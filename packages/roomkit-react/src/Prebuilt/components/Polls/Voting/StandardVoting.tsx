@@ -14,7 +14,7 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
 
   return (
     <>
-      {isQuiz && isStopped ? <PeerParticipationSummary poll={poll} /> : null}
+      {isQuiz && isStopped ? <PeerParticipationSummary quiz={poll} /> : null}
       {poll.questions?.map((question, index) => (
         <QuestionCard
           pollID={poll.id}
@@ -28,7 +28,6 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
           result={question.result}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
-          skippable={question.skippable}
           responses={question.responses}
           answer={question.answer}
           setCurrentIndex={() => {

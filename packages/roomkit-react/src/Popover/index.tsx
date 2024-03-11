@@ -15,7 +15,14 @@ const StyledArrow = styled(Arrow, {
   ...popoverAnimation,
 });
 
-const StyledTrigger = styled(Trigger, {});
+const StyledTrigger = styled(Trigger, {
+  '&:hover': {
+    cursor: 'pointer',
+  },
+  '&:focus-visible': {
+    boxShadow: '0 0 0 3px $colors$primary_default',
+  },
+});
 
 export const Popover = {
   Root,

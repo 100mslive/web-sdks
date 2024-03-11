@@ -147,6 +147,19 @@ export const getPeerResponses = (questions, peerid, userid) => {
   );
 };
 
+export const getLastAttemptedIndex = (questions, peerid, userid = '') => {
+  const peerResponses = getPeerResponses(questions, peerid, userid) || [];
+  for (let i = 0; i < peerResponses.length; i++) {
+    // If another peer has attempted, undefined changes to an empty array
+    if (peerResponses[i] === undefined || peerResponses[i].length === 0) {
+      // Backend question index starts at 1
+      return i + 1;
+    }
+  }
+  // To indicate all have been attempted
+  return questions.length + 1;
+};
+
 export const getPeerParticipationSummary = (poll, localPeerID, localCustomerUserID) => {
   let correctResponses = 0;
   let score = 0;

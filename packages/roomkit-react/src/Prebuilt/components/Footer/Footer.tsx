@@ -12,7 +12,6 @@ import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../Leave/LeaveRoom';
 // @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-// @ts-ignore: No implicit Any
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';

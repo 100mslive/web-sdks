@@ -11,6 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
+  private preset = 'balanced';
 
   constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
@@ -34,27 +35,47 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
-  setBlur(blur: number) {
-    this.blurAmount = blur;
+  removeBlur() {
+    this.blurAmount = 0;
+    this.effects.clearBlur();
+  }
+
+  removeBackground() {
     this.background = '';
-    this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.effects.setBlur(blur);
     this.effects.clearBackground();
   }
 
+  setBlur(blur: number) {
+    this.removeBackground();
+    this.blurAmount = blur;
+    this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
+    this.effects.setBlur(blur);
+  }
+
+  async setPreset(preset: string) {
+    this.preset = preset;
+    await this.effects.setSegmentationPreset(this.preset);
+  }
+
+  getPreset() {
+    return this.preset;
+  }
+
   removeEffects() {
-    this.effects.clearBackground();
-    this.effects.clearBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-    this.background = '';
+    this.removeBackground();
+    this.removeBlur();
   }
 
   setBackground(url: HMSEffectsBackground) {
     this.background = url;
-    this.blurAmount = 0;
+    this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-    this.effects.clearBlur();
     this.effects.setBackground(url);
+  }
+
+  getBlurAmount() {
+    return this.blurAmount;
   }
 
   getBackground() {
@@ -66,8 +87,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       if (this.effects) {
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset('lightning');
-        // Also ranges from 0 to 1
+        this.effects.setSegmentationPreset(this.preset);
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {

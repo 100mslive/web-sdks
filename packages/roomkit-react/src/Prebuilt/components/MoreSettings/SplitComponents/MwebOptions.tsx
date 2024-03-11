@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectPeerCount,
@@ -13,10 +14,11 @@ import {
 import {
   BrbIcon,
   CrossIcon,
-  DragHandleIcon,
   EmojiIcon,
+  HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
+  InfoIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -41,6 +43,8 @@ import { ActionTile } from '../ActionTile';
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
+import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -50,12 +54,11 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 // @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
-import { SIDE_PANE_OPTIONS } from '../../../common/constants';
-
-// const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
+import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -95,7 +98,10 @@ export const MwebOptions = ({
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
-  // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const { title, description } = useRoomLayoutHeader();
+  const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -118,8 +124,8 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton>
-              <DragHandleIcon />
+            <IconButton css={{ bg: isMobileHLSStream || isLandscapeHLSStream ? '$surface_default' : '' }}>
+              <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
         </Tooltip>
@@ -182,13 +188,19 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {/* {isVideoOn ? (
-              <Suspense fallback="">
-                <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
-              </Suspense>
+            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
+              <ActionTile.Root
+                onClick={() => {
+                  toggleVB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <VirtualBackgroundIcon />
+                <ActionTile.Title>Virtual Background</ActionTile.Title>
+              </ActionTile.Root>
             ) : null} */}
 
-            {elements?.emoji_reactions && (
+            {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);
@@ -279,12 +291,24 @@ export const MwebOptions = ({
               >
                 {isRecordingLoading ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {isBrowserRecordingOn
-                    ? 'Recording On'
-                    : isRecordingLoading
-                    ? 'Starting Recording'
-                    : 'Start Recording'}
+                  {match({ isBrowserRecordingOn, isRecordingLoading })
+                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
+                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')
+                    .otherwise(() => null)}
                 </ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+
+            {title || description ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setOpenOptionsSheet(false);
+                  toggleDetailsSheet();
+                }}
+              >
+                <InfoIcon />
+                <ActionTile.Title>About Session</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
           </Box>
@@ -319,7 +343,7 @@ export const MwebOptions = ({
             mx: '$4',
           }}
         >
-          <EmojiReaction />
+          <EmojiReaction showCard />
         </Box>
       )}
       {showRecordingOn && (

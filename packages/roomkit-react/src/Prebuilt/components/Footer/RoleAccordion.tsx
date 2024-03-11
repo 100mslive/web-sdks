@@ -4,10 +4,13 @@ import { FixedSizeList } from 'react-window';
 import { HMSPeer, selectIsLargeRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
+import { Button } from '../../../Button';
+import { HorizontalDivider } from '../../../Divider';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
+import { useGroupOnStageActions } from '../hooks/useGroupOnStageActions';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
 
@@ -16,6 +19,7 @@ const ITER_TIMER = 5000;
 
 export interface ItemData {
   peerList: HMSPeer[];
+  isHandRaisedAccordion?: boolean;
   isConnected: boolean;
 }
 
@@ -29,6 +33,7 @@ export const VirtualizedParticipantItem = React.memo(
       <Participant
         key={data.peerList[index].id}
         peer={data.peerList[index]}
+        isHandRaisedAccordion={data.isHandRaisedAccordion}
         isConnected={data.isConnected}
         style={style}
       />
@@ -63,6 +68,9 @@ export const RoleAccordion = ({
       peersInAccordion = peersInAccordion.filter(peer => peer.name.toLowerCase().includes(filter.search || ''));
     }
   }
+  const { bringAllToStage, bring_to_stage_label, canBringToStage, lowerAllHands } = useGroupOnStageActions({
+    peers: peersInAccordion,
+  });
 
   useEffect(() => {
     if (!isOffStageRole || !isLargeRoom) {
@@ -113,7 +121,7 @@ export const RoleAccordion = ({
       <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
         <FixedSizeList
           itemSize={ROW_HEIGHT}
-          itemData={{ peerList: peersInAccordion, isConnected }}
+          itemData={{ peerList: peersInAccordion, isConnected, isHandRaisedAccordion }}
           itemKey={itemKey}
           itemCount={peersInAccordion.length}
           width={width}
@@ -140,6 +148,17 @@ export const RoleAccordion = ({
             <ChevronRightIcon />
           </Flex>
         ) : null}
+        {isHandRaisedAccordion && (
+          <>
+            <HorizontalDivider />
+            <Flex css={{ w: '100%', p: '$6', gap: '$4' }} justify="center">
+              <Button variant="standard" onClick={() => lowerAllHands()}>
+                Lower All Hands
+              </Button>
+              {canBringToStage && <Button onClick={() => bringAllToStage()}>{bring_to_stage_label}</Button>}
+            </Flex>
+          </>
+        )}
       </Accordion.Content>
     </Accordion.Item>
   );

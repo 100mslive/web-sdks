@@ -20,22 +20,22 @@ const getOutlinedVariants = (
   textDisabled: string,
 ) => {
   return {
-    bg: '$transparent',
+    bg: 'transparent',
     border: `solid $space$px $colors${base}`,
     c: text,
     '&[disabled]': {
       c: textDisabled,
-      bg: '$transparent',
+      bg: 'transparent',
       border: `solid $space$px $colors${disabled}`,
       cursor: 'not-allowed',
     },
     '&:not([disabled]):hover': {
       border: `solid $space$px $colors${hover}`,
-      bg: '$transparent',
+      bg: 'transparent',
     },
     '&:not([disabled]):active': {
       border: `solid $space$px $colors${active}`,
-      bg: '$transparent',
+      bg: 'transparent',
     },
     '&:not([disabled]):focus-visible': {
       boxShadow: `0 0 0 3px $colors${base}`,
@@ -143,8 +143,8 @@ const StyledButton = styled('button', {
         '$secondary_bright',
         '$secondary_dim',
         '$secondary_disabled',
-        '$on_surface_high',
-        '$on_surface_low',
+        '$on_secondary_high',
+        '$on_secondary_low',
       ),
       danger: getButtonVariants(
         '$alert_error_default',

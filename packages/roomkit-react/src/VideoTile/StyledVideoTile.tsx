@@ -94,11 +94,11 @@ const AttributeBox = styled('div', {
 const AudioIndicator = styled(AttributeBox, { defaultVariants: { position: 'right' } });
 
 const FullScreenButton = styled('button', {
-  width: '2.25rem',
-  height: '2.25rem',
+  height: '$14',
+  p: '$2 $4',
   color: '$on_surface_high',
-  borderRadius: '$round',
-  backgroundColor: '$surface_default',
+  borderRadius: '$1',
+  border: 'none',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

@@ -46,12 +46,14 @@ export const APP_DATA = {
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
   background: 'background',
-  backgroundType: 'backgroundType',
+  sheet: 'sheet',
 };
+
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
   maxTileCount: 'maxTileCount',
   uiViewMode: 'uiViewMode',
+  layoutMode: 'layoutMode',
   showStatsOnTiles: 'showStatsOnTiles',
   enableAmbientMusic: 'enableAmbientMusic',
   mirrorLocalVideo: 'mirrorLocalVideo',
@@ -63,6 +65,11 @@ export const SIDE_PANE_OPTIONS = {
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
   VB: 'VB',
+  ROOM_DETAILS: 'ROOM_DETAILS',
+};
+
+export const SHEET_OPTIONS = {
+  ROOM_DETAILS: 'ROOM_DETAILS',
 };
 
 export const POLL_STATE = {
@@ -135,3 +142,5 @@ export enum QUESTION_TYPE {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '.prebuilt-container';
+
+export const TEST_AUDIO_URL = 'https://100ms.live/test-audio.wav';

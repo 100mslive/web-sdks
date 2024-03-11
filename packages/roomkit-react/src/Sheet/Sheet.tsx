@@ -35,7 +35,7 @@ const StyledContent = styled(DialogPrimitive.Content, {
   borderTopRightRadius: '$3',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   position: 'fixed',
-  zIndex: 1001,
+  zIndex: 22,
   top: 0,
   right: 0,
   left: 0,
@@ -57,6 +57,10 @@ const StyledContent = styled(DialogPrimitive.Content, {
     '&[data-state="closed"]': {
       animation: `${sheetSlideOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
     },
+  },
+  '@ls': {
+    maxWidth: '50%',
+    margin: '0 auto',
   },
 
   variants: {
@@ -88,11 +92,11 @@ const StyledContent = styled(DialogPrimitive.Content, {
 
 type SheetContentVariants = VariantProps<typeof StyledContent>;
 type DialogContentPrimitiveProps = React.ComponentProps<typeof DialogPrimitive.Content>;
-type SheetContentProps = DialogContentPrimitiveProps & SheetContentVariants & { css?: CSS };
+type SheetContentProps = DialogContentPrimitiveProps & SheetContentVariants & { css?: CSS; container?: HTMLElement };
 
 const SheetContent = React.forwardRef<React.ElementRef<typeof StyledContent>, SheetContentProps>(
-  ({ children, ...props }, forwardedRef) => (
-    <Dialog.Portal>
+  ({ children, container, ...props }, forwardedRef) => (
+    <Dialog.Portal container={container}>
       <StyledOverlay />
       <StyledContent {...props} ref={forwardedRef}>
         {children}

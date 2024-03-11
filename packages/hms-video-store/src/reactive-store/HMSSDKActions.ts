@@ -134,6 +134,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.actionBatcher = new ActionBatcher(store);
   }
 
+  getLocalTrack(trackID: string) {
+    return this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+  }
+
   get interactivityCenter() {
     return this.sdk.getInteractivityCenter();
   }
@@ -169,7 +173,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
-    const track = this.sdk.store.getTrackById(trackId);
+    const track = this.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         //@ts-ignore
@@ -195,6 +199,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
     }
+  }
+
+  getNativeTrackById(trackId: string) {
+    return this.sdk.store.getTrackById(trackId)?.nativeTrack;
+  }
+
+  getTrackById(trackId: string) {
+    return this.sdk.store.getTrackById(trackId);
   }
 
   getAuthTokenByRoomCode(
@@ -403,6 +415,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
       id: messageInput.id,
@@ -411,7 +424,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       type: messageInput.type || 'chat',
       recipientPeer: messageInput.recipientPeer,
       recipientRoles: messageInput.recipientRoles,
-      senderName: `${this.sdk.getLocalPeer()?.name} (You)`,
+      senderName: localPeer?.name,
+      sender: localPeer?.peerId,
+      senderRole: localPeer?.role?.name,
       ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
     };
     this.putMessageInStore(hmsMessage);
@@ -451,7 +466,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack?.type === 'video') {
       await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -492,7 +507,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has video track';
       return result;
     }
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
     } else {
@@ -517,7 +532,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has audio track';
       return result;
     }
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
     } else {
@@ -704,7 +719,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
-      const track = this.sdk.store.getTrackById(trackID);
+      const track = this.getTrackById(trackID);
       if (track && isRemoteTrack(track)) {
         await this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
       } else {
@@ -884,7 +899,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }, {} as { [key: string]: sdkTypes.HMSPoll });
       mergeNewPollsInDraft(draftStore.polls, pollsObject);
     }, actionName);
-
     polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 
@@ -915,10 +929,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
-    let sdkTrack = this.sdk.store.getTrackById(trackID);
+    let sdkTrack = this.getTrackById(trackID);
     // preview tracks are not added to the sdk store, so access from local peer.
     if (!sdkTrack) {
-      sdkTrack = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+      sdkTrack = this.getLocalTrack(trackID);
     }
     if (sdkTrack && sdkTrack.type === 'video') {
       await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
@@ -992,7 +1006,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
-      Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      if (draftStore.room.isConnected) {
+        Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      }
 
       /**
        * if preview is already present merge,
@@ -1284,15 +1300,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
       const draftTracks = draftStore.tracks;
       const trackId = sdkTrack.trackId;
-      // find and remove the exact track from hmsPeer
-      if (this.isSameStoreSDKTrack(trackId, hmsPeer?.audioTrack)) {
-        delete hmsPeer?.audioTrack;
-      } else if (this.isSameStoreSDKTrack(trackId, hmsPeer?.videoTrack)) {
-        delete hmsPeer?.videoTrack;
-      } else {
-        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
-        if (auxiliaryIndex > -1 && this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])) {
-          hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
+
+      if (hmsPeer) {
+        if (trackId === hmsPeer.audioTrack) {
+          delete hmsPeer.audioTrack;
+        } else if (trackId === hmsPeer.videoTrack) {
+          delete hmsPeer.videoTrack;
+        } else {
+          const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(trackId);
+          if (auxiliaryIndex > -1) {
+            hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
+          }
         }
       }
       delete draftTracks[trackId];
@@ -1300,7 +1318,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+    const track = this.getLocalTrack(trackID);
     if (track) {
       await track.setEnabled(enabled);
     } else {
@@ -1309,7 +1327,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalVideoTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalVideoTrack;
+    const track = this.getLocalTrack(trackID) as SDKHMSLocalVideoTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1318,7 +1336,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalAudioTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalAudioTrack;
+    const track = this.getLocalTrack(trackID) as SDKHMSLocalAudioTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1354,7 +1372,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
-    const track = this.sdk.store.getTrackById(trackId);
+    const track = this.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
         await track.setVolume(value);
@@ -1397,7 +1415,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.getLocalTrack(trackID);
+
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin, pluginFrameRate);
@@ -1406,7 +1425,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}VideoPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
   }
@@ -1418,7 +1437,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.getLocalTrack(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins(plugins);
@@ -1427,7 +1446,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}MediaStreamPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
   }
@@ -1439,7 +1458,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.getLocalTrack(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
@@ -1448,20 +1467,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}AudioPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
-  }
-
-  /**
-   * In case of replace track id is changed but not in store. Given the store id, check the real id
-   * sdk is using to refer to the track and match them.
-   */
-  private isSameStoreSDKTrack(sdkTrackID: string, storeTrackID?: string): boolean {
-    if (!storeTrackID) {
-      return false;
-    }
-    return this.sdk.store.getTrackById(storeTrackID)?.trackId === sdkTrackID;
   }
 
   /**
@@ -1493,7 +1501,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
     const trackIDs = this.store.getState(selectLocalTrackIDs);
-    return trackIDs.find(trackID => this.sdk.store.getTrackById(trackID)?.trackId === sdkTrack.trackId);
+    return trackIDs.find(trackID => this.getTrackById(trackID)?.trackId === sdkTrack.trackId);
   }
 
   private setProgress = ({ type, progress }: sdkTypes.HMSPlaylistProgressEvent) => {

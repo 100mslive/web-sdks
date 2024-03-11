@@ -7,6 +7,7 @@ import { config as cssConfig } from '../../../Theme';
 import emptyChat from '../../images/empty-chat.svg';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const EmptyChat = () => {
   const { elements } = useRoomLayoutConferencingScreen();
@@ -18,8 +19,11 @@ export const EmptyChat = () => {
       elements.chat.private_chat_enabled ||
       (elements.chat.roles_whitelist && elements.chat.roles_whitelist.length)) &&
     !isLocalPeerBlacklisted;
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeStream = useLandscapeHLSStream();
+  const streaming = isMobileHLSStream || isLandscapeStream;
 
-  if (isMobile && elements?.chat?.is_overlay) return <></>;
+  if (isMobile && elements?.chat?.is_overlay && !streaming) return <></>;
 
   return (
     <Flex
@@ -33,7 +37,10 @@ export const EmptyChat = () => {
       justify="center"
     >
       <Box>
-        <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+        <Box css={{ m: '0 auto', mt: '$4', '@media (max-height: 575px)': { display: 'none' } }}>
+          <img src={emptyChat} style={{ display: 'inline' }} alt="Empty Chat" height={132} width={185} />
+        </Box>
+
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
         </Text>

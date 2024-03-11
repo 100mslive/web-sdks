@@ -24,6 +24,7 @@ export { useEmbedShare } from './hooks/useEmbedShare';
 export { usePDFShare } from './hooks/usePDFShare';
 export { usePaginatedParticipants } from './hooks/usePaginatedParticipants';
 export { useWhiteboard } from './hooks/useWhiteboard';
+export { useAwayNotifications } from './hooks/useAwayNotifications';
 
 // types
 export type { hooksErrHandler } from './hooks/types';

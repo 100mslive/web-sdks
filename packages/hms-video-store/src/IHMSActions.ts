@@ -13,6 +13,7 @@ import {
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
   HMSScreenShareConfig,
+  HMSTrack,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
   RTMPRecordingConfig,
@@ -509,6 +510,19 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
 
+  /**
+   * @param trackId
+   * pass the trackId from store (for instance, peer.audioTrack) for which you want the native MediaStreamTrack instance.
+   * Be cautious when using this and modifying the underlying MediastreamTrack.
+   * Note: In case of local peer, the native audio track will change the first time it is unmuted.
+   * In case of video track, the native track changes everytime you mute/unmute.
+   * Be cautious when using this. This will not be needed unless you want to do some extra processing on the audio/video tracks.
+   * We recommend using our plugins for the same instead
+   */
+  getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
+
+  getTrackById(trackId: string): HMSTrack | undefined;
+
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   /**
@@ -531,7 +545,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   lowerLocalPeerHand(): Promise<void>;
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
-
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
   /**
    * Method to override the default settings for playlist tracks

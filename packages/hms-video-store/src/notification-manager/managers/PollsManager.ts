@@ -32,8 +32,12 @@ export class PollsManager {
 
   private async handlePollStart(notification: PollStartNotification) {
     const polls: HMSPoll[] = [];
+
     for (const pollParams of notification.polls) {
-      if (this.store.getPoll(pollParams.poll_id)) {
+      const pollInStore = this.store.getPoll(pollParams.poll_id);
+
+      if (pollInStore && pollInStore.state === 'started') {
+        this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STARTED, [pollInStore]);
         return;
       }
 

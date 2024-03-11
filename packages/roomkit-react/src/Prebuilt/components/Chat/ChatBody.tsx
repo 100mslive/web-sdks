@@ -27,7 +27,7 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { usePinnedMessages } from '../hooks/usePinnedMessages';
+import { usePinnedBy } from '../hooks/usePinnedBy';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const formatTime = (date: Date) => {
@@ -53,6 +53,18 @@ const setRowHeight = (index: number, id: string, size: number) => {
   }
   listInstance?.resetAfterIndex(Math.max(index - 1, 0));
   Object.assign(rowHeights, { [index]: { size, id } });
+};
+
+const getMessageBackgroundColor = (
+  messageType: string,
+  selectedPeerID: string,
+  selectedRole: string,
+  isOverlay: boolean,
+) => {
+  if (messageType && !(selectedPeerID || selectedRole)) {
+    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
+  }
+  return '';
 };
 
 const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }) => {
@@ -124,7 +136,7 @@ const Link = styled('a', {
   },
 });
 
-export const AnnotisedMessage = ({ message }: { message: string }) => {
+export const AnnotisedMessage = ({ message, length }: { message: string; length?: number }) => {
   if (!message) {
     return <Fragment />;
   }
@@ -137,10 +149,10 @@ export const AnnotisedMessage = ({ message }: { message: string }) => {
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link href={part} key={part} target="_blank" rel="noopener noreferrer">
-              {part}
+              {part.slice(0, length)}
             </Link>
           ) : (
-            part
+            part.slice(0, length)
           ),
         )}
     </Fragment>
@@ -163,52 +175,33 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const getMessageBackgroundColor = (
-  messageType: string,
-  selectedPeerID: string,
-  selectedRole: string,
-  isOverlay: boolean,
-  pinnedBy?: string,
-) => {
-  if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
-  if (messageType && !(selectedPeerID || selectedRole)) {
-    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
-  }
-  return '';
-};
-
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-    const { getPinnedBy } = usePinnedMessages();
-    const pinnedBy = getPinnedBy(message.id);
-    const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const localPeerName = useHMSStore(selectLocalPeerName);
     const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
     const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
     });
-    const [openSheet, setOpenSheet] = useState(false);
+    const [openSheet, setOpenSheetBare] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
-    let showReply = false;
-    if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
-      showReply = true;
-    } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
-      showReply = true;
-    }
-
+    const showReply = message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled;
     useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index, message.id, pinnedBy]);
+    }, [index, message.id]);
+
+    const setOpenSheet = (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e?.stopPropagation();
+      setOpenSheetBare(value);
+    };
 
     return (
       <Box
@@ -228,7 +221,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay, pinnedBy),
+            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay),
             r: '$1',
             p: '$4',
             userSelect: 'none',
@@ -240,20 +233,13 @@ const ChatMessage = React.memo(
             },
           }}
           data-testid="chat_msg"
-          onClick={() => {
+          onClick={e => {
             if (isMobile) {
-              setOpenSheet(true);
+              setOpenSheet(true, e);
             }
           }}
         >
-          {pinnedBy ? (
-            <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
-              <SolidPinIcon height={12} width={12} />
-              <Text variant="xs" css={{ color: 'inherit' }}>
-                Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}{' '}
-              </Text>
-            </Flex>
-          ) : null}
+          <PinnedBy messageId={message.id} index={index} rowRef={rowRef} />
           <Text
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',
@@ -281,7 +267,7 @@ const ChatMessage = React.memo(
                     variant="sub2"
                     css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
                   >
-                    {message.senderName}
+                    {message.sender === localPeerId ? `${message.senderName} (You)` : message.senderName}
                   </SenderName>
                 </Tooltip>
               )}
@@ -314,12 +300,13 @@ const ChatMessage = React.memo(
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
               onReply={() => {
-                if (message.recipientRoles?.length) {
-                  setRoleSelector(message.recipientRoles[0]);
+                setRoleSelector('');
+                setPeerSelector({ id: message.sender, name: message.senderName });
+              }}
+              onReplyGroup={() => {
+                if (message.senderRole) {
+                  setRoleSelector(message.senderRole);
                   setPeerSelector({});
-                } else {
-                  setRoleSelector('');
-                  setPeerSelector({ id: message.sender, name: message.senderName });
                 }
               }}
               showReply={showReply}
@@ -339,8 +326,7 @@ const ChatMessage = React.memo(
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
             onClick={e => {
-              e.stopPropagation();
-              setOpenSheet(true);
+              setOpenSheet(true, e);
             }}
           >
             <AnnotisedMessage message={message.message} />
@@ -440,10 +426,48 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0) {
-      return <EmptyChat />;
-    }
-
-    return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
+    return filteredMessages.length === 0 ? (
+      <EmptyChat />
+    ) : (
+      <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />
+    );
   },
 );
+
+const PinnedBy = ({
+  messageId,
+  index,
+  rowRef,
+}: {
+  messageId: string;
+  index: number;
+  rowRef?: React.MutableRefObject<HTMLDivElement | null>;
+}) => {
+  const pinnedBy = usePinnedBy(messageId);
+  const localPeerName = useHMSStore(selectLocalPeerName);
+
+  useLayoutEffect(() => {
+    if (rowRef?.current) {
+      if (pinnedBy) {
+        rowRef.current.style.background =
+          'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
+      } else {
+        rowRef.current.style.background = '';
+      }
+      setRowHeight(index, messageId, rowRef?.current.clientHeight);
+    }
+  }, [index, messageId, pinnedBy, rowRef]);
+
+  if (!pinnedBy) {
+    return null;
+  }
+
+  return (
+    <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
+      <SolidPinIcon height={12} width={12} />
+      <Text variant="xs" css={{ color: 'inherit' }}>
+        Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}
+      </Text>
+    </Flex>
+  );
+};

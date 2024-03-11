@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { v4 as uuid } from 'uuid';
 import {
   HMSRoomState,
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Footer } from './Footer/Footer';
+import { MoreSettings } from './MoreSettings/MoreSettings';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 // @ts-ignore: No implicit Any
 import { ActivatedPIP } from './PIP/PIPComponent';
@@ -19,15 +22,19 @@ import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
+import { EmojiReaction } from './EmojiReaction';
+// @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
+import { RaiseHand } from './RaiseHand';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
@@ -46,12 +53,21 @@ export const ConferenceScreen = () => {
   const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
+  // using it in hls stream to show action button when chat is disabled
+  const showChat = !!screenProps.elements?.chat;
+  const autoRoomJoined = useRef(isPreviewScreenEnabled);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
+
   const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0 && isMobileDevice) {
+    if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
       setHideControls(value => !value);
     }
   };
-  const autoRoomJoined = useRef(isPreviewScreenEnabled);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
@@ -79,7 +95,7 @@ export const ConferenceScreen = () => {
     ) {
       hmsActions
         .join({
-          userName: userName || '',
+          userName: userName || uuid(),
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
           settings: {
@@ -104,6 +120,8 @@ export const ConferenceScreen = () => {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
+  const hideControlsForStreaming = isMwebHLSStream ? true : hideControls;
+
   return (
     <>
       {isHLSStarted ? (
@@ -112,13 +130,13 @@ export const ConferenceScreen = () => {
         </Box>
       ) : null}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-        {!screenProps.hideSections.includes('header') && (
+        {!(screenProps.hideSections.includes('header') || isMwebHLSStream) && (
           <Box
             ref={headerRef}
             css={{
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
-              marginTop: hideControls ? `-${headerRef.current?.clientHeight}px` : 'none',
+              marginTop: hideControlsForStreaming ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
                 h: '$17',
               },
@@ -150,11 +168,11 @@ export const ConferenceScreen = () => {
             <VideoStreamingSection
               screenType={screenProps.screenType}
               elements={screenProps.elements}
-              hideControls={hideControls}
+              hideControls={hideControlsForStreaming}
             />
           ) : null}
         </Box>
-        {!screenProps.hideSections.includes('footer') && screenProps.elements && (
+        {!screenProps.hideSections.includes('footer') && screenProps.elements && !isMwebHLSStream && (
           <Box
             ref={footerRef}
             css={{
@@ -162,7 +180,7 @@ export const ConferenceScreen = () => {
               maxHeight: '$24',
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
-              marginBottom: hideControls ? `-${footerRef.current?.clientHeight}px` : undefined,
+              marginBottom: hideControlsForStreaming ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
@@ -172,6 +190,30 @@ export const ConferenceScreen = () => {
           >
             <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
           </Box>
+        )}
+        {isMwebHLSStream && !showChat && (
+          <Flex
+            css={{
+              alignItems: 'center',
+              pr: '$4',
+              pb: '$4',
+              position: 'relative',
+            }}
+            justify="end"
+            gap="2"
+          >
+            {noAVPermissions ? <RaiseHand /> : null}
+            <MoreSettings elements={screenProps.elements} screenType={screenProps.screenType} />
+            <Box
+              css={{
+                position: 'absolute',
+                bottom: '100%',
+                mb: '$4',
+              }}
+            >
+              <EmojiReaction />
+            </Box>
+          </Flex>
         )}
         <RoleChangeRequestModal />
         <HLSFailureModal />

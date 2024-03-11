@@ -6,14 +6,20 @@ import { CSS } from '../../../Theme';
 import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
-const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => (
-  <Flex
-    direction="column"
-    css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
-  >
-    {children}
-  </Flex>
-);
+const Root = ({
+  children,
+  edgeToEdge,
+  hasSidebar,
+}: React.PropsWithChildren<{ edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
+  return (
+    <Flex
+      direction={hasSidebar ? 'row' : 'column'}
+      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
+    >
+      {children}
+    </Flex>
+  );
+};
 
 const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
   return (
@@ -27,20 +33,31 @@ const SecondarySection = ({
   tiles,
   children,
   edgeToEdge,
-}: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>) => {
+  hasSidebar,
+}: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
   if (!tiles?.length) {
     return null;
   }
+  const gridStyles = hasSidebar
+    ? {
+        gridTemplateColumns: '1fr',
+        gridTemplateRows: `repeat(${tiles.length}, minmax(0, 1fr))`,
+        maxHeight: '100%',
+        width: 240,
+      }
+    : {
+        gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
+        gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))`,
+      };
   return (
     <Box
       css={{
         display: 'grid',
-        gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
-        gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))`,
-        margin: '0 auto',
-        gap: '$2 $4',
+        margin: 'auto',
+        gap: hasSidebar ? '$8' : '$2 $4',
         placeItems: 'center',
+        ...gridStyles,
         '@md': { gap: edgeToEdge ? 0 : '$4' },
       }}
     >
@@ -53,7 +70,7 @@ const SecondarySection = ({
             rootCSS={{
               padding: 0,
               maxWidth: 240,
-              maxHeight: '100%',
+              h: hasSidebar ? undefined : '100%',
               aspectRatio: 16 / 9,
               '@md': { aspectRatio: 1 },
             }}
@@ -62,7 +79,7 @@ const SecondarySection = ({
           />
         );
       })}
-      <Box css={{ gridColumn: `1/span ${tiles.length}` }}>{children}</Box>
+      {children && <Box css={{ gridColumn: hasSidebar ? 1 : `1/span ${tiles.length}` }}>{children}</Box>}
     </Box>
   );
 };

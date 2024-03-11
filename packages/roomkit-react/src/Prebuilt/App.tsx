@@ -26,6 +26,7 @@ import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
+import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -96,8 +97,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     ref,
   ) => {
     const reactiveStore = useRef<HMSPrebuiltRefType>();
-
     const [hydrated, setHydrated] = React.useState(false);
+
     useEffect(() => {
       setHydrated(true);
       const hms = new HMSReactiveStore();
@@ -122,14 +123,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       (ref as MutableRefObject<HMSPrebuiltRefType>).current = { ...reactiveStore.current };
     }, [ref]);
 
-    // leave room when component unmounts
-    useEffect(
-      () => () => {
+    useEffect(() => {
+      // leave room when component unmounts
+      return () => {
         VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
-      },
-      [],
-    );
+      };
+    }, []);
 
     const endpointsObj = endpoints as
       | {
@@ -214,7 +214,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
@@ -291,9 +290,11 @@ function AppRoutes({
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
+        {activeState !== PrebuiltStates.LEAVE && <AppData />}
         <ToastContainer />
         <Notifications />
         <MwebLandscapePrompt />
+        <Sheet />
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />

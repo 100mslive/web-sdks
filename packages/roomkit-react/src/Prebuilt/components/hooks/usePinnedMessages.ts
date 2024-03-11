@@ -11,7 +11,7 @@ import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
-type PinnedMessage = {
+export type PinnedMessage = {
   text: string;
   id: string;
   pinnedBy: string;
@@ -74,16 +74,5 @@ export const usePinnedMessages = () => {
     [hmsActions, vanillaStore],
   );
 
-  const getPinnedBy = (messageID: string) => {
-    const pinnedMessages = vanillaStore.getState(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
-    let pinnedBy = '';
-    pinnedMessages.forEach((pinnedMessage: PinnedMessage) => {
-      if (pinnedMessage.id === messageID) {
-        pinnedBy = pinnedMessage.pinnedBy;
-      }
-    });
-    return pinnedBy;
-  };
-
-  return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages, getPinnedBy };
+  return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages };
 };

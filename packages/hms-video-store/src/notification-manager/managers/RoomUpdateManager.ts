@@ -191,6 +191,7 @@ export class RoomUpdateManager {
         meetingURL: variant?.meeting_url,
         url: variant?.url,
         metadata: variant?.metadata,
+        playlist_type: variant?.playlist_type,
         startedAt: convertDateNumToDate(variant?.started_at),
         initialisedAt: convertDateNumToDate(variant?.initialised_at),
         state: variant.state,

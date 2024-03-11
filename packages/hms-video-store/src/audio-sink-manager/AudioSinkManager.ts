@@ -40,6 +40,7 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -93,6 +94,10 @@ export class AudioSinkManager {
   cleanup() {
     this.audioSink?.remove();
     this.audioSink = undefined;
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -191,7 +196,7 @@ export class AudioSinkManager {
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
-    if (event.error || !event.selection || event.type === 'video') {
+    if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
     this.unpauseAudioTracks();
@@ -264,13 +269,35 @@ export class AudioSinkManager {
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
+  // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
     if (this.audioSink?.children.length === 0) {
-      const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
+      let bluetoothDevice: InputDeviceInfo | null = null;
+      let speakerPhone: InputDeviceInfo | null = null;
+      let wired: InputDeviceInfo | null = null;
+      let earpiece: InputDeviceInfo | null = null;
+
+      for (const device of this.deviceManager.audioInput) {
+        if (device.label.toLowerCase().includes('speakerphone')) {
+          speakerPhone = device;
+        }
+        if (device.label.toLowerCase().includes('wired')) {
+          wired = device;
+        }
+        if (device.label.toLowerCase().includes('bluetooth')) {
+          bluetoothDevice = device;
+        }
+        if (device.label.toLowerCase().includes('earpiece')) {
+          earpiece = device;
+        }
+      }
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-      if (localAudioTrack && device) {
-        await localAudioTrack.setSettings({ deviceId: device?.deviceId });
-        await localAudioTrack.setSettings({ deviceId: 'default' });
+      if (localAudioTrack && earpiece) {
+        const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
+        await localAudioTrack.setSettings({
+          deviceId: externalDeviceID,
+        });
       }
     }
   };

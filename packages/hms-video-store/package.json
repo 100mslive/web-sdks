@@ -1,9 +1,15 @@
 {
-  "version": "0.10.28",
+  "version": "0.12.1",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/hms-video-store"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist",
     "src"
@@ -18,7 +24,7 @@
       "default": "./dist/index.js"
     }
   },
-  "sideEffects":  false,
+  "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
@@ -43,6 +49,7 @@
   "dependencies": {
     "eventemitter2": "^6.4.9",
     "immer": "^9.0.6",
+    "lodash.isequal": "^4.5.0",
     "reselect": "4.0.0",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^1.0.1",
@@ -52,6 +59,7 @@
   },
   "devDependencies": {
     "@types/dom-screen-wake-lock": "^1.0.1",
+    "@types/lodash.isequal": "^4.5.8",
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",

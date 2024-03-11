@@ -2,22 +2,24 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSException, selectLocalPeer, useAVToggle, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
-// @ts-ignore
+import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { RaiseHand } from '../RaiseHand';
+// @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useChatDraftMessage } from '../AppData/useChatState';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection } from '../../common/hooks';
+import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -77,7 +79,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const { elements } = useRoomLayoutConferencingScreen();
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
@@ -87,14 +89,21 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
+  const isMwebHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      inputRef.current?.focus();
+      // @ts-ignore
+      if (!(isMobile || isLandscapeHLSStream) && !elements?.chat?.disable_autofocus) {
+        inputRef.current?.focus();
+      }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream, elements?.chat]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -139,11 +148,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box>
+    <Box css={{ position: 'relative' }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }}>
+          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={e => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
@@ -205,6 +214,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 h: '$14',
                 boxSizing: 'border-box',
               },
+              ...(isLandscapeHLSStream ? { minHeight: '$14', py: 0 } : {}),
             }}
           >
             {children}
@@ -219,7 +229,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={!isMobile}
+              autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey) {
@@ -234,7 +244,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               onCut={e => e.stopPropagation()}
               onCopy={e => e.stopPropagation()}
             />
-            {!isMobile ? (
+            {!isMobile && !isLandscapeHLSStream ? (
               <EmojiPicker
                 onSelect={emoji => {
                   if (inputRef.current) {
@@ -257,6 +267,19 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               <SendIcon />
             </BaseIconButton>
           </Flex>
+          {(isMwebHLSStream || isLandscapeHLSStream) && (
+            <>
+              <Flex
+                css={{
+                  alignItems: 'center',
+                }}
+                gap="2"
+              >
+                {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
+                <MoreSettings elements={elements} screenType={screenType} />
+              </Flex>
+            </>
+          )}
         </Flex>
       )}
     </Box>

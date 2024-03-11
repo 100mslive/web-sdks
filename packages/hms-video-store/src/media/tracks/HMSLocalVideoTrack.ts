@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
@@ -16,6 +17,7 @@ import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/vide
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
+import { isBrowser, isMobile } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -24,7 +26,7 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
   return function hasChanged(
     prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced' | 'facingMode',
   ) {
-    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+    return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
 
@@ -35,6 +37,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
+  private enabledStateBeforeBackground = false;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -77,8 +80,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
-    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager();
+    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
     this.setFirstTrackId(this.trackId);
+    if (isBrowser && isMobile()) {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /** @internal */
@@ -125,6 +131,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async processPlugins() {
     try {
+      if (this.pluginsManager.getPlugins().length > 0) {
+        return;
+      }
       const plugins = this.mediaStreamPluginsManager.getPlugins();
       if (plugins.length > 0) {
         const processedStream = this.mediaStreamPluginsManager.applyPlugins(new MediaStream([this.nativeTrack]));
@@ -179,6 +188,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
+    } else {
+      await this.pluginsManager.waitForRestart();
     }
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
@@ -226,6 +237,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    if (isBrowser && isMobile()) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**
@@ -312,6 +326,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
     await this.replaceSender(track, this.enabled);
     this.nativeTrack = track;
+    await this.processPlugins();
     this.videoHandler.updateSinks();
     this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
     DeviceStorageManager.updateSelection('videoInput', {
@@ -408,12 +423,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
       await stream.setMaxBitrateAndFramerate(this);
     }
-
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       if (this.source === 'video') {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        await this.processPlugins();
         this.videoHandler.updateSinks();
       } else {
         await this.nativeTrack.applyConstraints(settings.toConstraints());
@@ -435,12 +450,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        await this.processPlugins();
         this.videoHandler.updateSinks();
       }
-      if (!internal) {
+      const groupId = this.nativeTrack.getSettings().groupId;
+      if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
+          groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'video',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }
@@ -459,5 +484,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
     }
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+  };
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'hidden' && this.source === 'regular') {
+      this.enabledStateBeforeBackground = this.enabled;
+      this.nativeTrack.enabled = false;
+      this.replaceSenderTrack(this.nativeTrack);
+    } else {
+      this.nativeTrack.enabled = this.enabledStateBeforeBackground;
+      this.replaceSenderTrack(this.nativeTrack);
+    }
+    this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
 }

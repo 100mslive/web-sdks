@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  selectLocalPeerID,
   selectPeerNameByID,
+  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -21,8 +21,11 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const actions = useHMSActions();
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
-  const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
+  const permissions = useHMSStore(selectPermissions);
+  const canEndActivity = !!permissions?.pollWrite;
   const { setPollView } = usePollViewState();
+  // Sets view - linear or vertical, toggles timer indicator
+  const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
 
   if (!poll) {
     return null;
@@ -30,18 +33,14 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
   const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 
-  // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = (poll.duration || 0) > 0;
-  const isLive = poll.state === 'started';
-
   return (
     <Container rounded>
       <Flex
         align="center"
         css={{
-          gap: '$6',
+          gap: '$4',
           py: '$6',
-          px: '$10',
+          px: '$8',
           my: '$4',
           w: '100%',
           color: '$on_surface_high',
@@ -55,44 +54,42 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           <ChevronLeftIcon />
         </Flex>
         <Text variant="h6">{poll.title}</Text>
-        <StatusIndicator isLive={isLive} />
+        <StatusIndicator status={poll.state} />
         <Box
           css={{
             marginLeft: 'auto',
             cursor: 'pointer',
             '&:hover': { opacity: '0.8' },
+            height: 'fit-content',
           }}
         >
           <CrossIcon onClick={toggleVoting} />
         </Box>
       </Flex>
 
-      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto' }}>
-        <Flex align="center">
-          <Box css={{ flex: 'auto' }}>
-            <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
-              {pollCreatorName || 'Participant'} started a {poll.type}
-            </Text>
-          </Box>
-        </Flex>
+      <Flex direction="column" css={{ p: '$8 $10', flex: '1 1 0', overflowY: 'auto' }}>
+        {poll.state === 'started' ? (
+          <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
+            {pollCreatorName || 'Participant'} started a {poll.type}
+          </Text>
+        ) : null}
 
-        {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
-
-        {poll.state === 'started' && isLocalPeerCreator && (
+        {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
+      </Flex>
+      <Flex
+        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}
+      >
+        {poll.state === 'started' && canEndActivity && (
           <Button
             variant="danger"
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
+            css={{ fontWeight: '$semiBold', w: 'max-content' }}
             onClick={() => actions.interactivityCenter.stopPoll(id)}
           >
             End {poll.type}
           </Button>
         )}
-
         {canViewLeaderboard ? (
-          <Button
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={() => setPollView(POLL_VIEWS.RESULTS)}
-          >
+          <Button css={{ fontWeight: '$semiBold', w: 'max-content' }} onClick={() => setPollView(POLL_VIEWS.RESULTS)}>
             View Leaderboard
           </Button>
         ) : null}

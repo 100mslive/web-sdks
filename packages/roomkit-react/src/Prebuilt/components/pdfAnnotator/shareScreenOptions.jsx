@@ -61,7 +61,7 @@ export function ShareScreenOptions() {
               pt: '$10',
               pb: '$6',
               '&:hover': {
-                bg: '$transparent',
+                bg: 'transparent',
                 cursor: 'default',
               },
             }}
@@ -78,7 +78,7 @@ export function ShareScreenOptions() {
               pt: '$6',
               pb: '$10',
               '&:hover': {
-                bg: '$transparent',
+                bg: 'transparent',
                 cursor: 'default',
               },
             }}
@@ -92,7 +92,7 @@ export function ShareScreenOptions() {
             >
               <IconButton
                 as="div"
-                onClick={() => toggleScreenShare()}
+                onClick={toggleScreenShare}
                 css={{
                   p: '$6',
                   display: 'flex',

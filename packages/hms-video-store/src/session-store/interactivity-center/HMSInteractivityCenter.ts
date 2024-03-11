@@ -65,7 +65,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     });
 
     poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
-
     this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_CREATED, [poll]);
   }
 
@@ -145,7 +144,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       avgTime: pollLeaderboard.avg_time,
       votedUsers: pollLeaderboard.voted_users,
       totalUsers: pollLeaderboard.total_users,
-      correctAnswers: pollLeaderboard.correct_users,
+      correctUsers: pollLeaderboard.correct_users,
     };
 
     const leaderboardEntries = pollLeaderboard.questions.map(question => {
@@ -163,21 +162,36 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async getPolls(): Promise<HMSPoll[]> {
-    const pollsList = await this.transport.signal.getPollsList({ count: 50 });
+    const launchedPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'started' });
     const polls: HMSPoll[] = [];
-    for (const pollParams of pollsList.polls) {
+    const canViewAllPolls = this.store.getLocalPeer()?.role?.permissions.pollWrite;
+
+    let visiblePolls = [...launchedPollsList.polls];
+    if (canViewAllPolls) {
+      const draftPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'created' });
+      const completedPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'stopped' });
+      visiblePolls = [...draftPollsList.polls, ...visiblePolls, ...completedPollsList.polls];
+    }
+
+    for (const pollParams of visiblePolls) {
       const questions = await this.transport.signal.getPollQuestions({
         poll_id: pollParams.poll_id,
         index: 0,
         count: 50,
       });
       const poll = createHMSPollFromPollParams(pollParams);
-      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
-
+      const existingPoll = this.store.getPoll(pollParams.poll_id);
+      poll.questions = questions.questions.map(({ question, options, answer }, index) => ({
+        ...question,
+        options,
+        answer,
+        responses: existingPoll?.questions?.[index]?.responses,
+      }));
       polls.push(poll);
       this.store.setPoll(poll);
     }
 
+    this.listener?.onPollsUpdate(HMSPollsUpdate.POLLS_LIST, polls);
     return polls;
   }
 

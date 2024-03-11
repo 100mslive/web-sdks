@@ -49,7 +49,7 @@ export const PeerNotifications = () => {
     }
 
     ToastBatcher.showToast({ notification });
-  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
+  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, selectedPeer.id, setPeerSelector]);
 
   return null;
 };

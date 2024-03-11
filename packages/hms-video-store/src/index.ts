@@ -40,6 +40,8 @@ export type {
   TokenRequestOptions,
   RID,
   HMSPoll,
+  HMSPollStates,
+  HMSPollState,
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
@@ -52,5 +54,11 @@ export type {
 } from './internal';
 
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
-export { HMSPluginUnsupportedTypes, HMSRecordingState } from './internal';
-export type { HMSVideoPlugin, HMSMediaStreamPlugin, HMSPluginSupportResult, HMSFrameworkInfo } from './internal';
+export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType } from './internal';
+export type {
+  HMSVideoPlugin,
+  HMSAudioPlugin,
+  HMSMediaStreamPlugin,
+  HMSPluginSupportResult,
+  HMSFrameworkInfo,
+} from './internal';

@@ -4,9 +4,15 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.28",
+  "type": "module",
+  "version": "0.10.1",
   "author": "100ms",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/react-sdk"
+  },
   "files": [
     "dist",
     "src"
@@ -43,7 +49,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.10.28",
+    "@100mslive/hms-video-store": "0.12.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }

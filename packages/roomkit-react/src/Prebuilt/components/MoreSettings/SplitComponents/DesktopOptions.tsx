@@ -5,10 +5,10 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, DragHandleIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
+import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
-// @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -26,7 +26,6 @@ import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
 // @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
-// @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
@@ -88,7 +87,7 @@ export const DesktopOptions = ({
         <Tooltip title="More options">
           <Dropdown.Trigger asChild data-testid="more_settings_btn">
             <IconButton>
-              <DragHandleIcon />
+              <HamburgerMenuIcon />
             </IconButton>
           </Dropdown.Trigger>
         </Tooltip>
@@ -145,41 +144,46 @@ export const DesktopOptions = ({
               Settings
             </Text>
           </Dropdown.Item>
-
-          {screenType === 'hls_live_streaming' ? (
-            HMSHLSPlayer.isSupported() ? (
-              <Dropdown.Item
-                onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
-                data-testid="hls_stats"
-              >
-                <Checkbox.Root
-                  css={{ margin: '$2' }}
-                  checked={enablHlsStats}
-                  onCheckedChange={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
+          {match({ screenType, isSupported: HMSHLSPlayer.isSupported() })
+            .with({ screenType: 'hls_live_streaming', isSupported: false }, () => null)
+            .with({ screenType: 'hls_live_streaming', isSupported: true }, () => {
+              return (
+                <Dropdown.Item
+                  onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
+                  data-testid="hls_stats"
                 >
-                  <Checkbox.Indicator>
-                    <CheckIcon width={16} height={16} />
-                  </Checkbox.Indicator>
-                </Checkbox.Root>
-                <Flex justify="between" css={{ width: '100%' }}>
-                  <Text variant="sm" css={{ ml: '$4' }}>
-                    Show HLS Stats
-                  </Text>
+                  <Checkbox.Root
+                    css={{ margin: '$2' }}
+                    checked={enablHlsStats}
+                    onCheckedChange={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
+                  >
+                    <Checkbox.Indicator>
+                      <CheckIcon width={16} height={16} />
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                  <Flex justify="between" css={{ width: '100%' }}>
+                    <Text variant="sm" css={{ ml: '$4' }}>
+                      Show HLS Stats
+                    </Text>
 
-                  <Text variant="sm" css={{ ml: '$4' }}>
-                    {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
-                  </Text>
-                </Flex>
+                    <Text variant="sm" css={{ ml: '$4' }}>
+                      {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
+                    </Text>
+                  </Flex>
+                </Dropdown.Item>
+              );
+            })
+            .otherwise(() => (
+              <Dropdown.Item
+                onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)}
+                data-testid="stats_for_nerds_btn"
+              >
+                <InfoIcon />
+                <Text variant="sm" css={{ ml: '$4' }}>
+                  Stats for Nerds
+                </Text>
               </Dropdown.Item>
-            ) : null
-          ) : (
-            <Dropdown.Item onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)} data-testid="stats_for_nreds_btn">
-              <InfoIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Stats for Nerds
-              </Text>
-            </Dropdown.Item>
-          )}
+            ))}
         </Dropdown.Content>
       </Dropdown.Root>
       {openModals.has(MODALS.BULK_ROLE_CHANGE) && (

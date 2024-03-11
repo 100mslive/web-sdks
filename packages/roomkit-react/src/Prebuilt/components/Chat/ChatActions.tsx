@@ -7,6 +7,7 @@ import {
   EyeCloseIcon,
   PeopleRemoveIcon,
   PinIcon,
+  ReplyGroupIcon,
   ReplyIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
@@ -36,6 +37,7 @@ const tooltipBoxCSS = {
 export const ChatActions = ({
   showPinAction,
   onReply,
+  onReplyGroup,
   showReply,
   message,
   sentByLocalPeer,
@@ -45,18 +47,18 @@ export const ChatActions = ({
 }: {
   showPinAction: boolean;
   onReply: () => void;
+  onReplyGroup: () => void;
   showReply: boolean;
   message: HMSMessage;
   sentByLocalPeer: boolean;
   isMobile: boolean;
   openSheet: boolean;
-  setOpenSheet: (value: boolean) => void;
+  setOpenSheet: (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }) => {
   const { elements } = useRoomLayoutConferencingScreen();
-  const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
-    can_hide_message: false,
-    can_block_user: false,
-  };
+  const { can_hide_message = false, can_block_user = false } = elements?.chat?.real_time_controls || {};
+  const { roles_whitelist = [] } = elements?.chat || {};
+
   const [open, setOpen] = useState(false);
   const actions = useHMSActions();
   const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
@@ -104,11 +106,18 @@ export const ChatActions = ({
     }
   > = {
     reply: {
-      text: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
-      tooltipText: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
+      text: 'Reply privately',
+      tooltipText: 'Reply privately',
       icon: <ReplyIcon style={iconStyle} />,
       onClick: onReply,
       show: showReply,
+    },
+    replyGroup: {
+      text: 'Reply to group',
+      tooltipText: 'Reply to group',
+      icon: <ReplyGroupIcon style={iconStyle} />,
+      onClick: onReplyGroup,
+      show: !!message.senderRole && roles_whitelist.includes(message.senderRole),
     },
     pin: {
       text: 'Pin message',
@@ -165,7 +174,7 @@ export const ChatActions = ({
   if (isMobile) {
     return (
       <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
-        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => setOpenSheet(false)}>
+        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={e => setOpenSheet(false, e)}>
           <Sheet.Title
             css={{
               display: 'flex',
@@ -181,7 +190,7 @@ export const ChatActions = ({
             }}
           >
             Message options
-            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => setOpenSheet(false)}>
+            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={e => setOpenSheet(false, e)}>
               <CrossIcon />
             </Sheet.Close>
           </Sheet.Title>
@@ -223,6 +232,13 @@ export const ChatActions = ({
           <Tooltip boxCss={tooltipBoxCSS} title={options.reply.tooltipText}>
             <IconButton data-testid="reply_message_btn" onClick={options.reply.onClick}>
               {options.reply.icon}
+            </IconButton>
+          </Tooltip>
+        ) : null}
+        {options.replyGroup.show ? (
+          <Tooltip boxCss={tooltipBoxCSS} title={options.replyGroup.tooltipText}>
+            <IconButton data-testid="reply_group_message_btn" onClick={options.replyGroup.onClick}>
+              {options.replyGroup.icon}
             </IconButton>
           </Tooltip>
         ) : null}

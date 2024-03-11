@@ -14,9 +14,10 @@ import { Box, Button, Dropdown, Flex, StyledVideoTile, Text, Video } from '../..
 import { config as cssConfig } from '../../../Theme';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useUISettings } from '../AppData/useUISettings';
+import { useAudioOutputTest } from '../hooks/useAudioOutputTest';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
-import { settingOverflow } from './common.js';
-import { UI_SETTINGS } from '../../common/constants';
+import { settingOverflow } from './common';
+import { TEST_AUDIO_URL, UI_SETTINGS } from '../../common/constants';
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
@@ -182,22 +183,8 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
   );
 };
 
-const TEST_AUDIO_URL = 'https://100ms.live/test-audio.wav';
-
 const TestAudio = ({ id }) => {
-  const audioRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  useEffect(() => {
-    if (audioRef.current && id) {
-      try {
-        if (typeof audioRef.current.setSinkId !== 'undefined') {
-          audioRef.current.setSinkId(id);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  }, [id]);
+  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: id });
   return (
     <>
       <Button
@@ -218,7 +205,13 @@ const TestAudio = ({ id }) => {
           &nbsp; speaker
         </Text>
       </Button>
-      <audio ref={audioRef} src={TEST_AUDIO_URL} onEnded={() => setPlaying(false)} onPlay={() => setPlaying(true)} />
+      <audio
+        ref={audioRef}
+        src={TEST_AUDIO_URL}
+        onEnded={() => setPlaying(false)}
+        onPlay={() => setPlaying(true)}
+        css={{ display: 'none' }}
+      />
     </>
   );
 };

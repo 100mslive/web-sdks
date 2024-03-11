@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Flex } from '../../../';
+import { Flex } from '../../../Layout';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
   return (
@@ -8,18 +8,25 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
       css={{
         size: '100%',
         position: 'relative',
+        justifyContent: 'center',
+        '@md': {
+          height: 'auto',
+          '& video': {
+            height: '$60 !important',
+          },
+        },
         '& video::cue': {
           color: 'white',
-          // textShadow: '0px 0px 4px #000',
           whiteSpace: 'pre-line',
-          fontSize: '$lg',
+          fontSize: '$sm',
           fontStyle: 'normal',
-          fontWeight: '$semiBold',
+          fontWeight: '$regular',
           lineHeight: '$sm',
-          letterSpacing: '0.5px',
+          letterSpacing: '0.25px',
         },
         '& video::-webkit-media-text-track-display': {
           padding: '0 $4',
+          boxShadow: '0px 1px 3px 0px #000000A3',
         },
         '& video::-webkit-media-text-track-container': {
           fontSize: '$space$10 !important',
@@ -30,12 +37,16 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
     >
       <video
         style={{
-          flex: '1 1 0',
           margin: '0 auto',
-          minHeight: '0',
+          objectFit: 'contain',
+          width: 'auto',
+          height: 'auto',
+          maxWidth: '100%',
+          maxHeight: '100%',
         }}
         ref={videoRef}
         playsInline
+        disablePictureInPicture
       />
       {children}
     </Flex>

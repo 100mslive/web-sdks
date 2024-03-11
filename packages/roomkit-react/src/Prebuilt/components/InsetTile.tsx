@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectIsAllowedToPublish, selectLocalPeer, selectVideoTrackByID, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsAllowedToPublish,
+  selectLocalPeer,
+  selectPeerByID,
+  selectVideoTrackByID,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
@@ -39,12 +45,13 @@ const insetMaxWidthPx = 240;
 const defaultMobileAspectRatio = 9 / 16;
 const desktopAspectRatio = 1 / defaultMobileAspectRatio;
 
-export const InsetTile = () => {
+export const InsetTile = ({ peerId }: { peerId?: string }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
-  const localPeer = useHMSStore(selectLocalPeer);
+  const selector = peerId ? selectPeerByID(peerId) : selectLocalPeer;
+  const peer = useHMSStore(selector);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
-  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const videoTrack = useHMSStore(selectVideoTrackByID(peer?.videoTrack));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const videoTileProps = useVideoTileContext();
   let aspectRatio = isMobile ? defaultMobileAspectRatio : desktopAspectRatio;
@@ -108,8 +115,8 @@ export const InsetTile = () => {
           <MinimisedTile setMinimised={setMinimised} />
         ) : (
           <VideoTile
-            peerId={localPeer?.id}
-            trackid={localPeer?.videoTrack}
+            peerId={peer?.id}
+            trackId={peer?.videoTrack}
             rootCSS={{
               size: '100%',
               padding: 0,

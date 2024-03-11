@@ -103,7 +103,6 @@ const PreviewJoin = ({
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
-
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
@@ -160,20 +159,7 @@ const PreviewJoin = ({
             <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
           </Flex>
         </Flex>
-        {toggleVideo ? (
-          <Flex
-            align="center"
-            justify="center"
-            css={{
-              mt: '$14',
-              '@md': { mt: 0 },
-              '@sm': { width: '100%' },
-              flexDirection: 'column',
-            }}
-          >
-            <PreviewTile name={name} error={previewError} />
-          </Flex>
-        ) : null}
+        {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
         <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
@@ -225,9 +211,12 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
         bg: '$surface_default',
         aspectRatio,
         height: 'min(360px, 70vh)',
+        width: 'auto',
         maxWidth: '640px',
         overflow: 'clip',
+        mt: '$14',
         '@md': {
+          mt: 0,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
@@ -236,7 +225,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     >
       {localPeer ? (
         <>
-          <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
+          <TileConnection name="" peerId={localPeer.id} hideLabel={false} />
           <Video
             mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
@@ -278,7 +267,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {!isMobile && vbEnabled ? <VBToggle /> : null}
+        {vbEnabled && !isMobile ? <VBToggle /> : null}
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

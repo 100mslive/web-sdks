@@ -41,6 +41,8 @@ export interface HMSRoom {
    * @alpha
    */
   effectsKey?: string;
+  isHipaaEnabled?: boolean;
+  isNoiseCancellationEnabled?: boolean;
 }
 
 export interface HMSRecording {
@@ -95,8 +97,14 @@ export interface HMSHLS {
   error?: HMSException;
 }
 
+export enum HLSPlaylistType {
+  DVR = 'dvr',
+  NO_DVR = 'no-dvr',
+}
+
 export interface HLSVariant {
   url: string;
+  playlist_type?: HLSPlaylistType;
   meetingURL?: string;
   metadata?: string;
   startedAt?: Date;

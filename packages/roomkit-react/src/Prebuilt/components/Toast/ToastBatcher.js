@@ -3,6 +3,7 @@ import { ToastManager } from './ToastManager';
 
 export const ToastBatcher = {
   toastsType: new Map(),
+  toastCache: {},
   showToastInternal({ notification, duration, type }) {
     let notificationType = type;
     if (!type) {
@@ -40,7 +41,13 @@ export const ToastBatcher = {
   },
   showToast({ notification, duration = 3000, type }) {
     try {
-      this.showToastInternal({ notification, duration, type });
+      if (!this.toastCache[notification.id]) {
+        this.showToastInternal({ notification, duration, type });
+      }
+      this.toastCache[notification.id] = true;
+      if (Object.keys(this.toastCache).length > 100) {
+        this.toastCache = {};
+      }
     } catch (err) {
       console.debug('Notifications', err);
     }

@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/roomkit-web",
-  "version": "0.0.12",
+  "version": "0.2.1",
   "description": "A web component implementation of 100ms Prebuilt component",
   "keywords": [
     "web-components",
@@ -11,8 +11,14 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "type": "module",
   "author": "100ms",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/roomkit-web"
+  },
   "files": [
     "dist"
   ],
@@ -28,7 +34,7 @@
     "build": "rm -rf dist && node ../../scripts/build-webapp"
   },
   "dependencies": {
-    "@100mslive/roomkit-react": "0.1.19",
+    "@100mslive/roomkit-react": "0.3.1",
     "@r2wc/react-to-web-component": "2.0.2"
   }
 }
