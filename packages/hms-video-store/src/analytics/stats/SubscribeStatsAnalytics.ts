@@ -92,7 +92,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
 
   // eslint-disable-next-line complexity
   private calculateAvSyncForStat(trackStats: HMSTrackStats, hmsStats: HMSWebrtcStats) {
-    if (!trackStats.peerID || !(trackStats.kind === 'video')) {
+    if (!trackStats.peerID || !trackStats.estimatedPlayoutTimestamp || !(trackStats.kind === 'video')) {
       return;
     }
     const peer = this.store.getPeerById(trackStats.peerID);
@@ -106,7 +106,10 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     if (!audioStats) {
       return MAX_SAFE_INTEGER;
     }
-    return audioStats.timestamp - trackStats.timestamp;
+    if (!audioStats.estimatedPlayoutTimestamp) {
+      return;
+    }
+    return audioStats.estimatedPlayoutTimestamp - trackStats.estimatedPlayoutTimestamp;
   }
 }
 
@@ -121,7 +124,7 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       timestamp: Date.now(),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
-      avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
+      avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay', false),
     };
 
     if (latestStat.kind === 'video') {
