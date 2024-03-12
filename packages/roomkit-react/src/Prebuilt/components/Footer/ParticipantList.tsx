@@ -22,8 +22,7 @@ import {
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Accordion, Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
-import { IconButton as BaseIconButton } from '../../../IconButton';
+import { Accordion, Box, Button, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
@@ -319,6 +318,7 @@ const ParticipantActions = React.memo(
   },
 );
 
+const quickActionStyle = { p: '$1', borderRadius: '$round' };
 const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: string; role: string }) => {
   const { handleStageAction, lowerPeerHand, shouldShowStageRoleChange, isInStage } = usePeerOnStageActions({
     peerId,
@@ -326,19 +326,13 @@ const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: strin
   });
   return (
     <>
-      <BaseIconButton
-        css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
-        onClick={() => lowerPeerHand()}
-      >
-        <CrossIcon height={19} width={19} />
-      </BaseIconButton>
+      <Button variant="standard" css={quickActionStyle} onClick={lowerPeerHand}>
+        <CrossIcon height={18} width={18} />
+      </Button>
       {shouldShowStageRoleChange && !isInStage && (
-        <BaseIconButton
-          css={{ p: '$1', c: '$on_surface_high', bg: '$primary_default', borderRadius: '$round' }}
-          onClick={() => handleStageAction()}
-        >
-          <AddIcon height={19} width={19} />
-        </BaseIconButton>
+        <Button variant="primary" onClick={handleStageAction} css={quickActionStyle}>
+          <AddIcon height={18} width={18} />
+        </Button>
       )}
     </>
   );
