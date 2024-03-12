@@ -78,11 +78,12 @@ export function CreateQuestions() {
                 await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
               }}
               isQuiz={isQuiz}
-              removeQuestion={questionID =>
-                setQuestions(prev => {
-                  return prev.filter(questionFromSet => questionID !== questionFromSet?.draftID);
-                })
-              }
+              removeQuestion={async questionID => {
+                const updatedQuestions = questions.filter(questionFromSet => questionID !== questionFromSet?.draftID);
+                setQuestions(updatedQuestions);
+                const validQuestions = updatedQuestions.filter(question => isValidQuestion(question));
+                await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
+              }}
               convertToDraft={questionID =>
                 setQuestions(prev => {
                   const copyOfQuestions = [...prev];
