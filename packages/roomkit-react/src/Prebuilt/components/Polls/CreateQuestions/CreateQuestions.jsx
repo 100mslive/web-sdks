@@ -75,7 +75,6 @@ export function CreateQuestions() {
                 const updatedQuestions = [...questions.slice(0, index), questionParams, ...questions.slice(index + 1)];
                 setQuestions(updatedQuestions);
                 const validQuestions = updatedQuestions.filter(question => isValidQuestion(question));
-
                 await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
               }}
               isQuiz={isQuiz}

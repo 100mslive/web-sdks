@@ -15,6 +15,7 @@ export const SavedQuestion = ({
   length: number;
   convertToDraft: (draftID: number) => void;
 }) => {
+  const answerArray = [question?.answer?.option, ...(question.answer?.options || [])];
   return (
     <>
       <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
@@ -29,8 +30,9 @@ export const SavedQuestion = ({
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             {option.text}
           </Text>
+          {/* Fix needed here */}
           {/* @ts-ignore */}
-          {option.isCorrectAnswer && (
+          {(answerArray.includes(index + 1) || option.isCorrectAnswer) && (
             <Flex css={{ color: '$alert_success', mx: '$xs' }}>
               <CheckCircleIcon height={24} width={24} />
             </Flex>
