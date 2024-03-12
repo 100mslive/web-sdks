@@ -337,21 +337,27 @@ const HLSView = () => {
     [hlsState?.variants, isLandscape, isMobile, onSeekTo],
   );
   const onClickHandler = useCallback(async () => {
-    if (!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
-      return;
-    }
-    if (!(isMobile || isLandscape)) {
-      if (isPaused) {
-        await hlsPlayer?.play();
-      } else {
-        hlsPlayer.pause();
-      }
-      return;
-    }
-    setControlsVisible(value => !value);
-    if (controlsTimerRef.current) {
-      clearTimeout(controlsTimerRef.current);
-    }
+    match({ isMobile, isLandscape, playlist_type: hlsState?.variants[0]?.playlist_type })
+      .with({ playlist_type: HLSPlaylistType.DVR, isMobile: false, isLandscape: false }, async () => {
+        if (isPaused) {
+          await hlsPlayer?.play();
+        } else {
+          hlsPlayer?.pause();
+        }
+      })
+      .with({ isMobile: true }, () => {
+        setControlsVisible(value => !value);
+        if (controlsTimerRef.current) {
+          clearTimeout(controlsTimerRef.current);
+        }
+      })
+      .with({ isLandscape: true }, () => {
+        setControlsVisible(value => !value);
+        if (controlsTimerRef.current) {
+          clearTimeout(controlsTimerRef.current);
+        }
+      })
+      .otherwise(() => null);
   }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
   const onHoverHandler = useCallback(
     event => {
