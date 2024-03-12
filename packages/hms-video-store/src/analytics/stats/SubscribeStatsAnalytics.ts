@@ -92,12 +92,16 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
 
   // eslint-disable-next-line complexity
   private calculateAvSyncForStat(trackStats: HMSTrackStats, hmsStats: HMSWebrtcStats) {
-    if (!trackStats.peerID || !trackStats.estimatedPlayoutTimestamp || !(trackStats.kind === 'video')) {
+    if (!trackStats.peerID || !trackStats.estimatedPlayoutTimestamp || trackStats.kind !== 'video') {
       return;
     }
     const peer = this.store.getPeerById(trackStats.peerID);
     const audioTrack = peer?.audioTrack;
     const videoTrack = peer?.videoTrack;
+    /**
+     * 1. Send value as MAX_SAFE_INTEGER when either audio or value track is muted for the entire window
+     * 2. When both audio and video are unmuted for a part of window , then divide the difference by those many number of samples only
+     */
     const areBothTracksEnabled = audioTrack && videoTrack && audioTrack.enabled && videoTrack.enabled;
     if (!areBothTracksEnabled) {
       return MAX_SAFE_INTEGER;
@@ -109,6 +113,8 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     if (!audioStats.estimatedPlayoutTimestamp) {
       return;
     }
+
+    // https://w3c.github.io/webrtc-stats/#dom-rtcinboundrtpstreamstats-estimatedplayouttimestamp
     return audioStats.estimatedPlayoutTimestamp - trackStats.estimatedPlayoutTimestamp;
   }
 }
