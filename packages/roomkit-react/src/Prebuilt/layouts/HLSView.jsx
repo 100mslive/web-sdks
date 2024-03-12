@@ -336,15 +336,23 @@ const HLSView = () => {
     },
     [hlsState?.variants, isLandscape, isMobile, onSeekTo],
   );
-  const onClickHandler = useCallback(() => {
+  const onClickHandler = useCallback(async () => {
+    if (!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
+      return;
+    }
     if (!(isMobile || isLandscape)) {
+      if (isPaused) {
+        await hlsPlayer?.play();
+      } else {
+        hlsPlayer.pause();
+      }
       return;
     }
     setControlsVisible(value => !value);
     if (controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
     }
-  }, [isLandscape, isMobile]);
+  }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
   const onHoverHandler = useCallback(
     event => {
       event.preventDefault();
