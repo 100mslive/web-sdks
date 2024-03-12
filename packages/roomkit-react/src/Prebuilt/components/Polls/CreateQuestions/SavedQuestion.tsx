@@ -30,7 +30,6 @@ export const SavedQuestion = ({
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             {option.text}
           </Text>
-          {/* Fix needed here */}
           {/* @ts-ignore */}
           {(answerArray.includes(index + 1) || option.isCorrectAnswer) && (
             <Flex css={{ color: '$alert_success', mx: '$xs' }}>
