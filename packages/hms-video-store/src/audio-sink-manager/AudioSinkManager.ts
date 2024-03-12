@@ -47,6 +47,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.startPollingForDevices();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -264,6 +265,19 @@ export class AudioSinkManager {
       audioEl.remove();
       track.setAudioElement(null);
     }
+  };
+
+  private startPollingForDevices = () => {
+    // device change supported, no polling needed
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    this.timer = setInterval(() => {
+      (async () => {
+        await this.deviceManager.init(true, false);
+        await this.autoSelectAudioOutput();
+      })();
+    }, 5000);
   };
 
   /**

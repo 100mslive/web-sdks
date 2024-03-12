@@ -4,14 +4,5 @@ import { getRoomCodeFromUrl } from './utils';
 export default function App() {
   const roomCode = getRoomCodeFromUrl();
 
-  return <HMSPrebuilt roomCode={roomCode}
-  options={{
-    endpoints: {
-      tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
-      roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
-      init: 'https://qa-in2-ipv6.100ms.live/init',
-    },
-  }}
-  screens={{ conferencing: { hls_live_streaming: { elements: { chat: null}}}}}
-  />
+  return <HMSPrebuilt roomCode={roomCode} />;
 }
