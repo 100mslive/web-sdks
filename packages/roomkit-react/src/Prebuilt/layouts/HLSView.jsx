@@ -345,18 +345,15 @@ const HLSView = () => {
           hlsPlayer?.pause();
         }
       })
-      .with({ isMobile: true }, () => {
-        setControlsVisible(value => !value);
-        if (controlsTimerRef.current) {
-          clearTimeout(controlsTimerRef.current);
-        }
-      })
-      .with({ isLandscape: true }, () => {
-        setControlsVisible(value => !value);
-        if (controlsTimerRef.current) {
-          clearTimeout(controlsTimerRef.current);
-        }
-      })
+      .when(
+        ({ isMobile, isLandscape }) => isMobile || isLandscape,
+        () => {
+          setControlsVisible(value => !value);
+          if (controlsTimerRef.current) {
+            clearTimeout(controlsTimerRef.current);
+          }
+        },
+      )
       .otherwise(() => null);
   }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
   const onHoverHandler = useCallback(
