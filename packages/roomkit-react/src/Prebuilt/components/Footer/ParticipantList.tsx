@@ -318,12 +318,12 @@ const ParticipantActions = React.memo(
   },
 );
 
+const quickActionStyle = { p: '$1', borderRadius: '$round' };
 const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: string; role: string }) => {
   const { handleStageAction, lowerPeerHand, shouldShowStageRoleChange, isInStage } = usePeerOnStageActions({
     peerId,
     role,
   });
-  const quickActionStyle = { p: '$1', borderRadius: '$round' };
   return (
     <>
       <Button variant="standard" css={quickActionStyle} onClick={lowerPeerHand}>
