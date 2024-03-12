@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, selectIsLargeRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
-import { ChevronRightIcon } from '@100mslive/react-icons';
+import { AddIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Button } from '../../../Button';
 import { HorizontalDivider } from '../../../Divider';
@@ -152,10 +152,14 @@ export const RoleAccordion = ({
           <>
             <HorizontalDivider />
             <Flex css={{ w: '100%', p: '$6', gap: '$4' }} justify="center">
-              <Button variant="standard" onClick={() => lowerAllHands()}>
-                Lower All Hands
+              <Button variant="standard" onClick={lowerAllHands} icon css={{ pl: '$2' }}>
+                <CrossIcon /> Lower All Hands
               </Button>
-              {canBringToStage && <Button onClick={() => bringAllToStage()}>{bring_to_stage_label}</Button>}
+              {canBringToStage && (
+                <Button onClick={bringAllToStage} icon css={{ pl: '$2' }}>
+                  <AddIcon /> {bring_to_stage_label}
+                </Button>
+              )}
             </Flex>
           </>
         )}
