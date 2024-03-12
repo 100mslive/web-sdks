@@ -182,13 +182,11 @@ export class HMSSdk implements HMSInterface {
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
-
     /**
      * Note: Subscribe to events here right after creating stores and managers
      * to not miss events that are published before the handlers are subscribed.
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
-    this.eventBus.analytics.subscribe(pluginUsageTracker.updatePluginUsage);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
@@ -500,6 +498,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -573,6 +572,8 @@ export class HMSSdk implements HMSInterface {
       throw error;
     }
     HMSLogger.timeEnd(`join-room-${roomId}`);
+    const sessionID = this.store.getRoom()?.sessionId || '';
+    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsage(e, sessionID));
   }
 
   private stringifyMetadata(config: HMSConfig) {
@@ -584,6 +585,8 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanup() {
+    const sessionID = this.store.getRoom()?.sessionId || '';
+    pluginUsageTracker.cleanup(sessionID);
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanup();
@@ -593,7 +596,6 @@ export class HMSSdk implements HMSInterface {
     LocalTrackManager.cleanup();
     this.notificationManager = undefined;
     HMSLogger.cleanup();
-    pluginUsageTracker.cleanup();
     this.sdkState = { ...INITIAL_STATE };
     /**
      * when leave is called after preview itself without join.

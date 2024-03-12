@@ -495,8 +495,8 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
-      this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage());
-
+      const sessionID = this.store.getRoom()?.sessionId || '';
+      this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage(sessionID));
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();

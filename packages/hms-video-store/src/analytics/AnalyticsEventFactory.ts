@@ -236,8 +236,8 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static getKrispUsage() {
-    const duration = pluginUsageTracker.getPluginUsage('HMSKrispPlugin');
+  static getKrispUsage(sessionID: string) {
+    const duration = pluginUsageTracker.getPluginUsage('HMSKrispPlugin', sessionID);
     return new AnalyticsEvent({
       name: 'krisp.usage',
       level: AnalyticsEventLevel.INFO,
