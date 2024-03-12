@@ -119,11 +119,6 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
 
     const baseSample = {
       timestamp: Date.now(),
-      fec_packets_discarded: this.calculateDifferenceForSample('fecPacketsDiscarded'),
-      fec_packets_received: this.calculateDifferenceForSample('fecPacketsReceived'),
-      total_samples_duration: this.calculateDifferenceForSample('totalSamplesDuration'),
-      total_packets_received: this.calculateDifferenceForSample('packetsReceived'),
-      total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
       avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
@@ -155,6 +150,11 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
         audio_concealed_samples,
         audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
         audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
+        fec_packets_discarded: this.calculateDifferenceForSample('fecPacketsDiscarded'),
+        fec_packets_received: this.calculateDifferenceForSample('fecPacketsReceived'),
+        total_samples_duration: this.calculateDifferenceForSample('totalSamplesDuration'),
+        total_packets_received: this.calculateDifferenceForSample('packetsReceived'),
+        total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       });
     }
   };
