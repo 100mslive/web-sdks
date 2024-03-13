@@ -33,7 +33,7 @@ class PluginUsageTracker {
       this.pluginLastAddedAt.set(pluginKey, addedAt);
     } else if (event.name === 'mediaPlugin.stats') {
       const duration = event.properties.duration;
-      if (duration) {
+      if (duration > 0) {
         this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
         this.pluginLastAddedAt.delete(pluginKey);
       }
