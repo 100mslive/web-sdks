@@ -51,7 +51,7 @@ export const MultipleChoiceOptions = ({
             ) : null}
 
             {isStopped && correctOptionIndexes?.includes(option.index) ? (
-              <Flex css={{ color: '$on_surface_high' }}>
+              <Flex align="center" css={{ color: '$on_surface_high' }}>
                 <CheckCircleIcon height={20} width={20} />
               </Flex>
             ) : null}

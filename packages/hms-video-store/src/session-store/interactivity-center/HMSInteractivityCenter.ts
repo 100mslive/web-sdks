@@ -197,9 +197,16 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
   // eslint-disable-next-line complexity
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {
+    // early return if the question has been saved before in a draft
     if (questionParams.index) {
-      // @ts-ignore
-      return { question: questionParams, options: questionParams.options, answer: questionParams.answer };
+      const optionsWithIndex = questionParams.options?.map((option, index) => {
+        return { ...option, index: index + 1 };
+      });
+      return {
+        question: { ...questionParams, index: index + 1 },
+        options: optionsWithIndex,
+        answer: questionParams.answer,
+      };
     }
     const question: PollQuestionParams['question'] = { ...questionParams, index: index + 1 };
     let options: HMSPollQuestionOption[] | undefined;
