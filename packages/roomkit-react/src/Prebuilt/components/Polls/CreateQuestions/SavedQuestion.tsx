@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { HMSPollQuestion } from '@100mslive/react-sdk';
 import { CheckCircleIcon } from '@100mslive/react-icons';
 import { Button, Flex, Text } from '../../../../';
@@ -15,7 +15,18 @@ export const SavedQuestion = ({
   length: number;
   convertToDraft: (draftID: number) => void;
 }) => {
-  const answerArray = [question?.answer?.option, ...(question.answer?.options || [])];
+  const answerArray = useMemo(() => {
+    const updatedAnswerArray = [];
+    const { option, options } = question?.answer ?? {};
+    if (option) {
+      updatedAnswerArray.push(option);
+    }
+    if (options) {
+      updatedAnswerArray.push(...options);
+    }
+    return updatedAnswerArray;
+  }, [question?.answer]);
+
   return (
     <>
       <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
