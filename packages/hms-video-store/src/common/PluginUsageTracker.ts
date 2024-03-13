@@ -19,21 +19,28 @@ class PluginUsageTracker {
     return this.pluginUsage.get(pluginKey);
   };
 
-  updatePluginUsage = (event: AnalyticsEvent, sessionID: string) => {
+  updatePluginUsageData = (event: AnalyticsEvent, sessionID: string) => {
+    // Sent on leave, after krisp usage is sent
+    if (event.name === 'subscriber.stats') {
+      this.cleanup(sessionID);
+      return;
+    }
+
     const name = event.properties.plugin_name;
     const pluginKey = `${sessionID}-${name}`;
-
     if (event.name === 'mediaPlugin.added') {
       const addedAt = event.properties.added_at;
       this.pluginLastAddedAt.set(pluginKey, addedAt);
     } else if (event.name === 'mediaPlugin.stats') {
       const duration = event.properties.duration;
-      this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
-      this.pluginLastAddedAt.delete(pluginKey);
+      if (duration) {
+        this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
+        this.pluginLastAddedAt.delete(pluginKey);
+      }
     }
   };
 
-  cleanup = (sessionID: string) => {
+  private cleanup = (sessionID: string) => {
     for (const key of this.pluginUsage.keys()) {
       if (sessionID.length && key.includes(sessionID)) {
         this.pluginUsage.delete(key);

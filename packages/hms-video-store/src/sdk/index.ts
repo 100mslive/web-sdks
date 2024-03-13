@@ -573,7 +573,7 @@ export class HMSSdk implements HMSInterface {
     }
     HMSLogger.timeEnd(`join-room-${roomId}`);
     const sessionID = this.store.getRoom()?.sessionId || '';
-    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsage(e, sessionID));
+    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsageData(e, sessionID));
   }
 
   private stringifyMetadata(config: HMSConfig) {
@@ -585,8 +585,6 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanup() {
-    const sessionID = this.store.getRoom()?.sessionId || '';
-    pluginUsageTracker.cleanup(sessionID);
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanup();
