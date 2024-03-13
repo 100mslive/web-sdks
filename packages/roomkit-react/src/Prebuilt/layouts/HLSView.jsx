@@ -82,6 +82,11 @@ const HLSView = () => {
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isSeekEnabled, setIsSeekEnabled] = useState(false);
+  const [hoverControlsVisible, setHoverControlsVisible] = useState({
+    seekForward: false,
+    pausePlay: false,
+    seekBackward: false,
+  });
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
   const lastHlsUrl = usePrevious(hlsUrl);
@@ -314,9 +319,32 @@ const HLSView = () => {
     };
   }, [controlsVisible, isFullScreen, seekProgress, qualityDropDownOpen]);
 
-  const onSeekTo = useCallback(seek => {
-    hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
-  }, []);
+  const onSeekTo = useCallback(
+    seek => {
+      match({ isLandscape, isMobile, seek })
+        .with({ seek: -10, isMobile: false, isLandscape: false }, () => {
+          setHoverControlsVisible({ ...hoverControlsVisible, seekBackward: true });
+          setTimeout(() => {
+            setHoverControlsVisible({
+              ...hoverControlsVisible,
+              seekBackward: false,
+            });
+          }, 2000);
+        })
+        .with({ seek: 10, isMobile: false, isLandscape: false }, () => {
+          setHoverControlsVisible({ ...hoverControlsVisible, seekForward: true });
+          setTimeout(() => {
+            setHoverControlsVisible({
+              ...hoverControlsVisible,
+              seekForward: false,
+            });
+          }, 2000);
+        })
+        .otherwise(() => null);
+      hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
+    },
+    [hoverControlsVisible, isLandscape, isMobile],
+  );
   const onDoubleClickHandler = useCallback(
     event => {
       if (!(isMobile || isLandscape) || hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
@@ -336,14 +364,27 @@ const HLSView = () => {
     },
     [hlsState?.variants, isLandscape, isMobile, onSeekTo],
   );
+  const playPauseAction = useCallback(async () => {
+    if (isPaused) {
+      await hlsPlayer?.play();
+    } else {
+      hlsPlayer?.pause();
+    }
+    setHoverControlsVisible({
+      ...hoverControlsVisible,
+      pausePlay: true,
+    });
+    setTimeout(() => {
+      setHoverControlsVisible({
+        ...hoverControlsVisible,
+        pausePlay: false,
+      });
+    }, 2000);
+  }, [hoverControlsVisible, isPaused]);
   const onClickHandler = useCallback(async () => {
     match({ isMobile, isLandscape, playlist_type: hlsState?.variants[0]?.playlist_type })
       .with({ playlist_type: HLSPlaylistType.DVR, isMobile: false, isLandscape: false }, async () => {
-        if (isPaused) {
-          await hlsPlayer?.play();
-        } else {
-          hlsPlayer?.pause();
-        }
+        await playPauseAction();
       })
       .when(
         ({ isMobile, isLandscape }) => isMobile || isLandscape,
@@ -355,7 +396,7 @@ const HLSView = () => {
         },
       )
       .otherwise(() => null);
-  }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
+  }, [hlsState?.variants, isLandscape, isMobile, playPauseAction]);
   const onHoverHandler = useCallback(
     event => {
       event.preventDefault();
@@ -484,6 +525,71 @@ const HLSView = () => {
             }}
           >
             <>
+              {!(isMobile || isLandscape) && (
+                <Flex
+                  align="center"
+                  justify="between"
+                  css={{
+                    position: 'absolute',
+                    bg: '#00000066',
+                    display: 'inline-flex',
+                    gap: '$2',
+                    zIndex: 1,
+                    size: '100%',
+                  }}
+                >
+                  {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
+                    <>
+                      <Flex
+                        css={{
+                          bg: 'rgba(0, 0, 0, 0.6)',
+                          r: '$round',
+                          size: '$24',
+                          visibility: hoverControlsVisible.seekBackward ? `` : `hidden`,
+                          opacity: hoverControlsVisible.seekBackward ? `1` : '0',
+                        }}
+                        direction="column"
+                        align="center"
+                      >
+                        <HMSVideoPlayer.Seeker title="backward">
+                          <BackwardArrowIcon width={52} height={52} />
+                        </HMSVideoPlayer.Seeker>
+                        <Text variant="body2" css={{ fontWeight: '$regular' }}>
+                          10 secs
+                        </Text>
+                      </Flex>
+                      <Box
+                        css={{
+                          bg: 'rgba(0, 0, 0, 0.6)',
+                          r: '$round',
+                          visibility: hoverControlsVisible.pausePlay ? `` : `hidden`,
+                          opacity: hoverControlsVisible.pausePlay ? `1` : '0',
+                        }}
+                      >
+                        <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
+                      </Box>
+                      <Flex
+                        css={{
+                          bg: 'rgba(0, 0, 0, 0.6)',
+                          r: '$round',
+                          size: '$24',
+                          visibility: hoverControlsVisible.seekForward ? `` : `hidden`,
+                          opacity: hoverControlsVisible.seekForward ? `1` : '0',
+                        }}
+                        direction="column"
+                        align="center"
+                      >
+                        <HMSVideoPlayer.Seeker title="forward">
+                          <ForwardArrowIcon width={52} height={52} />
+                        </HMSVideoPlayer.Seeker>
+                        <Text variant="body2" css={{ fontWeight: '$regular' }}>
+                          10 secs
+                        </Text>
+                      </Flex>
+                    </>
+                  )}
+                </Flex>
+              )}
               {isMobile || isLandscape ? (
                 <>
                   <Flex
@@ -607,7 +713,8 @@ const HLSView = () => {
                           {hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
                             <>
                               <HMSVideoPlayer.Seeker
-                                onClick={() => {
+                                onClick={e => {
+                                  e.stopPropagation();
                                   onSeekTo(-10);
                                 }}
                                 title="backward"
@@ -616,7 +723,8 @@ const HLSView = () => {
                               </HMSVideoPlayer.Seeker>
                               <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
                               <HMSVideoPlayer.Seeker
-                                onClick={() => {
+                                onClick={e => {
+                                  e.stopPropagation();
                                   onSeekTo(10);
                                 }}
                                 title="forward"
@@ -631,7 +739,8 @@ const HLSView = () => {
                       )}
                       <IconButton
                         css={{ px: '$2' }}
-                        onClick={async () => {
+                        onClick={async e => {
+                          e.stopPropagation();
                           await hlsPlayer?.seekToLivePosition();
                           setIsVideoLive(true);
                         }}
