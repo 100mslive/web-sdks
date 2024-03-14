@@ -21,7 +21,7 @@ class PluginUsageTracker {
 
   updatePluginUsageData = (event: AnalyticsEvent, sessionID: string) => {
     // Sent on leave, after krisp usage is sent
-    if (event.name === 'subscriber.stats') {
+    if (event.name === 'transport.leave') {
       this.cleanup(sessionID);
       return;
     }
