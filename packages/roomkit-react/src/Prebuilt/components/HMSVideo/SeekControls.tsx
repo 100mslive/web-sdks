@@ -9,7 +9,7 @@ export const SeekControls = ({
 }: {
   title: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  css: any;
+  css?: any;
   children: React.ReactNode;
 }) => {
   return (
