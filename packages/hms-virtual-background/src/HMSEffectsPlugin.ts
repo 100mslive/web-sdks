@@ -11,7 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset = 'balanced';
+  private preset = 'lightning';
 
   constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
