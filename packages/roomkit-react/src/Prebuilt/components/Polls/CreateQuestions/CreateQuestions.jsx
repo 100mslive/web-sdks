@@ -75,15 +75,15 @@ export function CreateQuestions() {
                 const updatedQuestions = [...questions.slice(0, index), questionParams, ...questions.slice(index + 1)];
                 setQuestions(updatedQuestions);
                 const validQuestions = updatedQuestions.filter(question => isValidQuestion(question));
-
                 await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
               }}
               isQuiz={isQuiz}
-              removeQuestion={questionID =>
-                setQuestions(prev => {
-                  return prev.filter(questionFromSet => questionID !== questionFromSet?.draftID);
-                })
-              }
+              removeQuestion={async questionID => {
+                const updatedQuestions = questions.filter(questionFromSet => questionID !== questionFromSet?.draftID);
+                setQuestions(updatedQuestions);
+                const validQuestions = updatedQuestions.filter(question => isValidQuestion(question));
+                await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
+              }}
               convertToDraft={questionID =>
                 setQuestions(prev => {
                   const copyOfQuestions = [...prev];
