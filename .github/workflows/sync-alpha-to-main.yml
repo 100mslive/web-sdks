@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - main
+      - dev
 
 jobs:
   pull-request:
@@ -15,8 +15,8 @@ jobs:
         if: github.event.pull_request.merged == true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: 'main'
+          source_branch: 'dev'
           destination_branch: 'publish-alpha'
           pr_title: 'Update publish-alpha'
-          pr_body: ':robot: Automated PR from main to publish-alpha'
+          pr_body: ':robot: Automated PR from dev to publish-alpha'
           pr_label: 'auto-pr'
