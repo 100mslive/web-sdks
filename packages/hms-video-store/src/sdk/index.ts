@@ -12,7 +12,6 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { pluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -182,6 +181,7 @@ export class HMSSdk implements HMSInterface {
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
+
     /**
      * Note: Subscribe to events here right after creating stores and managers
      * to not miss events that are published before the handlers are subscribed.
@@ -498,7 +498,6 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -572,8 +571,6 @@ export class HMSSdk implements HMSInterface {
       throw error;
     }
     HMSLogger.timeEnd(`join-room-${roomId}`);
-    const sessionID = this.store.getRoom()?.sessionId || '';
-    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsageData(e, sessionID));
   }
 
   private stringifyMetadata(config: HMSConfig) {

@@ -3,7 +3,6 @@ import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
-import { pluginUsageTracker } from '../common';
 import { HMSException } from '../error/HMSException';
 import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
@@ -233,23 +232,6 @@ export default class AnalyticsEventFactory {
       name: 'subscriber.stats',
       level: AnalyticsEventLevel.INFO,
       properties,
-    });
-  }
-
-  static getKrispUsage(sessionID: string) {
-    const duration = pluginUsageTracker.getPluginUsage('HMSKrispPlugin', sessionID);
-    return new AnalyticsEvent({
-      name: 'krisp.usage',
-      level: AnalyticsEventLevel.INFO,
-      properties: { duration },
-    });
-  }
-
-  static transportLeave() {
-    return new AnalyticsEvent({
-      name: 'transport.leave',
-      level: AnalyticsEventLevel.INFO,
-      properties: {},
     });
   }
 
