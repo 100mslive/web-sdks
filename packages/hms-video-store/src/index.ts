@@ -53,6 +53,7 @@ export type {
   HMSQuizLeaderboardSummary,
 } from './internal';
 
+export { pluginUsageTracker } from './common';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType } from './internal';
 export type {

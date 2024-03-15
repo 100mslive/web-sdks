@@ -192,11 +192,8 @@ export class DeviceManager implements HMSDeviceManager {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
-    if (audioTrack) {
-      await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    }
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({

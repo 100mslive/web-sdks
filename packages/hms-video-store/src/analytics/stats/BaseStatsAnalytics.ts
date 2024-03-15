@@ -85,6 +85,7 @@ export abstract class RunningTrackAnalytics {
 
   protected samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
   protected tempStats: TempPublishStats[] = [];
+  protected prevLatestStat?: TempPublishStats;
 
   constructor({
     track,
@@ -118,6 +119,7 @@ export abstract class RunningTrackAnalytics {
     }
 
     this.samples.push(this.collateSample());
+    this.prevLatestStat = this.getLatestStat();
     this.tempStats.length = 0;
   }
 
@@ -160,7 +162,7 @@ export abstract class RunningTrackAnalytics {
   }
 
   protected calculateDifferenceForSample(key: keyof TempPublishStats) {
-    const firstValue = Number(this.tempStats[0][key]) || 0;
+    const firstValue = Number(this.prevLatestStat?.[key]) || 0;
     const latestValue = Number(this.getLatestStat()[key]) || 0;
 
     return latestValue - firstValue;

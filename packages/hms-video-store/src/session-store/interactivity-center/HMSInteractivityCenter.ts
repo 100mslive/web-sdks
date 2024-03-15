@@ -195,10 +195,23 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return polls;
   }
 
+  // eslint-disable-next-line complexity
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {
+    // early return if the question has been saved before in a draft
+    if (questionParams.index) {
+      const optionsWithIndex = questionParams.options?.map((option, index) => {
+        return { ...option, index: index + 1 };
+      });
+      return {
+        question: { ...questionParams, index: index + 1 },
+        options: optionsWithIndex,
+        answer: questionParams.answer,
+      };
+    }
     const question: PollQuestionParams['question'] = { ...questionParams, index: index + 1 };
     let options: HMSPollQuestionOption[] | undefined;
     const answer: HMSPollQuestionAnswer = questionParams.answer || { hidden: false };
+
     if (
       Array.isArray(questionParams.options) &&
       [HMSPollQuestionType.SINGLE_CHOICE, HMSPollQuestionType.MULTIPLE_CHOICE].includes(questionParams.type)
@@ -209,7 +222,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         weight: option.weight,
       }));
 
-      delete answer?.text;
       if (questionParams.type === HMSPollQuestionType.SINGLE_CHOICE) {
         answer.option = questionParams.options.findIndex(option => option.isCorrectAnswer) + 1 || undefined;
       } else {
