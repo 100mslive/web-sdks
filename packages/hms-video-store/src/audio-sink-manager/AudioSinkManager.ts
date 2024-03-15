@@ -47,6 +47,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.startPollingForDevices();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -266,6 +267,19 @@ export class AudioSinkManager {
     }
   };
 
+  private startPollingForDevices = () => {
+    // device change supported, no polling needed
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    this.timer = setInterval(() => {
+      (async () => {
+        await this.deviceManager.init(true, false);
+        await this.autoSelectAudioOutput();
+      })();
+    }, 5000);
+  };
+
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
@@ -294,10 +308,18 @@ export class AudioSinkManager {
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
         const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
-        await localAudioTrack.setSettings({
-          deviceId: externalDeviceID,
-        });
+        HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+        // already selected appropriate device
+        if (localAudioTrack.settings.deviceId === externalDeviceID) {
+          return;
+        }
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+        await localAudioTrack.setSettings(
+          {
+            deviceId: externalDeviceID,
+          },
+          true,
+        );
       }
     }
   };
