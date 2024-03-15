@@ -153,7 +153,7 @@ export const RoleAccordion = ({
             <HorizontalDivider />
             <Flex css={{ w: '100%', p: '$6', gap: '$4' }} justify="center">
               <Button variant="standard" onClick={lowerAllHands} icon css={{ pl: '$2' }}>
-                <CrossIcon /> Lower All Hands
+                <CrossIcon /> Lower all hands
               </Button>
               {canBringToStage && (
                 <Button onClick={bringAllToStage} icon css={{ pl: '$2' }}>
