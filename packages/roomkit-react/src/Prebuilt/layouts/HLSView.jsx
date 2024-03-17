@@ -67,6 +67,7 @@ const ToggleChat = () => {
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef();
+  const { elements } = useRoomLayoutConferencingScreen();
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const notification = useHMSNotifications(HMSNotificationTypes.POLL_STOPPED);
@@ -97,6 +98,8 @@ const HLSView = () => {
   const controlsTimerRef = useRef();
   const [seekProgress, setSeekProgress] = useState(false);
   const isFullScreenSupported = screenfull.isEnabled;
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const showChat = !!elements?.chat;
 
   const isMobile = useMedia(config.media.md);
   const isLandscape = useIsLandscape();
@@ -589,7 +592,16 @@ const HLSView = () => {
                       }}
                     >
                       <HMSVideoPlayer.Controls.Right>
-                        {isLandscape && <ChatToggle />}
+                        {isLandscape && showChat && (
+                          <ChatToggle
+                            onClick={() => {
+                              if (isFullScreen) {
+                                toggle();
+                              }
+                              toggleChat();
+                            }}
+                          />
+                        )}
                         {hasCaptions && !isHlsAutoplayBlocked && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
                         {hlsViewRef.current && availableLayers.length > 0 && !isHlsAutoplayBlocked ? (
                           <HLSQualitySelector
