@@ -50,7 +50,6 @@ import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane'
 import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
-// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';

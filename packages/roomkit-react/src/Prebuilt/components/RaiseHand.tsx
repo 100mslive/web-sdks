@@ -4,7 +4,6 @@ import { CSS } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 // @ts-ignore: No implicit Any
 import IconButton from '../IconButton';
-// @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useMyMetadata } from './hooks/useMetadata';
 
