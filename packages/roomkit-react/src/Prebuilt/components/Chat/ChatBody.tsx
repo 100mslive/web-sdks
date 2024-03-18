@@ -410,7 +410,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     }, [blacklistedMessageIDs, messages]);
 
     const vanillaStore = useHMSVanillaStore();
-    const listResetFlag = useRef(false);
+    const rerenderOnFirstMount = useRef(false);
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -429,10 +429,10 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
 
     useEffect(() => {
       // @ts-ignore
-      if (filteredMessages.length > 0 && listRef?.current && !listResetFlag.current) {
-        listResetFlag.current = true;
+      if (filteredMessages.length > 0 && listRef?.current && !rerenderOnFirstMount.current) {
+        rerenderOnFirstMount.current = true;
         // @ts-ignore
-        listRef?.current?.resetAfterIndex(0);
+        listRef.current.resetAfterIndex(0);
       }
     }, [listRef, filteredMessages]);
 
