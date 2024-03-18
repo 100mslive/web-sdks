@@ -29,7 +29,7 @@ export interface HMSVideoPlugin {
    * variables, loading ML models etc. This can be used by a plugin to ensure it's prepared at the time
    * processVideoFrame is called.
    */
-  init(): Promise<void>;
+  init(sessionID?: string): Promise<void>;
 
   /**
    * @see HMSVideoPluginType

@@ -5,7 +5,7 @@ export interface HMSMediaStreamPlugin {
    */
   getName(): string;
 
-  apply(stream: MediaStream): MediaStream;
+  apply(stream: MediaStream, sessionID: string): MediaStream;
 
   stop(): void;
 }
