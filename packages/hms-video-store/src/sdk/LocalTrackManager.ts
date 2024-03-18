@@ -158,7 +158,30 @@ export class LocalTrackManager {
     nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
-
+  // eslint-disable-next-line complexity
+  private async updateScreenShareConstraint(screenVideoTrack: MediaStreamTrack, constraints: MediaStreamConstraints) {
+    const _settings: MediaTrackSettings = screenVideoTrack.getSettings();
+    if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
+      return;
+    }
+    const width = _settings.width || 0;
+    const height = _settings.height || 0;
+    const pixels = (constraints.video.width as number) * (constraints.video.height as number);
+    if (width * height > pixels) {
+      const ratio = (width * height) / pixels;
+      const divide_ratio = Math.sqrt(ratio);
+      const cons = {
+        ...constraints,
+        video: {
+          ...constraints.video,
+          width: Math.round(width / divide_ratio),
+          height: Math.round(height / divide_ratio),
+        },
+      };
+      // @ts-ignore
+      await screenVideoTrack.applyConstraints(cons);
+    }
+  }
   async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
@@ -187,6 +210,8 @@ export class LocalTrackManager {
       HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+      // todo change stream logic
+      await this.updateScreenShareConstraint(stream.getVideoTracks()[0], constraints);
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
       const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
