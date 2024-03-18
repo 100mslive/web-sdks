@@ -6,7 +6,6 @@ import {
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPermissions,
-  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -95,8 +94,6 @@ export const MwebOptions = ({
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
-  const { toggleAudio, toggleVideo } = useAVToggle();
-  const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const { title, description } = useRoomLayoutHeader();
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
@@ -175,7 +172,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
-            {!noAVPermissions ? (
+            {elements.hand_raise ? (
               <ActionTile.Root
                 active={isHandRaised}
                 onClick={() => {
