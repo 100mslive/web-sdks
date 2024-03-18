@@ -42,7 +42,7 @@ import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTION
 let hlsPlayer;
 const toastMap = {};
 
-const ToggleChat = () => {
+const ToggleChat = ({ isFullScreen = false }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
@@ -51,7 +51,10 @@ const ToggleChat = () => {
   const hmsActions = useHMSActions();
 
   useEffect(() => {
-    match({ sidepane, isMobile, showChat })
+    match({ sidepane, isMobile, showChat, isFullScreen })
+      .with({ isFullScreen: true }, () => {
+        hmsActions.setAppData(APP_DATA.sidePane, '');
+      })
       .with({ isMobile: true, showChat: true, sidepane: P.when(value => !value) }, () => {
         toggleChat();
       })
@@ -61,7 +64,7 @@ const ToggleChat = () => {
       .otherwise(() => {
         //do nothing
       });
-  }, [sidepane, isMobile, toggleChat, showChat, hmsActions]);
+  }, [sidepane, isMobile, toggleChat, showChat, hmsActions, isFullScreen]);
   return null;
 };
 const HLSView = () => {
@@ -723,7 +726,7 @@ const HLSView = () => {
           </HMSVideoPlayer.Root>
         </Flex>
       </HMSPlayerContext.Provider>
-      <ToggleChat />
+      <ToggleChat isFullScreen={isFullScreen} />
       {isMobile && !isFullScreen && <HLSViewTitle />}
     </Flex>
   );
