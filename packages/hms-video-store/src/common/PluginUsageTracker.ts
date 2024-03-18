@@ -38,9 +38,8 @@ class PluginUsageTracker {
       case 'mediaPlugin.toggled.off':
       case 'mediaPlugin.stats': {
         if (this.pluginLastAddedAt.has(pluginKey)) {
-          const duration = event.properties.duration
-            ? event.properties.duration
-            : (Date.now() - (this.pluginLastAddedAt.get(pluginKey) || 0)) / 1000;
+          const duration =
+            event.properties.duration || (Date.now() - (this.pluginLastAddedAt.get(pluginKey) || 0)) / 1000;
           this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + Math.max(duration, 0) * 1000);
           this.pluginLastAddedAt.delete(pluginKey);
         }
