@@ -592,7 +592,7 @@ const HLSView = () => {
                       }}
                     >
                       <HMSVideoPlayer.Controls.Right>
-                        {isLandscape && showChat && (
+                        {(isLandscape || (isMobile && isFullScreen)) && showChat && (
                           <ChatToggle
                             onClick={() => {
                               if (isFullScreen) {
