@@ -19,13 +19,13 @@ class PluginUsageTracker {
     return this.pluginUsage.get(pluginKey);
   };
 
+  // eslint-disable-next-line complexity
   updatePluginUsageData = (event: AnalyticsEvent, sessionID: string) => {
     // Sent on leave, after krisp usage is sent
     if (event.name === 'transport.leave') {
       this.cleanup(sessionID);
       return;
     }
-
     const name = event.properties.plugin_name;
     const pluginKey = `${sessionID}-${name}`;
     if (event.name === 'mediaPlugin.added') {
@@ -33,7 +33,7 @@ class PluginUsageTracker {
       this.pluginLastAddedAt.set(pluginKey, addedAt);
     } else if (event.name === 'mediaPlugin.stats') {
       const duration = event.properties.duration;
-      if (duration > 0) {
+      if (duration > 0 && this.pluginLastAddedAt.has(pluginKey)) {
         this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
         this.pluginLastAddedAt.delete(pluginKey);
       }
