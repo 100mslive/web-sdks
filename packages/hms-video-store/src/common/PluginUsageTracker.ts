@@ -21,23 +21,32 @@ class PluginUsageTracker {
 
   // eslint-disable-next-line complexity
   updatePluginUsageData = (event: AnalyticsEvent, sessionID: string) => {
-    // Sent on leave, after krisp usage is sent
-    if (event.name === 'transport.leave') {
-      this.cleanup(sessionID);
-      return;
-    }
-    const name = event.properties.plugin_name;
+    const name = event.properties?.plugin_name || '';
     const pluginKey = `${sessionID}-${name}`;
-    if (event.name === 'mediaPlugin.added') {
-      const addedAt = event.properties.added_at;
-      this.pluginLastAddedAt.set(pluginKey, addedAt);
-    } else if (event.name === 'mediaPlugin.stats') {
-      const duration = event.properties.duration;
-      if (duration > 0 && this.pluginLastAddedAt.has(pluginKey)) {
-        this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
-        this.pluginLastAddedAt.delete(pluginKey);
+    switch (event.name) {
+      // Sent on leave, after krisp usage is sent
+      case 'transport.leave': {
+        this.cleanup(sessionID);
+        return;
+      }
+      case 'mediaPlugin.toggled.on':
+      case 'mediaPlugin.added': {
+        const addedAt = event.properties.added_at || Date.now();
+        this.pluginLastAddedAt.set(pluginKey, addedAt);
+        break;
+      }
+      case 'mediaPlugin.toggled.off':
+      case 'mediaPlugin.stats': {
+        if (this.pluginLastAddedAt.has(pluginKey)) {
+          const duration = event.properties.duration
+            ? event.properties.duration
+            : (Date.now() - (this.pluginLastAddedAt.get(pluginKey) || 0)) / 1000;
+          this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + Math.max(duration, 0) * 1000);
+          this.pluginLastAddedAt.delete(pluginKey);
+        }
       }
     }
+    return;
   };
 
   private cleanup = (sessionID: string) => {
