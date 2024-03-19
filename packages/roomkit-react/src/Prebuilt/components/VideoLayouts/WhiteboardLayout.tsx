@@ -10,7 +10,6 @@ import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
-// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
 const WhiteboardEmbed = () => {
