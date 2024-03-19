@@ -9,7 +9,7 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ChatToggle = () => {
+export const ChatToggle = ({ onClick }: { onClick?: () => void }) => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
@@ -21,7 +21,7 @@ export const ChatToggle = () => {
       }}
     >
       <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
-        <IconButton onClick={toggleChat} active={!isChatOpen} data-testid="chat_btn">
+        <IconButton onClick={() => (onClick ? onClick() : toggleChat())} active={!isChatOpen} data-testid="chat_btn">
           <ChatIcon />
         </IconButton>
       </Tooltip>

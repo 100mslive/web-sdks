@@ -25,9 +25,9 @@ const IconSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   bg: 'transparent',
-  borderTopRightRadius: 0,
+  borderTopRightRadius: '0 !important',
   borderColor: '$border_bright',
-  borderBottomRightRadius: 0,
+  borderBottomRightRadius: '0 !important',
   position: 'relative',
   '&:not([disabled]):focus-visible': {
     zIndex: 1,
@@ -41,8 +41,8 @@ const IconSection = styled(IconButton, {
     ...variants,
     hideOptions: {
       true: {
-        borderTopRightRadius: '$1',
-        borderBottomRightRadius: '$1',
+        borderTopRightRadius: '$1 !important',
+        borderBottomRightRadius: '$1 !important',
       },
     },
   },
@@ -53,10 +53,10 @@ const OptionsSection = styled(IconButton, {
   h: '$14',
   p: '$4 $2',
   r: '$1',
-  borderTopLeftRadius: 0,
+  borderTopLeftRadius: '0 !important',
   borderColor: '$border_bright',
-  borderBottomLeftRadius: 0,
-  borderLeftWidth: 0,
+  borderBottomLeftRadius: '0 !important',
+  borderLeftWidth: '0 !important',
   position: 'relative',
   '&:not([disabled]):focus-visible': {
     zIndex: 1,
