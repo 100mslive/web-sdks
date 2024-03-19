@@ -159,28 +159,50 @@ export class LocalTrackManager {
     return nativeTracks;
   }
   // eslint-disable-next-line complexity
-  private async updateScreenShareConstraint(screenVideoTrack: MediaStreamTrack, constraints: MediaStreamConstraints) {
-    const _settings: MediaTrackSettings = screenVideoTrack.getSettings();
+  private async optimizeScreenShareConstraint(stream: MediaStream, constraints: MediaStreamConstraints) {
+    console.log('h ere ');
     if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
       return;
     }
-    const width = _settings.width || 0;
-    const height = _settings.height || 0;
-    const pixels = (constraints.video.width as number) * (constraints.video.height as number);
-    if (width * height > pixels) {
-      const ratio = (width * height) / pixels;
-      const divide_ratio = Math.sqrt(ratio);
-      const cons = {
-        ...constraints,
-        video: {
-          ...constraints.video,
-          width: Math.round(width / divide_ratio),
-          height: Math.round(height / divide_ratio),
-        },
-      };
-      // @ts-ignore
-      await screenVideoTrack.applyConstraints(cons);
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed?.includes('screen')) {
+      return;
     }
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = stream;
+    videoElement.addEventListener('loadedmetadata', async () => {
+      const { videoWidth, videoHeight } = videoElement;
+      console.log(`Initial resolution: ${videoWidth} x ${videoHeight}`);
+      const screen = publishParams.screen;
+      const pixels = screen.width * screen.height;
+      const actualAspectRatio = videoWidth / videoHeight;
+      const currentAspectRatio = screen.width / screen.height;
+      console.log('widht and height ', videoWidth, videoHeight, actualAspectRatio, currentAspectRatio);
+      if (actualAspectRatio > currentAspectRatio) {
+        const cons = {
+          ...constraints,
+          video: {
+            width: videoWidth,
+            height: videoHeight,
+          },
+        };
+        if (videoWidth * videoWidth > pixels) {
+          const ratio = (videoWidth * videoHeight) / pixels;
+          const divide_ratio = Math.sqrt(ratio);
+
+          cons.video.width = videoWidth / divide_ratio;
+          cons.video.height = videoHeight / divide_ratio;
+        } else {
+          const ratio = pixels / (videoWidth * videoHeight);
+          const multiply_ratio = Math.sqrt(ratio);
+          cons.video.height = videoHeight * multiply_ratio;
+          cons.video.width = videoWidth * multiply_ratio;
+        }
+        console.log('new cons ', cons);
+        //@ts-ignore
+        await screenVideoTrack.applyConstraints(cons);
+      }
+    });
   }
   async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
@@ -211,7 +233,7 @@ export class LocalTrackManager {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
       // todo change stream logic
-      await this.updateScreenShareConstraint(stream.getVideoTracks()[0], constraints);
+      await this.optimizeScreenShareConstraint(stream, constraints);
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
       const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
