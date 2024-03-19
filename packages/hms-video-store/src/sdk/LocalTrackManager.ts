@@ -160,7 +160,6 @@ export class LocalTrackManager {
   }
   // eslint-disable-next-line complexity
   private async optimizeScreenShareConstraint(stream: MediaStream, constraints: MediaStreamConstraints) {
-    console.log('h ere ');
     if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
       return;
     }
@@ -172,35 +171,26 @@ export class LocalTrackManager {
     videoElement.srcObject = stream;
     videoElement.addEventListener('loadedmetadata', async () => {
       const { videoWidth, videoHeight } = videoElement;
-      console.log(`Initial resolution: ${videoWidth} x ${videoHeight}`);
       const screen = publishParams.screen;
       const pixels = screen.width * screen.height;
       const actualAspectRatio = videoWidth / videoHeight;
       const currentAspectRatio = screen.width / screen.height;
-      console.log('widht and height ', videoWidth, videoHeight, actualAspectRatio, currentAspectRatio);
       if (actualAspectRatio > currentAspectRatio) {
-        const cons = {
-          ...constraints,
-          video: {
-            width: videoWidth,
-            height: videoHeight,
-          },
-        };
-        if (videoWidth * videoWidth > pixels) {
+        const videoConstraint = constraints.video as MediaTrackConstraints;
+        videoConstraint.width = videoWidth;
+        videoConstraint.height = videoHeight;
+        if (videoWidth * videoHeight > pixels) {
           const ratio = (videoWidth * videoHeight) / pixels;
           const divide_ratio = Math.sqrt(ratio);
-
-          cons.video.width = videoWidth / divide_ratio;
-          cons.video.height = videoHeight / divide_ratio;
+          videoConstraint.width = videoWidth / divide_ratio;
+          videoConstraint.height = videoHeight / divide_ratio;
         } else {
           const ratio = pixels / (videoWidth * videoHeight);
           const multiply_ratio = Math.sqrt(ratio);
-          cons.video.height = videoHeight * multiply_ratio;
-          cons.video.width = videoWidth * multiply_ratio;
+          videoConstraint.height = videoHeight * multiply_ratio;
+          videoConstraint.width = videoWidth * multiply_ratio;
         }
-        console.log('new cons ', cons);
-        //@ts-ignore
-        await screenVideoTrack.applyConstraints(cons);
+        await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
       }
     });
   }
