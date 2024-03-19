@@ -9,8 +9,8 @@ export const PlayPauseButton = ({
   height = 20,
 }: {
   isPaused: boolean;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
 }) => {
   const { hlsPlayer } = useHMSPlayerContext();
   const onClick = async (event: MouseEvent) => {
