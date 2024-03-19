@@ -93,6 +93,7 @@ export const RoleAccordion = ({
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>
       <Accordion.Header
+        chevronID={`role_accordion_btn_${roleName}`}
         iconStyles={{ c: '$on_surface_high' }}
         css={{
           textTransform: 'capitalize',
