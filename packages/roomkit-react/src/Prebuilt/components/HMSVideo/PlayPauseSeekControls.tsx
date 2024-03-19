@@ -5,7 +5,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config } from '../../../Theme';
 import { PlayPauseButton } from './PlayPauseButton';
-import { SeekControls } from './SeekControls';
+import { SeekControl } from './SeekControl';
 import { useIsLandscape } from '../../common/hooks';
 
 // desktop buttons
@@ -18,7 +18,7 @@ export const PlayPauseSeekControls = ({
 }) => {
   return (
     <>
-      <SeekControls
+      <SeekControl
         onClick={e => {
           e.stopPropagation();
           onSeekTo(-10);
@@ -26,9 +26,9 @@ export const PlayPauseSeekControls = ({
         title="backward"
       >
         <BackwardArrowIcon width={20} height={20} />
-      </SeekControls>
+      </SeekControl>
       <PlayPauseButton isPaused={isPaused} />
-      <SeekControls
+      <SeekControl
         onClick={e => {
           e.stopPropagation();
           onSeekTo(10);
@@ -36,7 +36,7 @@ export const PlayPauseSeekControls = ({
         title="forward"
       >
         <ForwardArrowIcon width={20} height={20} />
-      </SeekControls>
+      </SeekControl>
     </>
   );
 };
@@ -44,11 +44,11 @@ export const PlayPauseSeekControls = ({
 // overlay handlers
 export const PlayPauseSeekOverlayControls = ({
   isPaused,
-  controlsVisible,
+  showControls,
   hoverControlsVisible,
 }: {
   isPaused: boolean;
-  controlsVisible: boolean;
+  showControls: boolean;
   hoverControlsVisible: {
     seekBackward: boolean;
     seekForward: boolean;
@@ -73,9 +73,9 @@ export const PlayPauseSeekOverlayControls = ({
           direction="column"
           align="center"
         >
-          <SeekControls title="backward">
+          <SeekControl title="backward">
             <BackwardArrowIcon width={52} height={52} />
-          </SeekControls>
+          </SeekControl>
           <Text variant="body2" css={{ fontWeight: '$regular' }}>
             10 secs
           </Text>
@@ -101,9 +101,9 @@ export const PlayPauseSeekOverlayControls = ({
           direction="column"
           align="center"
         >
-          <SeekControls title="forward">
+          <SeekControl title="forward">
             <ForwardArrowIcon width={52} height={52} />
-          </SeekControls>
+          </SeekControl>
           <Text variant="body2" css={{ fontWeight: '$regular' }}>
             10 secs
           </Text>
@@ -123,11 +123,11 @@ export const PlayPauseSeekOverlayControls = ({
         gap: '$2',
         zIndex: 1,
         size: '100%',
-        visibility: controlsVisible ? `` : `hidden`,
-        opacity: controlsVisible ? `1` : '0',
+        visibility: showControls ? `` : `hidden`,
+        opacity: showControls ? `1` : '0',
       }}
     >
-      <SeekControls
+      <SeekControl
         title="backward"
         css={{
           visibility: hoverControlsVisible.seekBackward ? `` : `hidden`,
@@ -135,7 +135,7 @@ export const PlayPauseSeekOverlayControls = ({
         }}
       >
         <BackwardArrowIcon width={32} height={32} />
-      </SeekControls>
+      </SeekControl>
       <Box
         css={{
           bg: 'rgba(0, 0, 0, 0.6)',
@@ -144,7 +144,7 @@ export const PlayPauseSeekOverlayControls = ({
       >
         <PlayPauseButton isPaused={isPaused} width={48} height={48} />
       </Box>
-      <SeekControls
+      <SeekControl
         title="forward"
         css={{
           visibility: hoverControlsVisible.seekForward ? `` : `hidden`,
@@ -152,7 +152,7 @@ export const PlayPauseSeekOverlayControls = ({
         }}
       >
         <ForwardArrowIcon width={32} height={32} />
-      </SeekControls>
+      </SeekControl>
     </Flex>
   );
 };

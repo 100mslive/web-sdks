@@ -559,7 +559,7 @@ const HLSView = () => {
                   {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
                     <HMSVideoPlayer.PlayPauseSeekControls.Overlay
                       isPaused={isPaused}
-                      controlsVisible={controlsVisible}
+                      showControls={controlsVisible}
                       hoverControlsVisible={hoverControlsVisible}
                     />
                   )}
@@ -570,7 +570,7 @@ const HLSView = () => {
                   {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
                     <HMSVideoPlayer.PlayPauseSeekControls.Overlay
                       isPaused={isPaused}
-                      controlsVisible={controlsVisible}
+                      showControls={controlsVisible}
                       hoverControlsVisible={hoverControlsVisible}
                     />
                   )}

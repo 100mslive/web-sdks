@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 import { IconButton, Tooltip } from '../../..';
 
-export const SeekControls = ({
+export const SeekControl = ({
   title,
   onClick,
   children,
