@@ -87,6 +87,8 @@ export class HMSAudioPluginsManager {
     }
 
     await this.validateAndThrow(name, plugin);
+    // @ts-ignore
+    plugin.setEventBus?.(this.eventBus);
 
     try {
       if (this.pluginsMap.size === 0) {
