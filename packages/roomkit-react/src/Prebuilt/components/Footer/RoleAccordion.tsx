@@ -149,18 +149,17 @@ export const RoleAccordion = ({
             <ChevronRightIcon />
           </Flex>
         ) : null}
-        {isHandRaisedAccordion && (
+        {isHandRaisedAccordion && canBringToStage && (
           <>
             <HorizontalDivider />
             <Flex css={{ w: '100%', p: '$6', gap: '$4' }} justify="center">
               <Button variant="standard" onClick={lowerAllHands} icon css={{ pl: '$2' }}>
                 <CrossIcon /> Lower all hands
               </Button>
-              {canBringToStage && (
-                <Button onClick={bringAllToStage} icon css={{ pl: '$2' }}>
-                  <AddIcon /> {bring_to_stage_label}
-                </Button>
-              )}
+
+              <Button onClick={bringAllToStage} icon css={{ pl: '$2' }}>
+                <AddIcon /> {bring_to_stage_label}
+              </Button>
             </Flex>
           </>
         )}

@@ -324,12 +324,15 @@ const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: strin
     peerId,
     role,
   });
+  if (!shouldShowStageRoleChange) {
+    return null;
+  }
   return (
     <>
       <Button variant="standard" css={quickActionStyle} onClick={lowerPeerHand}>
         <CrossIcon height={18} width={18} />
       </Button>
-      {shouldShowStageRoleChange && !isInStage && (
+      {!isInStage && (
         <Button variant="primary" onClick={handleStageAction} css={quickActionStyle}>
           <AddIcon height={18} width={18} />
         </Button>
