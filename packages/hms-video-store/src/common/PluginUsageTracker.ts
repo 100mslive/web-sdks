@@ -43,9 +43,10 @@ class PluginUsageTracker {
           this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + Math.max(duration, 0) * 1000);
           this.pluginLastAddedAt.delete(pluginKey);
         }
+        break;
       }
+      default:
     }
-    return;
   };
 
   private cleanup = (sessionID: string) => {
