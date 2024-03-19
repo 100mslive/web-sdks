@@ -25,19 +25,14 @@ export const IconButton = styled('button', {
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
+    backgroundColor: '$secondary_dim',
+    color: '$on_primary_high',
   },
   '&:focus': {
     outline: 'none',
   },
   variants: {
     active: {
-      false: {
-        backgroundColor: '$secondary_dim',
-        color: '$on_primary_high',
-        '&:not([disabled]):hover': {
-          backgroundColor: '$secondary_default',
-        },
-      },
       true: {
         '&:not([disabled]):hover': {
           backgroundColor: '$on_surface_low',

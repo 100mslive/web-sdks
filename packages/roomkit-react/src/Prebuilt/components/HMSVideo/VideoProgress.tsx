@@ -25,8 +25,12 @@ export const VideoProgress = ({
     if (videoEl.buffered.length > 0) {
       bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), duration));
     }
-    setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
-    setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
+    if (!isNaN(videoProgress)) {
+      setVideoProgress(videoProgress);
+    }
+    if (!isNaN(bufferProgress)) {
+      setBufferProgress(bufferProgress);
+    }
   }, [videoEl]);
   const timeupdateHandler = useCallback(() => {
     if (!videoEl || seekProgress) {
@@ -42,7 +46,7 @@ export const VideoProgress = ({
     return function cleanup() {
       videoEl?.removeEventListener('timeupdate', timeupdateHandler);
     };
-  }, [timeupdateHandler, videoEl]);
+  }, [setProgress, timeupdateHandler, videoEl]);
 
   const onProgress = (progress: number[]) => {
     const progress1 = Math.floor(getPercentage(progress[0], 100));
