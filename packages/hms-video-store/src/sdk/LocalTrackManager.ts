@@ -158,7 +158,6 @@ export class LocalTrackManager {
     nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
-  // eslint-disable-next-line complexity
   private async optimizeScreenShareConstraint(stream: MediaStream, constraints: MediaStreamConstraints) {
     if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
       return;
@@ -177,18 +176,14 @@ export class LocalTrackManager {
       const currentAspectRatio = screen.width / screen.height;
       if (actualAspectRatio > currentAspectRatio) {
         const videoConstraint = constraints.video as MediaTrackConstraints;
-        videoConstraint.width = videoWidth;
-        videoConstraint.height = videoHeight;
+        const ratio = actualAspectRatio / currentAspectRatio;
+        const sqrt_ratio = Math.sqrt(ratio);
         if (videoWidth * videoHeight > pixels) {
-          const ratio = (videoWidth * videoHeight) / pixels;
-          const divide_ratio = Math.sqrt(ratio);
-          videoConstraint.width = videoWidth / divide_ratio;
-          videoConstraint.height = videoHeight / divide_ratio;
+          videoConstraint.width = videoWidth / sqrt_ratio;
+          videoConstraint.height = videoHeight / sqrt_ratio;
         } else {
-          const ratio = pixels / (videoWidth * videoHeight);
-          const multiply_ratio = Math.sqrt(ratio);
-          videoConstraint.height = videoHeight * multiply_ratio;
-          videoConstraint.width = videoWidth * multiply_ratio;
+          videoConstraint.height = videoHeight * sqrt_ratio;
+          videoConstraint.width = videoWidth * sqrt_ratio;
         }
         await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
       }
