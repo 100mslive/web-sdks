@@ -6,7 +6,6 @@ import {
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
-  useAVToggle,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -54,8 +53,6 @@ export const ConferenceScreen = () => {
   const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
 
-  const { toggleAudio, toggleVideo } = useAVToggle();
-  const noAVPermissions = !(toggleAudio || toggleVideo);
   // using it in hls stream to show action button when chat is disabled
   const showChat = !!screenProps.elements?.chat;
   const autoRoomJoined = useRef(isPreviewScreenEnabled);
@@ -202,7 +199,7 @@ export const ConferenceScreen = () => {
             justify="end"
             gap="2"
           >
-            {noAVPermissions ? <RaiseHand /> : null}
+            <RaiseHand />
             <MoreSettings elements={screenProps.elements} screenType={screenProps.screenType} />
             <Box
               css={{
