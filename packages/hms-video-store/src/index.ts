@@ -63,3 +63,4 @@ export type {
   HMSPluginSupportResult,
   HMSFrameworkInfo,
 } from './internal';
+export { DomainCategory } from './analytics/AnalyticsEventDomains';
