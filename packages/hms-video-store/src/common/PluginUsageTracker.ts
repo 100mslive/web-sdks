@@ -20,7 +20,6 @@ export class PluginUsageTracker {
       this.pluginLastAddedAt.delete(name);
     }
     const finalValue = this.pluginUsage.get(name);
-    this.cleanup();
     return finalValue;
   };
 
