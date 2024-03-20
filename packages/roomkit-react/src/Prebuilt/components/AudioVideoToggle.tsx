@@ -131,7 +131,6 @@ const NoiseCancellation = () => {
           setActive(value => !value);
           if (isPluginAdded) {
             plugin.toggle();
-            console.log('krisp', plugin);
           }
         }}
       >
@@ -146,6 +145,10 @@ const NoiseCancellation = () => {
           onClick={e => e.stopPropagation()}
           onCheckedChange={value => {
             setActive(value);
+            if (isPluginAdded) {
+              plugin.toggle();
+              console.log(plugin, 'lggr');
+            }
           }}
         />
       </Dropdown.Item>

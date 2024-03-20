@@ -41,7 +41,7 @@ export class HMSAudioPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
 
-  constructor(track: HMSLocalAudioTrack, eventBus: EventBus) {
+  constructor(track: HMSLocalAudioTrack, private eventBus: EventBus) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
@@ -89,7 +89,7 @@ export class HMSAudioPluginsManager {
     await this.validateAndThrow(name, plugin);
     // @ts-ignore
     plugin.setEventBus?.(this.eventBus);
-    console.log('krisp', plugin);
+    // @ts-ignore
 
     try {
       if (this.pluginsMap.size === 0) {
