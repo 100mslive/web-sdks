@@ -29,7 +29,7 @@ export interface HMSAudioPlugin {
    * variables, loading ML models etc. This can be used by a plugin to ensure it's prepared at the time
    * processAudio is called.
    */
-  init(sessionID?: string): Promise<void> | void;
+  init(): Promise<void> | void;
 
   /**
    * The name is meant to uniquely specify a plugin instance. This will be used to track number of plugins
