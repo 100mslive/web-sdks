@@ -10,7 +10,7 @@ export const transportLeaveEvent = {
   metadata: { peer: {}, userAgent: '' },
   timestamp: Date.now(),
   device_id: '',
-  event_id: crypto.randomUUID(),
+  event_id: '00000000',
   toSignalParams: () => {
     return {
       name: eventName,
