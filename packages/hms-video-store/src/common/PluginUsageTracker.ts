@@ -19,18 +19,15 @@ export class PluginUsageTracker {
       this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + extraDuration);
       this.pluginLastAddedAt.delete(name);
     }
-    return this.pluginUsage.get(name);
+    const finalValue = this.pluginUsage.get(name);
+    this.cleanup();
+    return finalValue;
   };
 
   // eslint-disable-next-line complexity
   updatePluginUsageData = (event: AnalyticsEvent) => {
     const name = event.properties?.plugin_name || '';
     switch (event.name) {
-      // Sent on leave, after krisp usage is sent
-      case 'transport.leave': {
-        this.cleanup();
-        return;
-      }
       case 'mediaPlugin.toggled.on':
       case 'mediaPlugin.added': {
         const addedAt = event.properties.added_at || Date.now();
