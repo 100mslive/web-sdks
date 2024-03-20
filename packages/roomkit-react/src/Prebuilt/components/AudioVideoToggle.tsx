@@ -109,9 +109,6 @@ const NoiseCancellation = () => {
       if (active && !isPluginAdded) {
         await actions.addPluginToAudioTrack(plugin);
       }
-      if (!active && isPluginAdded) {
-        await actions.removePluginFromAudioTrack(plugin);
-      }
       setInProgress(false);
     })();
   }, [actions, active, isPluginAdded]);
@@ -132,6 +129,10 @@ const NoiseCancellation = () => {
         onClick={e => {
           e.preventDefault();
           setActive(value => !value);
+          if (isPluginAdded) {
+            plugin.toggle();
+            console.log('krisp', plugin);
+          }
         }}
       >
         <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
