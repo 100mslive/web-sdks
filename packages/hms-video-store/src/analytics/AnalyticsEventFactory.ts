@@ -243,14 +243,6 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static transportLeave() {
-    return new AnalyticsEvent({
-      name: 'transport.leave',
-      level: AnalyticsEventLevel.INFO,
-      properties: {},
-    });
-  }
-
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

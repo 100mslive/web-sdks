@@ -12,6 +12,7 @@ import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
 import { PluginUsageTracker } from '../common/PluginUsageTracker';
+import { transportLeaveEvent } from '../common/transportLeaveEvent';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -500,7 +501,7 @@ export default class HMSTransport {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.getKrispUsage(this.pluginUsageTracker.getPluginUsage('HMSKrispPlugin')!),
       );
-      this.eventBus.analytics.publish(AnalyticsEventFactory.transportLeave());
+      this.pluginUsageTracker.updatePluginUsageData(transportLeaveEvent);
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();
