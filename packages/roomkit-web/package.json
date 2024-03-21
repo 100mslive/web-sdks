@@ -1,10 +1,6 @@
 {
   "name": "@100mslive/roomkit-web",
-<<<<<<< HEAD
   "version": "0.2.3-alpha.6",
-=======
-  "version": "0.2.2",
->>>>>>> dev
   "description": "A web component implementation of 100ms Prebuilt component",
   "keywords": [
     "web-components",

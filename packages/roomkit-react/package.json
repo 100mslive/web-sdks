@@ -10,11 +10,7 @@
     "prebuilt",
     "roomkit"
   ],
-<<<<<<< HEAD
   "version": "0.3.3-alpha.6",
-=======
-  "version": "0.3.2",
->>>>>>> dev
   "author": "100ms",
   "license": "MIT",
   "repository": {
