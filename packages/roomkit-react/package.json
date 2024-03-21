@@ -10,7 +10,11 @@
     "prebuilt",
     "roomkit"
   ],
+<<<<<<< HEAD
   "version": "0.3.3-alpha.6",
+=======
+  "version": "0.3.2",
+>>>>>>> dev
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -83,7 +87,7 @@
   },
   "dependencies": {
     "@100mslive/hls-player": "0.3.3-alpha.6",
-    "@100mslive/hms-noise-cancellation": "0.0.0-alpha.1",
+    "@100mslive/hms-noise-cancellation": "0.0.0-alpha.5",
     "@100mslive/hms-virtual-background": "1.13.3-alpha.6",
     "@100mslive/react-icons": "0.10.3-alpha.6",
     "@100mslive/react-sdk": "0.10.3-alpha.6",

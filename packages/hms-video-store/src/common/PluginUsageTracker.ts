@@ -1,53 +1,53 @@
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import { EventBus } from '../events/EventBus';
 
-class PluginUsageTracker {
+export class PluginUsageTracker {
   private pluginUsage: Map<string, number> = new Map<string, number>();
   private pluginLastAddedAt: Map<string, number> = new Map<string, number>();
 
-  getPluginUsage = (name: string, sessionID: string) => {
-    const pluginKey = `${sessionID}-${name}`;
+  constructor(private eventBus: EventBus) {
+    this.eventBus.analytics.subscribe(e => this.updatePluginUsageData(e));
+  }
 
-    if (!this.pluginUsage.has(pluginKey)) {
-      this.pluginUsage.set(pluginKey, 0);
+  getPluginUsage = (name: string) => {
+    if (!this.pluginUsage.has(name)) {
+      this.pluginUsage.set(name, 0);
     }
-    if (this.pluginLastAddedAt.has(pluginKey)) {
-      const lastAddedAt = this.pluginLastAddedAt.get(pluginKey) || 0;
+    if (this.pluginLastAddedAt.has(name)) {
+      const lastAddedAt = this.pluginLastAddedAt.get(name) || 0;
       const extraDuration = lastAddedAt ? Date.now() - lastAddedAt : 0;
-      this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + extraDuration);
-      this.pluginLastAddedAt.delete(pluginKey);
+      this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + extraDuration);
+      this.pluginLastAddedAt.delete(name);
     }
-    return this.pluginUsage.get(pluginKey);
+    const finalValue = this.pluginUsage.get(name);
+    return finalValue;
   };
 
-  updatePluginUsageData = (event: AnalyticsEvent, sessionID: string) => {
-    // Sent on leave, after krisp usage is sent
-    if (event.name === 'transport.leave') {
-      this.cleanup(sessionID);
-      return;
-    }
-
-    const name = event.properties.plugin_name;
-    const pluginKey = `${sessionID}-${name}`;
-    if (event.name === 'mediaPlugin.added') {
-      const addedAt = event.properties.added_at;
-      this.pluginLastAddedAt.set(pluginKey, addedAt);
-    } else if (event.name === 'mediaPlugin.stats') {
-      const duration = event.properties.duration;
-      if (duration > 0) {
-        this.pluginUsage.set(pluginKey, (this.pluginUsage.get(pluginKey) || 0) + duration * 1000);
-        this.pluginLastAddedAt.delete(pluginKey);
+  // eslint-disable-next-line complexity
+  updatePluginUsageData = (event: AnalyticsEvent) => {
+    const name = event.properties?.plugin_name || '';
+    switch (event.name) {
+      case 'mediaPlugin.toggled.on':
+      case 'mediaPlugin.added': {
+        const addedAt = event.properties.added_at || Date.now();
+        this.pluginLastAddedAt.set(name, addedAt);
+        break;
       }
+      case 'mediaPlugin.toggled.off':
+      case 'mediaPlugin.stats': {
+        if (this.pluginLastAddedAt.has(name)) {
+          const duration = event.properties.duration || (Date.now() - (this.pluginLastAddedAt.get(name) || 0)) / 1000;
+          this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + Math.max(duration, 0) * 1000);
+          this.pluginLastAddedAt.delete(name);
+        }
+        break;
+      }
+      default:
     }
   };
 
-  private cleanup = (sessionID: string) => {
-    for (const key of this.pluginUsage.keys()) {
-      if (sessionID.length && key.includes(sessionID)) {
-        this.pluginUsage.delete(key);
-        this.pluginLastAddedAt.delete(key);
-      }
-    }
+  cleanup = () => {
+    this.pluginLastAddedAt.clear();
+    this.pluginUsage.clear();
   };
 }
-
-export const pluginUsageTracker = new PluginUsageTracker();

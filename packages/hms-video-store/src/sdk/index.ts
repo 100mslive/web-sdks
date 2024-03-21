@@ -12,7 +12,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { pluginUsageTracker } from '../common/PluginUsageTracker';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -119,6 +119,7 @@ export class HMSSdk implements HMSInterface {
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private interactivityCenter!: InteractivityCenter;
+  private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private playlistSettings: HMSPlaylistSettings = {
@@ -156,6 +157,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
@@ -179,6 +181,7 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+      this.pluginUsageTracker,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
@@ -572,8 +575,6 @@ export class HMSSdk implements HMSInterface {
       throw error;
     }
     HMSLogger.timeEnd(`join-room-${roomId}`);
-    const sessionID = this.store.getRoom()?.sessionId || '';
-    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsageData(e, sessionID));
   }
 
   private stringifyMetadata(config: HMSConfig) {
