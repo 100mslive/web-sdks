@@ -60,5 +60,5 @@ export enum InitFlags {
   FLAG_EFFECTS_SDK_ENABLED = 'effectsSDKEnabled',
   FLAG_HIPAA_ENABLED = 'hipaa',
   FLAG_NOISE_CANCELLATION = 'noiseCancellation',
-  FLAG_SCREENSHARE_OPTIMIZATION = 'optimizeScreenshare',
+  FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS = 'scaleScreenshareBasedOnPixels',
 }

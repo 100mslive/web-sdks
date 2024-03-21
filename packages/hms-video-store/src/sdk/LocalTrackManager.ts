@@ -189,7 +189,7 @@ export class LocalTrackManager {
       }
     });
   }
-  async getLocalScreen(partialConfig?: HMSScreenShareConfig, needOptimized = false) {
+  async getLocalScreen(partialConfig?: HMSScreenShareConfig, optimise = false) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
@@ -217,11 +217,9 @@ export class LocalTrackManager {
       HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
-      console.log('need optimization ', needOptimized);
-      // TODO remove after testing
-      // if (needOptimized) {
-      await this.optimizeScreenShareConstraint(stream, constraints);
-      // }
+      if (optimise) {
+        await this.optimizeScreenShareConstraint(stream, constraints);
+      }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
       const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);

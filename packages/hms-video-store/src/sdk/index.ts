@@ -1345,7 +1345,7 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCREENSHARE_OPTIMIZATION);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
     const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
