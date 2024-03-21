@@ -11,6 +11,7 @@ import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -86,6 +87,7 @@ export default class HMSTransport {
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
+    private pluginUsageTracker: PluginUsageTracker,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -495,9 +497,9 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
-      const sessionID = this.store.getRoom()?.sessionId || '';
-      this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage(sessionID));
-      this.eventBus.analytics.publish(AnalyticsEventFactory.transportLeave());
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.getKrispUsage(this.pluginUsageTracker.getPluginUsage('HMSKrispPlugin')!),
+      );
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();

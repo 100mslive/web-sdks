@@ -3,6 +3,7 @@ import { HMSNotificationMethod } from './HMSNotificationMethod';
 import { NotificationManager } from './NotificationManager';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
@@ -95,6 +96,7 @@ beforeEach(() => {
     eventBus,
     new AnalyticsEventsService(store),
     new AnalyticsTimer(),
+    new PluginUsageTracker(eventBus),
   );
   store.setRoom(new HMSRoom('1234'));
 
