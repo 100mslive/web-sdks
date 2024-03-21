@@ -6,6 +6,7 @@ import {
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPermissions,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -50,6 +51,7 @@ import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane'
 import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
+// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
@@ -93,6 +95,8 @@ export const MwebOptions = ({
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const { title, description } = useRoomLayoutHeader();
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
@@ -171,7 +175,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
-            {elements.hand_raise ? (
+            {!noAVPermissions ? (
               <ActionTile.Root
                 active={isHandRaised}
                 onClick={() => {

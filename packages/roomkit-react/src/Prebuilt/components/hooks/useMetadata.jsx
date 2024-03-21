@@ -15,7 +15,7 @@ export const useMyMetadata = () => {
   const metaData = useHMSStore(selectPeerMetadata(localPeerId));
   const isHandRaised = useHMSStore(selectHasPeerHandRaised(localPeerId));
 
-  const update = async (updatedFields: Record<string, any>) => {
+  const update = async updatedFields => {
     try {
       // get current state from store and merge updated fields
       const currentMetadata = vanillaStore.getState(selectPeerMetadata(localPeerId));
@@ -24,7 +24,6 @@ export const useMyMetadata = () => {
     } catch (error) {
       console.error('failed to update metadata ', updatedFields);
     }
-    return false;
   };
 
   const toggleHandRaise = useCallback(async () => {
@@ -44,6 +43,12 @@ export const useMyMetadata = () => {
     }
   }, [metaData?.isBRBOn]); //eslint-disable-line
 
+  const setPrevRole = async role => {
+    await update({
+      prevRole: role,
+    });
+  };
+
   return {
     isHandRaised,
     isBRBOn: !!metaData?.isBRBOn,
@@ -51,5 +56,6 @@ export const useMyMetadata = () => {
     updateMetaData: update,
     toggleHandRaise,
     toggleBRB,
+    setPrevRole,
   };
 };

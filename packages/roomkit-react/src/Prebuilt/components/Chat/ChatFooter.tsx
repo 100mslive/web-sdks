@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSException, selectLocalPeer, useAVToggle, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -89,6 +89,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
   const isMwebHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
@@ -273,7 +275,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 }}
                 gap="2"
               >
-                <RaiseHand css={{ bg: '$surface_default' }} />
+                {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
                 <MoreSettings elements={elements} screenType={screenType} />
               </Flex>
             </>

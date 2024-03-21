@@ -29,6 +29,7 @@ import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
+// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS } from '../../../common/constants';
