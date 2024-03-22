@@ -3,7 +3,9 @@ import { useMedia } from 'react-use';
 import {
   DeviceType,
   selectIsLocalVideoEnabled,
+  selectLocalPeerID,
   selectLocalVideoTrackID,
+  selectPeerAudioByID,
   selectVideoTrackByID,
   useDevices,
   useHMSActions,
@@ -29,6 +31,8 @@ const Settings = ({ setHide }) => {
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const localPeerID = useHMSStore(selectLocalPeerID);
+  const localAudioLevel = useHMSStore(selectPeerAudioByID(localPeerID));
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for example) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
@@ -84,6 +88,10 @@ const Settings = ({ setHide }) => {
           />
         </Fragment>
       ) : null}
+
+      <Box css={{ w: '100%', r: '$2', overflow: 'hidden', bg: '$surface_brighter', mb: '$2' }}>
+        <Flex css={{ w: `${localAudioLevel}%`, transition: 'width 50ms ease', bg: '$alert_success', h: '$3' }} />
+      </Box>
 
       {audioInput?.length ? (
         <DeviceSelector
