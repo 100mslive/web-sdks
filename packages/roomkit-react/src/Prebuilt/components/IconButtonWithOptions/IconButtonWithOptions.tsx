@@ -34,8 +34,8 @@ const IconSection = styled(IconButton, {
   },
   '@md': {
     mx: 0,
-    borderTopRightRadius: '$1',
-    borderBottomRightRadius: '$1',
+    borderTopRightRadius: '$1 !important',
+    borderBottomRightRadius: '$1 !important',
   },
   variants: {
     ...variants,
