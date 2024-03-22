@@ -217,9 +217,10 @@ export class LocalTrackManager {
       HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
-      if (optimise) {
-        await this.optimizeScreenShareConstraint(stream, constraints);
-      }
+      console.log('optimize ', optimise);
+      // if (optimise) {
+      await this.optimizeScreenShareConstraint(stream, constraints);
+      // }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
       const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
