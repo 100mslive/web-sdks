@@ -235,6 +235,14 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static getKrispUsage(duration: number) {
+    return new AnalyticsEvent({
+      name: 'krisp.usage',
+      level: AnalyticsEventLevel.INFO,
+      properties: { duration },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

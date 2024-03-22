@@ -57,6 +57,7 @@ export interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCo
   totalFreezesDuration?: number;
   jitterBufferDelay?: number;
   jitterBufferEmittedCount?: number;
+  estimatedPlayoutTimestamp?: DOMHighResTimeStamp;
 }
 
 export type PeerConnectionType = 'publish' | 'subscribe';

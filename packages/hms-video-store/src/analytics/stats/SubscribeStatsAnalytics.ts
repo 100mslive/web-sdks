@@ -92,12 +92,16 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
 
   // eslint-disable-next-line complexity
   private calculateAvSyncForStat(trackStats: HMSTrackStats, hmsStats: HMSWebrtcStats) {
-    if (!trackStats.peerID || !(trackStats.kind === 'video')) {
+    if (!trackStats.peerID || !trackStats.estimatedPlayoutTimestamp || trackStats.kind !== 'video') {
       return;
     }
     const peer = this.store.getPeerById(trackStats.peerID);
     const audioTrack = peer?.audioTrack;
     const videoTrack = peer?.videoTrack;
+    /**
+     * 1. Send value as MAX_SAFE_INTEGER when either audio or value track is muted for the entire window
+     * 2. When both audio and video are unmuted for a part of window , then divide the difference by those many number of samples only
+     */
     const areBothTracksEnabled = audioTrack && videoTrack && audioTrack.enabled && videoTrack.enabled;
     if (!areBothTracksEnabled) {
       return MAX_SAFE_INTEGER;
@@ -106,7 +110,12 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     if (!audioStats) {
       return MAX_SAFE_INTEGER;
     }
-    return audioStats.timestamp - trackStats.timestamp;
+    if (!audioStats.estimatedPlayoutTimestamp) {
+      return;
+    }
+
+    // https://w3c.github.io/webrtc-stats/#dom-rtcinboundrtpstreamstats-estimatedplayouttimestamp
+    return audioStats.estimatedPlayoutTimestamp - trackStats.estimatedPlayoutTimestamp;
   }
 }
 
@@ -119,14 +128,9 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
 
     const baseSample = {
       timestamp: Date.now(),
-      fec_packets_discarded: this.calculateDifferenceForSample('fecPacketsDiscarded'),
-      fec_packets_received: this.calculateDifferenceForSample('fecPacketsReceived'),
-      total_samples_duration: this.calculateDifferenceForSample('totalSamplesDuration'),
-      total_packets_received: this.calculateDifferenceForSample('packetsReceived'),
-      total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
-      avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
+      avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay', false),
     };
 
     if (latestStat.kind === 'video') {
@@ -155,6 +159,11 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
         audio_concealed_samples,
         audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
         audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
+        fec_packets_discarded: this.calculateDifferenceForSample('fecPacketsDiscarded'),
+        fec_packets_received: this.calculateDifferenceForSample('fecPacketsReceived'),
+        total_samples_duration: this.calculateDifferenceForSample('totalSamplesDuration'),
+        total_packets_received: this.calculateDifferenceForSample('packetsReceived'),
+        total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       });
     }
   };
