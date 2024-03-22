@@ -158,8 +158,38 @@ export class LocalTrackManager {
     nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
-
-  async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
+  private async optimizeScreenShareConstraint(stream: MediaStream, constraints: MediaStreamConstraints) {
+    if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
+      return;
+    }
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed?.includes('screen')) {
+      return;
+    }
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = stream;
+    videoElement.addEventListener('loadedmetadata', async () => {
+      const { videoWidth, videoHeight } = videoElement;
+      const screen = publishParams.screen;
+      const pixels = screen.width * screen.height;
+      const actualAspectRatio = videoWidth / videoHeight;
+      const currentAspectRatio = screen.width / screen.height;
+      if (actualAspectRatio > currentAspectRatio) {
+        const videoConstraint = constraints.video as MediaTrackConstraints;
+        const ratio = actualAspectRatio / currentAspectRatio;
+        const sqrt_ratio = Math.sqrt(ratio);
+        if (videoWidth * videoHeight > pixels) {
+          videoConstraint.width = videoWidth / sqrt_ratio;
+          videoConstraint.height = videoHeight / sqrt_ratio;
+        } else {
+          videoConstraint.height = videoHeight * sqrt_ratio;
+          videoConstraint.width = videoWidth * sqrt_ratio;
+        }
+        await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
+      }
+    });
+  }
+  async getLocalScreen(partialConfig?: HMSScreenShareConfig, optimise = false) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
@@ -187,6 +217,9 @@ export class LocalTrackManager {
       HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+      if (optimise) {
+        await this.optimizeScreenShareConstraint(stream, constraints);
+      }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
       const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
