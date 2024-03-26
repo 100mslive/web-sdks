@@ -415,6 +415,9 @@ class Store {
       pluginName: keyof PolicyParams['plugins'],
       permission: HMSPermissionType,
     ) => {
+      if (!this.knownRoles[role]) {
+        return;
+      }
       const rolePermissions = this.knownRoles[role].permissions;
       if (!rolePermissions[pluginName]) {
         rolePermissions[pluginName] = [];
