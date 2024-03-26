@@ -9,24 +9,29 @@ import {
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
-  selectPeerMetadata,
   selectPermissions,
-  useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { ChangeRoleIcon, HandIcon, MicOffIcon, PeopleIcon, SearchIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Accordion, Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import {
+  AddIcon,
+  ChangeRoleIcon,
+  CrossIcon,
+  HandIcon,
+  MicOffIcon,
+  PeopleIcon,
+  SearchIcon,
+  VerticalMenuIcon,
+} from '@100mslive/react-icons';
+import { Accordion, Box, Button, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RemoveParticipant } from '../RemoveParticipant';
 import { RoleAccordion } from './RoleAccordion';
-import {
-  ConferencingScreenElements,
-  useRoomLayoutConferencingScreen,
-} from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { usePeerOnStageActions } from '../hooks/usePeerOnStageActions';
 import { useParticipants } from '../../common/hooks';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
@@ -146,10 +151,12 @@ export const ParticipantCount = () => {
 export const Participant = ({
   peer,
   isConnected,
+  isHandRaisedAccordion,
   style,
 }: {
   peer: HMSPeer;
   isConnected: boolean;
+  isHandRaisedAccordion?: boolean;
   style: React.CSSProperties;
 }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -175,7 +182,12 @@ export const Participant = ({
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
       {isConnected && peer.roleName ? (
-        <ParticipantActions peerId={peer.id} isLocal={peer.id === localPeerId} role={peer.roleName} />
+        <ParticipantActions
+          peerId={peer.id}
+          isLocal={peer.id === localPeerId}
+          role={peer.roleName}
+          isHandRaisedAccordion={isHandRaisedAccordion}
+        />
       ) : null}
     </Flex>
   );
@@ -247,7 +259,17 @@ const VirtualizedParticipants = ({
  * shows settings to change for a participant like changing their role
  */
 const ParticipantActions = React.memo(
-  ({ peerId, role, isLocal }: { peerId: string; role: string; isLocal: boolean }) => {
+  ({
+    peerId,
+    role,
+    isLocal,
+    isHandRaisedAccordion,
+  }: {
+    peerId: string;
+    role: string;
+    isLocal: boolean;
+    isHandRaisedAccordion?: boolean;
+  }) => {
     const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
     const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
     const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
@@ -264,72 +286,71 @@ const ParticipantActions = React.memo(
           gap: '$8',
         }}
       >
-        <ConnectionIndicator peerId={peerId} />
-        {isHandRaised && (
-          <Flex
-            align="center"
-            justify="center"
-            css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
-          >
-            <HandIcon height={19} width={19} />
-          </Flex>
-        )}
-        {isAudioMuted ? (
-          <Flex
-            align="center"
-            justify="center"
-            css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
-          >
-            <MicOffIcon height={19} width={19} />
-          </Flex>
-        ) : null}
+        {isHandRaisedAccordion ? (
+          <HandRaisedAccordionParticipantActions peerId={peerId} role={role} />
+        ) : (
+          <>
+            <ConnectionIndicator peerId={peerId} />
+            {isHandRaised && (
+              <Flex
+                align="center"
+                justify="center"
+                css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+              >
+                <HandIcon height={19} width={19} />
+              </Flex>
+            )}
+            {isAudioMuted ? (
+              <Flex
+                align="center"
+                justify="center"
+                css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+              >
+                <MicOffIcon height={19} width={19} />
+              </Flex>
+            ) : null}
 
-        {shouldShowMoreActions && !isLocal ? (
-          <ParticipantMoreActions peerId={peerId} role={role} elements={elements} canChangeRole={!!canChangeRole} />
-        ) : null}
+            {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
+          </>
+        )}
       </Flex>
     );
   },
 );
 
-const ParticipantMoreActions = ({
-  peerId,
-  role,
-  elements,
-  canChangeRole,
-}: {
-  peerId: string;
-  role: string;
-  canChangeRole: boolean;
-  elements: ConferencingScreenElements;
-}) => {
-  const hmsActions = useHMSActions();
+const quickActionStyle = { p: '$1', borderRadius: '$round' };
+const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: string; role: string }) => {
+  const { handleStageAction, lowerPeerHand, shouldShowStageRoleChange, isInStage } = usePeerOnStageActions({
+    peerId,
+    role,
+  });
+  if (!shouldShowStageRoleChange) {
+    return null;
+  }
+  return (
+    <>
+      <Button variant="standard" css={quickActionStyle} onClick={lowerPeerHand}>
+        <CrossIcon height={18} width={18} />
+      </Button>
+      {!isInStage && (
+        <Button variant="primary" onClick={handleStageAction} css={quickActionStyle}>
+          <AddIcon height={18} width={18} />
+        </Button>
+      )}
+    </>
+  );
+};
+
+const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string }) => {
   const {
+    open,
+    setOpen,
     bring_to_stage_label,
     remove_from_stage_label,
-    on_stage_role,
-    off_stage_roles = [],
-    skip_preview_for_role_change = false,
-  } = elements.on_stage_exp || {};
-  const isInStage = role === on_stage_role;
-  const shouldShowStageRoleChange =
-    canChangeRole &&
-    ((isInStage && remove_from_stage_label) || (off_stage_roles?.includes(role) && bring_to_stage_label));
-  const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
-  const [open, setOpen] = useState(false);
-
-  const handleStageAction = async () => {
-    if (isInStage) {
-      prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
-    } else if (on_stage_role) {
-      await hmsActions.changeRoleOfPeer(peerId, on_stage_role, skip_preview_for_role_change);
-      if (skip_preview_for_role_change) {
-        await hmsActions.lowerRemotePeerHand(peerId);
-      }
-    }
-    setOpen(false);
-  };
-
+    handleStageAction,
+    isInStage,
+    shouldShowStageRoleChange,
+  } = usePeerOnStageActions({ peerId, role });
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger

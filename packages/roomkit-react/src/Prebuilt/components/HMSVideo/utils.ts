@@ -25,11 +25,3 @@ export function getDurationFromSeconds(timeInSeconds: number) {
   }
   return videoTimeStr;
 }
-
-export function getTime(timeInMilles: number) {
-  const timeInSeconds = Math.floor(timeInMilles / 1000);
-  const hours = Math.floor(timeInSeconds / 3600);
-  const minutes = Math.floor((timeInSeconds % 3600) / 60);
-  const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}` : '';
-  return hour + `${hour ? 'h:' : ''}` + minutes + 'm';
-}

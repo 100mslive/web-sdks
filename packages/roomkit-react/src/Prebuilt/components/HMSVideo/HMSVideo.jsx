@@ -1,26 +1,29 @@
 import React, { forwardRef } from 'react';
-import { useMedia } from 'react-use';
-import { config, Flex } from '../../../';
-import { useIsLandscape } from '../../common/hooks';
+import { Flex } from '../../../Layout';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
-  const isLandscape = useIsLandscape();
-  const isMobile = useMedia(config.media.md);
   return (
     <Flex
       data-testid="hms-video"
       css={{
         size: '100%',
         position: 'relative',
+        justifyContent: 'center',
+        transition: 'all 0.3s ease-in-out',
+        '@md': {
+          height: 'auto',
+          '& video': {
+            height: '$60 !important',
+          },
+        },
         '& video::cue': {
           color: 'white',
-          // textShadow: '0px 0px 4px #000',
           whiteSpace: 'pre-line',
-          fontSize: '$lg',
+          fontSize: '$sm',
           fontStyle: 'normal',
-          fontWeight: '$semiBold',
+          fontWeight: '$regular',
           lineHeight: '$sm',
-          letterSpacing: '0.5px',
+          letterSpacing: '0.25px',
         },
         '& video::-webkit-media-text-track-display': {
           padding: '0 $4',
@@ -35,16 +38,16 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
     >
       <video
         style={{
-          flex: '1 1 0',
           margin: '0 auto',
-          minHeight: '0',
           objectFit: 'contain',
-          width: 'inherit',
-          height: isLandscape || isMobile ? '100%' : '',
-          position: isLandscape || isMobile ? 'absolute' : '',
+          width: 'auto',
+          height: 'auto',
+          maxWidth: '100%',
+          maxHeight: '100%',
         }}
         ref={videoRef}
         playsInline
+        disablePictureInPicture
       />
       {children}
     </Flex>

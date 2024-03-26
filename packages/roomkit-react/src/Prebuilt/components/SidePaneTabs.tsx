@@ -41,9 +41,8 @@ const ParticipantCount = ({ count }: { count: number }) => {
 
 export const SidePaneTabs = React.memo<{
   active: 'Participants | Chat';
-  hideControls?: boolean;
   hideTab?: boolean;
-}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideControls, hideTab = false }) => {
+}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideTab = false }) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const resetSidePane = useSidepaneReset();
@@ -85,7 +84,6 @@ export const SidePaneTabs = React.memo<{
         css={{
           color: '$on_primary_high',
           h: '100%',
-          marginTop: hideControls && isOverlayChat ? '$17' : '0',
           transition: 'margin 0.3s ease-in-out',
           position: 'relative',
         }}
@@ -103,7 +101,6 @@ export const SidePaneTabs = React.memo<{
       css={{
         color: '$on_primary_high',
         h: '100%',
-        marginTop: hideControls && isOverlayChat ? '$17' : '0',
         transition: 'margin 0.3s ease-in-out',
       }}
     >

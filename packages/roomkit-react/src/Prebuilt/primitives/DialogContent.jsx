@@ -216,7 +216,7 @@ export const DialogInputFile = ({ value, onChange, placeholder, disabled, type, 
           '&:hover': {
             border: 'none',
             background: 'none',
-            bg: '$transparent !important',
+            bg: 'transparent !important',
           },
         }}
       >

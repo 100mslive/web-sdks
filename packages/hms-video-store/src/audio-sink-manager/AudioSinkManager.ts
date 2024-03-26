@@ -274,7 +274,7 @@ export class AudioSinkManager {
     }
     this.timer = setInterval(() => {
       (async () => {
-        await this.deviceManager.init(true);
+        await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
       })();
     }, 5000);
@@ -308,14 +308,18 @@ export class AudioSinkManager {
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
         const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+        HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
         // already selected appropriate device
         if (localAudioTrack.settings.deviceId === externalDeviceID) {
           return;
         }
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
-        await localAudioTrack.setSettings({
-          deviceId: externalDeviceID,
-        });
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+        await localAudioTrack.setSettings(
+          {
+            deviceId: externalDeviceID,
+          },
+          true,
+        );
       }
     }
   };

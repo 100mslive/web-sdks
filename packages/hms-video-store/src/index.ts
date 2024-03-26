@@ -53,6 +53,7 @@ export type {
   HMSQuizLeaderboardSummary,
 } from './internal';
 
+export { EventBus } from './events/EventBus';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType } from './internal';
 export type {
@@ -62,3 +63,4 @@ export type {
   HMSPluginSupportResult,
   HMSFrameworkInfo,
 } from './internal';
+export { DomainCategory } from './analytics/AnalyticsEventDomains';

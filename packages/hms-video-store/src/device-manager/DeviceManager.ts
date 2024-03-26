@@ -86,7 +86,7 @@ export class DeviceManager implements HMSDeviceManager {
     return newDevice;
   };
 
-  async init(force = false) {
+  async init(force = false, logAnalytics = true) {
     if (this.initialized && !force) {
       return;
     }
@@ -98,13 +98,15 @@ export class DeviceManager implements HMSDeviceManager {
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.deviceChange({
-        selection: this.getCurrentSelection(),
-        type: 'list',
-        devices: this.getDevices(),
-      }),
-    );
+    if (logAnalytics) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: this.getCurrentSelection(),
+          type: 'list',
+          devices: this.getDevices(),
+        }),
+      );
+    }
   }
 
   getDevices(): DeviceMap {
@@ -190,11 +192,8 @@ export class DeviceManager implements HMSDeviceManager {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
-    if (audioTrack) {
-      await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    }
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({

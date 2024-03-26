@@ -8,16 +8,16 @@ import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, 
 import { IconButton } from '../../../IconButton';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useChatDraftMessage } from '../AppData/useChatState';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
@@ -148,11 +148,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box>
+    <Box css={{ position: 'relative' }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }}>
+          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={e => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
@@ -202,10 +202,12 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             align="center"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
+              minHeight: '$16',
               maxHeight: '$24',
               position: 'relative',
+              py: '$6',
               pl: '$8',
-              flexGrow: '1',
+              flexGrow: 1,
               r: '$1',
               '@md': {
                 minHeight: 'unset',
@@ -266,15 +268,17 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             </BaseIconButton>
           </Flex>
           {(isMwebHLSStream || isLandscapeHLSStream) && (
-            <Flex
-              css={{
-                alignItems: 'center',
-              }}
-              gap="1"
-            >
-              {noAVPermissions ? <RaiseHand /> : null}
-              <MoreSettings elements={elements} screenType={screenType} />
-            </Flex>
+            <>
+              <Flex
+                css={{
+                  alignItems: 'center',
+                }}
+                gap="2"
+              >
+                {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
+                <MoreSettings elements={elements} screenType={screenType} />
+              </Flex>
+            </>
           )}
         </Flex>
       )}

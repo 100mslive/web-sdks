@@ -22,6 +22,8 @@ import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
+import { EmojiReaction } from './EmojiReaction';
+// @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
@@ -195,12 +197,22 @@ export const ConferenceScreen = () => {
               alignItems: 'center',
               pr: '$4',
               pb: '$4',
+              position: 'relative',
             }}
             justify="end"
-            gap="1"
+            gap="2"
           >
             {noAVPermissions ? <RaiseHand /> : null}
             <MoreSettings elements={screenProps.elements} screenType={screenProps.screenType} />
+            <Box
+              css={{
+                position: 'absolute',
+                bottom: '100%',
+                mb: '$4',
+              }}
+            >
+              <EmojiReaction />
+            </Box>
           </Flex>
         )}
         <RoleChangeRequestModal />

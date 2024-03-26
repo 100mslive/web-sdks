@@ -12,6 +12,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -62,7 +63,7 @@ import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -118,6 +119,7 @@ export class HMSSdk implements HMSInterface {
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private interactivityCenter!: InteractivityCenter;
+  private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private playlistSettings: HMSPlaylistSettings = {
@@ -155,6 +157,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
@@ -178,10 +181,10 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+      this.pluginUsageTracker,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
-
     /**
      * Note: Subscribe to events here right after creating stores and managers
      * to not miss events that are published before the handlers are subscribed.
@@ -498,6 +501,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -1342,7 +1346,8 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);

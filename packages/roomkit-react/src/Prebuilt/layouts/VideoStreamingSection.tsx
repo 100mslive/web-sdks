@@ -5,14 +5,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
-import {
-  selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
-  selectPeerScreenSharing,
-  selectWhiteboard,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
@@ -24,7 +17,6 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
-import { WhiteboardView } from './WhiteboardView';
 import {
   usePDFConfig,
   useUrlToEmbed,
@@ -32,7 +24,7 @@ import {
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
-import { useMobileHLSStream } from '../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -50,14 +42,13 @@ export const VideoStreamingSection = ({
 }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const isWhiteboardOpen = useHMSStore(selectWhiteboard)?.open;
 
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -85,11 +76,14 @@ export const VideoStreamingSection = ({
         css={{
           size: '100%',
           position: 'relative',
-          gap: '$4',
+          gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
         }}
-        direction={isMobileHLSStream ? 'column' : 'row'}
+        direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
+          .with({ isLandscapeHLSStream: true }, () => 'row')
+          .with({ isMobileHLSStream: true }, () => 'column')
+          .otherwise(() => 'row')}
       >
-        {match({ screenType, localPeerRole, pdfAnnotatorActive, urlToIframe, peerSharing, isWhiteboardOpen })
+        {match({ screenType, localPeerRole, pdfAnnotatorActive, urlToIframe })
           .with(
             {
               screenType: 'hls_live_streaming',
@@ -105,17 +99,7 @@ export const VideoStreamingSection = ({
             ({ urlToIframe }) => !!urlToIframe,
             () => <EmbedView />,
           )
-          .when(
-            ({ peerSharing }) => !!peerSharing,
-            () => {
-              // @ts-ignore
-              return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
-            },
-          )
-          .when(
-            ({ isWhiteboardOpen }) => !!isWhiteboardOpen,
-            () => <WhiteboardView />,
-          )
+
           .otherwise(() => {
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
@@ -123,7 +107,11 @@ export const VideoStreamingSection = ({
 
         <Box
           css={{
-            flex: isMobileHLSStream ? '1 1 0' : undefined,
+            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+              .with({ isMobileHLSStream: true }, () => '2 1 0')
+              .otherwise(() => undefined),
+            position: 'relative',
             height: !isMobileHLSStream ? '100%' : undefined,
             maxHeight: '100%',
             '&:empty': { display: 'none' },
