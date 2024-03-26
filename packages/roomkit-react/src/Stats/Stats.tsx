@@ -56,7 +56,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 }
                 const layer = stat.rid ? simulcastMapping[stat.rid as RID] : '';
                 return (
-                  <Fragment>
+                  <Fragment key={`${stat.id}${stat.rid}`}>
                     {layer && <StatsRow label={layer.toUpperCase()} value="" />}
                     <StatsRow
                       show={isNotNullishAndNot0(stat.frameWidth)}
