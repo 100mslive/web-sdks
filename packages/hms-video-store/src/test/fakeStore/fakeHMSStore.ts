@@ -98,6 +98,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{}',
         groups: [],
         isHandRaised: false,
+        type: 'regular',
       },
       '2': {
         id: '2',
@@ -110,6 +111,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{"hello":"world"}',
         groups: [],
         isHandRaised: false,
+        type: 'regular',
       },
       '3': {
         id: '3',
@@ -121,6 +123,7 @@ export const makeFakeStore = (): HMSStore => {
         auxiliaryTracks: [],
         groups: [],
         isHandRaised: false,
+        type: 'regular',
       },
     },
     tracks: {

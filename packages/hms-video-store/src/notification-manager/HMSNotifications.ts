@@ -1,4 +1,5 @@
 import { VideoTrackLayerUpdate } from '../connection/channel-messages';
+import { HMSPeerType } from '../interfaces/peer/hms-peer';
 import { HMSRole } from '../interfaces/role';
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
@@ -39,7 +40,7 @@ export interface Info {
   name: string;
   data: string;
   user_id: string;
-  type: 'sip' | 'regular';
+  type: HMSPeerType;
 }
 
 export enum HMSRecordingState {

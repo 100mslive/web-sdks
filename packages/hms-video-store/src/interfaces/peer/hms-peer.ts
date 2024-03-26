@@ -1,6 +1,8 @@
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../media/tracks';
 import { HMSRole } from '../role';
 
+export type HMSPeerType = 'sip' | 'regular';
+
 export interface HMSPeer {
   peerId: string;
   name: string;
@@ -16,7 +18,7 @@ export interface HMSPeer {
   groups?: string[];
   realtime?: boolean;
   isHandRaised: boolean;
-  type: 'sip' | 'regular';
+  type: HMSPeerType;
 
   updateRole(newRole: HMSRole): void;
   updateName(newName: string): void;

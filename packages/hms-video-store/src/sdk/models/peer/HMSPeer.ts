@@ -1,4 +1,5 @@
 import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
+import { HMSPeerType } from '../../../interfaces/peer/hms-peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
 import { HAND_RAISE_GROUP_NAME } from '../../../utils/constants';
@@ -16,7 +17,7 @@ export type HMSPeerInit = {
   groups?: string[];
   realtime?: boolean;
   isHandRaised?: boolean;
-  type: 'sip' | 'regular';
+  type: HMSPeerType;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -33,7 +34,7 @@ export class HMSPeer implements IHMSPeer {
   networkQuality?: number;
   groups?: string[];
   realtime?: boolean;
-  type: 'sip' | 'regular';
+  type: HMSPeerType;
 
   constructor({
     peerId,
