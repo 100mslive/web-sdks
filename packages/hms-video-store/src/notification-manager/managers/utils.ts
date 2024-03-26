@@ -10,5 +10,6 @@ export const createRemotePeer = (notifPeer: PeerNotificationInfo, store: Store) 
     customerUserId: notifPeer.info.user_id,
     metadata: notifPeer.info.data,
     groups: notifPeer.groups,
+    type: notifPeer.info.type,
   });
 };
