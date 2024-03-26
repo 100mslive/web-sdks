@@ -24,12 +24,14 @@ import {
   HMSVideoTrack,
 } from '../../media/tracks';
 import { PolicyParams } from '../../notification-manager';
+import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store {
+  private TAG = '[Store]:';
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -416,6 +418,7 @@ class Store {
       permission: HMSPermissionType,
     ) => {
       if (!this.knownRoles[role]) {
+        HMSLogger.d(this.TAG, 'Known roles is not present', this.knownRoles);
         return;
       }
       const rolePermissions = this.knownRoles[role].permissions;
