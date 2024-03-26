@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-noise-cancellation@0.0.0-alpha.1":
-  version "0.0.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.0-alpha.1.tgz#894adbbbc8da757228d98719d3fc17abe129b11f"
-  integrity sha512-GZpycuSW0uA73vbOJy7AKs6xc8U+ifzm9xIOEwtAA28VubeyaEP9LbaP7NWrUkqAmkGl9fRMuxQWoG3gKYek2Q==
+"@100mslive/hms-noise-cancellation@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.1.tgz#037c8bdfb6b2d7bf12f9d257422150fe6ca43acb"
+  integrity sha512-DGnzcXRDJREWypIjGX70er+f2k/XLLRF41lrXPs1+PtB1imdEkECPPS0Fg4BA0BCWKDNAGTZBHZPrBDgUmr9Lw==
 
 "@100mslive/types-prebuilt@0.12.8":
   version "0.12.8"
@@ -9764,9 +9764,9 @@ flow-parser@0.*:
   integrity sha512-RW1Dh6BuT14DA7+gtNRKzgzvG3GTPdrceHCi4ddZ9VFGQ9HtO5L8wzxMGsor7XtInIrbWZZCSak0oxnBF7tApw==
 
 follow-redirects@^1.15.4:
-  version "1.15.5"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.5.tgz#54d4d6d062c0fa7d9d17feb008461550e3ba8020"
-  integrity sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==
+  version "1.15.6"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
+  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
 
 for-each@^0.3.3:
   version "0.3.3"

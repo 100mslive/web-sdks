@@ -96,6 +96,7 @@ const publishParams = hostRole.publishParams;
 let localPeer = new HMSLocalPeer({
   name: 'test',
   role: hostRole,
+  type: 'regular',
 });
 testStore.addPeer(localPeer);
 
@@ -231,6 +232,7 @@ describe('LocalTrackManager', () => {
     localPeer = new HMSLocalPeer({
       name: 'test',
       role: hostRole,
+      type: 'regular',
     });
     testStore.addPeer(localPeer);
   });
@@ -408,6 +410,7 @@ describe('LocalTrackManager', () => {
       localPeer = new HMSLocalPeer({
         name: 'test',
         role: hostRole,
+        type: 'regular',
       });
       testStore.addPeer(localPeer);
       mockGetUserMedia.mockClear();

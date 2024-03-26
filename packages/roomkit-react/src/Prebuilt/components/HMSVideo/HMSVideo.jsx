@@ -9,6 +9,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         size: '100%',
         position: 'relative',
         justifyContent: 'center',
+        transition: 'all 0.3s ease-in-out',
         '@md': {
           height: 'auto',
           '& video': {

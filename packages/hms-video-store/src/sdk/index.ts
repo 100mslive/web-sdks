@@ -12,7 +12,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { pluginUsageTracker } from '../common/PluginUsageTracker';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -63,7 +63,7 @@ import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -119,6 +119,7 @@ export class HMSSdk implements HMSInterface {
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private interactivityCenter!: InteractivityCenter;
+  private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private playlistSettings: HMSPlaylistSettings = {
@@ -156,6 +157,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
@@ -179,6 +181,7 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+      this.pluginUsageTracker,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
@@ -572,8 +575,6 @@ export class HMSSdk implements HMSInterface {
       throw error;
     }
     HMSLogger.timeEnd(`join-room-${roomId}`);
-    const sessionID = this.store.getRoom()?.sessionId || '';
-    this.eventBus.analytics.subscribe(e => pluginUsageTracker.updatePluginUsageData(e, sessionID));
   }
 
   private stringifyMetadata(config: HMSConfig) {
@@ -1299,6 +1300,7 @@ export class HMSSdk implements HMSInterface {
       role: policy,
       // default value is the original role if user didn't pass asRole in config
       asRole: asRolePolicy || policy,
+      type: 'regular',
     });
 
     this.store.addPeer(localPeer);
@@ -1345,7 +1347,8 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);

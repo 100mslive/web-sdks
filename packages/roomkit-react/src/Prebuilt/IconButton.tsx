@@ -7,21 +7,17 @@ const IconButton = styled(BaseIconButton, {
   border: '1px solid $border_bright',
   bg: '$background_dim',
   r: '$1',
+  '&[disabled]': {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+    backgroundColor: '$secondary_dim',
+    color: '$on_primary_high',
+  },
   variants: {
     active: {
       true: {
         color: '$on_surface_high',
         backgroundColor: 'transparent',
-      },
-      false: {
-        border: '1px solid transparent',
-        color: '$on_primary_high',
-      },
-    },
-    disabled: {
-      true: {
-        backgroundColor: '$surface_brighter',
-        color: '$on_surface_low',
       },
     },
   },

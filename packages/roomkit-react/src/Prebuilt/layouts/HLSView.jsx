@@ -15,7 +15,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { BackwardArrowIcon, ColoredHandIcon, ForwardArrowIcon, GoLiveIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, GoLiveIcon } from '@100mslive/react-icons';
 import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -42,7 +42,7 @@ import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTION
 let hlsPlayer;
 const toastMap = {};
 
-const ToggleChat = () => {
+const ToggleChat = ({ isFullScreen = false }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
@@ -51,7 +51,10 @@ const ToggleChat = () => {
   const hmsActions = useHMSActions();
 
   useEffect(() => {
-    match({ sidepane, isMobile, showChat })
+    match({ sidepane, isMobile, showChat, isFullScreen })
+      .with({ isFullScreen: true }, () => {
+        hmsActions.setAppData(APP_DATA.sidePane, '');
+      })
       .with({ isMobile: true, showChat: true, sidepane: P.when(value => !value) }, () => {
         toggleChat();
       })
@@ -61,12 +64,13 @@ const ToggleChat = () => {
       .otherwise(() => {
         //do nothing
       });
-  }, [sidepane, isMobile, toggleChat, showChat, hmsActions]);
+  }, [sidepane, isMobile, toggleChat, showChat, hmsActions, isFullScreen]);
   return null;
 };
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef();
+  const { elements } = useRoomLayoutConferencingScreen();
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const notification = useHMSNotifications(HMSNotificationTypes.POLL_STOPPED);
@@ -81,7 +85,11 @@ const HLSView = () => {
   const [hasCaptions, setHasCaptions] = useState(false);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
-  const [isSeekEnabled, setIsSeekEnabled] = useState(false);
+  const [hoverControlsVisible, setHoverControlsVisible] = useState({
+    seekForward: false,
+    pausePlay: false,
+    seekBackward: false,
+  });
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
   const lastHlsUrl = usePrevious(hlsUrl);
@@ -93,6 +101,8 @@ const HLSView = () => {
   const controlsTimerRef = useRef();
   const [seekProgress, setSeekProgress] = useState(false);
   const isFullScreenSupported = screenfull.isEnabled;
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const showChat = !!elements?.chat;
 
   const isMobile = useMedia(config.media.md);
   const isLandscape = useIsLandscape();
@@ -233,7 +243,19 @@ const HLSView = () => {
       setIsVideoLive(isLive);
     };
 
-    const playbackEventHandler = data => setIsPaused(data.state === HLSPlaybackState.paused);
+    const playbackEventHandler = data => {
+      setIsPaused(data.state === HLSPlaybackState.paused);
+      setHoverControlsVisible({
+        ...hoverControlsVisible,
+        pausePlay: true,
+      });
+      setTimeout(() => {
+        setHoverControlsVisible({
+          ...hoverControlsVisible,
+          pausePlay: false,
+        });
+      }, 2000);
+    };
     const captionEnabledEventHandler = isCaptionEnabled => {
       setIsCaptionEnabled(isCaptionEnabled);
     };
@@ -314,28 +336,63 @@ const HLSView = () => {
     };
   }, [controlsVisible, isFullScreen, seekProgress, qualityDropDownOpen]);
 
-  const onSeekTo = useCallback(seek => {
-    hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
-  }, []);
+  const onSeekTo = useCallback(
+    seek => {
+      match({ isLandscape, isMobile, seek })
+        .with({ seek: -10, isMobile: false, isLandscape: false }, () => {
+          setHoverControlsVisible({ ...hoverControlsVisible, seekBackward: true });
+          setTimeout(() => {
+            setHoverControlsVisible({
+              ...hoverControlsVisible,
+              seekBackward: false,
+            });
+          }, 1000);
+        })
+        .with({ seek: 10, isMobile: false, isLandscape: false }, () => {
+          setHoverControlsVisible({ ...hoverControlsVisible, seekForward: true });
+          setTimeout(() => {
+            setHoverControlsVisible({
+              ...hoverControlsVisible,
+              seekForward: false,
+            });
+          }, 1000);
+        })
+        .otherwise(() => null);
+      hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
+    },
+    [hoverControlsVisible, isLandscape, isMobile],
+  );
   const onDoubleClickHandler = useCallback(
     event => {
       if (!(isMobile || isLandscape) || hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
         return;
       }
       const sidePercentage = (event.screenX * 100) / event.target.clientWidth;
-      setIsSeekEnabled(true);
       // there is space for pause/unpause button
       if (sidePercentage < 45) {
+        setHoverControlsVisible({
+          ...hoverControlsVisible,
+          seekBackward: true,
+        });
         onSeekTo(-10);
       } else {
+        setHoverControlsVisible({
+          ...hoverControlsVisible,
+          seekForward: true,
+        });
         onSeekTo(10);
       }
       setTimeout(() => {
-        setIsSeekEnabled(false);
-      }, 200);
+        setHoverControlsVisible({
+          ...hoverControlsVisible,
+          seekForward: false,
+          seekBackward: false,
+        });
+      }, 1000);
     },
-    [hlsState?.variants, isLandscape, isMobile, onSeekTo],
+    [hlsState?.variants, hoverControlsVisible, isLandscape, isMobile, onSeekTo],
   );
+
   const onClickHandler = useCallback(async () => {
     match({ isMobile, isLandscape, playlist_type: hlsState?.variants[0]?.playlist_type })
       .with({ playlist_type: HLSPlaylistType.DVR, isMobile: false, isLandscape: false }, async () => {
@@ -356,6 +413,7 @@ const HLSView = () => {
       )
       .otherwise(() => null);
   }, [hlsState?.variants, isLandscape, isMobile, isPaused]);
+
   const onHoverHandler = useCallback(
     event => {
       event.preventDefault();
@@ -423,6 +481,7 @@ const HLSView = () => {
       justify="center"
       css={{
         flex: isLandscape ? '2 1 0' : '1 1 0',
+        transition: 'all 0.3s ease-in-out',
         '&:fullscreen': {
           '& video': {
             height: 'unset !important',
@@ -484,53 +543,37 @@ const HLSView = () => {
             }}
           >
             <>
+              {!(isMobile || isLandscape) && (
+                <Flex
+                  align="center"
+                  justify="between"
+                  css={{
+                    position: 'absolute',
+                    bg: '#00000066',
+                    display: 'inline-flex',
+                    gap: '$2',
+                    zIndex: 1,
+                    size: '100%',
+                  }}
+                >
+                  {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
+                    <HMSVideoPlayer.PlayPauseSeekControls.Overlay
+                      isPaused={isPaused}
+                      showControls={controlsVisible}
+                      hoverControlsVisible={hoverControlsVisible}
+                    />
+                  )}
+                </Flex>
+              )}
               {isMobile || isLandscape ? (
                 <>
-                  <Flex
-                    align="center"
-                    justify="center"
-                    css={{
-                      position: 'absolute',
-                      bg: '#00000066',
-                      display: 'inline-flex',
-                      gap: '$2',
-                      zIndex: 1,
-                      size: '100%',
-                      visibility: controlsVisible ? `` : `hidden`,
-                      opacity: controlsVisible ? `1` : '0',
-                    }}
-                  >
-                    {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
-                      <>
-                        <HMSVideoPlayer.Seeker
-                          title="backward"
-                          css={{
-                            visibility: isSeekEnabled ? `` : `hidden`,
-                            opacity: isSeekEnabled ? `1` : '0',
-                          }}
-                        >
-                          <BackwardArrowIcon width={32} height={32} />
-                        </HMSVideoPlayer.Seeker>
-                        <Box
-                          css={{
-                            bg: 'rgba(0, 0, 0, 0.6)',
-                            r: '$round',
-                          }}
-                        >
-                          <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
-                        </Box>
-                        <HMSVideoPlayer.Seeker
-                          title="forward"
-                          css={{
-                            visibility: isSeekEnabled ? `` : `hidden`,
-                            opacity: isSeekEnabled ? `1` : '0',
-                          }}
-                        >
-                          <ForwardArrowIcon width={32} height={32} />
-                        </HMSVideoPlayer.Seeker>
-                      </>
-                    )}
-                  </Flex>
+                  {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
+                    <HMSVideoPlayer.PlayPauseSeekControls.Overlay
+                      isPaused={isPaused}
+                      showControls={controlsVisible}
+                      hoverControlsVisible={hoverControlsVisible}
+                    />
+                  )}
                   <Flex
                     ref={controlsRef}
                     direction="column"
@@ -553,7 +596,19 @@ const HLSView = () => {
                       }}
                     >
                       <HMSVideoPlayer.Controls.Right>
-                        {isLandscape && <ChatToggle />}
+                        {(isLandscape || (isMobile && isFullScreen)) && showChat && (
+                          <ChatToggle
+                            onClick={() => {
+                              if (isFullScreen) {
+                                toggle();
+                              }
+                              // toggle and closing fullscreen takes few ms, to make it synced we are calling settimeout
+                              setTimeout(() => {
+                                toggleChat();
+                              }, 0);
+                            }}
+                          />
+                        )}
                         {hasCaptions && !isHlsAutoplayBlocked && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
                         {hlsViewRef.current && availableLayers.length > 0 && !isHlsAutoplayBlocked ? (
                           <HLSQualitySelector
@@ -606,23 +661,7 @@ const HLSView = () => {
                         <>
                           {hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
                             <>
-                              <HMSVideoPlayer.Seeker
-                                onClick={() => {
-                                  onSeekTo(-10);
-                                }}
-                                title="backward"
-                              >
-                                <BackwardArrowIcon width={20} height={20} />
-                              </HMSVideoPlayer.Seeker>
-                              <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
-                              <HMSVideoPlayer.Seeker
-                                onClick={() => {
-                                  onSeekTo(10);
-                                }}
-                                title="forward"
-                              >
-                                <ForwardArrowIcon width={20} height={20} />
-                              </HMSVideoPlayer.Seeker>
+                              <HMSVideoPlayer.PlayPauseSeekControls.Button isPaused={isPaused} onSeekTo={onSeekTo} />
                               {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                             </>
                           ) : null}
@@ -631,7 +670,8 @@ const HLSView = () => {
                       )}
                       <IconButton
                         css={{ px: '$2' }}
-                        onClick={async () => {
+                        onClick={async e => {
+                          e.stopPropagation();
                           await hlsPlayer?.seekToLivePosition();
                           setIsVideoLive(true);
                         }}
@@ -690,7 +730,7 @@ const HLSView = () => {
           </HMSVideoPlayer.Root>
         </Flex>
       </HMSPlayerContext.Provider>
-      <ToggleChat />
+      <ToggleChat isFullScreen={isFullScreen} />
       {isMobile && !isFullScreen && <HLSViewTitle />}
     </Flex>
   );
