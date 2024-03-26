@@ -1135,6 +1135,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   protected onMessageReceived(message: MessageNotification) {
+    // check if type `captions`
+    if (message.info.type === 'captions') {
+      return;
+    }
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
@@ -1154,6 +1158,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       'newMessage',
       150,
     );
+  }
+
+  protected putCaptionInStore() {
+    // this.setState(store => {
+    //   store.captions;
+    // });
   }
 
   /*
