@@ -39,6 +39,7 @@ export interface Info {
   name: string;
   data: string;
   user_id: string;
+  type: 'sip' | 'regular';
 }
 
 export enum HMSRecordingState {

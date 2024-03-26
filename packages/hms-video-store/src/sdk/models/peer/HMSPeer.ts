@@ -16,6 +16,7 @@ export type HMSPeerInit = {
   groups?: string[];
   realtime?: boolean;
   isHandRaised?: boolean;
+  type: 'sip' | 'regular';
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -32,8 +33,20 @@ export class HMSPeer implements IHMSPeer {
   networkQuality?: number;
   groups?: string[];
   realtime?: boolean;
+  type: 'sip' | 'regular';
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups, realtime }: HMSPeerInit) {
+  constructor({
+    peerId,
+    name,
+    isLocal,
+    customerUserId,
+    metadata,
+    role,
+    joinedAt,
+    groups,
+    realtime,
+    type,
+  }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
@@ -42,6 +55,7 @@ export class HMSPeer implements IHMSPeer {
     this.joinedAt = joinedAt;
     this.groups = groups;
     this.realtime = realtime;
+    this.type = type;
 
     if (role) {
       this.role = role;
@@ -68,6 +82,7 @@ export class HMSPeer implements IHMSPeer {
   updateNetworkQuality(quality: number) {
     this.networkQuality = quality;
   }
+
   /**
    * @internal
    */
