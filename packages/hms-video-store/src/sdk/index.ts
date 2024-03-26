@@ -63,7 +63,7 @@ import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -1346,7 +1346,8 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);
