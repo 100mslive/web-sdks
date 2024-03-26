@@ -107,6 +107,16 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 }`}
               />
               <StatsRow
+                show={isNotNullish(videoTrackStats?.totalPausesDuration)}
+                label="Pauses Duration"
+                value={videoTrackStats?.totalPausesDuration}
+              />
+              <StatsRow
+                show={isNotNullish(videoTrackStats?.totalFreezesDuration)}
+                label="Freezes Duration"
+                value={videoTrackStats?.totalFreezesDuration}
+              />
+              <StatsRow
                 show={isNotNullish(videoTrackStats?.bitrate)}
                 label="Bitrate(V)"
                 value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
@@ -185,7 +195,7 @@ const RawStatsRow = ({
   show?: boolean;
   tooltip?: string;
 }) => {
-  const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
+  const statsLabel = <Stats.Label>{label}</Stats.Label>;
 
   return (
     <>
