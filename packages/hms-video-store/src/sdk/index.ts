@@ -1300,6 +1300,7 @@ export class HMSSdk implements HMSInterface {
       role: policy,
       // default value is the original role if user didn't pass asRole in config
       asRole: asRolePolicy || policy,
+      type: 'regular',
     });
 
     this.store.addPeer(localPeer);
