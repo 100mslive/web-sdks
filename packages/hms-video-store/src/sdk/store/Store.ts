@@ -418,7 +418,7 @@ class Store {
       permission: HMSPermissionType,
     ) => {
       if (!this.knownRoles[role]) {
-        HMSLogger.d(this.TAG, 'Known roles is not present', this.knownRoles);
+        HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
         return;
       }
       const rolePermissions = this.knownRoles[role].permissions;
