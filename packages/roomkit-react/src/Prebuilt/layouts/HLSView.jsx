@@ -602,7 +602,10 @@ const HLSView = () => {
                               if (isFullScreen) {
                                 toggle();
                               }
-                              toggleChat();
+                              // toggle and closing fullscreen takes few ms, to make it synced we are calling settimeout
+                              setTimeout(() => {
+                                toggleChat();
+                              }, 0);
                             }}
                           />
                         )}
