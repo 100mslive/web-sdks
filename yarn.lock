@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.1.tgz#037c8bdfb6b2d7bf12f9d257422150fe6ca43acb"
   integrity sha512-DGnzcXRDJREWypIjGX70er+f2k/XLLRF41lrXPs1+PtB1imdEkECPPS0Fg4BA0BCWKDNAGTZBHZPrBDgUmr9Lw==
 
-"@100mslive/types-prebuilt@0.12.7":
-  version "0.12.7"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.7.tgz#66e26701964a8c7a0ab7df4787ac64ad8f8870f4"
-  integrity sha512-GsDJCZA74+wuBorERQbVA0isRUQduBZzkyzRfMhFA29ZDaVTManrnwamf9TrZvrFJRFTVhZ6lv05oUaauqJRjA==
+"@100mslive/types-prebuilt@0.12.8":
+  version "0.12.8"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.8.tgz#2fe9007eb14e66ad3ba687313c4254e2ed085629"
+  integrity sha512-W1ISh3Mk8/wkomeFiBte7HZLk1gJocnN5U0N8rzZ9WFdDlAW7q/hKgnh+X1/9QxVcv3USfuZyKotbZ7AXmvCiQ==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
