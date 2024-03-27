@@ -295,7 +295,7 @@ const ParticipantActions = React.memo(
           <HandRaisedAccordionParticipantActions peerId={peerId} role={role} />
         ) : (
           <>
-            {peerType === HMSPeerType.REGULAR && <ConnectionIndicator peerId={peerId} />}
+            <ConnectionIndicator peerId={peerId} />
             {peerType === HMSPeerType.SIP && (
               <Flex
                 align="center"
