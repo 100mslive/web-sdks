@@ -22,7 +22,7 @@ async function main() {
     target: 'es6',
     external,
     tsconfig: 'tsconfig.json',
-    minify: false,
+    minify: true,
     sourcemap: true,
   };
   try {
