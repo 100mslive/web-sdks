@@ -415,6 +415,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    const ignoreMessage = !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type);
+    if (ignoreMessage) {
+      return;
+    }
     const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
@@ -427,9 +431,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       senderName: localPeer?.name,
       sender: localPeer?.peerId,
       senderRole: localPeer?.role?.name,
-      ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
+      ignored: false,
     };
-    this.putMessageInStore(hmsMessage);
+    // update directly to store without batch
+    this.setState(store => {
+      store.messages.byID[hmsMessage.id] = hmsMessage;
+      store.messages.allIDs.push(hmsMessage.id);
+    }, 'newMessage');
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
