@@ -320,6 +320,7 @@ export class AudioSinkManager {
           },
           true,
         );
+        HMSLogger.d(this.TAG, 'applied device id', localAudioTrack.getMediaTrackSettings().deviceId);
         this.eventBus.deviceChange.publish({
           devices: this.deviceManager.getDevices(),
           selection: this.deviceManager.getCurrentSelection().audioInput,
