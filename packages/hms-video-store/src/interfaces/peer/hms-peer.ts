@@ -1,7 +1,10 @@
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../media/tracks';
 import { HMSRole } from '../role';
 
-export type HMSPeerType = 'sip' | 'regular';
+export enum HMSPeerType {
+  SIP = 'sip',
+  REGULAR = 'regular',
+}
 
 export interface HMSPeer {
   peerId: string;
