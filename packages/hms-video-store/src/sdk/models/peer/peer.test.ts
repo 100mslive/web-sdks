@@ -46,7 +46,7 @@ describe('HMSLocalPeer', () => {
     name: 'John Doe',
     role: getParamsForRole(role),
     customerUserId: userId,
-    type: 'regular' as HMSPeerType,
+    type: HMSPeerType.REGULAR as HMSPeerType,
   };
   const peer = new HMSLocalPeer(params);
 
@@ -82,7 +82,7 @@ describe('HMSRemotPeer', () => {
       name: 'John Doe',
       data: 'data',
       user_id: 'customer_user_id',
-      type: 'regular',
+      type: HMSPeerType.REGULAR,
     },
     role: 'viewer',
     tracks: {},
@@ -94,7 +94,7 @@ describe('HMSRemotPeer', () => {
     role: getParamsForRole(peerInfo.role),
     customerUserId: peerInfo.info.user_id,
     metadata: peerInfo.info.data,
-    type: 'regular',
+    type: HMSPeerType.REGULAR,
   });
 
   it('should be constructed using params', () => {
