@@ -116,7 +116,7 @@ export const DesktopOptions = ({
           ) : null}
 
           {screenType !== 'hls_live_streaming' ? (
-            <Dropdown.Item>
+            <Dropdown.Item css={{ '&:empty': { display: 'none' } }}>
               <PIP
                 content={
                   <Flex css={{ w: '100%' }}>
