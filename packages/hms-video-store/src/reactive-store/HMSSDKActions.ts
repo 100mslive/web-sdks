@@ -415,6 +415,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    if (!!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type)) {
+      return;
+    }
     const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
