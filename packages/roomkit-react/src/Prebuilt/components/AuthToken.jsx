@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSessionStorage } from 'react-use';
+import { match } from 'ts-pattern';
 import { v4 as uuid } from 'uuid';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { Dialog } from '../../Modal';
@@ -88,38 +89,38 @@ const convertError = error => {
     'If you think this is a mistake on our side, please reach out to us over Discord:',
     'https://discord.com/invite/kGdmszyzq2',
   );
-  if (error.action === 'GET_TOKEN' && error.code === 403) {
-    return {
+  return match([error.action, error.code])
+    .with(['GET_TOKEN', 403], () => ({
       title: 'Psst! This room is currently inactive.',
       body: 'Please feel free to join another open room for more conversations. Thanks for stopping by!',
-    };
-  } else if (error.action === 'GET_TOKEN' && error.code === 404) {
-    return {
+    }))
+
+    .with(['GET_TOKEN', 404], () => ({
       title: 'Room code does not exist',
       body: 'We could not find a room code corresponding to this link.',
-    };
-  } else if (error.action === 'GET_TOKEN' && error.code === 2003) {
-    return {
+    }))
+    .with(['GET_TOKEN', 2003], () => ({
       title: 'Endpoint is not reachable',
       body: `Endpoint is not reachable. ${error.description}.`,
-    };
-  } else if (error.response && error.response.status === 404) {
-    return {
-      title: 'Room does not exist',
-      body: 'We could not find a room corresponding to this link.',
-    };
-  } else if (error.response && error.response.status === 403) {
-    return {
-      title: 'Accessing room using this link format is disabled',
-      body: 'You can re-enable this from the developer section in Dashboard.',
-    };
-  } else {
-    console.error('Token API Error', error);
-    return {
-      title: 'Error fetching token',
-      body: 'An error occurred while fetching the app token. Please look into logs for more details.',
-    };
-  }
+    }))
+    .otherwise(() =>
+      match(error.response?.status)
+        .with(404, () => ({
+          title: 'Room does not exist',
+          body: 'We could not find a room corresponding to this link.',
+        }))
+        .with(403, () => ({
+          title: 'Accessing room using this link format is disabled',
+          body: 'You can re-enable this from the developer section in Dashboard.',
+        }))
+        .otherwise(() => {
+          console.error('Token API Error', error);
+          return {
+            title: 'Error fetching token',
+            body: 'An error occurred while fetching the app token. Please look into logs for more details.',
+          };
+        }),
+    );
 };
 
 export default AuthToken;
