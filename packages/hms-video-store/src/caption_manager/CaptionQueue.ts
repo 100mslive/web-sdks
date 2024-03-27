@@ -17,14 +17,10 @@ export class CaptionQueue implements ICaptionQueue {
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue();
     }
-    // if (this.size() === 0 || item.final) {
-    //   this.storage.push(item);
-    //   return;
-    // }
-    // if (item.final) {
-    //   this.storage.push(item);
-    //   return;
-    // }
+    if (this.size() === 0 || item.final) {
+      this.storage.push(item);
+      return;
+    }
     this.storage[this.size() - 1] = item;
   }
   dequeue(): QueueData | undefined {
@@ -42,9 +38,3 @@ export class CaptionQueue implements ICaptionQueue {
     return this.storage.length;
   }
 }
-// "123", "234" [] [] [] []
-// 1 2 3 1 2 3
-
-// "HI"
-// "HI AMar"
-// "HI AMAR or" final = true

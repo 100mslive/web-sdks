@@ -14,6 +14,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
 import { NamedSetState } from './internalTypes';
+import { CaptionManager } from '../caption_manager/CaptionManager';
 import { HMSLogger } from '../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../controller/beam/BeamSpeakerLabelsLogger';
 import { IHMSActions } from '../IHMSActions';
@@ -65,6 +66,7 @@ import {
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from '../schema';
+import { Captions } from '../schema/caption-data';
 import { HMSSdk } from '../sdk';
 import {
   HMSRoleChangeRequest,
@@ -123,6 +125,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  private captionManager: CaptionManager;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
@@ -132,6 +135,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.actionBatcher = new ActionBatcher(store);
+    this.captionManager = new CaptionManager(this.putCaptionInStore);
   }
 
   getLocalTrack(trackID: string) {
@@ -1137,6 +1141,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   protected onMessageReceived(message: MessageNotification) {
     // check if type `captions`
     if (message.info.type === 'captions') {
+      // add into the store
+      this.captionManager.add(message.info.message);
       return;
     }
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
@@ -1160,10 +1166,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     );
   }
 
-  protected putCaptionInStore() {
-    // this.setState(store => {
-    //   store.captions;
-    // });
+  protected putCaptionInStore(captions: Captions[]) {
+    this.setState(store => {
+      store.captions = captions;
+    }, 'captionUpdate');
   }
 
   /*

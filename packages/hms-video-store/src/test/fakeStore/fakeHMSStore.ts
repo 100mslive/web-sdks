@@ -291,6 +291,7 @@ export const makeFakeStore = (): HMSStore => {
     polls: {},
     whiteboards: {},
     hideLocalPeer: false,
+    captions: [],
   };
 
   localPeer = fakeStore.peers['1'];
