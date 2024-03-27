@@ -44,6 +44,7 @@ export { default as BuildingIcon } from './BuildingIcon';
 export { default as CalculatorIcon } from './CalculatorIcon';
 export { default as CalculatorIconsIcon } from './CalculatorIconsIcon';
 export { default as CalendarIcon } from './CalendarIcon';
+export { default as CallIcon } from './CallIcon';
 export { default as CameraFlipIcon } from './CameraFlipIcon';
 export { default as CardIcon } from './CardIcon';
 export { default as CardWithCvcIcon } from './CardWithCvcIcon';

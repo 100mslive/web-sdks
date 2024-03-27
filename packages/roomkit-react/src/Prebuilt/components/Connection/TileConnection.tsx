@@ -1,6 +1,12 @@
 import React from 'react';
-import { selectScreenShareByPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
-import { PinIcon, ShareScreenIcon, SpotlightIcon } from '@100mslive/react-icons';
+import {
+  HMSPeerType,
+  selectPeerTypeByID,
+  selectScreenShareByPeerID,
+  selectSessionStore,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import { CallIcon, PinIcon, ShareScreenIcon, SpotlightIcon } from '@100mslive/react-icons';
 import { Flex, styled, Text, textEllipsis } from '../../..';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -20,12 +26,18 @@ const TileConnection = ({
 }) => {
   const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const isPeerScreenSharing = !!useHMSStore(selectScreenShareByPeerID(peerId));
+  const peerType = useHMSStore(selectPeerTypeByID(peerId));
   return (
     <Wrapper>
       {!hideLabel ? (
         <>
           {name ? (
             <Flex align="center">
+              {peerType === HMSPeerType.SIP && (
+                <IconWrapper>
+                  <CallIcon width="15" height="15" />
+                </IconWrapper>
+              )}
               {isPeerScreenSharing && (
                 <IconWrapper>
                   <ShareScreenIcon width="15" height="15" />

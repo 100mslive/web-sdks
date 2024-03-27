@@ -18,6 +18,7 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
+  HMSPeerType,
 } from './internal';
 
 export type {

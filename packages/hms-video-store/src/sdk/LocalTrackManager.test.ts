@@ -5,7 +5,7 @@ import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSLocalVideoTrack, HMSTrackType } from '../internal';
+import { HMSLocalVideoTrack, HMSPeerType, HMSTrackType } from '../internal';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
 import { PolicyParams } from '../notification-manager';
@@ -96,6 +96,7 @@ const publishParams = hostRole.publishParams;
 let localPeer = new HMSLocalPeer({
   name: 'test',
   role: hostRole,
+  type: HMSPeerType.REGULAR,
 });
 testStore.addPeer(localPeer);
 
@@ -231,6 +232,7 @@ describe('LocalTrackManager', () => {
     localPeer = new HMSLocalPeer({
       name: 'test',
       role: hostRole,
+      type: HMSPeerType.REGULAR,
     });
     testStore.addPeer(localPeer);
   });
@@ -408,6 +410,7 @@ describe('LocalTrackManager', () => {
       localPeer = new HMSLocalPeer({
         name: 'test',
         role: hostRole,
+        type: HMSPeerType.REGULAR,
       });
       testStore.addPeer(localPeer);
       mockGetUserMedia.mockClear();
@@ -421,7 +424,7 @@ describe('LocalTrackManager', () => {
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
         } as MediaStreamTrack,
-        'regular',
+        HMSPeerType.REGULAR,
         testEventBus,
       );
       localPeer.videoTrack = mockVideoTrack;
@@ -453,7 +456,7 @@ describe('LocalTrackManager', () => {
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
         } as MediaStreamTrack,
-        'regular',
+        HMSPeerType.REGULAR,
         testEventBus,
       );
 
