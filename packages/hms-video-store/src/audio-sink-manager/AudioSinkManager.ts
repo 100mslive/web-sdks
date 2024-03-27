@@ -320,6 +320,11 @@ export class AudioSinkManager {
           },
           true,
         );
+        this.eventBus.deviceChange.publish({
+          devices: this.deviceManager.getDevices(),
+          selection: this.deviceManager.getCurrentSelection().audioInput,
+          type: 'audioInput',
+        });
       }
     }
   };
