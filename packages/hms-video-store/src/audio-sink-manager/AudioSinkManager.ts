@@ -41,13 +41,13 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
+  private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
-    this.startPollingForDevices();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -180,6 +180,7 @@ export class AudioSinkManager {
         // it's the first track, try to play it, that'll tell us whether autoplay is allowed
         this.state.autoplayCheckPromise = new Promise<void>(resolve => {
           this.playAudioFor(track).then(resolve);
+          this.startPollingForDevices();
         });
       }
       // and wait for the result to be known
@@ -313,13 +314,18 @@ export class AudioSinkManager {
         if (localAudioTrack.settings.deviceId === externalDeviceID) {
           return;
         }
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        await localAudioTrack.setSettings(
-          {
-            deviceId: externalDeviceID,
-          },
-          true,
-        );
+        if (!this.earpieceSelected) {
+          await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true).catch(console.error);
+          this.earpieceSelected = true;
+        }
+        await localAudioTrack
+          .setSettings(
+            {
+              deviceId: externalDeviceID,
+            },
+            true,
+          )
+          .catch(console.error);
         HMSLogger.d(this.TAG, 'applied device id', localAudioTrack.getMediaTrackSettings().deviceId);
         this.eventBus.deviceChange.publish({
           devices: this.deviceManager.getDevices(),
