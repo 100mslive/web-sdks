@@ -118,7 +118,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       inputRef.current.value = '';
       setTimeout(() => {
         onSend(1);
-      }, 200);
+      }, 0);
     } catch (error) {
       const err = error as HMSException;
       ToastManager.addToast({

@@ -429,7 +429,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       senderRole: localPeer?.role?.name,
       ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
     };
-    this.putMessageInStore(hmsMessage);
+    // update directly to store without batch
+    this.setState(store => {
+      store.messages.byID[hmsMessage.id] = hmsMessage;
+      store.messages.allIDs.push(hmsMessage.id);
+    }, 'newMessage');
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
