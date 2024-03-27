@@ -18,6 +18,7 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
+  HMSPeerType,
 } from './internal';
 
 export type {
@@ -51,7 +52,6 @@ export type {
   HMSPollQuestionOption,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
-  HMSPeerType,
 } from './internal';
 
 export { EventBus } from './events/EventBus';
