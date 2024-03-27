@@ -17,7 +17,9 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
+import { CaptionsViewer } from '../plugins/CaptionsViewer';
 import {
+  useIsCaptionEnabled,
   usePDFConfig,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -49,6 +51,7 @@ export const VideoStreamingSection = ({
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isCaptionEnabled = useIsCaptionEnabled();
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -98,6 +101,20 @@ export const VideoStreamingSection = ({
           .otherwise(() => 'row')}
       >
         {ViewComponent}
+        {isCaptionEnabled && (
+          <Box
+            css={{
+              position: 'fixed',
+              top: '85%',
+              left: '32%',
+              background: 'gray',
+              maxWidth: '40%',
+              textOverflow: 'clip',
+            }}
+          >
+            <CaptionsViewer />
+          </Box>
+        )}
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })

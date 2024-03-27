@@ -6,6 +6,7 @@ import { useAVToggle } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+import { CaptionIcon } from '../CaptionIcon';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 // @ts-ignore: No implicit Any
@@ -98,6 +99,7 @@ export const Footer = ({
           <>
             <ScreenshareToggle />
             <RaiseHand />
+            <CaptionIcon />
             {elements?.emoji_reactions && <EmojiReaction />}
             <LeaveRoom screenType={screenType} />
           </>
