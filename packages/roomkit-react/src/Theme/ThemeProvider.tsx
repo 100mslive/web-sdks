@@ -30,6 +30,10 @@ export type ThemeProviderProps = {
   themeType?: string;
   theme?: Theme;
   aspectRatio?: { width: number; height: number };
+  /**
+   * A container to apply the theme class to
+   */
+  container?: string;
 };
 
 const defaultContext = {
@@ -54,6 +58,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   theme: userTheme,
   aspectRatio = defaultAspectRatio,
   children,
+  container,
 }) => {
   const systemTheme = ThemeTypes.default;
   const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
@@ -64,13 +69,17 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     if (!isBrowser) {
       return updatedTheme;
     }
+    const element = container ? document.querySelector(container) : document.documentElement;
+    if (!element) {
+      return updatedTheme;
+    }
     if (previousClassName.current) {
-      document.documentElement.classList.remove(previousClassName.current);
+      element.classList.remove(previousClassName.current);
     }
     previousClassName.current = updatedTheme.className;
-    document.documentElement.classList.add(updatedTheme);
+    element.classList.add(updatedTheme);
     return updatedTheme;
-  }, [userTheme, currentTheme, isBrowser]);
+  }, [userTheme, currentTheme, isBrowser, container]);
 
   const toggleTheme = useCallback((themeToUpdateTo?: ThemeTypes) => {
     if (themeToUpdateTo) {
