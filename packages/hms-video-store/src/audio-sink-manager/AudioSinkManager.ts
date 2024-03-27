@@ -310,29 +310,21 @@ export class AudioSinkManager {
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (localAudioTrack && earpiece) {
       const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID, bluetoothDevice);
+      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
       // already selected appropriate device
       if (localAudioTrack.settings.deviceId === externalDeviceID) {
         return;
       }
       if (!this.earpieceSelected) {
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true).catch(console.error);
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }
-      await localAudioTrack
-        .setSettings(
-          {
-            deviceId: externalDeviceID,
-          },
-          true,
-        )
-        .catch(console.error);
-      HMSLogger.d(this.TAG, 'applied device id', localAudioTrack.getMediaTrackSettings().deviceId);
-      this.eventBus.deviceChange.publish({
-        devices: this.deviceManager.getDevices(),
-        selection: this.deviceManager.getCurrentSelection().audioInput,
-        type: 'audioInput',
-      });
+      await localAudioTrack.setSettings(
+        {
+          deviceId: externalDeviceID,
+        },
+        true,
+      );
     }
   };
 }

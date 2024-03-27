@@ -134,7 +134,6 @@ export class DeviceManager implements HMSDeviceManager {
       const id = this.createIdentifier(device);
       return id === audioDevice;
     });
-    console.log('local peer audio device', localPeer?.audioTrack?.getMediaTrackSettings().deviceId);
     const videoSelection = this.videoInput.find(device => this.createIdentifier(device) === videoDevice);
     return {
       audioInput: audioSelection,
