@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   HMSPeerType,
-  selectPeerByID,
+  selectPeerTypeByID,
   selectScreenShareByPeerID,
   selectSessionStore,
   useHMSStore,
@@ -26,7 +26,7 @@ const TileConnection = ({
 }) => {
   const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const isPeerScreenSharing = !!useHMSStore(selectScreenShareByPeerID(peerId));
-  const peerType = useHMSStore(selectPeerByID(peerId))?.type || '';
+  const peerType = useHMSStore(selectPeerTypeByID(peerId));
   return (
     <Wrapper>
       {!hideLabel ? (
