@@ -299,14 +299,11 @@ export class AudioSinkManager {
       const label = device.label.toLowerCase();
       if (label.includes('speakerphone')) {
         speakerPhone = device;
-      }
-      if (label.includes('wired')) {
+      } else if (label.includes('wired')) {
         wired = device;
-      }
-      if (label.includes('bluetooth')) {
+      } else if (label.includes('bluetooth')) {
         bluetoothDevice = device;
-      }
-      if (label.includes('earpiece')) {
+      } else if (label.includes('earpiece')) {
         earpiece = device;
       }
     }
