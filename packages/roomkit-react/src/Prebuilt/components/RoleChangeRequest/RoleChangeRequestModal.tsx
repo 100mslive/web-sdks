@@ -13,7 +13,6 @@ import { Flex, Text } from '../../..';
 import { PreviewControls, PreviewTile } from '../Preview/PreviewJoin';
 import { RequestPrompt } from './RequestPrompt';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore: No implicit Any
 import { useMyMetadata } from '../hooks/useMetadata';
 // @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
