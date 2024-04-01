@@ -13,10 +13,10 @@ export const useAutoEnableNoiseCancellation = (plugin: HMSKrispPlugin) => {
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
   const inProgress = useRef(false);
   const actions = useHMSActions();
-  const isNoiseCancellationEnabled = useHMSStore(selectRoom)?.isNoiseCancellationEnabled;
+  const isNoiseCancellationAllowed = useHMSStore(selectRoom)?.isNoiseCancellationEnabled;
 
   useEffect(() => {
-    if (!isNoiseCancellationEnabled || !localPeerAudioTrackID || inProgress.current) {
+    if (!isNoiseCancellationAllowed || !localPeerAudioTrackID || inProgress.current || isPluginAdded) {
       return;
     }
     (async () => {
@@ -24,5 +24,5 @@ export const useAutoEnableNoiseCancellation = (plugin: HMSKrispPlugin) => {
       await actions.addPluginToAudioTrack(plugin);
       inProgress.current = false;
     })();
-  }, [actions, isNoiseCancellationEnabled, isPluginAdded, plugin, localPeerAudioTrackID]);
+  }, [actions, isNoiseCancellationAllowed, isPluginAdded, plugin, localPeerAudioTrackID]);
 };
