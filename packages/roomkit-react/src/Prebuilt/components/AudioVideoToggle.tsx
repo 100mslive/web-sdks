@@ -38,6 +38,7 @@ import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
+import { useAutoEnableNoiseCancellation } from './hooks/useAutoEnableNoiseCancellation';
 import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 // const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
@@ -215,6 +216,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype && Number(audioOutput?.length) > 0;
   const { screenType } = useRoomLayoutConferencingScreen();
   const [showSettings, setShowSettings] = useState(false);
+  useAutoEnableNoiseCancellation(plugin);
 
   if (!toggleAudio && !toggleVideo) {
     return null;
