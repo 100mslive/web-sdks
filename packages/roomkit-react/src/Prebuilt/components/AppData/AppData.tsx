@@ -79,6 +79,7 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isMobile = useMedia(cssConfig.media.md);
   const { isLocalVideoEnabled } = useAVToggle();
+  const roomState = useHMSStore(selectRoomState);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -120,11 +121,11 @@ export const AppData = React.memo(() => {
     });
     if (defaultMediaURL) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      if (isLocalVideoEnabled && !isMobile) {
+      if (isLocalVideoEnabled && !isMobile && roomState === HMSRoomState.Preview) {
         toggleVB();
       }
     }
-  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB, isLocalVideoEnabled, isMobile]);
+  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB, isLocalVideoEnabled, isMobile, roomState]);
 
   return <ResetStreamingStart />;
 });
