@@ -5,6 +5,7 @@ import { InitFlags } from '../../signal/init/models';
 import { HMSWhiteboardCreateOptions } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
+import { constructWhiteboardURL } from '../../utils/whiteboard';
 
 export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
   private TAG = '[HMSWhiteboardInteractivityCenter]';
@@ -40,6 +41,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
       title: createOptions?.title,
       attributes: createOptions?.attributes,
       id: response.id,
+      url: constructWhiteboardURL(response.token, response.addr, this.store.getEnv()),
       token: response.token,
       addr: response.addr,
       owner: response.owner,
