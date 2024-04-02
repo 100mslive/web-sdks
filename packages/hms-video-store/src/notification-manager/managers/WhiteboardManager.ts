@@ -31,11 +31,17 @@ export class WhiteboardManager {
     whiteboard.open = isOwner ? prev?.open : open;
     whiteboard.owner = whiteboard.open ? notification.owner : undefined;
 
-    if (!isOwner && whiteboard.open) {
-      const response = await this.transport.signal.getWhiteboard({ id: notification.id });
-      whiteboard.token = response.token;
-      whiteboard.addr = response.addr;
-      whiteboard.permissions = response.permissions;
+    if (whiteboard.open) {
+      if (isOwner) {
+        whiteboard.token = prev?.token;
+        whiteboard.addr = prev?.addr;
+        whiteboard.permissions = prev?.permissions;
+      } else {
+        const response = await this.transport.signal.getWhiteboard({ id: notification.id });
+        whiteboard.token = response.token;
+        whiteboard.addr = response.addr;
+        whiteboard.permissions = response.permissions;
+      }
     }
 
     this.store.setWhiteboard(whiteboard);
