@@ -7,7 +7,7 @@ export class HMSAudioTrackSettingsBuilder {
   private _maxBitrate?: number = 32;
   private _deviceId = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
-    // @ts-ignore
+    /*  // @ts-ignore
     { googEchoCancellation: { exact: true } },
     // @ts-ignore
     { googExperimentalEchoCancellation: { exact: true } },
@@ -18,7 +18,7 @@ export class HMSAudioTrackSettingsBuilder {
     // @ts-ignore
     { googHighpassFilter: { exact: true } },
     // @ts-ignore
-    { googAudioMirroring: { exact: true } },
+    { googAudioMirroring: { exact: true } }, */
   ];
 
   volume(volume: number) {
