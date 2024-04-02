@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { LayoutMode, LayoutModeIconMapping, LayoutModeKeys } from './Settings/LayoutSettings';
 import { Flex } from '../../Layout';
@@ -11,7 +11,13 @@ import { UI_SETTINGS } from '../common/constants';
 export const LayoutModeSelector = () => {
   const [open, setOpen] = useState(false);
   const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
-
+  const updateLayoutMode = useCallback(
+    (value: string) => {
+      setLayoutMode(value);
+      setOpen(false);
+    },
+    [setLayoutMode],
+  );
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
@@ -65,7 +71,7 @@ export const LayoutModeSelector = () => {
           return (
             <Flex
               key={key}
-              onClick={() => setLayoutMode(value)}
+              onClick={() => updateLayoutMode(value)}
               align="center"
               css={{
                 gap: '$4',
