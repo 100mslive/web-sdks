@@ -34,11 +34,11 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
-  maxBitrate(maxBitrate?: number) {
-    if (maxBitrate && maxBitrate <= 0) {
+  maxBitrate(_maxBitrate?: number) {
+    if (_maxBitrate && _maxBitrate <= 0) {
       throw Error('maxBitrate should be >= 1');
     }
-    this._maxBitrate = maxBitrate;
+    this._maxBitrate = 320;
     return this;
   }
 
