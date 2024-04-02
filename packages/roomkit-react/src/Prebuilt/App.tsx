@@ -285,7 +285,7 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
-
+  console.log('ollo', { activeState });
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
