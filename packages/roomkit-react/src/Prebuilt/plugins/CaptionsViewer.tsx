@@ -141,7 +141,9 @@ export const CaptionsViewer = () => {
   });
 
   useCaptions({
-    onTranscript: (data: CaptionData[]) => captionQueue && captionQueue.push(data as CaptionData[]),
+    onTranscript: (data: CaptionData[]) => {
+      captionQueue && captionQueue.push(data as CaptionData[]);
+    },
   });
 
   return (

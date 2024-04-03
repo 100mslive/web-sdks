@@ -41,7 +41,8 @@ export const useCaptions = ({ onTranscript, handleError = logErrorHandler }: use
       const msg = notification.data;
       if (msg && msg.type === type) {
         try {
-          const data = msg.message.results as CaptionData[];
+          const message = JSON.parse(msg.message);
+          const data = message.results as CaptionData[];
           onTranscript?.(data);
         } catch (err) {
           handleError(err as Error, 'handleCaptionEvent');
