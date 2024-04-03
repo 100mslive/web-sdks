@@ -16,7 +16,7 @@ export const LayoutModeSelector = () => {
       setLayoutMode(value);
       setOpen(false);
     },
-    [setLayoutMode],
+    [setLayoutMode, setOpen],
   );
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
