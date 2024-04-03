@@ -1,5 +1,6 @@
 import { HMSLocalPeer } from './HMSLocalPeer';
 import { HMSRemotePeer } from './HMSRemotePeer';
+import { HMSPeerType } from '../../../internal';
 import { PeerNotification } from '../../../notification-manager';
 import decodeJWT from '../../../utils/jwt';
 
@@ -45,6 +46,7 @@ describe('HMSLocalPeer', () => {
     name: 'John Doe',
     role: getParamsForRole(role),
     customerUserId: userId,
+    type: HMSPeerType.REGULAR as HMSPeerType,
   };
   const peer = new HMSLocalPeer(params);
 
@@ -80,6 +82,7 @@ describe('HMSRemotPeer', () => {
       name: 'John Doe',
       data: 'data',
       user_id: 'customer_user_id',
+      type: HMSPeerType.REGULAR,
     },
     role: 'viewer',
     tracks: {},
@@ -91,6 +94,7 @@ describe('HMSRemotPeer', () => {
     role: getParamsForRole(peerInfo.role),
     customerUserId: peerInfo.info.user_id,
     metadata: peerInfo.info.data,
+    type: HMSPeerType.REGULAR,
   });
 
   it('should be constructed using params', () => {

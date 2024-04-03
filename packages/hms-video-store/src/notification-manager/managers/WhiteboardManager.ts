@@ -1,6 +1,7 @@
 import { HMSUpdateListener, HMSWhiteboard } from '../../interfaces';
 import { Store } from '../../sdk/store';
 import HMSTransport from '../../transport';
+import { constructWhiteboardURL } from '../../utils/whiteboard';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { WhiteboardInfo } from '../HMSNotifications';
 
@@ -31,11 +32,19 @@ export class WhiteboardManager {
     whiteboard.open = isOwner ? prev?.open : open;
     whiteboard.owner = whiteboard.open ? notification.owner : undefined;
 
-    if (!isOwner && whiteboard.open) {
-      const response = await this.transport.signal.getWhiteboard({ id: notification.id });
-      whiteboard.token = response.token;
-      whiteboard.addr = response.addr;
-      whiteboard.permissions = response.permissions;
+    if (whiteboard.open) {
+      if (isOwner) {
+        whiteboard.url = prev?.url;
+        whiteboard.token = prev?.token;
+        whiteboard.addr = prev?.addr;
+        whiteboard.permissions = prev?.permissions;
+      } else {
+        const response = await this.transport.signal.getWhiteboard({ id: notification.id });
+        whiteboard.url = constructWhiteboardURL(response.token, response.addr, this.store.getEnv());
+        whiteboard.token = response.token;
+        whiteboard.addr = response.addr;
+        whiteboard.permissions = response.permissions;
+      }
     }
 
     this.store.setWhiteboard(whiteboard);

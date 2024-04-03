@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
+import { match, P } from 'ts-pattern';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { useRoomLayout } from './provider/roomLayoutProvider';
@@ -52,20 +53,32 @@ export const useAppStateManager = () => {
     if (!roomLayout) {
       return;
     }
-    if (roomState === HMSRoomState.Connected) {
-      setActiveState(PrebuiltStates.MEETING);
-    } else if (
-      prevRoomState &&
-      [HMSRoomState.Reconnecting, HMSRoomState.Connected, HMSRoomState.Connecting].includes(prevRoomState) &&
-      [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
-    ) {
-      const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
-      setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
-      VBHandler.reset();
-      redirectToLeave(1000); // to clear toasts after 1 second
-    } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
-      setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
-    }
+    match([roomState, prevRoomState])
+      .with([HMSRoomState.Connected, P.any], () => setActiveState(PrebuiltStates.MEETING))
+      .with(
+        [HMSRoomState.Disconnecting, HMSRoomState.Connected],
+        [HMSRoomState.Disconnecting, HMSRoomState.Connecting],
+        [HMSRoomState.Disconnecting, HMSRoomState.Reconnecting],
+        [HMSRoomState.Disconnected, HMSRoomState.Connected],
+        [HMSRoomState.Disconnected, HMSRoomState.Connecting],
+        [HMSRoomState.Disconnected, HMSRoomState.Reconnecting],
+        () => {
+          setActiveState(
+            match({ isLeaveScreenEnabled, isPreviewScreenEnabled })
+              .with({ isLeaveScreenEnabled: true }, () => PrebuiltStates.LEAVE)
+              .with({ isPreviewScreenEnabled: true }, () => PrebuiltStates.PREVIEW)
+              .otherwise(() => PrebuiltStates.MEETING),
+          );
+          VBHandler.reset();
+          redirectToLeave(1000); // to clear toasts after 1 second
+        },
+      )
+      .with([HMSRoomState.Disconnected, P.nullish], () => {
+        setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+      })
+      .otherwise(() => {
+        // do nothing
+      });
   }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
 
   return { activeState, rejoin };

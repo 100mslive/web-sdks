@@ -73,20 +73,6 @@ export const VideoStreamingSection = ({
     return null;
   }
 
-  let ViewComponent;
-  if (screenType === 'hls_live_streaming') {
-    ViewComponent = <HLSView />;
-  } else if (localPeerRole === waitingViewerRole) {
-    ViewComponent = <WaitingView />;
-  } else if (pdfAnnotatorActive) {
-    ViewComponent = <PDFView />;
-  } else if (urlToIframe) {
-    ViewComponent = <EmbedView />;
-  } else {
-    //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
-  }
-
   return (
     <Suspense fallback={<FullPageProgress />}>
       <Flex
@@ -100,7 +86,27 @@ export const VideoStreamingSection = ({
           .with({ isMobileHLSStream: true }, () => 'column')
           .otherwise(() => 'row')}
       >
-        {ViewComponent}
+        {match({ screenType, localPeerRole, pdfAnnotatorActive, urlToIframe })
+          .with(
+            {
+              screenType: 'hls_live_streaming',
+            },
+            () => <HLSView />,
+          )
+          .when(
+            ({ localPeerRole }) => localPeerRole === waitingViewerRole,
+            () => <WaitingView />,
+          )
+          .with({ pdfAnnotatorActive: true }, () => <PDFView />)
+          .when(
+            ({ urlToIframe }) => !!urlToIframe,
+            () => <EmbedView />,
+          )
+
+          .otherwise(() => {
+            // @ts-ignore
+            return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
+          })}
         {isCaptionEnabled && (
           <Box
             css={{

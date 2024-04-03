@@ -9,7 +9,7 @@ import {
   HMSTrackSource,
   HMSTrackType,
 } from '../../';
-import { HMSSimulcastLayer } from '../../internal';
+import { HMSPeerType, HMSSimulcastLayer } from '../../internal';
 import { HMSAudioTrack, HMSPlaylist, HMSPlaylistType, HMSRole, HMSScreenVideoTrack, HMSVideoTrack } from '../../schema';
 
 function makeTrack(
@@ -98,6 +98,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{}',
         groups: [],
         isHandRaised: false,
+        type: HMSPeerType.REGULAR,
       },
       '2': {
         id: '2',
@@ -110,6 +111,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{"hello":"world"}',
         groups: [],
         isHandRaised: false,
+        type: HMSPeerType.REGULAR,
       },
       '3': {
         id: '3',
@@ -121,15 +123,16 @@ export const makeFakeStore = (): HMSStore => {
         auxiliaryTracks: [],
         groups: [],
         isHandRaised: false,
+        type: HMSPeerType.REGULAR,
       },
     },
     tracks: {
-      '101': makeTrack('101', 'video', 'regular', '1'),
-      '102': makeTrack('102', 'audio', 'regular', '1'),
-      '103': makeTrack('103', 'video', 'regular', '2'),
-      '104': makeTrack('104', 'audio', 'regular', '2'),
+      '101': makeTrack('101', 'video', HMSPeerType.REGULAR, '1'),
+      '102': makeTrack('102', 'audio', HMSPeerType.REGULAR, '1'),
+      '103': makeTrack('103', 'video', HMSPeerType.REGULAR, '2'),
+      '104': makeTrack('104', 'audio', HMSPeerType.REGULAR, '2'),
       '105': makeTrack('105', 'video', 'screen', '2'),
-      '106': makeTrack('106', 'audio', 'regular', '2'),
+      '106': makeTrack('106', 'audio', HMSPeerType.REGULAR, '2'),
       '107': makeTrack('107', 'audio', 'screen', '2'),
     },
     playlist: {

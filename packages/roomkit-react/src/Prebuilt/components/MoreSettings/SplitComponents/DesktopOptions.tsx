@@ -29,7 +29,6 @@ import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
-// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS } from '../../../common/constants';
@@ -117,7 +116,7 @@ export const DesktopOptions = ({
           ) : null}
 
           {screenType !== 'hls_live_streaming' ? (
-            <Dropdown.Item>
+            <Dropdown.Item css={{ '&:empty': { display: 'none' } }}>
               <PIP
                 content={
                   <Flex css={{ w: '100%' }}>

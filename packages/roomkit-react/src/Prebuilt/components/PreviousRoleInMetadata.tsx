@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { selectLocalPeerRoleName, useHMSVanillaStore } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import { useMyMetadata } from './hooks/useMetadata';
 
 export const PreviousRoleInMetadata = () => {
