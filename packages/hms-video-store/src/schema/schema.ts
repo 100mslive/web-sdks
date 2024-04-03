@@ -1,4 +1,3 @@
-import { Captions } from './caption-data';
 import { HMSException } from './error';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSPeer, HMSPeerID, HMSSpeaker, HMSTrack, HMSTrackID } from './peer';
@@ -49,7 +48,6 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   hideLocalPeer: boolean;
   /** @alpha */
   whiteboards: Record<string, HMSWhiteboard>;
-  captions: Captions[];
 }
 
 export interface HMSStatsStore {
@@ -134,7 +132,6 @@ export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T
     polls: {},
     whiteboards: {},
     hideLocalPeer: false,
-    captions: [],
   };
 };
 
