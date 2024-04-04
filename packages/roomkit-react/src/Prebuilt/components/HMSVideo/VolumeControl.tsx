@@ -65,7 +65,7 @@ const VolumeIcon = ({
   onClick,
 }: {
   volume: number;
-  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  onClick: (event: React.MouseEvent<SVGSVGElement>) => void;
 }) => {
   if (volume === 0) {
     return <VolumeZeroIcon style={{ cursor: 'pointer', transition: 'color 0.3s' }} onClick={onClick} />;
