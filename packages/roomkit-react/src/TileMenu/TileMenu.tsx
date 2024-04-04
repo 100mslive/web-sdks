@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   HMSPeerID,
   HMSTrack,
@@ -44,6 +44,8 @@ export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
     }
   };
   const trackVolume = useHMSStore(selectAudioVolumeByPeerID(peerId));
+  const formattedTrackVolume = useMemo(() => parseInt((trackVolume ?? 0).toFixed(0)), [trackVolume]);
+
   return (
     <StyledMenuTile.Root>
       <StyledMenuTile.Trigger>
@@ -67,12 +69,12 @@ export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
         {audioTrack ? (
           <StyledMenuTile.VolumeItem>
             <Flex>
-              <SpeakerIcon /> <span>Volume ({trackVolume})</span>
+              <SpeakerIcon /> <span>Volume ({formattedTrackVolume})</span>
             </Flex>
             <Slider
               css={{ my: '0.5rem' }}
               step={5}
-              value={[trackVolume || 0]}
+              value={[formattedTrackVolume]}
               onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
             />
           </StyledMenuTile.VolumeItem>
