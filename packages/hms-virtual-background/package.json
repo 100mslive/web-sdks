@@ -1,5 +1,5 @@
 {
-  "version": "1.13.5-alpha.2",
+  "version": "1.13.5-alpha.3",
   "license": "MIT",
   "name": "@100mslive/hms-virtual-background",
   "author": "100ms",
@@ -32,10 +32,10 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video-store": "0.12.5-alpha.2"
+    "@100mslive/hms-video-store": "0.12.5-alpha.3"
   },
   "devDependencies": {
-    "@100mslive/hms-video-store": "0.12.5-alpha.2"
+    "@100mslive/hms-video-store": "0.12.5-alpha.3"
   },
   "dependencies": {
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
