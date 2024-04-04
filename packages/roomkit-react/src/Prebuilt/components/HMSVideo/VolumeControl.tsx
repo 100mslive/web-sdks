@@ -23,8 +23,7 @@ export const VolumeControl = () => {
     >
       <VolumeIcon
         volume={volume}
-        onClick={event => {
-          event.stopPropagation();
+        onClick={() => {
           if (volume > 0) {
             setVolume(0);
             hlsPlayer?.setVolume(0);
@@ -45,7 +44,6 @@ export const VolumeControl = () => {
           display: showSlider ? '' : 'none',
           transition: `all .2s ease .5s`,
         }}
-        onClick={event => event.stopPropagation()}
         min={0}
         max={100}
         step={1}
@@ -60,13 +58,7 @@ export const VolumeControl = () => {
   );
 };
 
-const VolumeIcon = ({
-  volume,
-  onClick,
-}: {
-  volume: number;
-  onClick: (event: React.MouseEvent<SVGSVGElement>) => void;
-}) => {
+const VolumeIcon = ({ volume, onClick }: { volume: number; onClick: () => void }) => {
   if (volume === 0) {
     return <VolumeZeroIcon style={{ cursor: 'pointer', transition: 'color 0.3s' }} onClick={onClick} />;
   }
