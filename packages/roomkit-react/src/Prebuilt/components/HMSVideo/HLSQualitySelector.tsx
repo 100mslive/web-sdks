@@ -48,7 +48,10 @@ export function HLSQualitySelector({
         <Sheet.Content
           container={containerRef}
           css={{ bg: '$surface_default', pb: '$1' }}
-          onClick={() => onOpenChange(false)}
+          onClick={e => {
+            e.stopPropagation();
+            onOpenChange(false);
+          }}
         >
           <Sheet.Title
             css={{
@@ -125,8 +128,14 @@ export function HLSQualitySelector({
     );
   }
   return (
-    <Dropdown.Root open={open} onOpenChange={value => onOpenChange(value)} modal={false}>
-      <Dropdown.Trigger asChild data-testid="quality_selector">
+    <Dropdown.Root
+      open={open}
+      onOpenChange={value => {
+        onOpenChange(value);
+      }}
+      modal={false}
+    >
+      <Dropdown.Trigger asChild data-testid="quality_selector" onClick={e => e.stopPropagation()}>
         <Flex
           css={{
             color: '$on_primary_high',
@@ -193,7 +202,10 @@ export function HLSQualitySelector({
           {layers.map(layer => {
             return (
               <Dropdown.Item
-                onClick={() => onQualityChange(layer)}
+                onClick={e => {
+                  e.stopPropagation();
+                  onQualityChange(layer);
+                }}
                 key={layer.width}
                 css={{
                   bg:
@@ -221,7 +233,10 @@ export function HLSQualitySelector({
             );
           })}
           <Dropdown.Item
-            onClick={() => onQualityChange({ height: 'auto' })}
+            onClick={e => {
+              e.stopPropagation();
+              onQualityChange({ height: 'auto' });
+            }}
             key="auto"
             css={{
               bg: !isAuto ? '$surface_bright' : '$surface_default',
