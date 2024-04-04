@@ -75,7 +75,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
   async handleLocalRoleUpdate() {
     const whiteboards = this.store.getWhiteboards();
 
-    for await (const whiteboard of whiteboards.values()) {
+    for (const whiteboard of whiteboards.values()) {
       if (whiteboard.open && whiteboard.url) {
         const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
         const newWhiteboard: HMSWhiteboard = {
