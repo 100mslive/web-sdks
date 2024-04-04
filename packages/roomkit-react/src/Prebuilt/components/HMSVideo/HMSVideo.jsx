@@ -44,6 +44,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           height: 'auto',
           maxWidth: '100%',
           maxHeight: '100%',
+          minWidth: '100%',
+          minHeight: '100%',
         }}
         ref={videoRef}
         playsInline
