@@ -41,6 +41,7 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
+  private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -285,42 +286,45 @@ export class AudioSinkManager {
    */
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
-    if (this.audioSink?.children.length === 0) {
-      let bluetoothDevice: InputDeviceInfo | null = null;
-      let speakerPhone: InputDeviceInfo | null = null;
-      let wired: InputDeviceInfo | null = null;
-      let earpiece: InputDeviceInfo | null = null;
+    if (!this.audioSink?.children.length) {
+      HMSLogger.d(this.TAG, 'No remote audio added yet');
+      return;
+    }
+    let bluetoothDevice: InputDeviceInfo | null = null;
+    let speakerPhone: InputDeviceInfo | null = null;
+    let wired: InputDeviceInfo | null = null;
+    let earpiece: InputDeviceInfo | null = null;
 
-      for (const device of this.deviceManager.audioInput) {
-        if (device.label.toLowerCase().includes('speakerphone')) {
-          speakerPhone = device;
-        }
-        if (device.label.toLowerCase().includes('wired')) {
-          wired = device;
-        }
-        if (device.label.toLowerCase().includes('bluetooth')) {
-          bluetoothDevice = device;
-        }
-        if (device.label.toLowerCase().includes('earpiece')) {
-          earpiece = device;
-        }
+    for (const device of this.deviceManager.audioInput) {
+      const label = device.label.toLowerCase();
+      if (label.includes('speakerphone')) {
+        speakerPhone = device;
+      } else if (label.includes('wired')) {
+        wired = device;
+      } else if (label.includes('bluetooth')) {
+        bluetoothDevice = device;
+      } else if (label.includes('earpiece')) {
+        earpiece = device;
       }
-      const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-      if (localAudioTrack && earpiece) {
-        const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-        HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
-        // already selected appropriate device
-        if (localAudioTrack.settings.deviceId === externalDeviceID) {
-          return;
-        }
+    }
+    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+    if (localAudioTrack && earpiece) {
+      const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+      // already selected appropriate device
+      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+        return;
+      }
+      if (!this.earpieceSelected) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        await localAudioTrack.setSettings(
-          {
-            deviceId: externalDeviceID,
-          },
-          true,
-        );
+        this.earpieceSelected = true;
       }
+      await localAudioTrack.setSettings(
+        {
+          deviceId: externalDeviceID,
+        },
+        true,
+      );
     }
   };
 }

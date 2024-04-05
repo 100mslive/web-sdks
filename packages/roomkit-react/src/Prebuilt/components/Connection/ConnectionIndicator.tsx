@@ -1,5 +1,5 @@
 import React from 'react';
-import { selectConnectionQualityByPeerID, useHMSStore } from '@100mslive/react-sdk';
+import { HMSPeerType, selectConnectionQualityByPeerID, selectPeerTypeByID, useHMSStore } from '@100mslive/react-sdk';
 import { PoorConnectivityIcon } from '@100mslive/react-icons';
 import { styled, Tooltip, useTheme } from '../../..';
 // @ts-ignore
@@ -32,9 +32,10 @@ export const ConnectionIndicator = ({
   hideBg?: boolean;
 }) => {
   const downlinkQuality = useHMSStore(selectConnectionQualityByPeerID(peerId))?.downlinkQuality;
+  const peerType = useHMSStore(selectPeerTypeByID(peerId));
   const { theme } = useTheme();
   const defaultColor = theme.colors.on_surface_low;
-  if (downlinkQuality === -1 || downlinkQuality === undefined) {
+  if (downlinkQuality === -1 || downlinkQuality === undefined || peerType === HMSPeerType.SIP) {
     return null;
   }
   if (downlinkQuality === 0) {

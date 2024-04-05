@@ -420,7 +420,10 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
         }
         // @ts-ignore
         const outerElement = listRef.current._outerRef;
-        if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
+        if (
+          outerElement &&
+          outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight
+        ) {
           requestAnimationFrame(() => scrollToBottom(1));
         }
       }, selectUnreadHMSMessagesCount);

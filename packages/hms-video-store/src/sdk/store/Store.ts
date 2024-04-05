@@ -24,12 +24,14 @@ import {
   HMSVideoTrack,
 } from '../../media/tracks';
 import { PolicyParams } from '../../notification-manager';
+import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store {
+  private TAG = '[Store]:';
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -373,6 +375,10 @@ class Store {
     this.whiteboards.set(whiteboard.id, whiteboard);
   }
 
+  getWhiteboards() {
+    return this.whiteboards;
+  }
+
   getWhiteboard(id?: string): HMSWhiteboard | undefined {
     return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
   }
@@ -415,6 +421,10 @@ class Store {
       pluginName: keyof PolicyParams['plugins'],
       permission: HMSPermissionType,
     ) => {
+      if (!this.knownRoles[role]) {
+        HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
+        return;
+      }
       const rolePermissions = this.knownRoles[role].permissions;
       if (!rolePermissions[pluginName]) {
         rolePermissions[pluginName] = [];

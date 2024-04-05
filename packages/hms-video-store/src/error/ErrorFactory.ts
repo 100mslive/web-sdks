@@ -36,7 +36,7 @@ export const ErrorFactory = {
         ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
         'WebSocketConnectionLost',
         action,
-        `Network connection lost `,
+        `Network connection lost`,
         description,
       );
     },

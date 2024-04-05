@@ -28,6 +28,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSPeerType,
   HMSPlaylistSettings,
   HMSPlaylistType,
   HMSPreviewConfig,
@@ -1147,6 +1148,7 @@ export class HMSSdk implements HMSInterface {
   private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
     await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+    await this.interactivityCenter.whiteboard.handleLocalRoleUpdate();
   };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -1300,6 +1302,7 @@ export class HMSSdk implements HMSInterface {
       role: policy,
       // default value is the original role if user didn't pass asRole in config
       asRole: asRolePolicy || policy,
+      type: HMSPeerType.REGULAR,
     });
 
     this.store.addPeer(localPeer);

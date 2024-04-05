@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
@@ -251,12 +252,10 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
 
-  if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
-    return <PreviewScreen />;
-  } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
-    return <LeaveScreen />;
-  }
-  return <ConferenceScreen />;
+  return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
+    .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
+    .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)
+    .otherwise(() => <ConferenceScreen />);
 };
 
 const BackSwipe = () => {
@@ -286,7 +285,6 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
-
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>

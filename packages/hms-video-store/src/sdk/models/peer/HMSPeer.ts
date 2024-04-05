@@ -1,4 +1,5 @@
 import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
+import { HMSPeerType } from '../../../interfaces/peer/hms-peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
 import { HAND_RAISE_GROUP_NAME } from '../../../utils/constants';
@@ -16,6 +17,7 @@ export type HMSPeerInit = {
   groups?: string[];
   realtime?: boolean;
   isHandRaised?: boolean;
+  type: HMSPeerType;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -32,8 +34,20 @@ export class HMSPeer implements IHMSPeer {
   networkQuality?: number;
   groups?: string[];
   realtime?: boolean;
+  type: HMSPeerType;
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups, realtime }: HMSPeerInit) {
+  constructor({
+    peerId,
+    name,
+    isLocal,
+    customerUserId,
+    metadata,
+    role,
+    joinedAt,
+    groups,
+    realtime,
+    type,
+  }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
@@ -42,6 +56,7 @@ export class HMSPeer implements IHMSPeer {
     this.joinedAt = joinedAt;
     this.groups = groups;
     this.realtime = realtime;
+    this.type = type;
 
     if (role) {
       this.role = role;
@@ -68,6 +83,7 @@ export class HMSPeer implements IHMSPeer {
   updateNetworkQuality(quality: number) {
     this.networkQuality = quality;
   }
+
   /**
    * @internal
    */

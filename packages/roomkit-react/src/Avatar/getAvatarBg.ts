@@ -2,13 +2,17 @@ const getInitials = (name: string | undefined) => {
   if (!name) {
     return undefined;
   } else {
-    return name
-      .trim()
-      .match(/(^\S\S?|\b\S)?/g)
-      ?.join('')
-      ?.match(/(^\S|\S$)?/g)
-      ?.join('')
-      .toUpperCase();
+    return (
+      name
+        .trim()
+        // remove non chars/digits
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .match(/(^\S\S?|\b\S)?/g)
+        ?.join('')
+        ?.match(/(^\S|\S$)?/g)
+        ?.join('')
+        .toUpperCase()
+    );
   }
 };
 

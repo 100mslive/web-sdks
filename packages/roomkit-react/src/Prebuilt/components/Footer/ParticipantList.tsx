@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
   HMSPeer,
+  HMSPeerType,
   HMSRoleName,
   selectHandRaisedPeers,
   selectHasPeerHandRaised,
@@ -14,6 +15,7 @@ import {
 } from '@100mslive/react-sdk';
 import {
   AddIcon,
+  CallIcon,
   ChangeRoleIcon,
   CrossIcon,
   HandIcon,
@@ -184,6 +186,7 @@ export const Participant = ({
       {isConnected && peer.roleName ? (
         <ParticipantActions
           peerId={peer.id}
+          peerType={peer.type}
           isLocal={peer.id === localPeerId}
           role={peer.roleName}
           isHandRaisedAccordion={isHandRaisedAccordion}
@@ -261,6 +264,7 @@ const VirtualizedParticipants = ({
 const ParticipantActions = React.memo(
   ({
     peerId,
+    peerType,
     role,
     isLocal,
     isHandRaisedAccordion,
@@ -269,6 +273,7 @@ const ParticipantActions = React.memo(
     role: string;
     isLocal: boolean;
     isHandRaisedAccordion?: boolean;
+    peerType: HMSPeerType;
   }) => {
     const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
     const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
@@ -291,6 +296,15 @@ const ParticipantActions = React.memo(
         ) : (
           <>
             <ConnectionIndicator peerId={peerId} />
+            {peerType === HMSPeerType.SIP && (
+              <Flex
+                align="center"
+                justify="center"
+                css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+              >
+                <CallIcon width={19} height={19} />
+              </Flex>
+            )}
             {isHandRaised && (
               <Flex
                 align="center"
