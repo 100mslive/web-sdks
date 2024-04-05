@@ -76,7 +76,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     const whiteboards = this.store.getWhiteboards();
 
     for (const whiteboard of whiteboards.values()) {
-      if (whiteboard.open && whiteboard.url) {
+      if (whiteboard.url) {
         const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
         const newWhiteboard: HMSWhiteboard = {
           ...whiteboard,
