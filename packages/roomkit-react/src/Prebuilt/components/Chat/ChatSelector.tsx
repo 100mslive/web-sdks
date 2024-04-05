@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSPeer,
+  HMSPeerType,
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
   selectRemotePeers,
@@ -158,7 +159,9 @@ const VirtualizedSelectItemList = ({
     () =>
       peers.filter(
         // search should be empty or search phrase should be included in name
-        peer => !searchValue || peer.name.toLowerCase().includes(searchValue.toLowerCase()),
+        peer =>
+          (!searchValue || peer.name.toLowerCase().includes(searchValue.toLowerCase())) &&
+          peer.type !== HMSPeerType.SIP,
       ),
     [peers, searchValue],
   );

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
@@ -79,6 +79,17 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isMobile = useMedia(cssConfig.media.md);
   const { isLocalVideoEnabled } = useAVToggle();
+  const sidepaneOpenedRef = useRef(false);
+
+  const defaultMediaURL = useMemo(() => {
+    const media = elements?.virtual_background?.background_media || [];
+    for (let i = 0; i < media.length; i++) {
+      if (media[i].default && media[i].url) {
+        return media[i].url;
+      }
+    }
+    return '';
+  }, [elements?.virtual_background?.background_media]);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -112,19 +123,12 @@ export const AppData = React.memo(() => {
   }, [preferences.subscribedNotifications, hmsActions]);
 
   useEffect(() => {
-    let defaultMediaURL;
-    elements?.virtual_background?.background_media?.forEach(media => {
-      if (media.default && media.url) {
-        defaultMediaURL = media.url;
-      }
-    });
-    if (defaultMediaURL) {
+    if (defaultMediaURL && !sidepaneOpenedRef.current && !isMobile && isLocalVideoEnabled) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      if (isLocalVideoEnabled && !isMobile) {
-        toggleVB();
-      }
+      sidepaneOpenedRef.current = true;
+      toggleVB();
     }
-  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB, isLocalVideoEnabled, isMobile]);
+  }, [hmsActions, toggleVB, isLocalVideoEnabled, isMobile, defaultMediaURL]);
 
   return <ResetStreamingStart />;
 });

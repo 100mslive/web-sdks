@@ -594,6 +594,7 @@ const HLSView = () => {
                       css={{
                         p: '$4 $8',
                       }}
+                      onClick={e => e.stopPropagation()}
                     >
                       <HMSVideoPlayer.Controls.Right>
                         {(isLandscape || (isMobile && isFullScreen)) && showChat && (
@@ -602,7 +603,10 @@ const HLSView = () => {
                               if (isFullScreen) {
                                 toggle();
                               }
-                              toggleChat();
+                              // toggle and closing fullscreen takes few ms, to make it synced we are calling settimeout
+                              setTimeout(() => {
+                                toggleChat();
+                              }, 0);
                             }}
                           />
                         )}
@@ -652,6 +656,7 @@ const HLSView = () => {
                     css={{
                       p: '$4 $8',
                     }}
+                    onClick={e => e.stopPropagation()}
                   >
                     <HMSVideoPlayer.Controls.Left>
                       {!(isMobile || isLandscape) && (

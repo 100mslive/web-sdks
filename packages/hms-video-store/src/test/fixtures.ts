@@ -1,3 +1,4 @@
+import { HMSPeerType } from '../interfaces';
 import { HMSAudioTrack, HMSPeer, HMSTrackType, HMSVideoTrack } from '../';
 
 let counter = 100;
@@ -20,5 +21,6 @@ export const makeFakePeer = (): HMSPeer => {
     videoTrack: '',
     groups: [],
     isHandRaised: false,
+    type: HMSPeerType.REGULAR,
   };
 };

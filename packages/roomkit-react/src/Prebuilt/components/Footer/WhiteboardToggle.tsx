@@ -1,5 +1,5 @@
 import React from 'react';
-import { useScreenShare, useWhiteboard } from '@100mslive/react-sdk';
+import { selectPeerScreenSharing, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { PencilDrawIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
 // @ts-ignore: No implicit Any
@@ -9,9 +9,8 @@ import { ToastManager } from '../Toast/ToastManager';
 
 export const WhiteboardToggle = () => {
   const { toggle, open, isOwner } = useWhiteboard();
-  const { screenSharingPeerId, amIScreenSharing } = useScreenShare();
-  const remoteScreenShare = screenSharingPeerId && !amIScreenSharing;
-  const disabled = remoteScreenShare || (open && !isOwner);
+  const peerSharing = useHMSStore(selectPeerScreenSharing);
+  const disabled = !!peerSharing || (open && !isOwner);
 
   if (!toggle) {
     return null;
@@ -21,9 +20,7 @@ export const WhiteboardToggle = () => {
     <Tooltip
       key="whiteboard"
       title={
-        remoteScreenShare
-          ? 'Cannot open whiteboard when viewing a shared screen'
-          : `${open ? 'Close' : 'Open'} Whiteboard`
+        peerSharing ? 'Cannot open whiteboard when viewing a shared screen' : `${open ? 'Close' : 'Open'} Whiteboard`
       }
     >
       <IconButton

@@ -5,6 +5,7 @@ import { InitFlags } from '../../signal/init/models';
 import { HMSWhiteboardCreateOptions } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
+import { constructWhiteboardURL } from '../../utils/whiteboard';
 
 export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
   private TAG = '[HMSWhiteboardInteractivityCenter]';
@@ -40,6 +41,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
       title: createOptions?.title,
       attributes: createOptions?.attributes,
       id: response.id,
+      url: constructWhiteboardURL(response.token, response.addr, this.store.getEnv()),
       token: response.token,
       addr: response.addr,
       owner: response.owner,
@@ -68,6 +70,29 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
 
   setListener(listener?: InteractivityListener) {
     this.listener = listener;
+  }
+
+  async handleLocalRoleUpdate() {
+    const whiteboards = this.store.getWhiteboards();
+
+    for (const whiteboard of whiteboards.values()) {
+      if (whiteboard.url) {
+        const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
+        const newWhiteboard: HMSWhiteboard = {
+          ...whiteboard,
+          id: response.id,
+          url: constructWhiteboardURL(response.token, response.addr, this.store.getEnv()),
+          token: response.token,
+          addr: response.addr,
+          owner: response.owner,
+          permissions: response.permissions,
+          open: response.permissions.length > 0,
+        };
+
+        this.store.setWhiteboard(newWhiteboard);
+        this.listener?.onWhiteboardUpdate(newWhiteboard);
+      }
+    }
   }
 
   private getCreateOptionsWithDefaults(createOptions?: HMSWhiteboardCreateOptions): HMSWhiteboardCreateOptions {
