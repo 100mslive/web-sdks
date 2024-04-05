@@ -85,8 +85,8 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
           token: response.token,
           addr: response.addr,
           owner: response.owner,
-          permissions: response.permissions || [],
-          open: true,
+          permissions: response.permissions,
+          open: response.permissions.length > 0,
         };
 
         this.store.setWhiteboard(newWhiteboard);
