@@ -72,6 +72,29 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     this.listener = listener;
   }
 
+  async handleLocalRoleUpdate() {
+    const whiteboards = this.store.getWhiteboards();
+
+    for (const whiteboard of whiteboards.values()) {
+      if (whiteboard.open && whiteboard.url) {
+        const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
+        const newWhiteboard: HMSWhiteboard = {
+          ...whiteboard,
+          id: response.id,
+          url: constructWhiteboardURL(response.token, response.addr, this.store.getEnv()),
+          token: response.token,
+          addr: response.addr,
+          owner: response.owner,
+          permissions: response.permissions || [],
+          open: true,
+        };
+
+        this.store.setWhiteboard(newWhiteboard);
+        this.listener?.onWhiteboardUpdate(newWhiteboard);
+      }
+    }
+  }
+
   private getCreateOptionsWithDefaults(createOptions?: HMSWhiteboardCreateOptions): HMSWhiteboardCreateOptions {
     const roles = Object.values(this.store.getKnownRoles());
     const reader: Array<string> = [];
