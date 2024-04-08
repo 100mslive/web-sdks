@@ -149,11 +149,23 @@ export class RoomUpdateManager {
     if (!notification?.variants) {
       return hls;
     }
-    notification.variants.forEach((_: HLSVariant, index: number) => {
-      hls.variants.push({
-        initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
-        url: '',
-      });
+    notification.variants.forEach((variant: HLSVariant, index: number) => {
+      if (variant.url) {
+        hls.variants.push({
+          meetingURL: variant?.meetingURL,
+          url: variant?.url,
+          metadata: variant?.metadata,
+          playlist_type: variant?.playlist_type,
+          startedAt: convertDateNumToDate(notification?.variants?.[index].started_at),
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          state: variant.state,
+        });
+      } else {
+        hls.variants.push({
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          url: '',
+        });
+      }
     });
     return hls;
   }
