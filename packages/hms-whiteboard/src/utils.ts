@@ -1,13 +1,3 @@
-export function getQueryParams(url?: string) {
-  if (!url) url = window.location.search;
-  const query = url.substr(1);
-  return query.split('&').reduce((result, part) => {
-    const item = part.split('=');
-    result[item[0]] = decodeURIComponent(item[1]);
-    return result;
-  }, {} as Record<string, string | undefined>);
-}
-
 export default function decodeJWT(token?: string) {
   if (!token || token.length === 0) {
     throw Error('Token cannot be an empty string or undefined or null');

@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
-.tl-container {
-  border-radius: 0.75rem;
-}
-
 .tlui-navigation-zone,
 .tlui-navigation-panel {
   display: none;
+}
+
+.transparent-canvas {
+  --color-background: rgba(0, 0, 0, 0);
 }
