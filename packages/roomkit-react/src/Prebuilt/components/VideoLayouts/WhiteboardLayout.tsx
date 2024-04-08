@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
-import { Whiteboard, WhiteboardProps } from '@100mslive/hms-whiteboard';
+import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
@@ -19,19 +19,26 @@ const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
 
-  const handleMount = useCallback<NonNullable<WhiteboardProps['onMount']>>(({ store, editor }) => {
-    console.log(store, editor);
-    store?.listen(({ changes }) => {
-      Object.keys(changes.updated).forEach(key => {
-        // Only update the current page id from the instance changes, ignore pointer changes
-        if (!key.includes('instance')) {
-          return;
-        }
-        const newPage = editor?.currentPage;
-        console.log('page', newPage?.id, newPage?.name);
-      });
-    });
-  }, []);
+  const handleMount = useCallback<NonNullable<((args: { store?: unknown; editor?: unknown }) => void) | undefined>>(
+    ({ store, editor }) => {
+      // @ts-ignore
+      store?.listen(
+        // @ts-ignore
+        ({ changes }) => {
+          Object.keys(changes.updated).forEach(key => {
+            // Only update the current page id from the instance changes, ignore pointer changes
+            if (!key.includes('instance')) {
+              return;
+            }
+            // @ts-ignore
+            console.log('page', editor?.getCurrentPage());
+          });
+        },
+        { source: 'user', scope: 'session' },
+      );
+    },
+    [],
+  );
 
   return (
     <Box
