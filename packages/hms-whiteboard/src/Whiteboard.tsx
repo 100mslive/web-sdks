@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Editor, Tldraw, TLStore } from '@tldraw/tldraw';
+import { Editor, Tldraw } from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
 import { getQueryParams } from './utils';
@@ -12,15 +12,14 @@ export interface WhiteboardProps {
   endpoint?: string;
   token?: string;
   zoomToContent?: boolean;
-  onMount?: (args: { store?: TLStore; editor?: Editor }) => void;
+  onMount?: (args: { store?: unknown; editor?: unknown }) => void;
 }
-
-export const Whiteboard = ({
+export function Whiteboard({
+  onMount,
   endpoint = queryEndpoint,
   token = queryToken,
   zoomToContent = zoom_to_content === 'true',
-  onMount,
-}: WhiteboardProps) => {
+}: WhiteboardProps) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
@@ -42,7 +41,7 @@ export const Whiteboard = ({
       store={store}
       onMount={handleMount}
       components={{ ErrorFallback }}
-      hideUi={editor?.instanceState?.isReadonly}
+      hideUi={editor?.getInstanceState()?.isReadonly}
     />
   );
-};
+}
