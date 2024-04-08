@@ -4,5 +4,9 @@ import { getRoomCodeFromUrl } from './utils';
 export default function App() {
   const roomCode = getRoomCodeFromUrl();
 
-  return <HMSPrebuilt roomCode={roomCode} />;
+  return (
+    <HMSPrebuilt
+      roomCode={roomCode}
+    />
+  );
 }

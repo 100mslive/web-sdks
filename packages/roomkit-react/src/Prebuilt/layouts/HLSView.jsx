@@ -594,6 +594,7 @@ const HLSView = () => {
                       css={{
                         p: '$4 $8',
                       }}
+                      onClick={e => e.stopPropagation()}
                     >
                       <HMSVideoPlayer.Controls.Right>
                         {(isLandscape || (isMobile && isFullScreen)) && showChat && (
@@ -655,6 +656,7 @@ const HLSView = () => {
                     css={{
                       p: '$4 $8',
                     }}
+                    onClick={e => e.stopPropagation()}
                   >
                     <HMSVideoPlayer.Controls.Left>
                       {!(isMobile || isLandscape) && (
