@@ -32,14 +32,12 @@ export function Whiteboard({
   };
 
   return (
-    <div className="tldraw__editor">
-      <Tldraw
-        autoFocus
-        store={store}
-        onMount={handleMount}
-        components={{ ErrorFallback }}
-        hideUi={editor?.getInstanceState().isReadonly}
-      />
-    </div>
+    <Tldraw
+      autoFocus
+      store={store}
+      onMount={handleMount}
+      components={{ ErrorFallback }}
+      hideUi={editor?.instanceState?.isReadonly}
+    />
   );
 }

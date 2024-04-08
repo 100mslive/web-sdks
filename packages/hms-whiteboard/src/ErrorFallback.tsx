@@ -24,7 +24,7 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
     () => {
       try {
         if (editor) {
-          return editor.user.getIsDarkMode();
+          return editor.user.isDarkMode;
         }
       } catch {
         // we're in a funky error state so this might not work for spooky

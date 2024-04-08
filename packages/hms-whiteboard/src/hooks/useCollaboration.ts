@@ -37,7 +37,7 @@ export function useCollaboration({
     return store;
   });
 
-  const [currentPage, setCurrentPage] = useState<TLPage | undefined>(editor?.getCurrentPage());
+  const [currentPage, setCurrentPage] = useState<TLPage | undefined>(editor?.currentPage);
 
   const [storeWithStatus, setStoreWithStatus] = useState<TLStoreWithStatus>({
     status: 'loading',
@@ -55,11 +55,11 @@ export function useCollaboration({
   useSetEditorPermissions({ token, editor, zoomToContent, handleError });
 
   useEffect(() => {
-    if (!currentPage?.id || !editor || editor.getCurrentPageId() === currentPage.id) {
+    if (!currentPage?.id || !editor || editor.currentPageId === currentPage.id) {
       return;
     }
 
-    if (!editor.getPages().find(page => page.id === currentPage.id)) {
+    if (!editor.pages?.find(page => page.id === currentPage.id)) {
       editor.createPage(currentPage);
     }
 
@@ -192,7 +192,7 @@ export function useCollaboration({
             if (!key.includes('instance')) {
               return;
             }
-            const newPage = editor?.getCurrentPage();
+            const newPage = editor?.currentPage;
 
             if (newPage?.id !== currentPage?.id) {
               sessionStore?.set(CURRENT_PAGE_KEY, newPage);
@@ -212,7 +212,7 @@ export function useCollaboration({
 
   // zoom to fit on remote changes for hls viewer
   useEffect(() => {
-    if (!editor || !editor.getInstanceState().isReadonly || !zoomToContent) return;
+    if (!editor || !editor.instanceState?.isReadonly || !zoomToContent) return;
 
     store.listen(
       () => {

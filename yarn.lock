@@ -3359,7 +3359,7 @@
     "@radix-ui/react-primitive" "1.0.0"
     "@radix-ui/react-use-controllable-state" "1.0.0"
 
-"@radix-ui/react-alert-dialog@^1.0.5":
+"@radix-ui/react-alert-dialog@^1.0.0":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-alert-dialog/-/react-alert-dialog-1.0.5.tgz#70dd529cbf1e4bff386814d3776901fcaa131b8c"
   integrity sha512-OrVIOcZL0tl6xibeuGt5/+UxoT2N27KCFOPjFyfXMnchxSHZ/OW7cCX2nGlIYJrbHK/fczPcFzAwvNBB6XBNMA==
@@ -5550,16 +5550,16 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.4.3.tgz#af975e367743fa91989cd666666aec31a8f50591"
   integrity sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==
 
-"@tldraw/editor@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/editor/-/editor-2.0.2.tgz#2e4fd3c14fd2d079554d7d111531ab4bbc4861cc"
-  integrity sha512-ik7JvBQv9AsvkGhBfNkPdM0m+cBiarfPLrzlgyB2dec4lWQOIIL/p9J+28FUWQ4bzDvD6JN0eGXnsGj754ypQg==
+"@tldraw/editor@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/editor/-/editor-2.0.0-alpha.18.tgz#4e737a3f089b07e9ebb747bde9203454a6c413d9"
+  integrity sha512-731XLCIRX9QNRZmxIIUPpV92m4EjVjwC1gcVMyne4BS6HGEAzuplj0XFfmznBLSXoD8/RGkUkMQghIi0Ai56fA==
   dependencies:
-    "@tldraw/state" "2.0.2"
-    "@tldraw/store" "2.0.2"
-    "@tldraw/tlschema" "2.0.2"
-    "@tldraw/utils" "2.0.2"
-    "@tldraw/validate" "2.0.2"
+    "@tldraw/state" "2.0.0-alpha.18"
+    "@tldraw/store" "2.0.0-alpha.18"
+    "@tldraw/tlschema" "2.0.0-alpha.18"
+    "@tldraw/utils" "2.0.0-alpha.18"
+    "@tldraw/validate" "2.0.0-alpha.18"
     "@types/core-js" "^2.5.5"
     "@use-gesture/react" "^10.2.27"
     classnames "^2.3.2"
@@ -5571,50 +5571,62 @@
     lodash.uniq "^4.5.0"
     nanoid "4.0.2"
 
-"@tldraw/state@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/state/-/state-2.0.2.tgz#f23c724476c6d954d4f3f3e3b71e0bd33407f1c0"
-  integrity sha512-8736faV/vTDipYa6xpTG2l3XJgwu1lR4wAwobW/AdiflWBoxiejK4GZyVhb1HtSvcb9EV/ZDOG9SAwG2cKUw9A==
+"@tldraw/state@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/state/-/state-2.0.0-alpha.18.tgz#cd4f30cc998d5e9cfa9bf5d818e03f36a7e5ff00"
+  integrity sha512-CU82nfOm6QuXtQWgKn1oWXuBoPTMAuWz480bxDoBPGTP4RfsVzQzB3TBbJLfHNQ56C9Q5qdnETHZmWdO+g0rCA==
 
-"@tldraw/store@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/store/-/store-2.0.2.tgz#36090dfefa6945d3002668e19761665cf8db9e5f"
-  integrity sha512-02Wg37GiVGoUXxpcyLaoyOMUXn62OxuwcN3Ij7nVxHs7XGJmeMdWKodFMSss1Jh7lzJJMS5r8BJ3knB/ENdcWA==
+"@tldraw/store@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/store/-/store-2.0.0-alpha.18.tgz#c23a3f9c5e16f38e3213d1ed1ea27f02f721c197"
+  integrity sha512-w2KLr4r22hx+0AgFHrGPnWv1DCHCZ/xmbANNGm561W027k+KNK5oHs8FdUkTPWazZhvdQcmUGziBoUMhTjIz7w==
   dependencies:
-    "@tldraw/state" "2.0.2"
-    "@tldraw/utils" "2.0.2"
+    "@tldraw/state" "2.0.0-alpha.18"
+    "@tldraw/utils" "2.0.0-alpha.18"
     lodash.isequal "^4.5.0"
     nanoid "4.0.2"
 
-"@tldraw/tldraw@^2.0.0-alpha.18":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/tldraw/-/tldraw-2.0.2.tgz#b53be55b0a8e727ccaaf0fa171d4b97f7dbdf179"
-  integrity sha512-34GK/SjYMyvPSrO7D0DR0sg3qi0XtFhyNKS4ls4PNGNa24Ov4Etm3MVEmbOe+stqAi8FC4hlfSDd7eE/vIsU5w==
+"@tldraw/tldraw@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/tldraw/-/tldraw-2.0.0-alpha.18.tgz#900106559efd150e42590716922b3b4ec10f2b5c"
+  integrity sha512-U+cOCmC3sJFbfYM/Jbp0cECeZv5pbzXCaWIzGe8A/n7Jxk4V7XTIVCqnohSZu4ZTGsQ9Ng38ksvnGKKsnjAkXg==
   dependencies:
-    tldraw "2.0.2"
+    "@radix-ui/react-alert-dialog" "^1.0.0"
+    "@radix-ui/react-context-menu" "^2.1.5"
+    "@radix-ui/react-dialog" "^1.0.5"
+    "@radix-ui/react-dropdown-menu" "^2.0.6"
+    "@radix-ui/react-popover" "^1.0.7"
+    "@radix-ui/react-select" "^1.2.0"
+    "@radix-ui/react-slider" "^1.1.0"
+    "@radix-ui/react-toast" "^1.1.1"
+    "@tldraw/editor" "2.0.0-alpha.18"
+    canvas-size "^1.2.6"
+    classnames "^2.3.2"
+    hotkeys-js "^3.11.2"
+    lz-string "^1.4.4"
 
-"@tldraw/tlschema@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/tlschema/-/tlschema-2.0.2.tgz#b4925a9155d74354b0b3608276f3fdf2e78d8b76"
-  integrity sha512-gpSdyl7n5vMutgSX7+1dvZj6DGxQhCyDMhOmuWQGkTuQrbp/RmOIRwxAfLRIZCJstKKohy/skc3XzAhL5wEbHQ==
+"@tldraw/tlschema@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/tlschema/-/tlschema-2.0.0-alpha.18.tgz#ec906328a82d764ef25372c2b498a4da655784ad"
+  integrity sha512-1XTXg4YY6ZgfvjMQ68xgOOxINBvgBq7mHyXAiwUC4KEC+zXn9ADUxhTe8tDBbAS26FSZ8OKelhe1E9aY0PC6Lg==
   dependencies:
-    "@tldraw/state" "2.0.2"
-    "@tldraw/store" "2.0.2"
-    "@tldraw/utils" "2.0.2"
-    "@tldraw/validate" "2.0.2"
+    "@tldraw/state" "2.0.0-alpha.18"
+    "@tldraw/store" "2.0.0-alpha.18"
+    "@tldraw/utils" "2.0.0-alpha.18"
+    "@tldraw/validate" "2.0.0-alpha.18"
     nanoid "4.0.2"
 
-"@tldraw/utils@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/utils/-/utils-2.0.2.tgz#692e7a937efbb6e26575a9c258ccc2eec91cdd33"
-  integrity sha512-oXqCF2fERXG7e30npML/zMGtyRWIfgUXVvgdXtWR/S7/mwVU0MeY9YJ7eAuY+iIFshpV9MM99tQxqUZKVJ6NNw==
+"@tldraw/utils@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/utils/-/utils-2.0.0-alpha.18.tgz#86314caf60a4e0bc935a2018fb43fd504633c0c8"
+  integrity sha512-xQjysYEZu8FzdZ+uWV+t7hQfqFIuYnZ5rYOpNpVFKQ+jag75ppfWzhE6YOl6gqmkUTxqDiONoUEo3AgXKFMkQQ==
 
-"@tldraw/validate@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@tldraw/validate/-/validate-2.0.2.tgz#e03948a25d581f87167af7ffcdcc4d9cff937471"
-  integrity sha512-dc2WxVwDf4HKP0/5AXukv/gqjrEg2fNCbKTRrxGDgvXfsRe1Gg8o9cVYlzZLRmbvj1DL8ggw4DAvbyL1FZh5Gg==
+"@tldraw/validate@2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@tldraw/validate/-/validate-2.0.0-alpha.18.tgz#108bb49af021d0df269dbd54fc323967133a1f93"
+  integrity sha512-wDAwKmQeWfrML1CS7a7vxagbFO91PpM/MqFKYwCQIsHWDKzdChhisD8t8p1sJ/8RZPjM2YESL5mfQK5ec1eaAw==
   dependencies:
-    "@tldraw/utils" "2.0.2"
+    "@tldraw/utils" "2.0.0-alpha.18"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -16690,25 +16702,6 @@ tiny-invariant@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.3.1.tgz#8560808c916ef02ecfd55e66090df23a4b7aa642"
   integrity sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==
-
-tldraw@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/tldraw/-/tldraw-2.0.2.tgz#2d4efd6671c363ceec53d1ea57b872fbd90c1f1d"
-  integrity sha512-qWIbsZkbCVcexGHtUBBjT28+upgzwSu3yImtQXRbfwDj8wbVadxxczAK9Uh6gSsRqlEx8WaQRu3Nkv/3QJSTQQ==
-  dependencies:
-    "@radix-ui/react-alert-dialog" "^1.0.5"
-    "@radix-ui/react-context-menu" "^2.1.5"
-    "@radix-ui/react-dialog" "^1.0.5"
-    "@radix-ui/react-dropdown-menu" "^2.0.6"
-    "@radix-ui/react-popover" "^1.0.7"
-    "@radix-ui/react-select" "^1.2.0"
-    "@radix-ui/react-slider" "^1.1.0"
-    "@radix-ui/react-toast" "^1.1.1"
-    "@tldraw/editor" "2.0.2"
-    canvas-size "^1.2.6"
-    classnames "^2.3.2"
-    hotkeys-js "^3.11.2"
-    lz-string "^1.4.4"
 
 tmp@^0.0.33:
   version "0.0.33"

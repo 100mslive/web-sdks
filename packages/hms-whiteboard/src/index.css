@@ -1,15 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
-.tldraw__editor {
-  position: fixed;
-  inset: 0px;
-  overflow: hidden;
+.tl-container {
+  border-radius: 0.75rem;
 }
 
-.tlui-navigation-zone {
+.tlui-navigation-zone,
+.tlui-navigation-panel {
   display: none;
-}
-
-.tl-theme__light {
-  --color-background: rgba(0, 0, 0, 0);
 }
