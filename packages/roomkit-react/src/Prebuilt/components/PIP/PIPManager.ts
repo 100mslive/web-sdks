@@ -1,4 +1,6 @@
 import * as workerTimers from 'worker-timers';
+import { HMSActions, HMSPeer, HMSTrack, HMSVideoTrack } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit any
 import { drawVideoElementsOnCanvas, dummyChangeInCanvas, resetPIPCanvasColors } from './pipUtils';
 import { isIOS, isMacOS, isSafari } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
@@ -7,12 +9,12 @@ const DEFAULT_CANVAS_WIDTH = 480;
 const DEFAULT_CANVAS_HEIGHT = 320;
 const LEAVE_EVENT_NAME = 'leavepictureinpicture';
 
-const PIPStates = {
-  starting: 'starting',
-  started: 'started',
-  stopping: 'stopping',
-  stopped: 'stopped',
-};
+enum PIPStates {
+  starting = 'starting',
+  started = 'started',
+  stopping = 'stopping',
+  stopped = 'stopped',
+}
 
 /**
  * video elements are stitched together as a canvas which is converted to
@@ -24,12 +26,21 @@ const PIPStates = {
  * tracks which should be shown.
  */
 class PipManager {
-  listeners = new Set();
+  private listeners = new Set<(value: boolean) => void>();
+  private canvas: HTMLCanvasElement | null = null;
+  private pipVideo: HTMLVideoElement | null = null;
+  private hmsActions: HMSActions | null = null;
+  private timeoutRef = 0;
+  private videoElements: HTMLVideoElement[] = [];
+  private onStateChange: ((value: boolean) => void) | null = null;
+  private tracksToShow: Array<string> = [];
+  private state: PIPStates = PIPStates.stopped;
+
   constructor() {
     this.reset();
   }
 
-  listenToStateChange(cb) {
+  listenToStateChange(cb: (value: boolean) => void) {
     this.listeners.add(cb);
   }
 
@@ -41,12 +52,11 @@ class PipManager {
     resetPIPCanvasColors();
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
-    this.timeoutRef = null; // setTimeout reference so it can be cancelled
+    this.timeoutRef = 0; // setTimeout reference so it can be cancelled
     this.hmsActions = null; // for attaching detaching
     this.videoElements = []; // for attaching tracks
     this.tracksToShow = [];
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    this.onStateChange = () => {}; // for user of this class to listen to changes
+    this.onStateChange = null; // for user of this class to listen to changes
     this.state = PIPStates.stopped;
   }
 
@@ -70,7 +80,7 @@ class PipManager {
    * @param hmsActions
    * @param onStateChangeFn {function(bool):void} callback called to notify change in pip state
    */
-  async start(hmsActions, onStateChangeFn) {
+  async start(hmsActions: HMSActions, onStateChangeFn: (value: boolean) => void): Promise<void> {
     if (!this.isSupported()) {
       throw new Error('pip is not supported on this browser');
     }
@@ -84,14 +94,14 @@ class PipManager {
     try {
       await this.init(hmsActions, onStateChangeFn);
       // when user closes pip, call internal stop
-      this.pipVideo.addEventListener(LEAVE_EVENT_NAME, this.stop);
+      this.pipVideo?.addEventListener(LEAVE_EVENT_NAME, this.stop);
       this.renderLoop();
       if (!this.isOn()) {
         await this.requestPIP();
       }
       console.debug('pip started');
       this.state = PIPStates.started;
-      this.onStateChange(true);
+      this.onStateChange?.(true);
       this.callListeners(true);
     } catch (err) {
       console.error('error in request pip', err);
@@ -107,14 +117,14 @@ class PipManager {
     this.pipVideo?.removeEventListener(LEAVE_EVENT_NAME, this.stop);
     if (this.timeoutRef) {
       workerTimers.clearTimeout(this.timeoutRef);
-      this.timeoutRef = null;
+      this.timeoutRef = 0;
     }
     if (this.isOn()) {
       this.exitPIP();
     }
     // detach all to avoid bandwidth consumption
     await this.detachOldAttachNewTracks(this.tracksToShow, []);
-    this.onStateChange(false); // notify parent about this
+    this.onStateChange?.(false); // notify parent about this
     this.callListeners(false);
     this.reset(); // cleanup
     this.state = PIPStates.stopped;
@@ -124,13 +134,15 @@ class PipManager {
    * @param peers {Array} All Remote Peers present in call.
    * @param tracksMap {Object} map of track id to track
    * */
-  async updatePeersAndTracks(peers, tracksMap) {
+  async updatePeersAndTracks(peers: HMSPeer[], tracksMap: Record<string, HMSTrack>) {
     if (!this.canvas) {
+      console.log('no canvas to render video to');
       return;
     }
     const newTracksToShowUnordered = this.pickTracksToShow(peers, tracksMap);
     const currentTracksShowing = this.tracksToShow;
     this.tracksToShow = this.orderNewTracksToShow(newTracksToShowUnordered, currentTracksShowing);
+    console.log({ current: this.tracksToShow });
     try {
       await this.detachOldAttachNewTracks(currentTracksShowing, this.tracksToShow, tracksMap);
     } catch (error) {
@@ -142,14 +154,14 @@ class PipManager {
   /**
    * @private {boolean} on - whether pip is on/off
    */
-  callListeners = on => {
+  callListeners = (on: boolean) => {
     this.listeners.forEach(listener => listener?.(on));
   };
 
   /**
    * @private
    */
-  async init(hmsActions, onStateChangeFn) {
+  async init(hmsActions: HMSActions, onStateChangeFn: (value: boolean) => void) {
     await this.initMediaElements();
     this.hmsActions = hmsActions;
     this.onStateChange = onStateChangeFn;
@@ -180,11 +192,11 @@ class PipManager {
   }
 
   initializeVideoElements() {
-    let videoElements = [];
+    const videoElements = [];
     for (let i = 0; i < MAX_NUMBER_OF_TILES_IN_PIP; i++) {
       const videoElement = document.createElement('video');
       videoElement.autoplay = true;
-      videoElement.playsinline = true;
+      videoElement.playsInline = true;
       videoElements.push(videoElement);
     }
     return videoElements;
@@ -212,6 +224,9 @@ class PipManager {
       if (this.isOn()) {
         this.exitPIP(); // is this really needed?
       }
+      if (!this.pipVideo) {
+        return;
+      }
       await this.pipVideo.requestPictureInPicture();
     } catch (error) {
       console.error('error in requestpip', error, 'state', this.state);
@@ -228,16 +243,16 @@ class PipManager {
    * @param peers {Array<any>}
    * @param tracksMap {Record<string, any>}
    */
-  pickTracksToShow(peers, tracksMap) {
-    const tracksToShow = [];
+  pickTracksToShow(peers: HMSPeer[], tracksMap: Record<string, HMSTrack>) {
+    const tracksToShow = new Set<string>();
     for (const peer of peers) {
-      if (tracksToShow.length === MAX_NUMBER_OF_TILES_IN_PIP) {
+      if (tracksToShow.size === MAX_NUMBER_OF_TILES_IN_PIP) {
         break;
-      } else if (peer.videoTrack && tracksMap[peer.videoTrack]?.enabled) {
-        tracksToShow.push(peer.videoTrack);
+      } else if (peer.videoTrack && this.showTrack(tracksMap[peer.videoTrack] as HMSVideoTrack)) {
+        tracksToShow.add(peer.videoTrack);
       }
     }
-    return tracksToShow;
+    return Array.from(tracksToShow);
   }
 
   /**
@@ -252,9 +267,9 @@ class PipManager {
    * @param newTracks {Array}
    * @return {Array}
    */
-  orderNewTracksToShow(newTracks, oldTracks) {
-    const betterNewTracks = [];
-    const leftOvers = [];
+  orderNewTracksToShow(newTracks: string[], oldTracks: string[]) {
+    const betterNewTracks: Array<string> = new Array(newTracks.length);
+    const leftOvers: Array<string> = [];
     // put the common ones in right position
     newTracks.forEach(track => {
       const oldPosition = oldTracks.indexOf(track);
@@ -267,11 +282,16 @@ class PipManager {
     });
     // put the left overs in remaining empty positions
     for (let i = 0; i < newTracks.length; i++) {
-      if (!betterNewTracks[i]) {
-        betterNewTracks[i] = leftOvers.shift();
+      const newEntry = leftOvers.shift();
+      if (!betterNewTracks[i] && newEntry) {
+        betterNewTracks[i] = newEntry;
       }
     }
     return betterNewTracks;
+  }
+
+  private showTrack(track: HMSVideoTrack | undefined) {
+    return track && track.enabled && !track.degraded;
   }
 
   /**
@@ -283,7 +303,11 @@ class PipManager {
    * @param tracksMap {Record<String, any>}
    */
   // eslint-disable-next-line complexity
-  async detachOldAttachNewTracks(oldTracks, newTracks, tracksMap = null) {
+  async detachOldAttachNewTracks(
+    oldTracks: Array<string>,
+    newTracks: Array<string>,
+    tracksMap: Record<string, HMSTrack> | null = null,
+  ) {
     const numTracks = Math.max(oldTracks.length, newTracks.length);
     for (let i = 0; i < numTracks; i++) {
       if (oldTracks[i] === newTracks[i]) {
@@ -292,7 +316,7 @@ class PipManager {
         // old track is there but not equal to new track, detach
         // no need to call detach if we know for sure track is no longer in store
         if (!tracksMap || tracksMap[oldTracks[i]]) {
-          await this.hmsActions.detachVideo(oldTracks[i], this.videoElements[i]);
+          await this.hmsActions?.detachVideo(oldTracks[i], this.videoElements[i]);
         }
         if (this.videoElements[i]) {
           // even if old track got removed from the room, element needs to be cleaned up
@@ -300,7 +324,7 @@ class PipManager {
         }
       }
       if (newTracks[i]) {
-        await this.hmsActions.attachVideo(newTracks[i], this.videoElements[i]);
+        await this.hmsActions?.attachVideo(newTracks[i], this.videoElements[i]);
       }
     }
   }

@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { selectPeers, selectTracksMap, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
-import { Flex, Tooltip } from '../../../';
+import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
+// @ts-ignore: No implicit Any
 import { MediaSession } from './SetupMediaSession';
+// @ts-ignore: No implicit Any
 import { usePinnedTrack } from '../AppData/useUISettings';
 
 /**
@@ -61,7 +63,7 @@ export const ActivatedPIP = () => {
       }
       let pipPeers = storePeers;
       if (pinnedTrack) {
-        pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
+        pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
       }
       PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
         console.error('error in updating pip', err);
