@@ -4,6 +4,7 @@ import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100msli
 import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
+  selectIsLocalVideoEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -23,6 +24,7 @@ import {
   QuizIcon,
   RecordIcon,
   SettingsIcon,
+  VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
@@ -98,6 +100,8 @@ export const MwebOptions = ({
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -184,7 +188,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
+            {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
                   toggleVB();
@@ -194,7 +198,7 @@ export const MwebOptions = ({
                 <VirtualBackgroundIcon />
                 <ActionTile.Title>Virtual Background</ActionTile.Title>
               </ActionTile.Root>
-            ) : null} */}
+            ) : null}
 
             {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
