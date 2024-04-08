@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
-import { Whiteboard } from '@100mslive/hms-whiteboard';
+import { Whiteboard, WhiteboardProps } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
@@ -19,6 +19,20 @@ const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
 
+  const handleMount = useCallback<NonNullable<WhiteboardProps['onMount']>>(({ store, editor }) => {
+    console.log(store, editor);
+    store?.listen(({ changes }) => {
+      Object.keys(changes.updated).forEach(key => {
+        // Only update the current page id from the instance changes, ignore pointer changes
+        if (!key.includes('instance')) {
+          return;
+        }
+        const newPage = editor?.currentPage;
+        console.log('page', newPage?.id, newPage?.name);
+      });
+    });
+  }, []);
+
   return (
     <Box
       css={{
@@ -32,7 +46,12 @@ const WhiteboardEmbed = () => {
       }}
     >
       <Box css={{ size: '100%' }}>
-        <Whiteboard token={token} endpoint={`https://${endpoint}`} zoomToContent={zoomToContent} />
+        <Whiteboard
+          onMount={handleMount}
+          token={token}
+          endpoint={`https://${endpoint}`}
+          zoomToContent={zoomToContent}
+        />
       </Box>
     </Box>
   );

@@ -5550,16 +5550,16 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.4.3.tgz#af975e367743fa91989cd666666aec31a8f50591"
   integrity sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==
 
-"@tldraw/editor@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/editor/-/editor-2.0.0-alpha.18.tgz#4e737a3f089b07e9ebb747bde9203454a6c413d9"
-  integrity sha512-731XLCIRX9QNRZmxIIUPpV92m4EjVjwC1gcVMyne4BS6HGEAzuplj0XFfmznBLSXoD8/RGkUkMQghIi0Ai56fA==
+"@tldraw/editor@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/editor/-/editor-2.0.0-alpha.19.tgz#ffa7735486897b370a8d83f40bb17b5743f19aa2"
+  integrity sha512-dM3+oUUN+KEKYjoC5ZmuKJOi3zXg7yjrcS79i73tifcD1LbpGki116aBqmJ0EGTxTSbZP3/GGtTPIX3CJIXBLQ==
   dependencies:
-    "@tldraw/state" "2.0.0-alpha.18"
-    "@tldraw/store" "2.0.0-alpha.18"
-    "@tldraw/tlschema" "2.0.0-alpha.18"
-    "@tldraw/utils" "2.0.0-alpha.18"
-    "@tldraw/validate" "2.0.0-alpha.18"
+    "@tldraw/state" "2.0.0-alpha.19"
+    "@tldraw/store" "2.0.0-alpha.19"
+    "@tldraw/tlschema" "2.0.0-alpha.19"
+    "@tldraw/utils" "2.0.0-alpha.19"
+    "@tldraw/validate" "2.0.0-alpha.19"
     "@types/core-js" "^2.5.5"
     "@use-gesture/react" "^10.2.27"
     classnames "^2.3.2"
@@ -5571,25 +5571,25 @@
     lodash.uniq "^4.5.0"
     nanoid "4.0.2"
 
-"@tldraw/state@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/state/-/state-2.0.0-alpha.18.tgz#cd4f30cc998d5e9cfa9bf5d818e03f36a7e5ff00"
-  integrity sha512-CU82nfOm6QuXtQWgKn1oWXuBoPTMAuWz480bxDoBPGTP4RfsVzQzB3TBbJLfHNQ56C9Q5qdnETHZmWdO+g0rCA==
+"@tldraw/state@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/state/-/state-2.0.0-alpha.19.tgz#8aaaf695fa24ad7a8a56d7b873a902857ee2224d"
+  integrity sha512-rD1UbAuc346aGmE0Z0YW84GN0Xe2clRtF6TQhdzhKUtcwWyapT2TcNS0jqNvYnlHFWyAU61ZbPR2i+LSLsSJGQ==
 
-"@tldraw/store@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/store/-/store-2.0.0-alpha.18.tgz#c23a3f9c5e16f38e3213d1ed1ea27f02f721c197"
-  integrity sha512-w2KLr4r22hx+0AgFHrGPnWv1DCHCZ/xmbANNGm561W027k+KNK5oHs8FdUkTPWazZhvdQcmUGziBoUMhTjIz7w==
+"@tldraw/store@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/store/-/store-2.0.0-alpha.19.tgz#017ae3237463f70a94008f0ac790cb26bd2af40a"
+  integrity sha512-NuaaV81sWflxNiB62LT6FK8yyDvocCMbTCWvqsoicn8X7N0pUijOtWCcxXUxQhaRwt+F5D68KRrZYG5v1MzfGA==
   dependencies:
-    "@tldraw/state" "2.0.0-alpha.18"
-    "@tldraw/utils" "2.0.0-alpha.18"
+    "@tldraw/state" "2.0.0-alpha.19"
+    "@tldraw/utils" "2.0.0-alpha.19"
     lodash.isequal "^4.5.0"
     nanoid "4.0.2"
 
-"@tldraw/tldraw@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/tldraw/-/tldraw-2.0.0-alpha.18.tgz#900106559efd150e42590716922b3b4ec10f2b5c"
-  integrity sha512-U+cOCmC3sJFbfYM/Jbp0cECeZv5pbzXCaWIzGe8A/n7Jxk4V7XTIVCqnohSZu4ZTGsQ9Ng38ksvnGKKsnjAkXg==
+"@tldraw/tldraw@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/tldraw/-/tldraw-2.0.0-alpha.19.tgz#efb486a13cdaf0ccf39e1cda05cd8c91092c22c3"
+  integrity sha512-PLS4Pgk397qVTPhRjBRDiC0W9uJAsA3xVEUXLCxl3QSi9DcutvMY8NTPKpsAq2lmFQkkuKFyLTYdzI2NidwFEA==
   dependencies:
     "@radix-ui/react-alert-dialog" "^1.0.0"
     "@radix-ui/react-context-menu" "^2.1.5"
@@ -5599,34 +5599,35 @@
     "@radix-ui/react-select" "^1.2.0"
     "@radix-ui/react-slider" "^1.1.0"
     "@radix-ui/react-toast" "^1.1.1"
-    "@tldraw/editor" "2.0.0-alpha.18"
+    "@tldraw/editor" "2.0.0-alpha.19"
     canvas-size "^1.2.6"
     classnames "^2.3.2"
+    downscale "^1.0.6"
     hotkeys-js "^3.11.2"
     lz-string "^1.4.4"
 
-"@tldraw/tlschema@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/tlschema/-/tlschema-2.0.0-alpha.18.tgz#ec906328a82d764ef25372c2b498a4da655784ad"
-  integrity sha512-1XTXg4YY6ZgfvjMQ68xgOOxINBvgBq7mHyXAiwUC4KEC+zXn9ADUxhTe8tDBbAS26FSZ8OKelhe1E9aY0PC6Lg==
+"@tldraw/tlschema@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/tlschema/-/tlschema-2.0.0-alpha.19.tgz#5a9d6f14f897a9caa01a7e3c5b42383736736ce3"
+  integrity sha512-TSsFMv6r4oNN6aRxPrAjgo07O2oTu343Ts0NI2JJMG7/sxucDZAmWElKOpdIP+PkdUqQ+He1nasCHFWjT+BXsQ==
   dependencies:
-    "@tldraw/state" "2.0.0-alpha.18"
-    "@tldraw/store" "2.0.0-alpha.18"
-    "@tldraw/utils" "2.0.0-alpha.18"
-    "@tldraw/validate" "2.0.0-alpha.18"
+    "@tldraw/state" "2.0.0-alpha.19"
+    "@tldraw/store" "2.0.0-alpha.19"
+    "@tldraw/utils" "2.0.0-alpha.19"
+    "@tldraw/validate" "2.0.0-alpha.19"
     nanoid "4.0.2"
 
-"@tldraw/utils@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/utils/-/utils-2.0.0-alpha.18.tgz#86314caf60a4e0bc935a2018fb43fd504633c0c8"
-  integrity sha512-xQjysYEZu8FzdZ+uWV+t7hQfqFIuYnZ5rYOpNpVFKQ+jag75ppfWzhE6YOl6gqmkUTxqDiONoUEo3AgXKFMkQQ==
+"@tldraw/utils@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/utils/-/utils-2.0.0-alpha.19.tgz#4b4179bf6c74b7c4ecdf86cd573ae7cea8e79236"
+  integrity sha512-3GjBAcm9xqr0gdHrk2rcyoZlOjxORt7q2e93qC2S0zgH/xLmcMaY/so31kkbb8cW3Zm6C/hjtdwF54msea2q3g==
 
-"@tldraw/validate@2.0.0-alpha.18":
-  version "2.0.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/@tldraw/validate/-/validate-2.0.0-alpha.18.tgz#108bb49af021d0df269dbd54fc323967133a1f93"
-  integrity sha512-wDAwKmQeWfrML1CS7a7vxagbFO91PpM/MqFKYwCQIsHWDKzdChhisD8t8p1sJ/8RZPjM2YESL5mfQK5ec1eaAw==
+"@tldraw/validate@2.0.0-alpha.19":
+  version "2.0.0-alpha.19"
+  resolved "https://registry.yarnpkg.com/@tldraw/validate/-/validate-2.0.0-alpha.19.tgz#54040483e10f2447f1bd2127a09b5773414e1108"
+  integrity sha512-A5az5hUK5NSF7UCVXTJnfpB8mdWTDzt4TFtHHC6rB+4XC22vDyk6rWT5CT0QgWgsX3DS43J1jHtYg3SnlVJ0Bg==
   dependencies:
-    "@tldraw/utils" "2.0.0-alpha.18"
+    "@tldraw/utils" "2.0.0-alpha.19"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -8866,6 +8867,11 @@ dotenv@~10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
+
+downscale@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/downscale/-/downscale-1.0.6.tgz#f1a1cb4d64c5831f1ba65341369131b5a73d2f2c"
+  integrity sha512-Arh9ftj+wo3CkFoT48SgT/crMyqmgZtNaaV/etjzHaUqNAaS36GS38ECURnfl7X/XvXN5uZNigGF7Vhffrm/pg==
 
 duplexer@^0.1.1:
   version "0.1.2"
