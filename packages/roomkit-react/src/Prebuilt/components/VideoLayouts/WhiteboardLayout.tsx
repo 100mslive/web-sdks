@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
-import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
+import { Whiteboard } from '@100mslive/whiteboard';
+import { selectPeerByCondition, selectWhiteboard, useHMSStore } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -13,8 +14,8 @@ import { useSetUiSettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';
 
 const WhiteboardEmbed = () => {
-  const isMobile = useMedia(cssConfig.media.md);
-  const { iframeRef } = useWhiteboard(isMobile);
+  // const isMobile = useMedia(cssConfig.media.md);
+  // const { iframeRef } = useWhiteboard(isMobile);
 
   return (
     <Box
@@ -28,7 +29,8 @@ const WhiteboardEmbed = () => {
         },
       }}
     >
-      <iframe
+      <Whiteboard />
+      {/* <iframe
         title="Whiteboard View"
         ref={iframeRef}
         style={{
@@ -39,7 +41,7 @@ const WhiteboardEmbed = () => {
         }}
         allow="autoplay; clipboard-write;"
         referrerPolicy="no-referrer"
-      />
+      /> */}
     </Box>
   );
 };

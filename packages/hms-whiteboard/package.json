@@ -1,0 +1,48 @@
+{
+  "name": "@100mslive/hms-whiteboard",
+  "private": true,
+  "version": "0.0.0-alpha.1",
+  "type": "module",
+  "main": "dist/whiteboard.js",
+  "types": "dist/lib/main.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prestart": "rm -rf dist && yarn types:build",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "rm -rf dist && node ../../scripts/build-webapp",
+    "build": "yarn build:only && yarn types:build",
+    "build:proto": "protoc --ts_out ./src/grpc -I=./proto proto/*proto",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.json",
+    "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext .jsx --ext .ts --ext .tsx",
+    "lint:fix": "yarn lint --fix",
+    "format": "prettier -w src/**"
+  },
+  "dependencies": {
+    "@protobuf-ts/grpcweb-transport": "^2.9.1",
+    "@protobuf-ts/runtime": "^2.9.1",
+    "@protobuf-ts/runtime-rpc": "^2.9.1",
+    "@tldraw/tldraw": "^2.0.0-alpha.18"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.2 <19.0.0",
+    "react-dom": ">=17.0.2 <19.0.0"
+  },
+  "devDependencies": {
+    "@protobuf-ts/plugin": "^2.9.1",
+    "@types/node": "^20.12.5",
+    "@types/react": "^18.1.0",
+    "@types/react-dom": "^18.1.0",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "grpc-tools": "^1.12.4",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "typescript": "^5.2.2"
+  },
+  "sideEffects": false
+}
