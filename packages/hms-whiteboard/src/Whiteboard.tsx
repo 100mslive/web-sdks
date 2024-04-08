@@ -2,24 +2,17 @@ import React, { useState } from 'react';
 import { Editor, Tldraw } from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
-import { getQueryParams } from './utils';
 import '@tldraw/tldraw/tldraw.css';
 import './index.css';
-
-const { endpoint: queryEndpoint, token: queryToken, zoom_to_content } = getQueryParams();
 
 export interface WhiteboardProps {
   endpoint?: string;
   token?: string;
   zoomToContent?: boolean;
+  transparentCanvas?: boolean;
   onMount?: (args: { store?: unknown; editor?: unknown }) => void;
 }
-export function Whiteboard({
-  onMount,
-  endpoint = queryEndpoint,
-  token = queryToken,
-  zoomToContent = zoom_to_content === 'true',
-}: WhiteboardProps) {
+export function Whiteboard({ onMount, endpoint, token, zoomToContent, transparentCanvas }: WhiteboardProps) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
@@ -37,6 +30,7 @@ export function Whiteboard({
 
   return (
     <Tldraw
+      className={transparentCanvas ? 'transparent-canvas' : ''}
       autoFocus
       store={store}
       onMount={handleMount}
