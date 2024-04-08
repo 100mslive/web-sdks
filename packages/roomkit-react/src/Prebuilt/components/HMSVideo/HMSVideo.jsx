@@ -17,7 +17,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           },
         },
         '& video::cue': {
-          color: 'white',
+          // default for on-surface-high
+          color: '#EFF0FA',
           whiteSpace: 'pre-line',
           fontSize: '$sm',
           fontStyle: 'normal',
