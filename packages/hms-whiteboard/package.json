@@ -1,13 +1,22 @@
 {
   "name": "@100mslive/hms-whiteboard",
-  "private": true,
+  "author": "100ms",
+  "license": "MIT",
   "version": "0.0.0-alpha.1",
   "type": "module",
-  "main": "dist/whiteboard.js",
-  "types": "dist/lib/main.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
@@ -43,6 +52,5 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "typescript": "^5.2.2"
-  },
-  "sideEffects": false
+  }
 }
