@@ -1148,6 +1148,7 @@ export class HMSSdk implements HMSInterface {
   private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
     await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+    await this.interactivityCenter.whiteboard.handleLocalRoleUpdate();
   };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
