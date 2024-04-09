@@ -94,7 +94,10 @@ export const VideoStreamingSection = ({
             ({ localPeerRole }) => localPeerRole === waitingViewerRole,
             () => <WaitingView />,
           )
-          .with({ pdfAnnotatorActive: true }, () => <PDFView />)
+          .when(
+            ({ pdfAnnotatorActive }) => !!pdfAnnotatorActive,
+            () => <PDFView />,
+          )
           .when(
             ({ urlToIframe }) => !!urlToIframe,
             () => <EmbedView />,
