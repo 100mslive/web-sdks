@@ -128,9 +128,11 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       throw new Error('Invalid poll ID - Poll not found');
     }
 
-    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
+    const canViewSummary = !!(
+      this.store.getLocalPeer()?.role?.permissions.pollRead || this.store.getLocalPeer()?.role?.permissions.pollWrite
+    );
 
-    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
+    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canViewSummary) {
       return { entries: [], hasNext: false };
     }
     const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
