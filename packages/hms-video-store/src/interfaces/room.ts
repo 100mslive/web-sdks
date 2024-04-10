@@ -102,6 +102,11 @@ export enum HLSPlaylistType {
   NO_DVR = 'no-dvr',
 }
 
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariant {
   url: string;
   playlist_type?: HLSPlaylistType;
@@ -110,5 +115,5 @@ export interface HLSVariant {
   startedAt?: Date;
   initialisedAt?: Date;
   state?: HMSStreamingState;
-  stream_type?: string;
+  stream_type?: HLSStreamType;
 }

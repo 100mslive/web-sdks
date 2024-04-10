@@ -285,7 +285,11 @@ export enum HLSPlaylistType {
   DVR = 'dvr',
   NO_DVR = 'no-dvr',
 }
-
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
@@ -294,7 +298,7 @@ export interface HLSVariantInfo {
   started_at?: number;
   initialised_at?: number;
   state?: HMSStreamingState;
-  stream_type?: string;
+  stream_type?: HLSStreamType;
 }
 
 export interface MetadataChangeNotification {
