@@ -294,6 +294,7 @@ export interface HLSVariantInfo {
   started_at?: number;
   initialised_at?: number;
   state?: HMSStreamingState;
+  stream_type?: string;
 }
 
 export interface MetadataChangeNotification {

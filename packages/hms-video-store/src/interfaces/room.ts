@@ -110,4 +110,5 @@ export interface HLSVariant {
   startedAt?: Date;
   initialisedAt?: Date;
   state?: HMSStreamingState;
+  stream_type?: string;
 }
