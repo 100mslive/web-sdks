@@ -4,7 +4,7 @@ import { hooksErrHandler } from './types';
 import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 
-export interface CaptionData {
+export interface HMSTranscript {
   start: number;
   end: number;
   peer_id: string;
@@ -12,8 +12,8 @@ export interface CaptionData {
   transcript: string;
 }
 
-export interface useCaptionsInput {
-  onTranscript?: (data: CaptionData[]) => void;
+export interface useHMSTranscriptInput {
+  onTranscript?: (data: HMSTranscript[]) => void;
   handleError?: hooksErrHandler;
 }
 
@@ -22,8 +22,8 @@ export interface useCaptionsInput {
  * The data to be sent to remote is expected to be a serializable JSON. The serialization
  * and deserialization is taken care of by the hook.
  */
-export const useCaptions = ({ onTranscript, handleError = logErrorHandler }: useCaptionsInput) => {
-  const type = 'transcript';
+export const useTranscript = ({ onTranscript, handleError = logErrorHandler }: useHMSTranscriptInput) => {
+  const type = 'hms_transcript';
   const actions = useHMSActions();
   const notifications = useHMSVanillaNotifications();
 
@@ -42,7 +42,7 @@ export const useCaptions = ({ onTranscript, handleError = logErrorHandler }: use
       if (msg && msg.type === type) {
         try {
           const message = JSON.parse(msg.message);
-          const data = message.results as CaptionData[];
+          const data = message.results as HMSTranscript[];
           onTranscript?.(data);
         } catch (err) {
           handleError(err as Error, 'handleCaptionEvent');

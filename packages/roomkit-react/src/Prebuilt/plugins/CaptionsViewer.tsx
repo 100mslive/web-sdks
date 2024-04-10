@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { CaptionData, selectPeerNameByID, useCaptions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSTranscript, selectPeerNameByID, useHMSStore, useTranscript } from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
 
-interface CaptionQueueData extends CaptionData {
+interface CaptionQueueData extends HMSTranscript {
   transcriptQueue: SimpleQueue;
 }
 
@@ -107,8 +107,8 @@ class Queue {
 
 class CaptionMaintainerQueue {
   captionData: Queue = new Queue();
-  push(data: CaptionData[] = []) {
-    data.forEach((value: CaptionData) => {
+  push(data: HMSTranscript[] = []) {
+    data.forEach((value: HMSTranscript) => {
       this.captionData.enqueue(value.peer_id, {
         transcript: value.transcript,
         final: value.final,
@@ -140,9 +140,9 @@ export const CaptionsViewer = () => {
     return () => clearInterval(timeInterval);
   });
 
-  useCaptions({
-    onTranscript: (data: CaptionData[]) => {
-      captionQueue && captionQueue.push(data as CaptionData[]);
+  useTranscript({
+    onTranscript: (data: HMSTranscript[]) => {
+      captionQueue && captionQueue.push(data as HMSTranscript[]);
     },
   });
 
