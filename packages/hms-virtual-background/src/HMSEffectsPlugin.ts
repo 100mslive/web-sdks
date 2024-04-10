@@ -25,10 +25,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       wasmPaths: {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
-        'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
-        'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
       },
+      provider: 'webgpu',
     });
+    this.effects.onError(err => console.error('[HMSEffectsPlugin]', err));
   }
 
   getName(): string {
