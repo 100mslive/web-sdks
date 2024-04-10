@@ -1,3 +1,4 @@
+// @ts-check
 import image from '@rollup/plugin-image';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
@@ -13,6 +14,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 const deps = Object.keys(pkg.dependencies || {});
 const peerDeps = Object.keys(pkg.peerDependencies || {});
 
+/**
+ * @type {import('rollup').RollupOptions}
+ */
 const config = {
   input: 'src/index.ts',
   external: [...deps, ...peerDeps],
@@ -22,13 +26,13 @@ const config = {
   ],
   plugins: [
     commonjs(),
-    css(),
+    css({ output: 'index.css' }),
     image(),
     json(),
     esbuild({ format: 'esm', target: 'esnext' }),
     resolve({ preferBuiltins: false }),
     isProduction && terser(),
-    typescript({ sourceMap: true, exclude: '**/*.stories.tsx' }),
+    typescript({ sourceMap: true }),
   ],
 };
 
