@@ -174,7 +174,7 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     const running =
       notification.variants && notification.variants.length > 0
-        ? !notification.variants.find(variant => this.isStreamingRunning(variant.state))
+        ? notification.variants.some(variant => this.isStreamingRunning(variant.state))
         : false;
     if (!room) {
       HMSLogger.w(this.TAG, 'on hls - room not present');
