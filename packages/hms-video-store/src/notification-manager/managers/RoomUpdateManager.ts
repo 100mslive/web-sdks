@@ -149,11 +149,24 @@ export class RoomUpdateManager {
     if (!notification?.variants) {
       return hls;
     }
-    notification.variants.forEach((_: HLSVariant, index: number) => {
-      hls.variants.push({
-        initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
-        url: '',
-      });
+    notification.variants.forEach((variant: HLSVariant, index: number) => {
+      if (variant.url) {
+        hls.variants.push({
+          meetingURL: variant?.meetingURL,
+          url: variant?.url,
+          metadata: variant?.metadata,
+          playlist_type: variant?.playlist_type,
+          startedAt: convertDateNumToDate(notification?.variants?.[index].started_at),
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          state: variant.state,
+          stream_type: variant?.stream_type,
+        });
+      } else {
+        hls.variants.push({
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          url: '',
+        });
+      }
     });
     return hls;
   }
@@ -161,7 +174,7 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     const running =
       notification.variants && notification.variants.length > 0
-        ? this.isStreamingRunning(notification.variants[0].state)
+        ? notification.variants.some(variant => this.isStreamingRunning(variant.state))
         : false;
     if (!room) {
       HMSLogger.w(this.TAG, 'on hls - room not present');
@@ -173,6 +186,7 @@ export class RoomUpdateManager {
   }
 
   private convertHls(hlsNotification?: HLSNotification) {
+    // only checking for zeroth variant intialized
     const isInitialised =
       hlsNotification?.variants && hlsNotification.variants.length > 0
         ? hlsNotification.variants[0].state === HMSStreamingState.INITIALISED
@@ -195,6 +209,7 @@ export class RoomUpdateManager {
         startedAt: convertDateNumToDate(variant?.started_at),
         initialisedAt: convertDateNumToDate(variant?.initialised_at),
         state: variant.state,
+        stream_type: variant?.stream_type,
       });
     });
     return hls;
