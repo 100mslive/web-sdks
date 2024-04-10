@@ -27,8 +27,7 @@
       "require": "./dist/index.cjs.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./index.css": "./dist/index.css"
+    }
   },
   "sideEffects": false,
   "scripts": {
