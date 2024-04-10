@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -11,7 +10,6 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
@@ -77,7 +75,6 @@ export const AppData = React.memo(() => {
   const appData = useHMSStore(selectFullAppData);
   const { elements } = useRoomLayoutConferencingScreen();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const isMobile = useMedia(cssConfig.media.md);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
 
@@ -123,12 +120,12 @@ export const AppData = React.memo(() => {
   }, [preferences.subscribedNotifications, hmsActions]);
 
   useEffect(() => {
-    if (defaultMediaURL && !sidepaneOpenedRef.current && !isMobile && isLocalVideoEnabled) {
+    if (defaultMediaURL && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
       sidepaneOpenedRef.current = true;
       toggleVB();
     }
-  }, [hmsActions, toggleVB, isLocalVideoEnabled, isMobile, defaultMediaURL]);
+  }, [hmsActions, toggleVB, isLocalVideoEnabled, defaultMediaURL]);
 
   return <ResetStreamingStart />;
 });
