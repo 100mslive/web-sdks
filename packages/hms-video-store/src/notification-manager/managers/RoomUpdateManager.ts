@@ -150,7 +150,7 @@ export class RoomUpdateManager {
       return hls;
     }
     notification.variants.forEach((variant: HLSVariant, index: number) => {
-      if (variant.url) {
+      if (variant.state !== HMSStreamingState.INITIALISED) {
         hls.variants.push({
           meetingURL: variant?.meetingURL,
           url: variant?.url,
@@ -186,10 +186,9 @@ export class RoomUpdateManager {
   }
 
   private convertHls(hlsNotification?: HLSNotification) {
-    // only checking for zeroth variant intialized
     const isInitialised =
       hlsNotification?.variants && hlsNotification.variants.length > 0
-        ? hlsNotification.variants[0].state === HMSStreamingState.INITIALISED
+        ? hlsNotification.variants.some(variant => variant.state === HMSStreamingState.INITIALISED)
         : false;
     // handling for initialized state
     if (isInitialised) {
