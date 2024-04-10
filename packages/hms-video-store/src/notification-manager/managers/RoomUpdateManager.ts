@@ -159,7 +159,7 @@ export class RoomUpdateManager {
           startedAt: convertDateNumToDate(notification?.variants?.[index].started_at),
           initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
           state: variant.state,
-          stream_type: variant.stream_type,
+          stream_type: variant?.stream_type,
         });
       } else {
         hls.variants.push({
