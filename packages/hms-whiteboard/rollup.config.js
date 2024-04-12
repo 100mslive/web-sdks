@@ -1,6 +1,4 @@
 // @ts-check
-import image from '@rollup/plugin-image';
-import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import esbuild from 'rollup-plugin-esbuild';
@@ -26,9 +24,7 @@ const config = {
   ],
   plugins: [
     commonjs(),
-    css({ output: 'index.css' }),
-    image(),
-    json(),
+    css({ inject: true }),
     esbuild({ format: 'esm', target: 'esnext' }),
     resolve({ preferBuiltins: false }),
     isProduction && terser(),

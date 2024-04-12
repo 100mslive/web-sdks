@@ -14,8 +14,7 @@
       "require": "./dist/index.cjs.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./index.css": "./dist/index.css"
+    }
   },
   "sideEffects": false,
   "scripts": {
@@ -55,6 +54,7 @@
     "@rollup/plugin-typescript": "^8.3.1",
     "rollup": "^2.70.1",
     "rollup-plugin-esbuild": "^4.9.3",
+    "rollup-plugin-import-css": "^3.5.0",
     "rollup-plugin-terser": "^7.0.2"
   }
 }
