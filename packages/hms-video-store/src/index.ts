@@ -56,7 +56,7 @@ export type {
 
 export { EventBus } from './events/EventBus';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
-export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType } from './internal';
+export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType, HLSStreamType } from './internal';
 export type {
   HMSVideoPlugin,
   HMSAudioPlugin,

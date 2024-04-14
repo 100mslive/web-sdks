@@ -118,7 +118,6 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
-  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {

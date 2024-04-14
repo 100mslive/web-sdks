@@ -22,7 +22,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
 
   return (
     <Fragment>
-      <Flex direction="row" css={{ '@md': { display: 'none' } }}>
+      <Flex direction="row">
         <ScreenShareButton
           variant="standard"
           key="ShareScreen"

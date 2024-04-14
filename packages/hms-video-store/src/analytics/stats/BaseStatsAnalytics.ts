@@ -39,7 +39,7 @@ export abstract class BaseStatsAnalytics {
     this.stop();
     this.shouldSendEvent = true;
     this.eventBus.statsUpdate.subscribe(this.handleStatsUpdate.bind(this));
-    this.startLoop().catch(e => HMSLogger.e('[StatsAnanlytics]', e.message));
+    this.startLoop().catch(e => HMSLogger.e('[StatsAnalytics]', e.message));
   }
 
   stop = () => {
