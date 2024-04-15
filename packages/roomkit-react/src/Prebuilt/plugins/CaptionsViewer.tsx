@@ -7,41 +7,38 @@ interface CaptionQueueData extends HMSTranscript {
   transcriptQueue: SimpleQueue;
 }
 
-interface Transcript {
-  transcript: string;
-  final: boolean;
-}
 class SimpleQueue {
-  private storage: Transcript[] = [];
-  constructor(private capacity: number = 5) {}
-  enqueue(value: string, final: boolean): void {
+  private storage: HMSTranscript[] = [];
+  constructor(private capacity: number = 5, private MAX_STORAGE_TIME: number = 5000) {}
+  enqueue(data: HMSTranscript): void {
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue();
     }
     if (this.size() === 0) {
-      this.storage.push({
-        transcript: value,
-        final: final,
-      });
+      this.storage.push(data);
+      setInterval(() => {
+        this.dequeue();
+      }, this.MAX_STORAGE_TIME);
       return;
     }
     if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
-      this.storage.push({
-        transcript: value,
-        final: final,
-      });
+      this.storage.push(data);
+      setInterval(() => {
+        this.dequeue();
+      }, this.MAX_STORAGE_TIME);
       return;
     }
-    this.storage[this.size() - 1].transcript = value;
-    this.storage[this.size() - 1].final = final;
+    this.storage[this.size() - 1].transcript = data.transcript;
+    this.storage[this.size() - 1].final = data.final;
+    this.storage[this.size() - 1].end = data.end;
   }
-  dequeue(): Transcript | undefined {
+  dequeue(): HMSTranscript | undefined {
     if (this.size() <= 0) {
       return undefined;
     }
     return this.storage.shift();
   }
-  peek(): Transcript | undefined {
+  peek(): HMSTranscript | undefined {
     if (this.size() <= 0) {
       return undefined;
     }
@@ -49,38 +46,42 @@ class SimpleQueue {
   }
   getTranscription(): string {
     let script = '';
-    this.storage.forEach((value: Transcript) => (script += value.transcript + ' '));
+    this.storage.forEach((value: HMSTranscript) => (script += value.transcript + ' '));
     return script;
+  }
+  reset() {
+    this.storage.length = 0;
   }
   size(): number {
     return this.storage.length;
   }
 }
 class Queue {
-  private storage: { [key: string]: CaptionQueueData } = {};
+  private storage: Record<string, CaptionQueueData> = {};
   constructor(private capacity: number = 3) {}
 
-  enqueue(key: string, value: Transcript): void {
+  enqueue(data: HMSTranscript): void {
     if (this.size() === this.capacity) {
       this.dequeue();
     }
-    if (!this.storage[key]) {
-      this.storage[key] = {
-        peer_id: key,
-        transcript: value.transcript,
-        final: value.final,
+    if (!this.storage[data.peer_id]) {
+      this.storage[data.peer_id] = {
+        peer_id: data.peer_id,
+        transcript: data.transcript,
+        final: data.final,
         transcriptQueue: new SimpleQueue(),
-        start: 0,
-        end: 0,
+        start: data.start,
+        end: data.end,
       };
-      this.storage[key].transcriptQueue.enqueue(value.transcript, value.final);
+      this.storage[data.peer_id].transcriptQueue.enqueue(data);
       return;
     }
-    this.storage[key].transcriptQueue.enqueue(value.transcript, value.final);
+    this.storage[data.peer_id].transcriptQueue.enqueue(data);
   }
   dequeue(): CaptionQueueData {
     const key: string = Object.keys(this.storage).shift() || '';
     const captionData = this.storage[key];
+    captionData.transcriptQueue.reset();
     delete this.storage[key];
     return captionData;
   }
@@ -109,10 +110,7 @@ class CaptionMaintainerQueue {
   captionData: Queue = new Queue();
   push(data: HMSTranscript[] = []) {
     data.forEach((value: HMSTranscript) => {
-      this.captionData.enqueue(value.peer_id, {
-        transcript: value.transcript,
-        final: value.final,
-      });
+      this.captionData.enqueue(value);
     });
   }
 }
