@@ -25,3 +25,13 @@ export function getDurationFromSeconds(timeInSeconds: number) {
   }
   return videoTimeStr;
 }
+
+export function getDuration(videoEl: HTMLVideoElement): number {
+  if (isFinite(videoEl.duration)) {
+    return videoEl.duration;
+  }
+  if (videoEl.seekable.length > 0) {
+    return videoEl.seekable.end(0);
+  }
+  return 0;
+}
