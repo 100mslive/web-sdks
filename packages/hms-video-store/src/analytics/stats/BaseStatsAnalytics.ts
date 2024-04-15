@@ -63,15 +63,32 @@ export abstract class BaseStatsAnalytics {
     });
   }
 
+  protected cleanTrackAnalyticsAndCreateSample(shouldCreateSample: boolean) {
+    // delete track analytics if track is not present in store and no samples are present
+    this.trackAnalytics.forEach(trackAnalytic => {
+      if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
+        this.trackAnalytics.delete(trackAnalytic.track_id);
+      }
+    });
+
+    if (shouldCreateSample) {
+      this.trackAnalytics.forEach(trackAnalytic => {
+        trackAnalytic.createSample();
+      });
+    }
+  }
+
   protected abstract toAnalytics(): PublishAnalyticPayload | SubscribeAnalyticPayload;
 
   protected abstract handleStatsUpdate(hmsStats: HMSWebrtcStats): void;
 }
 
-type TempPublishStats = HMSTrackStats & {
+export type TempStats = HMSTrackStats & {
   availableOutgoingBitrate?: number;
   calculatedJitterBufferDelay?: number;
   avSync?: number;
+  expectedFrameHeight?: number;
+  expectedFrameWidth?: number;
 };
 
 export abstract class RunningTrackAnalytics {
@@ -83,9 +100,9 @@ export abstract class RunningTrackAnalytics {
   kind: string;
   rid?: string;
 
-  protected samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
-  protected tempStats: TempPublishStats[] = [];
-  protected prevLatestStat?: TempPublishStats;
+  samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
+  protected tempStats: TempStats[] = [];
+  protected prevLatestStat?: TempStats;
 
   constructor({
     track,
@@ -109,7 +126,7 @@ export abstract class RunningTrackAnalytics {
     this.sampleWindowSize = sampleWindowSize;
   }
 
-  pushTempStat(stat: TempPublishStats) {
+  pushTempStat(stat: TempStats) {
     this.tempStats.push(stat);
   }
 
@@ -145,7 +162,7 @@ export abstract class RunningTrackAnalytics {
     return this.tempStats[0];
   }
 
-  protected calculateSum(key: keyof TempPublishStats) {
+  protected calculateSum(key: keyof TempStats) {
     const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
       return;
@@ -155,25 +172,25 @@ export abstract class RunningTrackAnalytics {
     }, 0);
   }
 
-  protected calculateAverage(key: keyof TempPublishStats, round = true) {
+  protected calculateAverage(key: keyof TempStats, round = true) {
     const sum = this.calculateSum(key);
     const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
     return avg ? (round ? Math.round(avg) : avg) : undefined;
   }
 
-  protected calculateDifferenceForSample(key: keyof TempPublishStats) {
+  protected calculateDifferenceForSample(key: keyof TempStats) {
     const firstValue = Number(this.prevLatestStat?.[key]) || 0;
     const latestValue = Number(this.getLatestStat()[key]) || 0;
 
     return latestValue - firstValue;
   }
 
-  protected calculateDifferenceAverage(key: keyof TempPublishStats, round = true) {
+  protected calculateDifferenceAverage(key: keyof TempStats, round = true) {
     const avg = this.calculateDifferenceForSample(key) / this.tempStats.length;
     return round ? Math.round(avg) : avg;
   }
 
-  protected calculateInstancesOfHigh(key: keyof TempPublishStats, threshold: number) {
+  protected calculateInstancesOfHigh(key: keyof TempStats, threshold: number) {
     const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
       return;
@@ -185,10 +202,10 @@ export abstract class RunningTrackAnalytics {
   }
 }
 
-export const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasResolutionChanged = (newStat: TempStats, prevStat: TempStats) =>
   newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-export const hasEnabledStateChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasEnabledStateChanged = (newStat: TempStats, prevStat: TempStats) =>
   newStat && prevStat && newStat.enabled !== prevStat.enabled;
 
 export const removeUndefinedFromObject = <T extends Record<string, any>>(data: T) => {
