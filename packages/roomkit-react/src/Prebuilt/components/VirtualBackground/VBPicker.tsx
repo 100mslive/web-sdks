@@ -94,7 +94,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       };
       handleDefaultBackground();
     }
-    return () => setLoadingEffects(false);
   }, [
     hmsActions,
     role,
@@ -111,7 +110,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     if (!isVideoOn) {
       toggleVB();
     }
-  }, [isVideoOn, toggleVB]);
+    return () => setLoadingEffects(false);
+  }, [isVideoOn, setLoadingEffects, toggleVB]);
 
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
