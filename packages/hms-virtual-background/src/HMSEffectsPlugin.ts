@@ -11,7 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset = 'speed';
+  private preset = 'balanced';
   private initialised = false;
 
   constructor(effectsSDKKey: string) {
@@ -29,7 +29,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       },
       provider: 'webgpu',
     });
-    this.effects.onError(err => console.error('[HMSEffectsPlugin]', err));
+    this.effects.onError(err => {
+      // currently logging info type messages as well
+      if (!err.type || err.type === 'error') {
+        console.error('[HMSEffectsPlugin]', err);
+      }
+    });
   }
 
   getName(): string {
@@ -37,10 +42,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   execute(callback: () => void) {
-    console.log('ollo queueing', callback.name, this.effects);
     const interval = setInterval(() => {
       if (this.initialised) {
-        console.log('ollo cleared', callback.name, this.effects);
         clearInterval(interval);
         callback();
       }
@@ -66,7 +69,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
     this.execute(() => {
-      this.effects.setBlur(blur);
+      this.effects.setBlur(this.blurAmount);
     });
   }
 
@@ -89,11 +92,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   setBackground(url: HMSEffectsBackground) {
     this.background = url;
-    console.log('ollo', { url });
-    this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
+    this.removeBlur();
     this.execute(() => {
-      this.effects.setBackground(url);
+      this.effects.setBackground(this.background);
     });
   }
   getBlurAmount() {
@@ -107,10 +109,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
+        this.initialised = true;
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
-        this.initialised = true;
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {
