@@ -26,6 +26,7 @@ const Root = ({
       borderRadius: '$1',
       bg: '$surface_bright',
       border: `4px solid ${isActive ? '$primary_default' : '$surface_dim'}`,
+      opacity: disabled ? 0.8 : 1,
       cursor: 'pointer',
       '&:hover': { border: '4px solid $primary_dim' },
       ...(mediaURL ? { height: '$20', backgroundImage: `url(${mediaURL})`, backgroundSize: 'cover' } : {}),
