@@ -8,12 +8,14 @@ const Root = ({
   isActive,
   children,
   testid = '',
+  disabled = false,
 }: {
   onClick?: () => Promise<void>;
   mediaURL?: string;
   isActive: boolean;
   children?: React.JSX.Element[];
   testid: string;
+  disabled?: boolean;
 }) => (
   <Flex
     data-testid={testid}
@@ -28,7 +30,12 @@ const Root = ({
       '&:hover': { border: '4px solid $primary_dim' },
       ...(mediaURL ? { height: '$20', backgroundImage: `url(${mediaURL})`, backgroundSize: 'cover' } : {}),
     }}
-    onClick={async () => await onClick?.()}
+    onClick={async () => {
+      if (disabled) {
+        return;
+      }
+      await onClick?.();
+    }}
   >
     {children}
   </Flex>

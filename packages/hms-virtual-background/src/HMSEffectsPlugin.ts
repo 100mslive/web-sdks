@@ -12,9 +12,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
   private preset = 'lightning';
+  private onInit;
 
-  constructor(effectsSDKKey: string) {
+  constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
+    this.onInit = onInit;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -85,6 +87,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
+        this.onInit?.();
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
