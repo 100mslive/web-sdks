@@ -8,7 +8,6 @@ export const VBCollection = ({
   options,
   title,
   activeBackground = '',
-  disabled = false,
 }: {
   options: {
     title?: string;
@@ -19,7 +18,6 @@ export const VBCollection = ({
   }[];
   title: string;
   activeBackground: string;
-  disabled?: false;
 }) => {
   if (options.length === 0) {
     return null;
@@ -32,7 +30,6 @@ export const VBCollection = ({
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
         {options.map((option, index) => (
           <VBOption.Root
-            disabled={disabled}
             key={option.value}
             testid={option.value === HMSVirtualBackgroundTypes.IMAGE ? `virtual_bg_option-${index}` : option.value}
             {...option}

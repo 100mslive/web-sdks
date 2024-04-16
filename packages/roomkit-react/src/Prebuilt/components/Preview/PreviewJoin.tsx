@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
+  selectAppData,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
   selectRoomState,
@@ -35,7 +36,7 @@ import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
-import { UI_SETTINGS } from '../../common/constants';
+import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
@@ -78,6 +79,7 @@ const PreviewJoin = ({
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
+  const loadingEffects = useHMSStore(selectAppData(APP_DATA.loadingEffects));
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -159,7 +161,7 @@ const PreviewJoin = ({
             name={name}
             disabled={!!initialName}
             onChange={setName}
-            enableJoin={enableJoin}
+            enableJoin={enableJoin && !loadingEffects}
             onJoin={savePreferenceAndJoin}
             cannotPublishVideo={!toggleVideo}
             cannotPublishAudio={!toggleAudio}
