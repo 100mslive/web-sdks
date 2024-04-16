@@ -47,7 +47,6 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   sheet: 'sheet',
-  loadingEffects: 'loadingEffects',
 };
 
 export const UI_SETTINGS = {

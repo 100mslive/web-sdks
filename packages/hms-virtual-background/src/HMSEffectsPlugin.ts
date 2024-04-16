@@ -11,12 +11,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset = 'lightning';
-  private onInit;
+  private preset = 'speed';
+  private initialised = false;
 
-  constructor(effectsSDKKey: string, onInit?: () => void) {
+  constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
-    this.onInit = onInit;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -37,26 +36,45 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
+  execute(callback: () => void) {
+    console.log('ollo queueing', callback.name, this.effects);
+    const interval = setInterval(() => {
+      if (this.initialised) {
+        console.log('ollo cleared', callback.name, this.effects);
+        clearInterval(interval);
+        callback();
+      }
+    }, 100);
+  }
+
   removeBlur() {
     this.blurAmount = 0;
-    this.effects.clearBlur();
+    this.execute(() => {
+      this.effects.clearBlur();
+    });
   }
 
   removeBackground() {
     this.background = '';
-    this.effects.clearBackground();
+    this.execute(() => {
+      this.effects.clearBackground();
+    });
   }
 
   setBlur(blur: number) {
-    this.removeBackground();
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.effects.setBlur(blur);
+    this.removeBackground();
+    this.execute(() => {
+      this.effects.setBlur(blur);
+    });
   }
 
   async setPreset(preset: string) {
     this.preset = preset;
-    await this.effects.setSegmentationPreset(this.preset);
+    this.execute(async () => {
+      await this.effects.setSegmentationPreset(this.preset);
+    });
   }
 
   getPreset() {
@@ -71,11 +89,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   setBackground(url: HMSEffectsBackground) {
     this.background = url;
+    console.log('ollo', { url });
     this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-    this.effects.setBackground(url);
+    this.execute(() => {
+      this.effects.setBackground(url);
+    });
   }
-
   getBlurAmount() {
     return this.blurAmount;
   }
@@ -87,10 +107,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
-        this.onInit?.();
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
+        this.initialised = true;
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {
@@ -106,6 +126,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   stop() {
     this.removeEffects();
-    this.effects.stop();
+    this.execute(() => {
+      this.effects.stop();
+    });
   }
 }
