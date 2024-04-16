@@ -9,9 +9,9 @@ const FullPageProgress = ({
   text = '',
   css = {},
 }: {
-  loaderColor: string;
+  loaderColor?: string;
   text?: string;
-  css: CSS;
+  css?: CSS;
 }) => (
   <Flex direction="column" justify="center" align="center" css={{ size: '100%', color: loaderColor, ...css }}>
     <Loading color="currentColor" size={100} />
