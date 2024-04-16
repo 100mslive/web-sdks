@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -7,7 +7,6 @@ import {
   selectIsLocalVideoEnabled,
   selectPeerCount,
   selectPermissions,
-  selectRecordingState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -50,16 +49,16 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../../AppData/useUISettings';
+import { useSetAppDataByKey, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
+import { useIsRecordingStartErroredOut, useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
-import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { APP_DATA, SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -89,7 +88,7 @@ export const MwebOptions = ({
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
+  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const { showPolls } = useShowPolls();
   const togglePollView = usePollViewToggle();
@@ -103,13 +102,7 @@ export const MwebOptions = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-  const recordingState = useHMSStore(selectRecordingState);
-  useEffect(() => {
-    if (recordingState.browser.error && isRecordingLoading) {
-      setOpenOptionsSheet(false);
-      setIsRecordingLoading(false);
-    }
-  }, [isRecordingLoading, recordingState.browser.error]);
+  useIsRecordingStartErroredOut();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -259,7 +252,7 @@ export const MwebOptions = ({
               <ActionTile.Root
                 disabled={isHLSRunning}
                 onClick={async () => {
-                  if (isRecordingLoading) {
+                  if (recordingStarted) {
                     return;
                   }
                   if (isBrowserRecordingOn || isStreamingOn) {
@@ -267,13 +260,13 @@ export const MwebOptions = ({
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setIsRecordingLoading(true);
+                    setRecordingState(true);
                     try {
                       await hmsActions.startRTMPOrRecording({
                         record: true,
                       });
                       setOpenOptionsSheet(false);
-                      setIsRecordingLoading(false);
+                      setRecordingState(false);
                     } catch (error) {
                       // @ts-ignore
                       if (error.message.includes('stream already running')) {
@@ -288,7 +281,7 @@ export const MwebOptions = ({
                           variant: 'error',
                         });
                       }
-                      setIsRecordingLoading(false);
+                      setRecordingState(false);
                     }
                   }
                   if (isHLSRunning) {
@@ -296,12 +289,12 @@ export const MwebOptions = ({
                   }
                 }}
               >
-                {isRecordingLoading ? <Loading /> : <RecordIcon />}
+                {recordingStarted ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {match({ isBrowserRecordingOn, isRecordingLoading })
-                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
-                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
-                    .with({ isRecordingLoading: false }, () => 'Start Recording')
+                  {match({ isBrowserRecordingOn, recordingStarted })
+                    .with({ isBrowserRecordingOn: true, recordingStarted: false }, () => 'Recording On')
+                    .with({ recordingStarted: false }, () => 'Start Recording')
+                    .with({ recordingStarted: true }, () => 'Starting Recording')
                     .otherwise(() => null)}
                 </ActionTile.Title>
               </ActionTile.Root>

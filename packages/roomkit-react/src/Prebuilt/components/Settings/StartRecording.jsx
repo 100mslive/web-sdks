@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import {
-  selectPermissions,
-  selectRecordingState,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import React, { useState } from 'react';
+import { selectPermissions, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useIsRecordingStartErroredOut } from '../../common/hooks';
 import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export function getResolution(recordingResolution) {
@@ -32,13 +27,8 @@ const StartRecording = ({ open, onOpenChange }) => {
 
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
-  const recordingState = useHMSStore(selectRecordingState);
   const hmsActions = useHMSActions();
-  useEffect(() => {
-    if (recordingState.browser.error && recordingStarted) {
-      setRecordingState(false);
-    }
-  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
+  useIsRecordingStartErroredOut();
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }

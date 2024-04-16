@@ -22,6 +22,7 @@ import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useIsRecordingStartErroredOut } from '../../common/hooks';
 // @ts-ignore
 import { formatTime } from '../../common/utils';
 // @ts-ignore
@@ -149,13 +150,8 @@ const StartRecording = () => {
   const [open, setOpen] = useState(false);
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
-  const recordingState = useHMSStore(selectRecordingState);
   const hmsActions = useHMSActions();
-  useEffect(() => {
-    if (recordingState.browser.error && recordingStarted) {
-      setRecordingState(false);
-    }
-  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
+  useIsRecordingStartErroredOut();
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }

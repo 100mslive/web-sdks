@@ -3,20 +3,24 @@ import { useMedia } from 'react-use';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
+  HMSRecording,
   parsedUserAgent,
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPeerMetadata,
   selectPeers,
+  selectRecordingState,
   selectRemotePeers,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { config } from '../../Theme';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+// @ts-ignore
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { CHAT_SELECTOR } from './constants';
+import { APP_DATA, CHAT_SELECTOR } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
@@ -146,4 +150,15 @@ export const useKeyboardHandler = (isPaused: boolean, hlsPlayer: HMSHLSPlayer) =
   );
 
   return handleKeyEvent;
+};
+
+export const useIsRecordingStartErroredOut = () => {
+  const recordingState: HMSRecording = useHMSStore(selectRecordingState);
+  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  useEffect(() => {
+    if (recordingState.browser.error && recordingStarted) {
+      setRecordingState(false);
+    }
+  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
+  return;
 };
