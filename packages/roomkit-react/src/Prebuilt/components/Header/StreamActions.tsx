@@ -149,7 +149,13 @@ const StartRecording = () => {
   const [open, setOpen] = useState(false);
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
+  const recordingState = useHMSStore(selectRecordingState);
   const hmsActions = useHMSActions();
+  useEffect(() => {
+    if (recordingState.browser.error && recordingStarted) {
+      setRecordingState(false);
+    }
+  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }

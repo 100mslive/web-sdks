@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -7,6 +7,7 @@ import {
   selectIsLocalVideoEnabled,
   selectPeerCount,
   selectPermissions,
+  selectRecordingState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -102,7 +103,13 @@ export const MwebOptions = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-
+  const recordingState = useHMSStore(selectRecordingState);
+  useEffect(() => {
+    if (recordingState.browser.error && isRecordingLoading) {
+      setOpenOptionsSheet(false);
+      setIsRecordingLoading(false);
+    }
+  }, [isRecordingLoading, recordingState.browser.error]);
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
