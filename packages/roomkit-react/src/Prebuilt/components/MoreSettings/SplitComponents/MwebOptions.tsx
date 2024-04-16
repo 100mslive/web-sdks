@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -49,7 +49,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useSetAppDataByKey, useShowPolls } from '../../AppData/useUISettings';
+import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -58,7 +58,7 @@ import { useIsRecordingStartErroredOut, useLandscapeHLSStream, useMobileHLSStrea
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
-import { APP_DATA, SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -88,7 +88,7 @@ export const MwebOptions = ({
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const { showPolls } = useShowPolls();
   const togglePollView = usePollViewToggle();
@@ -102,9 +102,14 @@ export const MwebOptions = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-  useIsRecordingStartErroredOut();
+  const [recordingStarted, setRecordingState] = useIsRecordingStartErroredOut();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
+  useEffect(() => {
+    if (isRecordingLoading && !recordingStarted) {
+      setIsRecordingLoading(false);
+    }
+  }, [isRecordingLoading, recordingStarted]);
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -252,7 +257,7 @@ export const MwebOptions = ({
               <ActionTile.Root
                 disabled={isHLSRunning}
                 onClick={async () => {
-                  if (recordingStarted) {
+                  if (isRecordingLoading) {
                     return;
                   }
                   if (isBrowserRecordingOn || isStreamingOn) {
@@ -261,12 +266,14 @@ export const MwebOptions = ({
                   } else {
                     // start recording
                     setRecordingState(true);
+                    setIsRecordingLoading(true);
                     try {
                       await hmsActions.startRTMPOrRecording({
                         record: true,
                       });
                       setOpenOptionsSheet(false);
                       setRecordingState(false);
+                      setIsRecordingLoading(false);
                     } catch (error) {
                       // @ts-ignore
                       if (error.message.includes('stream already running')) {
@@ -282,6 +289,7 @@ export const MwebOptions = ({
                         });
                       }
                       setRecordingState(false);
+                      setIsRecordingLoading(false);
                     }
                   }
                   if (isHLSRunning) {
@@ -289,12 +297,12 @@ export const MwebOptions = ({
                   }
                 }}
               >
-                {recordingStarted ? <Loading /> : <RecordIcon />}
+                {isRecordingLoading ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {match({ isBrowserRecordingOn, recordingStarted })
-                    .with({ isBrowserRecordingOn: true, recordingStarted: false }, () => 'Recording On')
-                    .with({ recordingStarted: false }, () => 'Start Recording')
-                    .with({ recordingStarted: true }, () => 'Starting Recording')
+                  {match({ isBrowserRecordingOn, isRecordingLoading })
+                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
+                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')
                     .otherwise(() => null)}
                 </ActionTile.Title>
               </ActionTile.Root>

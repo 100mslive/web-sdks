@@ -160,5 +160,5 @@ export const useIsRecordingStartErroredOut = () => {
       setRecordingState(false);
     }
   }, [recordingStarted, recordingState.browser.error, setRecordingState]);
-  return;
+  return [recordingStarted, setRecordingState];
 };

@@ -20,13 +20,9 @@ import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
-import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useIsRecordingStartErroredOut } from '../../common/hooks';
 // @ts-ignore
 import { formatTime } from '../../common/utils';
-// @ts-ignore
-import { APP_DATA } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -148,10 +144,9 @@ export const RecordingPauseStatus = () => {
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
   const [open, setOpen] = useState(false);
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const [recordingStarted, setRecordingState] = useIsRecordingStartErroredOut();
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
-  useIsRecordingStartErroredOut();
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }

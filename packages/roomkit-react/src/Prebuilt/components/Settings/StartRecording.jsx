@@ -4,9 +4,8 @@ import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { ToastManager } from '../Toast/ToastManager';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useIsRecordingStartErroredOut } from '../../common/hooks';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
+import { RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export function getResolution(recordingResolution) {
   const resolution = {};
@@ -25,10 +24,9 @@ const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const [recordingStarted, setRecordingState] = useIsRecordingStartErroredOut();
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
-  useIsRecordingStartErroredOut();
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }
