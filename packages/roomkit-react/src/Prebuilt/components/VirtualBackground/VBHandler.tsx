@@ -70,7 +70,7 @@ export class VBPlugin {
     }
   };
 
-  setPreset = async (preset: string) => {
+  setPreset = async (preset: 'quality' | 'balanced') => {
     if (this.effectsPlugin) {
       await this.effectsPlugin.setPreset(preset);
     }
