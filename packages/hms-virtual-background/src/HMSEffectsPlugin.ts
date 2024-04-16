@@ -11,7 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset = 'balanced';
+  private preset: 'balanced' | 'quality' = 'balanced';
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
@@ -89,7 +89,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   /**
    * @param preset can be 'quality' or 'balanced'. The 'quality' preset has better quality but higher CPU usage than 'balanced'
    */
-  async setPreset(preset: string) {
+  async setPreset(preset: 'quality' | 'balanced') {
     this.preset = preset;
     this.executeAfterInit(async () => {
       await this.effects.setSegmentationPreset(this.preset);
