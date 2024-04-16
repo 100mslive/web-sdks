@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAppData,
   selectEffectsKey,
@@ -19,7 +20,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, Flex, Loading, Slider, Video } from '../../../index';
+import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -46,6 +47,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
+  const isMobile = useMedia(cssConfig.media.md);
   const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
@@ -92,6 +94,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       };
       handleDefaultBackground();
     }
+    return () => setLoadingEffects(false);
   }, [
     hmsActions,
     role,
@@ -114,7 +117,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
       <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
         <Text variant="h6" css={{ color: '$on_surface_high', display: 'flex', alignItems: 'center' }}>
-          Virtual Background {loadingEffects ? <Loading size={18} style={{ marginLeft: '0.5rem' }} /> : ''}
+          Virtual Background {isMobile && loadingEffects ? <Loading size={18} style={{ marginLeft: '0.5rem' }} /> : ''}
         </Text>
         <Box
           css={{ color: '$on_surface_high', '&:hover': { color: '$on_surface_medium' }, cursor: 'pointer' }}
