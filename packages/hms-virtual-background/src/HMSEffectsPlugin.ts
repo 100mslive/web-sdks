@@ -74,6 +74,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
+  /**
+   * @param blur ranges between 0 and 1
+   */
   async setBlur(blur: number) {
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
@@ -83,6 +86,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
+  /**
+   * @param preset can be 'quality' or 'balanced'. The 'quality' preset has better quality but higher CPU usage than 'balanced'
+   */
   async setPreset(preset: string) {
     this.preset = preset;
     this.executeAfterInit(async () => {
