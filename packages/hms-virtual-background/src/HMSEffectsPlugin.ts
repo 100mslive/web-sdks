@@ -13,6 +13,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
   private preset = 'balanced';
   private initialised = false;
+  private intervalId: NodeJS.Timer | null = null;
 
   constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
@@ -41,10 +42,17 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
-  execute(callback: () => void) {
-    const interval = setInterval(() => {
+  private executeAfterInit(callback: () => void) {
+    if (this.initialised) {
+      callback();
+    }
+
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+    }
+    this.intervalId = setInterval(() => {
       if (this.initialised) {
-        clearInterval(interval);
+        clearInterval(this.intervalId!);
         callback();
       }
     }, 100);
@@ -52,30 +60,30 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   removeBlur() {
     this.blurAmount = 0;
-    this.execute(() => {
+    this.executeAfterInit(() => {
       this.effects.clearBlur();
     });
   }
 
   removeBackground() {
     this.background = '';
-    this.execute(() => {
+    this.executeAfterInit(() => {
       this.effects.clearBackground();
     });
   }
 
-  setBlur(blur: number) {
+  async setBlur(blur: number) {
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
-    this.execute(() => {
+    await this.executeAfterInit(() => {
       this.effects.setBlur(this.blurAmount);
     });
   }
 
   async setPreset(preset: string) {
     this.preset = preset;
-    this.execute(async () => {
+    this.executeAfterInit(async () => {
       await this.effects.setSegmentationPreset(this.preset);
     });
   }
@@ -94,7 +102,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.background = url;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.removeBlur();
-    this.execute(() => {
+    this.executeAfterInit(() => {
       this.effects.setBackground(this.background);
     });
   }
@@ -128,7 +136,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   stop() {
     this.removeEffects();
-    this.execute(() => {
+    this.executeAfterInit(() => {
       this.effects.stop();
     });
   }
