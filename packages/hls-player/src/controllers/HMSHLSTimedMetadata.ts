@@ -44,7 +44,6 @@ export class HMSHLSTimedMetadata {
         value: { data: string };
         line: LineAndPositionSetting;
       };
-      // cue.line = -2;
       if (cue.queued) {
         cueIndex++;
         continue;
