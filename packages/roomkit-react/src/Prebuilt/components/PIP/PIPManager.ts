@@ -142,7 +142,6 @@ class PipManager {
     const newTracksToShowUnordered = this.pickTracksToShow(peers, tracksMap);
     const currentTracksShowing = this.tracksToShow;
     this.tracksToShow = this.orderNewTracksToShow(newTracksToShowUnordered, currentTracksShowing);
-    console.log({ current: this.tracksToShow });
     try {
       await this.detachOldAttachNewTracks(currentTracksShowing, this.tracksToShow, tracksMap);
     } catch (error) {
@@ -282,9 +281,11 @@ class PipManager {
     });
     // put the left overs in remaining empty positions
     for (let i = 0; i < newTracks.length; i++) {
-      const newEntry = leftOvers.shift();
-      if (!betterNewTracks[i] && newEntry) {
-        betterNewTracks[i] = newEntry;
+      if (!betterNewTracks[i]) {
+        const newEntry = leftOvers.shift();
+        if (newEntry) {
+          betterNewTracks[i] = newEntry;
+        }
       }
     }
     return betterNewTracks;

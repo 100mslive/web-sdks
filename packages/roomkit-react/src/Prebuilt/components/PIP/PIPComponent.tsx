@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { selectPeers, selectTracksMap, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';
@@ -55,23 +55,23 @@ export const ActivatedPIP = () => {
   const tracksMap = useHMSStore(selectTracksMap);
   const storePeers = useHMSStore(selectPeers);
   const pinnedTrack = usePinnedTrack();
+  const updatePIP = useCallback(() => {
+    if (!PictureInPicture.isOn()) {
+      return;
+    }
+    let pipPeers = storePeers;
+    if (pinnedTrack) {
+      pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
+    }
+    PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
+      console.error('error in updating pip', err);
+    });
+  }, [pinnedTrack, storePeers, tracksMap]);
+  useRef(PictureInPicture.listenToStateChange(updatePIP));
 
   useEffect(() => {
-    function updatePIP() {
-      if (!PictureInPicture.isOn()) {
-        return;
-      }
-      let pipPeers = storePeers;
-      if (pinnedTrack) {
-        pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
-      }
-      PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
-        console.error('error in updating pip', err);
-      });
-    }
-    PictureInPicture.listenToStateChange(updatePIP);
     updatePIP();
-  }, [storePeers, tracksMap, pinnedTrack]);
+  }, [updatePIP]);
 
   return <></>;
 };
