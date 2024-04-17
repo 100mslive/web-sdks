@@ -144,7 +144,7 @@ export const RecordingPauseStatus = () => {
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
   const [open, setOpen] = useState(false);
-  const [recordingStarted, setRecordingState] = useIsRecordingStartErroredOut();
+  const { startRecording, recordingStarted } = useIsRecordingStartErroredOut();
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording || isHLSRunning) {
@@ -198,26 +198,7 @@ const StartRecording = () => {
       icon
       disabled={recordingStarted || isStreamingOn}
       onClick={async () => {
-        try {
-          setRecordingState(true);
-          await hmsActions.startRTMPOrRecording({
-            record: true,
-          });
-        } catch (error) {
-          const err = error as Error;
-          if (err.message.includes('stream already running')) {
-            ToastManager.addToast({
-              title: 'Recording already running',
-              variant: 'error',
-            });
-          } else {
-            ToastManager.addToast({
-              title: err.message,
-              variant: 'error',
-            });
-          }
-          setRecordingState(false);
-        }
+        await startRecording();
       }}
     >
       {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}

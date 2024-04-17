@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -88,7 +88,6 @@ export const MwebOptions = ({
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const { showPolls } = useShowPolls();
   const togglePollView = usePollViewToggle();
@@ -102,14 +101,9 @@ export const MwebOptions = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-  const [recordingStarted, setRecordingState] = useIsRecordingStartErroredOut();
+  const { startRecording, isRecordingLoading } = useIsRecordingStartErroredOut();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
-  useEffect(() => {
-    if (isRecordingLoading && !recordingStarted) {
-      setIsRecordingLoading(false);
-    }
-  }, [isRecordingLoading, recordingStarted]);
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -265,32 +259,8 @@ export const MwebOptions = ({
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setRecordingState(true);
-                    setIsRecordingLoading(true);
-                    try {
-                      await hmsActions.startRTMPOrRecording({
-                        record: true,
-                      });
-                      setOpenOptionsSheet(false);
-                      setRecordingState(false);
-                      setIsRecordingLoading(false);
-                    } catch (error) {
-                      // @ts-ignore
-                      if (error.message.includes('stream already running')) {
-                        ToastManager.addToast({
-                          title: 'Recording already running',
-                          variant: 'error',
-                        });
-                      } else {
-                        ToastManager.addToast({
-                          // @ts-ignore
-                          title: error.message,
-                          variant: 'error',
-                        });
-                      }
-                      setRecordingState(false);
-                      setIsRecordingLoading(false);
-                    }
+                    await startRecording();
+                    setOpenOptionsSheet(false);
                   }
                   if (isHLSRunning) {
                     setOpenOptionsSheet(false);
