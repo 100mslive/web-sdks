@@ -62,6 +62,7 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.loadingEffects]: false,
   [APP_DATA.background]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
