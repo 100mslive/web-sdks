@@ -17,6 +17,7 @@ import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
@@ -26,6 +27,7 @@ init({ data });
 export const EmojiReaction = ({ showCard = false }) => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const { elements } = useRoomLayoutConferencingScreen();
   useDropdownList({ open: open, name: 'EmojiReaction' });
   // const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
@@ -64,7 +66,7 @@ export const EmojiReaction = ({ showCard = false }) => {
     } */
   };
 
-  if (!isConnected) {
+  if (!isConnected || !elements.emoji_reactions) {
     return null;
   }
 
