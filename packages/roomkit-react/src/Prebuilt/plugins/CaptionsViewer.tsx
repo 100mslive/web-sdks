@@ -7,54 +7,73 @@ interface CaptionQueueData extends HMSTranscript {
   transcriptQueue: SimpleQueue;
 }
 
+interface TranscriptData extends HMSTranscript {
+  timeout?: NodeJS.Timeout | undefined;
+}
 class SimpleQueue {
-  private storage: Record<number, HMSTranscript> = {};
-  constructor(private index: number = -1, private currentIndex = 0, private MAX_STORAGE_TIME: number = 5000) {}
-  enqueue(data: HMSTranscript): void {
-    console.log(this.storage);
-    if (this.index === -1) {
-      this.index++;
-      this.storage[this.index] = data;
-      if (data.final) {
-        setTimeout(() => {
-          console.log('clear 2 ', this.storage[this.index]);
-          delete this.storage[this.index];
-        }, this.MAX_STORAGE_TIME);
-      }
+  private storage: TranscriptData[] = [];
+  constructor(private capacity: number = 3, private MAX_STORAGE_TIME: number = 5000) {}
+  enqueue(data: TranscriptData): void {
+    if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
+      this.dequeue(this.storage[this.size() - 1]);
+    }
+    if (this.size() === 0) {
+      this.storage.push(data);
+      this.addTimeout(this.storage[this.size() - 1], data.final);
       return;
     }
-    if (this.index >= 0 && this.storage[this.index]?.final) {
-      this.index++;
-      this.storage[this.index] = data;
-      if (data.final) {
-        setTimeout(() => {
-          console.log('clear1 ', this.storage[this.index]);
-          delete this.storage[this.index];
-        }, this.MAX_STORAGE_TIME);
-      }
+    if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
+      this.storage.push(data);
+      this.addTimeout(this.storage[this.size() - 1], data.final);
       return;
     }
-    this.storage[this.index].transcript = data.transcript;
-    this.storage[this.index].final = data.final;
-    this.storage[this.index].end = data.end;
-    if (data.final) {
-      setTimeout(() => {
-        console.log('clear ', this.storage[this.index]);
-        delete this.storage[this.index];
-      }, this.MAX_STORAGE_TIME);
+    this.storage[this.size() - 1].transcript = data.transcript;
+    this.storage[this.size() - 1].final = data.final;
+    this.storage[this.size() - 1].end = data.end;
+    this.addTimeout(this.storage[this.size() - 1], data.final);
+  }
+  addTimeout(item: TranscriptData, isFinal: boolean) {
+    if (!isFinal) {
+      return;
     }
+    item.timeout = setTimeout(() => {
+      this.dequeue(item);
+    }, this.MAX_STORAGE_TIME);
+  }
+  dequeue(item: TranscriptData): TranscriptData | undefined {
+    const index = this.storage.indexOf(item);
+    if (index === -1) {
+      return undefined;
+    }
+    const removedItem = this.storage.splice(index, 1);
+    if (removedItem.length <= 0) {
+      return undefined;
+    }
+    this.clearTimeout(removedItem[0]);
+    return item;
+  }
+  clearTimeout(item: TranscriptData) {
+    if (!item.timeout) {
+      return;
+    }
+    clearTimeout(item.timeout);
+  }
+  peek(): TranscriptData | undefined {
+    if (this.size() <= 0) {
+      return undefined;
+    }
+    return this.storage[0];
   }
   getTranscription(): string {
     let script = '';
-    for (const key in this.storage) {
-      script += this.storage[key].transcript + ' ';
-    }
+    this.storage.forEach((value: TranscriptData) => (script += value.transcript + ' '));
     return script;
   }
   reset() {
-    this.storage = {};
-    this.currentIndex = 0;
-    this.index = 0;
+    this.storage.length = 0;
+  }
+  size(): number {
+    return this.storage.length;
   }
 }
 class Queue {
@@ -65,9 +84,6 @@ class Queue {
     if (this.size() === this.capacity) {
       this.dequeue();
     }
-    if (data.final) {
-      console.log('data ', data);
-    }
     if (!this.storage[data.peer_id]) {
       this.storage[data.peer_id] = {
         peer_id: data.peer_id,
@@ -77,10 +93,10 @@ class Queue {
         start: data.start,
         end: data.end,
       };
-      this.storage[data.peer_id].transcriptQueue.enqueue(data);
+      this.storage[data.peer_id].transcriptQueue.enqueue(data as TranscriptData);
       return;
     }
-    this.storage[data.peer_id].transcriptQueue.enqueue(data);
+    this.storage[data.peer_id].transcriptQueue.enqueue(data as TranscriptData);
   }
   dequeue(): CaptionQueueData {
     const key: string = Object.keys(this.storage).shift() || '';
