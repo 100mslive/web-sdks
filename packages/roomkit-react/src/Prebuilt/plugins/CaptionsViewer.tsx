@@ -16,8 +16,9 @@ class SimpleQueue {
       this.index++;
       this.storage[this.index] = data;
       if (data.final) {
-        setInterval(() => {
-          this.dequeue(this.index);
+        setTimeout(() => {
+          console.log('clear 2 ', this.storage[this.index]);
+          delete this.storage[this.index];
         }, this.MAX_STORAGE_TIME);
       }
       return;
@@ -26,8 +27,9 @@ class SimpleQueue {
       this.index++;
       this.storage[this.index] = data;
       if (data.final) {
-        setInterval(() => {
-          this.dequeue(this.index);
+        setTimeout(() => {
+          console.log('clear1 ', this.storage[this.index]);
+          delete this.storage[this.index];
         }, this.MAX_STORAGE_TIME);
       }
       return;
@@ -36,27 +38,11 @@ class SimpleQueue {
     this.storage[this.index].final = data.final;
     this.storage[this.index].end = data.end;
     if (data.final) {
-      setInterval(() => {
-        this.dequeue(this.index);
+      setTimeout(() => {
+        console.log('clear ', this.storage[this.index]);
+        delete this.storage[this.index];
       }, this.MAX_STORAGE_TIME);
     }
-  }
-  dequeue(removeIndex = 0): HMSTranscript | undefined {
-    console.log('here ', this.currentIndex, this.index);
-    if (!this.storage[removeIndex]) {
-      return undefined;
-    }
-    console.log('this. storage ', this.storage[removeIndex]);
-    const data = this.storage[removeIndex];
-    delete this.storage[removeIndex];
-    this.currentIndex = removeIndex + 1;
-    return data;
-  }
-  peek(): HMSTranscript | undefined {
-    if (!this.storage[this.currentIndex]) {
-      return undefined;
-    }
-    return this.storage[this.currentIndex];
   }
   getTranscription(): string {
     let script = '';

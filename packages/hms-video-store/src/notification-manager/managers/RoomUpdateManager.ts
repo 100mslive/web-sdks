@@ -7,6 +7,7 @@ import {
   HMSHLSRecording,
   HMSRoomUpdate,
   HMSSFURecording,
+  HMSTranscriptionInfo,
   HMSUpdateListener,
 } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';
@@ -26,6 +27,7 @@ import {
   RoomState,
   RTMPNotification,
   SessionInfo,
+  TranscriptionNotification,
 } from '../HMSNotifications';
 
 export class RoomUpdateManager {
@@ -93,7 +95,7 @@ export class RoomUpdateManager {
   }
 
   private onRoomState(roomNotification: RoomState) {
-    const { recording, streaming, session_id, started_at, name } = roomNotification;
+    const { recording, streaming, transcriptions, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     if (!room) {
       HMSLogger.w(this.TAG, 'on room state - room not present');
@@ -112,11 +114,26 @@ export class RoomUpdateManager {
 
     room.hls = this.convertHls(streaming?.hls);
 
+    room.transcriptions = this.addTranscriptionDetail(transcriptions);
+
     room.sessionId = session_id;
     room.startedAt = convertDateNumToDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
+  private addTranscriptionDetail(transcriptions?: TranscriptionNotification[]): HMSTranscriptionInfo[] {
+    if (!transcriptions) {
+      return [];
+    }
+    const newTranscriptions: HMSTranscriptionInfo[] = [];
+    transcriptions.forEach(transcription => {
+      newTranscriptions.push({
+        state: transcription.state,
+        mode: transcription.mode,
+      });
+    });
+    return transcriptions;
+  }
   private isRecordingRunning(state?: HMSRecordingState): boolean {
     if (!state) {
       return false;
