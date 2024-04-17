@@ -158,7 +158,7 @@ export interface RTMPRecordingResolution {
   width: number;
   height: number;
 }
-export const useIsRecordingStartErroredOut = () => {
+export const useRecordingHandler = () => {
   const hmsActions = useHMSActions();
   const recordingState: HMSRecording = useHMSStore(selectRecordingState);
   const [isRecordingLoading, setIsRecordingLoading] = useState(false);
@@ -177,7 +177,6 @@ export const useIsRecordingStartErroredOut = () => {
           resolution: getResolution(resolution),
           record: true,
         });
-        setIsRecordingLoading(false);
       } catch (error) {
         const err = error as Error;
         if (err.message.includes('stream already running')) {
@@ -191,9 +190,9 @@ export const useIsRecordingStartErroredOut = () => {
             variant: 'error',
           });
         }
-        setIsRecordingLoading(false);
         setRecordingState(false);
       }
+      setIsRecordingLoading(false);
     },
     [hmsActions, setRecordingState],
   );

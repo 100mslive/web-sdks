@@ -54,7 +54,7 @@ import { useShowPolls } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
-import { useIsRecordingStartErroredOut, useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream, useRecordingHandler } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
@@ -101,7 +101,7 @@ export const MwebOptions = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-  const { startRecording, isRecordingLoading } = useIsRecordingStartErroredOut();
+  const { startRecording, isRecordingLoading } = useRecordingHandler();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
