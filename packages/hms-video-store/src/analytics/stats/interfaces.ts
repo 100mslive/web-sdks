@@ -90,6 +90,8 @@ export interface RemoteVideoSample extends RemoteBaseSample {
   avg_av_sync_ms?: number;
   frame_width?: number;
   frame_height?: number;
+  expected_frame_width?: number;
+  expected_frame_height?: number;
   pause_count?: number;
   pause_duration_seconds?: number;
   freeze_count?: number;

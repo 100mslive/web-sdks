@@ -28,7 +28,9 @@ const Root = ({
       '&:hover': { border: '4px solid $primary_dim' },
       ...(mediaURL ? { height: '$20', backgroundImage: `url(${mediaURL})`, backgroundSize: 'cover' } : {}),
     }}
-    onClick={async () => await onClick?.()}
+    onClick={async () => {
+      await onClick?.();
+    }}
   >
     {children}
   </Flex>

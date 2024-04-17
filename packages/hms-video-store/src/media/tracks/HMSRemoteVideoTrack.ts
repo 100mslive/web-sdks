@@ -89,6 +89,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this.preferredLayer;
   }
 
+  getPreferredLayerDefinition() {
+    return this._layerDefinitions.find(layer => layer.layer === this.preferredLayer);
+  }
+
   replaceTrack(track: HMSRemoteVideoTrack) {
     this.nativeTrack = track.nativeTrack;
     if (track.transceiver) {
