@@ -8,52 +8,67 @@ interface CaptionQueueData extends HMSTranscript {
 }
 
 class SimpleQueue {
-  private storage: HMSTranscript[] = [];
-  constructor(private capacity: number = 5, private MAX_STORAGE_TIME: number = 5000) {}
+  private storage: Record<number, HMSTranscript> = {};
+  constructor(private index: number = -1, private currentIndex = 0, private MAX_STORAGE_TIME: number = 5000) {}
   enqueue(data: HMSTranscript): void {
-    if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
-      this.dequeue();
-    }
-    if (this.size() === 0) {
-      this.storage.push(data);
-      setInterval(() => {
-        this.dequeue();
-      }, this.MAX_STORAGE_TIME);
+    console.log(this.storage);
+    if (this.index === -1) {
+      this.index++;
+      this.storage[this.index] = data;
+      if (data.final) {
+        setInterval(() => {
+          this.dequeue(this.index);
+        }, this.MAX_STORAGE_TIME);
+      }
       return;
     }
-    if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
-      this.storage.push(data);
-      setInterval(() => {
-        this.dequeue();
-      }, this.MAX_STORAGE_TIME);
+    if (this.index >= 0 && this.storage[this.index]?.final) {
+      this.index++;
+      this.storage[this.index] = data;
+      if (data.final) {
+        setInterval(() => {
+          this.dequeue(this.index);
+        }, this.MAX_STORAGE_TIME);
+      }
       return;
     }
-    this.storage[this.size() - 1].transcript = data.transcript;
-    this.storage[this.size() - 1].final = data.final;
-    this.storage[this.size() - 1].end = data.end;
+    this.storage[this.index].transcript = data.transcript;
+    this.storage[this.index].final = data.final;
+    this.storage[this.index].end = data.end;
+    if (data.final) {
+      setInterval(() => {
+        this.dequeue(this.index);
+      }, this.MAX_STORAGE_TIME);
+    }
   }
-  dequeue(): HMSTranscript | undefined {
-    if (this.size() <= 0) {
+  dequeue(removeIndex = 0): HMSTranscript | undefined {
+    console.log('here ', this.currentIndex, this.index);
+    if (!this.storage[removeIndex]) {
       return undefined;
     }
-    return this.storage.shift();
+    console.log('this. storage ', this.storage[removeIndex]);
+    const data = this.storage[removeIndex];
+    delete this.storage[removeIndex];
+    this.currentIndex = removeIndex + 1;
+    return data;
   }
   peek(): HMSTranscript | undefined {
-    if (this.size() <= 0) {
+    if (!this.storage[this.currentIndex]) {
       return undefined;
     }
-    return this.storage[0];
+    return this.storage[this.currentIndex];
   }
   getTranscription(): string {
     let script = '';
-    this.storage.forEach((value: HMSTranscript) => (script += value.transcript + ' '));
+    for (const key in this.storage) {
+      script += this.storage[key].transcript + ' ';
+    }
     return script;
   }
   reset() {
-    this.storage.length = 0;
-  }
-  size(): number {
-    return this.storage.length;
+    this.storage = {};
+    this.currentIndex = 0;
+    this.index = 0;
   }
 }
 class Queue {
@@ -63,6 +78,9 @@ class Queue {
   enqueue(data: HMSTranscript): void {
     if (this.size() === this.capacity) {
       this.dequeue();
+    }
+    if (data.final) {
+      console.log('data ', data);
     }
     if (!this.storage[data.peer_id]) {
       this.storage[data.peer_id] = {
