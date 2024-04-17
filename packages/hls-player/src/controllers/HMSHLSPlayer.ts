@@ -50,6 +50,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @remarks It will create a video element with playiniline true.
    * @returns HTML video element
    */
+  // eslint-disable-next-line complexity
   private createVideoElement(): HTMLVideoElement {
     if (this._videoEl) {
       return this._videoEl;
@@ -58,6 +59,20 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     video.playsInline = true;
     video.controls = false;
     video.autoplay = true;
+    const textTracks = video.textTracks;
+
+    for (let i = 0; i < textTracks?.length ?? 0; i++) {
+      const cues = textTracks?.[i]?.cues;
+      if (cues && cues.length > 0) {
+        for (let j = 0; j < cues.length; j++) {
+          const cue = cues[j];
+          if (cue instanceof VTTCue) {
+            cue.line = -2;
+          }
+        }
+      }
+    }
+
     return video;
   }
 

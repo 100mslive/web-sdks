@@ -33,6 +33,7 @@ export interface HMSHLSCue {
   duration: number;
   startDate: Date;
   endDate?: Date;
+  line?: LineAndPositionSetting;
 }
 
 export interface HMSHLSManifestLoaded {

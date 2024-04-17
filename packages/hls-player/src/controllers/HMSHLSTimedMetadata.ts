@@ -42,7 +42,9 @@ export class HMSHLSTimedMetadata {
       const cue = cues[cueIndex] as TextTrackCue & {
         queued: boolean;
         value: { data: string };
+        line: LineAndPositionSetting;
       };
+      // cue.line = -2;
       if (cue.queued) {
         cueIndex++;
         continue;
