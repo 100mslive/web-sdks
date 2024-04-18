@@ -143,6 +143,7 @@ class PipManager {
     const currentTracksShowing = this.tracksToShow;
     this.tracksToShow = this.orderNewTracksToShow(newTracksToShowUnordered, currentTracksShowing);
     try {
+      console.log({ pipTracks: this.tracksToShow });
       await this.detachOldAttachNewTracks(currentTracksShowing, this.tracksToShow, tracksMap);
     } catch (error) {
       console.error('error in detaching/attaching tracks', error);
