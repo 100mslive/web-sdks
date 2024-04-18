@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
+  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -13,12 +14,14 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
+  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
+  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -49,7 +52,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../../AppData/useUISettings';
+import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -102,6 +105,10 @@ export const MwebOptions = ({
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
+
+  const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
+
+  const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -184,6 +191,20 @@ export const MwebOptions = ({
               >
                 {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+            {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setIsCaptionEnabled(!isCaptionEnabled);
+                }}
+              >
+                {isCaptionEnabled ? (
+                  <ClosedCaptionIcon width="20" height="20px" />
+                ) : (
+                  <OpenCaptionIcon width="20" height="20px" />
+                )}
+                <ActionTile.Title>{isCaptionEnabled ? 'Hide Captions' : 'Captions Disabled'}</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
 

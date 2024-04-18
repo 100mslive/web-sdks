@@ -138,15 +138,22 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
   const peerName = useHMSStore(selectPeerNameByID(peer_id));
   data = data.trim();
   if (!data) return null;
-  return <Text>{`${peerName}: ${data}`}</Text>;
+  return (
+    <Text
+      variant="body2"
+      css={{
+        fontWeight: '$normal',
+      }}
+    >
+      {`${peerName}: ${data}`}
+    </Text>
+  );
 };
+
 export const CaptionsViewer = () => {
-  const [captionQueue, setCaptionQueue] = useState<CaptionMaintainerQueue | null>(null);
+  const [captionQueue] = useState<CaptionMaintainerQueue>(new CaptionMaintainerQueue());
   const [currentData, setCurrentData] = useState<{ [key: string]: string }[]>([]);
 
-  useEffect(() => {
-    setCaptionQueue(new CaptionMaintainerQueue());
-  }, []);
   useEffect(() => {
     const timeInterval = setInterval(() => {
       if (!captionQueue) {
@@ -163,10 +170,19 @@ export const CaptionsViewer = () => {
       captionQueue && captionQueue.push(data as HMSTranscript[]);
     },
   });
-
+  const dataToShow = currentData.filter((data: { [key: string]: string }) => {
+    const key = Object.keys(data)[0];
+    if (data[key]) {
+      return true;
+    }
+    return false;
+  });
+  if (dataToShow.length <= 0) {
+    return null;
+  }
   return (
     <Flex direction="column" gap={1}>
-      {currentData.map((data: { [key: string]: string }, index: number) => {
+      {dataToShow.map((data: { [key: string]: string }, index: number) => {
         const key = Object.keys(data)[0];
         return <TranscriptView key={index} peer_id={key} data={data[key]} />;
       })}

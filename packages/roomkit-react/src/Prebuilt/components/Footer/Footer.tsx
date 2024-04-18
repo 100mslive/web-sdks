@@ -97,7 +97,7 @@ export const Footer = ({
           <>
             <ScreenshareToggle />
             <RaiseHand />
-            <CaptionIcon />
+            {screenType !== 'hls_live_streaming' && <CaptionIcon />}
             {elements?.emoji_reactions && <EmojiReaction />}
             <LeaveRoom screenType={screenType} />
           </>
