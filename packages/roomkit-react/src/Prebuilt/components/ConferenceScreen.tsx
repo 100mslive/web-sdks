@@ -66,7 +66,7 @@ export const ConferenceScreen = () => {
   const isCaptionEnabled = useIsCaptionEnabled();
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
-  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen;
+  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen && isMobile;
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
