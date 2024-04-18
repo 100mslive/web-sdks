@@ -288,7 +288,7 @@ class PipManager {
         }
       }
     }
-    return betterNewTracks;
+    return Array.from(new Set(betterNewTracks));
   }
 
   private showTrack(track: HMSVideoTrack | undefined) {
