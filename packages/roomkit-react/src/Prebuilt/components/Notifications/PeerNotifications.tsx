@@ -7,11 +7,7 @@ import { useSetSubscribedChatSelector, useSubscribedNotifications } from '../App
 // @ts-ignore: No implicit Any
 import { CHAT_SELECTOR, SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
-const notificationTypes = [
-  HMSNotificationTypes.PEER_LIST,
-  HMSNotificationTypes.PEER_JOINED,
-  HMSNotificationTypes.PEER_LEFT,
-];
+const notificationTypes = [HMSNotificationTypes.PEER_JOINED, HMSNotificationTypes.PEER_LEFT];
 
 export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
@@ -26,11 +22,6 @@ export const PeerNotifications = () => {
 
     console.debug(`[${notification.type}]`, notification);
     switch (notification.type) {
-      case HMSNotificationTypes.PEER_LIST:
-        if (!isPeerJoinSubscribed || notification.data.length === 0) {
-          return;
-        }
-        break;
       case HMSNotificationTypes.PEER_JOINED:
         if (!isPeerJoinSubscribed) {
           return;
@@ -47,7 +38,6 @@ export const PeerNotifications = () => {
       default:
         return;
     }
-
     ToastBatcher.showToast({ notification });
   }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, selectedPeer.id, setPeerSelector]);
 

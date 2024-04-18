@@ -6,7 +6,6 @@ import {
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
@@ -25,7 +24,6 @@ import {
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-// @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
 // @ts-ignore: No implicit Any
