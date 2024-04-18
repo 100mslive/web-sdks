@@ -182,6 +182,9 @@ export class DeviceManager implements HMSDeviceManager {
         audioInput: [...this.audioInput],
         audioOutput: [...this.audioOutput],
       });
+      const localPeer = this.store.getLocalPeer();
+      await (localPeer?.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+      await (localPeer?.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
       this.logDevices('Enumerate Devices');
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed enumerating devices', error);
