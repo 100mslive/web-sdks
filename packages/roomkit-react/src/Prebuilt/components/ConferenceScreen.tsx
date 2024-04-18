@@ -34,9 +34,11 @@ import {
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
+import { useIsSidepaneTypeOpen } from './AppData/useSidepane';
+// @ts-ignore: No implicit Any
 import { useAuthToken, useIsCaptionEnabled, useSetAppDataByKey } from './AppData/useUISettings';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
+import { APP_DATA, isAndroid, isIOS, isIPadOS, SIDE_PANE_OPTIONS } from '../common/constants';
 
 export const ConferenceScreen = () => {
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
@@ -62,6 +64,9 @@ export const ConferenceScreen = () => {
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
   const isCaptionEnabled = useIsCaptionEnabled();
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+
+  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen;
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
@@ -134,7 +139,8 @@ export const ConferenceScreen = () => {
           css={{
             position: 'fixed',
             maxWidth: isMobile ? '100%' : '40%',
-            bottom: hideControlsForStreaming ? '5%' : '10%',
+            bottom: showCaptionAtTop ? '' : hideControlsForStreaming ? '5%' : '10%',
+            top: showCaptionAtTop ? (hideControlsForStreaming ? '5%' : '10%') : '',
             left: isMobile ? 0 : '50%',
             transform: isMobile ? '' : 'translateX(-50%)',
             background: '#000000A3',
