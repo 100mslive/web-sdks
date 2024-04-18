@@ -68,6 +68,7 @@ const initialAppData = {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
+  [APP_DATA.caption]: true,
 };
 
 export const AppData = React.memo(() => {
