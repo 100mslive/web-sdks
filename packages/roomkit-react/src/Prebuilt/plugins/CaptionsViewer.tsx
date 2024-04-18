@@ -145,8 +145,8 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
         fontWeight: '$normal',
       }}
     >
-      <b>{`${peerName}: `}</b>
-      {`${data}`}
+      <b>{peerName + ': '}</b>
+      {data}
     </Text>
   );
 };
