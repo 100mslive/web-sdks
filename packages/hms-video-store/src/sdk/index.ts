@@ -235,6 +235,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.hls;
   }
 
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
+  }
+
   getTemplateAppData() {
     return this.store.getTemplateAppData();
   }

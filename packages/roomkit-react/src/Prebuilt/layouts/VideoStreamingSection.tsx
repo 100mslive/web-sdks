@@ -105,7 +105,6 @@ export const VideoStreamingSection = ({
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
-
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })
