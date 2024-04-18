@@ -138,7 +138,7 @@ export const ConferenceScreen = () => {
         <Box
           css={{
             position: 'fixed',
-            maxWidth: isMobile ? '100%' : '40%',
+            w: isMobile ? '100%' : '40%',
             bottom: showCaptionAtTop ? '' : hideControlsForStreaming ? '5%' : '10%',
             top: showCaptionAtTop ? (hideControlsForStreaming ? '5%' : '10%') : '',
             left: isMobile ? 0 : '50%',
