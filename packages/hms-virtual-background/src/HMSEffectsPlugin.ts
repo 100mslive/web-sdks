@@ -77,11 +77,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   /**
    * @param blur ranges between 0 and 1
    */
-  async setBlur(blur: number) {
+  setBlur(blur: number) {
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
-    await this.executeAfterInit(() => {
+    this.executeAfterInit(() => {
       this.effects.setBlur(this.blurAmount);
     });
   }
