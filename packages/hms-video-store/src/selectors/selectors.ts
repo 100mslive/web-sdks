@@ -400,13 +400,10 @@ export const selectIsTranscriptionEnabled = createSelector(selectRoom, room => {
   if (!room.transcriptions || room.transcriptions.length <= 0) {
     return false;
   }
-  let isEnabled = false;
-  room.transcriptions.forEach(transcription => {
-    if (transcription.mode === HMSTranscriptionMode.CAPTION && transcription.state === HMSTranscriptionState.STARTED) {
-      isEnabled = true;
-    }
-  });
-  return isEnabled;
+  return room.transcriptions.some(
+    transcription =>
+      transcription.mode === HMSTranscriptionMode.CAPTION && transcription.state === HMSTranscriptionState.STARTED,
+  );
 });
 
 /**

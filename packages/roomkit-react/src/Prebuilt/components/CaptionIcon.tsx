@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { selectIsTranscriptionEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../Tooltip';
@@ -11,9 +11,6 @@ export const CaptionIcon = () => {
   const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
   const [isCaption, setIsCaption] = useSetIsCaptionEnabled();
 
-  useEffect(() => {
-    setIsCaption(true);
-  }, [setIsCaption]);
   const onClick = () => {
     setIsCaption(!isCaption);
   };

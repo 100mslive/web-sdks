@@ -163,7 +163,7 @@ export const CaptionsViewer = () => {
       setCurrentData(data);
     }, 1000);
     return () => clearInterval(timeInterval);
-  });
+  }, [captionQueue]);
 
   useTranscript({
     onTranscript: (data: HMSTranscript[]) => {

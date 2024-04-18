@@ -125,14 +125,12 @@ export class RoomUpdateManager {
     if (!transcriptions) {
       return [];
     }
-    const newTranscriptions: HMSTranscriptionInfo[] = [];
-    transcriptions.forEach(transcription => {
-      newTranscriptions.push({
+    return transcriptions.map((transcription: TranscriptionNotification) => {
+      return {
         state: transcription.state,
         mode: transcription.mode,
-      });
+      };
     });
-    return transcriptions;
   }
   private isRecordingRunning(state?: HMSRecordingState): boolean {
     if (!state) {
