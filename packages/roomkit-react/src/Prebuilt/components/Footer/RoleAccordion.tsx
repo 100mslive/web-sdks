@@ -109,7 +109,7 @@ export const RoleAccordion = ({
           },
         }}
       >
-        <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
+        <Flex justify="between" align="center" css={{ flexGrow: 1, pr: '$6' }}>
           <Text
             variant="sm"
             css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
