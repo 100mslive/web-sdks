@@ -135,7 +135,7 @@ class CaptionMaintainerQueue {
   }
 }
 const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) => {
-  const peerName = useHMSStore(selectPeerNameByID(peer_id));
+  const peerName = useHMSStore(selectPeerNameByID(peer_id)) || 'Participant';
   data = data.trim();
   if (!data) return null;
   return (
@@ -145,7 +145,8 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
         fontWeight: '$normal',
       }}
     >
-      {`${peerName}: ${data}`}
+      <b>{peerName}: </b>
+      {data}
     </Text>
   );
 };
@@ -181,7 +182,7 @@ export const CaptionsViewer = () => {
     return null;
   }
   return (
-    <Flex direction="column" gap={1}>
+    <Flex direction="column">
       {dataToShow.map((data: { [key: string]: string }, index: number) => {
         const key = Object.keys(data)[0];
         return <TranscriptView key={index} peer_id={key} data={data[key]} />;

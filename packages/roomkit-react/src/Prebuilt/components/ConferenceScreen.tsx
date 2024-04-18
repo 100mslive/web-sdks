@@ -66,7 +66,7 @@ export const ConferenceScreen = () => {
   const isCaptionEnabled = useIsCaptionEnabled();
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
-  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen;
+  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen && isMobile;
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
@@ -138,7 +138,7 @@ export const ConferenceScreen = () => {
         <Box
           css={{
             position: 'fixed',
-            maxWidth: isMobile ? '100%' : '40%',
+            w: isMobile ? '100%' : '40%',
             bottom: showCaptionAtTop ? '' : hideControlsForStreaming ? '5%' : '10%',
             top: showCaptionAtTop ? (hideControlsForStreaming ? '5%' : '10%') : '',
             left: isMobile ? 0 : '50%',
