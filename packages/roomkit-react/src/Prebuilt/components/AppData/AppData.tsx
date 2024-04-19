@@ -62,11 +62,14 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.loadingEffects]: false,
   [APP_DATA.background]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
+  // by default off, so it will not appear in beam bots
+  [APP_DATA.caption]: false,
 };
 
 export const AppData = React.memo(() => {

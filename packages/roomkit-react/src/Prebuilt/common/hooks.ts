@@ -3,20 +3,27 @@ import { useMedia } from 'react-use';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
+  HMSRecording,
   parsedUserAgent,
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPeerMetadata,
   selectPeers,
+  selectRecordingState,
   selectRemotePeers,
+  useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit any
+import { ToastManager } from '../components/Toast/ToastManager';
 import { config } from '../../Theme';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+// @ts-ignore
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { CHAT_SELECTOR } from './constants';
+import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
@@ -147,3 +154,67 @@ export const useKeyboardHandler = (isPaused: boolean, hlsPlayer: HMSHLSPlayer) =
 
   return handleKeyEvent;
 };
+export interface RTMPRecordingResolution {
+  width: number;
+  height: number;
+}
+export const useRecordingHandler = () => {
+  const hmsActions = useHMSActions();
+  const recordingState: HMSRecording = useHMSStore(selectRecordingState);
+  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
+  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  useEffect(() => {
+    if (recordingState.browser.error && recordingStarted) {
+      setRecordingState(false);
+    }
+  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
+  const startRecording = useCallback(
+    async (resolution: RTMPRecordingResolution | null = null) => {
+      try {
+        setRecordingState(true);
+        setIsRecordingLoading(true);
+        await hmsActions.startRTMPOrRecording({
+          resolution: getResolution(resolution),
+          record: true,
+        });
+      } catch (error) {
+        const err = error as Error;
+        if (err.message.includes('stream already running')) {
+          ToastManager.addToast({
+            title: 'Recording already running',
+            variant: 'error',
+          });
+        } else {
+          ToastManager.addToast({
+            title: err.message,
+            variant: 'error',
+          });
+        }
+        setRecordingState(false);
+      }
+      setIsRecordingLoading(false);
+    },
+    [hmsActions, setRecordingState],
+  );
+  return {
+    recordingStarted,
+    startRecording,
+    isRecordingLoading,
+  };
+};
+
+export function getResolution(
+  recordingResolution: RTMPRecordingResolution | null,
+): RTMPRecordingResolution | undefined {
+  if (!recordingResolution) {
+    return undefined;
+  }
+  const resolution: RTMPRecordingResolution = RTMP_RECORD_DEFAULT_RESOLUTION;
+  if (recordingResolution.width) {
+    resolution.width = recordingResolution.width;
+  }
+  if (recordingResolution.height) {
+    resolution.height = recordingResolution.height;
+  }
+  return resolution;
+}

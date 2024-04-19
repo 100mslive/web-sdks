@@ -11,10 +11,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset = 'lightning';
+  private preset: 'balanced' | 'quality' = 'balanced';
+  private initialised = false;
+  private intervalId: NodeJS.Timer | null = null;
+  private onInit;
 
-  constructor(effectsSDKKey: string) {
+  constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
+    this.onInit = onInit;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -28,6 +32,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       },
       provider: 'webgpu',
     });
+    this.effects.onError(err => {
+      // currently logging info type messages as well
+      if (!err.type || err.type === 'error') {
+        console.error('[HMSEffectsPlugin]', err);
+      }
+    });
     this.effects.onError(err => console.error('[HMSEffectsPlugin]', err));
   }
 
@@ -35,26 +45,56 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
+  private executeAfterInit(callback: () => void) {
+    if (this.initialised) {
+      callback();
+    }
+
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+    }
+    this.intervalId = setInterval(() => {
+      if (this.initialised) {
+        clearInterval(this.intervalId!);
+        callback();
+      }
+    }, 100);
+  }
+
   removeBlur() {
     this.blurAmount = 0;
-    this.effects.clearBlur();
+    this.executeAfterInit(() => {
+      this.effects.clearBlur();
+    });
   }
 
   removeBackground() {
     this.background = '';
-    this.effects.clearBackground();
+    this.executeAfterInit(() => {
+      this.effects.clearBackground();
+    });
   }
 
+  /**
+   * @param blur ranges between 0 and 1
+   */
   setBlur(blur: number) {
-    this.removeBackground();
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.effects.setBlur(blur);
+    this.removeBackground();
+    this.executeAfterInit(() => {
+      this.effects.setBlur(this.blurAmount);
+    });
   }
 
-  async setPreset(preset: string) {
+  /**
+   * @param preset can be 'quality' or 'balanced'. The 'quality' preset has better quality but higher CPU usage than 'balanced'
+   */
+  async setPreset(preset: 'quality' | 'balanced') {
     this.preset = preset;
-    await this.effects.setSegmentationPreset(this.preset);
+    this.executeAfterInit(async () => {
+      await this.effects.setSegmentationPreset(this.preset);
+    });
   }
 
   getPreset() {
@@ -69,11 +109,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   setBackground(url: HMSEffectsBackground) {
     this.background = url;
-    this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-    this.effects.setBackground(url);
+    this.removeBlur();
+    this.executeAfterInit(() => {
+      this.effects.setBackground(this.background);
+    });
   }
-
   getBlurAmount() {
     return this.blurAmount;
   }
@@ -85,6 +126,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
+        this.initialised = true;
+        this.onInit?.();
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
@@ -103,6 +146,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   stop() {
     this.removeEffects();
-    this.effects.stop();
+    this.executeAfterInit(() => {
+      this.effects.stop();
+    });
   }
 }

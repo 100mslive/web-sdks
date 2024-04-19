@@ -162,7 +162,7 @@ const SidePane = ({
     mobileStream: isMobileHLSStream,
     hideControls,
     overlayChat: !!elements?.chat?.is_overlay,
-    roomDescription: isMobile && sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS,
+    roomDescription: sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS,
     virtualBackground: sidepane === SIDE_PANE_OPTIONS.VB,
   };
 
