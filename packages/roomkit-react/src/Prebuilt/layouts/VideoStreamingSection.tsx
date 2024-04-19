@@ -16,6 +16,8 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
+import { CaptionsViewer } from '../plugins/CaptionsViewer';
+// @ts-ignore: No implicit Any
 import {
   usePDFConfig,
   useUrlToEmbed,
@@ -25,7 +27,6 @@ import {
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
-
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
@@ -105,7 +106,7 @@ export const VideoStreamingSection = ({
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
-
+        <CaptionsViewer />
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })

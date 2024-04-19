@@ -5,6 +5,7 @@ import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+import { CaptionIcon } from '../CaptionIcon';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 // @ts-ignore: No implicit Any
@@ -96,6 +97,7 @@ export const Footer = ({
           <>
             <ScreenshareToggle />
             <RaiseHand />
+            {screenType !== 'hls_live_streaming' && <CaptionIcon />}
             {elements?.emoji_reactions && <EmojiReaction />}
             <LeaveRoom screenType={screenType} />
           </>

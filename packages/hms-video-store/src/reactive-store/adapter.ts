@@ -276,7 +276,13 @@ export class SDKToHMS {
     recording?: sdkTypes.HMSRecording,
     rtmp?: sdkTypes.HMSRTMP,
     hls?: sdkTypes.HMSHLS,
-  ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
+    transcriptions?: sdkTypes.HMSTranscriptionInfo[],
+  ): {
+    recording: sdkTypes.HMSRecording;
+    rtmp: sdkTypes.HMSRTMP;
+    hls: sdkTypes.HMSHLS;
+    transcriptions: sdkTypes.HMSTranscriptionInfo[];
+  } {
     return {
       recording: {
         browser: {
@@ -295,6 +301,7 @@ export class SDKToHMS {
         running: !!hls?.running,
         error: hls?.error,
       },
+      transcriptions: transcriptions || [],
     };
   }
 }

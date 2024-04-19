@@ -9,7 +9,7 @@ import {
   isVideoPlaylist,
 } from './selectorUtils';
 // noinspection ES6PreferShortImport
-import { HMSRole, HMSWhiteboard } from '../internal';
+import { HMSRole, HMSTranscriptionMode, HMSTranscriptionState, HMSWhiteboard } from '../internal';
 import {
   HMSException,
   HMSMessage,
@@ -395,6 +395,16 @@ export const selectRoomState = createSelector([selectRoom], room => room && room
 export const selectIsInPreview = createSelector(selectRoomState, roomState => roomState === HMSRoomState.Preview);
 
 export const selectRoomStarted = createSelector(selectRoom, room => room.roomState !== HMSRoomState.Disconnected);
+
+export const selectIsTranscriptionEnabled = createSelector(selectRoom, room => {
+  if (!room.transcriptions || room.transcriptions.length <= 0) {
+    return false;
+  }
+  return room.transcriptions.some(
+    transcription =>
+      transcription.mode === HMSTranscriptionMode.CAPTION && transcription.state === HMSTranscriptionState.STARTED,
+  );
+});
 
 /**
  * Select available roles in the room as a map between the role name and {@link HMSRole} object.
