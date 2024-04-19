@@ -197,12 +197,12 @@ export class DeviceManager implements HMSDeviceManager {
   private updateToActualDefaultDevice = async () => {
     const localPeer = this.store.getLocalPeer();
     const videoDeviceId = this.store.getConfig()?.settings?.videoDeviceId;
-    if (!videoDeviceId) {
-      await (localPeer?.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+    if (!videoDeviceId && localPeer?.videoTrack) {
+      await (localPeer.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
     }
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
-    if (!audioDeviceId) {
-      await (localPeer?.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
+    if (!audioDeviceId && localPeer?.audioTrack) {
+      await (localPeer.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
     }
   };
 
