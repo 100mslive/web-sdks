@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { v4 as uuid } from 'uuid';
 import {
@@ -19,7 +18,6 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
-import { config } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
@@ -28,21 +26,17 @@ import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
 import { RaiseHand } from './RaiseHand';
-import { CaptionsViewer } from '../plugins/CaptionsViewer';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
-import { useIsSidepaneTypeOpen } from './AppData/useSidepane';
-// @ts-ignore: No implicit Any
-import { useAuthToken, useIsCaptionEnabled, useSetAppDataByKey } from './AppData/useUISettings';
+import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-import { APP_DATA, isAndroid, isIOS, isIPadOS, SIDE_PANE_OPTIONS } from '../common/constants';
+import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 export const ConferenceScreen = () => {
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
-  const isMobile = useMedia(config.media.md);
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
@@ -63,10 +57,6 @@ export const ConferenceScreen = () => {
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
-  const isCaptionEnabled = useIsCaptionEnabled();
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-
-  const showCaptionAtTop = screenProps.elements?.chat?.is_overlay && isChatOpen && isMobile;
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
@@ -134,28 +124,6 @@ export const ConferenceScreen = () => {
           <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
         </Box>
       ) : null}
-      {isCaptionEnabled && screenProps.screenType !== 'hls_live_streaming' && (
-        <Box
-          css={{
-            position: 'fixed',
-            w: isMobile ? '100%' : '40%',
-            bottom: showCaptionAtTop ? '' : hideControlsForStreaming ? '5%' : '10%',
-            top: showCaptionAtTop ? (hideControlsForStreaming ? '5%' : '10%') : '',
-            left: isMobile ? 0 : '50%',
-            transform: isMobile ? '' : 'translateX(-50%)',
-            background: '#000000A3',
-            overflow: 'clip',
-            zIndex: 10,
-            height: 'fit-content',
-            r: '$1',
-            p: '$6',
-            transition: 'bottom 0.3s ease-in-out',
-            '&:empty': { display: 'none' },
-          }}
-        >
-          <CaptionsViewer />
-        </Box>
-      )}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
         {!(screenProps.hideSections.includes('header') || isMwebHLSStream) && (
           <Box
