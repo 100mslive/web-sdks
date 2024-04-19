@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { HMSTranscript, selectPeerNameByID, useHMSStore, useTranscript } from '@100mslive/react-sdk';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-
+import { config } from '../../Theme';
+// @ts-ignore: No implicit Any
+import { useIsSidepaneTypeOpen } from '../components/AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { useIsCaptionEnabled } from '../components/AppData/useUISettings';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { SIDE_PANE_OPTIONS } from '../common/constants';
 interface CaptionQueueData extends HMSTranscript {
   transcriptQueue: SimpleQueue;
 }
@@ -152,8 +159,16 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
 };
 
 export const CaptionsViewer = () => {
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
+  const isMobile = useMedia(config.media.md);
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+
+  const showCaptionAtTop = elements?.chat?.is_overlay && isChatOpen && isMobile;
+
   const [captionQueue] = useState<CaptionMaintainerQueue>(new CaptionMaintainerQueue());
   const [currentData, setCurrentData] = useState<{ [key: string]: string }[]>([]);
+
+  const isCaptionEnabled = useIsCaptionEnabled();
 
   useEffect(() => {
     const timeInterval = setInterval(() => {
@@ -178,15 +193,34 @@ export const CaptionsViewer = () => {
     }
     return false;
   });
-  if (dataToShow.length <= 0) {
+  if (dataToShow.length <= 0 || screenType === 'hls_live_streaming' || !isCaptionEnabled) {
     return null;
   }
   return (
-    <Flex direction="column">
-      {dataToShow.map((data: { [key: string]: string }, index: number) => {
-        const key = Object.keys(data)[0];
-        return <TranscriptView key={index} peer_id={key} data={data[key]} />;
-      })}
-    </Flex>
+    <Box
+      css={{
+        position: 'absolute',
+        w: isMobile ? '100%' : '40%',
+        bottom: showCaptionAtTop ? '' : '0',
+        top: showCaptionAtTop ? '0' : '',
+        left: isMobile ? 0 : '50%',
+        transform: isMobile ? '' : 'translateX(-50%)',
+        background: '#000000A3',
+        overflow: 'clip',
+        zIndex: 10,
+        height: 'fit-content',
+        r: '$1',
+        p: '$6',
+        transition: 'bottom 0.3s ease-in-out',
+        '&:empty': { display: 'none' },
+      }}
+    >
+      <Flex direction="column">
+        {dataToShow.map((data: { [key: string]: string }, index: number) => {
+          const key = Object.keys(data)[0];
+          return <TranscriptView key={index} peer_id={key} data={data[key]} />;
+        })}
+      </Flex>
+    </Box>
   );
 };

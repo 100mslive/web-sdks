@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect } from 'react';
-import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -10,7 +9,6 @@ import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMS
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
-import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -20,9 +18,7 @@ import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
-import { useIsSidepaneTypeOpen } from '../components/AppData/useSidepane';
 import {
-  useIsCaptionEnabled,
   usePDFConfig,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -30,7 +26,7 @@ import {
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../common/constants';
+import { SESSION_STORE_KEY } from '../common/constants';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
@@ -53,11 +49,6 @@ export const VideoStreamingSection = ({
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
-  const isCaptionEnabled = useIsCaptionEnabled();
-  const isMobile = useMedia(config.media.md);
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-
-  const showCaptionAtTop = elements?.chat?.is_overlay && isChatOpen && isMobile;
 
   useEffect(() => {
     if (!isConnected) {
@@ -115,28 +106,7 @@ export const VideoStreamingSection = ({
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
-        {isCaptionEnabled && screenType !== 'hls_live_streaming' && (
-          <Box
-            css={{
-              position: 'absolute',
-              w: isMobile ? '100%' : '40%',
-              bottom: showCaptionAtTop ? '' : '0',
-              top: showCaptionAtTop ? '0' : '',
-              left: isMobile ? 0 : '50%',
-              transform: isMobile ? '' : 'translateX(-50%)',
-              background: '#000000A3',
-              overflow: 'clip',
-              zIndex: 10,
-              height: 'fit-content',
-              r: '$1',
-              p: '$6',
-              transition: 'bottom 0.3s ease-in-out',
-              '&:empty': { display: 'none' },
-            }}
-          >
-            <CaptionsViewer />
-          </Box>
-        )}
+        <CaptionsViewer />
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })
