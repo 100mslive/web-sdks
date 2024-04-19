@@ -6,7 +6,6 @@ import {
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
@@ -17,6 +16,8 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
+import { CaptionsViewer } from '../plugins/CaptionsViewer';
+// @ts-ignore: No implicit Any
 import {
   usePDFConfig,
   useUrlToEmbed,
@@ -25,9 +26,7 @@ import {
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-// @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
-
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
@@ -107,7 +106,7 @@ export const VideoStreamingSection = ({
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
-
+        <CaptionsViewer />
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })

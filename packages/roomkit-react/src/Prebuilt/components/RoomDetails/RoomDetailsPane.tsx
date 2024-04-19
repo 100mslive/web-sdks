@@ -15,7 +15,7 @@ export const RoomDetailsPane = () => {
   const { description } = useRoomLayoutHeader();
   const isMwebHLSStream = useMobileHLSStream();
   return (
-    <Box css={{ flex: '1 1 0' }}>
+    <Box css={{ flex: '1 1 0', position: 'relative' }}>
       {isMwebHLSStream ? (
         <Flex direction="row" align="center" gap="2">
           <Logo />
@@ -41,7 +41,7 @@ const ShowRoomDetailHeader = () => {
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const isMwebHLSStream = useMobileHLSStream();
   return (
-    <Flex direction="column">
+    <Flex direction="column" css={{ position: 'sticky', top: 0, bg: '$surface_dim' }}>
       <Flex justify="between" align="center" css={{ w: '100%' }}>
         <Text variant="h6">{title}</Text>
         {!isMwebHLSStream && (
