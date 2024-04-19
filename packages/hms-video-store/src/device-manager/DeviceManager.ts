@@ -93,6 +93,7 @@ export class DeviceManager implements HMSDeviceManager {
     !this.initialized && navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     this.initialized = true;
     await this.enumerateDevices();
+    await this.updateToActualDefaultDevice();
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
@@ -182,12 +183,26 @@ export class DeviceManager implements HMSDeviceManager {
         audioInput: [...this.audioInput],
         audioOutput: [...this.audioOutput],
       });
-      const localPeer = this.store.getLocalPeer();
-      await (localPeer?.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
-      await (localPeer?.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
       this.logDevices('Enumerate Devices');
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed enumerating devices', error);
+    }
+  };
+
+  /**
+   * For example, if a different device, say OBS is selected as default from chrome settings, when you do getUserMedia with default, that is not the device
+   * you get. So update to the browser settings default device
+   * Update only when initial deviceId is not passed
+   */
+  private updateToActualDefaultDevice = async () => {
+    const localPeer = this.store.getLocalPeer();
+    const videoDeviceId = this.store.getConfig()?.settings?.videoDeviceId;
+    if (!videoDeviceId) {
+      await (localPeer?.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+    }
+    const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
+    if (!audioDeviceId) {
+      await (localPeer?.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
     }
   };
 
