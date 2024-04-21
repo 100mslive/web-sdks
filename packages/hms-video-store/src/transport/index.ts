@@ -1000,8 +1000,10 @@ export default class HMSTransport {
       this.subscribeStatsAnalytics = new SubscribeStatsAnalytics(
         this.store,
         this.eventBus,
-        this.getValueFromInitConfig('subscribeStats', 'maxSampleWindowSize', SUBSCRIBE_STATS_SAMPLE_WINDOW),
-        this.getValueFromInitConfig('subscribeStats', 'maxSamplePushInterval', SUBSCRIBE_STATS_PUSH_INTERVAL),
+        SUBSCRIBE_STATS_SAMPLE_WINDOW ||
+          this.getValueFromInitConfig('subscribeStats', 'maxSampleWindowSize', SUBSCRIBE_STATS_SAMPLE_WINDOW),
+        SUBSCRIBE_STATS_PUSH_INTERVAL ||
+          this.getValueFromInitConfig('subscribeStats', 'maxSamplePushInterval', SUBSCRIBE_STATS_PUSH_INTERVAL),
       );
 
       this.getWebrtcInternals()?.start();
