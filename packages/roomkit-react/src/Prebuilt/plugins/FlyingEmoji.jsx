@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
+  selectIsLargeRoom,
   selectLocalPeerID,
   selectPeerNameByID,
   useCustomEvent,
+  useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
@@ -43,17 +45,23 @@ const getStartingPoints = isMobile => {
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const vanillaStore = useHMSVanillaStore();
+  const hmsActions = useHMSActions();
   const [emojis, setEmojis] = useState([]);
   const isMobile = useMedia(cssConfig.media.md);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   const startingPoints = useMemo(() => getStartingPoints(isMobile), [isMobile]);
 
   const showFlyingEmoji = useCallback(
-    ({ emojiId, senderId }) => {
+    async ({ emojiId, senderId }) => {
       if (!emojiId || !senderId || document.hidden) {
         return;
       }
-      const senderPeerName = vanillaStore.getState(selectPeerNameByID(senderId));
+      let senderPeerName = vanillaStore.getState(selectPeerNameByID(senderId));
+      if (!senderPeerName && isLargeRoom) {
+        const sender = await hmsActions.getPeerListIterator({ peerIds: [senderId] }).findPeers()?.[0];
+        senderPeerName = sender?.name;
+      }
       const nameToShow = localPeerId === senderId ? 'You' : senderPeerName;
       const startingPoint = startingPoints[emojiCount % startingPoints.length];
       const id = emojiCount++;
@@ -71,7 +79,7 @@ export function FlyingEmoji() {
         ];
       });
     },
-    [localPeerId, vanillaStore, startingPoints],
+    [vanillaStore, isLargeRoom, localPeerId, startingPoints, hmsActions],
   );
 
   useCustomEvent({
@@ -118,24 +126,28 @@ export function FlyingEmoji() {
             <Box>
               <em-emoji id={emoji.emojiId} size="48px" set="apple"></em-emoji>
             </Box>
-            <Box
-              css={{
-                width: 'fit-content',
-                padding: '$2 $4',
-                background: '$surface_bright',
-                borderRadius: '$1',
-              }}
-            >
-              <Text
+            {emoji.senderName ? (
+              <Box
                 css={{
-                  fontSize: '$space$6',
-                  lineHeight: '$xs',
-                  color: '$on_surface_high',
+                  width: 'fit-content',
+                  padding: '$2 $4',
+                  background: '$surface_bright',
+                  borderRadius: '$1',
                 }}
               >
-                {emoji.senderName}
-              </Text>
-            </Box>
+                <Text
+                  css={{
+                    fontSize: '$space$6',
+                    lineHeight: '$xs',
+                    color: '$on_surface_high',
+                  }}
+                >
+                  {emoji.senderName}
+                </Text>
+              </Box>
+            ) : (
+              ''
+            )}
           </Flex>
         );
       })}
