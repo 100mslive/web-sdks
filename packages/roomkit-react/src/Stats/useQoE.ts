@@ -14,6 +14,17 @@ const clip = (value: number, min_value: number, max_value: number) => {
   return Math.max(Math.min(value, max_value), min_value);
 };
 
+/**
+ * calculate QoE using 5 params:
+ * p1:freeze_duration_norm
+ * p2:resolution_norm
+ * p3:fps_norm
+ * p4:delay_norm
+ * p5:audio_concealed_norm
+ * the formula is 5*(p1)^3 * (p2)^0.3 * (p3)^0.5 * (p4)^1 * (p5)*2
+ *
+ * https://github.com/100mslive/webrtc-benchmark/blob/daily/sssd.py#L112
+ */
 export const useQoE = ({ videoTrackID, audioTrackID, isLocal = false }: UseQoEProps) => {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
