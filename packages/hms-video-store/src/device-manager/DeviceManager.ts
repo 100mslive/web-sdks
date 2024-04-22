@@ -198,11 +198,11 @@ export class DeviceManager implements HMSDeviceManager {
     const localPeer = this.store.getLocalPeer();
     const videoDeviceId = this.store.getConfig()?.settings?.videoDeviceId;
     if (!videoDeviceId && localPeer?.videoTrack) {
-      await (localPeer.videoTrack as HMSLocalVideoTrack).setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+      await localPeer.videoTrack.setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
     }
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
     if (!audioDeviceId && localPeer?.audioTrack) {
-      await (localPeer.audioTrack as HMSLocalAudioTrack).setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
+      await localPeer.audioTrack.setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
     }
   };
 
@@ -384,7 +384,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
-      await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
+      await videoTrack.setSettings(newVideoTrackSettings, true);
       // On replace track, enabled will be true. Need to be set to previous state
       // videoTrack.setEnabled(enabled); // TODO: remove this once verified on qa.
       this.eventBus.deviceChange.publish({
