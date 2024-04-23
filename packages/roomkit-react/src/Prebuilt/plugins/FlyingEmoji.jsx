@@ -59,7 +59,7 @@ export function FlyingEmoji() {
       }
       let senderPeerName = vanillaStore.getState(selectPeerNameByID(senderId));
       if (!senderPeerName && isLargeRoom) {
-        const sender = await hmsActions.getPeerListIterator({ peerIds: [senderId] }).findPeers()?.[0];
+        const sender = await hmsActions.getPeerListIterator().getPeer(senderId);
         senderPeerName = sender?.name;
       }
       const nameToShow = localPeerId === senderId ? 'You' : senderPeerName;

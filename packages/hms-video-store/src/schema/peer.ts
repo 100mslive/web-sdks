@@ -6,6 +6,7 @@ import {
   ScreenCaptureHandle,
 } from '../interfaces';
 import { HMSPeerType } from '../interfaces/peer/hms-peer';
+import { getPeerRequestParams } from '../signal/interfaces';
 
 export type HMSPeerID = string;
 export type HMSTrackID = string;
@@ -125,4 +126,5 @@ export interface HMSPeerListIterator {
   next(): Promise<HMSPeer[]>;
   getTotal(): number;
   findPeers(): Promise<HMSPeer[]>;
+  getPeer(peerId: getPeerRequestParams): Promise<HMSPeer>;
 }
