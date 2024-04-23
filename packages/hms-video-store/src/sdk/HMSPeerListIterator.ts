@@ -3,7 +3,7 @@ import { Store } from './store';
 import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { PeerNotificationInfo } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
-import { getPeerRequestParams, PeersIterationResponse } from '../signal/interfaces';
+import { PeersIterationResponse } from '../signal/interfaces';
 import HMSTransport from '../transport';
 
 export class HMSPeerListIterator {
@@ -35,12 +35,6 @@ export class HMSPeerListIterator {
     });
     this.updateState(response);
     return this.processPeers(response.peers);
-  }
-
-  async getPeer(peerID: getPeerRequestParams) {
-    this.validateConnection();
-    const response = await this.transport.signal.getPeer(peerID);
-    return this.processPeers([response])[0];
   }
 
   async next() {

@@ -603,6 +603,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
+  async getPeer(peerId: getPeerRequestParams) {
+    return {
+      ...(SDKToHMS.convertPeer(await this.sdk.getPeer(peerId)) as HMSPeer),
+      id: peerId.toString(),
+    };
+  }
+
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     const iterator = this.sdk.getPeerListIterator(options);
     return {
@@ -610,12 +617,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       next: async () => {
         const sdkPeers = await iterator.next();
         return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
-      },
-      getPeer: async (peerId: getPeerRequestParams) => {
-        return {
-          ...(SDKToHMS.convertPeer(await iterator.getPeer(peerId)) as HMSPeer),
-          id: peerId.toString(),
-        };
       },
       findPeers: async () => {
         const sdkPeers = await iterator.findPeers();
