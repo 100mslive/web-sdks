@@ -80,6 +80,12 @@ const Wrapper = styled('div', {
     hideControls: {
       true: {},
     },
+    virtualBackground: {
+      true: {
+        maxHeight: '100%',
+        background: '$surface_dim',
+      },
+    },
   },
   compoundVariants: [
     {
@@ -156,7 +162,8 @@ const SidePane = ({
     mobileStream: isMobileHLSStream,
     hideControls,
     overlayChat: !!elements?.chat?.is_overlay,
-    roomDescription: isMobile && sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS,
+    roomDescription: sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS,
+    virtualBackground: sidepane === SIDE_PANE_OPTIONS.VB,
   };
 
   const SidepaneComponent = match(sidepane)

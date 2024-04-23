@@ -4,6 +4,8 @@ import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100msli
 import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
+  selectIsLocalVideoEnabled,
+  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -12,17 +14,20 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
+  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
+  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
   RecordIcon,
   SettingsIcon,
+  VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
@@ -47,12 +52,12 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../../AppData/useUISettings';
+import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream, useRecordingHandler } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
@@ -86,7 +91,6 @@ export const MwebOptions = ({
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const { showPolls } = useShowPolls();
   const togglePollView = usePollViewToggle();
@@ -98,7 +102,13 @@ export const MwebOptions = ({
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
+  const { startRecording, isRecordingLoading } = useRecordingHandler();
 
+  const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
+
+  const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -183,8 +193,22 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
+            {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setIsCaptionEnabled(!isCaptionEnabled);
+                }}
+              >
+                {isCaptionEnabled ? (
+                  <ClosedCaptionIcon width="20" height="20px" />
+                ) : (
+                  <OpenCaptionIcon width="20" height="20px" />
+                )}
+                <ActionTile.Title>{isCaptionEnabled ? 'Hide Captions' : 'Captions Disabled'}</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
 
-            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
+            {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
                   toggleVB();
@@ -194,7 +218,7 @@ export const MwebOptions = ({
                 <VirtualBackgroundIcon />
                 <ActionTile.Title>Virtual Background</ActionTile.Title>
               </ActionTile.Root>
-            ) : null} */}
+            ) : null}
 
             {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
@@ -256,29 +280,8 @@ export const MwebOptions = ({
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setIsRecordingLoading(true);
-                    try {
-                      await hmsActions.startRTMPOrRecording({
-                        record: true,
-                      });
-                      setOpenOptionsSheet(false);
-                      setIsRecordingLoading(false);
-                    } catch (error) {
-                      // @ts-ignore
-                      if (error.message.includes('stream already running')) {
-                        ToastManager.addToast({
-                          title: 'Recording already running',
-                          variant: 'error',
-                        });
-                      } else {
-                        ToastManager.addToast({
-                          // @ts-ignore
-                          title: error.message,
-                          variant: 'error',
-                        });
-                      }
-                      setIsRecordingLoading(false);
-                    }
+                    await startRecording();
+                    setOpenOptionsSheet(false);
                   }
                   if (isHLSRunning) {
                     setOpenOptionsSheet(false);

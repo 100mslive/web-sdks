@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
-import { getPercentage } from './utils';
+import { getDuration, getPercentage } from './utils';
 
 export const VideoProgress = ({
   seekProgress,
@@ -19,7 +19,7 @@ export const VideoProgress = ({
     if (!videoEl) {
       return;
     }
-    const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
+    const duration = getDuration(videoEl);
     const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
     let bufferProgress = 0;
     if (videoEl.buffered.length > 0) {
@@ -42,6 +42,7 @@ export const VideoProgress = ({
     if (!videoEl) {
       return;
     }
+    setProgress();
     videoEl.addEventListener('timeupdate', timeupdateHandler);
     return function cleanup() {
       videoEl?.removeEventListener('timeupdate', timeupdateHandler);

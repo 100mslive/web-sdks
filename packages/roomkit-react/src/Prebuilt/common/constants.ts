@@ -47,6 +47,8 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   sheet: 'sheet',
+  caption: 'caption',
+  loadingEffects: 'loadingEffects',
 };
 
 export const UI_SETTINGS = {
@@ -117,7 +119,6 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
-  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {

@@ -61,6 +61,14 @@ export enum HMSStreamingState {
   FAILED = 'failed',
 }
 
+export enum HMSTranscriptionState {
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+export enum HMSTranscriptionMode {
+  CAPTION = 'caption',
+}
 interface PluginPermissions {
   permissions?: {
     // list of roles
@@ -122,6 +130,11 @@ export interface PeerNotification {
   is_from_room_state?: boolean;
 }
 
+export interface TranscriptionNotification {
+  state?: HMSTranscriptionState;
+  mode?: HMSTranscriptionMode;
+}
+
 export interface RoomState {
   name: string;
   session_id?: string;
@@ -153,6 +166,7 @@ export interface RoomState {
     rtmp: { enabled: boolean; started_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
+  transcriptions?: TranscriptionNotification[];
 }
 
 export interface PeerListNotification {
@@ -285,7 +299,11 @@ export enum HLSPlaylistType {
   DVR = 'dvr',
   NO_DVR = 'no-dvr',
 }
-
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
@@ -294,6 +312,7 @@ export interface HLSVariantInfo {
   started_at?: number;
   initialised_at?: number;
   state?: HMSStreamingState;
+  stream_type?: HLSStreamType;
 }
 
 export interface MetadataChangeNotification {

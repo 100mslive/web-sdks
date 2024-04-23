@@ -13,6 +13,7 @@ import {
 import { Tooltip } from '../Tooltip';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
+import { useQoE } from './useQoE';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
@@ -33,6 +34,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
   const videoTrackStats = isLocal ? localVideoTrackStats?.[0] : remoteVideoTrackStats;
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   const availableOutgoingBitrate = useHMSStatsStore(selectHMSStats.availablePublishBitrate);
+  const qoe = useQoE({ videoTrackID, audioTrackID, isLocal });
 
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
@@ -87,6 +89,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             </Fragment>
           ) : (
             <Fragment>
+              <StatsRow show={isNotNullish(qoe)} label="QoE" value={qoe} />
               <StatsRow
                 show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
                 label="Width"

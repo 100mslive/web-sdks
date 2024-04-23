@@ -549,7 +549,13 @@ const HLSView = () => {
                   justify="between"
                   css={{
                     position: 'absolute',
-                    bg: '#00000066',
+                    bg: `${
+                      hoverControlsVisible.pausePlay ||
+                      hoverControlsVisible.seekBackward ||
+                      hoverControlsVisible.seekForward
+                        ? '#00000066'
+                        : ''
+                    }`,
                     display: 'inline-flex',
                     gap: '$2',
                     zIndex: 1,

@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -11,7 +10,6 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
@@ -64,11 +62,14 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.loadingEffects]: false,
   [APP_DATA.background]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
+  // by default off, so it will not appear in beam bots
+  [APP_DATA.caption]: false,
 };
 
 export const AppData = React.memo(() => {
@@ -77,7 +78,6 @@ export const AppData = React.memo(() => {
   const appData = useHMSStore(selectFullAppData);
   const { elements } = useRoomLayoutConferencingScreen();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const isMobile = useMedia(cssConfig.media.md);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
 
@@ -123,12 +123,12 @@ export const AppData = React.memo(() => {
   }, [preferences.subscribedNotifications, hmsActions]);
 
   useEffect(() => {
-    if (defaultMediaURL && !sidepaneOpenedRef.current && !isMobile && isLocalVideoEnabled) {
+    if (defaultMediaURL && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
       sidepaneOpenedRef.current = true;
       toggleVB();
     }
-  }, [hmsActions, toggleVB, isLocalVideoEnabled, isMobile, defaultMediaURL]);
+  }, [hmsActions, toggleVB, isLocalVideoEnabled, defaultMediaURL]);
 
   return <ResetStreamingStart />;
 });

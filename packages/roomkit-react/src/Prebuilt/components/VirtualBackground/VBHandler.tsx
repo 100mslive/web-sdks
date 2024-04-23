@@ -4,12 +4,12 @@ export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: HMSEffectsPlugin | undefined;
 
-  initialisePlugin = (effectsSDKKey?: string) => {
+  initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {
       return;
     }
     if (effectsSDKKey) {
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey);
+      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
@@ -70,7 +70,7 @@ export class VBPlugin {
     }
   };
 
-  setPreset = async (preset: string) => {
+  setPreset = async (preset: 'quality' | 'balanced') => {
     if (this.effectsPlugin) {
       await this.effectsPlugin.setPreset(preset);
     }
