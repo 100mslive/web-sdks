@@ -88,6 +88,7 @@ import {
   selectTracksMap,
   selectVideoTrackByID,
 } from '../selectors';
+import { getPeerRequestParams } from '../signal/interfaces';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -600,6 +601,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
   async lowerRemotePeerHand(peerId: string) {
     await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
+  async getPeer(peerId: getPeerRequestParams) {
+    const peer = await this.sdk.getPeer(peerId);
+    if (peer) {
+      return SDKToHMS.convertPeer(peer) as HMSPeer;
+    }
+    return undefined;
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
