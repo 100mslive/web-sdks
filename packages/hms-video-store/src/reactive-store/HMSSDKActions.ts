@@ -606,7 +606,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   async getPeer(peerId: getPeerRequestParams) {
     const peer = await this.sdk.getPeer(peerId);
     const hmsPeer = SDKToHMS.convertPeer(peer) as HMSPeer;
-    hmsPeer.id = peerId.toString();
     return hmsPeer;
   }
 
