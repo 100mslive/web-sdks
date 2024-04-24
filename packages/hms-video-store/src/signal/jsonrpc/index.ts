@@ -372,7 +372,7 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { ...params });
   }
 
-  async getPeer(params: getPeerRequestParams): Promise<PeerNotificationInfo> {
+  async getPeer(params: getPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
     return await this.call(HMSSignalMethod.GET_PEER, { ...params });
   }
 

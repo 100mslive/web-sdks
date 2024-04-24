@@ -731,7 +731,10 @@ export class HMSSdk implements HMSInterface {
 
   async getPeer(peerID: getPeerRequestParams) {
     const response = await this.transport.signal.getPeer(peerID);
-    return createRemotePeer(response, this.store);
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
