@@ -164,7 +164,6 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    await this.autoSelectAudioOutput();
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -197,6 +196,11 @@ export class AudioSinkManager {
   };
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+    // this means the initial load
+    if (!event.selection) {
+      HMSLogger.d(this.TAG, 'device change called');
+      this.autoSelectAudioOutput();
+    }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
@@ -286,8 +290,7 @@ export class AudioSinkManager {
    */
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
-    if (!this.audioSink?.children.length) {
-      HMSLogger.d(this.TAG, 'No remote audio added yet');
+    if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
     let bluetoothDevice: InputDeviceInfo | null = null;
