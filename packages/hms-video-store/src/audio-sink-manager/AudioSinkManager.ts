@@ -164,7 +164,6 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    await this.autoSelectAudioOutput();
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -197,6 +196,10 @@ export class AudioSinkManager {
   };
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+    // this means the initial load
+    if (!event.selection) {
+      this.autoSelectAudioOutput();
+    }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
@@ -276,7 +279,6 @@ export class AudioSinkManager {
     this.timer = setInterval(() => {
       (async () => {
         await this.deviceManager.init(true, false);
-        await this.autoSelectAudioOutput();
       })();
     }, 5000);
   };
