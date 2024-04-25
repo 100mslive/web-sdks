@@ -289,8 +289,7 @@ export class AudioSinkManager {
    */
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
-    if (!this.audioSink?.children.length) {
-      HMSLogger.d(this.TAG, 'No remote audio added yet');
+    if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
     let bluetoothDevice: InputDeviceInfo | null = null;
