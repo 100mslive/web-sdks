@@ -198,7 +198,7 @@ export class AudioSinkManager {
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // this means the initial load
     if (!event.selection) {
-      console.log('device change called');
+      HMSLogger.d(this.TAG, 'device change called');
       this.autoSelectAudioOutput();
     }
     // if there is no selection that means this is an init request. No need to do anything
