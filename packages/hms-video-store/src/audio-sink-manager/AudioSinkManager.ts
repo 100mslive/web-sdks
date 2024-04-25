@@ -280,6 +280,7 @@ export class AudioSinkManager {
     this.timer = setInterval(() => {
       (async () => {
         await this.deviceManager.init(true, false);
+        await this.autoSelectAudioOutput();
       })();
     }, 5000);
   };
