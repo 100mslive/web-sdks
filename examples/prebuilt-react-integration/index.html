@@ -5,16 +5,27 @@
     <link rel="icon" href="./favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>100ms Prebuilt Integration</title>
+    <script>
+      function delayPageLoad() {
+        setTimeout(function () {
+          showPage();
+        }, 60000); // 5000 milliseconds = 5 seconds
+      }
+
+      function showPage() {
+        document.getElementById('body').style.display = 'block';
+      }
+
+      window.onload = delayPageLoad;
+    </script>
+    <style>
+      body {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      window.onload = function () {
-        setTimeout(function () {
-          //Your function here
-        }, 5000);
-      };
-    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
