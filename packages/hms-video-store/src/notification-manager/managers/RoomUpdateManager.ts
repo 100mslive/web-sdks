@@ -7,6 +7,7 @@ import {
   HMSHLSRecording,
   HMSRoomUpdate,
   HMSSFURecording,
+  HMSTranscriptionInfo,
   HMSUpdateListener,
 } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';
@@ -26,6 +27,7 @@ import {
   RoomState,
   RTMPNotification,
   SessionInfo,
+  TranscriptionNotification,
 } from '../HMSNotifications';
 
 export class RoomUpdateManager {
@@ -93,7 +95,7 @@ export class RoomUpdateManager {
   }
 
   private onRoomState(roomNotification: RoomState) {
-    const { recording, streaming, session_id, started_at, name } = roomNotification;
+    const { recording, streaming, transcriptions, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     if (!room) {
       HMSLogger.w(this.TAG, 'on room state - room not present');
@@ -112,11 +114,24 @@ export class RoomUpdateManager {
 
     room.hls = this.convertHls(streaming?.hls);
 
+    room.transcriptions = this.addTranscriptionDetail(transcriptions);
+
     room.sessionId = session_id;
     room.startedAt = convertDateNumToDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
+  private addTranscriptionDetail(transcriptions?: TranscriptionNotification[]): HMSTranscriptionInfo[] {
+    if (!transcriptions) {
+      return [];
+    }
+    return transcriptions.map((transcription: TranscriptionNotification) => {
+      return {
+        state: transcription.state,
+        mode: transcription.mode,
+      };
+    });
+  }
   private isRecordingRunning(state?: HMSRecordingState): boolean {
     if (!state) {
       return false;
@@ -149,11 +164,24 @@ export class RoomUpdateManager {
     if (!notification?.variants) {
       return hls;
     }
-    notification.variants.forEach((_: HLSVariant, index: number) => {
-      hls.variants.push({
-        initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
-        url: '',
-      });
+    notification.variants.forEach((variant: HLSVariant, index: number) => {
+      if (variant.state !== HMSStreamingState.INITIALISED) {
+        hls.variants.push({
+          meetingURL: variant?.meetingURL,
+          url: variant?.url,
+          metadata: variant?.metadata,
+          playlist_type: variant?.playlist_type,
+          startedAt: convertDateNumToDate(notification?.variants?.[index].started_at),
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          state: variant.state,
+          stream_type: variant?.stream_type,
+        });
+      } else {
+        hls.variants.push({
+          initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+          url: '',
+        });
+      }
     });
     return hls;
   }
@@ -161,7 +189,7 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     const running =
       notification.variants && notification.variants.length > 0
-        ? this.isStreamingRunning(notification.variants[0].state)
+        ? notification.variants.some(variant => this.isStreamingRunning(variant.state))
         : false;
     if (!room) {
       HMSLogger.w(this.TAG, 'on hls - room not present');
@@ -175,7 +203,7 @@ export class RoomUpdateManager {
   private convertHls(hlsNotification?: HLSNotification) {
     const isInitialised =
       hlsNotification?.variants && hlsNotification.variants.length > 0
-        ? hlsNotification.variants[0].state === HMSStreamingState.INITIALISED
+        ? hlsNotification.variants.some(variant => variant.state === HMSStreamingState.INITIALISED)
         : false;
     // handling for initialized state
     if (isInitialised) {
@@ -195,6 +223,7 @@ export class RoomUpdateManager {
         startedAt: convertDateNumToDate(variant?.started_at),
         initialisedAt: convertDateNumToDate(variant?.initialised_at),
         state: variant.state,
+        stream_type: variant?.stream_type,
       });
     });
     return hls;

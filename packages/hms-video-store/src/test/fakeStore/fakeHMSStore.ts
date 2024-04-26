@@ -81,6 +81,7 @@ export const makeFakeStore = (): HMSStore => {
         variants: [],
       },
       sessionId: '',
+      transcriptions: [],
     },
     appData: {
       isAudioOnly: true,

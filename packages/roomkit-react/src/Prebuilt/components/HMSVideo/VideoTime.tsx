@@ -1,30 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import { Text } from '../../../Text';
 import { useHMSPlayerContext } from './PlayerContext';
-import { getDurationFromSeconds } from './utils';
+import { getDuration, getDurationFromSeconds } from './utils';
 
 export const VideoTime = () => {
   const { hlsPlayer } = useHMSPlayerContext();
-  const [videoTime, setVideoTime] = useState('');
 
-  useEffect(() => {
-    const timeupdateHandler = (currentTime: number) => {
+  const [videoTime, setVideoTime] = useState(getDurationFromSeconds(0));
+
+  const updateTime = useCallback(
+    (currentTime: number) => {
       const videoEl = hlsPlayer?.getVideoElement();
       if (videoEl) {
-        const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable.end(0) || 0;
+        const duration = getDuration(videoEl);
         setVideoTime(getDurationFromSeconds(duration - currentTime));
       } else {
         setVideoTime(getDurationFromSeconds(currentTime));
       }
+    },
+    [hlsPlayer],
+  );
+  useEffect(() => {
+    const timeupdateHandler = (currentTime: number) => {
+      updateTime(currentTime);
     };
     if (hlsPlayer) {
       hlsPlayer.on(HMSHLSPlayerEvents.CURRENT_TIME, timeupdateHandler);
+      const videoEl = hlsPlayer?.getVideoElement();
+      updateTime(videoEl.currentTime);
     }
     return function cleanup() {
       hlsPlayer?.off(HMSHLSPlayerEvents.CURRENT_TIME, timeupdateHandler);
     };
-  }, [hlsPlayer]);
+  }, [hlsPlayer, updateTime]);
 
   return hlsPlayer ? (
     <Text

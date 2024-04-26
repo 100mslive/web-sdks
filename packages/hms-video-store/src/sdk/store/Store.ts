@@ -375,6 +375,10 @@ class Store {
     this.whiteboards.set(whiteboard.id, whiteboard);
   }
 
+  getWhiteboards() {
+    return this.whiteboards;
+  }
+
   getWhiteboard(id?: string): HMSWhiteboard | undefined {
     return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
   }
