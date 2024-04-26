@@ -66,6 +66,7 @@ import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  getPeerRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
@@ -233,6 +234,10 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
   }
 
   getTemplateAppData() {
@@ -722,6 +727,14 @@ export class HMSSdk implements HMSInterface {
     }
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
+  }
+
+  async getPeer(peerID: getPeerRequestParams) {
+    const response = await this.transport.signal.getPeer(peerID);
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {

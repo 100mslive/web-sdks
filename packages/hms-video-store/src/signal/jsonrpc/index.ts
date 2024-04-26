@@ -5,7 +5,7 @@ import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
-import { SendMessage } from '../../notification-manager';
+import { PeerNotificationInfo, SendMessage } from '../../notification-manager';
 import {
   DEFAULT_SIGNAL_PING_INTERVAL,
   DEFAULT_SIGNAL_PING_TIMEOUT,
@@ -372,8 +372,8 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { ...params });
   }
 
-  async getPeer(params: getPeerRequestParams) {
-    await this.call(HMSSignalMethod.GET_PEER, { ...params });
+  async getPeer(params: getPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
+    return await this.call(HMSSignalMethod.GET_PEER, { ...params });
   }
 
   async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
