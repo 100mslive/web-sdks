@@ -119,6 +119,12 @@ const Wrapper = styled('div', {
   ],
 });
 
+const optionalComponents = [
+  { key: 'chat', view: SIDE_PANE_OPTIONS.CHAT },
+  { key: 'participant_list', view: SIDE_PANE_OPTIONS.PARTICIPANTS },
+  { key: 'virtual_background', view: SIDE_PANE_OPTIONS.VB },
+];
+
 const SidePane = ({
   tileProps,
   hideControls = false,
@@ -144,10 +150,15 @@ const SidePane = ({
   const resetSidePane = useSidepaneReset();
 
   useEffect(() => {
+    optionalComponents.forEach(pane => {
+      if (sidepane === pane.view && !elements?.[pane.key as keyof typeof elements]) {
+        resetSidePane();
+      }
+    });
     return () => {
       resetSidePane();
     };
-  }, [resetSidePane]);
+  }, [elements, resetSidePane, sidepane]);
 
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
