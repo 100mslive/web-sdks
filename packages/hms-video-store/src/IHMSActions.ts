@@ -1,4 +1,3 @@
-import { HMSPeer } from './sdk/models/peer';
 import { getPeerRequestParams } from './signal/interfaces';
 import {
   HLSConfig,
@@ -26,6 +25,7 @@ import {
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
+  HMSPeer,
   HMSPeerID,
   HMSPeerListIterator,
   HMSPeerListIteratorOptions,
