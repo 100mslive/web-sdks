@@ -20,7 +20,7 @@ const config = {
   ],
   plugins: [
     commonjs(),
-    css({ inject: true }),
+    css({ output: 'index.css' }),
     esbuild({ format: 'esm' }),
     resolve(),
     isProduction && terser(),

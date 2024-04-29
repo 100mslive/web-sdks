@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Editor, Tldraw } from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
-import '@tldraw/tldraw/tldraw.css';
 import './index.css';
 
 export interface WhiteboardProps {
