@@ -515,7 +515,7 @@ export class HMSSdk implements HMSInterface {
   // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     console.log('join called before delay');
-    await this.wait(60000);
+    await this.wait(55000);
     console.log('join after delay');
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
