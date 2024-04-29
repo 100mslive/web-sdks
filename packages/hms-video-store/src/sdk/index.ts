@@ -507,8 +507,16 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  private async wait(time: number) {
+    return new Promise((resolve, _) => {
+      setTimeout(resolve, time);
+    });
+  }
   // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
+    console.log('join called before delay');
+    await this.wait(5000);
+    console.log('join after delay');
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
 
