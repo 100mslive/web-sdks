@@ -148,6 +148,9 @@ const SidePane = ({
     : elements?.virtual_background?.background_media || [];
 
   const resetSidePane = useSidepaneReset();
+  const dependencies = optionalComponents.map(
+    optionalComponent => elements?.[optionalComponent.key as keyof typeof elements],
+  );
 
   useEffect(() => {
     optionalComponents.forEach(pane => {
@@ -155,10 +158,8 @@ const SidePane = ({
         resetSidePane();
       }
     });
-    return () => {
-      resetSidePane();
-    };
-  }, [elements, resetSidePane, sidepane]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dependencies, elements, resetSidePane, sidepane]);
 
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
@@ -210,7 +211,7 @@ const SidePane = ({
       return null;
     });
 
-  if (!trackId && !SidepaneComponent) {
+  if (!SidepaneComponent) {
     return null;
   }
 
