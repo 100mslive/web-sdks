@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePDFShare } from '@100mslive/react-sdk';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Box } from '../../Layout';
@@ -11,18 +11,28 @@ import { usePDFConfig, useResetPDFConfig } from '../components/AppData/useUISett
 export const PDFView = () => {
   const pdfConfig = usePDFConfig();
   const resetConfig = useResetPDFConfig();
-
+  const [isPDFShared, setIsPDFShared] = useState(true);
   // need to send resetConfig to clear configuration, if stop screenshare occurs.
   const { iframeRef, startPDFShare, isPDFShareInProgress } = usePDFShare(resetConfig);
 
+  useEffect(() => {
+    // no working in other useEffect, as return is called multiple time on state change
+    return () => {
+      if (isPDFShared) {
+        resetConfig();
+      }
+    };
+  }, [isPDFShared]);
   useEffect(() => {
     (async () => {
       try {
         if (!isPDFShareInProgress && pdfConfig) {
           await startPDFShare(pdfConfig);
+          setIsPDFShared(true);
         }
       } catch (err) {
         resetConfig();
+        setIsPDFShared(false);
         ToastManager.addToast({
           title: `Error while sharing annotator ${err.message || ''}`,
           variant: 'error',
