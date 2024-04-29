@@ -45,7 +45,7 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, ha
   // Handles final peer leaving from the last page
   useEffect(() => {
     if (peers.length > 0 && !pagesWithTiles[page]?.length) {
-      setPage(0);
+      setPage(Math.max(0, page - 1));
     }
   }, [peers, page, pagesWithTiles]);
 
