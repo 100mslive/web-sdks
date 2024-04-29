@@ -93,7 +93,10 @@ export class DeviceManager implements HMSDeviceManager {
     !this.initialized && navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     this.initialized = true;
     await this.enumerateDevices();
-    await this.updateToActualDefaultDevice();
+    // do it only on initial load.
+    if (!force) {
+      await this.updateToActualDefaultDevice();
+    }
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
