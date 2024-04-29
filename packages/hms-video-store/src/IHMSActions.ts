@@ -1,4 +1,3 @@
-import { getPeerRequestParams } from './signal/interfaces';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -548,7 +547,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
-  getPeer(peerId: getPeerRequestParams): Promise<HMSPeer | undefined>;
+  getPeer(peerId: string): Promise<HMSPeer | undefined>;
   /**
    * Method to override the default settings for playlist tracks
    * @param {HMSPlaylistSettings} settings

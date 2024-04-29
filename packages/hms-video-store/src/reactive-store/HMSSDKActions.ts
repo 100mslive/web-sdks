@@ -88,9 +88,6 @@ import {
   selectTracksMap,
   selectVideoTrackByID,
 } from '../selectors';
-import { getPeerRequestParams } from '../signal/interfaces';
-
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -603,8 +600,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
-  async getPeer(peerId: getPeerRequestParams) {
+  async getPeer(peerId: string) {
     const peer = await this.sdk.getPeer(peerId);
+    console.log('ollo', { peer });
     if (peer) {
       return SDKToHMS.convertPeer(peer) as HMSPeer;
     }
