@@ -730,7 +730,6 @@ export class HMSSdk implements HMSInterface {
 
   async getPeer(peerId: string) {
     const response = await this.transport.signal.getPeer({ peer_id: peerId });
-    console.log('ollo', { peerId, response });
     if (response) {
       return createRemotePeer(response, this.store);
     }
