@@ -1,50 +1,53 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
-import { Checkbox } from '../../Checkbox';
 import { Dropdown } from '../../Dropdown';
-import { Label } from '../../Label';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
+// @ts-ignore
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
-import { textEllipsis } from '../../utils';
 
-const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
-  <Text
-    {...rest}
-    ref={ref}
-    as="strong"
-    variant="body2"
-    css={{
-      ...textEllipsis(maxWidth),
-      display: 'inline-block',
-      fontWeight: '$semiBold',
-      c: 'inherit',
-    }}
-  >
-    {children}
-  </Text>
-));
+const HighlightTerm = ({ value }: { value: string | undefined }) => {
+  return value ? (
+    <Tooltip side="top" title={value}>
+      <Text
+        variant="body2"
+        css={{
+          color: '$on_surface_medium',
+          fontWeight: '$semiBold',
+        }}
+      >
+        '{value.slice(0, 100)}
+        {value.length > 100 ? '...' : ''}'
+      </Text>
+    </Tooltip>
+  ) : (
+    <></>
+  );
+};
 
-export const RoleChangeModal = ({ peerId, onOpenChange }) => {
+export const RoleChangeModal = ({
+  peerId,
+  onOpenChange,
+}: {
+  peerId: string;
+  onOpenChange: (open: boolean) => void;
+}) => {
   const peer = useHMSStore(selectPeerByID(peerId));
   const roles = useFilteredRoles();
-  const [selectedRole, setRole] = useState(peer?.roleName);
-  const [requestPermission, setRequestPermission] = useState(true);
+  const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
-  const [peerNameRef, setPeerNameRef] = useState();
-  const ref = useRef();
+
   if (!peer) {
     return null;
   }
 
-  const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -52,7 +55,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
         <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
           <Dialog.Title css={{ p: 0 }} asChild>
             <Text as="h6" variant="h6">
-              Change Role
+              Switch Role
             </Text>
           </Dialog.Title>
           <Dialog.Description asChild>
@@ -67,19 +70,9 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                 columnGap: '4px',
               }}
             >
-              Change the role of
-              {peerNameRef && peerNameRef.clientWidth === peerNameMaxWidth ? (
-                <Tooltip title={peer.name} side="top">
-                  <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
-                    {peer.name}
-                  </PeerName>
-                </Tooltip>
-              ) : (
-                <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
-                  {peer.name}
-                </PeerName>
-              )}
-              to
+              Switch the role of
+              <HighlightTerm value={peer.name} />
+              from <HighlightTerm value={peer.roleName} />
             </Text>
           </Dialog.Description>
           <Flex
@@ -102,11 +95,10 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                   asChild
                   css={{
                     border: '1px solid $border_bright',
-                    bg: '$surface_bright',
+                    bg: '$surface_default',
                     r: '$1',
                     p: '$6 $9',
                   }}
-                  ref={ref}
                 >
                   <Flex align="center" justify="between" css={{ width: '100%' }}>
                     <Text>{selectedRole}</Text>
@@ -114,11 +106,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                   </Flex>
                 </Dropdown.Trigger>
                 <Dropdown.Portal>
-                  <Dropdown.Content
-                    align="start"
-                    sideOffset={8}
-                    css={{ zIndex: 1000, width: ref.current?.clientWidth }}
-                  >
+                  <Dropdown.Content align="start" sideOffset={8} css={{ zIndex: 1000 }}>
                     {roles.map(role => {
                       return (
                         <Dropdown.Item
@@ -139,44 +127,30 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
               </Dropdown.Root>
             </Box>
           </Flex>
-          {!peer.isLocal && (
-            <Flex justify="between" css={{ w: '100%', mb: '$10' }}>
-              <Label htmlFor="requestRoleChangePermission" css={{ cursor: 'pointer' }}>
-                Request Permission
-              </Label>
-              <Checkbox.Root
-                checked={requestPermission}
-                onCheckedChange={value => setRequestPermission(value)}
-                id="requestRoleChangePermission"
-                data-testid="force_role_change_checkbox"
-              >
-                <Checkbox.Indicator>
-                  <CheckIcon width={16} height={16} />
-                </Checkbox.Indicator>
-              </Checkbox.Root>
-            </Flex>
-          )}
           <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
-            <Box css={{ width: '50%' }}>
-              <Dialog.Close css={{ width: '100%', p: '$4 $8' }} asChild>
-                <Button variant="standard" outlined css={{ width: '100%' }} data-testid="cancel_button">
-                  Cancel
-                </Button>
-              </Dialog.Close>
-            </Box>
-            <Box css={{ width: '50%' }}>
-              <Button
-                data-testid="change_button"
-                variant="primary"
-                css={{ width: '100%' }}
-                onClick={async () => {
-                  await hmsActions.changeRoleOfPeer(peerId, selectedRole, peer.isLocal ? true : !requestPermission);
+            <Button
+              variant="standard"
+              outlined
+              css={{ width: '100%' }}
+              onClick={() => setOpen(false)}
+              data-testid="cancel_button"
+            >
+              Cancel
+            </Button>
+
+            <Button
+              data-testid="change_button"
+              variant="primary"
+              css={{ width: '100%' }}
+              onClick={async () => {
+                if (selectedRole) {
+                  await hmsActions.changeRoleOfPeer(peerId, selectedRole, true);
                   onOpenChange(false);
-                }}
-              >
-                Change
-              </Button>
-            </Box>
+                }
+              }}
+            >
+              Switch Role
+            </Button>
           </Flex>
         </Dialog.Content>
       </Dialog.Portal>

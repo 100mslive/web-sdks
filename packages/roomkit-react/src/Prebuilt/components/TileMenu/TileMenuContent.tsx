@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSException,
@@ -17,6 +17,7 @@ import {
   MicOffIcon,
   MicOnIcon,
   PencilIcon,
+  PersonSettingsIcon,
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
@@ -32,6 +33,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { useHMSPrebuiltContext } from '../../AppContext';
+import { RoleChangeModal } from '../RoleChangeModal';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
@@ -238,7 +240,9 @@ export const TileMenuContent = ({
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
-  const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
+  const permissions = useHMSStore(selectPermissions);
+  const canChangeRole = !!permissions?.changeRole;
+  const removeOthers = !!permissions?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
@@ -251,6 +255,7 @@ export const TileMenuContent = ({
   });
 
   const isMobile = useMedia(cssConfig.media.md);
+  const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
 
   if (isLocal) {
     return showPinAction || canMinimise || !userName || showSpotlight ? (
@@ -290,6 +295,21 @@ export const TileMenuContent = ({
         >
           {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
           <span>{isVideoEnabled ? 'Mute Video' : 'Request to Unmute Video'}</span>
+        </StyledMenuTile.ItemButton>
+      ) : null}
+
+      {canChangeRole ? (
+        <StyledMenuTile.ItemButton
+          className={dragClassName}
+          css={spacingCSS}
+          onClick={() => {
+            closeSheetOnClick();
+            setOpenRoleChangeModal(true);
+          }}
+          data-testid="change_role_btn"
+        >
+          <PersonSettingsIcon height={20} width={20} />
+          <span>Switch Role</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 
@@ -364,6 +384,7 @@ export const TileMenuContent = ({
           <span>Stop Screenshare</span>
         </StyledMenuTile.RemoveItem>
       ) : null}
+      {openRoleChangeModal && <RoleChangeModal peerId={peerID} onOpenChange={setOpenRoleChangeModal} />}
     </>
   );
 };
