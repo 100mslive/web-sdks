@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSException,
@@ -33,7 +33,6 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { useHMSPrebuiltContext } from '../../AppContext';
-import { RoleChangeModal } from '../RoleChangeModal';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
@@ -226,6 +225,9 @@ export const TileMenuContent = ({
   openNameChangeModal = () => {
     return;
   },
+  openRoleChangeModal = () => {
+    return;
+  },
 }: {
   videoTrackID: string;
   audioTrackID: string;
@@ -237,6 +239,7 @@ export const TileMenuContent = ({
   canMinimise?: boolean;
   closeSheetOnClick?: () => void;
   openNameChangeModal?: () => void;
+  openRoleChangeModal?: () => void;
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
@@ -255,7 +258,6 @@ export const TileMenuContent = ({
   });
 
   const isMobile = useMedia(cssConfig.media.md);
-  const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
 
   if (isLocal) {
     return showPinAction || canMinimise || !userName || showSpotlight ? (
@@ -298,21 +300,6 @@ export const TileMenuContent = ({
         </StyledMenuTile.ItemButton>
       ) : null}
 
-      {canChangeRole ? (
-        <StyledMenuTile.ItemButton
-          className={dragClassName}
-          css={spacingCSS}
-          onClick={() => {
-            closeSheetOnClick();
-            setOpenRoleChangeModal(true);
-          }}
-          data-testid="change_role_btn"
-        >
-          <PersonSettingsIcon height={20} width={20} />
-          <span>Switch Role</span>
-        </StyledMenuTile.ItemButton>
-      ) : null}
-
       {toggleAudio ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
@@ -325,6 +312,21 @@ export const TileMenuContent = ({
         >
           {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
           <span>{isAudioEnabled ? 'Mute Audio' : 'Request to Unmute Audio'}</span>
+        </StyledMenuTile.ItemButton>
+      ) : null}
+
+      {canChangeRole ? (
+        <StyledMenuTile.ItemButton
+          className={dragClassName}
+          css={spacingCSS}
+          onClick={() => {
+            openRoleChangeModal();
+            closeSheetOnClick();
+          }}
+          data-testid="change_role_btn"
+        >
+          <PersonSettingsIcon height={20} width={20} />
+          <span>Switch Role</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 
@@ -384,7 +386,6 @@ export const TileMenuContent = ({
           <span>Stop Screenshare</span>
         </StyledMenuTile.RemoveItem>
       ) : null}
-      {openRoleChangeModal && <RoleChangeModal peerId={peerID} onOpenChange={setOpenRoleChangeModal} />}
     </>
   );
 };

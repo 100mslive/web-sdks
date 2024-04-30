@@ -17,6 +17,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig, useTheme } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
+import { RoleChangeModal } from '../RoleChangeModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { getDragClassName } from './utils';
@@ -56,6 +57,7 @@ const TileMenu = ({
   const isMobile = useMedia(cssConfig.media.md);
   const peer = useHMSStore(selectPeerByID(peerID));
   const [showNameChangeModal, setShowNameChangeModal] = useState(false);
+  const [showRoleChangeModal, setShowRoleChangeModal] = useState(false);
   useDropdownList({ open, name: 'TileMenu' });
   const dragClassName = getDragClassName();
 
@@ -64,6 +66,7 @@ const TileMenu = ({
   }
 
   const openNameChangeModal = () => setShowNameChangeModal(true);
+  const openRoleChangeModal = () => setShowRoleChangeModal(true);
 
   const props = {
     isLocal,
@@ -76,6 +79,7 @@ const TileMenu = ({
     showPinAction,
     canMinimise,
     openNameChangeModal,
+    openRoleChangeModal,
   };
 
   return (
@@ -133,6 +137,7 @@ const TileMenu = ({
         )}
       </StyledMenuTile.Root>
       {showNameChangeModal && <ChangeNameModal onOpenChange={setShowNameChangeModal} />}
+      {showRoleChangeModal && <RoleChangeModal peerId={peerID} onOpenChange={setShowRoleChangeModal} />}
     </>
   );
 };
