@@ -119,12 +119,10 @@ export function FlyingEmoji() {
                 emoji.wiggleType === 0 ? wiggleLeftRight() : wiggleRightLeft()
               } 1s ease-in-out infinite alternate`,
             }}
-            onAnimationEnd={() => {
-              setEmojis(emojis.filter(item => item.id !== emoji.id));
-            }}
+            onAnimationEnd={() => setEmojis(emojis.filter(item => item.id !== emoji.id))}
           >
             <Box>
-              <em-emoji id={emoji.emojiId} size="48px" set="apple"></em-emoji>
+              <em-emoji id={emoji.emojiId} size="48px" set="apple" />
             </Box>
             {emoji.senderName ? (
               <Box
