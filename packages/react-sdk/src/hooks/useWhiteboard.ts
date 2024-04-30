@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   selectAppData,
   selectIsConnectedToRoom,
@@ -19,18 +19,6 @@ export const useWhiteboard = (isMobile = false) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const permissions = useHMSStore(selectPermissions)?.whiteboard;
   const isAdmin = !!permissions?.includes('admin');
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
-  useEffect(() => {
-    if (!whiteboard?.open || !whiteboard?.url || !iframeRef.current) {
-      return;
-    }
-    const url = new URL(whiteboard.url);
-    if (isHeadless || isMobile) {
-      url.searchParams.set('zoom_to_content', 'true');
-    }
-    iframeRef.current.src = url.toString();
-  }, [whiteboard?.open, whiteboard?.url, isHeadless, isMobile]);
 
   useEffect(() => {
     if (isConnected) {
@@ -52,9 +40,11 @@ export const useWhiteboard = (isMobile = false) => {
 
   return {
     open,
+    token: whiteboard?.token,
+    endpoint: whiteboard?.addr,
     isOwner,
     isAdmin,
-    iframeRef,
+    zoomToContent: isHeadless || isMobile,
     toggle: isEnabled && isAdmin ? toggle : undefined,
   };
 };

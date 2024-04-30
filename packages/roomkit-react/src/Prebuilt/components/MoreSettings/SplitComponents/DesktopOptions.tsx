@@ -116,10 +116,10 @@ export const DesktopOptions = ({
           ) : null}
 
           {screenType !== 'hls_live_streaming' ? (
-            <Dropdown.Item css={{ '&:empty': { display: 'none' } }}>
+            <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
               <PIP
                 content={
-                  <Flex css={{ w: '100%' }}>
+                  <Flex css={{ w: '100%', h: '100%', p: '$8' }}>
                     <PipIcon />
                     <Text variant="sm" css={{ ml: '$4' }}>
                       {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
