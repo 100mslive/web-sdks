@@ -44,6 +44,7 @@ export class WhiteboardManager {
         whiteboard.token = response.token;
         whiteboard.addr = response.addr;
         whiteboard.permissions = response.permissions;
+        whiteboard.open = response.permissions.length > 0;
       }
     }
 

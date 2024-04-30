@@ -22,7 +22,7 @@ export const useWhiteboard = (isMobile = false) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
-    if (!whiteboard?.url || !iframeRef.current) {
+    if (!whiteboard?.open || !whiteboard?.url || !iframeRef.current) {
       return;
     }
     const url = new URL(whiteboard.url);
@@ -30,7 +30,7 @@ export const useWhiteboard = (isMobile = false) => {
       url.searchParams.set('zoom_to_content', 'true');
     }
     iframeRef.current.src = url.toString();
-  }, [whiteboard?.url, isHeadless, isMobile]);
+  }, [whiteboard?.open, whiteboard?.url, isHeadless, isMobile]);
 
   useEffect(() => {
     if (isConnected) {
