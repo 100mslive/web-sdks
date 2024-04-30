@@ -43,7 +43,7 @@ const RoleChangeContent = ({
   const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | undefined>();
 
   return (
     <>
@@ -87,6 +87,7 @@ const RoleChangeContent = ({
         >
           <Dropdown.Root open={open} onOpenChange={setOpen} css={{ width: '100%' }}>
             <Dropdown.Trigger
+              // @ts-ignore
               ref={triggerRef}
               data-testid="open_role_selection_dropdown"
               asChild
