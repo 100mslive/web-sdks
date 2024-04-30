@@ -1,0 +1,75 @@
+import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
+import { Value_Type } from '../grpc/sessionstore';
+import { StoreClient } from '../grpc/sessionstore.client';
+
+interface OpenCallbacks<T> {
+  handleChange: (key: string, value?: T) => void;
+  handleError: (error: Error) => void;
+}
+
+export class SessionStore<T> {
+  private storeClient: StoreClient;
+
+  constructor(endpoint: string, token: string) {
+    const transport = new GrpcWebFetchTransport({
+      baseUrl: endpoint,
+      meta: { Authorization: `Bearer ${token}` },
+    });
+
+    this.storeClient = new StoreClient(transport);
+  }
+
+  open({ handleChange, handleError }: OpenCallbacks<T>) {
+    const call = this.storeClient.open({
+      changeId: '',
+      select: [],
+    });
+
+    call.responses.onMessage(message => {
+      if (message.value) {
+        if (message.value?.data.oneofKind === 'str') {
+          const record = JSON.parse(message.value.data.str) as T;
+          handleChange(message.key, record);
+        }
+      } else {
+        handleChange(message.key);
+      }
+    });
+
+    call.responses.onError(error => {
+      handleError(error);
+    });
+
+    call.status.then(status => {
+      console.log('SessionStoreClient open', status);
+    });
+  }
+
+  set(key: string, value?: T) {
+    const valueStr = value ? JSON.stringify(value) : undefined;
+    return this.storeClient.set({
+      key,
+      value: valueStr
+        ? {
+            data: { str: valueStr, oneofKind: 'str' },
+            type: Value_Type.STRING,
+          }
+        : {
+            data: { oneofKind: undefined },
+            type: Value_Type.NONE,
+          },
+    });
+  }
+
+  async get(key: string) {
+    const { response } = await this.storeClient.get({ key });
+
+    if (response.value?.data.oneofKind === 'str') {
+      return JSON.parse(response.value.data.str) as T;
+    }
+  }
+
+  delete(key: string) {
+    return this.storeClient.delete({ key });
+  }
+}

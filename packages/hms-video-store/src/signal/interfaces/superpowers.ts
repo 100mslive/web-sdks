@@ -82,7 +82,7 @@ export interface HLSVariant {
 }
 
 export interface getPeerRequestParams {
-  peerId: string;
+  peer_id: string;
 }
 
 export interface findPeersRequestParams {

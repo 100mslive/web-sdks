@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package sessionstorepb;
+
+option go_package = "./internal;sessionstorepb";
+
+service Api {
+  rpc Hello(HelloRequest) returns (HelloResponse) {}
+  rpc Subscribe(SubscribeRequest) returns (stream Event) {}
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string response = 1;
+}
+
+message SubscribeRequest {
+  string name = 1;
+  int64 offset = 2;
+}
+
+message Event {
+  string message = 1;
+  int64 sequence = 2;
+}
+
+// metadata token -> session id, room id, user id, username
+
+// open is used for presence
+
+// change stream will return all keys in order of oldest to newsest.
+
+// max number of keys -> 5000
+// max size per key -> 10240 Bytes
+
+service Store {
+  // open - start listening to updates in keys with provided match patterns
+  // provide change_id as last received ID to resume updates
+  rpc open(OpenRequest) returns (stream ChangeStream) {}
+
+  // get last stored value in given key
+  rpc get(GetRequest) returns (GetResponse) {}
+
+  // set key value
+  rpc set(SetRequest) returns (SetResponse) {}
+
+  // delete key from store
+  rpc delete (DeleteRequest) returns (DeleteResponse) {}
+}
+
+// define new structure for value based on client needs and add support in
+// following message
+message Value {
+  enum Type {
+    NONE = 0;
+    BYTES = 1;
+    STRING = 2;
+    INTEGER = 3;
+    FLOAT = 4;
+  }
+  Type type = 1;
+  oneof Data {
+    int64 number = 2;
+    float float = 3;
+    string str = 4;
+    bytes raw_bytes = 5;
+  }
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  string key = 1;
+  string namespace = 2;
+  Value value = 3;
+}
+
+message DeleteRequest {
+  string key = 1;
+}
+
+message DeleteResponse {}
+
+message SetRequest {
+  string key = 1;
+  Value value = 3;
+}
+
+message SetResponse {}
+
+message ChangeStream {
+  string change_id = 1;
+  string key = 2;
+  string namespace = 3;
+  Value value = 4;
+  string from_id = 5;
+}
+
+message Select {
+  oneof match {
+    string all = 1;     // match all keys
+    string key = 2;     // match key
+    string prefix = 3;  // match keys with given prefix
+    string suffix = 4;  // match keys with given suffix
+  }
+}
+
+message OpenRequest {
+  // last received change_id for reconnection, "" if first connection
+  string change_id = 1;
+  repeated Select select = 3;
+}
