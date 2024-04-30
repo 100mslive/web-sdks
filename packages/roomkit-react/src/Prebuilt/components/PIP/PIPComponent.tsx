@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { selectPeers, selectTracksMap, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { selectPeers, selectTracksMap, useHMSActions, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
-import { Flex, Tooltip } from '../../../';
+import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
+// @ts-ignore: No implicit Any
 import { MediaSession } from './SetupMediaSession';
+// @ts-ignore: No implicit Any
 import { usePinnedTrack } from '../AppData/useUISettings';
 
 /**
@@ -50,26 +52,37 @@ const PIPComponent = ({ content = null }) => {
  * the subscriptions to store are done only if required.
  */
 export const ActivatedPIP = () => {
-  const tracksMap = useHMSStore(selectTracksMap);
-  const storePeers = useHMSStore(selectPeers);
+  const store = useHMSVanillaStore();
   const pinnedTrack = usePinnedTrack();
 
   useEffect(() => {
-    function updatePIP() {
-      if (!PictureInPicture.isOn()) {
-        return;
-      }
-      let pipPeers = storePeers;
-      if (pinnedTrack) {
-        pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
-      }
-      PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
-        console.error('error in updating pip', err);
-      });
+    function subscribeToStore() {
+      return store.subscribe(tracksMap => {
+        let pipPeers = store.getState(selectPeers);
+        if (pinnedTrack) {
+          pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
+        }
+        PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
+          console.error('error in updating pip', err);
+        });
+      }, selectTracksMap);
     }
-    PictureInPicture.listenToStateChange(updatePIP);
-    updatePIP();
-  }, [storePeers, tracksMap, pinnedTrack]);
+    let unsubscribe: (() => void) | undefined = PictureInPicture.isOn() ? subscribeToStore() : undefined;
+    PictureInPicture.listenToStateChange(isOn => {
+      if (isOn) {
+        if (!unsubscribe) {
+          unsubscribe = subscribeToStore();
+        }
+      } else {
+        unsubscribe?.();
+        unsubscribe = undefined;
+      }
+    });
+    return () => {
+      unsubscribe?.();
+      unsubscribe = undefined;
+    };
+  }, [pinnedTrack, store]);
 
   return <></>;
 };
