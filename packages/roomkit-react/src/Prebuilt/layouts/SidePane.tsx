@@ -119,12 +119,6 @@ const Wrapper = styled('div', {
   ],
 });
 
-const optionalComponents = [
-  { key: 'chat', view: SIDE_PANE_OPTIONS.CHAT },
-  { key: 'participant_list', view: SIDE_PANE_OPTIONS.PARTICIPANTS },
-  { key: 'virtual_background', view: SIDE_PANE_OPTIONS.VB },
-];
-
 const SidePane = ({
   tileProps,
   hideControls = false,
@@ -146,20 +140,6 @@ const SidePane = ({
   const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
     ? preview_elements?.virtual_background?.background_media
     : elements?.virtual_background?.background_media || [];
-
-  const resetSidePane = useSidepaneReset();
-  const dependencies = optionalComponents.map(
-    optionalComponent => elements?.[optionalComponent.key as keyof typeof elements],
-  );
-
-  useEffect(() => {
-    optionalComponents.forEach(pane => {
-      if (sidepane === pane.view && !elements?.[pane.key as keyof typeof elements]) {
-        resetSidePane();
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...dependencies, elements, resetSidePane, sidepane]);
 
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
@@ -211,7 +191,15 @@ const SidePane = ({
       return null;
     });
 
-  if (!SidepaneComponent) {
+  const resetSidePane = useSidepaneReset();
+
+  useEffect(() => {
+    return () => {
+      resetSidePane();
+    };
+  }, [resetSidePane]);
+
+  if (!SidepaneComponent && !trackId) {
     return null;
   }
 

@@ -33,6 +33,7 @@ import { RoleAccordion } from './RoleAccordion';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 import { usePeerOnStageActions } from '../hooks/usePeerOnStageActions';
 import { useParticipants } from '../../common/hooks';
 // @ts-ignore: No implicit Any
@@ -70,6 +71,8 @@ export const ParticipantList = ({
       }
     });
   }
+
+  useSidepaneResetOnLayoutUpdate('participant_list', SIDE_PANE_OPTIONS.PARTICIPANTS);
 
   const onSearch = useCallback((value: string) => {
     setFilter(filterValue => {
