@@ -141,14 +141,6 @@ const SidePane = ({
     ? preview_elements?.virtual_background?.background_media
     : elements?.virtual_background?.background_media || [];
 
-  const resetSidePane = useSidepaneReset();
-
-  useEffect(() => {
-    return () => {
-      resetSidePane();
-    };
-  }, [resetSidePane]);
-
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
     roundedVideoTile: tileProps?.rounded_video_tile,
@@ -199,7 +191,15 @@ const SidePane = ({
       return null;
     });
 
-  if (!trackId && !SidepaneComponent) {
+  const resetSidePane = useSidepaneReset();
+
+  useEffect(() => {
+    return () => {
+      resetSidePane();
+    };
+  }, [resetSidePane]);
+
+  if (!SidepaneComponent && !trackId) {
     return null;
   }
 
