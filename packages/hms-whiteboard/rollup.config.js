@@ -1,5 +1,3 @@
-import image from '@rollup/plugin-image';
-import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import esbuild from 'rollup-plugin-esbuild';
@@ -17,18 +15,16 @@ const config = {
   input: 'src/index.ts',
   external: [...deps, ...peerDeps],
   output: [
-    { file: pkg.main, format: 'cjs', sourcemap: true, inlineDynamicImports: true },
+    { file: pkg.main, format: 'cjs', sourcemap: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
   plugins: [
     commonjs(),
-    css(),
-    image(),
-    json(),
+    css({ output: 'index.css' }),
     esbuild({ format: 'esm' }),
-    resolve({ preferBuiltins: false }),
+    resolve(),
     isProduction && terser(),
-    typescript({ sourceMap: true, exclude: '**/*.stories.tsx' }),
+    typescript({ sourceMap: true }),
   ],
 };
 

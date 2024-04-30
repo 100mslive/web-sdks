@@ -1,8 +1,7 @@
 {
   "packages": [
     "packages/*",
-    "apps/*",
-    "playwright/*"
+    "examples/*"
   ],
   "version": "independent",
   "npmClient": "yarn",
@@ -13,6 +12,7 @@
       "message": "build: update version"
     },
     "publish": {
+      "access": "public",
       "registry": "https://registry.npmjs.org/"
     }
   },
