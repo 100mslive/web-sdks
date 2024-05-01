@@ -21,6 +21,7 @@ import {
   HandIcon,
   MicOffIcon,
   PeopleIcon,
+  PersonSettingsIcon,
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
@@ -29,6 +30,7 @@ import { Accordion, Box, Button, config as cssConfig, Dropdown, Flex, Input, Tex
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RemoveParticipant } from '../RemoveParticipant';
+import { RoleChangeModal } from '../RoleChangeModal';
 import { RoleAccordion } from './RoleAccordion';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
@@ -368,45 +370,59 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
     isInStage,
     shouldShowStageRoleChange,
   } = usePeerOnStageActions({ peerId, role });
-  return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
-      <Dropdown.Trigger
-        asChild
-        data-testid="participant_more_actions"
-        className="participant_item"
-        css={{
-          p: '$1',
-          r: '$0',
-          c: '$on_surface_high',
-          display: open ? 'flex' : 'none',
-          '&:hover': {
-            bg: '$surface_bright',
-          },
-          '@md': {
-            display: 'flex',
-          },
-        }}
-        tabIndex={0}
-      >
-        <Box css={{ my: 'auto' }}>
-          <VerticalMenuIcon />
-        </Box>
-      </Dropdown.Trigger>
-      <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {shouldShowStageRoleChange ? (
-            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
-              <ChangeRoleIcon />
-              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
-                {isInStage ? remove_from_stage_label : bring_to_stage_label}
-              </Text>
-            </Dropdown.Item>
-          ) : null}
+  const canChangeRole = !!useHMSStore(selectPermissions)?.changeRole;
+  const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
 
-          <RemoveParticipant peerId={peerId} />
-        </Dropdown.Content>
-      </Dropdown.Portal>
-    </Dropdown.Root>
+  return (
+    <>
+      <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
+        <Dropdown.Trigger
+          asChild
+          data-testid="participant_more_actions"
+          className="participant_item"
+          css={{
+            p: '$1',
+            r: '$0',
+            c: '$on_surface_high',
+            display: open ? 'flex' : 'none',
+            '&:hover': {
+              bg: '$surface_bright',
+            },
+            '@md': {
+              display: 'flex',
+            },
+          }}
+          tabIndex={0}
+        >
+          <Box css={{ my: 'auto' }}>
+            <VerticalMenuIcon />
+          </Box>
+        </Dropdown.Trigger>
+        <Dropdown.Portal>
+          <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
+            {shouldShowStageRoleChange ? (
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
+                <ChangeRoleIcon />
+                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                  {isInStage ? remove_from_stage_label : bring_to_stage_label}
+                </Text>
+              </Dropdown.Item>
+            ) : null}
+
+            {canChangeRole ? (
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => setOpenRoleChangeModal(true)}>
+                <PersonSettingsIcon />
+                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                  Switch Role
+                </Text>
+              </Dropdown.Item>
+            ) : null}
+            <RemoveParticipant peerId={peerId} />
+          </Dropdown.Content>
+        </Dropdown.Portal>
+      </Dropdown.Root>
+      {openRoleChangeModal && <RoleChangeModal peerId={peerId} onOpenChange={setOpenRoleChangeModal} />}
+    </>
   );
 };
 

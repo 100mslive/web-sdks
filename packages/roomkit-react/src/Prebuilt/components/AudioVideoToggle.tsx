@@ -122,6 +122,7 @@ const NoiseCancellation = () => {
 
   return (
     <>
+      <Dropdown.ItemSeparator css={{ mx: 0 }} />
       <Dropdown.Item
         css={{
           p: '$4 $8',
@@ -256,7 +257,6 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
               </Dropdown.Group>
             </>
           )}
-          <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <NoiseCancellation />
           <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
