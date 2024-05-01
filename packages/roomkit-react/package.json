@@ -27,8 +27,7 @@
       "require": "./dist/index.cjs.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./index.css": "./dist/index.css"
+    }
   },
   "sideEffects": false,
   "scripts": {
@@ -77,7 +76,6 @@
     "@100mslive/hls-player": "0.3.10-alpha.1",
     "@100mslive/hms-noise-cancellation": "0.0.1",
     "@100mslive/hms-virtual-background": "1.13.10-alpha.1",
-    "@100mslive/hms-whiteboard": "0.0.0-alpha.2",
     "@100mslive/react-icons": "0.10.10-alpha.1",
     "@100mslive/react-sdk": "0.10.10-alpha.1",
     "@100mslive/types-prebuilt": "0.12.8",
