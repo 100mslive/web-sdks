@@ -15,8 +15,9 @@ import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
-import { SESSION_STORE_KEY } from '../../common/constants';
+import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const Chat = () => {
   const { elements } = useRoomLayoutConferencingScreen();
@@ -27,6 +28,7 @@ export const Chat = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
+  useSidepaneResetOnLayoutUpdate('chat', SIDE_PANE_OPTIONS.CHAT);
 
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
@@ -42,9 +44,6 @@ export const Chat = () => {
     [hmsActions, vanillaStore],
   );
 
-  if (!elements?.chat) {
-    return null;
-  }
   const streaming = isMobileHLSStream || isLandscapeStream;
 
   return (
