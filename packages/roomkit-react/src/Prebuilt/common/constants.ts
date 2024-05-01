@@ -70,6 +70,8 @@ export const SIDE_PANE_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
 
+export type SidePaneOption = (typeof SIDE_PANE_OPTIONS)[keyof typeof SIDE_PANE_OPTIONS];
+
 export const SHEET_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
