@@ -152,18 +152,6 @@ const AddMenu = () => {
             Hide Vote Count
           </Text>
         </Flex>
-        {/* <Flex align="center" css={{ mt: '$10' }}>
-          <Switch onCheckedChange={value => setAnonymous(value)} css={{ mr: '$6' }} />
-          <Text variant="body2" css={{ c: '$on_surface_medium' }}>
-            Make Results Anonymous
-          </Text>
-        </Flex> */}
-        {/* <Timer
-        timer={timer}
-        setTimer={setTimer}
-        showTimerDropDown={showTimerDropDown}
-        setShowTimerDropDown={setShowTimerDropDown}
-      /> */}
 
         <Button
           variant="primary"
