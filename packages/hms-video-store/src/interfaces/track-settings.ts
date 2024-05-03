@@ -19,12 +19,18 @@ export enum HMSFacingMode {
   RIGHT = 'right',
 }
 
+export enum HMSAudioMode {
+  DEFAULT = 'default',
+  MUSIC = 'music',
+}
+
 export interface HMSAudioTrackSettings {
   volume?: number;
   codec?: HMSAudioCodec;
   maxBitrate?: number;
   deviceId?: string;
   advanced?: Array<MediaTrackConstraintSet>;
+  audioMode?: HMSAudioMode;
 }
 
 export interface HMSVideoTrackSettings {

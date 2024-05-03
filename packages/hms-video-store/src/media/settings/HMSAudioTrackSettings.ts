@@ -1,11 +1,12 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSAudioCodec, HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
+import { HMSAudioCodec, HMSAudioMode, HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 
 export class HMSAudioTrackSettingsBuilder {
   private _volume = 1.0;
   private _codec?: HMSAudioCodec = HMSAudioCodec.OPUS;
   private _maxBitrate?: number = 32;
   private _deviceId = 'default';
+  private _audioMode: HMSAudioMode = HMSAudioMode.DEFAULT;
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
     { googEchoCancellation: { exact: true } },
@@ -48,13 +49,36 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
+  audioMode(mode?: HMSAudioMode) {
+    if (mode === HMSAudioMode.MUSIC) {
+      this._maxBitrate = 320;
+      this._advanced.forEach((constraint, index) => {
+        if (constraint.autoGainControl) {
+          this._advanced[index] = { autoGainControl: { exact: false } };
+        }
+        if (constraint.noiseSuppression) {
+          this._advanced[index] = { noiseSuppression: { exact: false } };
+        }
+      });
+    }
+
+    return this;
+  }
+
   advanced(advanced: Array<MediaTrackConstraintSet>) {
     this._advanced = advanced;
     return this;
   }
 
   build() {
-    return new HMSAudioTrackSettings(this._volume, this._codec, this._maxBitrate, this._deviceId, this._advanced);
+    return new HMSAudioTrackSettings(
+      this._volume,
+      this._codec,
+      this._maxBitrate,
+      this._deviceId,
+      this._advanced,
+      this._audioMode,
+    );
   }
 }
 
@@ -64,6 +88,7 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
   readonly maxBitrate?: number;
   readonly deviceId?: string;
   readonly advanced?: Array<MediaTrackConstraintSet>;
+  readonly audioMode?: HMSAudioMode;
 
   constructor(
     volume?: number,
@@ -71,12 +96,14 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
     maxBitrate?: number,
     deviceId?: string,
     advanced?: Array<MediaTrackConstraintSet>,
+    audioMode?: HMSAudioMode,
   ) {
     this.volume = volume;
     this.codec = codec;
     this.maxBitrate = maxBitrate;
     this.deviceId = deviceId;
     this.advanced = advanced;
+    this.audioMode = audioMode;
   }
 
   toConstraints(): MediaTrackConstraints {
