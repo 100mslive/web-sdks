@@ -6,7 +6,7 @@ export class HMSAudioTrackSettingsBuilder {
   private _codec?: HMSAudioCodec = HMSAudioCodec.OPUS;
   private _maxBitrate?: number = 32;
   private _deviceId = 'default';
-  private _audioMode: HMSAudioMode = HMSAudioMode.DEFAULT;
+  private _audioMode: HMSAudioMode = HMSAudioMode.VOICE;
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
     { googEchoCancellation: { exact: true } },

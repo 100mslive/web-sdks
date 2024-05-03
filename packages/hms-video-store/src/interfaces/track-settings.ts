@@ -20,7 +20,7 @@ export enum HMSFacingMode {
 }
 
 export enum HMSAudioMode {
-  DEFAULT = 'default',
+  VOICE = 'voice',
   MUSIC = 'music',
 }
 
