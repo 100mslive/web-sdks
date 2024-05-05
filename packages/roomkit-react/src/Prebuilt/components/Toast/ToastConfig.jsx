@@ -72,28 +72,6 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
 });
 
 export const ToastConfig = {
-  PEER_LIST: {
-    single: function (notification) {
-      if (notification.data.length === 1) {
-        return {
-          title: `${notification.data[0]?.name} joined`,
-          icon: <PeopleAddIcon />,
-        };
-      }
-      return {
-        title: `${notification.data[notification.data.length - 1]?.name} and ${
-          notification.data.length - 1
-        } others joined`,
-        icon: <PeopleAddIcon />,
-      };
-    },
-    multiple: notifications => {
-      return {
-        title: `${notifications[0].data.name} and ${notifications.length - 1} others joined`,
-        icon: <PeopleAddIcon />,
-      };
-    },
-  },
   PEER_JOINED: {
     single: function (notification) {
       return {
@@ -123,6 +101,23 @@ export const ToastConfig = {
     },
   },
   RAISE_HAND: {
+    single: notification => {
+      return {
+        title: `${notification.data?.name} raised hand`,
+        icon: <HandIcon />,
+      };
+    },
+    multiple: notifications => {
+      const count = new Set(notifications.map(notification => notification.data?.id)).size;
+      return {
+        title: `${notifications[notifications.length - 1].data?.name} ${
+          count > 1 ? `${count} and others` : ''
+        } raised hand`,
+        icon: <HandIcon />,
+      };
+    },
+  },
+  RAISE_HAND_HLS: {
     single: notification => {
       return {
         title: `${notification.data?.name} raised hand`,

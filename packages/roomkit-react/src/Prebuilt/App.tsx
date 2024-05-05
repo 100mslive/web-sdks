@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
@@ -26,6 +27,7 @@ import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
+import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -96,8 +98,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     ref,
   ) => {
     const reactiveStore = useRef<HMSPrebuiltRefType>();
-
     const [hydrated, setHydrated] = React.useState(false);
+
     useEffect(() => {
       setHydrated(true);
       const hms = new HMSReactiveStore();
@@ -122,14 +124,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       (ref as MutableRefObject<HMSPrebuiltRefType>).current = { ...reactiveStore.current };
     }, [ref]);
 
-    // leave room when component unmounts
-    useEffect(
-      () => () => {
+    useEffect(() => {
+      // leave room when component unmounts
+      return () => {
         VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
-      },
-      [],
-    );
+      };
+    }, []);
 
     const endpointsObj = endpoints as
       | {
@@ -214,7 +215,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
@@ -252,12 +252,10 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
 
-  if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
-    return <PreviewScreen />;
-  } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
-    return <LeaveScreen />;
-  }
-  return <ConferenceScreen />;
+  return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
+    .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
+    .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)
+    .otherwise(() => <ConferenceScreen />);
 };
 
 const BackSwipe = () => {
@@ -287,13 +285,14 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
-
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
+        {activeState !== PrebuiltStates.LEAVE && <AppData />}
         <ToastContainer />
         <Notifications />
         <MwebLandscapePrompt />
+        <Sheet />
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />

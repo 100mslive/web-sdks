@@ -4,27 +4,13 @@ import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { ToastManager } from '../Toast/ToastManager';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
-
-export function getResolution(recordingResolution) {
-  const resolution = {};
-  if (recordingResolution.width) {
-    resolution.width = recordingResolution.width;
-  }
-  if (recordingResolution.height) {
-    resolution.height = recordingResolution.height;
-  }
-  if (Object.keys(resolution).length > 0) {
-    return resolution;
-  }
-}
+import { useRecordingHandler } from '../../common/hooks';
+import { RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
-
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const { startRecording, recordingStarted } = useRecordingHandler();
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording || isHLSRunning) {
@@ -101,26 +87,7 @@ const StartRecording = ({ open, onOpenChange }) => {
           type="submit"
           disabled={recordingStarted || isStreamingOn}
           onClick={async () => {
-            try {
-              setRecordingState(true);
-              await hmsActions.startRTMPOrRecording({
-                resolution: getResolution(resolution),
-                record: true,
-              });
-            } catch (error) {
-              if (error.message.includes('stream already running')) {
-                ToastManager.addToast({
-                  title: 'Recording already running',
-                  variant: 'error',
-                });
-              } else {
-                ToastManager.addToast({
-                  title: error.message,
-                  variant: 'error',
-                });
-              }
-              setRecordingState(false);
-            }
+            await startRecording(resolution);
             onOpenChange(false);
           }}
         >

@@ -8,8 +8,6 @@ import {
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
-const WHITEBOARD_ORIGIN = 'https://whiteboard-qa.100ms.live';
-
 export const useWhiteboard = (isMobile = false) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
@@ -24,17 +22,15 @@ export const useWhiteboard = (isMobile = false) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
-    if (!whiteboard?.addr || !whiteboard?.token || !iframeRef.current) {
+    if (!whiteboard?.open || !whiteboard?.url || !iframeRef.current) {
       return;
     }
-    const url = new URL(WHITEBOARD_ORIGIN);
-    url.searchParams.set('endpoint', `https://${whiteboard.addr}`);
-    url.searchParams.set('token', whiteboard.token);
+    const url = new URL(whiteboard.url);
     if (isHeadless || isMobile) {
       url.searchParams.set('zoom_to_content', 'true');
     }
     iframeRef.current.src = url.toString();
-  }, [whiteboard?.addr, whiteboard?.token, isHeadless, isMobile]);
+  }, [whiteboard?.open, whiteboard?.url, isHeadless, isMobile]);
 
   useEffect(() => {
     if (isConnected) {

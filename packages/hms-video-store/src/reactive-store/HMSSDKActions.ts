@@ -89,8 +89,6 @@ import {
   selectVideoTrackByID,
 } from '../selectors';
 
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
-
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
  * and takes control of data management by letting every action pass through it. The
@@ -415,6 +413,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    const ignoreMessage = !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type);
+    if (ignoreMessage) {
+      return;
+    }
     const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
@@ -427,9 +429,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       senderName: localPeer?.name,
       sender: localPeer?.peerId,
       senderRole: localPeer?.role?.name,
-      ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
+      ignored: false,
     };
-    this.putMessageInStore(hmsMessage);
+    // update directly to store without batch
+    this.setState(store => {
+      store.messages.byID[hmsMessage.id] = hmsMessage;
+      store.messages.allIDs.push(hmsMessage.id);
+    }, 'newMessage');
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
@@ -592,6 +598,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
   async lowerRemotePeerHand(peerId: string) {
     await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
+  async getPeer(peerId: string) {
+    const peer = await this.sdk.getPeer(peerId);
+    if (peer) {
+      return SDKToHMS.convertPeer(peer) as HMSPeer;
+    }
+    return undefined;
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
@@ -899,7 +913,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }, {} as { [key: string]: sdkTypes.HMSPoll });
       mergeNewPollsInDraft(draftStore.polls, pollsObject);
     }, actionName);
-
     polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 
@@ -995,6 +1008,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
     const hls = this.sdk.getHLSState();
+    const transcriptions = this.sdk.getTranscriptionState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -1007,7 +1021,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
-      Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      if (draftStore.room.isConnected) {
+        Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      }
 
       /**
        * if preview is already present merge,
@@ -1020,7 +1036,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls, transcriptions));
       Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
@@ -1137,6 +1153,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    if (hmsMessage.type === 'hms_transcript') {
+      hmsMessage.ignored = true;
+    }
     this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }

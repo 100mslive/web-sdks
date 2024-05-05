@@ -5,6 +5,7 @@ import {
   HMSSimulcastLayerDefinition,
   ScreenCaptureHandle,
 } from '../interfaces';
+import { HMSPeerType } from '../interfaces/peer/hms-peer';
 
 export type HMSPeerID = string;
 export type HMSTrackID = string;
@@ -42,6 +43,7 @@ export interface HMSPeer {
   joinedAt?: Date;
   groups?: HMSGroupName[];
   isHandRaised: boolean;
+  type: HMSPeerType;
 }
 
 /**

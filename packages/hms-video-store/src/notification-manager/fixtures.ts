@@ -1,10 +1,11 @@
 import { MessageNotification, PeerListNotification, PeerNotification, SpeakerList } from './HMSNotifications';
+import { HMSPeerType } from '../interfaces';
 
 export const FAKE_PEER_ID = 'peer_id_1';
 
 export const fakePeer: PeerNotification = {
   peer_id: 'peer_id_0',
-  info: { data: 'data', name: 'Sarvesh0', user_id: 'customer_user_id' },
+  info: { data: 'data', name: 'Sarvesh0', user_id: 'customer_user_id', type: HMSPeerType.REGULAR },
   role: 'host',
   tracks: {},
   groups: [],
@@ -17,6 +18,7 @@ export const fakePeerList: PeerListNotification = {
         name: 'Sarvesh1',
         data: 'data',
         user_id: 'customer_user_id',
+        type: HMSPeerType.REGULAR,
       },
       role: 'host',
       peer_id: FAKE_PEER_ID,
@@ -32,7 +34,7 @@ export const fakePeerList: PeerListNotification = {
         track_id_2: {
           mute: false,
           type: 'video',
-          source: 'regular',
+          source: HMSPeerType.REGULAR,
           description: '',
           track_id: 'track_id_2',
           stream_id: 'stream_id_1',
@@ -45,6 +47,7 @@ export const fakePeerList: PeerListNotification = {
         name: 'Sarvesh3',
         data: 'data',
         user_id: 'customer_user_id',
+        type: HMSPeerType.REGULAR,
       },
       peer_id: 'peer_id_3',
       role: 'viewer',
@@ -85,6 +88,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
         name: 'Sarvesh1',
         data: 'data',
         user_id: 'customer_user_id',
+        type: HMSPeerType.REGULAR,
       },
       role: 'host',
       peer_id: FAKE_PEER_ID,
@@ -100,7 +104,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
         track_id_2: {
           mute: false,
           type: 'video',
-          source: 'regular',
+          source: HMSPeerType.REGULAR,
           description: '',
           track_id: 'track_id_2',
           stream_id: 'stream_id_1',
@@ -113,6 +117,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
         name: 'Sarvesh2',
         data: 'data',
         user_id: 'customer_user_id',
+        type: HMSPeerType.REGULAR,
       },
       peer_id: 'peer_id_2',
       role: 'viewer',

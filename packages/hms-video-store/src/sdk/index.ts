@@ -12,6 +12,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -27,6 +28,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSPeerType,
   HMSPlaylistSettings,
   HMSPlaylistType,
   HMSPreviewConfig,
@@ -62,7 +64,7 @@ import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -118,6 +120,7 @@ export class HMSSdk implements HMSInterface {
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private interactivityCenter!: InteractivityCenter;
+  private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private playlistSettings: HMSPlaylistSettings = {
@@ -155,6 +158,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
@@ -178,10 +182,10 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+      this.pluginUsageTracker,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
-
     /**
      * Note: Subscribe to events here right after creating stores and managers
      * to not miss events that are published before the handlers are subscribed.
@@ -229,6 +233,10 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
   }
 
   getTemplateAppData() {
@@ -498,6 +506,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -717,6 +726,14 @@ export class HMSSdk implements HMSInterface {
     }
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
+  }
+
+  async getPeer(peerId: string) {
+    const response = await this.transport.signal.getPeer({ peer_id: peerId });
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
@@ -1143,6 +1160,7 @@ export class HMSSdk implements HMSInterface {
   private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
     await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+    await this.interactivityCenter.whiteboard.handleLocalRoleUpdate();
   };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -1296,6 +1314,7 @@ export class HMSSdk implements HMSInterface {
       role: policy,
       // default value is the original role if user didn't pass asRole in config
       asRole: asRolePolicy || policy,
+      type: HMSPeerType.REGULAR,
     });
 
     this.store.addPeer(localPeer);
@@ -1342,7 +1361,8 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);

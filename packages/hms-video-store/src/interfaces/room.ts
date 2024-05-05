@@ -41,6 +41,9 @@ export interface HMSRoom {
    * @alpha
    */
   effectsKey?: string;
+  isHipaaEnabled?: boolean;
+  isNoiseCancellationEnabled?: boolean;
+  transcriptions?: HMSTranscriptionInfo[];
 }
 
 export interface HMSRecording {
@@ -95,11 +98,39 @@ export interface HMSHLS {
   error?: HMSException;
 }
 
+export enum HLSPlaylistType {
+  DVR = 'dvr',
+  NO_DVR = 'no-dvr',
+}
+
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariant {
   url: string;
+  playlist_type?: HLSPlaylistType;
   meetingURL?: string;
   metadata?: string;
   startedAt?: Date;
   initialisedAt?: Date;
   state?: HMSStreamingState;
+  stream_type?: HLSStreamType;
+}
+
+/*
+Transcription related details
+*/
+export enum HMSTranscriptionState {
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+export enum HMSTranscriptionMode {
+  CAPTION = 'caption',
+}
+export interface HMSTranscriptionInfo {
+  state?: HMSTranscriptionState;
+  mode?: HMSTranscriptionMode;
 }

@@ -20,7 +20,7 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
       onClick={onClick}
     >
       <Text css={{ alignSelf: 'center', p: '$4' }}>
-        {imgSrc ? <img src={imgSrc} height={40} width={40} /> : <Icon width={40} height={40} />}
+        {imgSrc ? <img src={imgSrc} height={40} width={40} alt="Streaming" /> : <Icon width={40} height={40} />}
       </Text>
       <Box css={{ flex: '1 1 0', mx: '$8' }}>
         <Text variant="h6" css={{ mb: '$4' }}>

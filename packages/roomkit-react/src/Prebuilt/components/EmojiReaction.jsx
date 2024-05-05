@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
@@ -7,9 +7,7 @@ import {
   selectIsConnectedToRoom,
   selectLocalPeerID,
   useCustomEvent,
-  // useHMSActions,
   useHMSStore,
-  // useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
@@ -19,20 +17,26 @@ import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useDropdownList } from './hooks/useDropdownList';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 init({ data });
 
-export const EmojiReaction = () => {
+export const EmojiReaction = ({ showCard = false }) => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const { elements } = useRoomLayoutConferencingScreen();
   useDropdownList({ open: open, name: 'EmojiReaction' });
   // const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerId = useHMSStore(selectLocalPeerID);
   // const { isStreamingOn } = useRecordingStreaming();
   const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.ls);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeStream = useLandscapeHLSStream();
 
   const { sendEvent } = useCustomEvent({
     type: EMOJI_REACTION_TYPE,
@@ -62,27 +66,35 @@ export const EmojiReaction = () => {
     } */
   };
 
-  if (!isConnected) {
+  if (!isConnected || !elements.emoji_reactions) {
     return null;
   }
-  return isMobile ? (
-    <EmojiCard sendReaction={sendReaction} />
-  ) : (
-    <Fragment>
-      <Dropdown.Root open={open} onOpenChange={setOpen}>
-        <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
-          <IconButton>
-            <Tooltip title="Emoji reaction">
-              <Box>
-                <EmojiIcon />
-              </Box>
-            </Tooltip>
-          </IconButton>
-        </Dropdown.Trigger>
-        <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surface_default' }}>
-          <EmojiCard sendReaction={sendReaction} />
-        </Dropdown.Content>
-      </Dropdown.Root>
-    </Fragment>
+
+  if (showCard) {
+    return <EmojiCard sendReaction={sendReaction} />;
+  }
+  return (
+    <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
+        <IconButton
+          css={
+            isMobile || isLandscape ? { bg: '$surface_default', r: '$round', border: '1px solid $border_bright' } : {}
+          }
+        >
+          <Tooltip title="Emoji reaction">
+            <Box>
+              <EmojiIcon />
+            </Box>
+          </Tooltip>
+        </IconButton>
+      </Dropdown.Trigger>
+      <Dropdown.Content
+        sideOffset={5}
+        align={isMobileHLSStream || isLandscapeStream ? 'end' : 'center'}
+        css={{ p: '$8', bg: '$surface_default' }}
+      >
+        <EmojiCard sendReaction={sendReaction} />
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 };

@@ -65,6 +65,7 @@ export interface Resolution {
 interface RemoteBaseSample {
   timestamp: number;
   estimated_playout_timestamp?: number;
+  avg_jitter_buffer_delay?: number;
 }
 
 export interface RemoteAudioSample extends RemoteBaseSample {
@@ -77,7 +78,6 @@ export interface RemoteAudioSample extends RemoteBaseSample {
   total_samples_duration?: number;
   total_packets_received?: number;
   total_packets_lost?: number;
-  jitter_buffer_delay?: number;
   jitter_buffer_delay_high_seconds?: number;
 }
 
@@ -87,4 +87,13 @@ export interface RemoteVideoSample extends RemoteBaseSample {
   avg_frames_decoded_per_sec?: number;
   total_pli_count?: number;
   total_nack_count?: number;
+  avg_av_sync_ms?: number;
+  frame_width?: number;
+  frame_height?: number;
+  expected_frame_width?: number;
+  expected_frame_height?: number;
+  pause_count?: number;
+  pause_duration_seconds?: number;
+  freeze_count?: number;
+  freeze_duration_seconds?: number;
 }

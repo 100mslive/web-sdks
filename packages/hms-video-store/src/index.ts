@@ -25,6 +25,7 @@ export {
   HMSGetMediaActions,
   HMSPluginUnsupportedTypes,
   HMSRecordingState,
+  HMSPeerType,
 } from './internal';
 
 export type {
@@ -58,14 +59,20 @@ export type {
   HMSPollQuestionOption,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
+  HMSTranscriptionInfo,
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSMediaStreamPlugin,
   HMSPluginSupportResult,
   HMSFrameworkInfo,
   InitConfig,
+  HLSPlaylistType,
+  HLSStreamType,
+  HMSTranscriptionMode,
+  HMSTranscriptionState,
 } from './internal';
 
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSSdk } from './sdk/index';
 export { TrackAudioLevelMonitor } from './utils/track-audio-level-monitor';
+export { DomainCategory } from './analytics/AnalyticsEventDomains';

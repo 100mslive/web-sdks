@@ -24,6 +24,8 @@ export { useEmbedShare } from './hooks/useEmbedShare';
 export { usePDFShare } from './hooks/usePDFShare';
 export { usePaginatedParticipants } from './hooks/usePaginatedParticipants';
 export { useWhiteboard } from './hooks/useWhiteboard';
+export { useAwayNotifications } from './hooks/useAwayNotifications';
+export { useTranscript } from './hooks/useTranscript';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
@@ -43,6 +45,7 @@ export type { useEmbedShareResult } from './hooks/useEmbedShare';
 export type { usePDFShareResult } from './hooks/usePDFShare';
 export type { TrackWithPeerAndDimensions } from './utils/layout';
 export type { usePaginatedParticipantsResult, usePaginatedParticipantsInput } from './hooks/usePaginatedParticipants';
+export type { HMSTranscript, useHMSTranscriptInput } from './hooks/useTranscript';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';

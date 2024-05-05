@@ -10,7 +10,7 @@
     "prebuilt",
     "roomkit"
   ],
-  "version": "0.2.3",
+  "version": "0.3.9",
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -50,11 +50,6 @@
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-react": "^7.22.5",
     "@babel/preset-typescript": "^7.22.5",
-    "@rollup/plugin-commonjs": "^21.0.3",
-    "@rollup/plugin-image": "^3.0.2",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^13.1.3",
-    "@rollup/plugin-typescript": "^8.3.1",
     "@storybook/addon-a11y": "^7.0.27",
     "@storybook/addon-actions": "^7.0.27",
     "@storybook/addon-essentials": "^7.0.27",
@@ -72,22 +67,19 @@
     "babel-plugin-react-require": "3.1.3",
     "esbuild-loader": "^4.0.2",
     "react": "^18.1.0",
-    "rollup": "^2.70.1",
-    "rollup-plugin-esbuild": "^5.0.0",
-    "rollup-plugin-import-css": "^3.3.1",
-    "rollup-plugin-terser": "^7.0.2",
     "storybook-dark-mode": "^3.0.0"
   },
   "peerDependencies": {
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hls-player": "0.2.3",
-    "@100mslive/hms-virtual-background": "1.12.3",
+    "@100mslive/hls-player": "0.3.9",
     "@100mslive/hms-diagnostics": "0.0.1",
-    "@100mslive/react-icons": "0.9.3",
-    "@100mslive/react-sdk": "0.9.3",
-    "@100mslive/types-prebuilt": "0.12.6",
+    "@100mslive/hms-noise-cancellation": "0.0.1",
+    "@100mslive/hms-virtual-background": "1.13.9",
+    "@100mslive/react-icons": "0.10.9",
+    "@100mslive/react-sdk": "0.10.9",
+    "@100mslive/types-prebuilt": "0.12.8",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@radix-ui/react-accordion": "1.0.0",
@@ -118,6 +110,7 @@
     "react-window": "^1.8.7",
     "recordrtc": "^5.6.2",
     "screenfull": "^5.1.0",
+    "ts-pattern": "4.3.0",
     "uuid": "^8.3.2",
     "worker-timers": "^7.0.40"
   }

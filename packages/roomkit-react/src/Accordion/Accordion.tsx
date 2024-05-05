@@ -64,15 +64,15 @@ export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
 export const AccordionHeader: React.FC<
-  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS }>
+  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
 > = React.forwardRef<
   HTMLButtonElement,
-  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS }>
->(({ children, iconStyles, css, ...props }, forwardedRef) => (
+  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
+>(({ children, iconStyles, css, chevronID, ...props }, forwardedRef) => (
   <StyledHeader css={css}>
     <StyledTrigger {...props} ref={forwardedRef}>
       {children}
-      <StyledChevron aria-hidden css={iconStyles} />
+      <StyledChevron data-testid={chevronID} aria-hidden css={iconStyles} />
     </StyledTrigger>
   </StyledHeader>
 ));

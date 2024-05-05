@@ -128,9 +128,10 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       throw new Error('Invalid poll ID - Poll not found');
     }
 
-    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
+    const localPeerPermissions = this.store.getLocalPeer()?.role?.permissions;
+    const canViewSummary = !!(localPeerPermissions?.pollRead || localPeerPermissions?.pollWrite);
 
-    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
+    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canViewSummary) {
       return { entries: [], hasNext: false };
     }
     const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
@@ -180,8 +181,13 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         count: 50,
       });
       const poll = createHMSPollFromPollParams(pollParams);
-      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
-
+      const existingPoll = this.store.getPoll(pollParams.poll_id);
+      poll.questions = questions.questions.map(({ question, options, answer }, index) => ({
+        ...question,
+        options,
+        answer,
+        responses: existingPoll?.questions?.[index]?.responses,
+      }));
       polls.push(poll);
       this.store.setPoll(poll);
     }
@@ -190,10 +196,23 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return polls;
   }
 
+  // eslint-disable-next-line complexity
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {
+    // early return if the question has been saved before in a draft
+    if (questionParams.index) {
+      const optionsWithIndex = questionParams.options?.map((option, index) => {
+        return { ...option, index: index + 1 };
+      });
+      return {
+        question: { ...questionParams, index: index + 1 },
+        options: optionsWithIndex,
+        answer: questionParams.answer,
+      };
+    }
     const question: PollQuestionParams['question'] = { ...questionParams, index: index + 1 };
     let options: HMSPollQuestionOption[] | undefined;
     const answer: HMSPollQuestionAnswer = questionParams.answer || { hidden: false };
+
     if (
       Array.isArray(questionParams.options) &&
       [HMSPollQuestionType.SINGLE_CHOICE, HMSPollQuestionType.MULTIPLE_CHOICE].includes(questionParams.type)
@@ -204,7 +223,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         weight: option.weight,
       }));
 
-      delete answer?.text;
       if (questionParams.type === HMSPollQuestionType.SINGLE_CHOICE) {
         answer.option = questionParams.options.findIndex(option => option.isCorrectAnswer) + 1 || undefined;
       } else {

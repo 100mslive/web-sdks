@@ -51,6 +51,7 @@ export class SDKToHMS {
       joinedAt: sdkPeer.joinedAt,
       groups: sdkPeer.groups,
       isHandRaised: sdkPeer.isHandRaised,
+      type: sdkPeer.type,
     };
   }
 
@@ -157,6 +158,8 @@ export class SDKToHMS {
       isLargeRoom: sdkRoom.large_room_optimization,
       isEffectsEnabled: sdkRoom.isEffectsEnabled,
       effectsKey: sdkRoom.effectsKey,
+      isHipaaEnabled: sdkRoom.isHipaaEnabled,
+      isNoiseCancellationEnabled: sdkRoom.isNoiseCancellationEnabled,
     };
   }
 
@@ -273,7 +276,13 @@ export class SDKToHMS {
     recording?: sdkTypes.HMSRecording,
     rtmp?: sdkTypes.HMSRTMP,
     hls?: sdkTypes.HMSHLS,
-  ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
+    transcriptions?: sdkTypes.HMSTranscriptionInfo[],
+  ): {
+    recording: sdkTypes.HMSRecording;
+    rtmp: sdkTypes.HMSRTMP;
+    hls: sdkTypes.HMSHLS;
+    transcriptions: sdkTypes.HMSTranscriptionInfo[];
+  } {
     return {
       recording: {
         browser: {
@@ -292,6 +301,7 @@ export class SDKToHMS {
         running: !!hls?.running,
         error: hls?.error,
       },
+      transcriptions: transcriptions || [],
     };
   }
 }

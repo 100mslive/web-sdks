@@ -11,6 +11,7 @@ import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -86,6 +87,7 @@ export default class HMSTransport {
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
+    private pluginUsageTracker: PluginUsageTracker,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -495,6 +497,10 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
+      const usage = this.pluginUsageTracker.getPluginUsage('HMSKrispPlugin');
+      if (usage) {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage(usage));
+      }
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();
@@ -907,6 +913,8 @@ export default class HMSTransport {
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
         room.isEffectsEnabled = this.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
+        room.isHipaaEnabled = this.isFlagEnabled(InitFlags.FLAG_HIPAA_ENABLED);
+        room.isNoiseCancellationEnabled = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
       }
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);

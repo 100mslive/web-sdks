@@ -21,6 +21,7 @@ import { sleep } from '../../utils/timer-utils';
 export abstract class BaseStatsAnalytics {
   private shouldSendEvent = false;
   protected sequenceNum = 1;
+  protected abstract trackAnalytics: Map<string, RunningTrackAnalytics>;
 
   constructor(
     protected store: Store,
@@ -38,7 +39,7 @@ export abstract class BaseStatsAnalytics {
     this.stop();
     this.shouldSendEvent = true;
     this.eventBus.statsUpdate.subscribe(this.handleStatsUpdate.bind(this));
-    this.startLoop().catch(e => HMSLogger.e('[StatsAnanlytics]', e.message));
+    this.startLoop().catch(e => HMSLogger.e('[StatsAnalytics]', e.message));
   }
 
   stop = () => {
@@ -56,14 +57,39 @@ export abstract class BaseStatsAnalytics {
     }
   }
 
-  protected abstract sendEvent(): void;
+  protected sendEvent(): void {
+    this.trackAnalytics.forEach(trackAnalytic => {
+      trackAnalytic.clearSamples();
+    });
+  }
+
+  protected cleanTrackAnalyticsAndCreateSample(shouldCreateSample: boolean) {
+    // delete track analytics if track is not present in store and no samples are present
+    this.trackAnalytics.forEach(trackAnalytic => {
+      if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
+        this.trackAnalytics.delete(trackAnalytic.track_id);
+      }
+    });
+
+    if (shouldCreateSample) {
+      this.trackAnalytics.forEach(trackAnalytic => {
+        trackAnalytic.createSample();
+      });
+    }
+  }
 
   protected abstract toAnalytics(): PublishAnalyticPayload | SubscribeAnalyticPayload;
 
   protected abstract handleStatsUpdate(hmsStats: HMSWebrtcStats): void;
 }
 
-type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
+export type TempStats = HMSTrackStats & {
+  availableOutgoingBitrate?: number;
+  calculatedJitterBufferDelay?: number;
+  avSync?: number;
+  expectedFrameHeight?: number;
+  expectedFrameWidth?: number;
+};
 
 export abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;
@@ -73,9 +99,10 @@ export abstract class RunningTrackAnalytics {
   ssrc: string;
   kind: string;
   rid?: string;
-  samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
 
-  protected tempStats: TempPublishStats[] = [];
+  samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
+  protected tempStats: TempStats[] = [];
+  protected prevLatestStat?: TempStats;
 
   constructor({
     track,
@@ -99,22 +126,33 @@ export abstract class RunningTrackAnalytics {
     this.sampleWindowSize = sampleWindowSize;
   }
 
-  push(stat: TempPublishStats) {
+  pushTempStat(stat: TempStats) {
     this.tempStats.push(stat);
-
-    if (this.shouldCreateSample()) {
-      this.samples.push(this.createSample());
-      this.tempStats.length = 0;
-    }
   }
+
+  createSample() {
+    if (this.tempStats.length === 0) {
+      return;
+    }
+
+    this.samples.push(this.collateSample());
+    this.prevLatestStat = this.getLatestStat();
+    this.tempStats.length = 0;
+  }
+
+  clearSamples() {
+    this.samples.length = 0;
+  }
+
+  abstract shouldCreateSample: () => boolean;
+
+  protected abstract collateSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
 
   protected abstract toAnalytics: () =>
     | LocalAudioTrackAnalytics
     | LocalVideoTrackAnalytics
     | RemoteAudioTrackAnalytics
     | RemoteVideoTrackAnalytics;
-
-  protected abstract createSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
 
   protected getLatestStat() {
     return this.tempStats[this.tempStats.length - 1];
@@ -124,9 +162,7 @@ export abstract class RunningTrackAnalytics {
     return this.tempStats[0];
   }
 
-  protected abstract shouldCreateSample: () => boolean;
-
-  protected calculateSum(key: keyof TempPublishStats) {
+  protected calculateSum(key: keyof TempStats) {
     const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
       return;
@@ -136,20 +172,25 @@ export abstract class RunningTrackAnalytics {
     }, 0);
   }
 
-  protected calculateAverage(key: keyof TempPublishStats, round = true) {
+  protected calculateAverage(key: keyof TempStats, round = true) {
     const sum = this.calculateSum(key);
     const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
     return avg ? (round ? Math.round(avg) : avg) : undefined;
   }
 
-  protected calculateDifferenceForSample(key: keyof TempPublishStats) {
-    const firstValue = Number(this.tempStats[0][key]) || 0;
+  protected calculateDifferenceForSample(key: keyof TempStats) {
+    const firstValue = Number(this.prevLatestStat?.[key]) || 0;
     const latestValue = Number(this.getLatestStat()[key]) || 0;
 
     return latestValue - firstValue;
   }
 
-  protected calculateInstancesOfHigh(key: keyof TempPublishStats, threshold: number) {
+  protected calculateDifferenceAverage(key: keyof TempStats, round = true) {
+    const avg = this.calculateDifferenceForSample(key) / this.tempStats.length;
+    return round ? Math.round(avg) : avg;
+  }
+
+  protected calculateInstancesOfHigh(key: keyof TempStats, threshold: number) {
     const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
       return;
@@ -161,10 +202,10 @@ export abstract class RunningTrackAnalytics {
   }
 }
 
-export const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasResolutionChanged = (newStat: TempStats, prevStat: TempStats) =>
   newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-export const hasEnabledStateChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasEnabledStateChanged = (newStat: TempStats, prevStat: TempStats) =>
   newStat && prevStat && newStat.enabled !== prevStat.enabled;
 
 export const removeUndefinedFromObject = <T extends Record<string, any>>(data: T) => {

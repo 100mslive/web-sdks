@@ -86,25 +86,31 @@ export class DeviceManager implements HMSDeviceManager {
     return newDevice;
   };
 
-  async init(force = false) {
+  async init(force = false, logAnalytics = true) {
     if (this.initialized && !force) {
       return;
     }
     !this.initialized && navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     this.initialized = true;
     await this.enumerateDevices();
+    // do it only on initial load.
+    if (!force) {
+      await this.updateToActualDefaultDevice();
+    }
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.deviceChange({
-        selection: this.getCurrentSelection(),
-        type: 'list',
-        devices: this.getDevices(),
-      }),
-    );
+    if (logAnalytics) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: this.getCurrentSelection(),
+          type: 'list',
+          devices: this.getDevices(),
+        }),
+      );
+    }
   }
 
   getDevices(): DeviceMap {
@@ -186,15 +192,29 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
+  /**
+   * For example, if a different device, say OBS is selected as default from chrome settings, when you do getUserMedia with default, that is not the device
+   * you get. So update to the browser settings default device
+   * Update only when initial deviceId is not passed
+   */
+  private updateToActualDefaultDevice = async () => {
+    const localPeer = this.store.getLocalPeer();
+    const videoDeviceId = this.store.getConfig()?.settings?.videoDeviceId;
+    if (!videoDeviceId && localPeer?.videoTrack) {
+      await localPeer.videoTrack.setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+    }
+    const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
+    if (!audioDeviceId && localPeer?.audioTrack) {
+      await localPeer.audioTrack.setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
+    }
+  };
+
   private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
-    if (audioTrack) {
-      await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    }
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
@@ -367,7 +387,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
-      await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
+      await videoTrack.setSettings(newVideoTrackSettings, true);
       // On replace track, enabled will be true. Need to be set to previous state
       // videoTrack.setEnabled(enabled); // TODO: remove this once verified on qa.
       this.eventBus.deviceChange.publish({

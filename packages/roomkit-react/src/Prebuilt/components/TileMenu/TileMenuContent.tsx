@@ -17,6 +17,7 @@ import {
   MicOffIcon,
   MicOnIcon,
   PencilIcon,
+  PersonSettingsIcon,
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
@@ -224,6 +225,9 @@ export const TileMenuContent = ({
   openNameChangeModal = () => {
     return;
   },
+  openRoleChangeModal = () => {
+    return;
+  },
 }: {
   videoTrackID: string;
   audioTrackID: string;
@@ -235,10 +239,13 @@ export const TileMenuContent = ({
   canMinimise?: boolean;
   closeSheetOnClick?: () => void;
   openNameChangeModal?: () => void;
+  openRoleChangeModal?: () => void;
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
-  const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
+  const permissions = useHMSStore(selectPermissions);
+  const canChangeRole = !!permissions?.changeRole;
+  const removeOthers = !!permissions?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
@@ -289,7 +296,7 @@ export const TileMenuContent = ({
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
           {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
-          <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
+          <span>{isVideoEnabled ? 'Mute Video' : 'Request to Unmute Video'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 
@@ -304,7 +311,22 @@ export const TileMenuContent = ({
           data-testid={isAudioEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
           {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
-          <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
+          <span>{isAudioEnabled ? 'Mute Audio' : 'Request to Unmute Audio'}</span>
+        </StyledMenuTile.ItemButton>
+      ) : null}
+
+      {canChangeRole ? (
+        <StyledMenuTile.ItemButton
+          className={dragClassName}
+          css={spacingCSS}
+          onClick={() => {
+            openRoleChangeModal();
+            closeSheetOnClick();
+          }}
+          data-testid="change_role_btn"
+        >
+          <PersonSettingsIcon height={20} width={20} />
+          <span>Switch Role</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 

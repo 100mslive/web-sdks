@@ -136,7 +136,7 @@ const Link = styled('a', {
   },
 });
 
-export const AnnotisedMessage = ({ message }: { message: string }) => {
+export const AnnotisedMessage = ({ message, length }: { message: string; length?: number }) => {
   if (!message) {
     return <Fragment />;
   }
@@ -149,10 +149,10 @@ export const AnnotisedMessage = ({ message }: { message: string }) => {
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link href={part} key={part} target="_blank" rel="noopener noreferrer">
-              {part}
+              {part.slice(0, length)}
             </Link>
           ) : (
-            part
+            part.slice(0, length)
           ),
         )}
     </Fragment>
@@ -410,6 +410,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     }, [blacklistedMessageIDs, messages]);
 
     const vanillaStore = useHMSVanillaStore();
+    const rerenderOnFirstMount = useRef(false);
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -419,18 +420,30 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
         }
         // @ts-ignore
         const outerElement = listRef.current._outerRef;
-        if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
+        if (
+          outerElement &&
+          outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight
+        ) {
           requestAnimationFrame(() => scrollToBottom(1));
         }
       }, selectUnreadHMSMessagesCount);
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0) {
-      return <EmptyChat />;
-    }
+    useEffect(() => {
+      // @ts-ignore
+      if (filteredMessages.length > 0 && listRef?.current && !rerenderOnFirstMount.current) {
+        rerenderOnFirstMount.current = true;
+        // @ts-ignore
+        listRef.current.resetAfterIndex(0);
+      }
+    }, [listRef, filteredMessages]);
 
-    return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
+    return filteredMessages.length === 0 ? (
+      <EmptyChat />
+    ) : (
+      <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />
+    );
   },
 );
 

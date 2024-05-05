@@ -1,18 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
+import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
+  HMSRecording,
+  parsedUserAgent,
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPeerMetadata,
   selectPeers,
+  selectRecordingState,
   selectRemotePeers,
+  useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit any
+import { ToastManager } from '../components/Toast/ToastManager';
+import { config } from '../../Theme';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+// @ts-ignore
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { CHAT_SELECTOR } from './constants';
+import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
@@ -100,3 +111,110 @@ export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };
+
+export const useIsLandscape = () => {
+  const isMobile = parsedUserAgent.getDevice().type === 'mobile';
+  const isLandscape = useMedia(config.media.ls);
+  return isMobile && isLandscape;
+};
+
+export const useLandscapeHLSStream = () => {
+  const isLandscape = useIsLandscape();
+  const { screenType } = useRoomLayoutConferencingScreen();
+  return isLandscape && screenType === 'hls_live_streaming';
+};
+
+export const useMobileHLSStream = () => {
+  const isMobile = useMedia(config.media.md);
+  const { screenType } = useRoomLayoutConferencingScreen();
+  return isMobile && screenType === 'hls_live_streaming';
+};
+
+export const useKeyboardHandler = (isPaused: boolean, hlsPlayer: HMSHLSPlayer) => {
+  const handleKeyEvent = useCallback(
+    async (event: KeyboardEvent) => {
+      switch (event.key) {
+        case ' ':
+          if (isPaused) {
+            await hlsPlayer?.play();
+          } else {
+            hlsPlayer?.pause();
+          }
+          break;
+        case 'ArrowRight':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime + 10);
+          break;
+        case 'ArrowLeft':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime - 10);
+          break;
+      }
+    },
+    [hlsPlayer, isPaused],
+  );
+
+  return handleKeyEvent;
+};
+export interface RTMPRecordingResolution {
+  width: number;
+  height: number;
+}
+export const useRecordingHandler = () => {
+  const hmsActions = useHMSActions();
+  const recordingState: HMSRecording = useHMSStore(selectRecordingState);
+  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
+  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  useEffect(() => {
+    if (recordingState.browser.error && recordingStarted) {
+      setRecordingState(false);
+    }
+  }, [recordingStarted, recordingState.browser.error, setRecordingState]);
+  const startRecording = useCallback(
+    async (resolution: RTMPRecordingResolution | null = null) => {
+      try {
+        setRecordingState(true);
+        setIsRecordingLoading(true);
+        await hmsActions.startRTMPOrRecording({
+          resolution: getResolution(resolution),
+          record: true,
+        });
+      } catch (error) {
+        const err = error as Error;
+        if (err.message.includes('stream already running')) {
+          ToastManager.addToast({
+            title: 'Recording already running',
+            variant: 'error',
+          });
+        } else {
+          ToastManager.addToast({
+            title: err.message,
+            variant: 'error',
+          });
+        }
+        setRecordingState(false);
+      }
+      setIsRecordingLoading(false);
+    },
+    [hmsActions, setRecordingState],
+  );
+  return {
+    recordingStarted,
+    startRecording,
+    isRecordingLoading,
+  };
+};
+
+export function getResolution(
+  recordingResolution: RTMPRecordingResolution | null,
+): RTMPRecordingResolution | undefined {
+  if (!recordingResolution) {
+    return undefined;
+  }
+  const resolution: RTMPRecordingResolution = RTMP_RECORD_DEFAULT_RESOLUTION;
+  if (recordingResolution.width) {
+    resolution.width = recordingResolution.width;
+  }
+  if (recordingResolution.height) {
+    resolution.height = recordingResolution.height;
+  }
+  return resolution;
+}

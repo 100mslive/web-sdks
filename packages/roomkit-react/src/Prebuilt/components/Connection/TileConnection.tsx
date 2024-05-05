@@ -1,6 +1,12 @@
 import React from 'react';
-import { selectScreenShareByPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
-import { PinIcon, ShareScreenIcon, SpotlightIcon } from '@100mslive/react-icons';
+import {
+  HMSPeerType,
+  selectPeerTypeByID,
+  selectScreenShareByPeerID,
+  selectSessionStore,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import { CallIcon, PinIcon, ShareScreenIcon, SpotlightIcon } from '@100mslive/react-icons';
 import { Flex, styled, Text, textEllipsis } from '../../..';
 import { ConnectionIndicator } from './ConnectionIndicator';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -20,37 +26,45 @@ const TileConnection = ({
 }) => {
   const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const isPeerScreenSharing = !!useHMSStore(selectScreenShareByPeerID(peerId));
+  const peerType = useHMSStore(selectPeerTypeByID(peerId));
   return (
     <Wrapper>
       {!hideLabel ? (
         <>
-          <Flex align="center">
-            {isPeerScreenSharing && (
-              <IconWrapper>
-                <ShareScreenIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            {pinned && (
-              <IconWrapper>
-                <PinIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            {spotlighted && (
-              <IconWrapper>
-                <SpotlightIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            <Text
-              css={{
-                c: '$on_surface_high',
-                verticalAlign: 'baseline',
-                ...(width ? textEllipsis((width as number) - 60) : {}),
-              }}
-              variant="xs"
-            >
-              {name}
-            </Text>
-          </Flex>
+          {name ? (
+            <Flex align="center">
+              {peerType === HMSPeerType.SIP && (
+                <IconWrapper>
+                  <CallIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              {isPeerScreenSharing && (
+                <IconWrapper>
+                  <ShareScreenIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              {pinned && (
+                <IconWrapper>
+                  <PinIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              {spotlighted && (
+                <IconWrapper>
+                  <SpotlightIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              <Text
+                css={{
+                  c: '$on_surface_high',
+                  verticalAlign: 'baseline',
+                  ...(width ? textEllipsis((width as number) - 60) : {}),
+                }}
+                variant="xs"
+              >
+                {name}
+              </Text>
+            </Flex>
+          ) : null}
           <ConnectionIndicator isTile peerId={peerId} hideBg />
         </>
       ) : null}
@@ -70,6 +84,7 @@ const Wrapper = styled('div', {
   backgroundColor: '$background_dim',
   borderRadius: '$1',
   maxWidth: '85%',
+  zIndex: 1,
   '& p,span': {
     p: '$2 $3',
   },

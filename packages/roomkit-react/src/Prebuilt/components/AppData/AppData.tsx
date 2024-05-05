@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   HMSRoomState,
   selectFullAppData,
   selectHLSState,
   selectRoomState,
   selectRTMPState,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { LayoutMode } from '../Settings/LayoutSettings';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -50,6 +52,7 @@ const initialAppData = {
   },
   [APP_DATA.chatDraft]: '',
   [APP_DATA.sidePane]: '',
+  [APP_DATA.sheet]: '',
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
@@ -59,18 +62,34 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.loadingEffects]: false,
   [APP_DATA.background]: 'none',
-  [APP_DATA.backgroundType]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
+  // by default off, so it will not appear in beam bots
+  [APP_DATA.caption]: false,
 };
 
 export const AppData = React.memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const appData = useHMSStore(selectFullAppData);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const { isLocalVideoEnabled } = useAVToggle();
+  const sidepaneOpenedRef = useRef(false);
+
+  const defaultMediaURL = useMemo(() => {
+    const media = elements?.virtual_background?.background_media || [];
+    for (let i = 0; i < media.length; i++) {
+      if (media[i].default && media[i].url) {
+        return media[i].url;
+      }
+    }
+    return '';
+  }, [elements?.virtual_background?.background_media]);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -102,6 +121,14 @@ export const AppData = React.memo(() => {
     }
     hmsActions.setAppData(APP_DATA.subscribedNotifications, preferences.subscribedNotifications, true);
   }, [preferences.subscribedNotifications, hmsActions]);
+
+  useEffect(() => {
+    if (defaultMediaURL && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
+      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
+      sidepaneOpenedRef.current = true;
+      toggleVB();
+    }
+  }, [hmsActions, toggleVB, isLocalVideoEnabled, defaultMediaURL]);
 
   return <ResetStreamingStart />;
 });

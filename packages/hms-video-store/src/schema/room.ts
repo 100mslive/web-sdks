@@ -1,5 +1,5 @@
 import { HMSPeerID } from './peer';
-import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP } from '../interfaces';
+import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP, HMSTranscriptionInfo } from '../interfaces';
 
 export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };
 export type HMSRoomID = string;
@@ -33,6 +33,7 @@ export interface HMSRoom {
   sessionId: string;
   startedAt?: Date;
   joinedAt?: Date;
+  transcriptions?: HMSTranscriptionInfo[];
   /**
    * if this number is available room.peers is not guaranteed to have all the peers.
    */
@@ -40,4 +41,6 @@ export interface HMSRoom {
   isLargeRoom?: boolean;
   isEffectsEnabled?: boolean;
   effectsKey?: string;
+  isHipaaEnabled?: boolean;
+  isNoiseCancellationEnabled?: boolean;
 }
