@@ -59,7 +59,9 @@ export const VideoStreamingSection = ({
   useCloseScreenshareWhiteboard();
 
   const isNotAllowedToPublish = localPeerRole?.publishParams?.allowed.length === 0;
-  const isScreenOnlyPublishParams = localPeerRole?.publishParams?.allowed.some(value => value === 'screen');
+  const isScreenOnlyPublishParams =
+    localPeerRole?.publishParams?.allowed.some(value => value === 'screen') &&
+    localPeerRole?.publishParams?.allowed.length === 1;
 
   useEffect(() => {
     if (!isConnected) {
