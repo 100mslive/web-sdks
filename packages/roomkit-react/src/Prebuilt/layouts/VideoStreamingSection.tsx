@@ -6,6 +6,7 @@ import {
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { PeopleAddIcon } from '@100mslive/react-icons';
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
@@ -91,7 +92,13 @@ export const VideoStreamingSection = ({
           )
           .when(
             ({ localPeerRole }) => localPeerRole === waitingViewerRole,
-            () => <WaitingView />,
+            () => (
+              <WaitingView
+                title="Waiting for Host to join"
+                subTitle="Sit back and relax"
+                icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
+              />
+            ),
           )
           .when(
             ({ pdfAnnotatorActive }) => !!pdfAnnotatorActive,
