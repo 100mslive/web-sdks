@@ -358,6 +358,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
+
     if (trackID) {
       await this.setSDKLocalAudioTrackSettings(trackID, settings);
       this.syncRoomState('setAudioSettings');

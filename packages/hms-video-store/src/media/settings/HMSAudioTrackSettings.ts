@@ -52,16 +52,8 @@ export class HMSAudioTrackSettingsBuilder {
   audioMode(mode?: HMSAudioMode) {
     if (mode === HMSAudioMode.MUSIC) {
       this._maxBitrate = 320;
-      this._advanced.forEach((constraint, index) => {
-        if (constraint.autoGainControl) {
-          this._advanced[index] = { autoGainControl: { exact: false } };
-        }
-        if (constraint.noiseSuppression) {
-          this._advanced[index] = { noiseSuppression: { exact: false } };
-        }
-      });
+      this._advanced = [{ autoGainControl: { exact: false } }, { noiseSuppression: { exact: false } }];
     }
-
     return this;
   }
 
