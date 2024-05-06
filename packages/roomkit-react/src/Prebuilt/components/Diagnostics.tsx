@@ -23,18 +23,6 @@ import { ErrorDialog } from '../primitives/DialogContent';
 // @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 
-function isRoomCode(str: string) {
-  const regex = /^[A-Za-z]*(-[A-Za-z]*){2}$/;
-  return regex.test(str);
-}
-
-export const getRoomCodeFromUrl = () => {
-  const path = window.location.pathname;
-  const regex = /(\/streaming)?(\/(preview|meeting))?\/(?<code>[^/]+)/;
-  const roomCode = path.match(regex)?.groups?.code || null;
-  return roomCode && isRoomCode(roomCode) ? roomCode : null;
-};
-
 const diagnostics = new HMSDiagnostics();
 const HMSDiagnosticsChecks = Object.keys(HMSDiagnosticsCheck);
 
@@ -192,7 +180,6 @@ const downloadJson = (obj, fileName) => {
   a.click();
 };
 
-const env = process.env.REACT_APP_ENV;
 const Diagnostics = () => {
   const [results, setResults] = useState([]);
   const [jsonResult, setJsonResult] = useState();

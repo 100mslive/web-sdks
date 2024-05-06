@@ -25,6 +25,10 @@ export {
   HMSGetMediaActions,
   HMSPluginUnsupportedTypes,
   HMSRecordingState,
+  HLSPlaylistType,
+  HLSStreamType,
+  HMSTranscriptionMode,
+  HMSTranscriptionState,
   HMSPeerType,
 } from './internal';
 
@@ -66,12 +70,9 @@ export type {
   HMSPluginSupportResult,
   HMSFrameworkInfo,
   InitConfig,
-  HLSPlaylistType,
-  HLSStreamType,
-  HMSTranscriptionMode,
-  HMSTranscriptionState,
 } from './internal';
 
+export { EventBus } from './events/EventBus';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSSdk } from './sdk/index';
 export { TrackAudioLevelMonitor } from './utils/track-audio-level-monitor';
