@@ -92,7 +92,6 @@ const RoleChangeContent = ({
               data-testid="open_role_selection_dropdown"
               asChild
               css={{
-                border: '1px solid $border_bright',
                 bg: '$surface_default',
                 r: '$1',
                 p: '$6 $9',
