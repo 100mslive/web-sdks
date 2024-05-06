@@ -56,7 +56,7 @@ const RoleChangeContent = ({
 
       <Box>
         <Text
-          variant="body2"
+          variant="sm"
           css={{
             mt: '$4',
             mb: '$8',
@@ -68,7 +68,7 @@ const RoleChangeContent = ({
         >
           Switch the role of
           <HighlightTerm value={peer.name} />
-          from <HighlightTerm value={peer.roleName} />
+          from <HighlightTerm value={peer.roleName} /> to
         </Text>
       </Box>
       <Flex
@@ -176,12 +176,10 @@ export const RoleChangeModal = ({
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
-          <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
-        </Dialog.Content>
-      </Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10', overflow: 'visible' }}>
+        <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
+      </Dialog.Content>
     </Dialog.Root>
   );
 };
