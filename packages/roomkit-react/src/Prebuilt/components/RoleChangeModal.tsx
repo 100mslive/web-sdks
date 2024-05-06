@@ -165,8 +165,8 @@ export const RoleChangeModal = ({
 
   if (isMobile) {
     return (
-      <Sheet.Root open={true} onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ p: '$12 $8', background: '$surface_dim' }}>
+      <Sheet.Root open={true} onOpenChange={onOpenChange} css={{ borderRadius: '$0 $0 0 0' }}>
+        <Sheet.Content css={{ p: '$10 $8', background: '$surface_default' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} isMobile />
         </Sheet.Content>
       </Sheet.Root>
