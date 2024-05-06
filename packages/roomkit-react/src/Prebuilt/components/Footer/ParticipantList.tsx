@@ -437,6 +437,7 @@ export const ParticipantSearch = ({
 }) => {
   const [value, setValue] = React.useState('');
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
 
   useDebounce(
     () => {
@@ -471,6 +472,8 @@ export const ParticipantSearch = ({
         }}
         autoComplete="off"
         aria-autocomplete="none"
+        // @ts-ignore Flag added for customiser UI
+        autoFocus={!elements?.chat?.disable_autofocus}
       />
     </Flex>
   );
