@@ -89,8 +89,6 @@ import {
   selectVideoTrackByID,
 } from '../selectors';
 
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
-
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
  * and takes control of data management by letting every action pass through it. The
@@ -602,6 +600,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
+  async getPeer(peerId: string) {
+    const peer = await this.sdk.getPeer(peerId);
+    if (peer) {
+      return SDKToHMS.convertPeer(peer) as HMSPeer;
+    }
+    return undefined;
+  }
+
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     const iterator = this.sdk.getPeerListIterator(options);
     return {
@@ -1002,6 +1008,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
     const hls = this.sdk.getHLSState();
+    const transcriptions = this.sdk.getTranscriptionState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -1029,7 +1036,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls, transcriptions));
       Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
@@ -1146,6 +1153,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    if (hmsMessage.type === 'hms_transcript') {
+      hmsMessage.ignored = true;
+    }
     this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }

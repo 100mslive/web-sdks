@@ -22,7 +22,6 @@ import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from './EmojiReaction';
-// @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
@@ -34,7 +33,6 @@ import {
 // @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-// @ts-ignore: No implicit Any
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 export const ConferenceScreen = () => {

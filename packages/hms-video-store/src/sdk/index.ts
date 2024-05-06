@@ -235,6 +235,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.hls;
   }
 
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
+  }
+
   getTemplateAppData() {
     return this.store.getTemplateAppData();
   }
@@ -722,6 +726,14 @@ export class HMSSdk implements HMSInterface {
     }
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
+  }
+
+  async getPeer(peerId: string) {
+    const response = await this.transport.signal.getPeer({ peer_id: peerId });
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {

@@ -47,6 +47,8 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   sheet: 'sheet',
+  caption: 'caption',
+  loadingEffects: 'loadingEffects',
 };
 
 export const UI_SETTINGS = {
@@ -67,6 +69,8 @@ export const SIDE_PANE_OPTIONS = {
   VB: 'VB',
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
+
+export type SidePaneOption = (typeof SIDE_PANE_OPTIONS)[keyof typeof SIDE_PANE_OPTIONS];
 
 export const SHEET_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
@@ -117,7 +121,6 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
-  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {
