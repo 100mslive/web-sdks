@@ -183,7 +183,8 @@ const downloadJson = (obj: object, fileName: string) => {
 
 const QUERY_PARAM_AUTH_TOKEN = 'token';
 const env = process.env.REACT_APP_ENV || 'prod';
-const Diagnostics = () => {
+
+export const Diagnostics = () => {
   const [results, setResults] = useState<HMSDiagnosticsOutputValue[]>([]);
   const [jsonResult, setJsonResult] = useState<HMSDiagnosticsOutput>();
   const authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
@@ -292,5 +293,3 @@ const Diagnostics = () => {
     </Flex>
   );
 };
-
-export default Diagnostics;
