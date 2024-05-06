@@ -19,8 +19,6 @@ import { useTheme } from '../../Theme';
 import { StyledVideo } from '../../Video';
 // @ts-ignore: No implicit Any
 import { ErrorDialog } from '../primitives/DialogContent';
-// @ts-ignore: No implicit Any
-import FullPageProgress from './FullPageProgress';
 
 const diagnostics = new HMSDiagnostics();
 const HMSDiagnosticsChecks = Object.keys(HMSDiagnosticsCheck);
@@ -145,6 +143,12 @@ const VideoTile = React.memo(
     const videoRef = useRef<HTMLVideoElement | null>(null);
     useAudioLevelStyles(audioTrack, videoRef);
 
+    useEffect(() => {
+      if (videoRef.current && videoTrack) {
+        videoRef.current.srcObject = new MediaStream([videoTrack]);
+      }
+    }, [videoTrack]);
+
     return (
       <Flex direction="column" css={{ w: '60%' }}>
         {videoTrack && (
@@ -188,7 +192,6 @@ export const Diagnostics = () => {
   const [results, setResults] = useState<HMSDiagnosticsOutputValue[]>([]);
   const [jsonResult, setJsonResult] = useState<HMSDiagnosticsOutput>();
   const authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
-  const [error] = useState({ title: '', body: '' });
 
   // const tokenEndpoint = useTokenEndpoint();
   // const [token, setToken] = useState(null);
@@ -220,7 +223,13 @@ export const Diagnostics = () => {
           },
           {
             onUpdate: update => {
-              setResults(res => res.concat(update));
+              setResults(res => {
+                if (res.find(item => item.id === update.id)) {
+                  return res;
+                } else {
+                  return res.concat(update);
+                }
+              });
             },
           },
         )
@@ -241,16 +250,12 @@ export const Diagnostics = () => {
     [results],
   );
 
-  if (error.title) {
-    return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;
-  }
-
   if (!authToken) {
-    return <FullPageProgress />;
+    return <ErrorDialog title="Missing token">Auth token required to diagnose a session is missing</ErrorDialog>;
   }
 
   return (
-    <Flex direction="column" css={{ size: '100%', overflowY: 'auto' }}>
+    <Flex direction="column" css={{ size: '100%', overflowY: 'auto', bg: '$background_default' }}>
       <Header />
       {results && (
         <Flex>
