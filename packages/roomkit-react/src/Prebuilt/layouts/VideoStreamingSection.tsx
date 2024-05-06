@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useMemo } from 'react';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -10,6 +10,8 @@ import {
   selectIsLocalScreenShared,
   selectLocalPeerRole,
   selectLocalPeerRoleName,
+  selectPeersByRoles,
+  selectRolesMap,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -58,10 +60,20 @@ export const VideoStreamingSection = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
 
+  const roles = useHMSStore(selectRolesMap);
+  const peersByRoles = useHMSStore(selectPeersByRoles(localPeerRole?.subscribeParams.subscribeToRoles || []));
   const isNotAllowedToPublish = localPeerRole?.publishParams?.allowed.length === 0;
   const isScreenOnlyPublishParams =
     localPeerRole?.publishParams?.allowed.some(value => value === 'screen') &&
     localPeerRole?.publishParams?.allowed.length === 1;
+  const hasSubscribedRolePublishing = useMemo(() => {
+    return peersByRoles.some(peer => {
+      if (peer.roleName && roles[peer.roleName]) {
+        return !!roles[peer.roleName].publishParams?.allowed.length;
+      }
+      return true;
+    });
+  }, [peersByRoles, roles]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -99,6 +111,7 @@ export const VideoStreamingSection = ({
           screenType,
           isNotAllowedToPublish,
           isScreenOnlyPublishParams,
+          hasSubscribedRolePublishing,
           isSharingScreen,
           pdfAnnotatorActive,
           urlToIframe,
@@ -110,7 +123,8 @@ export const VideoStreamingSection = ({
             () => <HLSView />,
           )
           .when(
-            ({ isNotAllowedToPublish }) => isNotAllowedToPublish,
+            ({ isNotAllowedToPublish, hasSubscribedRolePublishing }) =>
+              isNotAllowedToPublish && !hasSubscribedRolePublishing,
             () => (
               <WaitingView
                 title="Waiting for Host to join"
@@ -120,7 +134,8 @@ export const VideoStreamingSection = ({
             ),
           )
           .when(
-            ({ isScreenOnlyPublishParams, isSharingScreen }) => isScreenOnlyPublishParams && !isSharingScreen,
+            ({ isScreenOnlyPublishParams, isSharingScreen, hasSubscribedRolePublishing }) =>
+              isScreenOnlyPublishParams && !isSharingScreen && !hasSubscribedRolePublishing,
             () => (
               <WaitingView
                 title="Ready to present"
