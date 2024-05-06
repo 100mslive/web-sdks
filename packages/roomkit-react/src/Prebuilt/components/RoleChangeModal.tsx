@@ -175,10 +175,12 @@ export const RoleChangeModal = ({
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Overlay />
-      <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10', overflow: 'visible' }}>
-        <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
-      </Dialog.Content>
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10', overflow: 'visible' }}>
+          <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
+        </Dialog.Content>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };
