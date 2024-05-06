@@ -1,13 +1,12 @@
-// @ts-nocheck
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParam } from 'react-use';
 import {
   HMSDiagnostics,
   HMSDiagnosticsCheck,
+  HMSDiagnosticsOutput,
   HMSDiagnosticsOutputValue,
   TrackAudioLevelMonitor,
 } from '@100mslive/hms-diagnostics';
-import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { Logo } from './Header/HeaderComponents';
 import { Accordion } from '../../Accordion';
@@ -31,7 +30,7 @@ const DiagnosticsItem = ({
   properties,
 }: {
   name: HMSDiagnosticsCheck;
-  properties: HMSDiagnosticsOutputValue;
+  properties?: HMSDiagnosticsOutputValue;
 }) => {
   if (!name) {
     return null;
@@ -95,13 +94,13 @@ const DiagnosticsItem = ({
   );
 };
 
-const sigmoid = z => {
+const sigmoid = (z: number) => {
   return 1 / (1 + Math.exp(-z));
 };
 
 const AUDIO_LEVEL_THRESHOLD = 35;
 
-function useAudioLevelStyles(track: HMSTrack, ref: MutableRefObject<HTMLDivElement | null>) {
+function useAudioLevelStyles(track: MediaStreamTrack, ref: MutableRefObject<HTMLVideoElement | null>) {
   const audioLevelMonitor = useRef<TrackAudioLevelMonitor | null>(null);
   const { theme } = useTheme();
   const color = theme.colors.primary_default.value;
@@ -141,22 +140,24 @@ function useAudioLevelStyles(track: HMSTrack, ref: MutableRefObject<HTMLDivEleme
   }, [track, ref, getStyle]);
 }
 
-const VideoTile = React.memo(({ videoTrack, audioTrack }: { videoTrack: HMSVideoTrack; audioTrack: HMSAudioTrack }) => {
-  const videoRef = useRef<HTMLDivElement | null>(null);
-  useAudioLevelStyles(audioTrack, videoRef);
+const VideoTile = React.memo(
+  ({ videoTrack, audioTrack }: { videoTrack: MediaStreamTrack; audioTrack: MediaStreamTrack }) => {
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    useAudioLevelStyles(audioTrack, videoRef);
 
-  return (
-    <Flex direction="column" css={{ w: '60%' }}>
-      {videoTrack && (
-        <>
-          <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} mirror={true} />
-          <Text css={{ textAlign: 'center', mb: '$3', mt: '$10' }}>Camera Used: {videoTrack.label}</Text>
-        </>
-      )}
-      {audioTrack && <Text css={{ textAlign: 'center', my: '$3' }}>Microphone Used: {audioTrack.label}</Text>}
-    </Flex>
-  );
-});
+    return (
+      <Flex direction="column" css={{ w: '60%' }}>
+        {videoTrack && (
+          <>
+            <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} mirror={true} />
+            <Text css={{ textAlign: 'center', mb: '$3', mt: '$10' }}>Camera Used: {videoTrack.label}</Text>
+          </>
+        )}
+        {audioTrack && <Text css={{ textAlign: 'center', my: '$3' }}>Microphone Used: {audioTrack.label}</Text>}
+      </Flex>
+    );
+  },
+);
 
 const Header = () => {
   return (
@@ -170,7 +171,7 @@ const Header = () => {
   );
 };
 
-const downloadJson = (obj, fileName) => {
+const downloadJson = (obj: object, fileName: string) => {
   const a = document.createElement('a');
   const file = new Blob([JSON.stringify(obj, null, 2)], {
     type: 'application/json',
@@ -180,9 +181,11 @@ const downloadJson = (obj, fileName) => {
   a.click();
 };
 
+const QUERY_PARAM_AUTH_TOKEN = 'token';
+const env = process.env.REACT_APP_ENV || 'prod';
 const Diagnostics = () => {
-  const [results, setResults] = useState([]);
-  const [jsonResult, setJsonResult] = useState();
+  const [results, setResults] = useState<HMSDiagnosticsOutputValue[]>([]);
+  const [jsonResult, setJsonResult] = useState<HMSDiagnosticsOutput>();
   const authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
   const [error] = useState({ title: '', body: '' });
 
@@ -227,13 +230,13 @@ const Diagnostics = () => {
     }
   }, [authToken]);
 
-  const videoTrack = useMemo(
-    () => results.find(item => item.name.toLowerCase().includes('camera'))?.info.videoTrack,
+  const videoTrack: MediaStreamTrack = useMemo(
+    () => results?.find(item => item?.name.toLowerCase().includes('camera'))?.info?.videoTrack,
     [results],
   );
 
-  const audioTrack = useMemo(
-    () => results.find(item => item.name.toLowerCase().includes('microphone'))?.info.audioTrack,
+  const audioTrack: MediaStreamTrack = useMemo(
+    () => results?.find(item => item?.name.toLowerCase().includes('microphone'))?.info?.audioTrack,
     [results],
   );
 
@@ -257,12 +260,12 @@ const Diagnostics = () => {
               m: '$8',
             }}
           >
-            <Accordion.Root defaultValue="WebRTC" type="multiple" collapsible>
+            <Accordion.Root defaultValue={['WebRTC']} type="multiple">
               {HMSDiagnosticsChecks.map(name => {
                 const checkResults = results.filter(check => check.name === name);
                 // check loading
                 if (checkResults.length === 0) {
-                  return <DiagnosticsItem key={name} name={name} />;
+                  return <DiagnosticsItem key={name} name={name as HMSDiagnosticsCheck} />;
                 } else {
                   return checkResults.map(item => <DiagnosticsItem key={item.id} name={item.name} properties={item} />);
                 }

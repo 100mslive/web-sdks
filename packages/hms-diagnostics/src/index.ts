@@ -271,4 +271,4 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
 export { TrackAudioLevelMonitor } from '@100mslive/hms-video-store';
 export { HMSDiagnosticsCheck } from './interfaces';
-export type { HMSDiagnosticsOutputValue } from './interfaces';
+export type { HMSDiagnosticsOutputValue, HMSDiagnosticsOutput } from './interfaces';
