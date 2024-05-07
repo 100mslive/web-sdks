@@ -15,7 +15,7 @@ import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings
 import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
-  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
+  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced' | 'audioMode') {
     return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
