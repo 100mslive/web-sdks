@@ -249,7 +249,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
     const { volume, codec, maxBitrate, deviceId, advanced, audioMode } = { ...this.settings, ...settings };
     const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced, audioMode);
-    console.log({ newSettings });
     return newSettings;
   }
 
@@ -257,7 +256,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if ((hasPropertyChanged('maxBitrate') || hasPropertyChanged('audioMode')) && settings.maxBitrate) {
-      await stream.setMaxBitrateAndFramerate(this);
+      await stream.setMaxBitrateAndFramerate(this, settings);
     }
 
     if (hasPropertyChanged('advanced') || hasPropertyChanged('audioMode')) {

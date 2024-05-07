@@ -3,6 +3,7 @@ import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { SimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../settings';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
 export class HMSLocalStream extends HMSMediaStream {
@@ -25,9 +26,11 @@ export class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
-    console.trace(track);
-    await this.connection?.setMaxBitrateAndFramerate(track);
+  async setMaxBitrateAndFramerate(
+    track: HMSLocalTrack,
+    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
+  ): Promise<void> {
+    await this.connection?.setMaxBitrateAndFramerate(track, updatedSettings);
   }
 
   // @ts-ignore

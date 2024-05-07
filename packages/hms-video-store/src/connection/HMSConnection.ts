@@ -1,6 +1,7 @@
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import JsonRpcSignal from '../signal/jsonrpc';
@@ -162,7 +163,15 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
+  // eslint-disable-next-line
+  async setMaxBitrateAndFramerate(
+    track: HMSLocalTrack,
+    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
+  ) {
+    if (updatedSettings) {
+      track.settings = updatedSettings;
+    }
+
     const maxBitrate = track.settings.maxBitrate;
     const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
