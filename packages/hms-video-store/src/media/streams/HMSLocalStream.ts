@@ -26,6 +26,7 @@ export class HMSLocalStream extends HMSMediaStream {
   }
 
   async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
+    console.trace(track);
     await this.connection?.setMaxBitrateAndFramerate(track);
   }
 

@@ -39,7 +39,8 @@ export class HMSAudioTrackSettingsBuilder {
     if (maxBitrate && maxBitrate <= 0) {
       throw Error('maxBitrate should be >= 1');
     }
-    this._maxBitrate = maxBitrate;
+    console.log('maxbr', maxBitrate, this._audioMode);
+    this._maxBitrate = this._audioMode === HMSAudioMode.MUSIC ? 320 : maxBitrate;
     return this;
   }
 
@@ -49,11 +50,12 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
-  audioMode(mode?: HMSAudioMode) {
-    if (mode === HMSAudioMode.MUSIC) {
+  audioMode(mode: HMSAudioMode = HMSAudioMode.VOICE) {
+    this._audioMode = mode;
+    if (this._audioMode === HMSAudioMode.MUSIC) {
       this._maxBitrate = 320;
-      this._advanced = [{ autoGainControl: { exact: false } }, { noiseSuppression: { exact: false } }];
     }
+    console.trace({ mode });
     return this;
   }
 
@@ -96,12 +98,15 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
     this.deviceId = deviceId;
     this.advanced = advanced;
     this.audioMode = audioMode;
+    if (this.audioMode === HMSAudioMode.MUSIC) {
+      this.maxBitrate = 320;
+    }
   }
 
   toConstraints(): MediaTrackConstraints {
     return {
       deviceId: this.deviceId,
-      advanced: this.advanced,
+      advanced: this.audioMode === HMSAudioMode.MUSIC ? [] : this.advanced,
     };
   }
 
