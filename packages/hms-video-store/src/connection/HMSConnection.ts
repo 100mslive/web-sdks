@@ -168,11 +168,7 @@ export default abstract class HMSConnection {
     track: HMSLocalTrack,
     updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
   ) {
-    if (updatedSettings) {
-      track.settings = updatedSettings;
-    }
-
-    const maxBitrate = track.settings.maxBitrate;
+    const maxBitrate = updatedSettings?.maxBitrate || track.settings.maxBitrate;
     const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
