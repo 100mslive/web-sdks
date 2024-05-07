@@ -56,7 +56,7 @@ const RoleChangeContent = ({
 
       <Box>
         <Text
-          variant="body2"
+          variant="sm"
           css={{
             mt: '$4',
             mb: '$8',
@@ -68,7 +68,7 @@ const RoleChangeContent = ({
         >
           Switch the role of
           <HighlightTerm value={peer.name} />
-          from <HighlightTerm value={peer.roleName} />
+          from <HighlightTerm value={peer.roleName} /> to
         </Text>
       </Box>
       <Flex
@@ -92,7 +92,6 @@ const RoleChangeContent = ({
               data-testid="open_role_selection_dropdown"
               asChild
               css={{
-                border: '1px solid $border_bright',
                 bg: '$surface_default',
                 r: '$1',
                 p: '$6 $9',
@@ -166,8 +165,8 @@ export const RoleChangeModal = ({
 
   if (isMobile) {
     return (
-      <Sheet.Root open={true} onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ p: '$12 $8', background: '$surface_dim' }}>
+      <Sheet.Root open={true} onOpenChange={onOpenChange} css={{ borderRadius: '$0 $0 0 0' }}>
+        <Sheet.Content css={{ p: '$10 $8', background: '$surface_dim', border: '1px solid $border_default' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} isMobile />
         </Sheet.Content>
       </Sheet.Root>
@@ -178,7 +177,7 @@ export const RoleChangeModal = ({
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
+        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10', overflow: 'visible' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
         </Dialog.Content>
       </Dialog.Portal>
