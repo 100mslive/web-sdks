@@ -39,7 +39,9 @@ const RoleChangeContent = ({
   onOpenChange: (open: boolean) => void;
   isMobile?: boolean;
 }) => {
-  const roles = useHMSStore(selectAvailableRoleNames).filter(role => role !== peer?.roleName);
+  const roles = useHMSStore(selectAvailableRoleNames).filter(
+    role => role !== peer?.roleName || role !== '__internal_recorder',
+  );
   const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
