@@ -4,6 +4,8 @@ package sessionstorepb;
 
 option go_package = "./internal;sessionstorepb";
 
+import "google/protobuf/timestamp.proto";
+
 service Api {
   rpc Hello(HelloRequest) returns (HelloResponse) {}
   rpc Subscribe(SubscribeRequest) returns (stream Event) {}
@@ -49,6 +51,9 @@ service Store {
 
   // delete key from store
   rpc delete (DeleteRequest) returns (DeleteResponse) {}
+
+  // count get count of keys
+  rpc count(CountRequest) returns (CountResponse) {}
 }
 
 // define new structure for value based on client needs and add support in
@@ -115,3 +120,10 @@ message OpenRequest {
   string change_id = 1;
   repeated Select select = 3;
 }
+
+message CountRequest {}
+
+message CountResponse {
+  int64 count = 1;
+}
+

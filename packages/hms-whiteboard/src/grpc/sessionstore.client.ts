@@ -5,6 +5,8 @@ import type { RpcOptions, RpcTransport, ServerStreamingCall, ServiceInfo, UnaryC
 import { stackIntercept } from '@protobuf-ts/runtime-rpc';
 import type {
   ChangeStream,
+  CountRequest,
+  CountResponse,
   DeleteRequest,
   DeleteResponse,
   Event,
@@ -94,6 +96,12 @@ export interface IStoreClient {
    * @generated from protobuf rpc: delete(sessionstorepb.DeleteRequest) returns (sessionstorepb.DeleteResponse);
    */
   delete(input: DeleteRequest, options?: RpcOptions): UnaryCall<DeleteRequest, DeleteResponse>;
+  /**
+   * count get count of keys
+   *
+   * @generated from protobuf rpc: count(sessionstorepb.CountRequest) returns (sessionstorepb.CountResponse);
+   */
+  count(input: CountRequest, options?: RpcOptions): UnaryCall<CountRequest, CountResponse>;
 }
 // metadata token -> session id, room id, user id, username
 
@@ -152,5 +160,15 @@ export class StoreClient implements IStoreClient, ServiceInfo {
     const method = this.methods[3],
       opt = this._transport.mergeOptions(options);
     return stackIntercept<DeleteRequest, DeleteResponse>('unary', this._transport, method, opt, input);
+  }
+  /**
+   * count get count of keys
+   *
+   * @generated from protobuf rpc: count(sessionstorepb.CountRequest) returns (sessionstorepb.CountResponse);
+   */
+  count(input: CountRequest, options?: RpcOptions): UnaryCall<CountRequest, CountResponse> {
+    const method = this.methods[4],
+      opt = this._transport.mergeOptions(options);
+    return stackIntercept<CountRequest, CountResponse>('unary', this._transport, method, opt, input);
   }
 }
