@@ -256,11 +256,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleSettingsChange = async (settings: HMSAudioTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
+    if ((hasPropertyChanged('maxBitrate') || hasPropertyChanged('audioMode')) && settings.maxBitrate) {
       await stream.setMaxBitrateAndFramerate(this);
     }
 
-    if (hasPropertyChanged('advanced')) {
+    if (hasPropertyChanged('advanced') || hasPropertyChanged('audioMode')) {
       await this.replaceTrackWith(settings);
     }
   };
