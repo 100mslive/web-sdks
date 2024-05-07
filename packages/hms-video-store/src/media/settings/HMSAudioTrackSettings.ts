@@ -39,7 +39,6 @@ export class HMSAudioTrackSettingsBuilder {
     if (maxBitrate && maxBitrate <= 0) {
       throw Error('maxBitrate should be >= 1');
     }
-    console.log('maxbr', maxBitrate, this._audioMode);
     this._maxBitrate = this._audioMode === HMSAudioMode.MUSIC ? 320 : maxBitrate;
     return this;
   }
@@ -55,7 +54,6 @@ export class HMSAudioTrackSettingsBuilder {
     if (this._audioMode === HMSAudioMode.MUSIC) {
       this._maxBitrate = 320;
     }
-    console.trace({ mode });
     return this;
   }
 

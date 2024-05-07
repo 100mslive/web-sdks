@@ -176,7 +176,6 @@ export default abstract class HMSConnection {
     const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
-    console.trace(maxBitrate);
     if (sender) {
       const params = sender.getParameters();
       // modify only for non-simulcast encodings
