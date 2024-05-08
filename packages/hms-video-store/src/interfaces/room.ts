@@ -133,4 +133,9 @@ export enum HMSTranscriptionMode {
 export interface HMSTranscriptionInfo {
   state?: HMSTranscriptionState;
   mode?: HMSTranscriptionMode;
+  initialised_at?: Date;
+  started_at?: Date;
+  updated_at?: Date;
+  stopped_at?: Date;
+  error?: HMSException;
 }

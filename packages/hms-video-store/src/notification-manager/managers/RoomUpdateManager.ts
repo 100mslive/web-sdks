@@ -59,6 +59,9 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.HLS_UPDATE:
         this.updateHLSStatus(notification as HLSNotification);
         break;
+      case HMSNotificationMethod.TRANSCRIPTION_UPDATE:
+        this.handleTranscriptionStatus([notification as TranscriptionNotification]);
+        break;
       default:
         break;
     }
@@ -125,12 +128,18 @@ export class RoomUpdateManager {
     if (!transcriptions) {
       return [];
     }
-    return transcriptions.map((transcription: TranscriptionNotification) => {
+    const output = transcriptions.map((transcription: TranscriptionNotification) => {
       return {
         state: transcription.state,
         mode: transcription.mode,
+        initialised_at: convertDateNumToDate(transcription.initialised_at),
+        started_at: convertDateNumToDate(transcription.started_at),
+        stopped_at: convertDateNumToDate(transcription.stopped_at),
+        updated_at: convertDateNumToDate(transcription.updated_at),
+        error: this.toSdkError(transcription?.error),
       };
     });
+    return output;
   }
   private isRecordingRunning(state?: HMSRecordingState): boolean {
     if (!state) {
@@ -200,6 +209,15 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
+  private handleTranscriptionStatus(notification: TranscriptionNotification[]) {
+    const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on transcription - room not present');
+      return;
+    }
+    room.transcriptions = this.addTranscriptionDetail(notification) || [];
+    this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
+  }
   private convertHls(hlsNotification?: HLSNotification) {
     const isInitialised =
       hlsNotification?.variants && hlsNotification.variants.length > 0

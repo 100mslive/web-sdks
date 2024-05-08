@@ -701,6 +701,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.stopHLSStreaming(params);
   }
 
+  async startTranscription(params?: sdkTypes.TranscriptionConfig) {
+    await this.sdk.startTranscription(params);
+  }
+
+  async stopTranscription(params?: sdkTypes.TranscriptionConfig): Promise<void> {
+    await this.sdk.stopTranscription(params);
+  }
+
   async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
     await this.sdk.sendHLSTimedMetadata(metadataList);
   }

@@ -133,6 +133,12 @@ export interface PeerNotification {
 export interface TranscriptionNotification {
   state?: HMSTranscriptionState;
   mode?: HMSTranscriptionMode;
+  initialised_at?: number;
+  started_at?: number;
+  updated_at?: number;
+  stopped_at?: number;
+  peer?: PeerNotificationInfo;
+  error?: ServerError;
 }
 
 export interface RoomState {
