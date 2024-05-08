@@ -473,7 +473,7 @@ export const ParticipantSearch = ({
         autoComplete="off"
         aria-autocomplete="none"
         // @ts-ignore Flag added for customiser UI
-        autoFocus={!elements?.chat?.disable_autofocus}
+        autoFocus={!elements?.participant_list?.disable_autofocus}
       />
     </Flex>
   );
