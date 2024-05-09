@@ -120,7 +120,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
 
-    this.nativeConnection = new RTCPeerConnection(config);
+    this.nativeConnection = new RTCPeerConnewction(config);
     this.initNativeConnectionCallbacks();
   }
 

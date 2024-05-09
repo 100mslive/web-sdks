@@ -425,6 +425,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
