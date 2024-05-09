@@ -5,6 +5,23 @@ import InitialSettings from './settings';
  * @link https://docs.100ms.live/javascript/v2/features/preview
  * @link https://docs.100ms.live/javascript/v2/features/join
  */
+
+export type HMSICEServer = {
+  urls: string[];
+  userName?: string;
+  password?: string;
+};
+
+enum HMSProxyType {
+  Socks5 = 0,
+}
+
+export type HMSProxyConfig = {
+  type: HMSProxyType;
+  host: string;
+  port: number;
+};
+
 export interface HMSConfig {
   /**
    * the name of the peer, can be later accessed via peer.name and can also be changed mid call.
@@ -57,6 +74,14 @@ export interface HMSConfig {
    * will be kept awake.
    */
   autoManageWakeLock?: boolean;
+  /**
+   * use custom proxy for signalling connection (advanced)
+   */
+  proxy?: HMSProxyConfig;
+  /**
+   * use custom STUN/TURN servers for media connection (advanced)
+   */
+  iceServers?: HMSICEServer[];
 }
 
 export interface HMSMidCallPreviewConfig {
