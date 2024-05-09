@@ -6,8 +6,6 @@ import { Text } from '../../Text';
 import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen } from '../components/AppData/useSidepane';
-// @ts-ignore: No implicit Any
-import { useIsCaptionEnabled } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 interface CaptionQueueData extends HMSTranscript {
@@ -142,7 +140,7 @@ class CaptionMaintainerQueue {
   }
 }
 const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) => {
-  const peerName = useHMSStore(selectPeerNameByID(peer_id)) || 'Participant';
+  const peerName = useHMSStore(selectPeerNameByID(peer_id)) || peer_id;
   data = data.trim();
   if (!data) return null;
   return (
@@ -159,7 +157,7 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
 };
 
 export const CaptionsViewer = () => {
-  const { elements, screenType } = useRoomLayoutConferencingScreen();
+  const { elements } = useRoomLayoutConferencingScreen();
   const isMobile = useMedia(config.media.md);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
@@ -168,7 +166,7 @@ export const CaptionsViewer = () => {
   const [captionQueue] = useState<CaptionMaintainerQueue>(new CaptionMaintainerQueue());
   const [currentData, setCurrentData] = useState<{ [key: string]: string }[]>([]);
 
-  const isCaptionEnabled = useIsCaptionEnabled();
+  // const isCaptionEnabled = useIsCaptionEnabled();
 
   useEffect(() => {
     const timeInterval = setInterval(() => {
@@ -193,9 +191,6 @@ export const CaptionsViewer = () => {
     }
     return false;
   });
-  if (dataToShow.length <= 0 || screenType === 'hls_live_streaming' || !isCaptionEnabled) {
-    return null;
-  }
   return (
     <Box
       css={{
