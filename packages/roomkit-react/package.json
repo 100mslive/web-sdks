@@ -27,7 +27,8 @@
       "require": "./dist/index.cjs.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./index.css": "./dist/index.css"
   },
   "sideEffects": false,
   "scripts": {
@@ -78,6 +79,7 @@
     "@100mslive/hms-virtual-background": "1.13.10-alpha.8",
     "@100mslive/react-icons": "0.10.10-alpha.8",
     "@100mslive/react-sdk": "0.10.10-alpha.8",
+    "@100mslive/hms-whiteboard": "0.0.0-alpha.2",
     "@100mslive/types-prebuilt": "0.12.8",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
