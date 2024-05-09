@@ -913,7 +913,6 @@ export default class HMSTransport {
         initEndpoint,
         iceServers,
       });
-
       const room = this.store.getRoom();
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
