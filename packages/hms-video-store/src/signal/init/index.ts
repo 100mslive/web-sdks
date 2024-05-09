@@ -2,6 +2,7 @@ import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSICEServer } from '../../interfaces';
+import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
 const TAG = '[InitService]';
@@ -84,6 +85,9 @@ export function getUrl(endpoint: string, peerId: string, userAgent: string, regi
 export function transformInitConfig(config: any, iceServers?: HMSICEServer[]): InitConfig {
   return {
     ...config,
-    rtcConfiguration: { ...config.rtcConfiguration, iceServers: iceServers || config.rtcConfiguration?.ice_servers },
+    rtcConfiguration: {
+      ...config.rtcConfiguration,
+      iceServers: transformIceServerConfig(iceServers) || config.rtcConfiguration?.ice_servers,
+    },
   };
 }
