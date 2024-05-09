@@ -3,6 +3,7 @@ import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
 
 interface OpenCallbacks<T> {
+  handleOpen: (values: T[]) => void;
   handleChange: (key: string, value?: T) => void;
   handleError: (error: Error) => void;
 }
@@ -19,17 +20,33 @@ export class SessionStore<T> {
     this.storeClient = new StoreClient(transport);
   }
 
-  open({ handleChange, handleError }: OpenCallbacks<T>) {
+  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
     const call = this.storeClient.open({
       changeId: '',
       select: [],
     });
+    /**
+     * on open, get key count to call handleOpen with the pre-existing values from the store
+     */
+    const keyCount = await this.getKeysCount();
+    const initialValues: T[] = [];
+
+    if (!keyCount) {
+      handleOpen([]);
+    }
 
     call.responses.onMessage(message => {
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
-          handleChange(message.key, record);
+          if (initialValues.length === keyCount) {
+            handleChange(message.key, record);
+          } else {
+            initialValues.push(record);
+            if (initialValues.length === keyCount) {
+              handleOpen(initialValues);
+            }
+          }
         }
       } else {
         handleChange(message.key);
@@ -67,6 +84,11 @@ export class SessionStore<T> {
     if (response.value?.data.oneofKind === 'str') {
       return JSON.parse(response.value.data.str) as T;
     }
+  }
+
+  async getKeysCount() {
+    const { response } = await this.storeClient.count({});
+    return Number(response.count);
   }
 
   delete(key: string) {
