@@ -80,6 +80,7 @@ import {
   HAND_RAISE_GROUP_NAME,
 } from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
+import { getEndpointFromProxy } from '../utils/get-endpoint-from-proxy';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -420,7 +421,7 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .preview(
           config.authToken,
-          config.initEndpoint!,
+          config.initEndpoint || getEndpointFromProxy(config.proxy),
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
@@ -1329,7 +1330,7 @@ export class HMSSdk implements HMSInterface {
   private commonSetup(config: HMSConfig, roomId: string, listener: HMSPreviewListener | HMSUpdateListener) {
     this.stringifyMetadata(config);
     if (!config.initEndpoint) {
-      config.initEndpoint = 'https://prod-init.100ms.live';
+      config.initEndpoint = getEndpointFromProxy(config.proxy) || 'https://prod-init.100ms.live';
     }
     this.errorListener = listener;
     this.deviceChangeListener = listener;

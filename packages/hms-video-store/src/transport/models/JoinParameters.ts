@@ -1,4 +1,5 @@
 import { HMSICEServer, HMSProxyConfig } from '../../interfaces';
+import { getEndpointFromProxy } from '../../utils/get-endpoint-from-proxy';
 
 export class JoinParameters {
   constructor(
@@ -10,5 +11,9 @@ export class JoinParameters {
     public autoSubscribeVideo: boolean = false,
     public proxy?: HMSProxyConfig,
     public iceServers?: HMSICEServer[],
-  ) {}
+  ) {
+    if (proxy) {
+      this.endpoint = getEndpointFromProxy(proxy);
+    }
+  }
 }

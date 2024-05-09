@@ -24,6 +24,7 @@ import {
   HMSVideoTrack,
 } from '../../media/tracks';
 import { PolicyParams } from '../../notification-manager';
+import { getEndpointFromProxy } from '../../utils/get-endpoint-from-proxy';
 import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
@@ -445,7 +446,7 @@ class Store {
     });
   }
   private setEnv() {
-    const endPoint = this.config?.initEndpoint!;
+    const endPoint = this.config?.initEndpoint || getEndpointFromProxy(this.config?.proxy);
     const url = endPoint.split('https://')[1];
     let env: ENV = ENV.PROD;
     if (url.startsWith(ENV.PROD)) {
