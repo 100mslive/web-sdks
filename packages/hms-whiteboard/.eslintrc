@@ -83,5 +83,5 @@
       }
     }
   },
-  "ignorePatterns": ["src/*.css", "src/images/*", "src/grpc/*"]
+  "ignorePatterns": ["src/*.css", "src/images/*", "src/grpc/*", "dist/**"]
 }

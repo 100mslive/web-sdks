@@ -2,7 +2,7 @@
   "name": "@100mslive/hms-whiteboard",
   "author": "100ms",
   "license": "MIT",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.2",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
     "prestart": "rm -rf dist",
     "start": "rollup -c -w",
     "build": "rm -rf dist && NODE_ENV=production rollup -c",
-    "build:proto": "protoc --ts_out ./src/grpc -I=./proto proto/*proto",
+    "build:proto": "protoc --ts_opt long_type_string  --ts_out ./src/grpc -I=./proto proto/*proto",
     "lint": "eslint -c .eslintrc src",
     "lint:fix": "eslint -c .eslintrc src --fix",
     "format": "prettier -w src/**"

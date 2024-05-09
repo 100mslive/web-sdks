@@ -10,11 +10,21 @@ import {
   TLPage,
   TLRecord,
   TLStoreWithStatus,
+  transact,
 } from '@tldraw/tldraw';
 import { DEFAULT_STORE } from './default_store';
 import { useSessionStore } from './useSessionStore';
 import { useSetEditorPermissions } from './useSetEditorPermissions';
 import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
+
+// mandatory record types required for initialisation of the whiteboard and for a full remote sync
+const FULL_SYNC_REQUIRED_RECORD_TYPES: TLRecord['typeName'][] = [
+  'camera',
+  'document',
+  'instance',
+  'instance_page_state',
+  'page',
+];
 
 export function useCollaboration({
   endpoint,
@@ -55,18 +65,6 @@ export function useCollaboration({
   useSetEditorPermissions({ token, editor, zoomToContent, handleError });
 
   useEffect(() => {
-    if (!currentPage?.id || !editor || editor.getCurrentPageId() === currentPage.id) {
-      return;
-    }
-
-    if (!editor.getPages()?.find(page => page.id === currentPage.id)) {
-      editor.createPage(currentPage);
-    }
-
-    editor?.setCurrentPage(currentPage);
-  }, [currentPage, editor]);
-
-  useEffect(() => {
     if (!sessionStore) return;
 
     setStoreWithStatus({ status: 'loading' });
@@ -92,8 +90,37 @@ export function useCollaboration({
       });
     };
 
+    const handleOpen = (initialRecords: TLRecord[]) => {
+      // 2.
+      // Initialize the tldraw store with the session store server records—or, if the session store
+      // is empty, initialize the session store server with the default tldraw store records.
+      const shouldUseServerRecords = FULL_SYNC_REQUIRED_RECORD_TYPES.every(
+        type => initialRecords.filter(record => record.typeName === type).length > 0,
+      );
+      if (shouldUseServerRecords) {
+        // Replace the tldraw store records with session store
+        transact(() => {
+          // The records here should be compatible with what's in the store
+          store.clear();
+          store.put(initialRecords);
+        });
+      } else {
+        // Create the initial store records
+        // Sync the local tldraw store records to session store
+        for (const record of store.allRecords()) {
+          sessionStore.set(record.id, record);
+        }
+      }
+      setStoreWithStatus({
+        store,
+        status: 'synced-remote',
+        connectionStatus: 'online',
+      });
+    };
+
     // Open session and sync the session store changes to the store
     sessionStore.open({
+      handleOpen,
       handleChange,
       handleError,
     });
@@ -117,31 +144,6 @@ export function useCollaboration({
         { source: 'user', scope: 'document' }, // only sync user's document changes
       ),
     );
-
-    // 2.
-    // Initialize the store with the yjs doc records—or, if the yjs doc
-    // is empty, initialize the yjs doc with the default store records.
-    // if (yStore.yarray.length) {
-    //   // Replace the store records with the yjs doc records
-    //   transact(() => {
-    //     // The records here should be compatible with what's in the store
-    //     store.clear();
-    //     const records = yStore.yarray.toJSON().map(({ val }) => val);
-    //     store.put(records);
-    //   });
-    // } else {
-    //   // Create the initial store records
-    //   // Sync the store records to the yjs doc
-    //   for (const record of store.allRecords()) {
-    //     sessionStore.set(record.id, record);
-    //   }
-    // }
-
-    setStoreWithStatus({
-      store,
-      status: 'synced-remote',
-      connectionStatus: 'online',
-    });
 
     // let hasConnectedBefore = false;
 
@@ -192,11 +194,12 @@ export function useCollaboration({
             if (!key.includes('instance')) {
               return;
             }
-            const newPage = editor?.getCurrentPage();
-
-            if (newPage?.id !== currentPage?.id) {
-              sessionStore?.set(CURRENT_PAGE_KEY, newPage);
-              setCurrentPage(newPage);
+            // full store sync
+            const instanceRecords = store
+              .allRecords()
+              .filter(record => FULL_SYNC_REQUIRED_RECORD_TYPES.includes(record.typeName));
+            for (const record of instanceRecords) {
+              sessionStore.set(record.id, record);
             }
           });
         }, PAGES_DEBOUNCE_TIME),
