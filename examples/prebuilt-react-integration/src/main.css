@@ -1,3 +1,5 @@
+@import url('@100mslive/roomkit-react/index.css');
+
 html,
 body,
 #root {
@@ -16,4 +18,8 @@ body {
   left: 0;
   width: 100%;
   margin: 0;
+}
+
+.tl-container {
+  border-radius: 0.75rem;
 }
