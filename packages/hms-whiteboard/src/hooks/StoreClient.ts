@@ -27,8 +27,9 @@ export class SessionStore<T> {
     });
     /**
      * on open, get key count to call handleOpen with the pre-existing values from the store
+     * retry if getKeysCount is called before open call is completed
      */
-    const keyCount = await this.getKeysCount();
+    const keyCount = await this.retryForOpen(this.getKeysCount.bind(this));
     const initialValues: T[] = [];
 
     if (!keyCount) {
@@ -93,5 +94,17 @@ export class SessionStore<T> {
 
   delete(key: string) {
     return this.storeClient.delete({ key });
+  }
+
+  private async retryForOpen<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      const shouldRetry = (error as Error).message.includes('peer not found') && retries > 0;
+      if (!shouldRetry) {
+        return Promise.reject(error);
+      }
+      return await this.retryForOpen(fn, retries - 1);
+    }
   }
 }
