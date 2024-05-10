@@ -223,7 +223,7 @@ export const StreamActions = () => {
       {!isMobile && (
         <Flex align="center" css={{ gap: '$4' }}>
           <RecordingPauseStatus />
-          <RecordingStatus />
+          {/* <RecordingStatus /> */}
           {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
         </Flex>
       )}
