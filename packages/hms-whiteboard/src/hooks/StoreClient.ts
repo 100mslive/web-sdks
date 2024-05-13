@@ -8,8 +8,11 @@ interface OpenCallbacks<T> {
   handleError: (error: Error) => void;
 }
 
+const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard close';
+
 export class SessionStore<T> {
   private storeClient: StoreClient;
+  private abortController = new AbortController();
 
   constructor(endpoint: string, token: string) {
     const transport = new GrpcWebFetchTransport({
@@ -21,10 +24,13 @@ export class SessionStore<T> {
   }
 
   async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
-    const call = this.storeClient.open({
-      changeId: '',
-      select: [],
-    });
+    const call = this.storeClient.open(
+      {
+        changeId: '',
+        select: [],
+      },
+      { abort: this.abortController.signal },
+    );
     /**
      * on open, get key count to call handleOpen with the pre-existing values from the store
      * retry if getKeysCount is called before open call is completed
@@ -55,12 +61,14 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
-      handleError(error);
+      if (error.message !== WHITEBOARD_CLOSE_MESSAGE) {
+        handleError(error);
+      }
     });
 
-    call.status.then(status => {
-      console.log('SessionStoreClient open', status);
-    });
+    return () => {
+      this.abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
+    };
   }
 
   set(key: string, value?: T) {
