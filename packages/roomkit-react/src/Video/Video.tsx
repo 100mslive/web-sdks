@@ -15,7 +15,7 @@ export const StyledVideo = styled('video', {
   variants: {
     mirror: {
       true: {
-        transform: 'scaleX(-1)',
+        // transform: 'scaleX(-1)',
       },
     },
     screenShare: {
