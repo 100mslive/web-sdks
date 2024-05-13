@@ -23,7 +23,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSICEServer, HMSRole } from '../interfaces';
+import { HMSICEServer, HMSProxyConfig, HMSRole } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -46,6 +46,7 @@ import {
   SUBSCRIBE_STATS_SAMPLE_WINDOW,
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
+import { getEndpointFromProxy } from '../utils/get-endpoint-from-proxy';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
@@ -442,6 +443,7 @@ export default class HMSTransport {
     this.observer.onStateChange(this.state);
   }
 
+  // eslint-disable-next-line complexity
   async connect(
     token: string,
     endpoint: string,
@@ -449,6 +451,7 @@ export default class HMSTransport {
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
     iceServers?: HMSICEServer[],
+    proxy?: HMSProxyConfig,
   ): Promise<InitConfig | void> {
     this.setTransportStateForConnect();
     this.joinParameters = new JoinParameters(
@@ -456,7 +459,7 @@ export default class HMSTransport {
       peerId,
       customData.name,
       customData.metaData,
-      endpoint,
+      getEndpointFromProxy(proxy) || endpoint,
       autoSubscribeVideo,
       iceServers,
     );
@@ -477,7 +480,7 @@ export default class HMSTransport {
 
       if (shouldRetry) {
         const task = async () => {
-          await this.internalConnect(token, endpoint, peerId);
+          await this.internalConnect(token, endpoint, peerId, iceServers);
           return Boolean(this.initConfig && this.initConfig.endpoint);
         };
 
@@ -1097,6 +1100,7 @@ export default class HMSTransport {
         this.joinParameters!.authToken,
         this.joinParameters!.endpoint,
         this.joinParameters!.peerId,
+        this.joinParameters!.iceServers,
       );
     }
 

@@ -5,7 +5,7 @@ export const transformIceServerConfig = (iceServers?: HMSICEServer[]) => {
     return null;
   }
   const transformedIceServers = iceServers.map(server => {
-    return { urls: server.urls, credentialType: 'password', credential: server.password, userName: server.userName };
+    return { urls: server.urls, credentialType: 'password', credential: server.password, username: server.userName };
   });
   return transformedIceServers;
 };

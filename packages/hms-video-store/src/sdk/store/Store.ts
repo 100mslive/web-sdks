@@ -445,9 +445,14 @@ class Store {
       permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
     });
   }
+
+  // eslint-disable-next-line complexity
   private setEnv() {
-    const endPoint = this.config?.initEndpoint || getEndpointFromProxy(this.config?.proxy);
-    const url = endPoint.split('https://')[1];
+    const endPoint = getEndpointFromProxy(this.config?.proxy) || this.config?.initEndpoint;
+    if (!endPoint) {
+      return;
+    }
+    const url = endPoint.split('https://')[1] || endPoint;
     let env: ENV = ENV.PROD;
     if (url.startsWith(ENV.PROD)) {
       env = ENV.PROD;
