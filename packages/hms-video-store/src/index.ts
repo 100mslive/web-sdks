@@ -53,6 +53,8 @@ export type {
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   HMSTranscriptionInfo,
+  HMSProxyConfig,
+  HMSICEServer,
 } from './internal';
 
 export { EventBus } from './events/EventBus';

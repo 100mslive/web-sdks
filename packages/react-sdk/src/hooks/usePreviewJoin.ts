@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import {
   HMSConfigInitialSettings,
+  HMSICEServer,
   HMSPreviewConfig,
+  HMSProxyConfig,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
@@ -51,6 +53,16 @@ export interface usePreviewInput {
    * will be kept awake.
    */
   autoManageWakeLock?: boolean;
+
+  /**
+   * use custom proxy for signalling connection (advanced)
+   */
+  proxy?: HMSProxyConfig;
+
+  /**
+   * use custom STUN/TURN servers for media connection (advanced)
+   */
+  iceServers?: HMSICEServer[];
 }
 
 export interface usePreviewResult {
@@ -90,6 +102,8 @@ export const usePreviewJoin = ({
   asRole,
   autoManageVideo,
   autoManageWakeLock,
+  proxy,
+  iceServers,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -108,6 +122,8 @@ export const usePreviewJoin = ({
       captureNetworkQualityInPreview,
       autoManageVideo,
       autoManageWakeLock,
+      proxy,
+      iceServers,
     };
   }, [
     name,
@@ -119,6 +135,8 @@ export const usePreviewJoin = ({
     asRole,
     autoManageVideo,
     autoManageWakeLock,
+    proxy,
+    iceServers,
   ]);
 
   const preview = useCallback(async () => {
