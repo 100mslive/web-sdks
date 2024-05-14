@@ -28,9 +28,12 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
 
   useEffect(() => {
-    if (poll && actions.interactivityCenter) {
-      actions.interactivityCenter.getPollResponses(poll, true);
-    }
+    const getResponses = async () => {
+      if (poll && actions.interactivityCenter) {
+        await actions.interactivityCenter.getPollResponses(poll, true);
+      }
+    };
+    getResponses();
   }, [poll, actions.interactivityCenter]);
 
   if (!poll) {
