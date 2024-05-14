@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -29,7 +29,7 @@ import {
   SettingsIcon,
   VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
-import { Box, Loading, Tooltip } from '../../../..';
+import { Box, Loading, Switch, Text, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -43,6 +43,7 @@ import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
+import { AdminCaptionModal } from '../AdminCaptionModal';
 // @ts-ignore: No implicit any
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
@@ -73,6 +74,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  ADMIN_CAPTION: 'adminCaption',
 };
 
 export const MwebOptions = ({
@@ -110,6 +112,12 @@ export const MwebOptions = ({
 
   const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
+
+  const [adminCaptionEnabled, setAdminCaptionEnabled] = useState(false);
+
+  useEffect(() => {
+    setAdminCaptionEnabled(isCaptionPresent);
+  }, [isCaptionPresent]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
@@ -193,6 +201,24 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
+            <ActionTile.Root
+              onClick={() => {
+                updateState(MODALS.ADMIN_CAPTION, true);
+              }}
+            >
+              <OpenCaptionIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
+                Closed Caption
+              </Text>
+              <Switch
+                id="closed_caption_start_stop"
+                checked={adminCaptionEnabled}
+                disabled={false}
+                onCheckedChange={value => {
+                  setAdminCaptionEnabled(value);
+                }}
+              />
+            </ActionTile.Root>
             {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
               <ActionTile.Root
                 onClick={() => {
@@ -323,7 +349,12 @@ export const MwebOptions = ({
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
-
+      {openModals.has(MODALS.ADMIN_CAPTION) && (
+        <AdminCaptionModal
+          onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)}
+          openParentSheet={() => setOpenOptionsSheet(true)}
+        />
+      )}
       {showEmojiCard && (
         <Box
           ref={emojiCardRef}

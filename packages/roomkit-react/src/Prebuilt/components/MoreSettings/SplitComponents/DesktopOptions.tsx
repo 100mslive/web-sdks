@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   ConferencingScreen,
@@ -6,9 +6,23 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
-import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
+import {
+  selectAppData,
+  selectIsTranscriptionEnabled,
+  selectLocalPeerID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import {
+  BrbIcon,
+  CheckIcon,
+  HamburgerMenuIcon,
+  InfoIcon,
+  OpenCaptionIcon,
+  PipIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
+import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -22,6 +36,7 @@ import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
 // @ts-ignore: No implicit any
 import { StatsForNerds } from '../../StatsForNerds';
+import { AdminCaptionModal } from '../AdminCaptionModal';
 // @ts-ignore: No implicit any
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
 // @ts-ignore: No implicit any
@@ -43,6 +58,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  ADMIN_CAPTION: 'adminCaption',
 };
 
 export const DesktopOptions = ({
@@ -59,8 +75,15 @@ export const DesktopOptions = ({
   const { isBRBOn, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
   const isBRBEnabled = !!elements?.brb;
+  const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+
+  const [adminCaptionEnabled, setAdminCaptionEnabled] = useState(false);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
+
+  useEffect(() => {
+    setAdminCaptionEnabled(isCaptionEnabled);
+  }, [isCaptionEnabled]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
@@ -115,6 +138,25 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
+          <Dropdown.Item
+            data-testid="closed_caption_admin"
+            onClick={() => {
+              updateState(MODALS.ADMIN_CAPTION, true);
+            }}
+          >
+            <OpenCaptionIcon />
+            <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
+              Closed Caption
+            </Text>
+            <Switch
+              id="closed_caption_start_stop"
+              checked={adminCaptionEnabled && isCaptionEnabled}
+              disabled={false}
+              onCheckedChange={value => {
+                setAdminCaptionEnabled(value);
+              }}
+            />
+          </Dropdown.Item>
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
               <PIP
@@ -210,6 +252,9 @@ export const DesktopOptions = ({
           peerId={localPeerId}
           onOpenChange={(value: boolean) => updateState(MODALS.SELF_ROLE_CHANGE, value)}
         />
+      )}
+      {openModals.has(MODALS.ADMIN_CAPTION) && (
+        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
