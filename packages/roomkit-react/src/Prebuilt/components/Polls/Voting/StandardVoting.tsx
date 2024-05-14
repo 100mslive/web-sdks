@@ -28,7 +28,7 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
           result={question.result}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
-          responses={question.responses}
+          localPeerResponse={question.responses?.[0]}
           answer={question.answer}
           setCurrentIndex={() => {
             return;

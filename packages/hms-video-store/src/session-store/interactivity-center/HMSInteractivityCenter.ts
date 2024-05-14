@@ -10,6 +10,7 @@ import {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
+  HMSPollQuestionResponse,
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
   HMSPollStates,
@@ -162,6 +163,38 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
   }
 
+  async getPollResponses(poll: HMSPoll, self: boolean) {
+    const serverResponseParams = await this.transport.signal.getPollResponses({
+      poll_id: poll.id,
+      index: 0,
+      count: 50,
+      self,
+    });
+    const pollCopy = { ...poll };
+    serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+      const question = poll?.questions?.find(question => question.index === response.question);
+      if (question) {
+        const pollResponse: HMSPollQuestionResponse = {
+          id: response.response_id,
+          questionIndex: response.question,
+          option: response.option,
+          options: response.options,
+          text: response.text,
+          responseFinal: final,
+          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+          skipped: response.skipped,
+          type: response.type,
+          update: response.update,
+        };
+        const existingResponses = question.responses ? [...question.responses] : [];
+
+        if (pollCopy.questions?.[response.question - 1]) {
+          pollCopy.questions[response.question - 1].responses = [...existingResponses, pollResponse];
+        }
+      }
+    });
+    this.store.setPoll(pollCopy);
+  }
   async getPolls(): Promise<HMSPoll[]> {
     const launchedPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'started' });
     const polls: HMSPoll[] = [];

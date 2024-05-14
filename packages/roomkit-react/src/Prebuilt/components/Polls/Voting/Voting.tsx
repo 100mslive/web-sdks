@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   selectPeerNameByID,
   selectPermissions,
@@ -26,6 +26,12 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
+
+  useEffect(() => {
+    if (poll && actions.interactivityCenter) {
+      actions.interactivityCenter.getPollResponses(poll, true);
+    }
+  }, [poll, actions.interactivityCenter]);
 
   if (!poll) {
     return null;

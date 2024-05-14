@@ -22,14 +22,11 @@ export const QuestionCard = ({
   options = [],
   answer,
   setCurrentIndex,
-  responses = [],
+  localPeerResponse,
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
-  const localPeerResponse = responses?.find(
-    response => response.peer?.peerid === localPeer?.id || response.peer?.userid === localPeer?.customerUserId,
-  );
 
   const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
@@ -37,20 +34,22 @@ export const QuestionCard = ({
     !rolesThatCanViewResponses ||
     rolesThatCanViewResponses.length === 0 ||
     rolesThatCanViewResponses.includes(localPeerRoleName || '');
+  const [localPeerChoice, setLocalPeerChoice] = useState(localPeerResponse);
+
   const showVoteCount =
-    roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
+    roleCanViewResponse && (localPeerChoice || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
 
   const isLive = pollState === 'started';
   const pollEnded = pollState === 'stopped';
-  const canRespond = isLive && !localPeerResponse;
+  const canRespond = isLive && !localPeerChoice;
   const startTime = useRef(Date.now());
-  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
+  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerChoice, type);
 
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
   const [showOptions, setShowOptions] = useState(true);
 
-  const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
+  const respondedToQuiz = isQuiz && localPeerChoice && !localPeerChoice.skipped;
 
   const isValidVote = useMemo(() => {
     if (type === QUESTION_TYPE.SINGLE_CHOICE) {
@@ -73,6 +72,7 @@ export const QuestionCard = ({
         duration: Date.now() - startTime.current,
       },
     ]);
+    setLocalPeerChoice({ skipped: false, option: index });
     startTime.current = Date.now();
   }, [isValidVote, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
 
@@ -147,7 +147,7 @@ export const QuestionCard = ({
             setAnswer={setSingleOptionAnswer}
             totalResponses={result?.totalResponses}
             showVoteCount={showVoteCount}
-            localPeerResponse={localPeerResponse}
+            localPeerResponse={localPeerChoice}
             isStopped={pollState === 'stopped'}
           />
         ) : null}
@@ -163,7 +163,7 @@ export const QuestionCard = ({
             setSelectedOptions={setMultipleOptionAnswer}
             totalResponses={result?.totalResponses}
             showVoteCount={showVoteCount}
-            localPeerResponse={localPeerResponse}
+            localPeerResponse={localPeerChoice}
             isStopped={pollState === 'stopped'}
           />
         ) : null}
@@ -172,7 +172,7 @@ export const QuestionCard = ({
         <QuestionActions
           isValidVote={isValidVote}
           onVote={handleVote}
-          response={localPeerResponse}
+          response={localPeerChoice}
           isQuiz={isQuiz}
           incrementIndex={() => {
             setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
