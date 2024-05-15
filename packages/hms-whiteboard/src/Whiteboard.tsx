@@ -35,6 +35,7 @@ export function Whiteboard({ onMount, endpoint, token, zoomToContent, transparen
       onMount={handleMount}
       components={{ ErrorFallback }}
       hideUi={editor?.getInstanceState()?.isReadonly}
+      initialState={editor?.getInstanceState()?.isReadonly ? 'hand' : 'select'}
     />
   );
 }
