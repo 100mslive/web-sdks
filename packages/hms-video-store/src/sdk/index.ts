@@ -420,7 +420,7 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .preview(
           config.authToken,
-          config.initEndpoint,
+          config.initEndpoint!,
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
