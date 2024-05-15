@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
@@ -35,6 +35,12 @@ export const QuestionCard = ({
     rolesThatCanViewResponses.length === 0 ||
     rolesThatCanViewResponses.includes(localPeerRoleName || '');
   const [localPeerChoice, setLocalPeerChoice] = useState(localPeerResponse);
+
+  useEffect(() => {
+    if (localPeerResponse) {
+      setLocalPeerChoice(localPeerResponse);
+    }
+  }, [localPeerResponse]);
 
   const showVoteCount =
     roleCanViewResponse && (localPeerChoice || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
@@ -175,7 +181,7 @@ export const QuestionCard = ({
           response={localPeerChoice}
           isQuiz={isQuiz}
           incrementIndex={() => {
-            setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
+            setCurrentIndex(curr => curr + 1);
           }}
         />
       )}
