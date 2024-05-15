@@ -170,7 +170,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       count: 50,
       self,
     });
-    const pollCopy = { ...poll };
+    const pollCopy = JSON.parse(JSON.stringify(poll));
     serverResponseParams.responses?.forEach(({ response, peer, final }) => {
       const question = poll?.questions?.find(question => question.index === response.question);
       if (question) {

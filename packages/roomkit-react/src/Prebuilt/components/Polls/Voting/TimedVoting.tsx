@@ -10,8 +10,7 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const lastAttemptedIndex = getLastAttemptedIndex(poll.questions, localPeerId, '');
   const [currentIndex, setCurrentIndex] = useState(lastAttemptedIndex);
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
-  const attemptedAll = poll.questions?.length === lastAttemptedIndex - 1;
-
+  const attemptedAll = poll.questions?.length === lastAttemptedIndex;
   if ((!activeQuestion && !attemptedAll) || !poll.questions?.length) {
     return null;
   }
