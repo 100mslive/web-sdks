@@ -79,7 +79,6 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
         user_agent_v2: event.metadata.userAgent,
       },
       body: JSON.stringify(requestBody),
-      agent: '',
     })
       .then(response => {
         // Ignore invalid token or expired token messages
