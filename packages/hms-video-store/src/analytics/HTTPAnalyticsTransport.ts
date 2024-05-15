@@ -49,6 +49,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
 
   setWebsocketEndpoint(ws: string, proxy?: HMSProxyConfig) {
     this.proxy = proxy;
+    console.log(this.proxy);
     // proxy - ws
     this.websocketURL = ws;
   }
