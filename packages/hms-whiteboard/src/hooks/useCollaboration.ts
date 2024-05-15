@@ -7,6 +7,8 @@ import {
   HistoryEntry,
   throttle,
   TLAnyShapeUtilConstructor,
+  TLInstance,
+  TLINSTANCE_ID,
   TLPage,
   TLRecord,
   TLStoreWithStatus,
@@ -196,12 +198,15 @@ export function useCollaboration({
             if (!key.includes('instance')) {
               return;
             }
-            // full store sync
-            const instanceRecords = store
-              .allRecords()
-              .filter(record => FULL_SYNC_REQUIRED_RECORD_TYPES.includes(record.typeName));
-            for (const record of instanceRecords) {
-              sessionStore.set(record.id, record);
+            const newPage = editor?.getCurrentPage();
+
+            if (newPage?.id !== currentPage?.id) {
+              sessionStore.get(TLINSTANCE_ID).then(instance => {
+                if (instance) {
+                  sessionStore?.set(instance.id, { ...instance, currentPageId: newPage?.id } as TLInstance);
+                }
+              });
+              setCurrentPage(newPage);
             }
           });
         }, PAGES_DEBOUNCE_TIME),
