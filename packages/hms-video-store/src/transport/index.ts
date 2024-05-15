@@ -46,7 +46,6 @@ import {
   SUBSCRIBE_STATS_SAMPLE_WINDOW,
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
-import { getEndpointFromProxy } from '../utils/get-endpoint-from-proxy';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
@@ -459,9 +458,10 @@ export default class HMSTransport {
       peerId,
       customData.name,
       customData.metaData,
-      getEndpointFromProxy(proxy) || endpoint,
+      endpoint,
       autoSubscribeVideo,
       iceServers,
+      proxy,
     );
     try {
       const response = await this.internalConnect(token, endpoint, peerId, iceServers);
