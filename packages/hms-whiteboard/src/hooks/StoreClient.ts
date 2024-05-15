@@ -8,7 +8,7 @@ interface OpenCallbacks<T> {
   handleError: (error: Error) => void;
 }
 
-const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard close';
+const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
 
 export class SessionStore<T> {
   private storeClient: StoreClient;
@@ -61,7 +61,7 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
-      if (error.message !== WHITEBOARD_CLOSE_MESSAGE) {
+      if (!error.message.includes('abort')) {
         handleError(error);
       }
     });
