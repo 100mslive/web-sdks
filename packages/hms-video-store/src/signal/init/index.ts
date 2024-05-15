@@ -1,7 +1,7 @@
 import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSICEServer } from '../../interfaces';
+import { HMSICEServer, HMSProxyConfig } from '../../interfaces';
 import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
@@ -29,6 +29,7 @@ export default class InitService {
     initEndpoint = 'https://prod-init.100ms.live',
     region = '',
     iceServers = [],
+    proxy,
   }: {
     token: string;
     peerId: string;
@@ -36,10 +37,13 @@ export default class InitService {
     initEndpoint?: string;
     region?: string;
     iceServers?: HMSICEServer[];
+    proxy?: HMSProxyConfig;
   }): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, userAgent, region);
     try {
+      // proxy - init
+      console.log(proxy);
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,

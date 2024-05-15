@@ -1,5 +1,6 @@
 import AnalyticsEvent from './AnalyticsEvent';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
+import { HMSProxyConfig } from '../interfaces';
 import {
   CLIENT_ANAYLTICS_PROD_ENDPOINT,
   CLIENT_ANAYLTICS_QA_ENDPOINT,
@@ -39,13 +40,16 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   isConnected = true;
   private env: null | ENV = null;
   private websocketURL = '';
+  private proxy?: HMSProxyConfig;
 
   setEnv(env: ENV) {
     this.env = env;
     this.flushFailedEvents();
   }
 
-  setWebsocketEndpoint(ws: string) {
+  setWebsocketEndpoint(ws: string, proxy?: HMSProxyConfig) {
+    this.proxy = proxy;
+    // proxy - ws
     this.websocketURL = ws;
   }
 
@@ -66,6 +70,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       },
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
+    // proxy - analytics
     fetch(url, {
       method: 'POST',
       headers: {
@@ -74,6 +79,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
         user_agent_v2: event.metadata.userAgent,
       },
       body: JSON.stringify(requestBody),
+      agent: '',
     })
       .then(response => {
         // Ignore invalid token or expired token messages

@@ -464,7 +464,7 @@ export default class HMSTransport {
       proxy,
     );
     try {
-      const response = await this.internalConnect(token, endpoint, peerId, iceServers);
+      const response = await this.internalConnect(token, endpoint, peerId, iceServers, proxy);
       return response;
     } catch (error) {
       const shouldRetry =
@@ -480,7 +480,7 @@ export default class HMSTransport {
 
       if (shouldRetry) {
         const task = async () => {
-          await this.internalConnect(token, endpoint, peerId, iceServers);
+          await this.internalConnect(token, endpoint, peerId, iceServers, proxy);
           return Boolean(this.initConfig && this.initConfig.endpoint);
         };
 
@@ -904,7 +904,13 @@ export default class HMSTransport {
     }
   }
 
-  private async internalConnect(token: string, initEndpoint: string, peerId: string, iceServers?: HMSICEServer[]) {
+  private async internalConnect(
+    token: string,
+    initEndpoint: string,
+    peerId: string,
+    iceServers?: HMSICEServer[],
+    proxy?: HMSProxyConfig,
+  ) {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
@@ -915,6 +921,7 @@ export default class HMSTransport {
         userAgent: this.store.getUserAgent(),
         initEndpoint,
         iceServers,
+        proxy,
       });
       const room = this.store.getRoom();
       if (room) {
@@ -924,7 +931,7 @@ export default class HMSTransport {
         room.isNoiseCancellationEnabled = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
       }
       this.analyticsTimer.end(TimedEvent.INIT);
-      HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
+      HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint, proxy);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
