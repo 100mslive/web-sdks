@@ -7,6 +7,8 @@ import {
   HistoryEntry,
   throttle,
   TLAnyShapeUtilConstructor,
+  TLInstance,
+  TLINSTANCE_ID,
   TLPage,
   TLRecord,
   TLStoreWithStatus,
@@ -199,8 +201,11 @@ export function useCollaboration({
             const newPage = editor?.getCurrentPage();
 
             if (newPage?.id !== currentPage?.id) {
-              const instance = editor.getInstanceState();
-              sessionStore?.set(instance.id, instance);
+              sessionStore.get(TLINSTANCE_ID).then(instance => {
+                if (instance) {
+                  sessionStore?.set(instance.id, { ...instance, currentPageId: newPage?.id } as TLInstance);
+                }
+              });
               setCurrentPage(newPage);
             }
           });
