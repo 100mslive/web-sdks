@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { HMSPoll, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import React, { useState } from 'react';
+import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
 // @ts-ignore
@@ -7,22 +7,10 @@ import { getLastAttemptedIndex } from '../../../common/utils';
 
 export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const actions = useHMSActions();
   const lastAttemptedIndex = getLastAttemptedIndex(poll.questions, localPeerId, '');
   const [currentIndex, setCurrentIndex] = useState(lastAttemptedIndex);
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
   const attemptedAll = (poll.questions?.length || 0) < currentIndex;
-
-  // Older questions lose their local state after being umnounted
-  // Once all questions are attempted, they are displayed
-  useEffect(() => {
-    const getResponses = async () => {
-      if (poll && actions.interactivityCenter && attemptedAll) {
-        await actions.interactivityCenter.getPollResponses(poll, true);
-      }
-    };
-    getResponses();
-  }, [poll, actions.interactivityCenter, attemptedAll]);
 
   if ((!activeQuestion && !attemptedAll) || !poll.questions?.length) {
     return null;
