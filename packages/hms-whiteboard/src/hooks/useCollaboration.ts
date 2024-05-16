@@ -17,7 +17,7 @@ import {
 import { DEFAULT_STORE } from './default_store';
 import { useSessionStore } from './useSessionStore';
 import { useSetEditorPermissions } from './useSetEditorPermissions';
-import { CURRENT_PAGE_KEY, OPEN_DELAY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
+import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
 
 // mandatory record types required for initialisation of the whiteboard and for a full remote sync
 const FULL_SYNC_REQUIRED_RECORD_TYPES: TLRecord['typeName'][] = [
@@ -63,37 +63,14 @@ export function useCollaboration({
   }, []);
 
   const sessionStore = useSessionStore({ token, endpoint, handleError });
+  const permissions = useSetEditorPermissions({ token, editor, zoomToContent, handleError });
 
-  useSetEditorPermissions({ token, editor, zoomToContent, handleError });
+  const handleOpen = useCallback(
+    (initialRecords: TLRecord[]) => {
+      if (!sessionStore) {
+        return;
+      }
 
-  useEffect(() => {
-    if (!sessionStore) return;
-
-    setStoreWithStatus({ status: 'loading' });
-
-    const unsubs: (() => void)[] = [];
-
-    // 1.
-    // Connect store to yjs store and vis versa, for both the document and awareness
-
-    /* -------------------- Document -------------------- */
-
-    const handleChange = (key: string, value?: TLRecord) => {
-      // put / remove the records in the store
-      store.mergeRemoteChanges(() => {
-        if (!value) {
-          return store.remove([key as TLRecord['id']]);
-        }
-        if (key === CURRENT_PAGE_KEY) {
-          setCurrentPage(value as TLPage);
-        } else {
-          store.put([value]);
-        }
-      });
-    };
-
-    const handleOpen = (initialRecords: TLRecord[]) => {
-      // 2.
       // Initialize the tldraw store with the session store server records—or, if the session store
       // is empty, initialize the session store server with the default tldraw store records.
       const shouldUseServerRecords = FULL_SYNC_REQUIRED_RECORD_TYPES.every(
@@ -118,7 +95,40 @@ export function useCollaboration({
         status: 'synced-remote',
         connectionStatus: 'online',
       });
-    };
+    },
+    [store, sessionStore],
+  );
+
+  const handleChange = useCallback(
+    (key: string, value?: TLRecord) => {
+      // put / remove the records in the store
+      store.mergeRemoteChanges(() => {
+        if (!value) {
+          return store.remove([key as TLRecord['id']]);
+        }
+        if (key === CURRENT_PAGE_KEY) {
+          setCurrentPage(value as TLPage);
+        } else {
+          transact(() => {
+            store.put([value]);
+            if (key === TLINSTANCE_ID) {
+              store.put([
+                { ...value, canMoveCamera: !!zoomToContent, isReadonly: !permissions.includes('write') } as TLInstance,
+              ]);
+            }
+          });
+        }
+      });
+    },
+    [store, permissions, zoomToContent],
+  );
+
+  useEffect(() => {
+    if (!sessionStore) return;
+
+    setStoreWithStatus({ status: 'loading' });
+
+    const unsubs: (() => void)[] = [];
 
     // Open session and sync the session store changes to the store
     // On opening, closing and reopening whiteboard with no delay(in case of role change), the session store server needs time to cleanup on the close before opening again
@@ -187,7 +197,7 @@ export function useCollaboration({
       unsubs.forEach(fn => fn());
       unsubs.length = 0;
     };
-  }, [store, sessionStore, handleError]);
+  }, [store, sessionStore, handleChange, handleOpen, handleError]);
 
   useEffect(() => {
     if (!editor || !sessionStore) return;
