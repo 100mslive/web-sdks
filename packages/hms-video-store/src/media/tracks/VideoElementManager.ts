@@ -44,7 +44,8 @@ export class VideoElementManager {
     // it will be a no-op if initialize already
     this.init();
     videoElement.addEventListener('pause', () => {
-      videoElement.play();
+      console.error('video element paused', document.visibilityState);
+      videoElement.play().catch(console.error);
     });
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
