@@ -18,6 +18,14 @@ export class SessionStore<T> {
     const transport = new GrpcWebFetchTransport({
       baseUrl: endpoint,
       meta: { Authorization: `Bearer ${token}` },
+      interceptors: [
+        {
+          interceptServerStreaming: (next, method, input, options) => {
+            console.log(method, input, options);
+            return next(method, input, options);
+          },
+        },
+      ],
     });
 
     this.storeClient = new StoreClient(transport);
@@ -43,6 +51,7 @@ export class SessionStore<T> {
     }
 
     call.responses.onMessage(message => {
+      console.log(keyCount, [...initialValues], message);
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
@@ -108,6 +117,7 @@ export class SessionStore<T> {
     try {
       return await fn();
     } catch (error) {
+      console.log(error);
       const shouldRetry = (error as Error).message.includes('peer not found') && retries > 0;
       if (!shouldRetry) {
         return Promise.reject(error);
