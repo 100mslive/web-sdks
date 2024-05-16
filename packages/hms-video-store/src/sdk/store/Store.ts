@@ -445,13 +445,9 @@ class Store {
     });
   }
 
-  // eslint-disable-next-line complexity
   private setEnv() {
-    const endPoint = this.config?.initEndpoint;
-    if (!endPoint) {
-      return;
-    }
-    const url = endPoint.split('https://')[1] || endPoint;
+    const endPoint = this.config?.initEndpoint!;
+    const url = endPoint.split('https://')[1];
     let env: ENV = ENV.PROD;
     if (url.startsWith(ENV.PROD)) {
       env = ENV.PROD;
