@@ -43,25 +43,28 @@ export class SessionStore<T> {
      * on open, get key count to call handleOpen with the pre-existing values from the store
      * retry if getKeysCount is called before open call is completed
      */
-    const keyCount = await this.retryForOpen(this.getKeysCount.bind(this));
+    // const keyCount = await this.retryForOpen(this.getKeysCount.bind(this));
     const initialValues: T[] = [];
+    let initialised = false;
 
-    if (!keyCount) {
-      handleOpen([]);
-    }
+    // if (!keyCount) {
+    //   handleOpen([]);
+    // }
+
+    setTimeout(() => {
+      handleOpen(initialValues);
+      initialised = true;
+    }, 1000);
 
     call.responses.onMessage(message => {
-      console.log(keyCount, [...initialValues], message);
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
-          if (initialValues.length === keyCount) {
+          if (initialised) {
             handleChange(message.key, record);
           } else {
             initialValues.push(record);
-            if (initialValues.length === keyCount) {
-              handleOpen(initialValues);
-            }
+            console.log([...initialValues], message);
           }
         }
       } else {
@@ -113,16 +116,16 @@ export class SessionStore<T> {
     return this.storeClient.delete({ key });
   }
 
-  private async retryForOpen<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
-    try {
-      return await fn();
-    } catch (error) {
-      console.log(error);
-      const shouldRetry = (error as Error).message.includes('peer not found') && retries > 0;
-      if (!shouldRetry) {
-        return Promise.reject(error);
-      }
-      return await this.retryForOpen(fn, retries - 1);
-    }
-  }
+  // private async retryForOpen<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
+  //   try {
+  //     return await fn();
+  //   } catch (error) {
+  //     console.log(error);
+  //     const shouldRetry = (error as Error).message.includes('peer not found') && retries > 0;
+  //     if (!shouldRetry) {
+  //       return Promise.reject(error);
+  //     }
+  //     return await this.retryForOpen(fn, retries - 1);
+  //   }
+  // }
 }
