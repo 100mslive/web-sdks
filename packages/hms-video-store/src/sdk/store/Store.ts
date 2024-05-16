@@ -444,7 +444,6 @@ class Store {
       permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
     });
   }
-
   private setEnv() {
     const endPoint = this.config?.initEndpoint!;
     const url = endPoint.split('https://')[1];

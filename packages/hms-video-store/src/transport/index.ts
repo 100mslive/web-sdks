@@ -442,7 +442,6 @@ export default class HMSTransport {
     this.observer.onStateChange(this.state);
   }
 
-  // eslint-disable-next-line complexity
   async connect(
     token: string,
     endpoint: string,
