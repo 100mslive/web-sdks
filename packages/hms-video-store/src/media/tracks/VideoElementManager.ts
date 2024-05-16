@@ -6,6 +6,7 @@ import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
 import { isBrowser } from '../../utils/support';
+import { sleep } from '../../utils/timer-utils';
 
 /**
  * This class is to manager video elements for video tracks.
@@ -45,6 +46,7 @@ export class VideoElementManager {
     this.init();
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
+    videoElement.addEventListener('pause', this.handleVisibilityChange);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
         this.TAG,
@@ -86,8 +88,11 @@ export class VideoElementManager {
     if (document.visibilityState === 'visible') {
       for (const element of this.videoElements) {
         if (element.paused) {
-          console.log('playing video element');
-          await element.play();
+          while (element.paused) {
+            console.log('playing video element');
+            sleep(1000);
+            await element.play();
+          }
         }
       }
     }
