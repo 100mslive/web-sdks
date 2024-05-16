@@ -2,6 +2,7 @@ import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSICEServer, HMSProxyConfig } from '../../interfaces';
+import { getEndpointFromProxy } from '../../utils/get-endpoint-from-proxy';
 import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
@@ -42,12 +43,13 @@ export default class InitService {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, userAgent, region);
     try {
-      // proxy - init
-      console.log(proxy);
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const proxyUrl = getEndpointFromProxy(proxy);
+      const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+      if (proxyUrl) {
+        headers['Target-URL'] = url;
+      }
+      const response = await fetch(proxyUrl || url, {
+        headers,
       });
       try {
         const config = await response.clone().json();

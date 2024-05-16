@@ -6,6 +6,7 @@ import {
   CLIENT_ANAYLTICS_QA_ENDPOINT,
   CLIENT_ANAYLTICS_STORAGE_LIMIT,
 } from '../utils/constants';
+import { getEndpointFromProxy } from '../utils/get-endpoint-from-proxy';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { ENV } from '../utils/support';
@@ -49,8 +50,6 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
 
   setWebsocketEndpoint(ws: string, proxy?: HMSProxyConfig) {
     this.proxy = proxy;
-    console.log(this.proxy);
-    // proxy - ws
     this.websocketURL = ws;
   }
 
@@ -71,14 +70,20 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       },
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
-    // proxy - analytics
-    fetch(url, {
+
+    const proxyUrl = getEndpointFromProxy(this.proxy);
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${event.metadata.token}`,
+      user_agent_v2: event.metadata.userAgent,
+      'Target-URL': url,
+    };
+    if (proxyUrl) {
+      headers['Target-URL'] = url;
+    }
+    fetch(proxyUrl || url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${event.metadata.token}`,
-        user_agent_v2: event.metadata.userAgent,
-      },
+      headers,
       body: JSON.stringify(requestBody),
     })
       .then(response => {

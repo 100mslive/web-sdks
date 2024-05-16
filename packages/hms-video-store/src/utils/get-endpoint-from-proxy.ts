@@ -7,10 +7,10 @@ export const getEndpointFromProxy = (proxy?: HMSProxyConfig) => {
   let endpoint = `://${proxy.host}:${proxy.port}`;
   switch (proxy.type) {
     case 0:
-      endpoint = `socks5${endpoint}`;
+      endpoint = `https${endpoint}`;
       break;
     default:
-      endpoint = `socks5${endpoint}`;
+      endpoint = `https${endpoint}`;
   }
   return endpoint;
 };

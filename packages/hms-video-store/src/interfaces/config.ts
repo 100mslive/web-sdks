@@ -13,7 +13,7 @@ export type HMSICEServer = {
 };
 
 enum HMSProxyType {
-  Socks5 = 0,
+  HTTPS = 0,
 }
 
 export type HMSProxyConfig = {
