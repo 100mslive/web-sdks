@@ -43,6 +43,9 @@ export class VideoElementManager {
     // Call init again, to initialize again if for some reason it failed in constructor
     // it will be a no-op if initialize already
     this.init();
+    videoElement.addEventListener('pause', () => {
+      videoElement.play();
+    });
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
     if (this.videoElements.size >= 10) {
