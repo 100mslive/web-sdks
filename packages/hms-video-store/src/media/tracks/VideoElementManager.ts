@@ -43,10 +43,6 @@ export class VideoElementManager {
     // Call init again, to initialize again if for some reason it failed in constructor
     // it will be a no-op if initialize already
     this.init();
-    videoElement.addEventListener('pause', () => {
-      console.error('video element paused', document.visibilityState);
-      videoElement.play().catch(console.error);
-    });
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
     if (this.videoElements.size >= 10) {
@@ -86,10 +82,22 @@ export class VideoElementManager {
     return Array.from(this.videoElements);
   }
 
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      for (const element of this.videoElements) {
+        if (element.paused) {
+          console.log('playing video element');
+          await element.play();
+        }
+      }
+    }
+  };
+
   private init() {
     if (isBrowser) {
       this.resizeObserver = HMSResizeObserver;
       this.intersectionObserver = HMSIntersectionObserver;
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
 
@@ -180,6 +188,7 @@ export class VideoElementManager {
       this.intersectionObserver?.unobserve(videoElement);
     });
     this.videoElements.clear();
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };
