@@ -29,13 +29,13 @@ export const AdminCaptionContent = ({
   const actions = useHMSActions();
   const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const transcriptionStates: HMSTranscriptionInfo[] = useHMSStore(selectTranscriptionsState);
+  const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
 
   useEffect(() => {
-    if (transcriptionStates.length > 0) {
+    if (transcriptionStates && transcriptionStates.length > 0) {
       if (
-        (transcriptionStates[0].state === HMSTranscriptionState.Stopped ||
-          transcriptionStates[0].state === HMSTranscriptionState.Failed) &&
+        (transcriptionStates[0].state === HMSTranscriptionState.STOPPED ||
+          transcriptionStates[0].state === HMSTranscriptionState.FAILED) &&
         transcriptionStates[0].error
       ) {
         ToastManager.addToast({
