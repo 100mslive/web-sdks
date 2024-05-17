@@ -1,6 +1,7 @@
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
+import { OPEN_WAIT_TIMEOUT } from '../utils';
 
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
@@ -8,8 +9,11 @@ interface OpenCallbacks<T> {
   handleError: (error: Error) => void;
 }
 
+const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
+
 export class SessionStore<T> {
   private storeClient: StoreClient;
+  private abortController = new AbortController();
 
   constructor(endpoint: string, token: string) {
     const transport = new GrpcWebFetchTransport({
@@ -21,32 +25,30 @@ export class SessionStore<T> {
   }
 
   async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
-    const call = this.storeClient.open({
-      changeId: '',
-      select: [],
-    });
-    /**
-     * on open, get key count to call handleOpen with the pre-existing values from the store
-     * retry if getKeysCount is called before open call is completed
-     */
-    const keyCount = await this.retryForOpen(this.getKeysCount.bind(this));
+    const call = this.storeClient.open(
+      {
+        changeId: '',
+        select: [],
+      },
+      { abort: this.abortController.signal },
+    );
     const initialValues: T[] = [];
+    let initialised = false;
 
-    if (!keyCount) {
-      handleOpen([]);
-    }
+    // on open, wait to call handleOpen with the pre-existing values from the store
+    setTimeout(() => {
+      handleOpen(initialValues);
+      initialised = true;
+    }, OPEN_WAIT_TIMEOUT);
 
     call.responses.onMessage(message => {
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
-          if (initialValues.length === keyCount) {
+          if (initialised) {
             handleChange(message.key, record);
           } else {
             initialValues.push(record);
-            if (initialValues.length === keyCount) {
-              handleOpen(initialValues);
-            }
           }
         }
       } else {
@@ -55,12 +57,14 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
-      handleError(error);
+      if (!error.message.includes('abort')) {
+        handleError(error);
+      }
     });
 
-    call.status.then(status => {
-      console.log('SessionStoreClient open', status);
-    });
+    return () => {
+      this.abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
+    };
   }
 
   set(key: string, value?: T) {
@@ -94,17 +98,5 @@ export class SessionStore<T> {
 
   delete(key: string) {
     return this.storeClient.delete({ key });
-  }
-
-  private async retryForOpen<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
-    try {
-      return await fn();
-    } catch (error) {
-      const shouldRetry = (error as Error).message.includes('peer not found') && retries > 0;
-      if (!shouldRetry) {
-        return Promise.reject(error);
-      }
-      return await this.retryForOpen(fn, retries - 1);
-    }
   }
 }
