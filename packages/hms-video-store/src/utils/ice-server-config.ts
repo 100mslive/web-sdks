@@ -1,7 +1,7 @@
 import { HMSICEServer } from '../interfaces';
 
 export const transformIceServerConfig = (defaultConfig: RTCIceServer[], iceServers?: HMSICEServer[]) => {
-  if (!iceServers) {
+  if (!iceServers || iceServers.length > 0) {
     return defaultConfig;
   }
   const transformedIceServers = iceServers.map(server => {
