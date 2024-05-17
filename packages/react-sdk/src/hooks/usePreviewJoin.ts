@@ -3,7 +3,6 @@ import {
   HMSConfigInitialSettings,
   HMSICEServer,
   HMSPreviewConfig,
-  HMSProxyConfig,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
@@ -55,11 +54,6 @@ export interface usePreviewInput {
   autoManageWakeLock?: boolean;
 
   /**
-   * use custom proxy for signalling connection (advanced)
-   */
-  proxy?: HMSProxyConfig;
-
-  /**
    * use custom STUN/TURN servers for media connection (advanced)
    */
   iceServers?: HMSICEServer[];
@@ -102,7 +96,6 @@ export const usePreviewJoin = ({
   asRole,
   autoManageVideo,
   autoManageWakeLock,
-  proxy,
   iceServers,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
@@ -122,7 +115,6 @@ export const usePreviewJoin = ({
       captureNetworkQualityInPreview,
       autoManageVideo,
       autoManageWakeLock,
-      proxy,
       iceServers,
     };
   }, [
@@ -135,7 +127,6 @@ export const usePreviewJoin = ({
     asRole,
     autoManageVideo,
     autoManageWakeLock,
-    proxy,
     iceServers,
   ]);
 

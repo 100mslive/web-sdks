@@ -1,8 +1,7 @@
 import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSICEServer, HMSProxyConfig } from '../../interfaces';
-import { getEndpointFromProxy } from '../../utils/get-endpoint-from-proxy';
+import { HMSICEServer } from '../../interfaces';
 import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
@@ -30,7 +29,6 @@ export default class InitService {
     initEndpoint = 'https://prod-init.100ms.live',
     region = '',
     iceServers = [],
-    proxy,
   }: {
     token: string;
     peerId: string;
@@ -38,18 +36,12 @@ export default class InitService {
     initEndpoint?: string;
     region?: string;
     iceServers?: HMSICEServer[];
-    proxy?: HMSProxyConfig;
   }): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, userAgent, region);
     try {
-      const proxyUrl = getEndpointFromProxy(proxy);
-      const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
-      if (proxyUrl) {
-        headers['Target-URL'] = url;
-      }
-      const response = await fetch(proxyUrl || url, {
-        headers,
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       try {
         const config = await response.clone().json();

@@ -53,7 +53,6 @@ export type {
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   HMSTranscriptionInfo,
-  HMSProxyConfig,
   HMSICEServer,
 } from './internal';
 

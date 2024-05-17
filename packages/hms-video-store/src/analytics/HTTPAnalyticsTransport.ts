@@ -1,12 +1,10 @@
 import AnalyticsEvent from './AnalyticsEvent';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
-import { HMSProxyConfig } from '../interfaces';
 import {
   CLIENT_ANAYLTICS_PROD_ENDPOINT,
   CLIENT_ANAYLTICS_QA_ENDPOINT,
   CLIENT_ANAYLTICS_STORAGE_LIMIT,
 } from '../utils/constants';
-import { getEndpointFromProxy } from '../utils/get-endpoint-from-proxy';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { ENV } from '../utils/support';
@@ -41,15 +39,13 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   isConnected = true;
   private env: null | ENV = null;
   private websocketURL = '';
-  private proxy?: HMSProxyConfig;
 
   setEnv(env: ENV) {
     this.env = env;
     this.flushFailedEvents();
   }
 
-  setWebsocketEndpoint(ws: string, proxy?: HMSProxyConfig) {
-    this.proxy = proxy;
+  setWebsocketEndpoint(ws: string) {
     this.websocketURL = ws;
   }
 
@@ -71,19 +67,13 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
 
-    const proxyUrl = getEndpointFromProxy(this.proxy);
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${event.metadata.token}`,
-      user_agent_v2: event.metadata.userAgent,
-      'Target-URL': url,
-    };
-    if (proxyUrl) {
-      headers['Target-URL'] = url;
-    }
-    fetch(proxyUrl || url, {
+    fetch(url, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${event.metadata.token}`,
+        user_agent_v2: event.metadata.userAgent,
+      },
       body: JSON.stringify(requestBody),
     })
       .then(response => {
