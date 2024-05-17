@@ -83,18 +83,22 @@ export class VideoElementManager {
     return Array.from(this.videoElements);
   }
 
-  private resumeVideoPlayback = async e => {
-    console.log(e);
+  private resumeVideoPlayback = () => {
     console.trace('Resuming playback');
     if (!document.hidden) {
-      for (const element of this.videoElements) {
-        if (element.paused) {
-          console.log('element paused');
-          await element.play().catch(err => {
-            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`);
-          });
+      setTimeout(() => {
+        for (const element of this.videoElements) {
+          if (element.paused) {
+            console.log('element paused, try resuming');
+            element.play().catch(err => {
+              HMSLogger.w(
+                this.TAG,
+                `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`,
+              );
+            });
+          }
         }
-      }
+      }, 0);
     }
   };
 
@@ -103,7 +107,6 @@ export class VideoElementManager {
       this.resizeObserver = HMSResizeObserver;
       this.intersectionObserver = HMSIntersectionObserver;
       document.addEventListener('visibilitychange', this.resumeVideoPlayback);
-      window.addEventListener('focus', this.resumeVideoPlayback);
     }
   }
 
@@ -195,7 +198,6 @@ export class VideoElementManager {
     });
     this.videoElements.clear();
     document.removeEventListener('visibilitychange', this.resumeVideoPlayback);
-    window.removeEventListener('focus', this.resumeVideoPlayback);
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };
