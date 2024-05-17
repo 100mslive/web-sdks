@@ -66,7 +66,6 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       },
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
-
     fetch(url, {
       method: 'POST',
       headers: {

@@ -28,7 +28,7 @@ export default class InitService {
     userAgent,
     initEndpoint = 'https://prod-init.100ms.live',
     region = '',
-    iceServers = [],
+    iceServers,
   }: {
     token: string;
     peerId: string;
@@ -85,7 +85,7 @@ export function transformInitConfig(config: any, iceServers?: HMSICEServer[]): I
     ...config,
     rtcConfiguration: {
       ...config.rtcConfiguration,
-      iceServers: transformIceServerConfig(iceServers) || config.rtcConfiguration?.ice_servers,
+      iceServers: transformIceServerConfig(config.rtcConfiguration?.ice_servers, iceServers),
     },
   };
 }
