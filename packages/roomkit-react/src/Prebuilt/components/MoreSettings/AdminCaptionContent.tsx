@@ -1,9 +1,20 @@
-import React from 'react';
-import { HMSTranscriptionMode, selectIsTranscriptionEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import React, { useEffect } from 'react';
+import {
+  HMSTranscriptionInfo,
+  HMSTranscriptionMode,
+  HMSTranscriptionState,
+  selectIsTranscriptionEnabled,
+  selectTranscriptionsState,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import { AlertTriangleIcon, ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
+import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
 
 export const AdminCaptionContent = ({
   isMobile,
@@ -14,9 +25,27 @@ export const AdminCaptionContent = ({
   onExit: () => void;
   onBackClick: () => void;
 }) => {
+  const DURATION = 2000;
   const actions = useHMSActions();
   const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
+  const transcriptionStates: HMSTranscriptionInfo[] = useHMSStore(selectTranscriptionsState);
+
+  useEffect(() => {
+    if (transcriptionStates.length > 0) {
+      if (
+        (transcriptionStates[0].state === HMSTranscriptionState.Stopped ||
+          transcriptionStates[0].state === HMSTranscriptionState.Failed) &&
+        transcriptionStates[0].error
+      ) {
+        ToastManager.addToast({
+          title: `Failed to enable Closed Caption`,
+          variant: 'danger',
+          icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+        });
+      }
+    }
+  }, [transcriptionStates]);
   return (
     <>
       <Text
@@ -68,11 +97,23 @@ export const AdminCaptionContent = ({
               await actions.stopTranscription({
                 mode: HMSTranscriptionMode.CAPTION,
               });
+              ToastManager.addToast({
+                title: `Disabling Closed Caption for everyone.`,
+                variant: 'standard',
+                duration: DURATION,
+                icon: <Loading color="currentColor" />,
+              });
               onExit();
               return;
             }
             await actions.startTranscription({
               mode: HMSTranscriptionMode.CAPTION,
+            });
+            ToastManager.addToast({
+              title: `Enabling Closed Caption for everyone.`,
+              variant: 'standard',
+              duration: DURATION,
+              icon: <Loading color="currentColor" />,
             });
             onExit();
           }}
