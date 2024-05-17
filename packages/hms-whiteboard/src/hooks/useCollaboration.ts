@@ -17,7 +17,7 @@ import {
 import { DEFAULT_STORE } from './default_store';
 import { useSessionStore } from './useSessionStore';
 import { useSetEditorPermissions } from './useSetEditorPermissions';
-import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
+import { CURRENT_PAGE_KEY, OPEN_DELAY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
 
 // mandatory record types required for initialisation of the whiteboard and for a full remote sync
 const FULL_SYNC_REQUIRED_RECORD_TYPES: TLRecord['typeName'][] = [
@@ -131,13 +131,17 @@ export function useCollaboration({
     const unsubs: (() => void)[] = [];
 
     // Open session and sync the session store changes to the store
-    sessionStore
-      .open({
-        handleOpen,
-        handleChange,
-        handleError,
-      })
-      .then(unsub => unsubs.push(unsub));
+    // On opening, closing and reopening whiteboard with no delay(in case of role change), the session store server needs time to cleanup on the close before opening again
+    // so there is a delay here before opening the connection
+    setTimeout(() => {
+      sessionStore
+        .open({
+          handleOpen,
+          handleChange,
+          handleError,
+        })
+        .then(unsub => unsubs.push(unsub));
+    }, OPEN_DELAY);
 
     // Sync store changes to the yjs doc
     unsubs.push(
