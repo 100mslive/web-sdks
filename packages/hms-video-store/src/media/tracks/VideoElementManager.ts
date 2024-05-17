@@ -6,7 +6,6 @@ import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
 import { isBrowser } from '../../utils/support';
-import { sleep } from '../../utils/timer-utils';
 
 /**
  * This class is to manager video elements for video tracks.
@@ -46,7 +45,7 @@ export class VideoElementManager {
     this.init();
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
-    videoElement.addEventListener('pause', this.handleVisibilityChange);
+    videoElement.addEventListener('pause', this.resumeVideoPlayback);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
         this.TAG,
@@ -84,15 +83,14 @@ export class VideoElementManager {
     return Array.from(this.videoElements);
   }
 
-  private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'visible') {
+  private resumeVideoPlayback = async () => {
+    console.trace('Resuming playback');
+    if (!document.hidden) {
       for (const element of this.videoElements) {
         if (element.paused) {
-          while (element.paused) {
-            sleep(1000);
-            console.log('playing video element');
-            await element.play();
-          }
+          await element.play().catch(err => {
+            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`);
+          });
         }
       }
     }
@@ -102,7 +100,8 @@ export class VideoElementManager {
     if (isBrowser) {
       this.resizeObserver = HMSResizeObserver;
       this.intersectionObserver = HMSIntersectionObserver;
-      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+      document.addEventListener('visibilitychange', this.resumeVideoPlayback);
+      window.addEventListener('focus', this.resumeVideoPlayback);
     }
   }
 
@@ -193,7 +192,8 @@ export class VideoElementManager {
       this.intersectionObserver?.unobserve(videoElement);
     });
     this.videoElements.clear();
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    document.removeEventListener('visibilitychange', this.resumeVideoPlayback);
+    window.removeEventListener('focus', this.resumeVideoPlayback);
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };
