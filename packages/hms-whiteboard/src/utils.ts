@@ -19,3 +19,4 @@ export default function decodeJWT(token?: string) {
 export const CURRENT_PAGE_KEY = 'currentPage';
 export const SHAPES_THROTTLE_TIME = 11;
 export const PAGES_DEBOUNCE_TIME = 200;
+export const OPEN_DELAY = 100;
