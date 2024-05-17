@@ -1,6 +1,6 @@
 import { HMSICEServer } from '../interfaces';
 
-export const transformIceServerConfig = (defaultConfig: RTCIceServer[], iceServers?: HMSICEServer[]) => {
+export const transformIceServerConfig = (defaultConfig?: RTCIceServer[], iceServers?: HMSICEServer[]) => {
   if (!iceServers || iceServers.length === 0) {
     return defaultConfig;
   }
