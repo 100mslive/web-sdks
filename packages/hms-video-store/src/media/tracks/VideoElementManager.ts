@@ -83,11 +83,13 @@ export class VideoElementManager {
     return Array.from(this.videoElements);
   }
 
-  private resumeVideoPlayback = async () => {
+  private resumeVideoPlayback = async e => {
+    console.log(e);
     console.trace('Resuming playback');
     if (!document.hidden) {
       for (const element of this.videoElements) {
         if (element.paused) {
+          console.log('element paused');
           await element.play().catch(err => {
             HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`);
           });
