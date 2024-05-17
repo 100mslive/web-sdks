@@ -131,8 +131,6 @@ export function useCollaboration({
     const unsubs: (() => void)[] = [];
 
     // Open session and sync the session store changes to the store
-    // On opening, closing and reopening whiteboard with no delay(in case of role change), the session store server needs time to cleanup on the close before opening again
-    // so there is a delay here before opening the connection
     sessionStore
       .open({
         handleOpen,
