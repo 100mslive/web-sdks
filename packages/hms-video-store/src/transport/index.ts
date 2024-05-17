@@ -23,7 +23,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSRole } from '../interfaces';
+import { HMSICEServer, HMSRole } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -397,8 +397,9 @@ export default class HMSTransport {
     peerId: string,
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
+    iceServers?: HMSICEServer[],
   ): Promise<InitConfig | void> {
-    const initConfig = await this.connect(token, endpoint, peerId, customData, autoSubscribeVideo);
+    const initConfig = await this.connect(token, endpoint, peerId, customData, autoSubscribeVideo, iceServers);
     this.state = TransportState.Preview;
     this.observer.onStateChange(this.state);
     return initConfig;
@@ -447,6 +448,7 @@ export default class HMSTransport {
     peerId: string,
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
+    iceServers?: HMSICEServer[],
   ): Promise<InitConfig | void> {
     this.setTransportStateForConnect();
     this.joinParameters = new JoinParameters(
@@ -456,9 +458,10 @@ export default class HMSTransport {
       customData.metaData,
       endpoint,
       autoSubscribeVideo,
+      iceServers,
     );
     try {
-      const response = await this.internalConnect(token, endpoint, peerId);
+      const response = await this.internalConnect(token, endpoint, peerId, iceServers);
       return response;
     } catch (error) {
       const shouldRetry =
@@ -474,7 +477,7 @@ export default class HMSTransport {
 
       if (shouldRetry) {
         const task = async () => {
-          await this.internalConnect(token, endpoint, peerId);
+          await this.internalConnect(token, endpoint, peerId, iceServers);
           return Boolean(this.initConfig && this.initConfig.endpoint);
         };
 
@@ -898,7 +901,7 @@ export default class HMSTransport {
     }
   }
 
-  private async internalConnect(token: string, initEndpoint: string, peerId: string) {
+  private async internalConnect(token: string, initEndpoint: string, peerId: string, iceServers?: HMSICEServer[]) {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
@@ -908,6 +911,7 @@ export default class HMSTransport {
         peerId,
         userAgent: this.store.getUserAgent(),
         initEndpoint,
+        iceServers,
       });
       const room = this.store.getRoom();
       if (room) {
@@ -1093,6 +1097,7 @@ export default class HMSTransport {
         this.joinParameters!.authToken,
         this.joinParameters!.endpoint,
         this.joinParameters!.peerId,
+        this.joinParameters!.iceServers,
       );
     }
 
