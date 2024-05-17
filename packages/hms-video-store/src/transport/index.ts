@@ -411,11 +411,12 @@ export default class HMSTransport {
     customData: { name: string; metaData: string },
     initEndpoint: string,
     autoSubscribeVideo = false,
+    iceServers?: HMSICEServer[],
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
     try {
       if (!this.signal.isConnected || !this.initConfig) {
-        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
+        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo, iceServers);
       }
 
       this.validateNotDisconnected('connect');
