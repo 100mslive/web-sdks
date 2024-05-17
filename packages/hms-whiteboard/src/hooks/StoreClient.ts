@@ -1,6 +1,7 @@
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
+import { OPEN_WAIT_TIMEOUT } from '../utils';
 
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
@@ -54,7 +55,7 @@ export class SessionStore<T> {
     setTimeout(() => {
       handleOpen(initialValues);
       initialised = true;
-    }, 1000);
+    }, OPEN_WAIT_TIMEOUT);
 
     call.responses.onMessage(message => {
       if (message.value) {
