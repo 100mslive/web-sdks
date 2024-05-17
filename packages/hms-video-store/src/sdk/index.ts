@@ -66,7 +66,6 @@ import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
-  getPeerRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
@@ -425,6 +424,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
@@ -566,6 +566,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
+        config.iceServers,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
@@ -729,8 +730,8 @@ export class HMSSdk implements HMSInterface {
     return await this.sendMessageInternal({ message, recipientPeer, type });
   }
 
-  async getPeer(peerID: getPeerRequestParams) {
-    const response = await this.transport.signal.getPeer(peerID);
+  async getPeer(peerId: string) {
+    const response = await this.transport.signal.getPeer({ peer_id: peerId });
     if (response) {
       return createRemotePeer(response, this.store);
     }

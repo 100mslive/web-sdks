@@ -5,6 +5,7 @@ import {
   HMSSimulcastLayerDefinition,
   HMSTrackID,
   HMSVideoTrack,
+  selectAvailableRoleNames,
   selectPermissions,
   selectSessionStore,
   selectTrackByID,
@@ -17,6 +18,7 @@ import {
   MicOffIcon,
   MicOnIcon,
   PencilIcon,
+  PersonSettingsIcon,
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
@@ -224,6 +226,9 @@ export const TileMenuContent = ({
   openNameChangeModal = () => {
     return;
   },
+  openRoleChangeModal = () => {
+    return;
+  },
 }: {
   videoTrackID: string;
   audioTrackID: string;
@@ -235,11 +240,15 @@ export const TileMenuContent = ({
   canMinimise?: boolean;
   closeSheetOnClick?: () => void;
   openNameChangeModal?: () => void;
+  openRoleChangeModal?: () => void;
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
-  const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
+  const permissions = useHMSStore(selectPermissions);
+  const canChangeRole = !!permissions?.changeRole;
+  const removeOthers = !!permissions?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
+  const roles = useHMSStore(selectAvailableRoleNames);
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
@@ -305,6 +314,21 @@ export const TileMenuContent = ({
         >
           {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
           <span>{isAudioEnabled ? 'Mute Audio' : 'Request to Unmute Audio'}</span>
+        </StyledMenuTile.ItemButton>
+      ) : null}
+
+      {canChangeRole && roles.length > 1 ? (
+        <StyledMenuTile.ItemButton
+          className={dragClassName}
+          css={spacingCSS}
+          onClick={() => {
+            openRoleChangeModal();
+            closeSheetOnClick();
+          }}
+          data-testid="change_role_btn"
+        >
+          <PersonSettingsIcon height={20} width={20} />
+          <span>Switch Role</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 

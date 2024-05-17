@@ -27,7 +27,7 @@ export const StyledDialogPortal = styled(DialogPrimitive.Portal, {});
 
 export const CustomDialogContent = styled(DialogPrimitive.Content, {
   color: '$on_surface_medium',
-  backgroundColor: '$surface_default',
+  backgroundColor: '$surface_dim',
   borderRadius: '8px',
   position: 'absolute',
   top: '50%',
