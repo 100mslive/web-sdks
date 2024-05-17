@@ -203,6 +203,7 @@ export const MwebOptions = ({
             ) : null}
             <ActionTile.Root
               onClick={() => {
+                setOpenOptionsSheet(false);
                 updateState(MODALS.ADMIN_CAPTION, true);
               }}
             >
@@ -350,10 +351,7 @@ export const MwebOptions = ({
         />
       )}
       {openModals.has(MODALS.ADMIN_CAPTION) && (
-        <AdminCaptionModal
-          onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)}
-          openParentSheet={() => setOpenOptionsSheet(true)}
-        />
+        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)} />
       )}
       {showEmojiCard && (
         <Box

@@ -4,21 +4,13 @@ import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { AdminCaptionContent } from './AdminCaptionContent';
 
-export const AdminCaptionModal = ({
-  onOpenChange,
-  openParentSheet = undefined,
-}: {
-  onOpenChange: (value: boolean) => void;
-  openParentSheet?: () => void;
-}) => {
+export const AdminCaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) => void }) => {
   const isMobile = useMedia(cssConfig.media.md);
 
   const props = {
     isMobile,
-    onExit: () => onOpenChange(false),
-    onBackClick: () => {
+    onExit: () => {
       onOpenChange(false);
-      openParentSheet?.();
     },
   };
 

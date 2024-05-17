@@ -8,7 +8,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
@@ -16,15 +16,7 @@ import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 
-export const AdminCaptionContent = ({
-  isMobile,
-  onExit,
-  onBackClick,
-}: {
-  isMobile: boolean;
-  onExit: () => void;
-  onBackClick: () => void;
-}) => {
+export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit: () => void }) => {
   const DURATION = 2000;
   const actions = useHMSActions();
   const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
@@ -58,7 +50,6 @@ export const AdminCaptionContent = ({
           '@md': { px: '$8', borderBottom: '1px solid $border_default' },
         }}
       >
-        {isMobile ? <ChevronLeftIcon onClick={onBackClick} style={{ marginRight: '0.5rem' }} /> : null}
         {isCaptionEnabled ? 'Disable' : 'Enable'} Closed Caption (CC) for this session?
         <Box
           css={{ color: 'inherit', ml: 'auto', '&:hover': { color: '$on_surface_medium', cursor: 'pointer' } }}
