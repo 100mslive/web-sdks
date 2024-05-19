@@ -70,7 +70,6 @@ const initialAppData = {
   },
   // by default off, so it will not appear in beam bots
   [APP_DATA.caption]: false,
-  // {poll_id: [{skipped: boolean, option: number, options: number[]}]}
   [APP_DATA.savedPollResponses]: {},
 };
 

@@ -18,6 +18,7 @@ export const TimedView = ({
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
   const attemptedAll = (poll.questions?.length || 0) < currentIndex;
 
+  // Handles increments so only one question is shown at a time in quiz
   useEffect(() => {
     setCurrentIndex(getIndexToShow(localPeerResponses));
   }, [localPeerResponses]);

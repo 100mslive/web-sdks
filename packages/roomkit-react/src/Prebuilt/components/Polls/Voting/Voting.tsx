@@ -29,6 +29,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const fetchedInitialResponses = useRef(false);
   const [savedPollResponses, setSavedPollResponses] = useSetAppDataByKey(APP_DATA.savedPollResponses);
 
+  // To reset whenever a different poll is opened
   useEffect(() => {
     fetchedInitialResponses.current = false;
   }, [id]);
@@ -53,7 +54,6 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
     return null;
   }
 
-  // Skipping is not allowed yet
   const updateSavedResponses = (questionIndex: number, option?: number, options?: number[]) => {
     const savedPollResponsesCopy = { ...savedPollResponses };
     savedPollResponsesCopy[questionIndex] = { option, options };
