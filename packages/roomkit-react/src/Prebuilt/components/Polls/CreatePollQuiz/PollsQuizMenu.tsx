@@ -183,11 +183,10 @@ const AddMenu = () => {
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
   const polls = useHMSStore(selectPolls);
-  const getPollsRef = useRef(false);
   const sortedPolls = useMemo(
     () =>
       polls
-        ?.sort((a, b) => (b?.createdAt?.getTime() || 0) - (a?.createdAt?.getTime() || 0))
+        ?.sort((a, b) => (b?.createdAt?.getTime?.() || 0) - (a?.createdAt?.getTime?.() || 0))
         ?.sort((a, b) => (b?.state === 'started' ? 1 : 0) - (a?.state === 'started' ? 1 : 0)),
     [polls],
   );
@@ -196,11 +195,8 @@ const PrevMenu = () => {
   useEffect(() => {
     const updatePolls = async () => {
       await hmsActions.interactivityCenter.getPolls();
-      getPollsRef.current = true;
     };
-    if (!getPollsRef.current) {
-      updatePolls();
-    }
+    updatePolls();
   }, [hmsActions.interactivityCenter]);
 
   return polls?.length ? (

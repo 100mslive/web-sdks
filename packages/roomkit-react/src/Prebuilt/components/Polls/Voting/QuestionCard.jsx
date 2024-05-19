@@ -21,8 +21,8 @@ export const QuestionCard = ({
   text,
   options = [],
   answer,
-  setCurrentIndex,
   localPeerResponse,
+  updateSavedResponses,
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
@@ -69,18 +69,24 @@ export const QuestionCard = ({
     if (!isValidVote) {
       return;
     }
-
-    await actions.interactivityCenter.addResponsesToPoll(pollID, [
-      {
-        questionIndex: index,
-        option: singleOptionAnswer,
-        options: Array.from(multipleOptionAnswer),
-        duration: Date.now() - startTime.current,
-      },
-    ]);
-    setLocalPeerChoice({ skipped: false, option: index });
+    const submittedResponse = {
+      questionIndex: index,
+      option: singleOptionAnswer,
+      options: Array.from(multipleOptionAnswer),
+      duration: Date.now() - startTime.current,
+    };
+    await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
+    updateSavedResponses(index, singleOptionAnswer, Array.from(multipleOptionAnswer));
     startTime.current = Date.now();
-  }, [isValidVote, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
+  }, [
+    isValidVote,
+    index,
+    singleOptionAnswer,
+    multipleOptionAnswer,
+    actions.interactivityCenter,
+    pollID,
+    updateSavedResponses,
+  ]);
 
   return (
     <Box
@@ -175,21 +181,13 @@ export const QuestionCard = ({
         ) : null}
       </Box>
       {isLive && (
-        <QuestionActions
-          isValidVote={isValidVote}
-          onVote={handleVote}
-          response={localPeerChoice}
-          isQuiz={isQuiz}
-          incrementIndex={() => {
-            setCurrentIndex(curr => curr + 1);
-          }}
-        />
+        <QuestionActions isValidVote={isValidVote} onVote={handleVote} response={localPeerChoice} isQuiz={isQuiz} />
       )}
     </Box>
   );
 };
 
-const QuestionActions = ({ isValidVote, response, isQuiz, onVote, incrementIndex }) => {
+const QuestionActions = ({ isValidVote, response, isQuiz, onVote }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
       {response ? (
@@ -199,14 +197,7 @@ const QuestionActions = ({ isValidVote, response, isQuiz, onVote, incrementIndex
           {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
-        <Button
-          css={{ p: '$xs $10', fontWeight: '$semiBold' }}
-          disabled={!isValidVote}
-          onClick={() => {
-            onVote();
-            incrementIndex();
-          }}
-        >
+        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
           {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}

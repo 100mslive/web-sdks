@@ -186,13 +186,15 @@ export class InteractivityCenter implements HMSInteractivityCenter {
           type: response.type,
           update: response.update,
         };
-        const existingResponses = question.responses ? [...question.responses] : [];
+        const existingResponses = question.responses && !self ? [...question.responses] : [];
 
         if (pollCopy.questions?.[response.question - 1]) {
           pollCopy.questions[response.question - 1].responses = [...existingResponses, pollResponse];
         }
       }
     });
+    // To debug: the store only updates the second time this runs (opening the sidepane a second time)
+    console.log('zzz setting', { pollCopy: pollCopy?.questions });
     this.store.setPoll(pollCopy);
   }
   async getPolls(): Promise<HMSPoll[]> {

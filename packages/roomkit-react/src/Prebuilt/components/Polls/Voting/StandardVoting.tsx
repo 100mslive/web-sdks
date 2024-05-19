@@ -4,7 +4,15 @@ import { PeerParticipationSummary } from './PeerParticipationSummary';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
 
-export const StandardView = ({ poll }: { poll: HMSPoll }) => {
+export const StandardView = ({
+  poll,
+  localPeerResponses,
+  updateSavedResponses,
+}: {
+  poll: HMSPoll;
+  localPeerResponses: Record<number, number | number[] | undefined>;
+  updateSavedResponses: (questionIndex: number, option?: number, options?: number[]) => void;
+}) => {
   if (!poll?.questions) {
     return null;
   }
@@ -28,11 +36,9 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
           result={question.result}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
-          localPeerResponse={question.responses?.[0]}
+          localPeerResponse={localPeerResponses?.[question.index]}
           answer={question.answer}
-          setCurrentIndex={() => {
-            return;
-          }}
+          updateSavedResponses={updateSavedResponses}
           rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
         />
       ))}

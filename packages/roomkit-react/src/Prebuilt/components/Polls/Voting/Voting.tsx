@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   selectPeerNameByID,
   selectPermissions,
@@ -13,9 +13,9 @@ import { Container } from '../../Streaming/Common';
 import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 // @ts-ignore
-import { usePollViewState } from '../../AppData/useUISettings';
+import { usePollViewState, useSetAppDataByKey } from '../../AppData/useUISettings';
 import { StatusIndicator } from '../common/StatusIndicator';
-import { POLL_VIEWS } from '../../../common/constants';
+import { APP_DATA, POLL_VIEWS } from '../../../common/constants';
 
 export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => void }) => {
   const actions = useHMSActions();
@@ -26,19 +26,39 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
+  const fetchedInitialResponses = useRef(false);
+  const [savedPollResponses, setSavedPollResponses] = useSetAppDataByKey(APP_DATA.savedPollResponses);
+
+  useEffect(() => {
+    fetchedInitialResponses.current = false;
+  }, [id]);
 
   useEffect(() => {
     const getResponses = async () => {
-      if (poll && actions.interactivityCenter) {
+      if (poll && actions.interactivityCenter && !fetchedInitialResponses.current) {
         await actions.interactivityCenter.getPollResponses(poll, true);
+        fetchedInitialResponses.current = true;
+        const pollResponses: Record<number, any> = {};
+        poll.questions?.forEach(question => {
+          pollResponses[question.index] = question.responses?.[0];
+        });
+        console.log('zzz updating', { pollResponses });
+        setSavedPollResponses(pollResponses);
       }
     };
     getResponses();
-  }, [poll, actions.interactivityCenter]);
+  }, [poll, actions.interactivityCenter, setSavedPollResponses]);
 
   if (!poll) {
     return null;
   }
+
+  // Skipping is not allowed yet
+  const updateSavedResponses = (questionIndex: number, option?: number, options?: number[]) => {
+    const savedPollResponsesCopy = { ...savedPollResponses };
+    savedPollResponsesCopy[questionIndex] = { option, options };
+    setSavedPollResponses(savedPollResponsesCopy);
+  };
 
   const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 
@@ -83,7 +103,15 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           </Text>
         ) : null}
 
-        {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
+        {showSingleView ? (
+          <TimedView poll={poll} localPeerResponses={savedPollResponses} updateSavedResponses={updateSavedResponses} />
+        ) : (
+          <StandardView
+            poll={poll}
+            localPeerResponses={savedPollResponses}
+            updateSavedResponses={updateSavedResponses}
+          />
+        )}
       </Flex>
       <Flex
         css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}

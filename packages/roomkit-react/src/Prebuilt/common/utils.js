@@ -147,17 +147,16 @@ export const getPeerResponses = (questions, peerid, userid) => {
   );
 };
 
-export const getLastAttemptedIndex = (questions, peerid, userid = '') => {
-  const peerResponses = getPeerResponses(questions, peerid, userid) || [];
-  for (let i = 0; i < peerResponses.length; i++) {
-    // If another peer has attempted, undefined changes to an empty array
-    if (peerResponses[i] === undefined || peerResponses[i].length === 0) {
-      // Backend question index starts at 1
-      return i + 1;
+export const getIndexToShow = responses => {
+  let lastAttemptedIndex = 0;
+
+  Object.keys(responses).forEach(key => {
+    const keyNum = parseInt(key);
+    if (keyNum > lastAttemptedIndex && responses[key]) {
+      lastAttemptedIndex = keyNum;
     }
-  }
-  // To indicate all have been attempted
-  return questions.length + 1;
+  });
+  return lastAttemptedIndex + 1;
 };
 
 export const getPeerParticipationSummary = (poll, localPeerID, localCustomerUserID) => {

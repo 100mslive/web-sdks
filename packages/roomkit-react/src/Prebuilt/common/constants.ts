@@ -49,6 +49,7 @@ export const APP_DATA = {
   sheet: 'sheet',
   caption: 'caption',
   loadingEffects: 'loadingEffects',
+  savedPollResponses: 'savedPollResponses',
 };
 
 export const UI_SETTINGS = {
