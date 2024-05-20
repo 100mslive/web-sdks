@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
   HMSPeer,
@@ -438,10 +438,6 @@ export const ParticipantSearch = ({
 }) => {
   const [value, setValue] = React.useState('');
   const isMobile = useMedia(cssConfig.media.md);
-  const { elements } = useRoomLayoutConferencingScreen();
-  const inputRef = useRef<HTMLInputElement>(null);
-  // @ts-ignore Flag added for customiser UI
-  const enableAutoFocus = !elements?.participant_list?.disable_autofocus;
 
   useDebounce(
     () => {
@@ -450,13 +446,6 @@ export const ParticipantSearch = ({
     300,
     [value, onSearch],
   );
-
-  useEffect(() => {
-    if (enableAutoFocus) {
-      // When switching from chat to peer list, the tab retains focus due to the click
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  }, [enableAutoFocus]);
 
   return (
     <Flex
@@ -472,7 +461,6 @@ export const ParticipantSearch = ({
     >
       <SearchIcon style={{ position: 'absolute', left: '0.5rem' }} />
       <Input
-        ref={inputRef}
         type="text"
         placeholder={placeholder}
         css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
