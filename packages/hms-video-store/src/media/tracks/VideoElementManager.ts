@@ -29,7 +29,6 @@ export class VideoElementManager {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
         this.track.addSink(videoElement, requestLayer);
-        this.resumeVideoPlayback({ target: videoElement } as unknown as Event);
       } else {
         this.track.removeSink(videoElement, requestLayer);
       }
@@ -87,12 +86,8 @@ export class VideoElementManager {
   private resumeVideoPlayback = (e: Event) => {
     const element = e.target as HTMLVideoElement;
     if (!document.hidden && isMobile() && element.paused) {
-      setTimeout(() => {
-        this.track.addSink(element);
-        element.play().catch(err => {
-          HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.peerId} ${(err as Error).message}`);
-        });
-      }, 0);
+      // add sink again to play the video specially in safari iOS
+      this.track.addSink(element);
     }
   };
 
