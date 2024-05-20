@@ -29,6 +29,7 @@ export class VideoElementManager {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
         this.track.addSink(videoElement, requestLayer);
+        this.resumeVideoPlayback({ target: videoElement } as unknown as Event);
       } else {
         this.track.removeSink(videoElement, requestLayer);
       }
@@ -84,20 +85,13 @@ export class VideoElementManager {
   }
 
   private resumeVideoPlayback = (e: Event) => {
-    console.trace('Resuming playback');
-    if (!document.hidden && isMobile()) {
+    const element = e.target as HTMLVideoElement;
+    if (!document.hidden && isMobile() && element.paused) {
       setTimeout(() => {
-        const element = e.target as HTMLVideoElement;
-        if (element.paused) {
-          element.oncanplaythrough = () => {
-            console.log('element can play', this.track.peerId);
-          };
-          console.log('element paused, try resuming', this.track.peerId);
-          this.track.addSink(element);
-          element.play().catch(err => {
-            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.peerId} ${(err as Error).message}`);
-          });
-        }
+        this.track.addSink(element);
+        element.play().catch(err => {
+          HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.peerId} ${(err as Error).message}`);
+        });
       }, 0);
     }
   };
