@@ -128,7 +128,7 @@ export const ParticipantList = ({
 export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const isPeerListOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
 
   if (peerCount === 0) {
     return null;
@@ -139,13 +139,13 @@ export const ParticipantCount = () => {
         w: 'auto',
         p: '$4',
         h: 'auto',
+        bg: isPeerListOpen ? '$surface_brighter' : '',
       }}
       onClick={() => {
         if (peerCount > 0) {
           toggleSidepane();
         }
       }}
-      active={!isParticipantsOpen}
       data-testid="participant_list"
     >
       <PeopleIcon />
