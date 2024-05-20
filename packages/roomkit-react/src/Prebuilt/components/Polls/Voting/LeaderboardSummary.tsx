@@ -4,6 +4,8 @@ import { ChevronLeftIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-i
 import { Box, Flex } from '../../../../Layout';
 import { Loading } from '../../../../Loading';
 import { Text } from '../../../../Text';
+// @ts-ignore
+import { Container } from '../../Streaming/Common';
 import { LeaderboardEntry } from './LeaderboardEntry';
 import { PeerParticipationSummary } from './PeerParticipationSummary';
 // @ts-ignore
@@ -32,80 +34,83 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
   const questionCount = quiz.questions?.length || 0;
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
-      <Flex justify="between" align="center" css={{ pb: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
-        <Flex align="center" css={{ gap: '$4' }}>
+    <Container rounded>
+      <Flex direction="column" css={{ size: '100%', p: '$8' }}>
+        <Flex justify="between" align="center" css={{ pb: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
+          <Flex align="center" css={{ gap: '$4' }}>
+            <Flex
+              css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
+              onClick={() => setPollView(POLL_VIEWS.VOTE)}
+            >
+              <ChevronLeftIcon />
+            </Flex>
+            <Text variant="lg" css={{ fontWeight: '$semiBold' }}>
+              {quiz.title}
+            </Text>
+            <StatusIndicator status={quiz.state} />
+          </Flex>
           <Flex
             css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
-            onClick={() => setPollView(POLL_VIEWS.VOTE)}
+            onClick={toggleSidepane}
           >
-            <ChevronLeftIcon />
+            <CrossIcon />
           </Flex>
-          <Text variant="lg" css={{ fontWeight: '$semiBold' }}>
-            {quiz.title}
+        </Flex>
+        <Box css={{ overflowY: 'auto', mr: '-$4', pr: '$4' }}>
+          {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
+
+          <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '$4' }}>
+            Leaderboard
           </Text>
-          <StatusIndicator status={quiz.state} />
-        </Flex>
-        <Flex
-          css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
-          onClick={toggleSidepane}
-        >
-          <CrossIcon />
-        </Flex>
-      </Flex>
-
-      {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
-
-      <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '$4' }}>
-        Leaderboard
-      </Text>
-      <Text variant="xs" css={{ color: '$on_surface_medium' }}>
-        Based on score and time taken to cast the correct answer
-      </Text>
-      <Box
-        css={{
-          mt: '$8',
-          overflowY: 'auto',
-          flex: viewAllEntries ? '1 1 0' : 'unset',
-          mr: viewAllEntries ? '-$6' : 'unset',
-          px: viewAllEntries ? '0' : '$4',
-          pr: viewAllEntries ? '$6' : '$4',
-          backgroundColor: viewAllEntries ? '' : '$surface_default',
-          borderRadius: '$1',
-        }}
-      >
-        {quizLeaderboard?.entries &&
-          quizLeaderboard.entries
-            .slice(0, viewAllEntries ? undefined : 5)
-            .map(question => (
-              <LeaderboardEntry
-                key={question.position}
-                position={question.position}
-                score={question.score}
-                questionCount={questionCount}
-                correctResponses={question.correctResponses}
-                userName={question.peer.username || ''}
-                maxPossibleScore={maxPossibleScore}
-                duration={question.duration}
-              />
-            ))}
-        {quizLeaderboard?.entries?.length > 5 && !viewAllEntries ? (
-          <Flex
-            align="center"
-            justify="end"
+          <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+            Based on score and time taken to cast the correct answer
+          </Text>
+          <Box
             css={{
-              w: '100%',
-              borderTop: '1px solid $border_bright',
-              cursor: 'pointer',
-              color: '$on_surface_high',
-              p: '$6 $2',
+              mt: '$8',
+              overflowY: 'auto',
+              flex: viewAllEntries ? '1 1 0' : 'unset',
+              mr: viewAllEntries ? '-$6' : 'unset',
+              px: viewAllEntries ? '0' : '$4',
+              pr: viewAllEntries ? '$6' : '$4',
+              backgroundColor: viewAllEntries ? '' : '$surface_default',
+              borderRadius: '$1',
             }}
-            onClick={() => setViewAllEntries(true)}
           >
-            <Text variant="sm">View All</Text> <ChevronRightIcon />
-          </Flex>
-        ) : null}
-      </Box>
-    </Flex>
+            {quizLeaderboard?.entries &&
+              quizLeaderboard.entries
+                .slice(0, viewAllEntries ? undefined : 5)
+                .map(question => (
+                  <LeaderboardEntry
+                    key={question.position}
+                    position={question.position}
+                    score={question.score}
+                    questionCount={questionCount}
+                    correctResponses={question.correctResponses}
+                    userName={question.peer.username || ''}
+                    maxPossibleScore={maxPossibleScore}
+                    duration={question.duration}
+                  />
+                ))}
+            {quizLeaderboard?.entries?.length > 5 && !viewAllEntries ? (
+              <Flex
+                align="center"
+                justify="end"
+                css={{
+                  w: '100%',
+                  borderTop: '1px solid $border_bright',
+                  cursor: 'pointer',
+                  color: '$on_surface_high',
+                  p: '$6 $2',
+                }}
+                onClick={() => setViewAllEntries(true)}
+              >
+                <Text variant="sm">View All</Text> <ChevronRightIcon />
+              </Flex>
+            ) : null}
+          </Box>
+        </Box>
+      </Flex>
+    </Container>
   );
 };
