@@ -102,6 +102,13 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       }
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream, elements?.chat]);
+
+  const resetInputHeight = () => {
+    if (inputRef.current) {
+      inputRef.current.style.height = `${Math.max(32, inputRef.current.value ? inputRef.current.scrollHeight : 0)}px`;
+    }
+  };
+
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -116,6 +123,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = '';
+      resetInputHeight();
       setTimeout(() => {
         onSend(1);
       }, 0);
@@ -197,11 +205,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       {selection && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
-            align="center"
+            align="end"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
               minHeight: '$16',
-              maxHeight: '$24',
               position: 'relative',
               py: '$6',
               pl: '$8',
@@ -238,6 +245,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               }}
               autoComplete="off"
               aria-autocomplete="none"
+              onChange={e => {
+                const element = e.target;
+                element.style.height = `${Math.min(element.scrollHeight, 24 * 4)}px`;
+              }}
+              onBlur={resetInputHeight}
               onPaste={e => e.stopPropagation()}
               onCut={e => e.stopPropagation()}
               onCopy={e => e.stopPropagation()}
