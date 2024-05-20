@@ -109,6 +109,12 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     }
   };
 
+  const updateInputHeight = () => {
+    if (inputRef.current) {
+      inputRef.current.style.height = `${Math.max(32, Math.min(inputRef.current.scrollHeight, 24 * 4))}px`;
+    }
+  };
+
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -139,6 +145,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     const messageElement = inputRef.current;
     if (messageElement) {
       messageElement.value = draftMessage;
+      updateInputHeight();
     }
   }, [draftMessage]);
 
@@ -245,10 +252,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               }}
               autoComplete="off"
               aria-autocomplete="none"
-              onChange={e => {
-                const element = e.target;
-                element.style.height = `${Math.min(element.scrollHeight, 24 * 4)}px`;
-              }}
+              onChange={updateInputHeight}
               onBlur={resetInputHeight}
               onPaste={e => e.stopPropagation()}
               onCut={e => e.stopPropagation()}
