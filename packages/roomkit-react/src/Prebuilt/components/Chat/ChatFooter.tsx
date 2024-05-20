@@ -103,17 +103,17 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream, elements?.chat]);
 
-  const resetInputHeight = () => {
+  const resetInputHeight = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.style.height = `${Math.max(32, inputRef.current.value ? inputRef.current.scrollHeight : 0)}px`;
     }
-  };
+  }, []);
 
-  const updateInputHeight = () => {
+  const updateInputHeight = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.style.height = `${Math.max(32, Math.min(inputRef.current.scrollHeight, 24 * 4))}px`;
     }
-  };
+  }, []);
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
