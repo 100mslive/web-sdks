@@ -89,10 +89,13 @@ export class VideoElementManager {
       setTimeout(() => {
         const element = e.target as HTMLVideoElement;
         if (element.paused) {
-          console.log('element paused, try resuming');
+          element.oncanplaythrough = () => {
+            console.log('element can play', this.track.peerId);
+          };
+          console.log('element paused, try resuming', this.track.peerId);
           this.track.addSink(element);
           element.play().catch(err => {
-            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`);
+            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.peerId} ${(err as Error).message}`);
           });
         }
       }, 0);
