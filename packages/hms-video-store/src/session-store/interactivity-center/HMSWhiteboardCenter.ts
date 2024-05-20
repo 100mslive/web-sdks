@@ -78,6 +78,11 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     for (const whiteboard of whiteboards.values()) {
       if (whiteboard.url) {
         const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
+        const localPeer = this.store.getLocalPeer();
+        const isOwner = localPeer?.customerUserId === response.owner;
+        const open = isOwner
+          ? localPeer.role?.permissions.whiteboard?.includes('admin')
+          : response.permissions.length > 0;
         const newWhiteboard: HMSWhiteboard = {
           ...whiteboard,
           id: response.id,
@@ -86,7 +91,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
           addr: response.addr,
           owner: response.owner,
           permissions: response.permissions,
-          open: response.permissions.length > 0,
+          open,
         };
 
         this.store.setWhiteboard(newWhiteboard);

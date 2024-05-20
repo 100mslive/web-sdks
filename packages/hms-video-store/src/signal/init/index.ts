@@ -1,6 +1,8 @@
 import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
+import { HMSICEServer } from '../../interfaces';
+import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
 const TAG = '[InitService]';
@@ -26,26 +28,26 @@ export default class InitService {
     userAgent,
     initEndpoint = 'https://prod-init.100ms.live',
     region = '',
+    iceServers,
   }: {
     token: string;
     peerId: string;
     userAgent: string;
     initEndpoint?: string;
     region?: string;
+    iceServers?: HMSICEServer[];
   }): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, userAgent, region);
     try {
       const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       try {
         const config = await response.clone().json();
         this.handleError(response, config);
         HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
-        return transformInitConfig(config);
+        return transformInitConfig(config, iceServers);
       } catch (err) {
         const text = await response.text();
         HMSLogger.e(TAG, 'json error', (err as Error).message, text);
@@ -78,9 +80,12 @@ export function getUrl(endpoint: string, peerId: string, userAgent: string, regi
   }
 }
 
-export function transformInitConfig(config: any): InitConfig {
+export function transformInitConfig(config: any, iceServers?: HMSICEServer[]): InitConfig {
   return {
     ...config,
-    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration?.ice_servers },
+    rtcConfiguration: {
+      ...config.rtcConfiguration,
+      iceServers: transformIceServerConfig(config.rtcConfiguration?.ice_servers, iceServers),
+    },
   };
 }

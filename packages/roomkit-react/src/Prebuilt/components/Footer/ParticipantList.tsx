@@ -4,6 +4,7 @@ import {
   HMSPeer,
   HMSPeerType,
   HMSRoleName,
+  selectAvailableRoleNames,
   selectHandRaisedPeers,
   selectHasPeerHandRaised,
   selectIsLargeRoom,
@@ -373,6 +374,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
   } = usePeerOnStageActions({ peerId, role });
   const canChangeRole = !!useHMSStore(selectPermissions)?.changeRole;
   const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
+  const roles = useHMSStore(selectAvailableRoleNames);
 
   return (
     <>
@@ -410,7 +412,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
               </Dropdown.Item>
             ) : null}
 
-            {canChangeRole ? (
+            {canChangeRole && roles.length > 1 ? (
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => setOpenRoleChangeModal(true)}>
                 <PersonSettingsIcon />
                 <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>

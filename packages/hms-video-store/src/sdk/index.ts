@@ -424,6 +424,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
@@ -565,6 +566,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
+        config.iceServers,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
