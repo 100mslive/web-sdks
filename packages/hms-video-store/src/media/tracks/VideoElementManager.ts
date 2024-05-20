@@ -5,7 +5,7 @@ import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '../../internal';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
-import { isBrowser } from '../../utils/support';
+import { isBrowser, isMobile } from '../../utils/support';
 
 /**
  * This class is to manager video elements for video tracks.
@@ -83,20 +83,17 @@ export class VideoElementManager {
     return Array.from(this.videoElements);
   }
 
-  private resumeVideoPlayback = () => {
+  private resumeVideoPlayback = (e: Event) => {
     console.trace('Resuming playback');
-    if (!document.hidden) {
+    if (!document.hidden && isMobile()) {
       setTimeout(() => {
-        for (const element of this.videoElements) {
-          if (element.paused) {
-            console.log('element paused, try resuming');
-            element.play().catch(err => {
-              HMSLogger.w(
-                this.TAG,
-                `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`,
-              );
-            });
-          }
+        const element = e.target as HTMLVideoElement;
+        if (element.paused) {
+          console.log('element paused, try resuming');
+          this.track.addSink(element);
+          element.play().catch(err => {
+            HMSLogger.w(this.TAG, `Error resuming video playback for ${this.track.trackId} ${(err as Error).message}`);
+          });
         }
       }, 0);
     }
@@ -106,7 +103,6 @@ export class VideoElementManager {
     if (isBrowser) {
       this.resizeObserver = HMSResizeObserver;
       this.intersectionObserver = HMSIntersectionObserver;
-      document.addEventListener('visibilitychange', this.resumeVideoPlayback);
     }
   }
 
@@ -197,7 +193,6 @@ export class VideoElementManager {
       this.intersectionObserver?.unobserve(videoElement);
     });
     this.videoElements.clear();
-    document.removeEventListener('visibilitychange', this.resumeVideoPlayback);
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };
