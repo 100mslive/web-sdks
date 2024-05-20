@@ -5,6 +5,7 @@ import {
   HMSSimulcastLayerDefinition,
   HMSTrackID,
   HMSVideoTrack,
+  selectAvailableRoleNames,
   selectPermissions,
   selectSessionStore,
   selectTrackByID,
@@ -247,6 +248,7 @@ export const TileMenuContent = ({
   const canChangeRole = !!permissions?.changeRole;
   const removeOthers = !!permissions?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
+  const roles = useHMSStore(selectAvailableRoleNames);
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
@@ -315,7 +317,7 @@ export const TileMenuContent = ({
         </StyledMenuTile.ItemButton>
       ) : null}
 
-      {canChangeRole ? (
+      {canChangeRole && roles.length > 1 ? (
         <StyledMenuTile.ItemButton
           className={dragClassName}
           css={spacingCSS}
