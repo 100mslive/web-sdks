@@ -77,8 +77,13 @@ export class HMSVideoTrack extends HMSTrack {
         this.reduceSinkCount();
       }
     }
-    videoElement.srcObject = new MediaStream([track]);
-    // videoElement.play().catch(console.error);
+    const stream = new MediaStream([track]);
+    videoElement.srcObject = stream;
+    setTimeout(() => {
+      // This is needed for safari and firefox to work properly
+      videoElement.srcObject = stream;
+      videoElement.play().catch(console.error);
+    }, 0);
     this.sinkCount++;
   }
 
