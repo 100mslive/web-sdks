@@ -193,8 +193,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         }
       }
     });
-    // To debug: the store only updates the second time this runs (opening the sidepane a second time)
-    console.log('zzz setting', { pollCopy: pollCopy?.questions });
     this.store.setPoll(pollCopy);
   }
   async getPolls(): Promise<HMSPoll[]> {
