@@ -1,3 +1,5 @@
+import { HMSICEServer } from '../../interfaces';
+
 export class JoinParameters {
   constructor(
     public authToken: string,
@@ -6,5 +8,6 @@ export class JoinParameters {
     public data: string = '',
     public endpoint: string = 'https://prod-init.100ms.live/init',
     public autoSubscribeVideo: boolean = false,
+    public iceServers?: HMSICEServer[],
   ) {}
 }

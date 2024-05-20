@@ -32,8 +32,7 @@ export const useSetEditorPermissions = ({
 
     const isReadonly = !permissions.includes('write');
     editor?.updateInstanceState({ isReadonly });
-    if (isReadonly) {
-      editor?.setCurrentTool('hand');
-    }
   }, [permissions, zoomToContent, editor]);
+
+  return permissions;
 };
