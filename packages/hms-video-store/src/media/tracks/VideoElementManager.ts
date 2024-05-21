@@ -182,7 +182,6 @@ export class VideoElementManager {
   cleanup = () => {
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
-      videoElement.removeEventListener('play', this.resumeVideoPlayback);
       videoElement.removeEventListener('pause', this.resumeVideoPlayback);
       this.resizeObserver?.unobserve(videoElement);
       this.intersectionObserver?.unobserve(videoElement);
