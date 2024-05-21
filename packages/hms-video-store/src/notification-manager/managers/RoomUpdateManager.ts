@@ -128,7 +128,7 @@ export class RoomUpdateManager {
     if (!transcriptions) {
       return [];
     }
-    const output = transcriptions.map((transcription: TranscriptionNotification) => {
+    return transcriptions.map((transcription: TranscriptionNotification) => {
       return {
         state: transcription.state,
         mode: transcription.mode,
@@ -139,7 +139,6 @@ export class RoomUpdateManager {
         error: this.toSdkError(transcription?.error),
       };
     });
-    return output;
   }
   private isRecordingRunning(state?: HMSRecordingState): boolean {
     if (!state) {

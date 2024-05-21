@@ -62,6 +62,7 @@ export enum HMSStreamingState {
 }
 
 export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
   STARTED = 'started',
   STOPPED = 'stopped',
   FAILED = 'failed',

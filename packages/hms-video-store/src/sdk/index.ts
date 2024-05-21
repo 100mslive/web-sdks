@@ -425,6 +425,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
@@ -566,6 +567,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
+        config.iceServers,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
@@ -1011,15 +1013,12 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.signal.stopHLSStreaming();
   }
 
-  async startTranscription(params?: TranscriptionConfig) {
+  async startTranscription(params: TranscriptionConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
-        'No local peer present, cannot start HLS streaming',
+        'No local peer present, cannot start transcriptions',
       );
-    }
-    if (!params) {
-      throw ErrorFactory.GenericErrors.Signalling(HMSAction.VALIDATION, 'No mode is passed to start the transcription');
     }
     const transcriptionParams: StartTranscriptionRequestParams = {
       mode: params.mode,
@@ -1027,11 +1026,11 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.signal.startTranscription(transcriptionParams);
   }
 
-  async stopTranscription(params?: TranscriptionConfig) {
+  async stopTranscription(params: TranscriptionConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
-        'No local peer present, cannot stop HLS streaming',
+        'No local peer present, cannot stop transcriptions',
       );
     }
     if (!params) {

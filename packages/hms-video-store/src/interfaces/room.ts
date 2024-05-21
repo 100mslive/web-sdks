@@ -123,6 +123,7 @@ export interface HLSVariant {
 Transcription related details
 */
 export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
   STARTED = 'started',
   STOPPED = 'stopped',
   FAILED = 'failed',
