@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
@@ -21,15 +21,12 @@ export const QuestionCard = ({
   text,
   options = [],
   answer,
-  setCurrentIndex,
-  responses = [],
+  localPeerResponse,
+  updateSavedResponses,
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
-  const localPeerResponse = responses?.find(
-    response => response.peer?.peerid === localPeer?.id || response.peer?.userid === localPeer?.customerUserId,
-  );
 
   const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
@@ -37,20 +34,26 @@ export const QuestionCard = ({
     !rolesThatCanViewResponses ||
     rolesThatCanViewResponses.length === 0 ||
     rolesThatCanViewResponses.includes(localPeerRoleName || '');
+  const [localPeerChoice, setLocalPeerChoice] = useState(localPeerResponse);
+
+  useEffect(() => {
+    setLocalPeerChoice(localPeerResponse);
+  }, [localPeerResponse]);
+
   const showVoteCount =
-    roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
+    roleCanViewResponse && (localPeerChoice || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
 
   const isLive = pollState === 'started';
   const pollEnded = pollState === 'stopped';
-  const canRespond = isLive && !localPeerResponse;
+  const canRespond = isLive && !localPeerChoice;
   const startTime = useRef(Date.now());
-  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
+  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerChoice, type);
 
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
   const [showOptions, setShowOptions] = useState(true);
 
-  const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
+  const respondedToQuiz = isQuiz && localPeerChoice && !localPeerChoice.skipped;
 
   const isValidVote = useMemo(() => {
     if (type === QUESTION_TYPE.SINGLE_CHOICE) {
@@ -64,17 +67,28 @@ export const QuestionCard = ({
     if (!isValidVote) {
       return;
     }
-
-    await actions.interactivityCenter.addResponsesToPoll(pollID, [
-      {
-        questionIndex: index,
-        option: singleOptionAnswer,
-        options: Array.from(multipleOptionAnswer),
-        duration: Date.now() - startTime.current,
-      },
-    ]);
+    const submittedResponse = {
+      questionIndex: index,
+      option: singleOptionAnswer,
+      options: Array.from(multipleOptionAnswer),
+      duration: Date.now() - startTime.current,
+    };
+    await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
+    updateSavedResponses(prev => {
+      const prevCopy = { ...prev };
+      prevCopy[index] = { option: singleOptionAnswer, options: Array.from(multipleOptionAnswer) };
+      return prevCopy;
+    });
     startTime.current = Date.now();
-  }, [isValidVote, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
+  }, [
+    isValidVote,
+    index,
+    singleOptionAnswer,
+    multipleOptionAnswer,
+    actions.interactivityCenter,
+    pollID,
+    updateSavedResponses,
+  ]);
 
   return (
     <Box
@@ -147,7 +161,7 @@ export const QuestionCard = ({
             setAnswer={setSingleOptionAnswer}
             totalResponses={result?.totalResponses}
             showVoteCount={showVoteCount}
-            localPeerResponse={localPeerResponse}
+            localPeerResponse={localPeerChoice}
             isStopped={pollState === 'stopped'}
           />
         ) : null}
@@ -163,27 +177,19 @@ export const QuestionCard = ({
             setSelectedOptions={setMultipleOptionAnswer}
             totalResponses={result?.totalResponses}
             showVoteCount={showVoteCount}
-            localPeerResponse={localPeerResponse}
+            localPeerResponse={localPeerChoice}
             isStopped={pollState === 'stopped'}
           />
         ) : null}
       </Box>
       {isLive && (
-        <QuestionActions
-          isValidVote={isValidVote}
-          onVote={handleVote}
-          response={localPeerResponse}
-          isQuiz={isQuiz}
-          incrementIndex={() => {
-            setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
-          }}
-        />
+        <QuestionActions isValidVote={isValidVote} onVote={handleVote} response={localPeerChoice} isQuiz={isQuiz} />
       )}
     </Box>
   );
 };
 
-const QuestionActions = ({ isValidVote, response, isQuiz, onVote, incrementIndex }) => {
+const QuestionActions = ({ isValidVote, response, isQuiz, onVote }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
       {response ? (
@@ -193,14 +199,7 @@ const QuestionActions = ({ isValidVote, response, isQuiz, onVote, incrementIndex
           {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
-        <Button
-          css={{ p: '$xs $10', fontWeight: '$semiBold' }}
-          disabled={!isValidVote}
-          onClick={() => {
-            onVote();
-            incrementIndex();
-          }}
-        >
+        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
           {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}

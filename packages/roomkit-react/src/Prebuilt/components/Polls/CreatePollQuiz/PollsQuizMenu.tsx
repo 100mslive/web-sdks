@@ -152,18 +152,6 @@ const AddMenu = () => {
             Hide Vote Count
           </Text>
         </Flex>
-        {/* <Flex align="center" css={{ mt: '$10' }}>
-          <Switch onCheckedChange={value => setAnonymous(value)} css={{ mr: '$6' }} />
-          <Text variant="body2" css={{ c: '$on_surface_medium' }}>
-            Make Results Anonymous
-          </Text>
-        </Flex> */}
-        {/* <Timer
-        timer={timer}
-        setTimer={setTimer}
-        showTimerDropDown={showTimerDropDown}
-        setShowTimerDropDown={setShowTimerDropDown}
-      /> */}
 
         <Button
           variant="primary"
@@ -198,8 +186,8 @@ const PrevMenu = () => {
   const sortedPolls = useMemo(
     () =>
       polls
-        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0)),
+        ?.sort((a, b) => (b?.createdAt?.getTime?.() || 0) - (a?.createdAt?.getTime?.() || 0))
+        ?.sort((a, b) => (b?.state === 'started' ? 1 : 0) - (a?.state === 'started' ? 1 : 0)),
     [polls],
   );
   const permissions = useHMSStore(selectPermissions);
@@ -208,7 +196,6 @@ const PrevMenu = () => {
     const updatePolls = async () => {
       await hmsActions.interactivityCenter.getPolls();
     };
-
     updatePolls();
   }, [hmsActions.interactivityCenter]);
 
