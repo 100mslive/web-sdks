@@ -60,6 +60,7 @@ import {
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
+  StartTranscriptionRequestParams,
   Track,
   TrackUpdateRequestParams,
   UpdatePeerRequestParams,
@@ -362,6 +363,14 @@ export default class JsonRpcSignal {
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { ...params });
+  }
+
+  async startTranscription(params: StartTranscriptionRequestParams) {
+    await this.call(HMSSignalMethod.START_TRANSCRIPTION, { ...params });
+  }
+
+  async stopTranscription(params: StartTranscriptionRequestParams) {
+    await this.call(HMSSignalMethod.STOP_TRANSCRIPTION, { ...params });
   }
 
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {

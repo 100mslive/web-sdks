@@ -1,4 +1,4 @@
-import { HMSTrackSource } from '../..';
+import { HMSTrackSource, HMSTranscriptionMode } from '../..';
 import { HLSTimedMetadata, RTMPRecordingResolution } from '../../interfaces';
 
 /**
@@ -57,6 +57,9 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
+export interface StartTranscriptionRequestParams {
+  mode: HMSTranscriptionMode;
+}
 export interface SetSessionMetadataParams {
   key?: string;
   data: any;
