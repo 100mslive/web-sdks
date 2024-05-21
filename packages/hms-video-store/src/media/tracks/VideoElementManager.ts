@@ -74,6 +74,8 @@ export class VideoElementManager {
   removeVideoElement(videoElement: HTMLVideoElement): void {
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
+    videoElement.removeEventListener('play', this.resumeVideoPlayback);
+    videoElement.removeEventListener('pause', this.resumeVideoPlayback);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
@@ -182,6 +184,8 @@ export class VideoElementManager {
   cleanup = () => {
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
+      videoElement.removeEventListener('play', this.resumeVideoPlayback);
+      videoElement.removeEventListener('pause', this.resumeVideoPlayback);
       this.resizeObserver?.unobserve(videoElement);
       this.intersectionObserver?.unobserve(videoElement);
     });
