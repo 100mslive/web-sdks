@@ -70,7 +70,6 @@ const initialAppData = {
   },
   // by default off, so it will not appear in beam bots
   [APP_DATA.caption]: false,
-  [APP_DATA.savedPollResponses]: {},
 };
 
 export const AppData = React.memo(() => {

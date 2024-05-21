@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { HMSPoll } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
@@ -12,7 +12,7 @@ export const TimedView = ({
 }: {
   poll: HMSPoll;
   localPeerResponses?: Record<number, number | number[] | undefined>;
-  updateSavedResponses: (questionIndex: number, option?: number, options?: number[]) => void;
+  updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
 }) => {
   const [currentIndex, setCurrentIndex] = useState(getIndexToShow(localPeerResponses));
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);

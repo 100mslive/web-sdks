@@ -74,7 +74,11 @@ export const QuestionCard = ({
       duration: Date.now() - startTime.current,
     };
     await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
-    updateSavedResponses(index, singleOptionAnswer, Array.from(multipleOptionAnswer));
+    updateSavedResponses(prev => {
+      const prevCopy = { ...prev };
+      prevCopy[index] = { option: singleOptionAnswer, options: Array.from(multipleOptionAnswer) };
+      return prevCopy;
+    });
     startTime.current = Date.now();
   }, [
     isValidVote,

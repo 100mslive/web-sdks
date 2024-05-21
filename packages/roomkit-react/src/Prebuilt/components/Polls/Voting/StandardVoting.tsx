@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { HMSPoll } from '@100mslive/react-sdk';
 import { PeerParticipationSummary } from './PeerParticipationSummary';
 // @ts-ignore
@@ -11,7 +11,7 @@ export const StandardView = ({
 }: {
   poll: HMSPoll;
   localPeerResponses: Record<number, number | number[] | undefined>;
-  updateSavedResponses: (questionIndex: number, option?: number, options?: number[]) => void;
+  updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
 }) => {
   if (!poll?.questions) {
     return null;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   selectLocalPeerID,
   selectPeerNameByID,
@@ -14,11 +14,11 @@ import { Container } from '../../Streaming/Common';
 import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 // @ts-ignore
-import { usePollViewState, useSetAppDataByKey } from '../../AppData/useUISettings';
+import { usePollViewState } from '../../AppData/useUISettings';
 // @ts-ignore
 import { getPeerResponses } from '../../../common/utils';
 import { StatusIndicator } from '../common/StatusIndicator';
-import { APP_DATA, POLL_VIEWS } from '../../../common/constants';
+import { POLL_VIEWS } from '../../../common/constants';
 
 export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => void }) => {
   const actions = useHMSActions();
@@ -30,14 +30,14 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
   const fetchedInitialResponses = useRef(false);
-  const [savedPollResponses, setSavedPollResponses] = useSetAppDataByKey(APP_DATA.savedPollResponses);
+  const [savedResponses, setSavedResponses] = useState<Record<any, any>>({});
   const localPeerId = useHMSStore(selectLocalPeerID);
 
   // To reset whenever a different poll is opened
   useEffect(() => {
     fetchedInitialResponses.current = false;
-    setSavedPollResponses('');
-  }, [id, setSavedPollResponses]);
+    setSavedResponses({});
+  }, [id, setSavedResponses]);
 
   useEffect(() => {
     const getResponses = async () => {
@@ -47,16 +47,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       }
     };
     getResponses();
-  }, [poll, actions.interactivityCenter, setSavedPollResponses]);
-
-  const updateSavedResponses = (questionIndex: number, option?: number, options?: number[]) => {
-    if (!option && !options) {
-      return;
-    }
-    const savedPollResponsesCopy = { ...savedPollResponses };
-    savedPollResponsesCopy[questionIndex] = { option, options };
-    setSavedPollResponses(savedPollResponsesCopy);
-  };
+  }, [poll, actions.interactivityCenter]);
 
   useEffect(() => {
     if (poll?.questions) {
@@ -64,11 +55,14 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       // @ts-ignore
       localPeerResponses?.forEach(response => {
         if (response) {
-          updateSavedResponses(response[0]?.questionIndex, response[0]?.option, response[0]?.options);
+          setSavedResponses(prev => {
+            const prevCopy = { ...prev };
+            prevCopy[response[0]?.questionIndex] = { option: response[0]?.option, options: response[0]?.options };
+            return prevCopy;
+          });
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localPeerId, poll?.questions, id]);
 
   if (!poll) {
@@ -119,13 +113,9 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         ) : null}
 
         {showSingleView ? (
-          <TimedView poll={poll} localPeerResponses={savedPollResponses} updateSavedResponses={updateSavedResponses} />
+          <TimedView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
         ) : (
-          <StandardView
-            poll={poll}
-            localPeerResponses={savedPollResponses}
-            updateSavedResponses={updateSavedResponses}
-          />
+          <StandardView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
         )}
       </Flex>
       <Flex
