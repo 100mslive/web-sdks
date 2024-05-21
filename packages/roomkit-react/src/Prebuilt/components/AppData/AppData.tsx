@@ -21,7 +21,6 @@ import { useSetAppDataByKey } from './useUISettings';
 import {
   APP_DATA,
   CHAT_SELECTOR,
-  DEFAULT_WAITING_VIEWER_ROLE,
   POLL_STATE,
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
@@ -56,7 +55,6 @@ const initialAppData = {
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
-  [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
