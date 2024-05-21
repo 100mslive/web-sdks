@@ -281,6 +281,7 @@ export class AudioSinkManager {
       (async () => {
         await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
+        this.unpauseAudioTracks();
       })();
     }, 5000);
   };
