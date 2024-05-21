@@ -56,7 +56,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
       const getCalculatedJitterBufferDelay = (trackStats: HMSTrackStats) =>
         trackStats.jitterBufferDelay &&
         trackStats.jitterBufferEmittedCount &&
-        trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount;
+        (trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount) * 1000;
 
       const calculatedJitterBufferDelay = getCalculatedJitterBufferDelay(trackStats);
 

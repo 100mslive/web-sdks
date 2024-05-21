@@ -7,6 +7,8 @@ import {
   HistoryEntry,
   throttle,
   TLAnyShapeUtilConstructor,
+  TLInstance,
+  TLINSTANCE_ID,
   TLPage,
   TLRecord,
   TLStoreWithStatus,
@@ -61,37 +63,14 @@ export function useCollaboration({
   }, []);
 
   const sessionStore = useSessionStore({ token, endpoint, handleError });
+  const permissions = useSetEditorPermissions({ token, editor, zoomToContent, handleError });
 
-  useSetEditorPermissions({ token, editor, zoomToContent, handleError });
+  const handleOpen = useCallback(
+    (initialRecords: TLRecord[]) => {
+      if (!sessionStore) {
+        return;
+      }
 
-  useEffect(() => {
-    if (!sessionStore) return;
-
-    setStoreWithStatus({ status: 'loading' });
-
-    const unsubs: (() => void)[] = [];
-
-    // 1.
-    // Connect store to yjs store and vis versa, for both the document and awareness
-
-    /* -------------------- Document -------------------- */
-
-    const handleChange = (key: string, value?: TLRecord) => {
-      // put / remove the records in the store
-      store.mergeRemoteChanges(() => {
-        if (!value) {
-          return store.remove([key as TLRecord['id']]);
-        }
-        if (key === CURRENT_PAGE_KEY) {
-          setCurrentPage(value as TLPage);
-        } else {
-          store.put([value]);
-        }
-      });
-    };
-
-    const handleOpen = (initialRecords: TLRecord[]) => {
-      // 2.
       // Initialize the tldraw store with the session store server records—or, if the session store
       // is empty, initialize the session store server with the default tldraw store records.
       const shouldUseServerRecords = FULL_SYNC_REQUIRED_RECORD_TYPES.every(
@@ -116,7 +95,40 @@ export function useCollaboration({
         status: 'synced-remote',
         connectionStatus: 'online',
       });
-    };
+    },
+    [store, sessionStore],
+  );
+
+  const handleChange = useCallback(
+    (key: string, value?: TLRecord) => {
+      // put / remove the records in the store
+      store.mergeRemoteChanges(() => {
+        if (!value) {
+          return store.remove([key as TLRecord['id']]);
+        }
+        if (key === CURRENT_PAGE_KEY) {
+          setCurrentPage(value as TLPage);
+        } else {
+          transact(() => {
+            store.put([value]);
+            if (key === TLINSTANCE_ID) {
+              store.put([
+                { ...value, canMoveCamera: !!zoomToContent, isReadonly: !permissions.includes('write') } as TLInstance,
+              ]);
+            }
+          });
+        }
+      });
+    },
+    [store, permissions, zoomToContent],
+  );
+
+  useEffect(() => {
+    if (!sessionStore) return;
+
+    setStoreWithStatus({ status: 'loading' });
+
+    const unsubs: (() => void)[] = [];
 
     // Open session and sync the session store changes to the store
     sessionStore
@@ -181,7 +193,7 @@ export function useCollaboration({
       unsubs.forEach(fn => fn());
       unsubs.length = 0;
     };
-  }, [store, sessionStore, handleError]);
+  }, [store, sessionStore, handleChange, handleOpen, handleError]);
 
   useEffect(() => {
     if (!editor || !sessionStore) return;
@@ -196,12 +208,15 @@ export function useCollaboration({
             if (!key.includes('instance')) {
               return;
             }
-            // full store sync
-            const instanceRecords = store
-              .allRecords()
-              .filter(record => FULL_SYNC_REQUIRED_RECORD_TYPES.includes(record.typeName));
-            for (const record of instanceRecords) {
-              sessionStore.set(record.id, record);
+            const newPage = editor?.getCurrentPage();
+
+            if (newPage?.id !== currentPage?.id) {
+              sessionStore.get(TLINSTANCE_ID).then(instance => {
+                if (instance) {
+                  sessionStore?.set(instance.id, { ...instance, currentPageId: newPage?.id } as TLInstance);
+                }
+              });
+              setCurrentPage(newPage);
             }
           });
         }, PAGES_DEBOUNCE_TIME),
