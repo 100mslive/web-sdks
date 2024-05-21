@@ -87,7 +87,6 @@ export class HMSVideoTrack extends HMSTrack {
   private reTriggerPlay = ({ videoElement, stream }: { videoElement: HTMLVideoElement; stream: MediaStream }) => {
     setTimeout(() => {
       if (videoElement.paused) {
-        console.log('retriggering play');
         // This is needed for safari and firefox to work properly
         videoElement.srcObject = stream;
         videoElement.play().catch(console.error);
