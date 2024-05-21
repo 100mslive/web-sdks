@@ -140,10 +140,10 @@ export class SDKToHMS {
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom, sdkLocalPeerId?: string): Partial<HMSRoom> {
     const { recording, rtmp, hls, transcriptions } = SDKToHMS.convertRecordingStreamingState(
-      sdkRoom?.recording,
-      sdkRoom?.rtmp,
-      sdkRoom?.hls,
-      sdkRoom?.transcriptions,
+      sdkRoom.recording,
+      sdkRoom.rtmp,
+      sdkRoom.hls,
+      sdkRoom.transcriptions,
     );
     return {
       id: sdkRoom.id,

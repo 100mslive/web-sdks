@@ -84,28 +84,36 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
           css={{ width: '100%' }}
           data-testid="popup_change_btn"
           onClick={async () => {
-            if (isCaptionEnabled) {
-              await actions.stopTranscription({
+            try {
+              if (isCaptionEnabled) {
+                await actions.stopTranscription({
+                  mode: HMSTranscriptionMode.CAPTION,
+                });
+                ToastManager.addToast({
+                  title: `Disabling Closed Caption for everyone.`,
+                  variant: 'standard',
+                  duration: DURATION,
+                  icon: <Loading color="currentColor" />,
+                });
+                onExit();
+                return;
+              }
+              await actions.startTranscription({
                 mode: HMSTranscriptionMode.CAPTION,
               });
               ToastManager.addToast({
-                title: `Disabling Closed Caption for everyone.`,
+                title: `Enabling Closed Caption for everyone.`,
                 variant: 'standard',
                 duration: DURATION,
                 icon: <Loading color="currentColor" />,
               });
-              onExit();
-              return;
+            } catch (err) {
+              ToastManager.addToast({
+                title: `Failed to enabled caption`,
+                variant: 'danger',
+                icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+              });
             }
-            await actions.startTranscription({
-              mode: HMSTranscriptionMode.CAPTION,
-            });
-            ToastManager.addToast({
-              title: `Enabling Closed Caption for everyone.`,
-              variant: 'standard',
-              duration: DURATION,
-              icon: <Loading color="currentColor" />,
-            });
             onExit();
           }}
         >
