@@ -194,6 +194,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       }
     });
     this.store.setPoll(pollCopy);
+    this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, [pollCopy]);
   }
   async getPolls(): Promise<HMSPoll[]> {
     const launchedPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'started' });

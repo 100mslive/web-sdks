@@ -39,16 +39,20 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       if (poll && actions.interactivityCenter && !fetchedInitialResponses.current) {
         await actions.interactivityCenter.getPollResponses(poll, true);
         fetchedInitialResponses.current = true;
-        const pollResponses: Record<number, any> = {};
-        poll.questions?.forEach(question => {
-          pollResponses[question.index] = question.responses?.[0];
-        });
-        console.log('zzz updating', { pollResponses });
-        setSavedPollResponses(pollResponses);
       }
     };
     getResponses();
   }, [poll, actions.interactivityCenter, setSavedPollResponses]);
+
+  useEffect(() => {
+    if (poll?.questions) {
+      const pollResponses: Record<number, any> = {};
+      poll.questions?.forEach(question => {
+        pollResponses[question.index] = question.responses?.[0];
+      });
+      setSavedPollResponses(pollResponses);
+    }
+  }, [poll?.questions, setSavedPollResponses]);
 
   if (!poll) {
     return null;
