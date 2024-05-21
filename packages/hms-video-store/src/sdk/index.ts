@@ -48,7 +48,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import { PlaylistManager } from '../internal';
+import { PlaylistManager, TranscriptionConfig } from '../internal';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -70,6 +70,7 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   StartRTMPOrRecordingRequestParams,
+  StartTranscriptionRequestParams,
 } from '../signal/interfaces';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -1010,6 +1011,35 @@ export class HMSSdk implements HMSInterface {
       await this.transport?.signal.stopHLSStreaming(hlsParams);
     }
     await this.transport?.signal.stopHLSStreaming();
+  }
+
+  async startTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start transcriptions',
+      );
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.startTranscription(transcriptionParams);
+  }
+
+  async stopTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop transcriptions',
+      );
+    }
+    if (!params) {
+      throw ErrorFactory.GenericErrors.Signalling(HMSAction.VALIDATION, 'No mode is passed to stop the transcription');
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.stopTranscription(transcriptionParams);
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {

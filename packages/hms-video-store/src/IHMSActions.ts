@@ -1,3 +1,4 @@
+import { TranscriptionConfig } from './interfaces/transcription-config';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -370,6 +371,18 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+
+  /**
+   * If you want to start transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription. Currently we have Caption mode only
+   */
+  startTranscription(params: TranscriptionConfig): Promise<void>;
+
+  /**
+   * If you want to stop transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription you want to stop. Currently we have Caption mode only
+   */
+  stopTranscription(params: TranscriptionConfig): Promise<void>;
 
   /**
    * @alpha
