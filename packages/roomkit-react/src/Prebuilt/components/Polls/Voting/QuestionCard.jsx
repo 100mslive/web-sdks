@@ -37,9 +37,7 @@ export const QuestionCard = ({
   const [localPeerChoice, setLocalPeerChoice] = useState(localPeerResponse);
 
   useEffect(() => {
-    if (localPeerResponse) {
-      setLocalPeerChoice(localPeerResponse);
-    }
+    setLocalPeerChoice(localPeerResponse);
   }, [localPeerResponse]);
 
   const showVoteCount =
