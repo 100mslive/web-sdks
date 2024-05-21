@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
+  selectLocalPeerID,
   selectPeerNameByID,
   selectPermissions,
   selectPollByID,
@@ -14,6 +15,8 @@ import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 // @ts-ignore
 import { usePollViewState, useSetAppDataByKey } from '../../AppData/useUISettings';
+// @ts-ignore
+import { getPeerResponses } from '../../../common/utils';
 import { StatusIndicator } from '../common/StatusIndicator';
 import { APP_DATA, POLL_VIEWS } from '../../../common/constants';
 
@@ -28,11 +31,12 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
   const fetchedInitialResponses = useRef(false);
   const [savedPollResponses, setSavedPollResponses] = useSetAppDataByKey(APP_DATA.savedPollResponses);
+  const localPeerId = useHMSStore(selectLocalPeerID);
 
   // To reset whenever a different poll is opened
   useEffect(() => {
     fetchedInitialResponses.current = false;
-  }, [id]);
+  }, [id, setSavedPollResponses]);
 
   useEffect(() => {
     const getResponses = async () => {
@@ -55,13 +59,13 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
   useEffect(() => {
     if (poll?.questions) {
-      poll.questions?.forEach(question => {
-        // To find using local peer ID here
-        updateSavedResponses(question.index, question.responses?.[0]?.option, question.responses?.[0]?.options);
+      const localPeerResponses = getPeerResponses(poll.questions, localPeerId);
+      localPeerResponses.forEach(response => {
+        if (response) updateSavedResponses(response.questionIndex, response.option, response.options);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poll?.questions]);
+  }, [localPeerId, poll?.questions]);
 
   if (!poll) {
     return null;
