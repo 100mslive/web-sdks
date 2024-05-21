@@ -10,17 +10,20 @@ import { Box, Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore: No implicit any
 import { EmojiReaction } from '../EmojiReaction';
+import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { RaiseHand } from '../RaiseHand';
 import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const Chat = () => {
-  const { elements } = useRoomLayoutConferencingScreen();
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const listRef = useRef<VariableSizeList | null>(null);
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
@@ -29,6 +32,7 @@ export const Chat = () => {
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
   useSidepaneResetOnLayoutUpdate('chat', SIDE_PANE_OPTIONS.CHAT);
+  const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
 
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
@@ -57,20 +61,27 @@ export const Chat = () => {
     >
       {isMobile && elements?.chat?.is_overlay && !streaming ? null : <PinnedMessage />}
       <ChatBody ref={listRef} scrollToBottom={scrollToBottom} />
-
-      <ChatPaused />
-      <ChatBlocked />
+      <Flex align="center" css={{ w: '100%', gap: '$2' }}>
+        <ChatPaused />
+        <ChatBlocked />
+        {streaming && (!isChatEnabled || isLocalPeerBlacklisted) && (
+          <>
+            <RaiseHand css={{ bg: '$surface_default' }} />
+            <MoreSettings elements={elements} screenType={screenType} />
+          </>
+        )}
+      </Flex>
       {isMobile && elements?.chat?.is_overlay && !streaming ? <PinnedMessage /> : null}
       {isChatEnabled ? (
         <ChatFooter onSend={scrollToBottom}>
           <NewMessageIndicator scrollToBottom={scrollToBottom} listRef={listRef} />
         </ChatFooter>
       ) : null}
-      {(isMobileHLSStream || isLandscapeStream) && (
+      {streaming && (
         <Box
           css={{
             position: 'absolute',
-            ...match({ isLandscapeStream, isMobileHLSStream, isChatEnabled })
+            ...match({ isLandscapeStream, isMobileHLSStream, isChatEnabled, isLocalPeerBlacklisted })
               .with(
                 {
                   isLandscapeStream: true,
@@ -96,6 +107,7 @@ export const Chat = () => {
                 {
                   isMobileHLSStream: true,
                   isChatEnabled: true,
+                  isLocalPeerBlacklisted: false,
                 },
                 () => ({ bottom: '$17', right: '$8' }),
               )
@@ -103,6 +115,14 @@ export const Chat = () => {
                 {
                   isLandscapeStream: false,
                   isChatEnabled: true,
+                  isLocalPeerBlacklisted: true,
+                },
+                () => ({ bottom: '$18', right: '$8' }),
+              )
+              .with(
+                {
+                  isMobileHLSStream: true,
+                  isLocalPeerBlacklisted: true,
                 },
                 () => ({ bottom: '$20', right: '$8' }),
               )
