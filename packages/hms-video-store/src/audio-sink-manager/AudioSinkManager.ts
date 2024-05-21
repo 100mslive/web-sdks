@@ -115,14 +115,7 @@ export class AudioSinkManager {
   }
 
   private handleAudioPaused = async (event: any) => {
-    const audioEl = event.target as HTMLAudioElement;
-    //@ts-ignore
-    const track = audioEl.srcObject?.getAudioTracks()[0];
-    if (!track?.enabled) {
-      // No need to play if already disabled
-      return;
-    }
-    // this means the audio paused because of external factors(headset removal)
+    // this means the audio paused because of external factors(headset removal, incoming phone call)
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
