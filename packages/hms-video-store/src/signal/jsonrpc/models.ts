@@ -39,6 +39,8 @@ export enum HMSSignalMethod {
   UPDATE_PEER_METADATA = 'peer-update',
   START_HLS_STREAMING = 'hls-start',
   STOP_HLS_STREAMING = 'hls-stop',
+  START_TRANSCRIPTION = 'transcription-start',
+  STOP_TRANSCRIPTION = 'transcription-stop',
   HLS_TIMED_METADATA = 'hls-timed-metadata',
   SET_METADATA = 'set-metadata',
   GET_METADATA = 'get-metadata',
