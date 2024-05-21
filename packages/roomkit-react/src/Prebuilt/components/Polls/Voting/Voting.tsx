@@ -36,6 +36,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   // To reset whenever a different poll is opened
   useEffect(() => {
     fetchedInitialResponses.current = false;
+    setSavedPollResponses('');
   }, [id, setSavedPollResponses]);
 
   useEffect(() => {
@@ -60,14 +61,15 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   useEffect(() => {
     if (poll?.questions) {
       const localPeerResponses = getPeerResponses(poll.questions, localPeerId);
-
       // @ts-ignore
-      localPeerResponses.forEach(response => {
-        if (response) updateSavedResponses(response.questionIndex, response.option, response.options);
+      localPeerResponses?.forEach(response => {
+        if (response) {
+          updateSavedResponses(response[0]?.questionIndex, response[0]?.option, response[0]?.options);
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localPeerId, poll?.questions]);
+  }, [localPeerId, poll?.questions, id]);
 
   if (!poll) {
     return null;

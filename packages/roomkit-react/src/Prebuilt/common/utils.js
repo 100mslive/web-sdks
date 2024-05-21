@@ -142,7 +142,7 @@ export const getPeerResponses = (questions, peerid, userid) => {
   return questions.map(question =>
     question.responses?.filter(
       response =>
-        ((response && response.peer?.peerid === peerid) || response.peer?.userid === userid) && !response.skipped,
+        response && (response.peer?.peerid === peerid || response.peer?.userid === userid) && !response.skipped,
     ),
   );
 };
