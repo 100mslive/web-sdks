@@ -44,25 +44,28 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
     getResponses();
   }, [poll, actions.interactivityCenter, setSavedPollResponses]);
 
-  useEffect(() => {
-    if (poll?.questions) {
-      const pollResponses: Record<number, any> = {};
-      poll.questions?.forEach(question => {
-        pollResponses[question.index] = question.responses?.[0];
-      });
-      setSavedPollResponses(pollResponses);
-    }
-  }, [poll?.questions, setSavedPollResponses]);
-
-  if (!poll) {
-    return null;
-  }
-
   const updateSavedResponses = (questionIndex: number, option?: number, options?: number[]) => {
+    if (!option && !options) {
+      return;
+    }
     const savedPollResponsesCopy = { ...savedPollResponses };
     savedPollResponsesCopy[questionIndex] = { option, options };
     setSavedPollResponses(savedPollResponsesCopy);
   };
+
+  useEffect(() => {
+    if (poll?.questions) {
+      poll.questions?.forEach(question => {
+        // To find using local peer ID here
+        updateSavedResponses(question.index, question.responses?.[0]?.option, question.responses?.[0]?.options);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poll?.questions]);
+
+  if (!poll) {
+    return null;
+  }
 
   const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 

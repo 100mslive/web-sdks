@@ -156,6 +156,7 @@ export const getIndexToShow = responses => {
       lastAttemptedIndex = keyNum;
     }
   });
+
   return lastAttemptedIndex + 1;
 };
 
