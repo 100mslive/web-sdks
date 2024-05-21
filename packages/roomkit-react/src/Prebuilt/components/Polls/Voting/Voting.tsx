@@ -60,6 +60,8 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   useEffect(() => {
     if (poll?.questions) {
       const localPeerResponses = getPeerResponses(poll.questions, localPeerId);
+
+      // @ts-ignore
       localPeerResponses.forEach(response => {
         if (response) updateSavedResponses(response.questionIndex, response.option, response.options);
       });
