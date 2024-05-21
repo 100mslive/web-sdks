@@ -3,7 +3,7 @@ import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 
 export const WaitingView = React.memo(
-  ({ icon, title, subTitle }: { icon: React.ReactNode; title: string; subTitle: string }) => {
+  ({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) => {
     return (
       <Flex
         align="center"
@@ -43,7 +43,7 @@ export const WaitingView = React.memo(
             variant="body1"
             css={{ fontWeight: '$regular', color: '$on_surface_medium', '@md': { fontSize: '$sm' } }}
           >
-            {subTitle}
+            {subtitle}
           </Text>
         </Flex>
       </Flex>

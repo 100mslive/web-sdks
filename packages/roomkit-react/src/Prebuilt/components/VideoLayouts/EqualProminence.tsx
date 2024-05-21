@@ -52,7 +52,7 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
       {pageList.length === 0 ? (
         <WaitingView
           title="Waiting for Host to join"
-          subTitle="Sit back and relax till others join"
+          subtitle="Sit back and relax till others join"
           icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
         />
       ) : null}

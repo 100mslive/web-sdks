@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -8,10 +8,7 @@ import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectIsLocalScreenShared,
-  selectLocalPeerRole,
   selectLocalPeerRoleName,
-  selectPeersByRoles,
-  selectRolesMap,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -34,7 +31,7 @@ import {
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -49,7 +46,6 @@ export const VideoStreamingSection = ({
   hideControls: boolean;
 }) => {
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
-  const localPeerRole = useHMSStore(selectLocalPeerRole);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const isSharingScreen = useHMSStore(selectIsLocalScreenShared);
 
@@ -60,21 +56,9 @@ export const VideoStreamingSection = ({
   const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
 
-  const roles = useHMSStore(selectRolesMap);
-  const peersByRoles = useHMSStore(selectPeersByRoles(localPeerRole?.subscribeParams.subscribeToRoles || []));
-  const isNotAllowedToPublish = localPeerRole?.publishParams?.allowed.length === 0;
-  const isScreenOnlyPublishParams =
-    localPeerRole?.publishParams?.allowed.some(value => value === 'screen') &&
-    localPeerRole?.publishParams?.allowed.length === 1;
-  const hasSubscribedRolePublishing = useMemo(() => {
-    return peersByRoles.some(peer => {
-      if (peer.roleName && roles[peer.roleName]) {
-        return !!roles[peer.roleName].publishParams?.allowed.length;
-      }
-      return true;
-    });
-  }, [peersByRoles, roles]);
+  const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();
 
+  console.log('pring ', isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing);
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -128,7 +112,7 @@ export const VideoStreamingSection = ({
             () => (
               <WaitingView
                 title="Waiting for Host to join"
-                subTitle="Sit back and relax"
+                subtitle="Sit back and relax"
                 icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
               />
             ),
@@ -139,7 +123,7 @@ export const VideoStreamingSection = ({
             () => (
               <WaitingView
                 title="Ready to present"
-                subTitle="Select the Screenshare button to start presenting"
+                subtitle="Select the Screenshare button to start presenting"
                 icon={<ShareScreenIcon width="56px" height="56px" style={{ color: 'white' }} />}
               />
             ),
