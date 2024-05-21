@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { HMSPoll } from '@100mslive/react-sdk';
 import { PeerParticipationSummary } from './PeerParticipationSummary';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
 
-export const StandardView = ({ poll }: { poll: HMSPoll }) => {
+export const StandardView = ({
+  poll,
+  localPeerResponses,
+  updateSavedResponses,
+}: {
+  poll: HMSPoll;
+  localPeerResponses: Record<number, number | number[] | undefined>;
+  updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
+}) => {
   if (!poll?.questions) {
     return null;
   }
@@ -28,11 +36,9 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
           result={question.result}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
-          responses={question.responses}
+          localPeerResponse={localPeerResponses?.[question.index]}
           answer={question.answer}
-          setCurrentIndex={() => {
-            return;
-          }}
+          updateSavedResponses={updateSavedResponses}
           rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
         />
       ))}
