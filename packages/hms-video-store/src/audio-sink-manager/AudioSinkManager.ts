@@ -9,7 +9,6 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { isMobile } from '../utils/support';
 import { sleep } from '../utils/timer-utils';
 
 /**
@@ -120,13 +119,7 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
-      if (isMobile()) {
-        // Play after a delay since mobile devices don't call onDevice change event
-        await sleep(500);
-        this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
-      } else {
-        this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
-      }
+      this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
     }
   };
 
