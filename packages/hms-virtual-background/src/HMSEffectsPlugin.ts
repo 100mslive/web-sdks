@@ -114,6 +114,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       this.effects.setBackground(this.background);
     });
   }
+
   getBlurAmount() {
     return this.blurAmount;
   }
@@ -138,9 +139,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     };
     this.effects.clear();
+    const { height, width } = stream.getVideoTracks()[0].getSettings();
+    const canvas = document.createElement('canvas');
+    canvas.width = width!;
+    canvas.height = height!;
     this.effects.useStream(stream);
-    // getStream potentially returns null
-    return this.effects.getStream() || stream;
+    this.effects.toCanvas(canvas);
+    return canvas.captureStream(30) || stream;
   }
 
   stop() {
