@@ -29,7 +29,7 @@ import {
   SettingsIcon,
   VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
-import { Box, Loading, Tooltip } from '../../../..';
+import { Box, Loading, Text, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -43,6 +43,7 @@ import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
@@ -73,6 +74,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  CAPTION: 'caption',
 };
 
 export const MwebOptions = ({
@@ -106,9 +108,9 @@ export const MwebOptions = ({
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
 
-  const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
+  const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -193,21 +195,17 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-            {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
-              <ActionTile.Root
-                onClick={() => {
-                  setIsCaptionEnabled(!isCaptionEnabled);
-                }}
-              >
-                {isCaptionEnabled ? (
-                  <ClosedCaptionIcon width="20" height="20px" />
-                ) : (
-                  <OpenCaptionIcon width="20" height="20px" />
-                )}
-                <ActionTile.Title>{isCaptionEnabled ? 'Hide Captions' : 'Captions Disabled'}</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
-
+            <ActionTile.Root
+              onClick={() => {
+                setOpenOptionsSheet(false);
+                updateState(MODALS.CAPTION, true);
+              }}
+            >
+              {isTranscriptionEnabled && isCaptionEnabled ? <ClosedCaptionIcon /> : <OpenCaptionIcon />}
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
+                Closed Caption
+              </Text>
+            </ActionTile.Root>
             {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
@@ -323,7 +321,9 @@ export const MwebOptions = ({
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
-
+      {openModals.has(MODALS.CAPTION) && (
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
+      )}
       {showEmojiCard && (
         <Box
           ref={emojiCardRef}
