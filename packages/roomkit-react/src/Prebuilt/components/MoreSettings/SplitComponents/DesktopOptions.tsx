@@ -36,9 +36,9 @@ import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
 // @ts-ignore: No implicit any
 import { StatsForNerds } from '../../StatsForNerds';
-import { AdminCaptionModal } from '../AdminCaptionModal';
 // @ts-ignore: No implicit any
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
@@ -139,9 +139,14 @@ export const DesktopOptions = ({
             }}
           >
             <OpenCaptionIcon />
-            <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
-              Closed Caption
-            </Text>
+            <Flex direction="column" css={{ flexGrow: '1' }}>
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                Closed Captions
+              </Text>
+              <Text variant="caption" css={{ ml: '$4', color: '$on_surface_medium' }}>
+                {isTranscriptionEnabled ? 'Enabled' : 'Disabled'}
+              </Text>
+            </Flex>
             <Switch id="closed_caption_start_stop" checked={isTranscriptionEnabled} disabled={false} />
           </Dropdown.Item>
           {screenType !== 'hls_live_streaming' ? (
@@ -241,7 +246,7 @@ export const DesktopOptions = ({
         />
       )}
       {openModals.has(MODALS.CAPTION) && (
-        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
