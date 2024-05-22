@@ -117,7 +117,7 @@ export const GridLayout = ({
           },
         )
         .when(
-          ({ state }) => state === HMSTranscriptionState.Started,
+          ({ state }) => state === HMSTranscriptionState.STARTED,
           () => {
             ToastManager.addToast({
               title: `Failed to enable Closed Caption`,
