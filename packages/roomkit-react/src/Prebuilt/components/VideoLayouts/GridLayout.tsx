@@ -104,7 +104,6 @@ export const GridLayout = ({
   const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
 
   useEffect(() => {
-    console.log('transcription state', transcriptionStates);
     if (transcriptionStates && transcriptionStates.length > 0) {
       match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
         .when(
