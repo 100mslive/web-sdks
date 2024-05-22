@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { EqualProminence } from './EqualProminence';
@@ -105,13 +105,14 @@ export const GridLayout = ({
 
   useEffect(() => {
     if (transcriptionStates && transcriptionStates.length > 0) {
+      console.log('state ', transcriptionStates[0].state);
       match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
         .when(
-          ({ error }) => error,
+          ({ error }) => !!error,
           () => {
             ToastManager.addToast({
               title: `Failed to enable Closed Caption`,
-              variant: 'danger',
+              variant: 'error',
               icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
             });
           },
@@ -120,9 +121,9 @@ export const GridLayout = ({
           ({ state }) => state === HMSTranscriptionState.STARTED,
           () => {
             ToastManager.addToast({
-              title: `Failed to enable Closed Caption`,
-              variant: 'danger',
-              icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+              title: `Closed Captioning enabled for everyone`,
+              variant: 'standard',
+              icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
             });
           },
         )
@@ -130,9 +131,9 @@ export const GridLayout = ({
           ({ state }) => state === HMSTranscriptionState.STOPPED || state === HMSTranscriptionState.FAILED,
           () => {
             ToastManager.addToast({
-              title: `Failed to enable Closed Caption`,
-              variant: 'danger',
-              icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+              title: `Closed Captioning disabled for everyone`,
+              variant: 'standard',
+              icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
             });
           },
         );
