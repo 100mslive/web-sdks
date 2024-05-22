@@ -234,8 +234,8 @@ export function useWaitingRoomInfo(): WaitingRoomInfo {
   const { video, audio, screen } = useHMSStore(selectIsAllowedToPublish);
   const roles = useHMSStore(selectRolesMap);
   const peersByRoles = useHMSStore(selectPeersByRoles(localPeerRole?.subscribeParams.subscribeToRoles || []));
-  const isNotAllowedToPublish = video && audio && screen;
-  const isScreenOnlyPublishParams: boolean = screen;
+  const isNotAllowedToPublish = !(video || audio || screen);
+  const isScreenOnlyPublishParams: boolean = screen && !(video || audio);
   const hasSubscribedRolePublishing: boolean = useMemo(() => {
     return peersByRoles.some((peer: HMSPeer) => {
       if (peer.roleName && roles[peer.roleName] && !peer.isLocal) {
