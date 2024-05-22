@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import { match } from 'ts-pattern';
 import {
   HMSTranscriptionInfo,
   selectLocalPeerID,
@@ -103,19 +102,12 @@ export const GridLayout = ({
   const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
 
   useEffect(() => {
-    if (transcriptionStates && transcriptionStates.length > 0) {
-      match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
-        .when(
-          ({ error }) => !!error,
-          () => {
-            ToastManager.addToast({
-              title: `Failed to enable Closed Caption`,
-              variant: 'error',
-              icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-            });
-          },
-        )
-        .otherwise(() => null);
+    if (transcriptionStates && transcriptionStates.length > 0 && transcriptionStates[0].error) {
+      ToastManager.addToast({
+        title: `Failed to enable Closed Caption`,
+        variant: 'error',
+        icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+      });
     }
   }, [transcriptionStates]);
 
