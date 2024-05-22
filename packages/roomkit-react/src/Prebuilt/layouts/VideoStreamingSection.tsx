@@ -58,7 +58,6 @@ export const VideoStreamingSection = ({
 
   const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();
 
-  console.log('pring ', isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing);
   useEffect(() => {
     if (!isConnected) {
       return;
