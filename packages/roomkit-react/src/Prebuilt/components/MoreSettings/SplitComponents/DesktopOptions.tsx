@@ -58,7 +58,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
-  ADMIN_CAPTION: 'adminCaption',
+  CAPTION: 'caption',
 };
 
 export const DesktopOptions = ({
@@ -135,7 +135,7 @@ export const DesktopOptions = ({
           <Dropdown.Item
             data-testid="closed_caption_admin"
             onClick={() => {
-              updateState(MODALS.ADMIN_CAPTION, true);
+              updateState(MODALS.CAPTION, true);
             }}
           >
             <OpenCaptionIcon />
@@ -240,8 +240,8 @@ export const DesktopOptions = ({
           onOpenChange={(value: boolean) => updateState(MODALS.SELF_ROLE_CHANGE, value)}
         />
       )}
-      {openModals.has(MODALS.ADMIN_CAPTION) && (
-        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)} />
+      {openModals.has(MODALS.CAPTION) && (
+        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />

@@ -74,7 +74,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
-  ADMIN_CAPTION: 'adminCaption',
+  CAPTION: 'caption',
 };
 
 export const MwebOptions = ({
@@ -198,7 +198,7 @@ export const MwebOptions = ({
             <ActionTile.Root
               onClick={() => {
                 setOpenOptionsSheet(false);
-                updateState(MODALS.ADMIN_CAPTION, true);
+                updateState(MODALS.CAPTION, true);
               }}
             >
               <OpenCaptionIcon />
@@ -337,8 +337,8 @@ export const MwebOptions = ({
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
-      {openModals.has(MODALS.ADMIN_CAPTION) && (
-        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.ADMIN_CAPTION, value)} />
+      {openModals.has(MODALS.CAPTION) && (
+        <AdminCaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {showEmojiCard && (
         <Box
