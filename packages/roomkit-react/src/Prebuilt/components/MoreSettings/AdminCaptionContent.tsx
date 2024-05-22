@@ -1,13 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  HMSTranscriptionInfo,
-  HMSTranscriptionMode,
-  HMSTranscriptionState,
-  selectIsTranscriptionEnabled,
-  selectTranscriptionsState,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import React from 'react';
+import { HMSTranscriptionMode, selectIsTranscriptionEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
@@ -21,23 +13,6 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
   const actions = useHMSActions();
   const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
-
-  useEffect(() => {
-    if (transcriptionStates && transcriptionStates.length > 0) {
-      if (
-        (transcriptionStates[0].state === HMSTranscriptionState.STOPPED ||
-          transcriptionStates[0].state === HMSTranscriptionState.FAILED) &&
-        transcriptionStates[0].error
-      ) {
-        ToastManager.addToast({
-          title: `Failed to enable Closed Caption`,
-          variant: 'danger',
-          icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-        });
-      }
-    }
-  }, [transcriptionStates]);
   return (
     <>
       <Text
@@ -109,8 +84,8 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
               });
             } catch (err) {
               ToastManager.addToast({
-                title: `Failed to enabled caption`,
-                variant: 'danger',
+                title: `Failed to ${isCaptionEnabled ? 'disabled' : 'enabled'} closed caption`,
+                variant: 'error',
                 icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
               });
             }

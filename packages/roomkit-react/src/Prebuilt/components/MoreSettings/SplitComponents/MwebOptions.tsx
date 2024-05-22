@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -113,12 +113,6 @@ export const MwebOptions = ({
   const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
-  const [adminCaptionEnabled, setAdminCaptionEnabled] = useState(false);
-
-  useEffect(() => {
-    setAdminCaptionEnabled(isCaptionPresent);
-  }, [isCaptionPresent]);
-
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -211,14 +205,7 @@ export const MwebOptions = ({
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
                 Closed Caption
               </Text>
-              <Switch
-                id="closed_caption_start_stop"
-                checked={adminCaptionEnabled}
-                disabled={false}
-                onCheckedChange={value => {
-                  setAdminCaptionEnabled(value);
-                }}
-              />
+              <Switch id="closed_caption_start_stop" checked={isCaptionPresent} disabled={false} />
             </ActionTile.Root>
             {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
               <ActionTile.Root

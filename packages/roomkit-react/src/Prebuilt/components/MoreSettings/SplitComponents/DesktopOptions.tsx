@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   ConferencingScreen,
@@ -77,13 +77,7 @@ export const DesktopOptions = ({
   const isBRBEnabled = !!elements?.brb;
   const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const [adminCaptionEnabled, setAdminCaptionEnabled] = useState(false);
-
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
-
-  useEffect(() => {
-    setAdminCaptionEnabled(isCaptionEnabled);
-  }, [isCaptionEnabled]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
@@ -148,14 +142,7 @@ export const DesktopOptions = ({
             <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
               Closed Caption
             </Text>
-            <Switch
-              id="closed_caption_start_stop"
-              checked={adminCaptionEnabled && isCaptionEnabled}
-              disabled={false}
-              onCheckedChange={value => {
-                setAdminCaptionEnabled(value);
-              }}
-            />
+            <Switch id="closed_caption_start_stop" checked={isCaptionEnabled} disabled={false} />
           </Dropdown.Item>
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
