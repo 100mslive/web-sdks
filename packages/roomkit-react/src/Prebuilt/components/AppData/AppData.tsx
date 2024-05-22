@@ -66,8 +66,8 @@ const initialAppData = {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
-  // by default off, so it will not appear in beam bots
-  [APP_DATA.caption]: false,
+  // by default on because of on demand now
+  [APP_DATA.caption]: true,
 };
 
 export const AppData = React.memo(() => {
