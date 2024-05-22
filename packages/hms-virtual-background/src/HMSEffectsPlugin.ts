@@ -150,9 +150,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   stop() {
-    if (this.canvas && this.canvas.parentNode) {
-      this.canvas.parentNode.removeChild(this.canvas);
-    }
     this.removeEffects();
     this.executeAfterInit(() => {
       this.effects.stop();
