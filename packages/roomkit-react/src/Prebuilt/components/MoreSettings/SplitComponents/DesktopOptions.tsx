@@ -75,7 +75,7 @@ export const DesktopOptions = ({
   const { isBRBOn, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
   const isBRBEnabled = !!elements?.brb;
-  const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -142,7 +142,7 @@ export const DesktopOptions = ({
             <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
               Closed Caption
             </Text>
-            <Switch id="closed_caption_start_stop" checked={isCaptionEnabled} disabled={false} />
+            <Switch id="closed_caption_start_stop" checked={isTranscriptionEnabled} disabled={false} />
           </Dropdown.Item>
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>

@@ -11,7 +11,7 @@ import { ToastManager } from '../Toast/ToastManager';
 export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit: () => void }) => {
   const DURATION = 2000;
   const actions = useHMSActions();
-  const isCaptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
   return (
     <>
@@ -25,7 +25,7 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
           '@md': { px: '$8', borderBottom: '1px solid $border_default' },
         }}
       >
-        {isCaptionEnabled ? 'Disable' : 'Enable'} Closed Caption (CC) for this session?
+        {isTranscriptionEnabled ? 'Disable' : 'Enable'} Closed Caption (CC) for this session?
         <Box
           css={{ color: 'inherit', ml: 'auto', '&:hover': { color: '$on_surface_medium', cursor: 'pointer' } }}
           onClick={onExit}
@@ -34,8 +34,8 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
         </Box>
       </Text>
       <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
-        This will {isCaptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You can
-        {isCaptionEnabled ? 'enable' : 'disable'} it later.
+        This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You can
+        {isTranscriptionEnabled ? 'enable' : 'disable'} it later.
       </Text>
 
       <Flex
@@ -55,12 +55,12 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
         )}
 
         <Button
-          variant={isCaptionEnabled ? 'danger' : 'primary'}
+          variant={isTranscriptionEnabled ? 'danger' : 'primary'}
           css={{ width: '100%' }}
           data-testid="popup_change_btn"
           onClick={async () => {
             try {
-              if (isCaptionEnabled) {
+              if (isTranscriptionEnabled) {
                 await actions.stopTranscription({
                   mode: HMSTranscriptionMode.CAPTION,
                 });
@@ -84,7 +84,7 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
               });
             } catch (err) {
               ToastManager.addToast({
-                title: `Failed to ${isCaptionEnabled ? 'disabled' : 'enabled'} closed caption`,
+                title: `Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`,
                 variant: 'error',
                 icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
               });
@@ -92,7 +92,7 @@ export const AdminCaptionContent = ({ isMobile, onExit }: { isMobile: boolean; o
             onExit();
           }}
         >
-          {isCaptionEnabled ? 'Disable' : 'Enable'} for Everyone
+          {isTranscriptionEnabled ? 'Disable' : 'Enable'} for Everyone
         </Button>
       </Flex>
     </>

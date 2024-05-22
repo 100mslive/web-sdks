@@ -108,7 +108,7 @@ export const MwebOptions = ({
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
 
-  const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
   const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -205,9 +205,9 @@ export const MwebOptions = ({
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
                 Closed Caption
               </Text>
-              <Switch id="closed_caption_start_stop" checked={isCaptionPresent} disabled={false} />
+              <Switch id="closed_caption_start_stop" checked={isTranscriptionEnabled} disabled={false} />
             </ActionTile.Root>
-            {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
+            {isTranscriptionEnabled && screenType !== 'hls_live_streaming' ? (
               <ActionTile.Root
                 onClick={() => {
                   setIsCaptionEnabled(!isCaptionEnabled);
