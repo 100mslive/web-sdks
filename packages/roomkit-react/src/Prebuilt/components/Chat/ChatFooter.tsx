@@ -210,7 +210,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         ) : null}
       </Flex>
       {selection && (
-        <Flex align="center" css={{ gap: '$4', w: '100%' }}>
+        <Flex align={inputRef.current?.scrollHeight === 32 ? 'center' : 'end'} css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="end"
             css={{
@@ -222,8 +222,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               flexGrow: 1,
               r: '$1',
               '@md': {
-                minHeight: 'unset',
-                h: '$14',
+                minHeight: '$14',
                 boxSizing: 'border-box',
               },
               ...(isLandscapeHLSStream ? { minHeight: '$14', py: 0 } : {}),
