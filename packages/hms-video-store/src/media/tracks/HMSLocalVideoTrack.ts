@@ -493,7 +493,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.replaceSenderTrack(this.nativeTrack);
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      this.processPlugins();
       this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
