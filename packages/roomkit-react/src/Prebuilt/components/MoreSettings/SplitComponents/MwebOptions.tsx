@@ -29,7 +29,7 @@ import {
   SettingsIcon,
   VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
-import { Box, Loading, Text, Tooltip } from '../../../..';
+import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -202,9 +202,7 @@ export const MwebOptions = ({
               }}
             >
               {isTranscriptionEnabled && isCaptionEnabled ? <ClosedCaptionIcon /> : <OpenCaptionIcon />}
-              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high', flexGrow: '1' }}>
-                Closed Caption
-              </Text>
+              <ActionTile.Title>Closed Caption</ActionTile.Title>
             </ActionTile.Root>
             {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
