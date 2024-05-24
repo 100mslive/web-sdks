@@ -3,7 +3,15 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPermissionType, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
+import {
+  HMSConfig,
+  HMSFrameworkInfo,
+  HMSPermissionType,
+  HMSPoll,
+  HMSSpeaker,
+  HMSTranscriptionMode,
+  HMSWhiteboard,
+} from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -420,16 +428,25 @@ class Store {
       role: string,
       pluginName: keyof PolicyParams['plugins'],
       permission: HMSPermissionType,
+      mode?: HMSTranscriptionMode,
     ) => {
       if (!this.knownRoles[role]) {
         HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
         return;
       }
       const rolePermissions = this.knownRoles[role].permissions;
-      if (!rolePermissions[pluginName]) {
-        rolePermissions[pluginName] = [];
+      if (pluginName === 'transcriptions' && mode) {
+        // currently only admin is allowed, so no issue
+        rolePermissions[pluginName] = {
+          ...rolePermissions[pluginName],
+          [mode]: [permission],
+        };
+      } else if (pluginName === 'whiteboard') {
+        if (!rolePermissions[pluginName]) {
+          rolePermissions[pluginName] = [];
+        }
+        rolePermissions[pluginName]?.push(permission);
       }
-      rolePermissions[pluginName]?.push(permission);
     };
 
     Object.keys(plugins).forEach(plugin => {
@@ -437,11 +454,19 @@ class Store {
       if (!plugins[pluginName]) {
         return;
       }
-
-      const permissions = plugins[pluginName].permissions;
-      permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
-      permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
-      permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
+      if (pluginName === 'whiteboard') {
+        const permissions = plugins[pluginName]?.permissions;
+        permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
+        permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
+        permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
+      } else if (pluginName === 'transcriptions') {
+        const transcriptionPlugins = plugins[pluginName] || [];
+        for (const transcription of transcriptionPlugins) {
+          transcription.permissions?.admin?.forEach(role =>
+            addPermissionToRole(role, pluginName, 'admin', transcription.mode),
+          );
+        }
+      }
     });
   }
   private setEnv() {
