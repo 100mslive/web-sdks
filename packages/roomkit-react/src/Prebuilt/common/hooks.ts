@@ -28,6 +28,8 @@ import { useRoomLayout } from '../provider/roomLayoutProvider';
 // @ts-ignore
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit any
+import { isScreenshareSupported } from '../common/utils';
 import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -232,9 +234,11 @@ export interface WaitingRoomInfo {
 export function useWaitingRoomInfo(): WaitingRoomInfo {
   const localPeerRole = useHMSStore(selectLocalPeerRole);
   const { video, audio, screen } = useHMSStore(selectIsAllowedToPublish);
+  const isScreenShareAllowed = isScreenshareSupported();
   const roles = useHMSStore(selectRolesMap);
   const peersByRoles = useHMSStore(selectPeersByRoles(localPeerRole?.subscribeParams.subscribeToRoles || []));
-  const isNotAllowedToPublish = !(video || audio || screen);
+  // show no publish as screenshare in mweb is not possible
+  const isNotAllowedToPublish = !(video || audio || (screen && isScreenShareAllowed));
   const isScreenOnlyPublishParams: boolean = screen && !(video || audio);
   const hasSubscribedRolePublishing: boolean = useMemo(() => {
     return peersByRoles.some((peer: HMSPeer) => {
