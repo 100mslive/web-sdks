@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
+import { match } from 'ts-pattern';
 import {
   HMSTranscriptionInfo,
+  HMSTranscriptionState,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeers,
@@ -11,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { EqualProminence } from './EqualProminence';
@@ -102,12 +104,41 @@ export const GridLayout = ({
   const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
 
   useEffect(() => {
-    if (transcriptionStates && transcriptionStates.length > 0 && transcriptionStates[0].error) {
-      ToastManager.addToast({
-        title: `Failed to enable Closed Caption`,
-        variant: 'error',
-        icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-      });
+    if (transcriptionStates && transcriptionStates.length > 0) {
+      match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
+        .when(
+          ({ error }) => !!error,
+          () => {
+            ToastManager.addToast({
+              title: `Failed to enable Closed Caption`,
+              variant: 'error',
+              icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+            });
+          },
+        )
+        .when(
+          ({ state }) => state === HMSTranscriptionState.STARTED,
+          () => {
+            ToastManager.addToast({
+              title: `Closed Captioning enabled for everyone`,
+              variant: 'standard',
+              duration: 2000,
+              icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
+            });
+          },
+        )
+        .when(
+          ({ state }) => state === HMSTranscriptionState.STOPPED || state === HMSTranscriptionState.FAILED,
+          () => {
+            ToastManager.addToast({
+              title: `Closed Captioning disabled for everyone`,
+              variant: 'standard',
+              duration: 2000,
+              icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
+            });
+          },
+        )
+        .otherwise(() => null);
     }
   }, [transcriptionStates]);
 
