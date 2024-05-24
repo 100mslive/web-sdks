@@ -5,7 +5,6 @@ import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
-  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -14,14 +13,12 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
-  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
-  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -53,7 +50,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
+import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -108,9 +105,6 @@ export const MwebOptions = ({
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
 
-  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-
-  const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -195,15 +189,6 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-            <ActionTile.Root
-              onClick={() => {
-                setOpenOptionsSheet(false);
-                updateState(MODALS.CAPTION, true);
-              }}
-            >
-              {isTranscriptionEnabled && isCaptionEnabled ? <ClosedCaptionIcon /> : <OpenCaptionIcon />}
-              <ActionTile.Title>Closed Caption</ActionTile.Title>
-            </ActionTile.Root>
             {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
