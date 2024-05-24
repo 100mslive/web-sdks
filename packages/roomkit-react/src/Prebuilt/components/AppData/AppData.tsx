@@ -66,8 +66,8 @@ const initialAppData = {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
-  // by default on because of on demand now
-  [APP_DATA.caption]: true,
+  // by default on because of on demand now, for beam disabled
+  [APP_DATA.caption]: false,
 };
 
 export const AppData = React.memo(() => {
