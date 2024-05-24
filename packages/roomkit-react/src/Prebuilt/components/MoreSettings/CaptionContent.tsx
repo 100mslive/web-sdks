@@ -38,7 +38,8 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
       </Text>
       {!isMobile ? (
         <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
-          This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You can
+          This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You
+          can&nbsp;
           {isTranscriptionEnabled ? 'enable' : 'disable'} it later.
         </Text>
       ) : null}
@@ -123,7 +124,8 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
       </Flex>
       {isMobile && (
         <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
-          This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You can
+          This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You
+          can&nbsp;
           {isTranscriptionEnabled ? 'enable' : 'disable'} it later.
         </Text>
       )}
