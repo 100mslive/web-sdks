@@ -718,11 +718,11 @@ export class HMSSdk implements HMSInterface {
     let recipientPeer = this.store.getPeerById(peerId);
     if (!recipientPeer) {
       if (isLargeRoom) {
-        const { peers } = await this.transport.signal.findPeers({ peers: [peerId], limit: 1 });
-        if (peers.length === 0) {
+        const peer = await this.transport.signal.getPeer({ peer_id: peerId });
+        if (!peer) {
           throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
         }
-        recipientPeer = createRemotePeer(peers[0], this.store);
+        recipientPeer = createRemotePeer(peer, this.store);
       } else {
         throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
       }
