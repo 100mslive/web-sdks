@@ -15,12 +15,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
-  private canvas: HTMLCanvasElement;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
-    this.canvas = document.createElement('canvas');
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -141,12 +139,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     };
     this.effects.clear();
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
     this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
-    return this.canvas.captureStream(30) || stream;
+    // getStream potentially returns null
+    return this.effects.getStream() || stream;
   }
 
   stop() {
