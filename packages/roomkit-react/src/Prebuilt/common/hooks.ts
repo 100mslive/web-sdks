@@ -30,7 +30,7 @@ import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit any
 import { isScreenshareSupported } from '../common/utils';
-import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
+import { APP_DATA, CAPTION_TOAST, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
@@ -255,3 +255,11 @@ export function useWaitingRoomInfo(): WaitingRoomInfo {
     hasSubscribedRolePublishing,
   };
 }
+
+export const CaptionToastManager = () => {
+  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
+  return {
+    toastId,
+    setToastId,
+  };
+};

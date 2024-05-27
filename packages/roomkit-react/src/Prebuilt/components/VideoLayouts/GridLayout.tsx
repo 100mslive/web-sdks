@@ -14,8 +14,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
-// @ts-ignore: No implicit Any
-import { ToastManager } from '../Toast/ToastManager';
+import { CaptionToast } from '../MoreSettings/CaptionContent';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -23,6 +22,7 @@ import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
+import { CaptionToastManager } from '../../common/hooks';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
 
@@ -92,6 +92,7 @@ export const GridLayout = ({
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
+  const { toastId, setToastId } = CaptionToastManager();
   const tileLayout = {
     enableSpotlightingPeer: enable_spotlighting_peer,
     hideParticipantNameOnTile: hide_participant_name_on_tile,
@@ -109,7 +110,9 @@ export const GridLayout = ({
         .when(
           ({ error }) => !!error,
           () => {
-            ToastManager.addToast({
+            CaptionToast({
+              toastId,
+              setToastId,
               title: `Failed to enable Closed Caption`,
               variant: 'error',
               icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
@@ -117,7 +120,9 @@ export const GridLayout = ({
           },
         )
         .with({ state: HMSTranscriptionState.STARTED }, () => {
-          ToastManager.addToast({
+          CaptionToast({
+            toastId,
+            setToastId,
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
             duration: 2000,
@@ -125,7 +130,9 @@ export const GridLayout = ({
           });
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
-          ToastManager.addToast({
+          CaptionToast({
+            toastId,
+            setToastId,
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',
             duration: 2000,
