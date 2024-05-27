@@ -31,7 +31,7 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { PolicyParams } from '../../notification-manager';
+import { Plugins, PolicyParams } from '../../notification-manager';
 import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
@@ -435,13 +435,13 @@ class Store {
         return;
       }
       const rolePermissions = this.knownRoles[role].permissions;
-      if (pluginName === 'transcriptions' && mode) {
+      if (pluginName === Plugins.TRANSCRIPTIONS && mode) {
         // currently only admin is allowed, so no issue
         rolePermissions[pluginName] = {
           ...rolePermissions[pluginName],
           [mode]: [permission],
         };
-      } else if (pluginName === 'whiteboard') {
+      } else if (pluginName === Plugins.WHITEBOARD) {
         if (!rolePermissions[pluginName]) {
           rolePermissions[pluginName] = [];
         }
@@ -454,12 +454,12 @@ class Store {
       if (!plugins[pluginName]) {
         return;
       }
-      if (pluginName === 'whiteboard') {
+      if (pluginName === Plugins.WHITEBOARD) {
         const permissions = plugins[pluginName]?.permissions;
         permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
         permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
         permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
-      } else if (pluginName === 'transcriptions') {
+      } else if (pluginName === Plugins.TRANSCRIPTIONS) {
         const transcriptionPlugins = plugins[pluginName] || [];
         for (const transcription of transcriptionPlugins) {
           transcription.permissions?.admin?.forEach(role =>

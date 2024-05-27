@@ -116,28 +116,22 @@ export const GridLayout = ({
             });
           },
         )
-        .when(
-          ({ state }) => state === HMSTranscriptionState.STARTED,
-          () => {
-            ToastManager.addToast({
-              title: `Closed Captioning enabled for everyone`,
-              variant: 'standard',
-              duration: 2000,
-              icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
-            });
-          },
-        )
-        .when(
-          ({ state }) => state === HMSTranscriptionState.STOPPED || state === HMSTranscriptionState.FAILED,
-          () => {
-            ToastManager.addToast({
-              title: `Closed Captioning disabled for everyone`,
-              variant: 'standard',
-              duration: 2000,
-              icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
-            });
-          },
-        )
+        .with({ state: HMSTranscriptionState.STARTED }, () => {
+          ToastManager.addToast({
+            title: `Closed Captioning enabled for everyone`,
+            variant: 'standard',
+            duration: 2000,
+            icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
+          });
+        })
+        .with({ state: HMSTranscriptionState.STOPPED }, () => {
+          ToastManager.addToast({
+            title: `Closed Captioning disabled for everyone`,
+            variant: 'standard',
+            duration: 2000,
+            icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
+          });
+        })
         .otherwise(() => null);
     }
   }, [transcriptionStates]);
