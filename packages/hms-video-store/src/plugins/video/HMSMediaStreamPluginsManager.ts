@@ -20,15 +20,14 @@ export class HMSMediaStreamPluginsManager {
     plugins.forEach(plugin => {
       switch (plugin.getName()) {
         case 'HMSEffectsPlugin':
-          if (this.room?.isEffectsEnabled) {
-            this.plugins.add(plugin);
-          } else {
+          if (!this.room?.isEffectsEnabled) {
             console.error('Effects Virtual Background is not enabled for this room');
+            return;
           }
           break;
         default:
-          this.plugins.add(plugin);
       }
+      this.plugins.add(plugin);
     });
   }
 
