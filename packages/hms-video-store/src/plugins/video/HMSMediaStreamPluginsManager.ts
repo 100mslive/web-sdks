@@ -21,8 +21,9 @@ export class HMSMediaStreamPluginsManager {
       switch (plugin.getName()) {
         case 'HMSEffectsPlugin':
           if (!this.room?.isEffectsEnabled) {
-            console.error('Effects Virtual Background is not enabled for this room');
-            return;
+            const errorMessage = 'Effects Virtual Background is not enabled for this room';
+            console.error(errorMessage);
+            throw Error(errorMessage);
           }
           break;
         default:
