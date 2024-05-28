@@ -140,7 +140,7 @@ export const GridLayout = ({
         .otherwise(() => null);
       setToastId(id);
     }
-  }, [transcriptionStates]);
+  }, [setToastId, transcriptionStates]);
 
   useEffect(() => {
     if (mainPage !== 0) {
