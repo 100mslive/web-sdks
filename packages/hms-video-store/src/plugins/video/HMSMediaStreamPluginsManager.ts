@@ -2,19 +2,34 @@ import { HMSMediaStreamPlugin } from './HMSMediaStreamPlugin';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { EventBus } from '../../events/EventBus';
 import { HMSException } from '../../internal';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
 export class HMSMediaStreamPluginsManager {
   private analytics: VideoPluginsAnalytics;
   private plugins: Set<HMSMediaStreamPlugin>;
+  private room?: Room;
 
-  constructor(eventBus: EventBus) {
+  constructor(eventBus: EventBus, room?: Room) {
     this.plugins = new Set<HMSMediaStreamPlugin>();
     this.analytics = new VideoPluginsAnalytics(eventBus);
+    this.room = room;
   }
 
   addPlugins(plugins: HMSMediaStreamPlugin[]): void {
-    plugins.forEach(plugin => this.plugins.add(plugin));
+    plugins.forEach(plugin => {
+      switch (plugin.getName()) {
+        case 'HMSEffectsPlugin':
+          if (this.room?.isEffectsEnabled) {
+            this.plugins.add(plugin);
+          } else {
+            console.error('Effects Virtual Background is not enabled for this room');
+          }
+          break;
+        default:
+          this.plugins.add(plugin);
+      }
+    });
   }
 
   removePlugins(plugins: HMSMediaStreamPlugin[]) {

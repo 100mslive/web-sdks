@@ -4,6 +4,7 @@ import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack } from '../../media/tracks';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
 const DEFAULT_SAMPLE_RATE = 48000;
@@ -40,12 +41,14 @@ export class HMSAudioPluginsManager {
   // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
+  private room?: Room;
 
-  constructor(track: HMSLocalAudioTrack, private eventBus: EventBus) {
+  constructor(track: HMSLocalAudioTrack, private eventBus: EventBus, room?: Room) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
     this.createAudioContext();
+    this.room = room;
   }
 
   getPlugins(): string[] {
@@ -69,6 +72,16 @@ export class HMSAudioPluginsManager {
       throw err;
     }
 
+    switch (plugin.getName()) {
+      case 'HMSKrispPlugin':
+        if (!this.room?.isNoiseCancellationEnabled) {
+          console.error('Krisp Noise Cancellation is not enabled for this room');
+          return;
+        }
+        break;
+
+      default:
+    }
     this.pluginAddInProgress = true;
 
     try {
