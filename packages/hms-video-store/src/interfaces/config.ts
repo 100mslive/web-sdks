@@ -1,16 +1,16 @@
 import InitialSettings from './settings';
 
-/**
- * the config object tells the SDK options you want to join with
- * @link https://docs.100ms.live/javascript/v2/features/preview
- * @link https://docs.100ms.live/javascript/v2/features/join
- */
-
 export type HMSICEServer = {
   urls: string[];
   userName?: string;
   password?: string;
 };
+
+/**
+ * the config object tells the SDK options you want to join with
+ * @link https://docs.100ms.live/javascript/v2/features/preview
+ * @link https://docs.100ms.live/javascript/v2/features/join
+ */
 
 export interface HMSConfig {
   /**
