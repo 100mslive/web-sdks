@@ -16,12 +16,14 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
+  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
+  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -53,7 +55,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../../AppData/useUISettings';
+import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
