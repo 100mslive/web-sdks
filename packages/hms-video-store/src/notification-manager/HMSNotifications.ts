@@ -43,7 +43,7 @@ export interface Info {
   type: HMSPeerType;
 }
 
-export interface findPeerByNameInfo {
+export interface FindPeerByNameInfo {
   name: string;
   peer_id: string;
   role: string;

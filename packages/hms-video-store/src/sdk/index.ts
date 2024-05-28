@@ -746,26 +746,30 @@ export class HMSSdk implements HMSInterface {
   }
 
   async findPeerByName({ query, limit = 10, offset }: findPeerByNameRequestParams) {
-    const { peers } = await this.transport.signal.findPeerByName({ query, limit, offset });
+    const { peers, offset: responseOffset, eof } = await this.transport.signal.findPeerByName({ query, limit, offset });
     if (peers.length > 0) {
-      return peers.map(peerInfo => {
-        return createRemotePeer(
-          {
-            peer_id: peerInfo.peer_id,
-            role: peerInfo.role,
-            groups: [],
-            info: {
-              name: peerInfo.name,
-              data: '',
-              user_id: '',
-              type: peerInfo.type,
-            },
-          } as PeerNotificationInfo,
-          this.store,
-        );
-      });
+      return {
+        offset: responseOffset,
+        eof,
+        peers: peers.map(peerInfo => {
+          return createRemotePeer(
+            {
+              peer_id: peerInfo.peer_id,
+              role: peerInfo.role,
+              groups: [],
+              info: {
+                name: peerInfo.name,
+                data: '',
+                user_id: '',
+                type: peerInfo.type,
+              },
+            } as PeerNotificationInfo,
+            this.store,
+          );
+        }),
+      };
     }
-    return [];
+    return { offset: responseOffset, peers: [] };
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {

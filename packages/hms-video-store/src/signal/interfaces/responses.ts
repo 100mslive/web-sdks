@@ -1,5 +1,5 @@
 import { HMSPermissionType } from '../../interfaces';
-import { findPeerByNameInfo, PeerNotificationInfo } from '../../notification-manager';
+import { FindPeerByNameInfo, PeerNotificationInfo } from '../../notification-manager';
 
 export interface BroadcastResponse {
   timestamp: number;
@@ -37,7 +37,7 @@ export interface FindPeerByNameResponse {
   limit: number;
   offset: number;
   eof: boolean;
-  peers: findPeerByNameInfo[];
+  peers: FindPeerByNameInfo[];
 }
 
 export interface CreateWhiteboardResponse {
