@@ -106,6 +106,7 @@ export const GridLayout = ({
 
   useEffect(() => {
     if (transcriptionStates && transcriptionStates.length > 0) {
+      let id = '';
       match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
         .when(
           ({ error }) => !!error,
@@ -114,12 +115,11 @@ export const GridLayout = ({
               ToastManager.removeToast(toastId);
               setToastId('');
             }
-            const id = ToastManager.addToast({
+            id = ToastManager.addToast({
               title: `Failed to enable Closed Caption`,
               variant: 'error',
               icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
             });
-            setToastId(id);
           },
         )
         .with({ state: HMSTranscriptionState.STARTED }, () => {
@@ -127,28 +127,27 @@ export const GridLayout = ({
             ToastManager.removeToast(toastId);
             setToastId('');
           }
-          const id = ToastManager.addToast({
+          id = ToastManager.addToast({
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
             duration: 2000,
             icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
-          setToastId(id);
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
           if (toastId) {
             ToastManager.removeToast(toastId);
             setToastId('');
           }
-          const id = ToastManager.addToast({
+          id = ToastManager.addToast({
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',
             duration: 2000,
             icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
-          setToastId(id);
         })
         .otherwise(() => null);
+      setToastId(id);
     }
   }, [transcriptionStates]);
 
