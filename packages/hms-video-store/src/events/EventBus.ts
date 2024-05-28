@@ -17,6 +17,7 @@ import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
+  readonly analytics: HMSInternalEvent<AnalyticsEvent>;
   readonly deviceChange = new HMSInternalEvent<HMSDeviceChangeEvent>(HMSEvents.DEVICE_CHANGE, this.eventEmitter);
   readonly localAudioEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalAudioTrack }>(
     HMSEvents.LOCAL_AUDIO_ENABLED,
@@ -50,8 +51,6 @@ export class EventBus {
     this.eventEmitter,
   );
 
-  readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
-
   readonly policyChange = new HMSInternalEvent<PolicyParams>(HMSEvents.POLICY_CHANGE, this.eventEmitter);
 
   readonly localRoleUpdate = new HMSInternalEvent<{ oldRole: HMSRole; newRole: HMSRole }>(
@@ -77,4 +76,11 @@ export class EventBus {
   readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
 
   readonly leave = new HMSInternalEvent<HMSException | undefined>(HMSEvents.LEAVE, this.eventEmitter);
+
+  constructor(sendAnalytics = true) {
+    this.analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
+    if (!sendAnalytics) {
+      this.analytics.publish = () => {};
+    }
+  }
 }

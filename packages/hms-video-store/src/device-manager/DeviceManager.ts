@@ -34,38 +34,40 @@ export class DeviceManager implements HMSDeviceManager {
   private videoInputChanged = false;
   private audioInputChanged = false;
 
-  constructor(private store: Store, private eventBus: EventBus) {
-    const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
-      enabled && track.source === 'regular';
-    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.videoInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
-    });
-    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.audioInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
-    });
+  constructor(private store: Store, private eventBus: EventBus, sendAnalytics = true) {
+    if (sendAnalytics) {
+      const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
+        enabled && track.source === 'regular';
+      this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
+        await this.enumerateDevices();
+        if (this.videoInputChanged) {
+          this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+        }
+      });
+      this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
+        await this.enumerateDevices();
+        if (this.audioInputChanged) {
+          this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+        }
+      });
 
-    this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {
-      if (isUserSelection) {
-        const inputType = type === 'video' ? 'videoInput' : type;
-        const newSelection = this[inputType].find(
-          device => this.createIdentifier(device) === this.createIdentifier(selection),
-        );
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.deviceChange({
-            selection: { [inputType]: newSelection },
-            devices: this.getDevices(),
-            type,
-            isUserSelection,
-          }),
-        );
-      }
-    });
+      this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {
+        if (isUserSelection) {
+          const inputType = type === 'video' ? 'videoInput' : type;
+          const newSelection = this[inputType].find(
+            device => this.createIdentifier(device) === this.createIdentifier(selection),
+          );
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.deviceChange({
+              selection: { [inputType]: newSelection },
+              devices: this.getDevices(),
+              type,
+              isUserSelection,
+            }),
+          );
+        }
+      });
+    }
   }
 
   updateOutputDevice = async (deviceId?: string, isUserSelection?: boolean) => {
