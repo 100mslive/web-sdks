@@ -95,6 +95,12 @@ export interface findPeersRequestParams {
   limit: number;
 }
 
+export interface findPeerByNameRequestParams {
+  query?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export interface peerIterRequestParams {
   iterator: string;
   limit: number;

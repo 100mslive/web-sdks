@@ -59,13 +59,19 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, PeerLeaveRequestNotification, SendMessage } from '../notification-manager';
+import {
+  HMSNotificationMethod,
+  PeerLeaveRequestNotification,
+  PeerNotificationInfo,
+  SendMessage,
+} from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  findPeerByNameRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
@@ -737,6 +743,29 @@ export class HMSSdk implements HMSInterface {
       return createRemotePeer(response, this.store);
     }
     return undefined;
+  }
+
+  async findPeerByName({ query, limit = 10, offset }: findPeerByNameRequestParams) {
+    const { peers } = await this.transport.signal.findPeerByName({ query, limit, offset });
+    if (peers.length > 0) {
+      return peers.map(peerInfo => {
+        return createRemotePeer(
+          {
+            peer_id: peerInfo.peer_id,
+            role: peerInfo.role,
+            groups: [],
+            info: {
+              name: peerInfo.name,
+              data: '',
+              user_id: '',
+              type: peerInfo.type,
+            },
+          } as PeerNotificationInfo,
+          this.store,
+        );
+      });
+    }
+    return [];
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {

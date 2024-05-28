@@ -43,6 +43,13 @@ export interface Info {
   type: HMSPeerType;
 }
 
+export interface findPeerByNameInfo {
+  name: string;
+  peer_id: string;
+  role: string;
+  type: HMSPeerType;
+}
+
 export enum HMSRecordingState {
   NONE = 'none',
   INITIALISED = 'initialised',

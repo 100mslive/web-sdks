@@ -20,6 +20,8 @@ import {
   AcceptRoleChangeParams,
   BroadcastResponse,
   CreateWhiteboardResponse,
+  findPeerByNameRequestParams,
+  FindPeerByNameResponse,
   findPeersRequestParams,
   getPeerRequestParams,
   GetSessionMetadataResponse,
@@ -407,6 +409,10 @@ export default class JsonRpcSignal {
 
   async findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
+  }
+
+  async findPeerByName(params: findPeerByNameRequestParams): Promise<FindPeerByNameResponse> {
+    return await this.call(HMSSignalMethod.SEARCH_BY_NAME, params);
   }
 
   setSessionMetadata(params: SetSessionMetadataParams) {
