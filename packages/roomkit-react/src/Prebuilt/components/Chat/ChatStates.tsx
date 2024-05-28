@@ -30,7 +30,7 @@ export const ChatPaused = () => {
     <Flex
       align="center"
       justify="between"
-      css={{ borderRadius: '$1', bg: '$surface_default', p: '$4 $4 $4 $8', w: '100%' }}
+      css={{ borderRadius: '$1', bg: '$surface_default', p: '$2 $4 $2 $8', w: '100%' }}
     >
       <Box>
         <Text variant="sm" css={{ fontWeight: '$semiBold', color: '$on_surface_high' }}>

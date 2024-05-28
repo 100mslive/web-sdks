@@ -5,7 +5,6 @@ import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
-  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -14,14 +13,12 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
-  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
-  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -43,6 +40,7 @@ import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
@@ -52,7 +50,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
+import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -73,6 +71,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  CAPTION: 'caption',
 };
 
 export const MwebOptions = ({
@@ -106,9 +105,6 @@ export const MwebOptions = ({
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
 
-  const isCaptionPresent = useHMSStore(selectIsTranscriptionEnabled);
-
-  const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -193,21 +189,6 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-            {isCaptionPresent && screenType !== 'hls_live_streaming' ? (
-              <ActionTile.Root
-                onClick={() => {
-                  setIsCaptionEnabled(!isCaptionEnabled);
-                }}
-              >
-                {isCaptionEnabled ? (
-                  <ClosedCaptionIcon width="20" height="20px" />
-                ) : (
-                  <OpenCaptionIcon width="20" height="20px" />
-                )}
-                <ActionTile.Title>{isCaptionEnabled ? 'Hide Captions' : 'Captions Disabled'}</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
-
             {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
@@ -323,7 +304,9 @@ export const MwebOptions = ({
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
-
+      {openModals.has(MODALS.CAPTION) && (
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
+      )}
       {showEmojiCard && (
         <Box
           ref={emojiCardRef}

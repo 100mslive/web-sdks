@@ -1,17 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
+  HMSPeer,
   HMSRecording,
   parsedUserAgent,
   selectAvailableRoleNames,
+  selectIsAllowedToPublish,
   selectIsConnectedToRoom,
+  selectLocalPeerRole,
   selectPeerCount,
   selectPeerMetadata,
   selectPeers,
+  selectPeersByRoles,
   selectRecordingState,
   selectRemotePeers,
+  selectRolesMap,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -23,6 +28,8 @@ import { useRoomLayout } from '../provider/roomLayoutProvider';
 // @ts-ignore
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit any
+import { isScreenshareSupported } from '../common/utils';
 import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -217,4 +224,34 @@ export function getResolution(
     resolution.height = recordingResolution.height;
   }
   return resolution;
+}
+
+export interface WaitingRoomInfo {
+  isNotAllowedToPublish: boolean;
+  isScreenOnlyPublishParams: boolean;
+  hasSubscribedRolePublishing: boolean;
+}
+export function useWaitingRoomInfo(): WaitingRoomInfo {
+  const localPeerRole = useHMSStore(selectLocalPeerRole);
+  const { video, audio, screen } = useHMSStore(selectIsAllowedToPublish);
+  const isScreenShareAllowed = isScreenshareSupported();
+  const roles = useHMSStore(selectRolesMap);
+  const peersByRoles = useHMSStore(selectPeersByRoles(localPeerRole?.subscribeParams.subscribeToRoles || []));
+  // show no publish as screenshare in mweb is not possible
+  const isNotAllowedToPublish = !(video || audio || (screen && isScreenShareAllowed));
+  const isScreenOnlyPublishParams: boolean = screen && !(video || audio);
+  const hasSubscribedRolePublishing: boolean = useMemo(() => {
+    return peersByRoles.some((peer: HMSPeer) => {
+      if (peer.roleName && roles[peer.roleName] && !peer.isLocal) {
+        return !!roles[peer.roleName].publishParams?.allowed.length;
+      }
+      return false;
+    });
+  }, [peersByRoles, roles]);
+
+  return {
+    isNotAllowedToPublish,
+    isScreenOnlyPublishParams,
+    hasSubscribedRolePublishing,
+  };
 }

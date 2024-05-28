@@ -24,6 +24,7 @@ import StartRecording from '../../Settings/StartRecording';
 import { StatsForNerds } from '../../StatsForNerds';
 // @ts-ignore: No implicit any
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
@@ -43,6 +44,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  CAPTION: 'caption',
 };
 
 export const DesktopOptions = ({
@@ -114,7 +116,6 @@ export const DesktopOptions = ({
               </Flex>
             </Dropdown.Item>
           ) : null}
-
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
               <PIP
@@ -210,6 +211,9 @@ export const DesktopOptions = ({
           peerId={localPeerId}
           onOpenChange={(value: boolean) => updateState(MODALS.SELF_ROLE_CHANGE, value)}
         />
+      )}
+      {openModals.has(MODALS.CAPTION) && (
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />

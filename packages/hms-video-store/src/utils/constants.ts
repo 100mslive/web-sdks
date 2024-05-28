@@ -59,7 +59,7 @@ export const HMSEvents = {
 
 export const PROTOCOL_VERSION = '2.5';
 
-export const PROTOCOL_SPEC = '20240417';
+export const PROTOCOL_SPEC = '20240521';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
 

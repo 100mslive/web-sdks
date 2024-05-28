@@ -34,6 +34,7 @@ import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+import { WaitingView } from './WaitingView';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
@@ -457,17 +458,19 @@ const HLSView = () => {
             flex: isLandscape ? '2 1 0' : '1 1 0',
           }}
         >
-          <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
-            <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-              {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
-            </Flex>
-            <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
-              {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
-            </Text>
-            <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
-              {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
-            </Text>
-          </Flex>
+          {streamEnded ? (
+            <WaitingView
+              icon={<ColoredHandIcon height={56} width={56} />}
+              title="Stream has ended"
+              subtitle="Have a nice day!"
+            />
+          ) : (
+            <WaitingView
+              icon={<GoLiveIcon height={56} width={56} style={{ color: 'white' }} />}
+              title="Stream yet to start"
+              subtitle="Sit back and relax"
+            />
+          )}
         </Flex>
       </>
     );

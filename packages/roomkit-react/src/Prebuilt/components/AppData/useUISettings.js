@@ -48,9 +48,6 @@ export const useSetUiSettings = uiSettingKey => {
   return [value, setValue];
 };
 
-export const useWaitingViewerRole = () => {
-  return useHMSStore(selectAppData(APP_DATA.waitingViewerRole));
-};
 export const useIsHLSStartedFromUI = () => {
   return useHMSStore(selectAppData(APP_DATA.hlsStarted));
 };
