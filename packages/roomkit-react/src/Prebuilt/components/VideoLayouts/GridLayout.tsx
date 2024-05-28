@@ -1,21 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import { match } from 'ts-pattern';
 import {
-  HMSTranscriptionInfo,
-  HMSTranscriptionState,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
-  selectTranscriptionsState,
   selectWhiteboard,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
-import { ToastManager } from '../Toast/ToastManager';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -24,7 +18,7 @@ import { WhiteboardLayout } from './WhiteboardLayout';
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
-import { APP_DATA, CAPTION_TOAST } from '../../common/constants';
+import { APP_DATA } from '../../common/constants';
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
@@ -92,7 +86,6 @@ export const GridLayout = ({
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
-  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
   const tileLayout = {
     enableSpotlightingPeer: enable_spotlighting_peer,
     hideParticipantNameOnTile: hide_participant_name_on_tile,
@@ -101,46 +94,6 @@ export const GridLayout = ({
     hideMetadataOnTile: hide_metadata_on_tile,
     objectFit: video_object_fit,
   };
-
-  const transcriptionStates: HMSTranscriptionInfo[] | undefined = useHMSStore(selectTranscriptionsState);
-
-  useEffect(() => {
-    if (transcriptionStates && transcriptionStates.length > 0) {
-      let id = '';
-      match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
-        .when(
-          ({ error }) => !!error,
-          () => {
-            ToastManager.removeToast(toastId);
-            id = ToastManager.addToast({
-              title: `Failed to enable Closed Caption`,
-              variant: 'error',
-              icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-            });
-          },
-        )
-        .with({ state: HMSTranscriptionState.STARTED }, () => {
-          ToastManager.removeToast(toastId);
-          id = ToastManager.addToast({
-            title: `Closed Captioning enabled for everyone`,
-            variant: 'standard',
-            duration: 2000,
-            icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
-          });
-        })
-        .with({ state: HMSTranscriptionState.STOPPED }, () => {
-          ToastManager.removeToast(toastId);
-          id = ToastManager.addToast({
-            title: `Closed Captioning disabled for everyone`,
-            variant: 'standard',
-            duration: 2000,
-            icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
-          });
-        })
-        .otherwise(() => null);
-      setToastId(id);
-    }
-  }, [setToastId, transcriptionStates]);
 
   useEffect(() => {
     if (mainPage !== 0) {

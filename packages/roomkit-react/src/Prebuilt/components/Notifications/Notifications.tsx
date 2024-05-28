@@ -1,9 +1,11 @@
 /* eslint-disable no-case-declarations */
 import React, { useCallback, useEffect } from 'react';
+import { match } from 'ts-pattern';
 import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
   HMSRoomState,
+  HMSTranscriptionState,
   selectIsLocalScreenShared,
   selectLocalPeerID,
   selectPeerNameByID,
@@ -14,7 +16,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { GroupIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, ClosedCaptionIcon, GroupIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 import { Box, Button } from '../../..';
 import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
@@ -33,8 +35,8 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-import { ROLE_CHANGE_DECLINED } from '../../common/constants';
+import { useIsNotificationDisabled, useSetAppDataByKey, useSubscribedNotifications } from '../AppData/useUISettings';
+import { CAPTION_TOAST, ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
 
@@ -51,6 +53,7 @@ export function Notifications() {
   const { showNotification } = useAwayNotifications();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const logoURL = useRoomLayout()?.logo?.url;
+  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -176,6 +179,44 @@ export function Notifications() {
             body: notification.data.message,
             icon: logoURL,
           });
+        }
+        break;
+      case HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED:
+        const transcriptionStates = notification.data;
+        if (transcriptionStates && transcriptionStates.length > 0) {
+          let id = '';
+          match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
+            .when(
+              ({ error }) => !!error,
+              () => {
+                ToastManager.removeToast(toastId);
+                id = ToastManager.addToast({
+                  title: `Failed to enable Closed Caption`,
+                  variant: 'error',
+                  icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
+                });
+              },
+            )
+            .with({ state: HMSTranscriptionState.STARTED }, () => {
+              ToastManager.removeToast(toastId);
+              id = ToastManager.addToast({
+                title: `Closed Captioning enabled for everyone`,
+                variant: 'standard',
+                duration: 2000,
+                icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
+              });
+            })
+            .with({ state: HMSTranscriptionState.STOPPED }, () => {
+              ToastManager.removeToast(toastId);
+              id = ToastManager.addToast({
+                title: `Closed Captioning disabled for everyone`,
+                variant: 'standard',
+                duration: 2000,
+                icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
+              });
+            })
+            .otherwise(() => null);
+          setToastId(id);
         }
         break;
       default:
