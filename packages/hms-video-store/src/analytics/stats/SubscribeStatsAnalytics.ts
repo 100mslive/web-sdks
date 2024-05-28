@@ -141,8 +141,6 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay', false),
     };
 
-    console.log('avg_jitter_buffer_delay', this.kind, baseSample.avg_jitter_buffer_delay);
-
     if (latestStat.kind === 'video') {
       return removeUndefinedFromObject<RemoteVideoSample>({
         ...baseSample,
