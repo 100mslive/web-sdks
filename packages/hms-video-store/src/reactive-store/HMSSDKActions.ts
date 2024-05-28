@@ -88,6 +88,7 @@ import {
   selectTracksMap,
   selectVideoTrackByID,
 } from '../selectors';
+import { FindPeerByNameRequestParams } from '../signal/interfaces';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -606,6 +607,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       return SDKToHMS.convertPeer(peer) as HMSPeer;
     }
     return undefined;
+  }
+
+  async findPeerByName(options: FindPeerByNameRequestParams) {
+    const { offset, peers, eof } = await this.sdk.findPeerByName(options);
+    return { offset, eof, peers: peers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer) };
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
