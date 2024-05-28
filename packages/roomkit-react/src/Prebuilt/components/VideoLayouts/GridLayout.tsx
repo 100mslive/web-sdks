@@ -14,7 +14,8 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
-import { CaptionToast } from '../MoreSettings/CaptionContent';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -22,9 +23,8 @@ import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
-import { CaptionToastManager } from '../../common/hooks';
 import PeersSorter from '../../common/PeersSorter';
-import { APP_DATA } from '../../common/constants';
+import { APP_DATA, CAPTION_TOAST } from '../../common/constants';
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
@@ -92,7 +92,7 @@ export const GridLayout = ({
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
-  const { toastId, setToastId } = CaptionToastManager();
+  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
   const tileLayout = {
     enableSpotlightingPeer: enable_spotlighting_peer,
     hideParticipantNameOnTile: hide_participant_name_on_tile,
@@ -110,34 +110,43 @@ export const GridLayout = ({
         .when(
           ({ error }) => !!error,
           () => {
-            CaptionToast({
-              toastId,
-              setToastId,
+            if (toastId) {
+              ToastManager.removeToast(toastId);
+              setToastId('');
+            }
+            const id = ToastManager.addToast({
               title: `Failed to enable Closed Caption`,
               variant: 'error',
               icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
             });
+            setToastId(id);
           },
         )
         .with({ state: HMSTranscriptionState.STARTED }, () => {
-          CaptionToast({
-            toastId,
-            setToastId,
+          if (toastId) {
+            ToastManager.removeToast(toastId);
+            setToastId('');
+          }
+          const id = ToastManager.addToast({
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
             duration: 2000,
             icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
+          setToastId(id);
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
-          CaptionToast({
-            toastId,
-            setToastId,
+          if (toastId) {
+            ToastManager.removeToast(toastId);
+            setToastId('');
+          }
+          const id = ToastManager.addToast({
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',
             duration: 2000,
             icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
+          setToastId(id);
         })
         .otherwise(() => null);
     }

@@ -8,14 +8,14 @@ import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore: No implicit Any
-import { useSetIsCaptionEnabled } from '../AppData/useUISettings';
-import { CaptionToastManager } from '../../common/hooks';
+import { useSetAppDataByKey, useSetIsCaptionEnabled } from '../AppData/useUISettings';
+import { CAPTION_TOAST } from '../../common/constants';
 
 export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit: () => void }) => {
   const DURATION = 2000;
   const actions = useHMSActions();
-  const { toastId, setToastId } = CaptionToastManager();
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
 
   const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
 
@@ -89,40 +89,41 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
             data-testid="popup_change_btn"
             onClick={async () => {
               try {
+                if (toastId) {
+                  ToastManager.removeToast(toastId);
+                  setToastId('');
+                }
                 if (isTranscriptionEnabled) {
                   await actions.stopTranscription({
                     mode: HMSTranscriptionMode.CAPTION,
                   });
-                  CaptionToast({
-                    toastId,
-                    setToastId,
+                  const id = ToastManager.addToast({
                     title: `Disabling Closed Caption for everyone.`,
                     variant: 'standard',
                     duration: DURATION,
                     icon: <Loading color="currentColor" />,
                   });
+                  setToastId(id);
                   onExit();
                   return;
                 }
                 await actions.startTranscription({
                   mode: HMSTranscriptionMode.CAPTION,
                 });
-                CaptionToast({
-                  toastId,
-                  setToastId,
+                const id = ToastManager.addToast({
                   title: `Enabling Closed Caption for everyone.`,
                   variant: 'standard',
                   duration: DURATION,
                   icon: <Loading color="currentColor" />,
                 });
+                setToastId(id);
               } catch (err) {
-                CaptionToast({
-                  toastId,
-                  setToastId,
+                const id = ToastManager.addToast({
                   title: `Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`,
                   variant: 'error',
                   icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
                 });
+                setToastId(id);
               }
               onExit();
             }}
@@ -140,32 +141,4 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
       )}
     </>
   );
-};
-
-export const CaptionToast = ({
-  toastId,
-  setToastId,
-  title,
-  variant = 'standard',
-  duration = 4000,
-  icon,
-}: {
-  toastId: string;
-  setToastId: (id: string) => void;
-  title: string;
-  variant?: string;
-  duration?: number;
-  icon?: React.ReactNode;
-}) => {
-  if (toastId) {
-    ToastManager.removeToast(toastId);
-    setToastId('');
-  }
-  const id = ToastManager.addToast({
-    title,
-    variant,
-    duration,
-    icon,
-  });
-  setToastId(id);
 };
