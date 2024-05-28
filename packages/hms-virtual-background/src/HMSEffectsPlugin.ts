@@ -15,6 +15,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
+  private canvas: HTMLCanvasElement;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
@@ -32,6 +33,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       },
       provider: 'webgpu',
     });
+    this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // currently logging info type messages as well
       if (!err.type || err.type === 'error') {
@@ -139,9 +141,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     };
     this.effects.clear();
+    const { height, width } = stream.getVideoTracks()[0].getSettings();
+    this.canvas.width = width!;
+    this.canvas.height = height!;
     this.effects.useStream(stream);
-    // getStream potentially returns null
-    return this.effects.getStream() || stream;
+    this.effects.toCanvas(this.canvas);
+    return this.canvas.captureStream(30) || stream;
   }
 
   stop() {
