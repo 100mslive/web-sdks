@@ -1096,6 +1096,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
+    if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED) {
+      this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
+    }
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
