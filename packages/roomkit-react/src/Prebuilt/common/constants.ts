@@ -86,6 +86,9 @@ export const POLL_VIEWS = {
   RESULTS: 'RESULTS',
 };
 
+export const CAPTION_TOAST = {
+  captionToast: 'captionToast',
+};
 export const SUBSCRIBED_NOTIFICATIONS = {
   PEER_JOINED: 'PEER_JOINED',
   PEER_LEFT: 'PEER_LEFT',

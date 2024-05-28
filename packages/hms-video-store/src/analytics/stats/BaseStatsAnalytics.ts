@@ -154,7 +154,7 @@ export abstract class RunningTrackAnalytics {
     | RemoteAudioTrackAnalytics
     | RemoteVideoTrackAnalytics;
 
-  protected getLatestStat() {
+  getLatestStat() {
     return this.tempStats[this.tempStats.length - 1];
   }
 

@@ -3,8 +3,11 @@ import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
+  HMSTranscriptionMode,
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
+  selectIsTranscriptionAllowedByMode,
+  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -104,7 +107,10 @@ export const MwebOptions = ({
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const { startRecording, isRecordingLoading } = useRecordingHandler();
+  const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
+  const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -187,6 +193,17 @@ export const MwebOptions = ({
               >
                 {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+            {isTranscriptionAllowed ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setOpenOptionsSheet(false);
+                  updateState(MODALS.CAPTION, true);
+                }}
+              >
+                {isTranscriptionEnabled && isCaptionEnabled ? <ClosedCaptionIcon /> : <OpenCaptionIcon />}
+                <ActionTile.Title>Closed Caption</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
             {isLocalVideoEnabled && !!elements?.virtual_background ? (
