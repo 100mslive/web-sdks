@@ -111,10 +111,7 @@ export const GridLayout = ({
         .when(
           ({ error }) => !!error,
           () => {
-            if (toastId) {
-              ToastManager.removeToast(toastId);
-              setToastId('');
-            }
+            ToastManager.removeToast(toastId);
             id = ToastManager.addToast({
               title: `Failed to enable Closed Caption`,
               variant: 'error',
@@ -123,10 +120,7 @@ export const GridLayout = ({
           },
         )
         .with({ state: HMSTranscriptionState.STARTED }, () => {
-          if (toastId) {
-            ToastManager.removeToast(toastId);
-            setToastId('');
-          }
+          ToastManager.removeToast(toastId);
           id = ToastManager.addToast({
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
@@ -135,10 +129,7 @@ export const GridLayout = ({
           });
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
-          if (toastId) {
-            ToastManager.removeToast(toastId);
-            setToastId('');
-          }
+          ToastManager.removeToast(toastId);
           id = ToastManager.addToast({
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',

@@ -89,10 +89,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
             data-testid="popup_change_btn"
             onClick={async () => {
               try {
-                if (toastId) {
-                  ToastManager.removeToast(toastId);
-                  setToastId('');
-                }
+                ToastManager.removeToast(toastId);
                 if (isTranscriptionEnabled) {
                   await actions.stopTranscription({
                     mode: HMSTranscriptionMode.CAPTION,
