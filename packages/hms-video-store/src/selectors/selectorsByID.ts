@@ -4,6 +4,7 @@ import {
   selectFullAppData,
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerRole,
   selectMessagesMap,
   selectPeers,
   selectPeersMap,
@@ -19,6 +20,7 @@ import {
   isVideoPlaylist,
 } from './selectorUtils';
 import { HMSLogger } from '../common/ui-logger';
+import { HMSTranscriptionMode } from '../internal';
 import {
   HMSAudioTrack,
   HMSGenericTypes,
@@ -528,4 +530,13 @@ export const selectPollByID = byIDCurry(selectPollByIDBare);
 export const selectMessageByMessageID = (id: string) =>
   createSelector(selectMessagesMap, messages => {
     return messages[id];
+  });
+
+export const selectIsTranscriptionAllowedByMode = (mode: HMSTranscriptionMode) =>
+  createSelector(selectLocalPeerRole, role => {
+    if (!role?.permissions.transcriptions) {
+      return false;
+    }
+    // only one admin permission
+    return role.permissions.transcriptions[mode].length > 0;
   });

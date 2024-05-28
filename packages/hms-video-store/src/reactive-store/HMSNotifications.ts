@@ -1,5 +1,10 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import {
+  PEER_NOTIFICATION_TYPES,
+  POLL_NOTIFICATION_TYPES,
+  TRACK_NOTIFICATION_TYPES,
+  TRANSCRIPTION_NOTIFICATION_TYPES,
+} from './common/mapping';
 import { IHMSStore } from '../IHMSStore';
 import * as sdkTypes from '../internal';
 import {
@@ -172,6 +177,14 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     }
   }
 
+  sendTranscriptionUpdate(transcriptions?: sdkTypes.HMSTranscriptionInfo[]) {
+    const notification = this.createNotification(
+      TRANSCRIPTION_NOTIFICATION_TYPES[sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED],
+      transcriptions,
+      HMSNotificationSeverity.INFO,
+    );
+    this.emitEvent(notification);
+  }
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
@@ -190,6 +203,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
       | HMSDeviceChangeEvent
       | HMSPlaylistItem<T>
       | sdkTypes.HMSPoll
+      | sdkTypes.HMSTranscriptionInfo[]
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

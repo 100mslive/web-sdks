@@ -86,13 +86,27 @@ interface PluginPermissions {
   };
 }
 
+interface TranscriptionPluginPermissions {
+  permissions?: {
+    // list of roles
+    admin?: Array<string>;
+  };
+  mode: HMSTranscriptionMode;
+}
+
+export enum Plugins {
+  WHITEBOARD = 'whiteboard',
+  TRANSCRIPTIONS = 'transcriptions',
+}
+
 export interface PolicyParams {
   name: string;
   known_roles: {
     [role: string]: HMSRole;
   };
   plugins: {
-    [plugin in 'whiteboard']?: PluginPermissions;
+    [Plugins.WHITEBOARD]?: PluginPermissions;
+    [Plugins.TRANSCRIPTIONS]?: TranscriptionPluginPermissions[];
   };
   template_id: string;
   app_data?: Record<string, string>;
