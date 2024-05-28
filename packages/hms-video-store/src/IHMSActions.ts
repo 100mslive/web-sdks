@@ -1,5 +1,5 @@
 import { TranscriptionConfig } from './interfaces/transcription-config';
-import { findPeerByNameRequestParams } from './signal/interfaces';
+import { FindPeerByNameRequestParams } from './signal/interfaces';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -562,7 +562,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   lowerRemotePeerHand(peerId: string): Promise<void>;
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
   getPeer(peerId: string): Promise<HMSPeer | undefined>;
-  findPeerByName(options: findPeerByNameRequestParams): Promise<{ offset: number; eof?: boolean; peers: HMSPeer[] }>;
+  findPeerByName(options: FindPeerByNameRequestParams): Promise<{ offset: number; eof?: boolean; peers: HMSPeer[] }>;
   /**
    * Method to override the default settings for playlist tracks
    * @param {HMSPlaylistSettings} settings

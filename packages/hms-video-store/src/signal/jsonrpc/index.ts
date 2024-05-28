@@ -20,10 +20,10 @@ import {
   AcceptRoleChangeParams,
   BroadcastResponse,
   CreateWhiteboardResponse,
-  findPeerByNameRequestParams,
+  FindPeerByNameRequestParams,
   FindPeerByNameResponse,
-  findPeersRequestParams,
-  getPeerRequestParams,
+  FindPeersRequestParams,
+  GetPeerRequestParams,
   GetSessionMetadataResponse,
   GetWhiteboardResponse,
   HLSRequestParams,
@@ -32,7 +32,7 @@ import {
   HMSWhiteboardCreateOptions,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterRequestParams,
+  PeerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -383,7 +383,7 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { ...params });
   }
 
-  async getPeer(params: getPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
+  async getPeer(params: GetPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
     return await this.call(HMSSignalMethod.GET_PEER, { ...params });
   }
 
@@ -403,15 +403,15 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.GROUP_REMOVE, { name, peer_id: peerId });
   }
 
-  async peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
+  async peerIterNext(params: PeerIterRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.PEER_ITER_NEXT, params);
   }
 
-  async findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
+  async findPeers(params: FindPeersRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
   }
 
-  async findPeerByName(params: findPeerByNameRequestParams): Promise<FindPeerByNameResponse> {
+  async findPeerByName(params: FindPeerByNameRequestParams): Promise<FindPeerByNameResponse> {
     return await this.call(HMSSignalMethod.SEARCH_BY_NAME, params);
   }
 
