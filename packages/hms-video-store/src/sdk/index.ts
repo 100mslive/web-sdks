@@ -746,14 +746,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   async findPeerByName({ query, limit = 10, offset }: FindPeerByNameRequestParams) {
-    if (!query) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Invalid query');
-    }
     const {
       peers,
       offset: responseOffset,
       eof,
-    } = await this.transport.signal.findPeerByName({ query: query.toLowerCase(), limit, offset });
+    } = await this.transport.signal.findPeerByName({ query: query?.toLowerCase(), limit, offset });
     if (peers.length > 0) {
       return {
         offset: responseOffset,
