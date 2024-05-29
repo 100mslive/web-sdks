@@ -17,12 +17,14 @@ import { ToastManager } from '../Toast/ToastManager';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
-import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
+const WhiteboardLayout = React.lazy(() =>
+  import('./WhiteboardLayout').then(module => ({ default: module.WhiteboardLayout })),
+);
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
@@ -136,12 +138,14 @@ export const GridLayout = ({
   } else if (whiteboard?.open) {
     return (
       <VideoTileContext.Provider value={tileLayout}>
-        <WhiteboardLayout
-          peers={sortedPeers}
-          onPageSize={setPageSize}
-          onPageChange={setMainPage}
-          edgeToEdge={edge_to_edge}
-        />
+        <React.Suspense>
+          <WhiteboardLayout
+            peers={sortedPeers}
+            onPageSize={setPageSize}
+            onPageChange={setMainPage}
+            edgeToEdge={edge_to_edge}
+          />
+        </React.Suspense>
       </VideoTileContext.Provider>
     );
   } else if (isRoleProminence) {
