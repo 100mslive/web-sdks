@@ -93,7 +93,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                   await actions.stopTranscription({
                     mode: HMSTranscriptionMode.CAPTION,
                   });
-                  const id = ToastManager.replaceToastId(toastId, {
+                  const id = ToastManager.replaceToast(toastId, {
                     title: `Disabling Closed Caption for everyone.`,
                     variant: 'standard',
                     duration: DURATION,
@@ -106,7 +106,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                 await actions.startTranscription({
                   mode: HMSTranscriptionMode.CAPTION,
                 });
-                const id = ToastManager.replaceToastId(toastId, {
+                const id = ToastManager.replaceToast(toastId, {
                   title: `Enabling Closed Caption for everyone.`,
                   variant: 'standard',
                   duration: DURATION,
@@ -114,7 +114,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                 });
                 setToastId(id);
               } catch (err) {
-                const id = ToastManager.replaceToastId(toastId, {
+                const id = ToastManager.replaceToast(toastId, {
                   title: `Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`,
                   variant: 'error',
                   icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,

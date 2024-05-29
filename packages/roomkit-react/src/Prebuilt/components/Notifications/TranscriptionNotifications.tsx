@@ -25,7 +25,7 @@ export const TranscriptionNotifications = () => {
         .when(
           ({ error }) => !!error,
           () => {
-            id = ToastManager.replaceToastId(toastId, {
+            id = ToastManager.replaceToast(toastId, {
               title: `Failed to enable Closed Caption`,
               variant: 'error',
               icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
@@ -33,7 +33,7 @@ export const TranscriptionNotifications = () => {
           },
         )
         .with({ state: HMSTranscriptionState.STARTED }, () => {
-          id = ToastManager.replaceToastId(toastId, {
+          id = ToastManager.replaceToast(toastId, {
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
             duration: 2000,
@@ -41,7 +41,7 @@ export const TranscriptionNotifications = () => {
           });
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
-          id = ToastManager.replaceToastId(toastId, {
+          id = ToastManager.replaceToast(toastId, {
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',
             duration: 2000,
