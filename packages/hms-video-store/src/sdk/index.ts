@@ -750,7 +750,7 @@ export class HMSSdk implements HMSInterface {
       peers,
       offset: responseOffset,
       eof,
-    } = await this.transport.signal.findPeerByName({ query: query.toLowerCase(), limit, offset });
+    } = await this.transport.signal.findPeerByName({ query: query?.toLowerCase(), limit, offset });
     if (peers.length > 0) {
       return {
         offset: responseOffset,
