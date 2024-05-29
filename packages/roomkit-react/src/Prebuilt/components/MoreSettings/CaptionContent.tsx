@@ -1,26 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HMSTranscriptionMode, selectIsTranscriptionEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
+import { TranscriptionNotifications } from '../Notifications/TranscriptionNotifications';
 // @ts-ignore: No implicit Any
-import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore: No implicit Any
-import { useSetAppDataByKey, useSetIsCaptionEnabled } from '../AppData/useUISettings';
-import { CAPTION_TOAST } from '../../common/constants';
+import { useSetIsCaptionEnabled } from '../AppData/useUISettings';
 
+enum CaptionState {
+  'STARTING',
+  'STOPPING',
+  'FAILED',
+}
 export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit: () => void }) => {
   const DURATION = 2000;
   const actions = useHMSActions();
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
-
+  const [captionState, setCaptionState] = useState<CaptionState>();
   const [isCaptionEnabled, setIsCaptionEnabled] = useSetIsCaptionEnabled();
 
+  console.log('captionstate ', captionState);
   return (
     <>
+      {captionState === CaptionState.STARTING && (
+        <TranscriptionNotifications
+          title="Enabling Closed Caption for everyone."
+          variant="standard"
+          duration={DURATION}
+          icon={<Loading color="currentColor" />}
+        />
+      )}
+      {captionState === CaptionState.STOPPING && (
+        <TranscriptionNotifications
+          title="Disabling Closed Caption for everyone."
+          variant="standard"
+          duration={DURATION}
+          icon={<Loading color="currentColor" />}
+        />
+      )}
+      {captionState === CaptionState.STOPPING && (
+        <TranscriptionNotifications
+          title={`Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`}
+          variant="error"
+          icon={<AlertTriangleIcon style={{ marginRight: '0.5rem' }} />}
+        />
+      )}
       <Text
         variant={isMobile ? 'md' : 'lg'}
         css={{
@@ -89,38 +115,22 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
             data-testid="popup_change_btn"
             onClick={async () => {
               try {
-                ToastManager.removeToast(toastId);
                 if (isTranscriptionEnabled) {
                   await actions.stopTranscription({
                     mode: HMSTranscriptionMode.CAPTION,
                   });
-                  const id = ToastManager.addToast({
-                    title: `Disabling Closed Caption for everyone.`,
-                    variant: 'standard',
-                    duration: DURATION,
-                    icon: <Loading color="currentColor" />,
-                  });
-                  setToastId(id);
+                  setCaptionState(CaptionState.STOPPING);
+
                   onExit();
                   return;
                 }
                 await actions.startTranscription({
                   mode: HMSTranscriptionMode.CAPTION,
                 });
-                const id = ToastManager.addToast({
-                  title: `Enabling Closed Caption for everyone.`,
-                  variant: 'standard',
-                  duration: DURATION,
-                  icon: <Loading color="currentColor" />,
-                });
-                setToastId(id);
+                setCaptionState(CaptionState.STARTING);
+                console.log('ere');
               } catch (err) {
-                const id = ToastManager.addToast({
-                  title: `Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`,
-                  variant: 'error',
-                  icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-                });
-                setToastId(id);
+                setCaptionState(CaptionState.FAILED);
               }
               onExit();
             }}

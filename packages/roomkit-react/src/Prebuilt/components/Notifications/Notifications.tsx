@@ -31,12 +31,13 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { TranscriptionNotifications } from './TranscriptionNotifications';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useIsNotificationDisabled, useSetAppDataByKey, useSubscribedNotifications } from '../AppData/useUISettings';
-import { CAPTION_TOAST, ROLE_CHANGE_DECLINED } from '../../common/constants';
+import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
+import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
 
@@ -53,7 +54,6 @@ export function Notifications() {
   const { showNotification } = useAwayNotifications();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const logoURL = useRoomLayout()?.logo?.url;
-  const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -184,39 +184,34 @@ export function Notifications() {
       case HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED:
         const transcriptionStates = notification.data;
         if (transcriptionStates && transcriptionStates.length > 0) {
-          let id = '';
           match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
             .when(
               ({ error }) => !!error,
               () => {
-                ToastManager.removeToast(toastId);
-                id = ToastManager.addToast({
-                  title: `Failed to enable Closed Caption`,
-                  variant: 'error',
-                  icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
-                });
+                <TranscriptionNotifications
+                  title="Failed to enable Closed Caption"
+                  variant="error"
+                  icon={<AlertTriangleIcon style={{ marginRight: '0.5rem' }} />}
+                />;
               },
             )
             .with({ state: HMSTranscriptionState.STARTED }, () => {
-              ToastManager.removeToast(toastId);
-              id = ToastManager.addToast({
-                title: `Closed Captioning enabled for everyone`,
-                variant: 'standard',
-                duration: 2000,
-                icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
-              });
+              <TranscriptionNotifications
+                title="Closed Captioning enabled for everyone"
+                variant="standard"
+                duration={2000}
+                icon={<OpenCaptionIcon style={{ marginRight: '0.5rem' }} />}
+              />;
             })
             .with({ state: HMSTranscriptionState.STOPPED }, () => {
-              ToastManager.removeToast(toastId);
-              id = ToastManager.addToast({
-                title: `Closed Captioning disabled for everyone`,
-                variant: 'standard',
-                duration: 2000,
-                icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
-              });
+              <TranscriptionNotifications
+                title="Closed Captioning disabled for everyone"
+                variant="standard"
+                duration={2000}
+                icon={<ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />}
+              />;
             })
             .otherwise(() => null);
-          setToastId(id);
         }
         break;
       default:
