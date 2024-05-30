@@ -27,8 +27,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
           color: '$on_surface_high',
           fontWeight: '$semiBold',
           display: 'flex',
-          pb: '$4',
-          '@md': { px: '$8', borderBottom: '1px solid $border_default' },
+          '@md': { px: '$8' },
         }}
       >
         {isTranscriptionEnabled ? 'Disable' : 'Enable'} Closed Caption (CC) for this session?
@@ -40,7 +39,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
         </Box>
       </Text>
       {!isMobile ? (
-        <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
+        <Text variant="sm" css={{ color: '$on_surface_medium', mt: '$4', '@md': { px: '$8' } }}>
           This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You
           can&nbsp;
           {isTranscriptionEnabled ? 'enable' : 'disable'} it later.
@@ -68,12 +67,13 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
           align="center"
           css={{
             width: '100%',
+            '@md': { px: '$4' },
           }}
         >
           {isMobile && isTranscriptionEnabled ? (
             <Button
               variant="standard"
-              css={{ w: '100%', mb: '$8' }}
+              css={{ w: '100%', mb: '$4' }}
               outlined
               onClick={() => {
                 setIsCaptionEnabled(!isCaptionEnabled);
@@ -115,7 +115,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                 setToastId(id);
               } catch (err) {
                 const id = ToastManager.replaceToast(toastId, {
-                  title: `Failed to ${isTranscriptionEnabled ? 'disabled' : 'enabled'} closed caption`,
+                  title: `Failed to ${isTranscriptionEnabled ? 'disable' : 'enable'} closed caption`,
                   variant: 'error',
                   icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
                 });
@@ -129,7 +129,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
         </Flex>
       </Flex>
       {isMobile && (
-        <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
+        <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$4', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
           This will {isTranscriptionEnabled ? 'disable' : 'enable'} Closed Captions for everyone in this room. You
           can&nbsp;
           {isTranscriptionEnabled ? 'enable' : 'disable'} it later.
