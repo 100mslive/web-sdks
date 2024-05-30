@@ -103,5 +103,6 @@
       "path": "packages/react-icons/dist/index.js",
       "limit": "100 KB"
     }
-  ]
+  ],
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }
