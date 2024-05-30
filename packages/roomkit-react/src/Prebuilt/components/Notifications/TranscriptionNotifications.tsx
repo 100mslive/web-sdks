@@ -37,7 +37,7 @@ export const TranscriptionNotifications = () => {
             title: `Closed Captioning enabled for everyone`,
             variant: 'standard',
             duration: 2000,
-            icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
+            icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
         })
         .with({ state: HMSTranscriptionState.STOPPED }, () => {
@@ -45,7 +45,7 @@ export const TranscriptionNotifications = () => {
             title: `Closed Captioning disabled for everyone`,
             variant: 'standard',
             duration: 2000,
-            icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
+            icon: <OpenCaptionIcon style={{ marginRight: '0.5rem' }} />,
           });
         })
         .otherwise(() => null);
