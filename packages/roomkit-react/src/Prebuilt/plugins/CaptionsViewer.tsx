@@ -32,23 +32,19 @@ class SimpleQueue {
     }
     if (this.size() === 0) {
       this.storage.push(data);
-      this.addTimeout(this.storage[this.size() - 1], data.final);
+      this.addTimeout(this.storage[this.size() - 1]);
       return;
     }
     if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
       this.storage.push(data);
-      this.addTimeout(this.storage[this.size() - 1], data.final);
+      this.addTimeout(this.storage[this.size() - 1]);
       return;
     }
     this.storage[this.size() - 1].transcript = data.transcript;
     this.storage[this.size() - 1].final = data.final;
     this.storage[this.size() - 1].end = data.end;
-    this.addTimeout(this.storage[this.size() - 1], data.final);
   }
-  addTimeout(item: TranscriptData, isFinal: boolean) {
-    if (!isFinal) {
-      return;
-    }
+  addTimeout(item: TranscriptData) {
     item.timeout = setTimeout(() => {
       this.dequeue(item);
     }, this.MAX_STORAGE_TIME);
