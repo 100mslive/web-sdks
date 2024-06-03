@@ -72,6 +72,10 @@ export const QuestionCard = ({
       option: singleOptionAnswer,
       options: Array.from(multipleOptionAnswer),
       duration: Date.now() - startTime.current,
+      peer: {
+        userid: localPeer?.customerUserId,
+        peerid: localPeer?.id,
+      },
     };
     await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
     updateSavedResponses(prev => {
@@ -85,6 +89,8 @@ export const QuestionCard = ({
     index,
     singleOptionAnswer,
     multipleOptionAnswer,
+    localPeer?.customerUserId,
+    localPeer?.id,
     actions.interactivityCenter,
     pollID,
     updateSavedResponses,
