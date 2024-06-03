@@ -12,6 +12,7 @@ export class VBPlugin {
       this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+      onInit?.();
     }
   };
 
