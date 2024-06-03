@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import {
-  selectAppData,
-  selectEffectsKey,
-  selectIsEffectsEnabled,
-  selectLocalPeerRole,
-} from '@100mslive/hms-video-store';
+import { selectAppData, selectEffectsKey, selectLocalPeerRole } from '@100mslive/hms-video-store';
 import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
@@ -46,7 +41,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const [blurAmount, setBlurAmount] = useState(VBHandler.getBlurAmount() || 0.5);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+  const isEffectsEnabled = false;
   const effectsKey = useHMSStore(selectEffectsKey);
   const isMobile = useMedia(cssConfig.media.md);
   const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
