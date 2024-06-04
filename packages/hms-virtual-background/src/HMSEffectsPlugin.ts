@@ -125,6 +125,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
+  private updateCanvas(stream: MediaStream) {
+    const { height, width } = stream.getVideoTracks()[0].getSettings();
+    this.canvas.width = width!;
+    this.canvas.height = height!;
+    this.effects.useStream(stream);
+    this.effects.toCanvas(this.canvas);
+  }
+
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
@@ -141,11 +149,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     };
     this.effects.clear();
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
-    this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
+    this.effects.onChangeInputResolution(() => {
+      this.updateCanvas(stream);
+    });
+    this.updateCanvas(stream);
+
     return this.canvas.captureStream(30) || stream;
   }
 
