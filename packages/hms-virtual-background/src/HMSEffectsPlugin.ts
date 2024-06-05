@@ -17,7 +17,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private onInit;
   private canvas: HTMLCanvasElement;
 
-  constructor(effectsSDKKey: string, onInit?: () => void) {
+  constructor(effectsSDKKey: string, onInit?: () => void, forwardError?: (err: string) => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
     this.canvas = document.createElement('canvas');
@@ -38,6 +38,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       // currently logging info type messages as well
       if (!err.type || err.type === 'error') {
         console.error('[HMSEffectsPlugin]', err);
+        forwardError?.(JSON.stringify(err));
       }
     });
   }
@@ -146,6 +147,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.canvas.height = height!;
     this.effects.useStream(stream);
     this.effects.toCanvas(this.canvas);
+
     return this.canvas.captureStream(30) || stream;
   }
 

@@ -4,12 +4,12 @@ export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: HMSEffectsPlugin | undefined;
 
-  initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
+  initialisePlugin = (effectsSDKKey?: string, onInit?: () => void, forwardError?: (err: string) => void) => {
     if (this.getVBObject()) {
       return;
     }
     if (effectsSDKKey) {
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit, forwardError);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }

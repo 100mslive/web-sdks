@@ -68,7 +68,11 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       setLoadingEffects(true);
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
+        VBHandler.initialisePlugin(
+          isEffectsEnabled && effectsKey ? effectsKey : '',
+          () => setLoadingEffects(false),
+          err => hmsActions.sendBroadcastMessage(err),
+        );
         vbObject = VBHandler.getVBObject();
         if (isEffectsEnabled && effectsKey) {
           hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
