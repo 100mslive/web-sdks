@@ -58,6 +58,7 @@ export enum HMSSignalMethod {
   POLL_LEADERBOARD = 'poll-leaderboard',
   GET_PEER = 'get-peer',
   FIND_PEER = 'find-peer',
+  SEARCH_BY_NAME = 'peer-name-search',
   PEER_ITER_NEXT = 'peer-iter-next',
   GROUP_JOIN = 'group-join',
   GROUP_LEAVE = 'group-leave',

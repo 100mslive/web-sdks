@@ -50,15 +50,23 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     const remoteTracksStats = hmsStats.getAllRemoteTracksStats();
     let shouldCreateSample = false;
     Object.keys(remoteTracksStats).forEach(trackID => {
-      const trackStats = remoteTracksStats[trackID];
       const track = this.store.getTrackById(trackID);
+      const trackStats = remoteTracksStats[trackID];
+      const prevTrackStats = this.trackAnalytics.get(trackID)?.getLatestStat();
 
-      const getCalculatedJitterBufferDelay = (trackStats: HMSTrackStats) =>
-        trackStats.jitterBufferDelay &&
-        trackStats.jitterBufferEmittedCount &&
-        (trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount) * 1000;
+      // eslint-disable-next-line complexity
+      const getCalculatedJitterBufferDelay = (trackStats: HMSTrackStats, prevTrackStats?: TempStats) => {
+        const prevJBDelay = prevTrackStats?.jitterBufferDelay || 0;
+        const prevJBEmittedCount = prevTrackStats?.jitterBufferEmittedCount || 0;
+        const currentJBDelay = (trackStats?.jitterBufferDelay || 0) - prevJBDelay;
+        const currentJBEmittedCount = (trackStats?.jitterBufferEmittedCount || 0) - prevJBEmittedCount;
 
-      const calculatedJitterBufferDelay = getCalculatedJitterBufferDelay(trackStats);
+        return currentJBEmittedCount > 0
+          ? (currentJBDelay * 1000) / currentJBEmittedCount
+          : prevTrackStats?.calculatedJitterBufferDelay || 0;
+      };
+
+      const calculatedJitterBufferDelay = getCalculatedJitterBufferDelay(trackStats, prevTrackStats);
 
       const avSync = this.calculateAvSyncForStat(trackStats, hmsStats);
       const newTempStat: TempStats = { ...trackStats, calculatedJitterBufferDelay, avSync };

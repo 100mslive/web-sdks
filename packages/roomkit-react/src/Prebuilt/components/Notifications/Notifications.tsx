@@ -29,6 +29,7 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { TranscriptionNotifications } from './TranscriptionNotifications';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
@@ -171,7 +172,7 @@ export function Notifications() {
         }
         break;
       case HMSNotificationTypes.NEW_MESSAGE:
-        if (amIScreenSharing) {
+        if (amIScreenSharing && !notification.data?.ignored) {
           showNotification(`New message from ${notification.data.senderName}`, {
             body: notification.data.message,
             icon: logoURL,
@@ -200,6 +201,7 @@ export function Notifications() {
       <InitErrorModal />
       <ChatNotifications />
       <HandRaisedNotifications />
+      <TranscriptionNotifications />
     </>
   );
 }
