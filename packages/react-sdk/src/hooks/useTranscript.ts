@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { HMSNotificationTypes } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
-import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
+import { useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 
 export interface HMSTranscript {
@@ -24,13 +24,8 @@ export interface useHMSTranscriptInput {
  */
 export const useTranscript = ({ onTranscript, handleError = logErrorHandler }: useHMSTranscriptInput) => {
   const type = 'hms_transcript';
-  const actions = useHMSActions();
   const notifications = useHMSVanillaNotifications();
 
-  useEffect(() => {
-    // we don't want these messages to be stored in store reserving that for chat messages
-    actions.ignoreMessageTypes([type]);
-  }, [actions, type]);
   // this is to handle messages from remote peers
   useEffect(() => {
     if (!notifications) {
