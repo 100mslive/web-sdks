@@ -172,7 +172,7 @@ export function Notifications() {
         }
         break;
       case HMSNotificationTypes.NEW_MESSAGE:
-        if (amIScreenSharing || !notification.ignored) {
+        if (amIScreenSharing && !notification.data?.ignored) {
           showNotification(`New message from ${notification.data.senderName}`, {
             body: notification.data.message,
             icon: logoURL,
