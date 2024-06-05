@@ -18,9 +18,7 @@ async function main() {
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
-  const target = fs.existsSync('tsconfig.json')
-    ? JSON.parse(fs.readFileSync('tsconfig.json', 'utf8')).compilerOptions.target
-    : 'es6';
+  const target = 'es6';
   const plugins = [
     PostCssPlugin.default({
       plugins: [autoprefixer],
