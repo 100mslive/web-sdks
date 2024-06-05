@@ -49,6 +49,7 @@ export const VideoStreamingSection = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const isSharingScreen = useHMSStore(selectIsLocalScreenShared);
 
+  // useSetEmbedConfig('https://www.youtube.com/embed/nDDxYlkp-_A');
   const hmsActions = useHMSActions();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();

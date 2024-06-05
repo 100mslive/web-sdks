@@ -26,7 +26,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
 
 export function EmbedUrlModal({ onOpenChange }) {
   const [embedConfig, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
-  const [url, setUrl] = useState(embedConfig?.url || '');
+  const [url, setUrl] = useState(embedConfig || '');
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
@@ -66,7 +66,7 @@ export function EmbedUrlModal({ onOpenChange }) {
               type="submit"
               disabled={!url.toString().trim()}
               onClick={() => {
-                setEmbedConfig({ url, shareScreen: true });
+                setEmbedConfig(url);
                 onOpenChange(false);
               }}
               data-testid="embed_url_btn"
