@@ -689,24 +689,26 @@ export default class HMSTransport {
     this.analyticsTimer.end(TimedEvent.JOIN_RESPONSE);
   }
 
-  private createPeerConnections() {
-    if (this.initConfig) {
-      if (!this.publishConnection) {
-        this.publishConnection = new HMSPublishConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.publishConnectionObserver,
-        );
-      }
+  private createPeerConnections(iceTransportPolicy?: RTCIceTransportPolicy) {
+    if (!this.initConfig) {
+      return;
+    }
+    this.initConfig.rtcConfiguration.iceTransportPolicy = iceTransportPolicy;
+    if (!this.publishConnection) {
+      this.publishConnection = new HMSPublishConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.publishConnectionObserver,
+      );
+    }
 
-      if (!this.subscribeConnection) {
-        this.subscribeConnection = new HMSSubscribeConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.isFlagEnabled.bind(this),
-          this.subscribeConnectionObserver,
-        );
-      }
+    if (!this.subscribeConnection) {
+      this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.isFlagEnabled.bind(this),
+        this.subscribeConnectionObserver,
+      );
     }
   }
 
@@ -1069,7 +1071,7 @@ export default class HMSTransport {
   };
 
   private retrySubscribeIceFailedTask = async () => {
-    if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
+    if (this.subscribeConnection?.connectionState !== 'connected') {
       const p = new Promise<boolean>((resolve, reject) => {
         // Use subscribe constant string
         this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {
@@ -1080,10 +1082,16 @@ export default class HMSTransport {
       });
 
       const timeout = new Promise(resolve => {
-        setTimeout(resolve, SUBSCRIBE_TIMEOUT, false);
+        setTimeout(() => resolve({ success: false, type: 'timeout' }), SUBSCRIBE_TIMEOUT);
       });
 
-      return Promise.race([p, timeout]) as Promise<boolean>;
+      return Promise.race([p, timeout]).then(value => {
+        if (!value) {
+          this.subscribeConnection = null;
+          this.createPeerConnections('relay');
+        }
+        return value;
+      }) as Promise<boolean>;
     }
 
     return true;
