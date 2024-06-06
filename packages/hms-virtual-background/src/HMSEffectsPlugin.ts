@@ -15,17 +15,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
-  private onResolutionChange;
+  private onResolutionChange?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
 
-  constructor(
-    effectsSDKKey: string,
-    onInit?: () => void,
-    onResolutionChange?: (width: number, height: number) => void,
-  ) {
+  constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
-    this.onResolutionChange = onResolutionChange;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -101,6 +96,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.executeAfterInit(async () => {
       await this.effects.setSegmentationPreset(this.preset);
     });
+  }
+
+  setOnResolutionChange(callback: (width: number, height: number) => void) {
+    this.onResolutionChange = callback;
   }
 
   getPreset() {
