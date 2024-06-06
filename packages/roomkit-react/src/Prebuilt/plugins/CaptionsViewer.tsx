@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSTranscript, selectPeerNameByID, useHMSStore, useTranscript } from '@100mslive/react-sdk';
+import {
+  HMSTranscript,
+  selectIsTranscriptionEnabled,
+  selectPeerNameByID,
+  useHMSStore,
+  useTranscript,
+} from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config } from '../../Theme';
@@ -170,6 +176,8 @@ export const CaptionsViewer = () => {
 
   const isCaptionEnabled = useIsCaptionEnabled();
 
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+
   useEffect(() => {
     const timeInterval = setInterval(() => {
       if (!captionQueue) {
@@ -193,7 +201,7 @@ export const CaptionsViewer = () => {
     }
     return false;
   });
-  if (dataToShow.length <= 0 || screenType === 'hls_live_streaming' || !isCaptionEnabled) {
+  if (dataToShow.length <= 0 || screenType === 'hls_live_streaming' || !isCaptionEnabled || !isTranscriptionEnabled) {
     return null;
   }
   return (

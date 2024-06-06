@@ -14,6 +14,7 @@ import {
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore: No implicit Any
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
