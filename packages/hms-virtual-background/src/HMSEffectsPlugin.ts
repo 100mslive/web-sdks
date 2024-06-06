@@ -15,11 +15,17 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
+  private onResolutionChange;
   private canvas: HTMLCanvasElement;
 
-  constructor(effectsSDKKey: string, onInit?: () => void) {
+  constructor(
+    effectsSDKKey: string,
+    onInit?: () => void,
+    onResolutionChange?: (width: number, height: number) => void,
+  ) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
+    this.onResolutionChange = onResolutionChange;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -31,7 +37,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
-      provider: 'webgpu',
     });
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
@@ -151,6 +156,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.clear();
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);
+      const { height, width } = stream.getVideoTracks()[0].getSettings();
+      this.onResolutionChange?.(width!, height!);
     });
     this.updateCanvas(stream);
 
