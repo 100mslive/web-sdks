@@ -6,9 +6,25 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
-import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
+import {
+  HMSTranscriptionMode,
+  selectAppData,
+  selectIsTranscriptionAllowedByMode,
+  selectIsTranscriptionEnabled,
+  selectLocalPeerID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import {
+  BrbIcon,
+  CheckIcon,
+  HamburgerMenuIcon,
+  InfoIcon,
+  OpenCaptionIcon,
+  PipIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
+import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -61,6 +77,8 @@ export const DesktopOptions = ({
   const { isBRBOn, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
   const isBRBEnabled = !!elements?.brb;
+  const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -114,6 +132,25 @@ export const DesktopOptions = ({
               <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
                 {isBRBOn ? <CheckIcon /> : null}
               </Flex>
+            </Dropdown.Item>
+          ) : null}
+          {isTranscriptionAllowed ? (
+            <Dropdown.Item
+              data-testid="closed_caption_admin"
+              onClick={() => {
+                updateState(MODALS.CAPTION, true);
+              }}
+            >
+              <OpenCaptionIcon />
+              <Flex direction="column" css={{ flexGrow: '1' }}>
+                <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                  Closed Captions
+                </Text>
+                <Text variant="caption" css={{ ml: '$4', color: '$on_surface_medium' }}>
+                  {isTranscriptionEnabled ? 'Enabled' : 'Disabled'}
+                </Text>
+              </Flex>
+              <Switch id="closed_caption_start_stop" checked={isTranscriptionEnabled} disabled={false} />
             </Dropdown.Item>
           ) : null}
           {screenType !== 'hls_live_streaming' ? (
