@@ -15,7 +15,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
-  private onResolutionChange?: (width: number, height: number) => void;
+  private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
@@ -98,8 +98,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
-  setOnResolutionChange(callback: (width: number, height: number) => void) {
-    this.onResolutionChange = callback;
+  OnResolutionChange(callback: (width: number, height: number) => void) {
+    this.onResolutionChangeCallback = callback;
   }
 
   getPreset() {
@@ -156,7 +156,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);
       const { height, width } = stream.getVideoTracks()[0].getSettings();
-      this.onResolutionChange?.(width!, height!);
+      this.onResolutionChangeCallback?.(width!, height!);
     });
     this.updateCanvas(stream);
 
