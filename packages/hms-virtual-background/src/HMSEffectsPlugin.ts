@@ -98,7 +98,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
-  OnResolutionChange(callback: (width: number, height: number) => void) {
+  onResolutionChange(callback: (width: number, height: number) => void) {
     this.onResolutionChangeCallback = callback;
   }
 
