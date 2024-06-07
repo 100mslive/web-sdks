@@ -12,6 +12,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { APP_DATA, POLL_STATE, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
 
@@ -200,4 +201,19 @@ export const usePollViewState = () => {
     pollInView: pollState?.pollInView,
     view: pollState?.view,
   };
+};
+
+export const useIsNoiseCancellationEnabled = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const IsNoiseCancellationEnabled = useHMSStore(selectAppDataByPath(APP_DATA.noiseCancellation));
+  return IsNoiseCancellationEnabled && (elements?.noise_cancellation?.enabled_by_default || false);
+};
+
+export const useSetNoiseCancellationEnabled = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
+  return [
+    isNoiseCancellationEnabled && (elements?.noise_cancellation?.enabled_by_default || false),
+    setNoiseCancellationEnabled,
+  ];
 };
