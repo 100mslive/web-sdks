@@ -478,11 +478,3 @@ export const selectWhiteboard = createSelector(
   selectWhiteboards,
   whiteboards => Object.values(whiteboards)[0] as HMSWhiteboard | undefined,
 );
-
-export const selectIsNoiseCancellationEnabled = createSelector(
-  selectRoom,
-  selectLocalPeerRole,
-  (room, role): boolean => {
-    return !!(room.isNoiseCancellationEnabled && role?.permissions.noiseCancellation);
-  },
-);

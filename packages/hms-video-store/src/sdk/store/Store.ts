@@ -214,6 +214,7 @@ class Store {
 
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
+    this.addPluginsToRoles(params.plugins);
     this.roleDetailsArrived = true;
     this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
@@ -223,7 +224,6 @@ class Store {
     this.videoLayers = this.convertSimulcastLayers(publishParams.simulcast?.video);
     // this.screenshareLayers = this.convertSimulcastLayers(publishParams.simulcast?.screen);
     this.updatePeersPolicy();
-    this.addPluginsToRoles(params.plugins);
   }
 
   hasRoleDetailsArrived(): boolean {
@@ -489,13 +489,12 @@ class Store {
     }
   };
   private addNoiseCancellationPluginToRole = (plugin?: NoiseCancellationPlugin) => {
-    const peer = this.getLocalPeer();
-    const role = peer?.asRole || peer?.role;
-    if (!role) {
+    if (!this.room) {
       return;
     }
-    role.permissions.noiseCancellation = plugin?.enabled || false;
+    this.room.isNoiseCancellationEnabled = plugin?.enabled || false;
   };
+
   private setEnv() {
     const endPoint = this.config?.initEndpoint!;
     const url = endPoint.split('https://')[1];
