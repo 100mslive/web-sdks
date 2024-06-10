@@ -25,7 +25,6 @@ export interface HMSRole {
     pollWrite: boolean;
     whiteboard?: Array<HMSPermissionType>;
     transcriptions?: Record<HMSTranscriptionMode, Array<HMSPermissionType>>;
-    noiseCancellation: boolean;
   };
   priority: number;
 }
