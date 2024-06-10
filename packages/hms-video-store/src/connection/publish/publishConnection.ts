@@ -7,7 +7,7 @@ import { HMSConnectionRole } from '../model';
 
 export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
-  private readonly observer: IPublishConnectionObserver;
+  protected readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
   readonly channel: RTCDataChannel;
 
@@ -23,6 +23,7 @@ export default class HMSPublishConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
+        this.observer.onIceCandidate(candidate);
         signal.trickle(this.role, candidate);
       }
     };

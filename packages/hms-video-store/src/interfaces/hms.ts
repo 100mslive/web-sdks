@@ -16,7 +16,6 @@ import { TranscriptionConfig } from './transcription-config';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
-import { HMSDiagnosticsInterface } from '../diagnostics/interfaces';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSPeerListIterator } from '../sdk/HMSPeerListIterator';
@@ -39,7 +38,6 @@ export interface HMSInterface {
   getInteractivityCenter(): HMSInteractivityCenter;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
-  getDiagnosticsSDK(customerUserID?: string): HMSDiagnosticsInterface;
   refreshDevices(): Promise<void>;
 
   /**

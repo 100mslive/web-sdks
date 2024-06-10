@@ -16,8 +16,7 @@ import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
-import { Diagnostics } from '../diagnostics';
-import { HMSDiagnosticsInterface } from '../diagnostics/interfaces';
+import { HMSConnectivityListener } from '../diagnostics/interfaces';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -135,7 +134,9 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
-  private diagnostics?: Diagnostics;
+  setConnectivityListener(listener: HMSConnectivityListener) {
+    this.transport.setConnectivityListener(listener);
+  }
 
   private initNotificationManager() {
     if (!this.notificationManager) {
@@ -211,12 +212,6 @@ export class HMSSdk implements HMSInterface {
     this.sendAnalyticsEvent(AnalyticsEventFactory.hlsPlayerError(error));
   }
 
-  getDiagnosticsSDK(customerUserID?: string): HMSDiagnosticsInterface {
-    if (!this.diagnostics) {
-      this.diagnostics = new Diagnostics(customerUserID);
-    }
-    return this.diagnostics;
-  }
   async refreshDevices() {
     this.validateJoined('refreshDevices');
     await this.deviceManager.init(true);

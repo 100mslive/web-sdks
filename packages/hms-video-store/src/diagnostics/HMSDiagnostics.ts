@@ -1,53 +1,18 @@
+import { ConnectivityCheck } from './ConnectivityCheck';
+import { baseRole, DEFAULT_TEST_AUDIO_URL } from './constants';
 import { HMSDiagnosticsInterface } from './interfaces';
 import { DeviceManager } from '../device-manager';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType, HMSRole } from '../internal';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
+import { HMSSdk } from '../sdk';
 import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSLocalPeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
+import { fetchWithRetry } from '../utils/fetch';
 import { sleep } from '../utils/timer-utils';
-
-const baseRole: HMSRole = {
-  name: 'diagnostics-role',
-  priority: 1,
-  publishParams: {
-    allowed: ['audio', 'video'],
-    audio: { bitRate: 32, codec: 'opus' },
-    video: {
-      bitRate: 100,
-      codec: 'vp8',
-      frameRate: 30,
-      height: 720,
-      width: 1280,
-    },
-    screen: {
-      bitRate: 100,
-      codec: 'vp8',
-      frameRate: 10,
-      height: 1080,
-      width: 1920,
-    },
-  },
-  subscribeParams: {
-    subscribeToRoles: [],
-    maxSubsBitRate: 3200,
-  },
-  permissions: {
-    browserRecording: false,
-    changeRole: false,
-    endRoom: false,
-    hlsStreaming: false,
-    mute: false,
-    pollRead: false,
-    pollWrite: false,
-    removeOthers: false,
-    rtmpStreaming: false,
-    unmute: false,
-  },
-};
-
-const DEFAULT_TEST_AUDIO_URL = 'https://100ms.live/test-audio.wav';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private store: Store;
@@ -55,7 +20,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   private deviceManager: DeviceManager;
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
 
-  constructor(private customerUserID?: string) {
+  constructor(private sdk?: HMSSdk) {
     this.store = new Store();
     this.eventBus = new EventBus(false);
     this.deviceManager = new DeviceManager(this.store, this.eventBus, false);
@@ -156,6 +121,41 @@ export class Diagnostics implements HMSDiagnosticsInterface {
 
   getRecordedAudio() {
     return this.recordedAudio;
+  }
+
+  async startConnectivityCheck(userId?: string, region?: string) {
+    if (!this.sdk) {
+      throw new Error('SDK not found');
+    }
+    const connectivityCheck = new ConnectivityCheck(this.sdk);
+    this.sdk.setConnectivityListener(connectivityCheck);
+
+    const authToken = await this.getDiagnosticsAuthToken(region);
+    this.sdk.join({ authToken, userName: 'diagonistic-test' }, connectivityCheck);
+  }
+
+  private async getDiagnosticsAuthToken(region?: string): Promise<string> {
+    const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
+    if (region) {
+      tokenAPIURL.searchParams.append('region', region);
+    }
+    const response = await fetchWithRetry(
+      tokenAPIURL.toString(),
+      { method: 'GET' },
+      [429, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511],
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
+    }
+
+    const { token } = data;
+    if (!token) {
+      throw Error(data.message);
+    }
+    return token;
   }
 
   private async getLocalAudioTrack(inputDevice?: string) {
