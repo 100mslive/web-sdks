@@ -4,9 +4,6 @@ import { HMSSdk } from '../sdk';
 import { HMSPeer } from '../sdk/models/peer';
 
 export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateListener {
-  progressCallback?: (state: ConnectivityState) => void;
-  completionCallback?: (state: ConnectivityCheckResult) => void;
-
   private wsConnected = false;
   private websocketURL?: string;
   private initConnected = false;
@@ -25,7 +22,11 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
   private cleanupTimer?: number;
   private timestamp = Date.now();
 
-  constructor(private sdk: HMSSdk) {}
+  constructor(
+    private sdk: HMSSdk,
+    private progressCallback: (state: ConnectivityState) => void,
+    private completionCallback: (state: ConnectivityCheckResult) => void,
+  ) {}
   onRoomUpdate(): void {}
   onPeerUpdate(): void {}
   onMessageReceived(): void {}

@@ -1,6 +1,6 @@
 import { ConnectivityCheck } from './ConnectivityCheck';
 import { baseRole, DEFAULT_TEST_AUDIO_URL } from './constants';
-import { HMSDiagnosticsInterface } from './interfaces';
+import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
 import { DeviceManager } from '../device-manager';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -123,11 +123,15 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     return this.recordedAudio;
   }
 
-  async startConnectivityCheck(userId?: string, region?: string) {
+  async startConnectivityCheck(
+    progress: (state: ConnectivityState) => void,
+    completed: (result: ConnectivityCheckResult) => void,
+    region?: string,
+  ) {
     if (!this.sdk) {
       throw new Error('SDK not found');
     }
-    const connectivityCheck = new ConnectivityCheck(this.sdk);
+    const connectivityCheck = new ConnectivityCheck(this.sdk, progress, completed);
     this.sdk.setConnectivityListener(connectivityCheck);
 
     const authToken = await this.getDiagnosticsAuthToken(region);

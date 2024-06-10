@@ -29,13 +29,16 @@ export interface HMSDiagnosticsInterface {
   startMicCheck(inputDevice?: string, time?: number): Promise<DeviceCheckReturn>;
   startCameraCheck(inputDevice?: string): Promise<DeviceCheckReturn>;
 
-  startConnectivityCheck(usedId?: string, region?: string): Promise<void>;
+  startConnectivityCheck(
+    progress: (state: ConnectivityState) => void,
+    completed: (result: ConnectivityCheckResult) => void,
+    region?: string,
+  ): Promise<void>;
 }
 
 export interface HMSDiagnosticsListener {
   onAudioTrack(audioTrack: HMSLocalAudioTrack): void;
   onVideoTrack(videoTrack: HMSLocalVideoTrack): void;
-  onConnectivityStateChange(state: ConnectivityState): void;
 }
 
 export interface ConnectivityCheckResult {
