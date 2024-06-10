@@ -43,18 +43,19 @@ export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
       css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer', borderBottom: '1px solid $border_bright', mb: '$8' }}
     >
       {onBack ? (
-        <Text
+        <Flex
+          align="center"
           css={{
-            alignSelf: 'center',
             mr: '$8',
+            color: '$on_surface_high',
           }}
           onClick={onBack}
           data-testid="go_back"
         >
           <ChevronLeftIcon />
-        </Text>
+        </Flex>
       ) : null}
-      <Box css={{ flex: '1 1 0' }}>
+      <Box css={{ flex: '1 1 0', display: 'flex', alignItems: 'center' }}>
         {title ? (
           <Text
             variant="tiny"
