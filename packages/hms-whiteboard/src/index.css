@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+@import url('@tldraw/tldraw/tldraw.css');
+
+.tlui-navigation-zone,
+.tlui-navigation-panel {
+  display: none;
+}
+
+.transparent-canvas {
+  --color-background: rgba(0, 0, 0, 0);
+}
+
+.tl-container {
+  --layer-background: 4; /* 100 */
+  --layer-grid: 5; /* 150 */
+  --layer-canvas: 6; /* 200 */
+  --layer-shapes: 7; /* 300 */
+  --layer-overlays: 8; /* 400 */
+  --layer-following-indicator: 12; /* 1000 */
+
+  --layer-panels: 7;
+  --layer-menus: 8;
+  --layer-overlays: 9;
+  --layer-toasts: 10;
+  --layer-cursor: 11;
+}

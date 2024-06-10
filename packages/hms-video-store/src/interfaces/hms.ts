@@ -8,10 +8,11 @@ import { HMSPlaylistManager, HMSPlaylistSettings } from './playlist';
 import { HMSPreviewListener } from './preview-listener';
 import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
-import { HMSHLS, HMSRecording, HMSRTMP } from './room';
+import { HMSHLS, HMSRecording, HMSRTMP, HMSTranscriptionInfo } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSInteractivityCenter, HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
+import { TranscriptionConfig } from './transcription-config';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
@@ -61,9 +62,12 @@ export interface HMSInterface {
    */
   startHLSStreaming(params?: HLSConfig): Promise<void>;
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+  startTranscription(params: TranscriptionConfig): Promise<void>;
+  stopTranscription(params: TranscriptionConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
   getHLSState(): HMSHLS | undefined;
+  getTranscriptionState(): HMSTranscriptionInfo[] | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
 

@@ -43,6 +43,13 @@ export interface Info {
   type: HMSPeerType;
 }
 
+export interface FindPeerByNameInfo {
+  name: string;
+  peer_id: string;
+  role: string;
+  type: HMSPeerType;
+}
+
 export enum HMSRecordingState {
   NONE = 'none',
   INITIALISED = 'initialised',
@@ -61,6 +68,15 @@ export enum HMSStreamingState {
   FAILED = 'failed',
 }
 
+export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+export enum HMSTranscriptionMode {
+  CAPTION = 'caption',
+}
 interface PluginPermissions {
   permissions?: {
     // list of roles
@@ -70,13 +86,27 @@ interface PluginPermissions {
   };
 }
 
+interface TranscriptionPluginPermissions {
+  permissions?: {
+    // list of roles
+    admin?: Array<string>;
+  };
+  mode: HMSTranscriptionMode;
+}
+
+export enum Plugins {
+  WHITEBOARD = 'whiteboard',
+  TRANSCRIPTIONS = 'transcriptions',
+}
+
 export interface PolicyParams {
   name: string;
   known_roles: {
     [role: string]: HMSRole;
   };
   plugins: {
-    [plugin in 'whiteboard']?: PluginPermissions;
+    [Plugins.WHITEBOARD]?: PluginPermissions;
+    [Plugins.TRANSCRIPTIONS]?: TranscriptionPluginPermissions[];
   };
   template_id: string;
   app_data?: Record<string, string>;
@@ -122,6 +152,17 @@ export interface PeerNotification {
   is_from_room_state?: boolean;
 }
 
+export interface TranscriptionNotification {
+  state?: HMSTranscriptionState;
+  mode?: HMSTranscriptionMode;
+  initialised_at?: number;
+  started_at?: number;
+  updated_at?: number;
+  stopped_at?: number;
+  peer?: PeerNotificationInfo;
+  error?: ServerError;
+}
+
 export interface RoomState {
   name: string;
   session_id?: string;
@@ -153,6 +194,7 @@ export interface RoomState {
     rtmp: { enabled: boolean; started_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
+  transcriptions?: TranscriptionNotification[];
 }
 
 export interface PeerListNotification {
@@ -285,7 +327,11 @@ export enum HLSPlaylistType {
   DVR = 'dvr',
   NO_DVR = 'no-dvr',
 }
-
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
@@ -294,6 +340,7 @@ export interface HLSVariantInfo {
   started_at?: number;
   initialised_at?: number;
   state?: HMSStreamingState;
+  stream_type?: HLSStreamType;
 }
 
 export interface MetadataChangeNotification {

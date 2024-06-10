@@ -139,10 +139,11 @@ export class SDKToHMS {
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom, sdkLocalPeerId?: string): Partial<HMSRoom> {
-    const { recording, rtmp, hls } = SDKToHMS.convertRecordingStreamingState(
-      sdkRoom?.recording,
-      sdkRoom?.rtmp,
-      sdkRoom?.hls,
+    const { recording, rtmp, hls, transcriptions } = SDKToHMS.convertRecordingStreamingState(
+      sdkRoom.recording,
+      sdkRoom.rtmp,
+      sdkRoom.hls,
+      sdkRoom.transcriptions,
     );
     return {
       id: sdkRoom.id,
@@ -151,6 +152,7 @@ export class SDKToHMS {
       recording,
       rtmp,
       hls,
+      transcriptions,
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt,
       joinedAt: sdkRoom.joinedAt,
@@ -276,7 +278,13 @@ export class SDKToHMS {
     recording?: sdkTypes.HMSRecording,
     rtmp?: sdkTypes.HMSRTMP,
     hls?: sdkTypes.HMSHLS,
-  ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
+    transcriptions?: sdkTypes.HMSTranscriptionInfo[],
+  ): {
+    recording: sdkTypes.HMSRecording;
+    rtmp: sdkTypes.HMSRTMP;
+    hls: sdkTypes.HMSHLS;
+    transcriptions: sdkTypes.HMSTranscriptionInfo[];
+  } {
     return {
       recording: {
         browser: {
@@ -295,6 +303,7 @@ export class SDKToHMS {
         running: !!hls?.running,
         error: hls?.error,
       },
+      transcriptions: transcriptions || [],
     };
   }
 }

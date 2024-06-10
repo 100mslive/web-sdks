@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAppData,
   selectEffectsKey,
@@ -19,14 +20,15 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, Flex, Slider, Video } from '../../../index';
+import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
+import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 // @ts-ignore
-import { useUISettings } from '../AppData/useUISettings';
+import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia } from './constants';
 
@@ -46,6 +48,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
+  const isMobile = useMedia(cssConfig.media.md);
+  const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.length
@@ -61,13 +65,15 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       return;
     }
     if (!isPluginAdded) {
+      setLoadingEffects(true);
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
+        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
         vbObject = VBHandler.getVBObject();
         if (isEffectsEnabled && effectsKey) {
           hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
         } else {
+          setLoadingEffects(false);
           if (!role) {
             return;
           }
@@ -89,19 +95,32 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       };
       handleDefaultBackground();
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
+  }, [
+    hmsActions,
+    role,
+    isPluginAdded,
+    isEffectsEnabled,
+    effectsKey,
+    track?.id,
+    background,
+    blurAmount,
+    setLoadingEffects,
+  ]);
 
   useEffect(() => {
     if (!isVideoOn) {
       toggleVB();
     }
-  }, [isVideoOn, toggleVB]);
+    return () => setLoadingEffects(false);
+  }, [isVideoOn, setLoadingEffects, toggleVB]);
+
+  useSidepaneResetOnLayoutUpdate('virtual_background', SIDE_PANE_OPTIONS.VB);
 
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
       <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
-        <Text variant="h6" css={{ color: '$on_surface_high' }}>
-          Virtual Background
+        <Text variant="h6" css={{ color: '$on_surface_high', display: 'flex', alignItems: 'center' }}>
+          Virtual Background {isMobile && loadingEffects ? <Loading size={18} style={{ marginLeft: '0.5rem' }} /> : ''}
         </Text>
         <Box
           css={{ color: '$on_surface_high', '&:hover': { color: '$on_surface_medium' }, cursor: 'pointer' }}

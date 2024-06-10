@@ -1,4 +1,4 @@
-import { HMSHLS, HMSRecording, HMSRoom, HMSRTMP } from '../../interfaces/room';
+import { HMSHLS, HMSRecording, HMSRoom, HMSRTMP, HMSTranscriptionInfo } from '../../interfaces/room';
 
 export default class Room implements HMSRoom {
   id: string;
@@ -14,6 +14,7 @@ export default class Room implements HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
+  transcriptions?: HMSTranscriptionInfo[] = [];
   /**
    * @alpha
    */

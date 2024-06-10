@@ -43,6 +43,7 @@ export interface HMSRoom {
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
+  transcriptions?: HMSTranscriptionInfo[];
 }
 
 export interface HMSRecording {
@@ -102,6 +103,11 @@ export enum HLSPlaylistType {
   NO_DVR = 'no-dvr',
 }
 
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariant {
   url: string;
   playlist_type?: HLSPlaylistType;
@@ -110,4 +116,27 @@ export interface HLSVariant {
   startedAt?: Date;
   initialisedAt?: Date;
   state?: HMSStreamingState;
+  stream_type?: HLSStreamType;
+}
+
+/*
+Transcription related details
+*/
+export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+export enum HMSTranscriptionMode {
+  CAPTION = 'caption',
+}
+export interface HMSTranscriptionInfo {
+  state?: HMSTranscriptionState;
+  mode?: HMSTranscriptionMode;
+  initialised_at?: Date;
+  started_at?: Date;
+  updated_at?: Date;
+  stopped_at?: Date;
+  error?: HMSException;
 }

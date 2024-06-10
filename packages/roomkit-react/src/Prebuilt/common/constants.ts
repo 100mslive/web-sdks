@@ -1,6 +1,5 @@
 import { parsedUserAgent } from '@100mslive/react-sdk';
 
-export const DEFAULT_WAITING_VIEWER_ROLE = 'waiting-room';
 export const QUERY_PARAM_SKIP_PREVIEW = 'skip_preview';
 export const QUERY_PARAM_SKIP_PREVIEW_HEADFUL = 'skip_preview_headful';
 export const QUERY_PARAM_NAME = 'name';
@@ -30,7 +29,6 @@ export const APP_DATA = {
   appConfig: 'appConfig',
   sidePane: 'sidePane',
   hlsStats: 'hlsStats',
-  waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
   hlsStarted: 'hlsStarted',
@@ -47,6 +45,8 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   sheet: 'sheet',
+  caption: 'caption',
+  loadingEffects: 'loadingEffects',
 };
 
 export const UI_SETTINGS = {
@@ -68,6 +68,8 @@ export const SIDE_PANE_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
 
+export type SidePaneOption = (typeof SIDE_PANE_OPTIONS)[keyof typeof SIDE_PANE_OPTIONS];
+
 export const SHEET_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
@@ -84,6 +86,9 @@ export const POLL_VIEWS = {
   RESULTS: 'RESULTS',
 };
 
+export const CAPTION_TOAST = {
+  captionToast: 'captionToast',
+};
 export const SUBSCRIBED_NOTIFICATIONS = {
   PEER_JOINED: 'PEER_JOINED',
   PEER_LEFT: 'PEER_LEFT',
@@ -117,7 +122,6 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
-  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {

@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { HMSPoll } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
 // @ts-ignore
-import { getLastAttemptedIndex } from '../../../common/utils';
+import { getIndexToShow } from '../../../common/utils';
 
-export const TimedView = ({ poll }: { poll: HMSPoll }) => {
-  const localPeerId = useHMSStore(selectLocalPeerID);
-  const lastAttemptedIndex = getLastAttemptedIndex(poll.questions, localPeerId, '');
-  const [currentIndex, setCurrentIndex] = useState(lastAttemptedIndex);
+export const TimedView = ({
+  poll,
+  localPeerResponses,
+  updateSavedResponses,
+}: {
+  poll: HMSPoll;
+  localPeerResponses?: Record<number, number | number[] | undefined>;
+  updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(getIndexToShow(localPeerResponses));
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
-  const attemptedAll = poll.questions?.length === lastAttemptedIndex - 1;
+  const attemptedAll = (poll.questions?.length || 0) < currentIndex;
+
+  // Handles increments so only one question is shown at a time in quiz
+  useEffect(() => {
+    setCurrentIndex(getIndexToShow(localPeerResponses));
+  }, [localPeerResponses]);
 
   if ((!activeQuestion && !attemptedAll) || !poll.questions?.length) {
     return null;
@@ -32,10 +43,10 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
             result={question?.result}
             totalQuestions={poll.questions?.length || 0}
             options={question.options}
-            responses={question.responses}
+            localPeerResponse={localPeerResponses?.[question.index]}
             answer={question.answer}
-            setCurrentIndex={setCurrentIndex}
             rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
+            updateSavedResponses={updateSavedResponses}
           />
         ) : null;
       })}

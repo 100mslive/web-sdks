@@ -59,10 +59,14 @@ export const HMSEvents = {
 
 export const PROTOCOL_VERSION = '2.5';
 
-export const PROTOCOL_SPEC = '20240406';
+export const PROTOCOL_SPEC = '20240521';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
 
 export const DEFAULT_PLAYLIST_VIDEO_BITRATE = 1000;
 
 export const DEFAULT_PLAYLIST_AUDIO_BITRATE = 64;
+
+export const WHITEBOARD_ORIGIN = 'https://whiteboard.100ms.live';
+
+export const WHITEBOARD_QA_ORIGIN = 'https://whiteboard-qa.100ms.live';

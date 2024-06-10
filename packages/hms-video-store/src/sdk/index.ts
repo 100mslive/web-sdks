@@ -48,7 +48,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import { PlaylistManager } from '../internal';
+import { PlaylistManager, TranscriptionConfig } from '../internal';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -59,17 +59,24 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, PeerLeaveRequestNotification, SendMessage } from '../notification-manager';
+import {
+  HMSNotificationMethod,
+  PeerLeaveRequestNotification,
+  PeerNotificationInfo,
+  SendMessage,
+} from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  FindPeerByNameRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
   StartRTMPOrRecordingRequestParams,
+  StartTranscriptionRequestParams,
 } from '../signal/interfaces';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -233,6 +240,10 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
   }
 
   getTemplateAppData() {
@@ -420,6 +431,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
@@ -561,6 +573,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
+        config.iceServers,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
@@ -711,17 +724,56 @@ export class HMSSdk implements HMSInterface {
     let recipientPeer = this.store.getPeerById(peerId);
     if (!recipientPeer) {
       if (isLargeRoom) {
-        const { peers } = await this.transport.signal.findPeers({ peers: [peerId], limit: 1 });
-        if (peers.length === 0) {
+        const peer = await this.transport.signal.getPeer({ peer_id: peerId });
+        if (!peer) {
           throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
         }
-        recipientPeer = createRemotePeer(peers[0], this.store);
+        recipientPeer = createRemotePeer(peer, this.store);
       } else {
         throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
       }
     }
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
+  }
+
+  async getPeer(peerId: string) {
+    const response = await this.transport.signal.getPeer({ peer_id: peerId });
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
+  }
+
+  async findPeerByName({ query, limit = 10, offset }: FindPeerByNameRequestParams) {
+    const {
+      peers,
+      offset: responseOffset,
+      eof,
+    } = await this.transport.signal.findPeerByName({ query: query?.toLowerCase(), limit, offset });
+    if (peers.length > 0) {
+      return {
+        offset: responseOffset,
+        eof,
+        peers: peers.map(peerInfo => {
+          return createRemotePeer(
+            {
+              peer_id: peerInfo.peer_id,
+              role: peerInfo.role,
+              groups: [],
+              info: {
+                name: peerInfo.name,
+                data: '',
+                user_id: '',
+                type: peerInfo.type,
+              },
+            } as PeerNotificationInfo,
+            this.store,
+          );
+        }),
+      };
+    }
+    return { offset: responseOffset, peers: [] };
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
@@ -998,6 +1050,35 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.signal.stopHLSStreaming();
   }
 
+  async startTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start transcriptions',
+      );
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.startTranscription(transcriptionParams);
+  }
+
+  async stopTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop transcriptions',
+      );
+    }
+    if (!params) {
+      throw ErrorFactory.GenericErrors.Signalling(HMSAction.VALIDATION, 'No mode is passed to stop the transcription');
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.stopTranscription(transcriptionParams);
+  }
+
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
     this.validateJoined('sendHLSTimedMetadata');
     if (metadataList.length > 0) {
@@ -1148,6 +1229,7 @@ export class HMSSdk implements HMSInterface {
   private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
     await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+    await this.interactivityCenter.whiteboard.handleLocalRoleUpdate();
   };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {

@@ -52,11 +52,20 @@ export type {
   HMSPollQuestionOption,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
+  HMSTranscriptionInfo,
+  HMSICEServer,
 } from './internal';
 
 export { EventBus } from './events/EventBus';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
-export { HMSPluginUnsupportedTypes, HMSRecordingState, HLSPlaylistType } from './internal';
+export {
+  HMSPluginUnsupportedTypes,
+  HMSRecordingState,
+  HLSPlaylistType,
+  HLSStreamType,
+  HMSTranscriptionMode,
+  HMSTranscriptionState,
+} from './internal';
 export type {
   HMSVideoPlugin,
   HMSAudioPlugin,

@@ -4,6 +4,7 @@ import {
   hasResolutionChanged,
   removeUndefinedFromObject,
   RunningTrackAnalytics,
+  TempStats,
 } from './BaseStatsAnalytics';
 import {
   RemoteAudioSample,
@@ -13,6 +14,7 @@ import {
   SubscribeAnalyticPayload,
 } from './interfaces';
 import { HMSTrackStats } from '../../interfaces';
+import { HMSRemoteVideoTrack } from '../../internal';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { MAX_SAFE_INTEGER, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
@@ -48,16 +50,33 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     const remoteTracksStats = hmsStats.getAllRemoteTracksStats();
     let shouldCreateSample = false;
     Object.keys(remoteTracksStats).forEach(trackID => {
-      const trackStats = remoteTracksStats[trackID];
       const track = this.store.getTrackById(trackID);
-      const calculatedJitterBufferDelay =
-        trackStats.jitterBufferDelay &&
-        trackStats.jitterBufferEmittedCount &&
-        trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount;
+      const trackStats = remoteTracksStats[trackID];
+      const prevTrackStats = this.trackAnalytics.get(trackID)?.getLatestStat();
+
+      // eslint-disable-next-line complexity
+      const getCalculatedJitterBufferDelay = (trackStats: HMSTrackStats, prevTrackStats?: TempStats) => {
+        const prevJBDelay = prevTrackStats?.jitterBufferDelay || 0;
+        const prevJBEmittedCount = prevTrackStats?.jitterBufferEmittedCount || 0;
+        const currentJBDelay = (trackStats?.jitterBufferDelay || 0) - prevJBDelay;
+        const currentJBEmittedCount = (trackStats?.jitterBufferEmittedCount || 0) - prevJBEmittedCount;
+
+        return currentJBEmittedCount > 0
+          ? (currentJBDelay * 1000) / currentJBEmittedCount
+          : prevTrackStats?.calculatedJitterBufferDelay || 0;
+      };
+
+      const calculatedJitterBufferDelay = getCalculatedJitterBufferDelay(trackStats, prevTrackStats);
 
       const avSync = this.calculateAvSyncForStat(trackStats, hmsStats);
+      const newTempStat: TempStats = { ...trackStats, calculatedJitterBufferDelay, avSync };
+      if (trackStats.kind === 'video') {
+        const definition = (track as HMSRemoteVideoTrack).getPreferredLayerDefinition();
+        newTempStat.expectedFrameHeight = definition?.resolution.height;
+        newTempStat.expectedFrameWidth = definition?.resolution.width;
+      }
       if (this.trackAnalytics.has(trackID)) {
-        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
+        this.trackAnalytics.get(trackID)?.pushTempStat(newTempStat);
       } else {
         if (track) {
           const trackAnalytics = new RunningRemoteTrackAnalytics({
@@ -66,7 +85,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
             ssrc: trackStats.ssrc.toString(),
             kind: trackStats.kind,
           });
-          trackAnalytics.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
+          trackAnalytics.pushTempStat(newTempStat);
           this.trackAnalytics.set(trackID, trackAnalytics);
         }
       }
@@ -76,18 +95,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
       }
     });
 
-    // delete track analytics if track is not present in store and no samples are present
-    this.trackAnalytics.forEach(trackAnalytic => {
-      if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
-        this.trackAnalytics.delete(trackAnalytic.track_id);
-      }
-    });
-
-    if (shouldCreateSample) {
-      this.trackAnalytics.forEach(trackAnalytic => {
-        trackAnalytic.createSample();
-      });
-    }
+    this.cleanTrackAnalyticsAndCreateSample(shouldCreateSample);
   }
 
   // eslint-disable-next-line complexity
@@ -142,6 +150,8 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
         avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
         frame_width: this.calculateAverage('frameWidth'),
         frame_height: this.calculateAverage('frameHeight'),
+        expected_frame_width: this.calculateAverage('expectedFrameWidth'),
+        expected_frame_height: this.calculateAverage('expectedFrameHeight'),
         pause_count: this.calculateDifferenceForSample('pauseCount'),
         pause_duration_seconds: this.calculateDifferenceForSample('totalPausesDuration'),
         freeze_count: this.calculateDifferenceForSample('freezeCount'),

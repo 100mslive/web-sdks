@@ -1,5 +1,7 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
+const PostCssPlugin = require('esbuild-plugin-postcss2');
+const autoprefixer = require('autoprefixer');
 
 async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -20,6 +22,9 @@ async function main() {
       '.svg': 'text',
     },
     plugins: [
+      PostCssPlugin.default({
+        plugins: [autoprefixer],
+      }),
       {
         name: 'on-rebuild-plugin',
         setup(build) {

@@ -88,8 +88,7 @@ import {
   selectTracksMap,
   selectVideoTrackByID,
 } from '../selectors';
-
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
+import { FindPeerByNameRequestParams } from '../signal/interfaces';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -602,6 +601,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
+  async getPeer(peerId: string) {
+    const peer = await this.sdk.getPeer(peerId);
+    if (peer) {
+      return SDKToHMS.convertPeer(peer) as HMSPeer;
+    }
+    return undefined;
+  }
+
+  async findPeerByName(options: FindPeerByNameRequestParams) {
+    const { offset, peers, eof } = await this.sdk.findPeerByName(options);
+    return { offset, eof, peers: peers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer) };
+  }
+
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     const iterator = this.sdk.getPeerListIterator(options);
     return {
@@ -693,6 +705,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async stopHLSStreaming(params?: sdkTypes.HLSConfig): Promise<void> {
     await this.sdk.stopHLSStreaming(params);
+  }
+
+  async startTranscription(params: sdkTypes.TranscriptionConfig) {
+    await this.sdk.startTranscription(params);
+  }
+
+  async stopTranscription(params: sdkTypes.TranscriptionConfig): Promise<void> {
+    await this.sdk.stopTranscription(params);
   }
 
   async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
@@ -1002,6 +1022,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
     const hls = this.sdk.getHLSState();
+    const transcriptions = this.sdk.getTranscriptionState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -1029,7 +1050,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls, transcriptions));
       Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
@@ -1081,6 +1102,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
+    if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED) {
+      this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
+    }
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
@@ -1146,6 +1170,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    if (hmsMessage.type === 'hms_transcript') {
+      hmsMessage.ignored = true;
+    }
     this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }

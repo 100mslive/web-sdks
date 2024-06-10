@@ -3,7 +3,15 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPermissionType, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
+import {
+  HMSConfig,
+  HMSFrameworkInfo,
+  HMSPermissionType,
+  HMSPoll,
+  HMSSpeaker,
+  HMSTranscriptionMode,
+  HMSWhiteboard,
+} from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -23,7 +31,7 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { PolicyParams } from '../../notification-manager';
+import { Plugins, PolicyParams } from '../../notification-manager';
 import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
@@ -375,6 +383,10 @@ class Store {
     this.whiteboards.set(whiteboard.id, whiteboard);
   }
 
+  getWhiteboards() {
+    return this.whiteboards;
+  }
+
   getWhiteboard(id?: string): HMSWhiteboard | undefined {
     return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
   }
@@ -416,16 +428,25 @@ class Store {
       role: string,
       pluginName: keyof PolicyParams['plugins'],
       permission: HMSPermissionType,
+      mode?: HMSTranscriptionMode,
     ) => {
       if (!this.knownRoles[role]) {
         HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
         return;
       }
       const rolePermissions = this.knownRoles[role].permissions;
-      if (!rolePermissions[pluginName]) {
-        rolePermissions[pluginName] = [];
+      if (pluginName === Plugins.TRANSCRIPTIONS && mode) {
+        // currently only admin is allowed, so no issue
+        rolePermissions[pluginName] = {
+          ...rolePermissions[pluginName],
+          [mode]: [permission],
+        };
+      } else if (pluginName === Plugins.WHITEBOARD) {
+        if (!rolePermissions[pluginName]) {
+          rolePermissions[pluginName] = [];
+        }
+        rolePermissions[pluginName]?.push(permission);
       }
-      rolePermissions[pluginName]?.push(permission);
     };
 
     Object.keys(plugins).forEach(plugin => {
@@ -433,11 +454,19 @@ class Store {
       if (!plugins[pluginName]) {
         return;
       }
-
-      const permissions = plugins[pluginName].permissions;
-      permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
-      permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
-      permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
+      if (pluginName === Plugins.WHITEBOARD) {
+        const permissions = plugins[pluginName]?.permissions;
+        permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
+        permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
+        permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
+      } else if (pluginName === Plugins.TRANSCRIPTIONS) {
+        const transcriptionPlugins = plugins[pluginName] || [];
+        for (const transcription of transcriptionPlugins) {
+          transcription.permissions?.admin?.forEach(role =>
+            addPermissionToRole(role, pluginName, 'admin', transcription.mode),
+          );
+        }
+      }
     });
   }
   private setEnv() {
