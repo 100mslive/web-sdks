@@ -6,6 +6,7 @@ import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
 export class HMSMediaStreamPluginsManager {
+  private readonly TAG = '[MediaStreamPluginsManager]';
   private analytics: VideoPluginsAnalytics;
   private plugins: Set<HMSMediaStreamPlugin>;
   private room?: Room;
@@ -22,8 +23,11 @@ export class HMSMediaStreamPluginsManager {
         case 'HMSEffectsPlugin':
           if (!this.room?.isEffectsEnabled) {
             const errorMessage = 'Effects Virtual Background is not enabled for this room';
-            console.error(errorMessage);
-            throw Error(errorMessage);
+            if (this.getPlugins().length === 1) {
+              throw Error(errorMessage);
+            } else {
+              HMSLogger.w(this.TAG, errorMessage);
+            }
           }
           break;
         default:
