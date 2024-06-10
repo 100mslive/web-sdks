@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
   HMSRoomState,
+  selectEffectsKey,
   selectFullAppData,
   selectHLSState,
+  selectIsEffectsEnabled,
   selectRoomState,
   selectRTMPState,
   useAVToggle,
@@ -11,6 +13,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { LayoutMode } from '../Settings/LayoutSettings';
+import { VBHandler } from '../VirtualBackground/VBHandler';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
@@ -78,6 +81,20 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
+  const effectsKey = useHMSStore(selectEffectsKey);
+  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+
+  useEffect(() => {
+    const preloadVB = async () => {
+      console.log('ollo running', { effectsKey, isEffectsEnabled });
+      if (effectsKey && isEffectsEnabled) {
+        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
+        await VBHandler.preload();
+        console.log('ollo preloading');
+      }
+    };
+    preloadVB();
+  }, [effectsKey, isEffectsEnabled]);
 
   const defaultMediaURL = useMemo(() => {
     const media = elements?.virtual_background?.background_media || [];

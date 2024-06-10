@@ -15,6 +15,12 @@ export class VBPlugin {
     }
   };
 
+  preload = async () => {
+    if (this.effectsPlugin) {
+      await this.effectsPlugin.preload();
+    }
+  };
+
   getBackground = () => {
     if (this.effectsPlugin) {
       return this.effectsPlugin?.getBackground();

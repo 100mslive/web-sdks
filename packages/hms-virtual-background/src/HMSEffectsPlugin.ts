@@ -42,6 +42,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
+  async preload() {
+    await this.effects.preload();
+  }
+
   getName(): string {
     return 'HMSEffects';
   }

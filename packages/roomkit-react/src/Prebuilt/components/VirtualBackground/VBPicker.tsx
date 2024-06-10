@@ -67,18 +67,15 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     if (!isPluginAdded) {
       setLoadingEffects(true);
       let vbObject = VBHandler.getVBObject();
-      if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
-        vbObject = VBHandler.getVBObject();
-        if (isEffectsEnabled && effectsKey) {
-          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
-        } else {
-          setLoadingEffects(false);
-          if (!role) {
-            return;
-          }
-          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+      vbObject = VBHandler.getVBObject();
+      if (isEffectsEnabled && effectsKey) {
+        hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
+      } else {
+        setLoadingEffects(false);
+        if (!role) {
+          return;
         }
+        hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
       }
       const handleDefaultBackground = async () => {
         switch (background) {
