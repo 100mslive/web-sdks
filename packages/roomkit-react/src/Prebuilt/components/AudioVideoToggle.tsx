@@ -1,13 +1,13 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
+import { match } from 'ts-pattern';
 import {
   DeviceType,
   HMSRoomState,
-  selectIsInPreview,
   selectIsLocalAudioPluginPresent,
+  selectIsNoiseCancellationEnabled,
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
-  selectRoom,
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
@@ -105,7 +105,6 @@ const NoiseCancellation = () => {
   const [active, setActive] = useSetNoiseCancellationEnabled();
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
-  const room = useHMSStore(selectRoom);
 
   useEffect(() => {
     (async () => {
@@ -120,7 +119,7 @@ const NoiseCancellation = () => {
     })();
   }, [actions, active, isPluginAdded]);
 
-  if (!plugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
+  if (!plugin.isSupported() || !localPeerAudioTrackID) {
     return null;
   }
 
@@ -221,25 +220,28 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { screenType } = useRoomLayoutConferencingScreen();
   const [showSettings, setShowSettings] = useState(false);
 
-  const isPreview = useHMSStore(selectIsInPreview);
+  const isNoiseCancellationAllowed = useHMSStore(selectIsNoiseCancellationEnabled);
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
   const isNoiseCancellationEnabled = useIsNoiseCancellationEnabled();
 
   useEffect(() => {
-    (async () => {
-      if (isNoiseCancellationEnabled && !isPluginAdded) {
+    match({ isNoiseCancellationAllowed, isNoiseCancellationEnabled, isPluginAdded })
+      .with({ isNoiseCancellationAllowed: false, isPluginAdded: true }, async () => {
+        await actions.removePluginFromAudioTrack(plugin);
+      })
+      .with({ isNoiseCancellationAllowed: true, isPluginAdded: false, isNoiseCancellationEnabled: true }, async () => {
         await actions.addPluginToAudioTrack(plugin);
-      }
-      if (isNoiseCancellationEnabled && isPluginAdded && isPreview) {
+      })
+      .with({ isNoiseCancellationAllowed: true, isPluginAdded: true, isNoiseCancellationEnabled: true }, () => {
         ToastManager.addToast({
           title: `Noise Reduction Enabled`,
           variant: 'standard',
           duration: 2000,
           icon: <AudioLevelIcon />,
         });
-      }
-    })();
-  }, [actions, isNoiseCancellationEnabled, isPluginAdded, isPreview]);
+      })
+      .otherwise(() => null);
+  }, [actions, isNoiseCancellationEnabled, isPluginAdded, isNoiseCancellationAllowed]);
 
   if (!toggleAudio && !toggleVideo) {
     return null;
@@ -280,7 +282,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
               </Dropdown.Group>
             </>
           )}
-          <NoiseCancellation />
+          {isNoiseCancellationAllowed ? <NoiseCancellation /> : null}
           <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
       ) : null}

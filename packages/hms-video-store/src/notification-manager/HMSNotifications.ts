@@ -77,7 +77,7 @@ export enum HMSTranscriptionState {
 export enum HMSTranscriptionMode {
   CAPTION = 'caption',
 }
-interface PluginPermissions {
+export interface WhiteBoardPluginPermissions {
   permissions?: {
     // list of roles
     admin?: Array<string>;
@@ -86,7 +86,7 @@ interface PluginPermissions {
   };
 }
 
-interface TranscriptionPluginPermissions {
+export interface TranscriptionPluginPermissions {
   permissions?: {
     // list of roles
     admin?: Array<string>;
@@ -94,9 +94,13 @@ interface TranscriptionPluginPermissions {
   mode: HMSTranscriptionMode;
 }
 
+export interface NoiseCancellationPlugin {
+  enabled?: boolean;
+}
 export enum Plugins {
   WHITEBOARD = 'whiteboard',
   TRANSCRIPTIONS = 'transcriptions',
+  NOISE_CANCELLATION = 'noiseCancellation',
 }
 
 export interface PolicyParams {
@@ -105,8 +109,9 @@ export interface PolicyParams {
     [role: string]: HMSRole;
   };
   plugins: {
-    [Plugins.WHITEBOARD]?: PluginPermissions;
+    [Plugins.WHITEBOARD]?: WhiteBoardPluginPermissions;
     [Plugins.TRANSCRIPTIONS]?: TranscriptionPluginPermissions[];
+    [Plugins.NOISE_CANCELLATION]?: NoiseCancellationPlugin;
   };
   template_id: string;
   app_data?: Record<string, string>;
