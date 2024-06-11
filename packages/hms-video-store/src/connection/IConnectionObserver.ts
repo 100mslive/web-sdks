@@ -1,3 +1,8 @@
+export interface RTCIceCandidatePair {
+  local?: RTCIceCandidate;
+  remote?: RTCIceCandidate;
+}
+
 export default interface IConnectionObserver {
   onIceConnectionChange(newState: RTCIceConnectionState): void;
 

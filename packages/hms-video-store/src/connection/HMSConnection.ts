@@ -1,4 +1,4 @@
-import IConnectionObserver from './IConnectionObserver';
+import IConnectionObserver, { RTCIceCandidatePair } from './IConnectionObserver';
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';

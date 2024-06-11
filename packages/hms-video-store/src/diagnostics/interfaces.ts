@@ -1,3 +1,4 @@
+import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
 import { HMSException, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../internal';
 
 interface DeviceCheckReturn {

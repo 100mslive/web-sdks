@@ -1,4 +1,5 @@
 import { ConnectivityCheckResult, ConnectivityState, HMSConnectivityListener } from './interfaces';
+import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
 import { HMSException, HMSTrack, HMSTrackType, HMSTrackUpdate, HMSUpdateListener } from '../internal';
 import { HMSSdk } from '../sdk';
 import { HMSPeer } from '../sdk/models/peer';
