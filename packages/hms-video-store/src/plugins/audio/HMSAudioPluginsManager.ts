@@ -80,6 +80,7 @@ export class HMSAudioPluginsManager {
             throw Error(errorMessage);
           } else {
             HMSLogger.w(this.TAG, errorMessage);
+            return;
           }
         }
         break;
