@@ -5,6 +5,7 @@ import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/
 import { Box, Flex, HMSThemeProvider, Text } from '@100mslive/roomkit-react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
 import { AudioTest } from './AudioTest';
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 
 const DiagnosticsSteps = {
   audio: 'Test Audio',
@@ -99,7 +100,7 @@ DiagnosticsStepsList.propTypes = {
 export const Diagnostics = () => {
   const [activeStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
   return (
-    <HMSRoomProvider>
+    <HMSRoomProvider store={hmsStore} actions={hmsActions} notifications={hmsNotifications} stats={hmsStats}>
       <HMSThemeProvider
         themeType="default"
         theme={{
