@@ -1,41 +1,33 @@
 import { ConnectivityCheck } from './ConnectivityCheck';
 import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole } from './constants';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
-import { DeviceManager } from '../device-manager';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
-import { EventBus } from '../events/EventBus';
+import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSSdk } from '../sdk';
-import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSLocalPeer } from '../sdk/models/peer';
-import { Store } from '../sdk/store';
 import { fetchWithRetry } from '../utils/fetch';
 import { sleep } from '../utils/timer-utils';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
-  private store: Store;
-  private eventBus: EventBus;
-  private deviceManager: DeviceManager;
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
 
-  constructor(private sdk?: HMSSdk) {
-    this.store = new Store();
-    this.eventBus = new EventBus(false);
-    this.deviceManager = new DeviceManager(this.store, this.eventBus, false);
-
+  constructor(private sdk?: HMSSdk, listener?: HMSPreviewListener) {
+    listener && this.sdk?.initStoreAndManagers(listener);
     const localPeer = new HMSLocalPeer({
       name: 'diagnostics-peer',
       role: diagnosticsRole,
       type: HMSPeerType.REGULAR,
     });
 
-    this.store.addPeer(localPeer);
+    this.sdk?.store.addPeer(localPeer);
+    this.sdk?.deviceManager.init();
   }
 
   get localPeer() {
-    return this.store.getLocalPeer();
+    return this.sdk?.store.getLocalPeer();
   }
 
   async startCameraCheck(inputDevice?: string) {
@@ -43,27 +35,16 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('Local peer not found');
     }
 
-    const localTrackManager = new LocalTrackManager(
-      this.store,
-      {
-        onFailure: exception => {
-          throw exception;
-        },
-      },
-      this.deviceManager,
-      this.eventBus,
-    );
-
     this.localPeer.role = {
       ...diagnosticsRole,
       publishParams: { ...diagnosticsRole.publishParams, allowed: ['video'] },
     };
-    this.deviceManager.init();
+    this.sdk?.deviceManager.init(true);
     const settings = new HMSTrackSettingsBuilder()
       .video(new HMSVideoTrackSettingsBuilder().deviceId(inputDevice || 'default').build())
       .build();
-    const tracks = await localTrackManager.getLocalTracks({ audio: false, video: true }, settings);
-    const track = tracks.find(track => track.type === 'video') as HMSLocalVideoTrack;
+    const tracks = await this.sdk?.localTrackManager.getLocalTracks({ audio: false, video: true }, settings);
+    const track = tracks?.find(track => track.type === 'video') as HMSLocalVideoTrack;
 
     if (!track) {
       throw new Error('No video track found');
@@ -84,6 +65,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
 
   async startMicCheck(inputDevice?: string, time = 10000) {
     const track = await this.getLocalAudioTrack(inputDevice);
+    this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
       throw new Error('Local peer not found');
     }
@@ -138,6 +120,9 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk.join({ authToken, userName: 'diagonistic-test' }, connectivityCheck);
   }
 
+  /** @internal */
+  initLocalPeer() {}
+
   private async getAuthToken(region?: string): Promise<string> {
     const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
     if (region) {
@@ -167,26 +152,15 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       return;
     }
 
-    const localTrackManager = new LocalTrackManager(
-      this.store,
-      {
-        onFailure: exception => {
-          throw exception;
-        },
-      },
-      this.deviceManager,
-      this.eventBus,
-    );
-
     this.localPeer.role = {
       ...diagnosticsRole,
       publishParams: { ...diagnosticsRole.publishParams, allowed: ['audio'] },
     };
-    this.deviceManager.init();
+    this.sdk?.deviceManager.init();
     const settings = new HMSTrackSettingsBuilder()
       .audio(new HMSAudioTrackSettingsBuilder().deviceId(inputDevice || 'default').build())
       .build();
-    const tracks = await localTrackManager.getLocalTracks({ audio: true, video: false }, settings);
-    return tracks.find(track => track.type === 'audio') as HMSLocalAudioTrack;
+    const tracks = await this.sdk?.localTrackManager.getLocalTracks({ audio: true, video: false }, settings);
+    return tracks?.find(track => track.type === 'audio') as HMSLocalAudioTrack;
   }
 }
