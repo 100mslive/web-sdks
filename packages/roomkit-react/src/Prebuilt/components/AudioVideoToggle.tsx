@@ -95,9 +95,8 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
 };
 
 const plugin = new HMSKrispPlugin();
-const NoiseCancellation = ({ active, setActive }: { active: boolean; setActive: (value: boolean) => void }) => {
+const NoiseCancellation = ({ enabled, setEnabled }: { enabled: boolean; setEnabled: (value: boolean) => void }) => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  // use conference screen as noise cancellation is enabled and disabled will be synced in backend
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
@@ -106,15 +105,15 @@ const NoiseCancellation = ({ active, setActive }: { active: boolean; setActive: 
   useEffect(() => {
     (async () => {
       setInProgress(true);
-      if (active && !isPluginAdded) {
+      if (enabled && !isPluginAdded) {
         await actions.addPluginToAudioTrack(plugin);
       }
-      if (!active && isPluginAdded) {
+      if (!enabled && isPluginAdded) {
         await actions.removePluginFromAudioTrack(plugin);
       }
       setInProgress(false);
     })();
-  }, [actions, active, isPluginAdded]);
+  }, [actions, enabled, isPluginAdded]);
 
   if (!plugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
     return null;
@@ -132,7 +131,7 @@ const NoiseCancellation = ({ active, setActive }: { active: boolean; setActive: 
         }}
         onClick={e => {
           e.preventDefault();
-          setActive(!active);
+          setEnabled(!enabled);
         }}
       >
         <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
@@ -141,11 +140,11 @@ const NoiseCancellation = ({ active, setActive }: { active: boolean; setActive: 
         </Text>
         <Switch
           id="noise_cancellation"
-          checked={active && isPluginAdded}
+          checked={enabled && isPluginAdded}
           disabled={inProgress}
           onClick={e => e.stopPropagation()}
           onCheckedChange={value => {
-            setActive(value);
+            setEnabled(value);
           }}
         />
       </Dropdown.Item>
@@ -279,7 +278,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
               </Dropdown.Group>
             </>
           )}
-          <NoiseCancellation active={isNoiseCancellationEnabled} setActive={setNoiseCancellationEnabled} />
+          <NoiseCancellation enabled={isNoiseCancellationEnabled} setEnabled={setNoiseCancellationEnabled} />
           <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
       ) : null}

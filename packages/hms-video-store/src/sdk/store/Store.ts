@@ -442,7 +442,7 @@ class Store {
           break;
         }
         case Plugins.NOISE_CANCELLATION: {
-          this.addNoiseCancellationPluginToRole(plugins[pluginName]);
+          this.handleNoiseCancellationPlugin(plugins[pluginName]);
           break;
         }
         default: {
@@ -488,11 +488,11 @@ class Store {
       );
     }
   };
-  private addNoiseCancellationPluginToRole = (plugin?: NoiseCancellationPlugin) => {
+  private handleNoiseCancellationPlugin = (plugin?: NoiseCancellationPlugin) => {
     if (!this.room) {
       return;
     }
-    this.room.isNoiseCancellationEnabled = plugin?.enabled || false;
+    this.room.isNoiseCancellationEnabled = !!plugin?.enabled;
   };
 
   private setEnv() {
