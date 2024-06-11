@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
 import {
   HMSTranscript,
@@ -178,6 +179,8 @@ export const CaptionsViewer = () => {
 
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
+  const nodeRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const timeInterval = setInterval(() => {
       if (!captionQueue) {
@@ -205,30 +208,33 @@ export const CaptionsViewer = () => {
     return null;
   }
   return (
-    <Box
-      css={{
-        position: 'absolute',
-        w: isMobile ? '100%' : '40%',
-        bottom: showCaptionAtTop ? '' : '0',
-        top: showCaptionAtTop ? '0' : '',
-        left: isMobile ? 0 : '50%',
-        transform: isMobile ? '' : 'translateX(-50%)',
-        background: '#000000A3',
-        overflow: 'clip',
-        zIndex: 10,
-        height: 'fit-content',
-        r: '$1',
-        p: '$6',
-        transition: 'bottom 0.3s ease-in-out',
-        '&:empty': { display: 'none' },
-      }}
-    >
-      <Flex direction="column">
-        {dataToShow.map((data: { [key: string]: string }, index: number) => {
-          const key = Object.keys(data)[0];
-          return <TranscriptView key={index} peer_id={key} data={data[key]} />;
-        })}
-      </Flex>
-    </Box>
+    <Draggable bounds="parent" nodeRef={nodeRef} defaultPosition={{ x: isMobile ? 0 : -200, y: 0 }}>
+      <Box
+        ref={nodeRef}
+        css={{
+          position: 'absolute',
+          w: isMobile ? '100%' : '40%',
+          bottom: showCaptionAtTop ? '' : '0',
+          top: showCaptionAtTop ? '0' : '',
+          left: isMobile ? 0 : '50%',
+          transform: isMobile ? '' : 'translateX(-50%)',
+          background: '#000000A3',
+          overflow: 'clip',
+          zIndex: 10,
+          height: 'fit-content',
+          r: '$1',
+          p: '$6',
+          transition: 'bottom 0.3s ease-in-out',
+          '&:empty': { display: 'none' },
+        }}
+      >
+        <Flex direction="column">
+          {dataToShow.map((data: { [key: string]: string }, index: number) => {
+            const key = Object.keys(data)[0];
+            return <TranscriptView key={index} peer_id={key} data={data[key]} />;
+          })}
+        </Flex>
+      </Box>
+    </Draggable>
   );
 };
