@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
 import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../Layout';
@@ -39,10 +38,6 @@ const Container = ({ children }: { children: React.ReactNode }) => (
   </Box>
 );
 
-Container.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
   let TestComponent;
   if (activeStep === 'audio') {
@@ -51,10 +46,6 @@ const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
     TestComponent = VideoTest;
   }
   return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
-};
-
-DiagnosticsStepTest.propTypes = {
-  activeStep: PropTypes.string.isRequired,
 };
 
 const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
@@ -66,10 +57,6 @@ const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
   );
 };
 
-DiagnosticsStepHeader.propTypes = {
-  activeStep: PropTypes.string.isRequired,
-};
-
 const DiagnosticsStep = ({ activeStep }: { activeStep: string }) => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1' }}>
@@ -77,10 +64,6 @@ const DiagnosticsStep = ({ activeStep }: { activeStep: string }) => {
       <DiagnosticsStepTest activeStep={activeStep} />
     </Box>
   );
-};
-
-DiagnosticsStep.propTypes = {
-  activeStep: PropTypes.string.isRequired,
 };
 
 const DiagnosticsStepsList = ({
@@ -110,11 +93,6 @@ const DiagnosticsStepsList = ({
   );
 };
 
-DiagnosticsStepsList.propTypes = {
-  activeStep: PropTypes.string.isRequired,
-  setActiveStep: PropTypes.func.isRequired,
-};
-
 export const Diagnostics = () => {
   const [activeStep, setActiveStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
   return (
@@ -123,7 +101,7 @@ export const Diagnostics = () => {
         <Container>
           <Text variant="h4">Pre-call Test</Text>
           <Text variant="md" css={{ c: '$on_primary_medium' }}>
-            {`Make sure your devices and network are good to go, let's get started.`}
+            Make sure your devices and network are good to go, let's get started.
           </Text>
           <Flex css={{ direction: 'column', gap: '$14', mt: '$12', justifyItems: 'center' }}>
             <DiagnosticsStepsList activeStep={activeStep} setActiveStep={setActiveStep} />
