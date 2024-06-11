@@ -492,7 +492,8 @@ class Store {
     if (!this.room) {
       return;
     }
-    this.room.isNoiseCancellationEnabled = !!plugin?.enabled;
+    // it will be called again after internalConnect room initialization, even after network disconnection
+    this.room.isNoiseCancellationEnabled = !!plugin?.enabled && !!this.room.isNoiseCancellationEnabled;
   };
 
   private setEnv() {

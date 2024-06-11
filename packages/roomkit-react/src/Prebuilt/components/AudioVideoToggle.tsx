@@ -37,6 +37,8 @@ import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
+import { useIsNoiseCancellationEnabled, useSetNoiseCancellationEnabled } from './AppData/useUISettings';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
 import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
@@ -95,8 +97,9 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
 };
 
 const plugin = new HMSKrispPlugin();
-const NoiseCancellation = ({ enabled, setEnabled }: { enabled: boolean; setEnabled: (value: boolean) => void }) => {
+const NoiseCancellation = () => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  const [enabled, setEnabled] = useSetNoiseCancellationEnabled();
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
@@ -213,16 +216,11 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const hasAudioDevices = Number(audioInput?.length) > 0;
   const hasVideoDevices = Number(videoInput?.length) > 0;
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype && Number(audioOutput?.length) > 0;
-  const { screenType, elements } = useRoomLayoutConferencingScreen();
+  const { screenType } = useRoomLayoutConferencingScreen();
   const [showSettings, setShowSettings] = useState(false);
-  const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useState(false);
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
+  const isNoiseCancellationEnabled = useIsNoiseCancellationEnabled();
 
-  useEffect(() => {
-    if (elements.noise_cancellation?.enabled_by_default) {
-      setNoiseCancellationEnabled(true);
-    }
-  }, [elements.noise_cancellation?.enabled_by_default, setNoiseCancellationEnabled]);
   useEffect(() => {
     (async () => {
       if (isNoiseCancellationEnabled && !isPluginAdded) {
@@ -278,7 +276,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
               </Dropdown.Group>
             </>
           )}
-          <NoiseCancellation enabled={isNoiseCancellationEnabled} setEnabled={setNoiseCancellationEnabled} />
+          <NoiseCancellation />
           <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
       ) : null}

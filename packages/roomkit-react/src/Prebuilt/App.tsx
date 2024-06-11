@@ -39,7 +39,7 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
-import { useIsNotificationDisabled } from './components/AppData/useUISettings';
+import { useIsNotificationDisabled, useSetNoiseCancellationEnabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
   useRoomLayoutLeaveScreen,
@@ -248,10 +248,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
 const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { isPreviewScreenEnabled, elements } = useRoomLayoutPreviewScreen();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const [, setNoiseCancellationEnabled] = useSetNoiseCancellationEnabled();
   useAutoStartStreaming();
-
+  useEffect(() => {
+    if (elements?.noise_cancellation?.enabled_by_default) {
+      setNoiseCancellationEnabled(true);
+    }
+  }, [elements?.noise_cancellation?.enabled_by_default, setNoiseCancellationEnabled]);
   return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
     .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
     .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)

@@ -68,6 +68,7 @@ const initialAppData = {
   },
   // by default on because of on demand now, for beam disabled
   [APP_DATA.caption]: false,
+  [APP_DATA.noiseCancellation]: false,
 };
 
 export const AppData = React.memo(() => {
