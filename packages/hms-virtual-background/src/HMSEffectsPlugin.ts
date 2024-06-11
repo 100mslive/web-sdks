@@ -1,5 +1,5 @@
 import { tsvb } from 'effects-sdk';
-import { HMSMediaStreamPlugin } from '@100mslive/hms-video-store';
+import { HMSMediaStreamPlugin, parsedUserAgent } from '@100mslive/hms-video-store';
 import { EFFECTS_SDK_ASSETS } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
@@ -35,7 +35,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
     this.effects.cache();
     // mweb optimisation
-    if (window.screen.width < 768) {
+    if (parsedUserAgent.getDevice().type === 'mobile') {
       this.effects.enableFrameSkipping();
     }
     this.effects.setBackgroundFitMode('fill');
