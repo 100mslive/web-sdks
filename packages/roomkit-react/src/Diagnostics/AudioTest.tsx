@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { DeviceCheckReturn, selectLocalMediaSettings } from '@100mslive/hms-video-store';
+import { DeviceCheckReturn, selectLocalMediaSettings, selectTrackAudioByID } from '@100mslive/hms-video-store';
 import { selectDevices, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon } from '@100mslive/react-icons';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
+import { Progress } from '../Progress';
 import { Text } from '../Text';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
@@ -16,8 +17,9 @@ const MicTest = () => {
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
   const { audioInputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId);
+  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || 'default');
   const [checkResult, setCheckResult] = useState<DeviceCheckReturn>();
+  const audioLevel = useHMSStore(selectTrackAudioByID(checkResult?.track?.trackId || ''));
 
   return (
     <Box css={{ w: '50%' }}>
@@ -31,21 +33,38 @@ const MicTest = () => {
           checkResult?.stop();
         }}
       />
-      <Button
-        onClick={() =>
-          hmsDiagnostics
-            .startMicCheck(selectedMic, () => {
-              setIsRecording(false);
-            })
-            .then(result => {
-              setCheckResult(result);
-              setIsRecording(true);
-            })
-        }
-        disabled={isRecording}
-      >
-        {isRecording ? 'Recording...' : 'Record'}
-      </Button>
+      <Flex css={{ gap: '$6', alignItems: 'center' }}>
+        <Button
+          onClick={() =>
+            hmsDiagnostics
+              .startMicCheck(selectedMic, () => {
+                setIsRecording(false);
+              })
+              .then(result => {
+                setCheckResult(result);
+                setIsRecording(true);
+              })
+          }
+          disabled={isRecording}
+        >
+          {isRecording ? 'Recording...' : 'Record'}
+        </Button>
+        {isRecording && (
+          <>
+            <Text>
+              <MicOnIcon />
+            </Text>
+            <Progress.Root value={audioLevel} css={{ h: '$2' }}>
+              <Progress.Content
+                style={{
+                  transform: `translateX(-${100 - audioLevel}%)`,
+                  transition: 'transform 0.3s',
+                }}
+              />
+            </Progress.Root>
+          </>
+        )}
+      </Flex>
     </Box>
   );
 };

@@ -75,6 +75,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
 
     this.localPeer.audioTrack = track;
+    this.sdk?.initPreviewTrackAudioLevelMonitor();
     this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
 
     const mediaRecorder = new MediaRecorder(track.stream.nativeStream);

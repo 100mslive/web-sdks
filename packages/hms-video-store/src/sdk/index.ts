@@ -1287,7 +1287,8 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.cleanup();
   }
 
-  private initPreviewTrackAudioLevelMonitor() {
+  /** @internal */
+  initPreviewTrackAudioLevelMonitor() {
     const localAudioTrack = this.localPeer?.audioTrack;
     localAudioTrack?.initAudioLevelMonitor();
     this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {

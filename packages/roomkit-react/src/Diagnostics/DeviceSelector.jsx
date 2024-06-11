@@ -9,7 +9,7 @@ export const DeviceSelector = ({ title, devices, selection, onChange, icon, chil
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   return (
-    <Box css={{ mb: '$10' }}>
+    <Box css={{ mb: '$6' }}>
       <Text css={{ mb: '$4' }}>{title}</Text>
       <Flex
         align="center"

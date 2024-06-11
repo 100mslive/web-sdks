@@ -800,8 +800,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       await this.beamSpeakerLabelsLogger.start();
     }
   }
+
   initDiagnostics() {
-    return new Diagnostics(this.sdk, {
+    const diagnostics = new Diagnostics(this.sdk, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
       onReconnected: this.onReconnected.bind(this),
@@ -811,6 +812,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
     });
+    this.sdk.addAudioListener({
+      onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    return diagnostics;
   }
 
   private resetState(reason = 'resetState') {
