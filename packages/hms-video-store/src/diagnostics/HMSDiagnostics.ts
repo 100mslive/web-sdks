@@ -1,5 +1,5 @@
 import { ConnectivityCheck } from './ConnectivityCheck';
-import { baseRole, DEFAULT_TEST_AUDIO_URL } from './constants';
+import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole } from './constants';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
 import { DeviceManager } from '../device-manager';
 import { ErrorFactory } from '../error/ErrorFactory';
@@ -27,7 +27,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
 
     const localPeer = new HMSLocalPeer({
       name: 'diagnostics-peer',
-      role: baseRole,
+      role: diagnosticsRole,
       type: HMSPeerType.REGULAR,
     });
 
@@ -55,8 +55,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     );
 
     this.localPeer.role = {
-      ...baseRole,
-      publishParams: { ...baseRole.publishParams, allowed: ['video'] },
+      ...diagnosticsRole,
+      publishParams: { ...diagnosticsRole.publishParams, allowed: ['video'] },
     };
     this.deviceManager.init();
     const settings = new HMSTrackSettingsBuilder()
@@ -134,11 +134,11 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     const connectivityCheck = new ConnectivityCheck(this.sdk, progress, completed);
     this.sdk.setConnectivityListener(connectivityCheck);
 
-    const authToken = await this.getDiagnosticsAuthToken(region);
+    const authToken = await this.getAuthToken(region);
     this.sdk.join({ authToken, userName: 'diagonistic-test' }, connectivityCheck);
   }
 
-  private async getDiagnosticsAuthToken(region?: string): Promise<string> {
+  private async getAuthToken(region?: string): Promise<string> {
     const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
     if (region) {
       tokenAPIURL.searchParams.append('region', region);
@@ -179,8 +179,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     );
 
     this.localPeer.role = {
-      ...baseRole,
-      publishParams: { ...baseRole.publishParams, allowed: ['audio'] },
+      ...diagnosticsRole,
+      publishParams: { ...diagnosticsRole.publishParams, allowed: ['audio'] },
     };
     this.deviceManager.init();
     const settings = new HMSTrackSettingsBuilder()

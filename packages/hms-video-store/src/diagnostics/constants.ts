@@ -1,6 +1,6 @@
 import { HMSRole } from '../internal';
 
-export const baseRole: HMSRole = {
+export const diagnosticsRole: HMSRole = {
   name: 'diagnostics-role',
   priority: 1,
   publishParams: {
