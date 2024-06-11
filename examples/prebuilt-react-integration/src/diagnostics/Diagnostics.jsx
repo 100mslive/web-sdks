@@ -20,10 +20,6 @@ const DiagnosticsStepIcon = {
   connectivity: <ConnectivityIcon width="2rem" height="2rem" />,
 };
 
-const BulletSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-<circle cx="7.99984" cy="8" r="5.33333" fill="#C2D0E5" fill-opacity="0.5"/>
-</svg>`;
-
 const Container = ({ children }) => (
   <Box
     css={{
@@ -44,21 +40,15 @@ Container.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-const DiagnosticsStepsList = ({ activeStep }) => {
-  return (
-    <ul style={{ listStyleImage: `url(${BulletSvg})`, marginRight: '3.5rem' }}>
-      {Object.keys(DiagnosticsSteps).map(key => (
-        <li key={key}>
-          <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
-            {DiagnosticsSteps[key]}
-          </Text>
-        </li>
-      ))}
-    </ul>
-  );
+const DiagnosticsStepTest = ({ activeStep }) => {
+  let TestComponent;
+  if (activeStep === 'audio') {
+    TestComponent = AudioTest;
+  }
+  return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
 };
 
-DiagnosticsStepsList.propTypes = {
+DiagnosticsStepTest.propTypes = {
   activeStep: PropTypes.string.isRequired,
 };
 
@@ -75,18 +65,6 @@ DiagnosticsStepHeader.propTypes = {
   activeStep: PropTypes.string.isRequired,
 };
 
-const DiagnosticsStepTest = ({ activeStep }) => {
-  let TestComponent;
-  if (activeStep === 'audio') {
-    TestComponent = AudioTest;
-  }
-  return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
-};
-
-DiagnosticsStepTest.propTypes = {
-  activeStep: PropTypes.string.isRequired,
-};
-
 const DiagnosticsStep = ({ activeStep }) => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1' }}>
@@ -97,6 +75,24 @@ const DiagnosticsStep = ({ activeStep }) => {
 };
 
 DiagnosticsStep.propTypes = {
+  activeStep: PropTypes.string.isRequired,
+};
+
+const DiagnosticsStepsList = ({ activeStep }) => {
+  return (
+    <ul style={{ width: '25%', marginRight: '3.5rem' }}>
+      {Object.keys(DiagnosticsSteps).map(key => (
+        <li key={key}>
+          <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
+            {DiagnosticsSteps[key]}
+          </Text>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+DiagnosticsStepsList.propTypes = {
   activeStep: PropTypes.string.isRequired,
 };
 
