@@ -39,7 +39,6 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       ...diagnosticsRole,
       publishParams: { ...diagnosticsRole.publishParams, allowed: ['video'] },
     };
-    this.sdk?.deviceManager.init(true);
     const settings = new HMSTrackSettingsBuilder()
       .video(new HMSVideoTrackSettingsBuilder().deviceId(inputDevice || 'default').build())
       .build();
@@ -50,6 +49,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('No video track found');
     }
 
+    this.sdk?.deviceManager.init(true);
     this.localPeer.videoTrack = track;
     this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
 
