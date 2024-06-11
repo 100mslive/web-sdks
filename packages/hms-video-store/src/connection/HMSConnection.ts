@@ -124,6 +124,7 @@ export default abstract class HMSConnection {
           const iceTransport = transmitter.transport.iceTransport;
 
           const handleSelectedCandidate = () => {
+            // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
               // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
@@ -139,7 +140,9 @@ export default abstract class HMSConnection {
             }
           };
 
+          // @ts-expect-error
           if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
+            // @ts-expect-error
             iceTransport.onselectedcandidatepairchange = handleSelectedCandidate;
           }
           handleSelectedCandidate();
