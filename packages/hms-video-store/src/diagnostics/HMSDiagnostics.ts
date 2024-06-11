@@ -4,7 +4,7 @@ import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } f
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType } from '../internal';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType, HMSPeerUpdate } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSSdk } from '../sdk';
 import { HMSLocalPeer } from '../sdk/models/peer';
@@ -51,6 +51,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
 
     this.localPeer.videoTrack = track;
+    this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
 
     return {
       track,
@@ -74,6 +75,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
 
     this.localPeer.audioTrack = track;
+    this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
 
     const mediaRecorder = new MediaRecorder(track.stream.nativeStream);
     const chunks: Blob[] = [];
