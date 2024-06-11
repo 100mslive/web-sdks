@@ -1,30 +1,29 @@
-import React, { Fragment } from 'react';
-import {
-  DeviceType,
-  selectIsLocalVideoEnabled,
-  selectLocalVideoTrackID,
-  selectVideoTrackByID,
-  useDevices,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import React, { useEffect, useState } from 'react';
+import { selectDevices, selectLocalMediaSettings, useHMSStore } from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
+import { Flex } from '../Layout';
+import { Text } from '../Text';
 import { Video } from '../Video';
 import { StyledVideoTile } from '../VideoTile';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
+import { hmsDiagnostics } from './hms';
 
 export const VideoTest = () => {
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+  const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
-  const videoTrackId = useHMSStore(selectLocalVideoTrackID);
+  const [trackId, setTrackId] = useState<string>();
+  const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
 
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-  const trackSelector = selectVideoTrackByID(videoTrackId);
-  const track = useHMSStore(trackSelector);
-
+  useEffect(() => {
+    (async () => {
+      const { track } = await hmsDiagnostics.startCameraCheck();
+      setTrackId(track.trackId);
+    })();
+  }, []);
   return (
-    <Fragment>
-      {isVideoOn && (
+    <Flex>
+      {trackId && (
         <StyledVideoTile.Container
           css={{
             w: '90%',
@@ -34,21 +33,25 @@ export const VideoTest = () => {
             m: '$10 auto',
           }}
         >
-          <Video trackId={videoTrackId} mirror={track?.facingMode !== 'environment'} />
+          <Video trackId={trackId} />
         </StyledVideoTile.Container>
       )}
-      <DeviceSelector
-        title="Video"
-        devices={videoInput || []}
-        icon={<VideoOnIcon />}
-        selection={selectedDeviceIDs.videoInput}
-        onChange={(deviceId: string) =>
-          updateDevice({
-            deviceId,
-            deviceType: DeviceType.videoInput,
-          })
-        }
-      />
-    </Fragment>
+      <Flex direction="column">
+        <Text variant="md">
+          Move in front of your camera to make sure it's working. If you don't see your video, try changing the selected
+          camera. If the camera isn't part of your computer, check your settings to make sure your system recognizes it.
+        </Text>
+        <DeviceSelector
+          title="Video"
+          devices={videoInput || []}
+          icon={<VideoOnIcon />}
+          selection={sdkSelectedDevices.videoInputDeviceId}
+          onChange={async (deviceId: string) => {
+            const { track } = await hmsDiagnostics.startCameraCheck(deviceId);
+            setTrackId(track.trackId);
+          }}
+        />
+      </Flex>
+    </Flex>
   );
 };
