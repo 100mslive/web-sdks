@@ -33,6 +33,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
     });
+    this.effects.onReady = () => {
+      if (this.effects) {
+        this.initialised = true;
+        this.onInit?.();
+        this.effects.run();
+      }
+    };
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // currently logging info type messages as well
@@ -138,20 +145,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
-    this.effects.onReady = () => {
-      if (this.effects) {
-        this.initialised = true;
-        this.onInit?.();
-        this.effects.run();
-        this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset(this.preset);
-        if (this.blurAmount) {
-          this.setBlur(this.blurAmount);
-        } else if (this.background) {
-          this.setBackground(this.background);
-        }
-      }
-    };
+    this.effects.setBackgroundFitMode('fill');
+    this.effects.setSegmentationPreset(this.preset);
+    if (this.blurAmount) {
+      this.setBlur(this.blurAmount);
+    } else if (this.background) {
+      this.setBackground(this.background);
+    }
     this.effects.clear();
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);
