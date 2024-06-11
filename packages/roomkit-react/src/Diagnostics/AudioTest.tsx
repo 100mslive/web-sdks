@@ -1,7 +1,10 @@
-import { Box, Button, Text } from '@100mslive/roomkit-react';
+import React from 'react';
+import { Button } from '../Button';
+import { Box } from '../Layout';
+import { Text } from '../Text';
 import { hmsDiagnostics } from './hms';
 
-export const VideoTest = () => {
+export const AudioTest = () => {
   return (
     <Box>
       <Text variant="body2" css={{ c: '$on_primary_medium' }}>

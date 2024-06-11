@@ -38,3 +38,4 @@ export * from './Prebuilt';
 export * from './Progress';
 export * from './context/DialogContext';
 export * from './TextArea';
+export * from './Diagnostics';
