@@ -1,10 +1,14 @@
 import { HMSPrebuilt } from '@100mslive/roomkit-react';
 import { getRoomCodeFromUrl } from './utils';
+import { Diagnostics } from './diagnostics';
 
 export default function App() {
   const roomCode = getRoomCodeFromUrl();
+  const isDiagnostics = location.pathname.includes('diagnostics');
 
-  return (
-    <HMSPrebuilt roomCode={roomCode} />
-  );
+  if (isDiagnostics) {
+    return <Diagnostics />;
+  }
+
+  return <HMSPrebuilt roomCode={roomCode} />;
 }
