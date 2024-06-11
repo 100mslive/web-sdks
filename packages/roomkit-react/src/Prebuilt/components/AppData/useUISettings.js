@@ -201,3 +201,13 @@ export const usePollViewState = () => {
     view: pollState?.view,
   };
 };
+
+export const useIsNoiseCancellationEnabled = () => {
+  const IsNoiseCancellationEnabled = useHMSStore(selectAppDataByPath(APP_DATA.noiseCancellation));
+  return IsNoiseCancellationEnabled;
+};
+
+export const useSetNoiseCancellationEnabled = () => {
+  const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
+  return [isNoiseCancellationEnabled, setNoiseCancellationEnabled];
+};

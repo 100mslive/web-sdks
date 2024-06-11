@@ -31,7 +31,13 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { Plugins, PolicyParams } from '../../notification-manager';
+import {
+  NoiseCancellationPlugin,
+  Plugins,
+  PolicyParams,
+  TranscriptionPluginPermissions,
+  WhiteBoardPluginPermissions,
+} from '../../notification-manager';
 import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
@@ -424,51 +430,72 @@ class Store {
       return;
     }
 
-    const addPermissionToRole = (
-      role: string,
-      pluginName: keyof PolicyParams['plugins'],
-      permission: HMSPermissionType,
-      mode?: HMSTranscriptionMode,
-    ) => {
-      if (!this.knownRoles[role]) {
-        HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
-        return;
-      }
-      const rolePermissions = this.knownRoles[role].permissions;
-      if (pluginName === Plugins.TRANSCRIPTIONS && mode) {
-        // currently only admin is allowed, so no issue
-        rolePermissions[pluginName] = {
-          ...rolePermissions[pluginName],
-          [mode]: [permission],
-        };
-      } else if (pluginName === Plugins.WHITEBOARD) {
-        if (!rolePermissions[pluginName]) {
-          rolePermissions[pluginName] = [];
-        }
-        rolePermissions[pluginName]?.push(permission);
-      }
-    };
-
     Object.keys(plugins).forEach(plugin => {
       const pluginName = plugin as keyof PolicyParams['plugins'];
-      if (!plugins[pluginName]) {
-        return;
-      }
-      if (pluginName === Plugins.WHITEBOARD) {
-        const permissions = plugins[pluginName]?.permissions;
-        permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
-        permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
-        permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
-      } else if (pluginName === Plugins.TRANSCRIPTIONS) {
-        const transcriptionPlugins = plugins[pluginName] || [];
-        for (const transcription of transcriptionPlugins) {
-          transcription.permissions?.admin?.forEach(role =>
-            addPermissionToRole(role, pluginName, 'admin', transcription.mode),
-          );
+      switch (pluginName) {
+        case Plugins.WHITEBOARD: {
+          this.addWhiteboardPluginToRole(plugins[pluginName]);
+          break;
+        }
+        case Plugins.TRANSCRIPTIONS: {
+          this.addTranscriptionsPluginToRole(plugins[pluginName]);
+          break;
+        }
+        case Plugins.NOISE_CANCELLATION: {
+          this.handleNoiseCancellationPlugin(plugins[pluginName]);
+          break;
+        }
+        default: {
+          break;
         }
       }
     });
   }
+  private addPermissionToRole = (
+    role: string,
+    pluginName: keyof PolicyParams['plugins'],
+    permission: HMSPermissionType,
+    mode?: HMSTranscriptionMode,
+  ) => {
+    if (!this.knownRoles[role]) {
+      HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
+      return;
+    }
+    const rolePermissions = this.knownRoles[role].permissions;
+    if (pluginName === Plugins.TRANSCRIPTIONS && mode) {
+      // currently only admin is allowed, so no issue
+      rolePermissions[pluginName] = {
+        ...rolePermissions[pluginName],
+        [mode]: [permission],
+      };
+    } else if (pluginName === Plugins.WHITEBOARD) {
+      if (!rolePermissions[pluginName]) {
+        rolePermissions[pluginName] = [];
+      }
+      rolePermissions[pluginName]?.push(permission);
+    }
+  };
+  private addWhiteboardPluginToRole = (plugin?: WhiteBoardPluginPermissions) => {
+    const permissions = plugin?.permissions;
+    permissions?.admin?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'admin'));
+    permissions?.reader?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'read'));
+    permissions?.writer?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'write'));
+  };
+  private addTranscriptionsPluginToRole = (plugin: TranscriptionPluginPermissions[] = []) => {
+    for (const transcription of plugin) {
+      transcription.permissions?.admin?.forEach(role =>
+        this.addPermissionToRole(role, Plugins.TRANSCRIPTIONS, 'admin', transcription.mode),
+      );
+    }
+  };
+  private handleNoiseCancellationPlugin = (plugin?: NoiseCancellationPlugin) => {
+    if (!this.room) {
+      return;
+    }
+    // it will be called again after internalConnect room initialization, even after network disconnection
+    this.room.isNoiseCancellationEnabled = !!plugin?.enabled && !!this.room.isNoiseCancellationEnabled;
+  };
+
   private setEnv() {
     const endPoint = this.config?.initEndpoint!;
     const url = endPoint.split('https://')[1];
