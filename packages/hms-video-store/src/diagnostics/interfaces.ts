@@ -27,7 +27,7 @@ export interface HMSConnectivityListener {
 }
 
 export interface HMSDiagnosticsInterface {
-  startMicCheck(inputDevice?: string, time?: number): Promise<DeviceCheckReturn>;
+  startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<DeviceCheckReturn>;
   getRecordedAudio(): string | undefined;
   startCameraCheck(inputDevice?: string): Promise<DeviceCheckReturn>;
 

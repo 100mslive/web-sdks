@@ -64,7 +64,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     };
   }
 
-  async startMicCheck(inputDevice?: string, time = 10000) {
+  async startMicCheck(inputDevice?: string, onStop?: () => void, time = 10000) {
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
@@ -95,6 +95,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       if (this.localPeer) {
         this.localPeer.audioTrack = undefined;
       }
+      onStop?.();
     };
 
     mediaRecorder.start();

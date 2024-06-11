@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { DeviceCheckReturn } from '@100mslive/hms-video-store';
-import { selectDevices, useHMSStore } from '@100mslive/react-sdk';
+import { DeviceCheckReturn, selectLocalMediaSettings } from '@100mslive/hms-video-store';
+import { selectDevices, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon } from '@100mslive/react-icons';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
@@ -15,8 +15,8 @@ import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 const MicTest = () => {
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedMic, setSelectedMic] = useState(devices.audioInput[0]?.deviceId);
-
+  const { audioInputDeviceId } = useHMSStore(selectLocalMediaSettings);
+  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId);
   const [checkResult, setCheckResult] = useState<DeviceCheckReturn>();
 
   return (
@@ -27,20 +27,22 @@ const MicTest = () => {
         selection={selectedMic}
         icon={<MicOnIcon />}
         onChange={(deviceId: string) => {
-          checkResult?.stop();
           setSelectedMic(deviceId);
+          checkResult?.stop();
         }}
       />
       <Button
         onClick={() =>
-          hmsDiagnostics.startMicCheck(selectedMic).then(result => {
-            setCheckResult(result);
-            result.track.nativeTrack.onended = () => {
+          hmsDiagnostics
+            .startMicCheck(selectedMic, () => {
               setIsRecording(false);
-            };
-            setIsRecording(true);
-          })
+            })
+            .then(result => {
+              setCheckResult(result);
+              setIsRecording(true);
+            })
         }
+        disabled={isRecording}
       >
         {isRecording ? 'Recording...' : 'Record'}
       </Button>
@@ -49,19 +51,20 @@ const MicTest = () => {
 };
 
 const SpeakerTest = () => {
+  const actions = useHMSActions();
   const devices = useHMSStore(selectDevices);
-  const [selectedSpeaker, setSelectedSpeaker] = useState(devices.audioOutput[0]?.deviceId);
-  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: selectedSpeaker });
+  const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
+  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: audioOutputDeviceId || 'default' });
 
   return (
     <Box css={{ w: '50%' }}>
       <DeviceSelector
         title="Speaker(output)"
         devices={devices.audioOutput}
-        selection={selectedSpeaker}
+        selection={audioOutputDeviceId}
         icon={<SpeakerIcon />}
         onChange={(deviceId: string) => {
-          setSelectedSpeaker(deviceId);
+          actions.setAudioOutputDevice(deviceId);
         }}
       />
       <Button
