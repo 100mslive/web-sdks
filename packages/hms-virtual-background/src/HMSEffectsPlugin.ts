@@ -33,12 +33,19 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
     });
-    this.effects.onReady = async () => {
+    this.effects.cache();
+    // mweb optimisation
+    if (window.screen.width < 768) {
+      this.effects.enableFrameSkipping();
+    }
+    this.effects.setBackgroundFitMode('fill');
+    this.effects.setSegmentationPreset(this.preset);
+
+    this.effects.onReady = () => {
       if (this.effects) {
         this.initialised = true;
         this.onInit?.();
         this.effects.run();
-        await this.effects.cache();
       }
     };
     this.canvas = document.createElement('canvas');
@@ -146,12 +153,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
-    // mweb optimisation
-    if (window.screen.width < 768) {
-      this.effects.enableFrameSkipping();
-    }
-    this.effects.setBackgroundFitMode('fill');
-    this.effects.setSegmentationPreset(this.preset);
     if (this.blurAmount) {
       this.setBlur(this.blurAmount);
     } else if (this.background) {
