@@ -32,3 +32,11 @@ export const POLL_NOTIFICATION_TYPES: PollNotificationMap = {
   [sdkTypes.HMSPollsUpdate.POLL_STATS_UPDATED]: HMSNotificationTypes.POLL_VOTES_UPDATED,
   [sdkTypes.HMSPollsUpdate.POLLS_LIST]: HMSNotificationTypes.POLLS_LIST,
 };
+
+type TranscriptionNotificationMap = {
+  [key in sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED]: HMSNotificationTypes;
+};
+
+export const TRANSCRIPTION_NOTIFICATION_TYPES: TranscriptionNotificationMap = {
+  [sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED]: HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED,
+};

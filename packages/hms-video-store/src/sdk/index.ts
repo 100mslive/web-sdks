@@ -60,13 +60,19 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, PeerLeaveRequestNotification, SendMessage } from '../notification-manager';
+import {
+  HMSNotificationMethod,
+  PeerLeaveRequestNotification,
+  PeerNotificationInfo,
+  SendMessage,
+} from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  FindPeerByNameRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
@@ -723,11 +729,11 @@ export class HMSSdk implements HMSInterface {
     let recipientPeer = this.store.getPeerById(peerId);
     if (!recipientPeer) {
       if (isLargeRoom) {
-        const { peers } = await this.transport.signal.findPeers({ peers: [peerId], limit: 1 });
-        if (peers.length === 0) {
+        const peer = await this.transport.signal.getPeer({ peer_id: peerId });
+        if (!peer) {
           throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
         }
-        recipientPeer = createRemotePeer(peers[0], this.store);
+        recipientPeer = createRemotePeer(peer, this.store);
       } else {
         throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
       }
@@ -742,6 +748,37 @@ export class HMSSdk implements HMSInterface {
       return createRemotePeer(response, this.store);
     }
     return undefined;
+  }
+
+  async findPeerByName({ query, limit = 10, offset }: FindPeerByNameRequestParams) {
+    const {
+      peers,
+      offset: responseOffset,
+      eof,
+    } = await this.transport.signal.findPeerByName({ query: query?.toLowerCase(), limit, offset });
+    if (peers.length > 0) {
+      return {
+        offset: responseOffset,
+        eof,
+        peers: peers.map(peerInfo => {
+          return createRemotePeer(
+            {
+              peer_id: peerInfo.peer_id,
+              role: peerInfo.role,
+              groups: [],
+              info: {
+                name: peerInfo.name,
+                data: '',
+                user_id: '',
+                type: peerInfo.type,
+              },
+            } as PeerNotificationInfo,
+            this.store,
+          );
+        }),
+      };
+    }
+    return { offset: responseOffset, peers: [] };
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {

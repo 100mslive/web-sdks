@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  selectLocalPeerID,
+  selectLocalPeer,
   selectPeerNameByID,
   selectPermissions,
   selectPollByID,
@@ -31,7 +31,9 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
   const fetchedInitialResponses = useRef(false);
   const [savedResponses, setSavedResponses] = useState<Record<any, any>>({});
-  const localPeerId = useHMSStore(selectLocalPeerID);
+  const localPeer = useHMSStore(selectLocalPeer);
+  const localPeerId = localPeer?.id;
+  const customerUserId = localPeer?.customerUserId;
 
   // To reset whenever a different poll is opened
   useEffect(() => {
@@ -51,7 +53,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
   useEffect(() => {
     if (poll?.questions) {
-      const localPeerResponses = getPeerResponses(poll.questions, localPeerId);
+      const localPeerResponses = getPeerResponses(poll.questions, localPeerId, customerUserId);
       // @ts-ignore
       localPeerResponses?.forEach(response => {
         if (response) {
@@ -63,7 +65,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         }
       });
     }
-  }, [localPeerId, poll?.questions, id]);
+  }, [localPeerId, poll?.questions, id, customerUserId]);
 
   if (!poll) {
     return null;

@@ -15,12 +15,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
   private onInit;
+  private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
-    this.canvas = document.createElement('canvas');
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -32,8 +32,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
-      provider: 'webgpu',
     });
+    this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // currently logging info type messages as well
       if (!err.type || err.type === 'error') {
@@ -98,6 +98,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
   }
 
+  onResolutionChange(callback: (width: number, height: number) => void) {
+    this.onResolutionChangeCallback = callback;
+  }
+
   getPreset() {
     return this.preset;
   }
@@ -125,6 +129,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
+  private updateCanvas(stream: MediaStream) {
+    const { height, width } = stream.getVideoTracks()[0].getSettings();
+    this.canvas.width = width!;
+    this.canvas.height = height!;
+    this.effects.useStream(stream);
+    this.effects.toCanvas(this.canvas);
+  }
+
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
@@ -141,11 +153,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     };
     this.effects.clear();
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
-    this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
+    this.effects.onChangeInputResolution(() => {
+      this.updateCanvas(stream);
+      const { height, width } = stream.getVideoTracks()[0].getSettings();
+      this.onResolutionChangeCallback?.(width!, height!);
+    });
+    this.updateCanvas(stream);
+
     return this.canvas.captureStream(30) || stream;
   }
 
