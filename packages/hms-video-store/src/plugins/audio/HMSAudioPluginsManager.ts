@@ -76,7 +76,7 @@ export class HMSAudioPluginsManager {
       case 'HMSKrispPlugin':
         if (!this.room?.isNoiseCancellationEnabled) {
           const errorMessage = 'Krisp Noise Cancellation is not enabled for this room';
-          if (this.getPlugins().length === 1) {
+          if (this.pluginsMap.size === 0) {
             throw Error(errorMessage);
           } else {
             HMSLogger.w(this.TAG, errorMessage);
