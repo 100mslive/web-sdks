@@ -13,7 +13,6 @@ import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../common/storeName';
-import { Diagnostics } from '../diagnostics';
 import { HMSDiagnosticsInterface } from '../diagnostics/interfaces';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
@@ -138,7 +137,7 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
 
   getDiagnosticsSDK = (): HMSDiagnosticsInterface => {
     if (!this.diagnostics) {
-      this.diagnostics = new Diagnostics(this.sdk);
+      this.diagnostics = this.actions.initDiagnostics();
     }
 
     return this.diagnostics;
