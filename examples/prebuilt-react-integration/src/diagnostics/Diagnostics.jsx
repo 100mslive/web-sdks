@@ -5,6 +5,7 @@ import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/
 import { Box, Flex, HMSThemeProvider, Text } from '@100mslive/roomkit-react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
 import { AudioTest } from './AudioTest';
+import { VideoTest } from './VideoTest';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 
 const DiagnosticsSteps = {
@@ -45,6 +46,8 @@ const DiagnosticsStepTest = ({ activeStep }) => {
   let TestComponent;
   if (activeStep === 'audio') {
     TestComponent = AudioTest;
+  } else if (activeStep === 'video') {
+    TestComponent = VideoTest;
   }
   return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
 };
@@ -79,11 +82,18 @@ DiagnosticsStep.propTypes = {
   activeStep: PropTypes.string.isRequired,
 };
 
-const DiagnosticsStepsList = ({ activeStep }) => {
+const DiagnosticsStepsList = ({ activeStep, setActiveStep }) => {
   return (
     <ul style={{ width: '25%', marginRight: '3.5rem' }}>
       {Object.keys(DiagnosticsSteps).map(key => (
-        <li key={key}>
+        <li
+          key={key}
+          onClick={() => {
+            if (activeStep !== key) {
+              setActiveStep(key);
+            }
+          }}
+        >
           <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
             {DiagnosticsSteps[key]}
           </Text>
@@ -95,10 +105,11 @@ const DiagnosticsStepsList = ({ activeStep }) => {
 
 DiagnosticsStepsList.propTypes = {
   activeStep: PropTypes.string.isRequired,
+  setActiveStep: PropTypes.func.isRequired,
 };
 
 export const Diagnostics = () => {
-  const [activeStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
+  const [activeStep, setActiveStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
   return (
     <HMSRoomProvider store={hmsStore} actions={hmsActions} notifications={hmsNotifications} stats={hmsStats}>
       <HMSThemeProvider
@@ -115,7 +126,7 @@ export const Diagnostics = () => {
             {`Make sure your devices and network are good to go, let's get started.`}
           </Text>
           <Flex css={{ direction: 'column', gap: '$14', mt: '$12', justifyItems: 'center' }}>
-            <DiagnosticsStepsList activeStep={activeStep} />
+            <DiagnosticsStepsList activeStep={activeStep} setActiveStep={setActiveStep} />
             <DiagnosticsStep activeStep={activeStep} />
           </Flex>
         </Container>
