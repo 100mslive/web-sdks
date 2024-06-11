@@ -1,3 +1,4 @@
+import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
 import { TranscriptionConfig } from './interfaces/transcription-config';
 import { FindPeerByNameRequestParams } from './signal/interfaces';
 import {
@@ -568,4 +569,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param {HMSPlaylistSettings} settings
    */
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
+
+  initDiagnostics(): HMSDiagnosticsInterface;
 }

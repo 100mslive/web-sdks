@@ -114,13 +114,15 @@ export class HMSSdk implements HMSInterface {
   private audioListener?: HMSAudioListener;
   public store!: Store;
   private notificationManager?: NotificationManager;
-  private deviceManager!: DeviceManager;
+  /** @internal */
+  public deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private playlistManager!: PlaylistManager;
   private audioOutput!: AudioOutputManager;
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
-  private localTrackManager!: LocalTrackManager;
+  /** @internal */
+  public localTrackManager!: LocalTrackManager;
   private analyticsEventsService!: AnalyticsEventsService;
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
@@ -156,7 +158,12 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private initStoreAndManagers() {
+  /** @internal */
+  initStoreAndManagers(listener: HMSPreviewListener | HMSUpdateListener) {
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.store?.setErrorListener(this.errorListener);
+
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
@@ -1405,10 +1412,8 @@ export class HMSSdk implements HMSInterface {
     if (!config.initEndpoint) {
       config.initEndpoint = 'https://prod-init.100ms.live';
     }
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-    this.store.setErrorListener(this.errorListener);
+
+    this.initStoreAndManagers(listener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId));
     }
