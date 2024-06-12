@@ -1,5 +1,6 @@
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
@@ -42,6 +43,8 @@ export class HMSAudioPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
   private room?: Room;
+  private krispPluginDuration: number;
+  private krispPluginStarted: number;
 
   constructor(track: HMSLocalAudioTrack, private eventBus: EventBus, room?: Room) {
     this.hmsTrack = track;
@@ -49,6 +52,8 @@ export class HMSAudioPluginsManager {
     this.analytics = new AudioPluginsAnalytics(eventBus);
     this.createAudioContext();
     this.room = room;
+    this.krispPluginDuration = 0;
+    this.krispPluginStarted = 0;
   }
 
   getPlugins(): string[] {
@@ -83,6 +88,7 @@ export class HMSAudioPluginsManager {
             return;
           }
         }
+        this.krispPluginStarted = Date.now();
         break;
 
       default:
@@ -130,6 +136,12 @@ export class HMSAudioPluginsManager {
     return plugin.checkSupport(this.audioContext);
   }
 
+  sendKrispUsage() {
+    if (!this.krispPluginDuration) {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage(this.krispPluginDuration));
+    }
+  }
+
   async validateAndThrow(name: string, plugin: HMSAudioPlugin) {
     const result = this.validatePlugin(plugin);
     if (result.isSupported) {
@@ -158,6 +170,15 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
+    switch (plugin.getName()) {
+      case 'HMSKrispPlugin':
+        if (this.krispPluginStarted !== 0) {
+          this.krispPluginDuration += Date.now() - this.krispPluginStarted;
+        }
+        break;
+      default:
+        break;
+    }
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes
