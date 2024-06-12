@@ -28,6 +28,9 @@ class SimpleQueue {
   private storage: TranscriptData[] = [];
   constructor(private capacity: number = 3, private MAX_STORAGE_TIME: number = 5000) {}
   enqueue(data: TranscriptData): void {
+    if (!data.transcript.trim()) {
+      return;
+    }
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue(this.storage[this.size() - 1]);
     }
