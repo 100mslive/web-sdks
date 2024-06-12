@@ -1,11 +1,6 @@
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
 import { HMSException, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSUpdateListener } from '../internal';
 
-export interface DeviceCheckReturn {
-  track: HMSLocalAudioTrack | HMSLocalVideoTrack;
-  stop: () => void;
-}
-
 export enum ConnectivityState {
   STARTING,
   INIT_FETCHED,
@@ -26,15 +21,19 @@ export interface HMSDiagnosticsConnectivityListener extends HMSUpdateListener {
 }
 
 export interface HMSDiagnosticsInterface {
-  startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<DeviceCheckReturn>;
+  startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<void>;
   getRecordedAudio(): string | undefined;
-  startCameraCheck(inputDevice?: string): Promise<DeviceCheckReturn>;
+  stopMicCheck(): void;
+
+  startCameraCheck(inputDevice?: string): Promise<void>;
+  stopCameraCheck(): void;
 
   startConnectivityCheck(
     progress: (state: ConnectivityState) => void,
     completed: (result: ConnectivityCheckResult) => void,
     region?: string,
   ): Promise<void>;
+  stopConnectivityCheck(): Promise<void>;
 }
 
 export interface HMSDiagnosticsListener {

@@ -3,7 +3,14 @@ import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole } from './constants';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType, HMSPeerUpdate, HMSUpdateListener } from '../internal';
+import {
+  HMSLocalAudioTrack,
+  HMSLocalVideoTrack,
+  HMSPeerType,
+  HMSPeerUpdate,
+  HMSRoomUpdate,
+  HMSUpdateListener,
+} from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSSdk } from '../sdk';
 import HMSRoom from '../sdk/models/HMSRoom';
@@ -14,18 +21,11 @@ import { sleep } from '../utils/timer-utils';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
+  private mediaRecorder?: MediaRecorder;
   private isConnectivityCheckInProgress = false;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
-    sdkListener && this.sdk?.initStoreAndManagers(sdkListener);
-    const localPeer = new HMSLocalPeer({
-      name: 'diagnostics-peer',
-      role: diagnosticsRole,
-      type: HMSPeerType.REGULAR,
-    });
-
-    this.sdk?.store.addPeer(localPeer);
-    this.sdk?.deviceManager.init();
+    this.initSdkWithLocalPeer();
   }
 
   get localPeer() {
@@ -36,6 +36,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     if (!this.localPeer) {
       throw new Error('Local peer not found');
     }
+
+    this.sdk.store.setSimulcastEnabled(false);
 
     this.localPeer.role = {
       ...diagnosticsRole,
@@ -54,19 +56,16 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk?.deviceManager.init(true);
     this.localPeer.videoTrack = track;
     this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
-
-    return {
-      track,
-      stop: () => {
-        track.cleanup();
-        if (this.localPeer) {
-          this.localPeer.videoTrack = undefined;
-        }
-      },
-    };
   }
 
-  async startMicCheck(inputDevice?: string, onStop?: () => void, time = 10000) {
+  stopCameraCheck(): void {
+    this.localPeer?.videoTrack?.cleanup();
+    if (this.localPeer) {
+      this.localPeer.videoTrack = undefined;
+    }
+  }
+
+  async startMicCheck(inputDevice?: string, onStop?: () => void, time = 10_000) {
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
@@ -80,31 +79,32 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk?.initPreviewTrackAudioLevelMonitor();
     this.sdk?.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, [this.localPeer]);
 
-    const mediaRecorder = new MediaRecorder(track.stream.nativeStream);
+    this.mediaRecorder = new MediaRecorder(track.stream.nativeStream);
     const chunks: Blob[] = [];
 
-    mediaRecorder.ondataavailable = function (e) {
+    this.mediaRecorder.ondataavailable = function (e) {
       chunks.push(e.data);
     };
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+    this.mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, { type: this.mediaRecorder?.mimeType });
       this.recordedAudio = URL.createObjectURL(blob);
     };
 
-    const stop = () => {
-      mediaRecorder.stop();
-      track.cleanup();
-      if (this.localPeer) {
-        this.localPeer.audioTrack = undefined;
-      }
+    this.mediaRecorder.start();
+
+    sleep(time).then(() => {
+      this.stopMicCheck();
       onStop?.();
-    };
+    });
+  }
 
-    mediaRecorder.start();
-    sleep(time).then(stop);
-
-    return { track, stop };
+  stopMicCheck(): void {
+    this.mediaRecorder?.stop();
+    this.localPeer?.audioTrack?.cleanup();
+    if (this.localPeer) {
+      this.localPeer.audioTrack = undefined;
+    }
   }
 
   getRecordedAudio() {
@@ -144,6 +144,26 @@ export class Diagnostics implements HMSDiagnosticsInterface {
         connectivityCheck.handleConnectionQualityUpdate(qualityUpdates);
       },
     });
+  }
+
+  stopConnectivityCheck(): Promise<void> {
+    return this.sdk.leave();
+  }
+
+  private initSdkWithLocalPeer() {
+    this.sdkListener && this.sdk?.initStoreAndManagers(this.sdkListener);
+    const localPeer = new HMSLocalPeer({
+      name: 'diagnostics-peer',
+      role: diagnosticsRole,
+      type: HMSPeerType.REGULAR,
+    });
+
+    this.sdk?.store.addPeer(localPeer);
+
+    const room = new HMSRoom('diagnostics-room');
+    this.sdk.store.setRoom(room);
+    this.sdkListener.onRoomUpdate(HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED, room);
+    this.sdk?.deviceManager.init();
   }
 
   private async getAuthToken(region?: string): Promise<string> {
