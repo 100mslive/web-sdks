@@ -107,7 +107,6 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                 await actions.startTranscription({
                   mode: HMSTranscriptionMode.CAPTION,
                 });
-                setIsCaptionEnabled(true);
                 const id = ToastManager.replaceToast(toastId, {
                   title: `Enabling Closed Caption for everyone.`,
                   variant: 'standard',
@@ -122,6 +121,8 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
                   icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
                 });
                 setToastId(id);
+              } finally {
+                setIsCaptionEnabled(true);
               }
               onExit();
             }}
