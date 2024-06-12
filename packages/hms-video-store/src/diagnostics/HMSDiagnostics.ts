@@ -131,6 +131,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
       connectivityCheck,
     );
+
+    return () => this.sdk?.leave();
   }
 
   /** @internal */

@@ -1,3 +1,4 @@
+import { DiagnosticsStatsCollector } from './DiagnosticsStatsCollector';
 import { ConnectivityCheckResult, ConnectivityState, HMSConnectivityListener } from './interfaces';
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
 import { HMSException, HMSTrack, HMSTrackType, HMSTrackUpdate, HMSUpdateListener } from '../internal';
@@ -19,6 +20,7 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
   private errors: HMSException[] = [];
   private isAudioTrackCaptured = false;
   private isVideoTrackCaptured = false;
+  private statsCollector: DiagnosticsStatsCollector;
 
   private cleanupTimer?: number;
   private timestamp = Date.now();
@@ -27,7 +29,10 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
     private sdk: HMSSdk,
     private progressCallback: (state: ConnectivityState) => void,
     private completionCallback: (state: ConnectivityCheckResult) => void,
-  ) {}
+  ) {
+    this.statsCollector = new DiagnosticsStatsCollector(sdk);
+    this.sdk.getWebrtcInternals()?.onStatsChange(stats => this.statsCollector.handleStatsUpdate(stats));
+  }
   onRoomUpdate(): void {}
   onPeerUpdate(): void {}
   onMessageReceived(): void {}
@@ -151,13 +156,6 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
 
   private buildReport(): ConnectivityCheckResult {
     const connectionQualityScore = this.networkScores.reduce((a, b) => a + b, 0) / this.networkScores.length;
-    // const currRTCStats = this.sdk.getWebrtcInternals()?.getCurrentStats();
-    // const localPeerStats = currRTCStats?.getLocalPeerStats();
-    // const localTrackStats = currRTCStats?.getLocalTrackStats();
-    // const audioTrackID = this.sdk.getLocalPeer()?.audioTrack?.trackId;
-    // const videoTrackID = this.sdk.getLocalPeer()?.videoTrack?.trackId;
-    // const audioTrackStats = audioTrackID ? localTrackStats?.[audioTrackID] : undefined;
-    // const videoTrackStats = videoTrackID ? localTrackStats?.[videoTrackID] : undefined;
 
     return {
       testTimestamp: this.timestamp,
@@ -169,14 +167,7 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
         websocketUrl: this.websocketURL,
       },
       mediaServerReport: {
-        // stats: {
-        //   combined: {
-        //     bytesSent: localPeerStats?.publish?.bytesSent,
-        //     bytesReceived: localPeerStats?.subscribe?.bytesReceived,
-        //     bitrateSent: localPeerStats?.publish?.bitrate,
-        //   },
-        //   audio: {},
-        // },
+        stats: this.statsCollector.buildReport(),
         connectionQualityScore,
         isPublishICEConnected: this.isPublishICEConnected,
         isSubscribeICEConnected: this.isSubscribeICEConnected,
