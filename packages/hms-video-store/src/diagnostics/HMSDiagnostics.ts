@@ -1,5 +1,5 @@
 import { ConnectivityCheck } from './ConnectivityCheck';
-import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole } from './constants';
+import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole, MIC_CHECK_RECORD_DURATION } from './constants';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -65,7 +65,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
   }
 
-  async startMicCheck(inputDevice?: string, onStop?: () => void, time = 10_000) {
+  async startMicCheck(inputDevice?: string, onStop?: () => void, time = MIC_CHECK_RECORD_DURATION) {
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
