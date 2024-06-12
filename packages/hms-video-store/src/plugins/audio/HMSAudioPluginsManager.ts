@@ -1,5 +1,6 @@
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
@@ -83,6 +84,7 @@ export class HMSAudioPluginsManager {
             return;
           }
         }
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
         break;
 
       default:
@@ -158,6 +160,13 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
+    switch (plugin.getName()) {
+      case 'HMSKrispPlugin':
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
+        break;
+      default:
+        break;
+    }
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes
