@@ -137,9 +137,6 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     return () => this.sdk?.leave();
   }
 
-  /** @internal */
-  initLocalPeer() {}
-
   private async getAuthToken(region?: string): Promise<string> {
     const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
     if (region) {

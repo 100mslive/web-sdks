@@ -79,7 +79,7 @@ export default class HMSTransport {
   private publishStatsAnalytics?: PublishStatsAnalytics;
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
-  private connectivityListner?: HMSConnectivityListener;
+  private connectivityListener?: HMSConnectivityListener;
   joinRetryCount = 0;
 
   constructor(
@@ -285,7 +285,7 @@ export default class HMSTransport {
       log(TAG, `Publish connection state change: ${newState}`);
 
       if (newState === 'connected') {
-        this.connectivityListner?.onICESuccess(true);
+        this.connectivityListener?.onICESuccess(true);
         this.publishConnection?.handleSelectedIceCandidatePairs();
       }
 
@@ -316,11 +316,11 @@ export default class HMSTransport {
     },
 
     onIceCandidate: candidate => {
-      this.connectivityListner?.onICECandidate(candidate, true);
+      this.connectivityListener?.onICECandidate(candidate, true);
     },
 
     onSelectedCandidatePairChange: candidatePair => {
-      this.connectivityListner?.onSelectedICECandidatePairChange(candidatePair, true);
+      this.connectivityListener?.onSelectedICECandidatePairChange(candidatePair, true);
     },
   };
 
@@ -351,7 +351,7 @@ export default class HMSTransport {
         const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
         this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
-        this.connectivityListner?.onICESuccess(false);
+        this.connectivityListener?.onICESuccess(false);
         if (callback) {
           callback.promise.resolve(true);
         }
@@ -393,11 +393,11 @@ export default class HMSTransport {
     },
 
     onIceCandidate: candidate => {
-      this.connectivityListner?.onICECandidate(candidate, false);
+      this.connectivityListener?.onICECandidate(candidate, false);
     },
 
     onSelectedCandidatePairChange: candidatePair => {
-      this.connectivityListner?.onSelectedICECandidatePairChange(candidatePair, false);
+      this.connectivityListener?.onSelectedICECandidatePairChange(candidatePair, false);
     },
   };
 
@@ -412,7 +412,7 @@ export default class HMSTransport {
   }
 
   setConnectivityListener(listener: HMSConnectivityListener) {
-    this.connectivityListner = listener;
+    this.connectivityListener = listener;
   }
 
   async preview(
@@ -573,7 +573,7 @@ export default class HMSTransport {
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
-        this.connectivityListner?.onMediaPublished();
+        this.connectivityListener?.onMediaPublished();
       } catch (error) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
@@ -939,7 +939,7 @@ export default class HMSTransport {
         initEndpoint,
         iceServers,
       });
-      this.connectivityListner?.onInitSuccess(this.initConfig.endpoint);
+      this.connectivityListener?.onInitSuccess(this.initConfig.endpoint);
       const room = this.store.getRoom();
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
@@ -953,7 +953,7 @@ export default class HMSTransport {
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       this.observer.onConnected();
-      this.connectivityListner?.onSignallingSuccess();
+      this.connectivityListener?.onSignallingSuccess();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
