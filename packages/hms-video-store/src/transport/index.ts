@@ -18,7 +18,7 @@ import HMSPublishConnection from '../connection/publish/publishConnection';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
-import { HMSConnectivityListener } from '../diagnostics/interfaces';
+import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -79,7 +79,7 @@ export default class HMSTransport {
   private publishStatsAnalytics?: PublishStatsAnalytics;
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
-  private connectivityListener?: HMSConnectivityListener;
+  private connectivityListener?: HMSDiagnosticsConnectivityListener;
   joinRetryCount = 0;
 
   constructor(
@@ -411,7 +411,7 @@ export default class HMSTransport {
     return flags.includes(flag);
   }
 
-  setConnectivityListener(listener: HMSConnectivityListener) {
+  setConnectivityListener(listener: HMSDiagnosticsConnectivityListener) {
     this.connectivityListener = listener;
   }
 

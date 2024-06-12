@@ -5,7 +5,7 @@ import { HMSWebrtcStats } from '../rtc-stats';
 import { HMSSdk } from '../sdk';
 
 const isValidNumber = (num: number | undefined): boolean => !!num && !isNaN(num);
-const getLastElement = <T>(arr: T[]): T => arr[arr.length - 1];
+const getLastElement = <T>(arr: T[]): T | undefined => arr[arr.length - 1];
 
 export class DiagnosticsStatsCollector {
   private peerStatsList: HMSPeerStats[] = [];
@@ -66,13 +66,8 @@ export class DiagnosticsStatsCollector {
       )
       .filter(isValidNumber);
 
-    console.log(
-      this.peerStatsList,
-      this.localAudioTrackStatsList,
-      this.localVideoTrackStatsList,
-      this.remoteAudioTrackStatsList,
-      this.remoteVideoTrackStatsList,
-    );
+    const lastLocalAudioTrackStats = getLastElement(this.localAudioTrackStatsList);
+    const lastLocalVideoTrackStats = getLastElement(this.localVideoTrackStatsList);
 
     return {
       combined: {
@@ -98,10 +93,9 @@ export class DiagnosticsStatsCollector {
         bitrateReceived:
           this.remoteAudioTrackStatsList.reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
           this.remoteAudioTrackStatsList.filter(curr => isValidNumber(curr.bitrate)).length,
-        bytesSent: Object.values(getLastElement(this.localAudioTrackStatsList)).reduce(
-          (acc, curr) => acc + (curr.bytesSent || 0),
-          0,
-        ),
+        bytesSent: lastLocalAudioTrackStats
+          ? Object.values(lastLocalAudioTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
+          : 0,
       },
       video: {
         roundTripTime,
@@ -113,10 +107,9 @@ export class DiagnosticsStatsCollector {
         bitrateReceived:
           this.remoteVideoTrackStatsList.reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
           this.remoteVideoTrackStatsList.filter(curr => isValidNumber(curr.bitrate)).length,
-        bytesSent: Object.values(getLastElement(this.localVideoTrackStatsList)).reduce(
-          (acc, curr) => acc + (curr.bytesSent || 0),
-          0,
-        ),
+        bytesSent: lastLocalVideoTrackStats
+          ? Object.values(lastLocalVideoTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
+          : 0,
       },
     };
   }
