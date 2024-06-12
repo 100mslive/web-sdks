@@ -31,7 +31,6 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
     private completionCallback: (state: ConnectivityCheckResult) => void,
   ) {
     this.statsCollector = new DiagnosticsStatsCollector(sdk);
-    this.sdk.getWebrtcInternals()?.onStatsChange(stats => this.statsCollector.handleStatsUpdate(stats));
   }
   onRoomUpdate(): void {}
   onPeerUpdate(): void {}
@@ -112,6 +111,8 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
   }
 
   onJoin(): void {
+    this.sdk.getWebrtcInternals()?.onStatsChange(stats => this.statsCollector.handleStatsUpdate(stats));
+    this.sdk.getWebrtcInternals()?.start();
     this.cleanupTimer = window.setTimeout(() => {
       this.cleanupAndReport();
     }, 30000);
@@ -156,7 +157,7 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
 
   private buildReport(): ConnectivityCheckResult {
     const connectionQualityScore = this.networkScores.reduce((a, b) => a + b, 0) / this.networkScores.length;
-
+    const stats = this.statsCollector.buildReport();
     return {
       testTimestamp: this.timestamp,
       connectivityState: this.state,
@@ -167,7 +168,7 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
         websocketUrl: this.websocketURL,
       },
       mediaServerReport: {
-        stats: this.statsCollector.buildReport(),
+        stats,
         connectionQualityScore,
         isPublishICEConnected: this.isPublishICEConnected,
         isSubscribeICEConnected: this.isSubscribeICEConnected,
