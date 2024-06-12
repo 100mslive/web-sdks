@@ -12,7 +12,7 @@ import { VideoTest } from './VideoTest';
 const DiagnosticsSteps: Record<string, string> = {
   audio: 'Test Audio',
   video: 'Test Video',
-  browser: 'Browser Support',
+  // browser: 'Browser Support',
   connectivity: 'Connection Quality',
 };
 
@@ -62,7 +62,7 @@ const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
 
 const DiagnosticsStep = ({ activeStep }: { activeStep: string }) => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1' }}>
+    <Box css={{ border: '1px solid $border_default', r: '$1', w: '100%' }}>
       <DiagnosticsStepHeader activeStep={activeStep} />
       <DiagnosticsStepTest activeStep={activeStep} />
     </Box>

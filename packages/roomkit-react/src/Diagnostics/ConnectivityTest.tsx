@@ -16,9 +16,13 @@ const ConnectivityStateMessage = {
   [ConnectivityState.COMPLETED]: 'Completed',
 };
 
-// const ConnectivityTestResult = ({ result }) => {
-//   return {};
-// };
+export const ConnectivityTestStepResult = ({ title }: { title: string }) => {
+  return (
+    <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
+      <Text css={{ c: '$on_primary_medium' }}>{title}</Text>
+    </Box>
+  );
+};
 
 export const ConnectivityTest = () => {
   const [error, setError] = useState<Error | undefined>();
@@ -41,9 +45,8 @@ export const ConnectivityTest = () => {
   }, []);
 
   if (error) {
-    console.log({ error });
     return (
-      <Box css={{ textAlign: 'center' }}>
+      <Box css={{ w: '100%', textAlign: 'center' }}>
         <Text css={{ c: '$alert_error_default', mb: '$4' }}>
           <CrossCircleIcon />
         </Text>
@@ -56,12 +59,18 @@ export const ConnectivityTest = () => {
   }
 
   if (result) {
-    // return (
-    // )
+    console.log(result.errors);
+    return (
+      <Box css={{ w: '100%' }}>
+        <Text css={{ c: '$on_primary_medium' }}>Connectivity test has been completed.</Text>
+        <ConnectivityTestStepResult title="Signalling server connection test" />
+        <ConnectivityTestStepResult title="Media server connection test" />
+      </Box>
+    );
   }
 
   return (
-    <Box css={{ textAlign: 'center' }}>
+    <Box css={{ w: '100%', textAlign: 'center' }}>
       <Text css={{ c: '$primary_bright', mb: '$4' }}>
         <Loading />
       </Text>
