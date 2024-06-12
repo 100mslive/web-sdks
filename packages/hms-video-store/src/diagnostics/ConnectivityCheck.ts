@@ -46,11 +46,11 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
   onWhiteboardUpdate(): void {}
 
   private _state: ConnectivityState = ConnectivityState.STARTING;
-  public get state(): ConnectivityState {
+  private get state(): ConnectivityState {
     return this._state;
   }
-  public set state(value: ConnectivityState) {
-    if (value > this._state) {
+  private set state(value: ConnectivityState) {
+    if (value < this._state) {
       return;
     }
     this._state = value;
