@@ -3,8 +3,7 @@ import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole } from './constants';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
-import { HMSPreviewListener } from '../interfaces/preview-listener';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType, HMSPeerUpdate } from '../internal';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSPeerType, HMSPeerUpdate, HMSUpdateListener } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSSdk } from '../sdk';
 import HMSRoom from '../sdk/models/HMSRoom';
@@ -15,8 +14,9 @@ import { sleep } from '../utils/timer-utils';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
+  private isConnectivityCheckInProgress = false;
 
-  constructor(private sdk?: HMSSdk, private sdkListener?: HMSPreviewListener) {
+  constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
     sdkListener && this.sdk?.initStoreAndManagers(sdkListener);
     const localPeer = new HMSLocalPeer({
       name: 'diagnostics-peer',
@@ -118,21 +118,30 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('SDK not found');
     }
 
+    if (this.isConnectivityCheckInProgress) {
+      return;
+    }
+    this.isConnectivityCheckInProgress = true;
+
     const authToken = await this.getAuthToken(region);
     const { roomId } = decodeJWT(authToken);
 
     this.sdk?.store.setRoom(new HMSRoom(roomId));
     await this.sdk.leave();
 
-    const connectivityCheck = new ConnectivityCheck(this.sdk, progress, completed);
-    this.sdkListener && this.sdk?.initStoreAndManagers(this.sdkListener);
-    this.sdk.setConnectivityListener(connectivityCheck);
+    const connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, result => {
+      this.isConnectivityCheckInProgress = false;
+      completed(result);
+    });
     await this.sdk.join(
       { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
       connectivityCheck,
     );
-
-    return () => this.sdk?.leave();
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate(qualityUpdates) {
+        connectivityCheck.handleConnectionQualityUpdate(qualityUpdates);
+      },
+    });
   }
 
   private async getAuthToken(region?: string): Promise<string> {

@@ -16,7 +16,7 @@ import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
-import { HMSConnectivityListener } from '../diagnostics/interfaces';
+import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -142,10 +142,6 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
-  setConnectivityListener(listener: HMSConnectivityListener) {
-    this.transport.setConnectivityListener(listener);
-  }
-
   private initNotificationManager() {
     if (!this.notificationManager) {
       this.notificationManager = new NotificationManager(
@@ -159,7 +155,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   /** @internal */
-  initStoreAndManagers(listener: HMSPreviewListener | HMSUpdateListener) {
+  initStoreAndManagers(listener: HMSPreviewListener | HMSUpdateListener | HMSDiagnosticsConnectivityListener) {
     this.listener = listener as unknown as HMSUpdateListener;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
@@ -204,6 +200,10 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer,
       this.pluginUsageTracker,
     );
+    // add diagnostics callbacks if present
+    if ((listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
+      this.transport.setConnectivityListener(listener as unknown as HMSDiagnosticsConnectivityListener);
+    }
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
     /**

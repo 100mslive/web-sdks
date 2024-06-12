@@ -1,11 +1,21 @@
+import { CONNECTIVITY_TEST_DURATION } from './constants';
 import { DiagnosticsStatsCollector } from './DiagnosticsStatsCollector';
-import { ConnectivityCheckResult, ConnectivityState, HMSConnectivityListener } from './interfaces';
+import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsConnectivityListener } from './interfaces';
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
-import { HMSException, HMSTrack, HMSTrackType, HMSTrackUpdate, HMSUpdateListener } from '../internal';
+import {
+  HMSConnectionQuality,
+  HMSException,
+  HMSRoom,
+  HMSTrack,
+  HMSTrackType,
+  HMSTrackUpdate,
+  HMSUpdateListener,
+} from '../internal';
 import { HMSSdk } from '../sdk';
 import { HMSPeer } from '../sdk/models/peer';
+import { isPresent } from '../utils/validations';
 
-export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateListener {
+export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private wsConnected = false;
   private websocketURL?: string;
   private initConnected = false;
@@ -27,27 +37,28 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
 
   constructor(
     private sdk: HMSSdk,
+    private sdkListener: HMSUpdateListener,
     private progressCallback: (state: ConnectivityState) => void,
     private completionCallback: (state: ConnectivityCheckResult) => void,
   ) {
     this.statsCollector = new DiagnosticsStatsCollector(sdk);
   }
-  onRoomUpdate(): void {}
-  onPeerUpdate(): void {}
-  onMessageReceived(): void {}
-  onReconnecting(): void {}
-  onReconnected(): void {}
-  onRoleChangeRequest(): void {}
-  onRoleUpdate(): void {}
-  onChangeTrackStateRequest(): void {}
-  onChangeMultiTrackStateRequest(): void {}
-  onRemovedFromRoom(): void {}
-  onNetworkQuality?(): void {}
-  onPreview(): void {}
-  onDeviceChange?(): void {}
-  onSessionStoreUpdate(): void {}
-  onPollsUpdate(): void {}
-  onWhiteboardUpdate(): void {}
+  onRoomUpdate = this.sdkListener.onRoomUpdate.bind(this.sdkListener);
+  onPeerUpdate = this.sdkListener.onPeerUpdate.bind(this.sdkListener);
+  onMessageReceived = this.sdkListener.onMessageReceived.bind(this.sdkListener);
+  onReconnecting = this.sdkListener.onReconnecting.bind(this.sdkListener);
+  onReconnected = this.sdkListener.onReconnected.bind(this.sdkListener);
+  onRoleChangeRequest = this.sdkListener.onRoleChangeRequest.bind(this.sdkListener);
+  onRoleUpdate = this.sdkListener.onRoleUpdate.bind(this.sdkListener);
+  onChangeTrackStateRequest = this.sdkListener.onChangeTrackStateRequest.bind(this.sdkListener);
+  onChangeMultiTrackStateRequest = this.sdkListener.onChangeMultiTrackStateRequest.bind(this.sdkListener);
+  onRemovedFromRoom = this.sdkListener.onRemovedFromRoom.bind(this.sdkListener);
+  onNetworkQuality = this.sdkListener.onNetworkQuality?.bind(this.sdkListener);
+  onPreview = this.sdkListener.onPreview.bind(this.sdkListener);
+  onDeviceChange = this.sdkListener.onDeviceChange?.bind(this.sdkListener);
+  onSessionStoreUpdate = this.sdkListener.onSessionStoreUpdate.bind(this.sdkListener);
+  onPollsUpdate = this.sdkListener.onPollsUpdate.bind(this.sdkListener);
+  onWhiteboardUpdate = this.sdkListener.onWhiteboardUpdate.bind(this.sdkListener);
 
   private _state: ConnectivityState = ConnectivityState.STARTING;
   private get state(): ConnectivityState {
@@ -61,11 +72,10 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
     this.progressCallback?.(value);
   }
 
-  onNetworkQualityScore(score: number): void {
-    if (score > 0) {
-      this.networkScores.push(score);
-    }
-  }
+  handleConnectionQualityUpdate = (qualities: HMSConnectionQuality[]) => {
+    const localPeerQuality = qualities.find(quality => quality.peerID === this.sdk?.store.getLocalPeer()?.peerId);
+    this.networkScores.push(isPresent(localPeerQuality?.downlinkQuality) ? localPeerQuality!.downlinkQuality : -1);
+  };
 
   onICESuccess(isPublish: boolean): void {
     if (isPublish) {
@@ -110,15 +120,17 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
     this.state = ConnectivityState.SIGNAL_CONNECTED;
   }
 
-  onJoin(): void {
+  onJoin(room: HMSRoom): void {
+    this.sdkListener.onJoin(room);
     this.sdk.getWebrtcInternals()?.onStatsChange(stats => this.statsCollector.handleStatsUpdate(stats));
     this.sdk.getWebrtcInternals()?.start();
     this.cleanupTimer = window.setTimeout(() => {
       this.cleanupAndReport();
-    }, 30000);
+    }, CONNECTIVITY_TEST_DURATION);
   }
 
   onError(error: HMSException): void {
+    this.sdkListener.onError(error);
     this.errors.push(error);
     if (error?.isTerminal) {
       this.cleanupAndReport();
@@ -127,6 +139,7 @@ export class ConnectivityCheck implements HMSConnectivityListener, HMSUpdateList
 
   // eslint-disable-next-line complexity
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void {
+    this.sdkListener.onTrackUpdate(type, track, peer);
     if (peer.isLocal && type === HMSTrackUpdate.TRACK_ADDED) {
       switch (track.type) {
         case HMSTrackType.AUDIO:

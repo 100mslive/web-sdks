@@ -1,5 +1,5 @@
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
-import { HMSException, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../internal';
+import { HMSException, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSUpdateListener } from '../internal';
 
 export interface DeviceCheckReturn {
   track: HMSLocalAudioTrack | HMSLocalVideoTrack;
@@ -16,9 +16,8 @@ export enum ConnectivityState {
   COMPLETED,
 }
 
-export interface HMSConnectivityListener {
+export interface HMSDiagnosticsConnectivityListener extends HMSUpdateListener {
   onInitSuccess(websocketURL: string): void;
-  onNetworkQualityScore(score: number): void;
   onSignallingSuccess(): void;
   onICESuccess(isPublish: boolean): void;
   onMediaPublished(): void;
@@ -35,7 +34,7 @@ export interface HMSDiagnosticsInterface {
     progress: (state: ConnectivityState) => void,
     completed: (result: ConnectivityCheckResult) => void,
     region?: string,
-  ): Promise<() => void>;
+  ): Promise<void>;
 }
 
 export interface HMSDiagnosticsListener {
