@@ -1,5 +1,7 @@
 import { HMSRole } from '../internal';
 
+export const DIAGNOSTICS_ROOM_ID = '6669151f480e55c215299a4a';
+
 export const diagnosticsRole: HMSRole = {
   name: 'diagnostics-role',
   priority: 1,
