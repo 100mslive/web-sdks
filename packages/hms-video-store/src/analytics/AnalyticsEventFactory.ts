@@ -243,14 +243,14 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static getKrispStart() {
+  static krispStart() {
     return new AnalyticsEvent({
       name: 'krisp.start',
       level: AnalyticsEventLevel.INFO,
     });
   }
 
-  static getKrispStop() {
+  static krispStop() {
     return new AnalyticsEvent({
       name: 'krisp.stop',
       level: AnalyticsEventLevel.INFO,

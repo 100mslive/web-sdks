@@ -84,7 +84,7 @@ export class HMSAudioPluginsManager {
             return;
           }
         }
-        this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispStart());
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
         break;
 
       default:
@@ -162,7 +162,7 @@ export class HMSAudioPluginsManager {
   async removePlugin(plugin: HMSAudioPlugin) {
     switch (plugin.getName()) {
       case 'HMSKrispPlugin':
-        this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispStop());
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
         break;
       default:
         break;
