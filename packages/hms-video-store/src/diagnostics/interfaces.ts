@@ -35,7 +35,7 @@ export interface HMSDiagnosticsInterface {
     progress: (state: ConnectivityState) => void,
     completed: (result: ConnectivityCheckResult) => void,
     region?: string,
-  ): Promise<void>;
+  ): Promise<() => void>;
 }
 
 export interface HMSDiagnosticsListener {
