@@ -225,9 +225,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
-  sendKrispUsage() {
-    this.pluginsManager.sendKrispUsage();
-  }
   /**
    * @internal
    * published track id will be different in case there was some processing done using plugins.

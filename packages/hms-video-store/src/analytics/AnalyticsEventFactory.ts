@@ -243,6 +243,19 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static getKrispStart() {
+    return new AnalyticsEvent({
+      name: 'krisp.start',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static getKrispStop() {
+    return new AnalyticsEvent({
+      name: 'krisp.stop',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

@@ -265,11 +265,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       this.logPossibleInconsistency('room leave is called when no room is connected');
     }
     const currentRoomState = this.store.getState(selectRoomState);
-    const audioTrackId = this.store.getState(selectLocalAudioTrackID);
-    if (audioTrackId) {
-      const track = this.getLocalTrack(audioTrackId) as SDKHMSLocalAudioTrack;
-      track.sendKrispUsage();
-    }
     this.setState(store => {
       store.room.roomState = HMSRoomState.Disconnecting;
     }, 'leaving');
