@@ -1,7 +1,13 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { DeviceCheckReturn, selectLocalMediaSettings, selectTrackAudioByID } from '@100mslive/hms-video-store';
-import { selectDevices, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectDevices,
+  selectLocalAudioTrackID,
+  selectLocalMediaSettings,
+  selectTrackAudioByID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon } from '@100mslive/react-icons';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
@@ -18,8 +24,8 @@ const MicTest = () => {
   const [isRecording, setIsRecording] = useState(false);
   const { audioInputDeviceId } = useHMSStore(selectLocalMediaSettings);
   const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || 'default');
-  const [checkResult, setCheckResult] = useState<DeviceCheckReturn>();
-  const audioLevel = useHMSStore(selectTrackAudioByID(checkResult?.track?.trackId || ''));
+  const trackID = useHMSStore(selectLocalAudioTrackID);
+  const audioLevel = useHMSStore(selectTrackAudioByID(trackID));
 
   return (
     <Box css={{ w: '50%' }}>
@@ -30,7 +36,8 @@ const MicTest = () => {
         icon={<MicOnIcon />}
         onChange={(deviceId: string) => {
           setSelectedMic(deviceId);
-          checkResult?.stop();
+          hmsDiagnostics.stopMicCheck();
+          setIsRecording(false);
         }}
       />
       <Flex css={{ gap: '$6', alignItems: 'center' }}>
@@ -40,8 +47,7 @@ const MicTest = () => {
               .startMicCheck(selectedMic, () => {
                 setIsRecording(false);
               })
-              .then(result => {
-                setCheckResult(result);
+              .then(() => {
                 setIsRecording(true);
               })
           }

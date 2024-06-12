@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { DeviceCheckReturn, selectDevices, selectLocalMediaSettings, useHMSStore } from '@100mslive/react-sdk';
+import React, { useEffect } from 'react';
+import { selectDevices, selectLocalMediaSettings, selectLocalVideoTrackID, useHMSStore } from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
@@ -12,25 +12,23 @@ import { hmsDiagnostics } from './hms';
 export const VideoTest = () => {
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
-  const [checkResult, setCheckResult] = useState<DeviceCheckReturn>();
+  const trackID = useHMSStore(selectLocalVideoTrackID);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
 
   useEffect(() => {
-    hmsDiagnostics.startCameraCheck().then(result => {
-      setCheckResult(result);
-    });
+    hmsDiagnostics.startCameraCheck();
   }, []);
 
   return (
     <Flex>
-      {checkResult?.track && (
+      {trackID && (
         <StyledVideoTile.Container
           css={{
             w: '90%',
             height: '$48',
           }}
         >
-          <Video mirror={true} trackId={checkResult.track.trackId} />
+          <Video mirror={true} trackId={trackID} />
         </StyledVideoTile.Container>
       )}
       <Flex direction="column" css={{ ml: '$10' }}>
@@ -44,8 +42,8 @@ export const VideoTest = () => {
           icon={<VideoOnIcon />}
           selection={sdkSelectedDevices.videoInputDeviceId}
           onChange={async (deviceId: string) => {
-            checkResult?.stop();
-            hmsDiagnostics.startCameraCheck(deviceId).then(result => setCheckResult(result));
+            hmsDiagnostics.stopCameraCheck();
+            hmsDiagnostics.startCameraCheck(deviceId);
           }}
         />
       </Flex>
