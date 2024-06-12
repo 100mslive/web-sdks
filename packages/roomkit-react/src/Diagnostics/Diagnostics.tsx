@@ -5,6 +5,7 @@ import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
+import { ConnectivityTest } from './ConnectivityTest';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 import { VideoTest } from './VideoTest';
 
@@ -44,6 +45,8 @@ const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
     TestComponent = AudioTest;
   } else if (activeStep === 'video') {
     TestComponent = VideoTest;
+  } else if (activeStep === 'connectivity') {
+    TestComponent = ConnectivityTest;
   }
   return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
 };
