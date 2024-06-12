@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ConnectivityCheckResult, ConnectivityState } from '@100mslive/react-sdk';
+import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
@@ -62,7 +62,7 @@ const DetailedInfo = ({
   Icon?: (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element;
 }) => {
   return (
-    <Box css={{ w: '50%', mt: '$6' }}>
+    <Box css={{ flex: '50%', mt: '$6' }}>
       <Text variant="caption" css={{ fontWeight: '$semiBold', c: '$on_primary_medium' }}>
         {title}
       </Text>
@@ -86,7 +86,7 @@ const MediaServerResult = ({ result }: { result?: ConnectivityCheckResult['media
       title="Media server connection test"
       success={result?.isPublishICEConnected && result.isSubscribeICEConnected}
     >
-      <Flex>
+      <Flex css={{ flexWrap: 'wrap' }}>
         <DetailedInfo
           title="Media Captured"
           value={result?.stats?.audio.bytesSent ? 'Yes' : 'No'}
@@ -108,7 +108,7 @@ const MediaServerResult = ({ result }: { result?: ConnectivityCheckResult['media
 const SignallingResult = ({ result }: { result?: ConnectivityCheckResult['signallingReport'] }) => {
   return (
     <ConnectivityTestStepResult title="Signalling server connection test" success={result?.isConnected}>
-      <Flex>
+      <Flex css={{ flexWrap: 'wrap' }}>
         <DetailedInfo
           title="Signalling Gateway"
           value={result?.isConnected ? 'Reachable' : 'Unreachable'}
@@ -116,6 +116,24 @@ const SignallingResult = ({ result }: { result?: ConnectivityCheckResult['signal
         />
         <DetailedInfo title="Websocket URL" value={result?.websocketUrl || 'N/A'} Icon={LinkIcon} />
       </Flex>
+    </ConnectivityTestStepResult>
+  );
+};
+
+const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
+  return (
+    <ConnectivityTestStepResult title="Audio" success={!!stats?.bytesSent}>
+      {stats && (
+        <Flex css={{ flexWrap: 'wrap' }}>
+          <DetailedInfo title="Bytes Sent" value={stats.bytesSent.toString()} />
+          <DetailedInfo title="Bytes Received" value={stats.bytesReceived.toString()} />
+          <DetailedInfo title="Packets Received" value={stats.packetsReceived.toString()} />
+          <DetailedInfo title="Packets Lost" value={stats.packetsLost.toString()} />
+          <DetailedInfo title="Bitrate Sent" value={stats.bitrateSent.toString()} />
+          <DetailedInfo title="Bitrate Received" value={stats.bitrateReceived.toString()} />
+          <DetailedInfo title="Round Trip Time" value={stats.roundTripTime.toString()} />
+        </Flex>
+      )}
     </ConnectivityTestStepResult>
   );
 };
@@ -161,6 +179,7 @@ export const ConnectivityTest = () => {
         <Text css={{ c: '$on_primary_medium' }}>Connectivity test has been completed.</Text>
         <SignallingResult result={result?.signallingReport} />
         <MediaServerResult result={result?.mediaServerReport} />
+        <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
       </Box>
     );
   }
