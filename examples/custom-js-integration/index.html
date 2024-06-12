@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quickstart JS</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <header class="hide">
+      <img class="logo" src="https://www.100ms.live/assets/logo.svg" />
+      <button id="leave-btn" class="btn btn-danger hide">
+        <span class="material-symbols-outlined">logout</span>&nbsp;Leave Room
+      </button>
+    </header>
+    <form id="join">
+      <img class="logo" src="https://www.100ms.live/assets/logo.svg" />
+      <h2>Join Room</h2>
+      <p class="description">Enter your room code and name before joining</p>
+      <div class="input-container">
+        <input id="room-code" type="text" name="roomCode" placeholder="Your Room code" />
+      </div>
+      <div class="input-container">
+        <input id="name" type="text" name="username" placeholder="Your Name" />
+      </div>
+
+      <button type="button" class="btn btn-primary" id="preview-btn" style="margin: 0 auto">
+        Proceed <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </form>
+    <h3 class="hide loading">Loading ...</h3>
+    <div id="conference" class="conference-section hide">
+      <div id="peers-container"></div>
+      <!-- <button id="join-btn" class="hide btn btn-primary">
+        Looks good! Join
+      </button> -->
+    </div>
+
+    <div id="controls" class="control-bar hide">
+      <button id="mute-aud" class="btn-control">
+        <span class="material-symbols-outlined"> mic </span>
+      </button>
+      <button id="mute-vid" class="btn-control">
+        <span class="material-symbols-outlined"> videocam </span>
+      </button>
+      <button title="Screenshare" id="toggle-screenshare" class="btn-control highlight">
+        <span class="material-symbols-outlined"> screen_share </span>
+      </button>
+      <button title="Noise cancellation" id="toggle-nc" class="btn-control highlight">
+        <span class="material-symbols-outlined"> graphic_eq </span>
+      </button>
+    </div>
+
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
