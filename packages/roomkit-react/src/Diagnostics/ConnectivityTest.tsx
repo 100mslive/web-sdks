@@ -69,13 +69,11 @@ const DetailedInfo = ({
       </Text>
       <Flex css={{ mt: '$xs', alignItems: 'flex-start' }}>
         {Icon && (
-          <Text>
+          <Text css={{ mr: '$4' }}>
             <Icon width="1rem" height="1rem" />
           </Text>
         )}
-        <Text variant="caption" css={{ ml: '$4' }}>
-          {value}
-        </Text>
+        <Text variant="caption">{value}</Text>
       </Flex>
     </Box>
   );
@@ -99,7 +97,10 @@ const MediaServerResult = ({ result }: { result?: ConnectivityCheckResult['media
           Icon={result?.stats?.audio.bytesSent ? CheckCircleIcon : CrossCircleIcon}
         />
         {result?.connectionQualityScore ? (
-          <DetailedInfo title="Connection Quality Score (CQS)" value={`${result.connectionQualityScore} (out of 5)`} />
+          <DetailedInfo
+            title="Connection Quality Score (CQS)"
+            value={`${result.connectionQualityScore.toFixed(2)} (out of 5)`}
+          />
         ) : null}
       </Flex>
     </ConnectivityTestStepResult>
@@ -132,7 +133,7 @@ const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
           <DetailedInfo title="Packets Lost" value={stats.packetsLost.toString()} />
           <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
           <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
-          <DetailedInfo title="Round Trip Time" value={stats.roundTripTime.toString()} />
+          <DetailedInfo title="Round Trip Time" value={`${stats.roundTripTime} ms`} />
         </Flex>
       )}
     </ConnectivityTestStepResult>
@@ -150,7 +151,7 @@ const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
           <DetailedInfo title="Packets Lost" value={stats.packetsLost.toString()} />
           <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
           <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
-          <DetailedInfo title="Round Trip Time" value={stats.roundTripTime.toString()} />
+          <DetailedInfo title="Round Trip Time" value={`${stats.roundTripTime} ms`} />
         </Flex>
       )}
     </ConnectivityTestStepResult>
