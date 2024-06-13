@@ -1,7 +1,7 @@
 import { DiagnosticsRTCStatsReport } from '.';
 import { HMSPeerStats, HMSTrackStats } from '../interfaces';
-import { HMSTrackType } from '../internal';
 import { HMSWebrtcStats } from '../rtc-stats';
+import { computeBitrate } from '../rtc-stats/utils';
 import { HMSSdk } from '../sdk';
 
 const isValidNumber = (num: number | undefined): boolean => !!num && !isNaN(num);
@@ -16,7 +16,7 @@ export class DiagnosticsStatsCollector {
 
   constructor(private sdk: HMSSdk) {}
 
-  handleStatsUpdate(stats: HMSWebrtcStats): void {
+  async handleStatsUpdate(stats: HMSWebrtcStats) {
     const localPeerStats = stats.getLocalPeerStats();
     if (localPeerStats) {
       this.peerStatsList.push(localPeerStats);
@@ -31,21 +31,27 @@ export class DiagnosticsStatsCollector {
       localVideoTrackID && this.localVideoTrackStatsList.push(localTrackStats[localVideoTrackID]);
     }
 
-    const remoteTrackStats = stats.getAllRemoteTracksStats();
-    Object.values(remoteTrackStats).forEach(trackStats => {
-      if (trackStats.kind === HMSTrackType.AUDIO) {
-        this.remoteAudioTrackStatsList.push(trackStats);
-      } else {
-        this.remoteVideoTrackStatsList.push(trackStats);
+    const subscribeStatsReport = await this.sdk.getWebrtcInternals()?.getSubscribePeerConnection()?.getStats();
+    subscribeStatsReport?.forEach(stat => {
+      if (stat.type === 'inbound-rtp') {
+        const list = stat.kind === 'audio' ? this.remoteAudioTrackStatsList : this.remoteVideoTrackStatsList;
+        const bitrate = computeBitrate('bytesReceived', stat, getLastElement(list));
+        list.push({ ...stat, bitrate });
       }
     });
   }
 
   // eslint-disable-next-line complexity
   buildReport(): DiagnosticsRTCStatsReport {
-    const publishRoundTripTime = getLastElement(this.peerStatsList)?.publish?.totalRoundTripTime || 0;
-    const subscribeRoundTripTime = getLastElement(this.peerStatsList)?.subscribe?.totalRoundTripTime || 0;
-    const roundTripTime = (publishRoundTripTime + subscribeRoundTripTime) / 2;
+    const lastPublishStats = getLastElement(this.peerStatsList)?.publish;
+    const lastSubscribeStats = getLastElement(this.peerStatsList)?.subscribe;
+    const publishRoundTripTime = lastPublishStats?.responsesReceived
+      ? (lastPublishStats?.totalRoundTripTime || 0) / lastPublishStats.responsesReceived
+      : 0;
+    const subscribeRoundTripTime = lastSubscribeStats?.responsesReceived
+      ? (lastSubscribeStats?.totalRoundTripTime || 0) / lastSubscribeStats.responsesReceived
+      : 0;
+    const roundTripTime = Number((((publishRoundTripTime + subscribeRoundTripTime) / 2) * 1000).toFixed(2));
 
     const audioPacketsReceived = getLastElement(this.remoteAudioTrackStatsList)?.packetsReceived || 0;
     const videoPacketsReceived = getLastElement(this.remoteVideoTrackStatsList)?.packetsReceived || 0;
@@ -73,9 +79,9 @@ export class DiagnosticsStatsCollector {
       combined: {
         roundTripTime,
         packetsReceived: audioPacketsReceived + videoPacketsReceived,
-        packetsLost: getLastElement(this.peerStatsList)?.subscribe?.packetsLost || 0,
-        bytesSent: getLastElement(this.peerStatsList)?.publish?.bytesSent || 0,
-        bytesReceived: getLastElement(this.peerStatsList)?.subscribe?.bytesReceived || 0,
+        packetsLost: lastSubscribeStats?.packetsLost || 0,
+        bytesSent: lastPublishStats?.bytesSent || 0,
+        bytesReceived: lastSubscribeStats?.bytesReceived || 0,
         bitrateSent:
           this.peerStatsList.reduce((acc, curr) => acc + (curr.publish?.bitrate || 0), 0) /
           this.peerStatsList.filter(curr => isValidNumber(curr.publish?.bitrate)).length,
