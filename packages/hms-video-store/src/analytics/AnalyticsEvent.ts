@@ -11,6 +11,7 @@ interface AnalyticsEventInit {
   includesPII?: boolean;
   properties?: Record<string, any>;
   timestamp?: number;
+  onlyForwardProperties?: boolean;
 }
 
 interface SignalEventParams {
@@ -24,6 +25,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   level: AnalyticsEventLevel;
   includesPII: boolean;
   properties: Record<string, any>;
+  onlyForwardProperties?: boolean;
   metadata: {
     token?: string;
     peer: {
@@ -47,7 +49,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   event_id: string;
   device_id: string;
 
-  constructor({ name, level, properties, includesPII, timestamp }: AnalyticsEventInit) {
+  constructor({ name, level, properties, includesPII, timestamp, onlyForwardProperties = false }: AnalyticsEventInit) {
     this.name = name;
     this.level = level;
     this.includesPII = includesPII || false;
@@ -55,13 +57,18 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
     this.event_id = uuid();
     this.device_id = getAnalyticsDeviceId();
+    this.onlyForwardProperties = onlyForwardProperties;
   }
 
   toSignalParams() {
-    return {
+    const signalParams = {
       name: this.name,
-      info: { ...this.properties, timestamp: this.timestamp, domain: domainCategory },
+      info: { ...this.properties },
       timestamp: new Date().getTime(), // Timestamp of sending the event
     };
+    if (!this.onlyForwardProperties) {
+      signalParams['info'] = { ...signalParams.info, timestamp: this.timestamp, domain: domainCategory };
+    }
+    return signalParams;
   }
 }

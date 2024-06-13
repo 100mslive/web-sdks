@@ -240,6 +240,7 @@ export default class AnalyticsEventFactory {
       name: 'krisp.usage',
       level: AnalyticsEventLevel.INFO,
       properties: { duration },
+      onlyForwardProperties: true,
     });
   }
 
