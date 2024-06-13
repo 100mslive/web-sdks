@@ -47,6 +47,7 @@ export const APP_DATA = {
   sheet: 'sheet',
   caption: 'caption',
   loadingEffects: 'loadingEffects',
+  noiseCancellation: 'noiseCancellation',
 };
 
 export const UI_SETTINGS = {
