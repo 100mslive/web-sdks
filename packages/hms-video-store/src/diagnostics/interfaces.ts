@@ -60,7 +60,7 @@ export interface MediaServerReport {
   stats?: DiagnosticsRTCStatsReport; // represents the overall stats of the call
   isPublishICEConnected: boolean; // True is ICE connected successfully for both publish and subscribe
   isSubscribeICEConnected: boolean;
-  connectionQualityScore?: number; // Averga of all the downlink scores for this call for this peer
+  connectionQualityScore?: number; // Average of all the downlink scores for this call for this peer
   publishIceCandidatesGathered?: Array<RTCIceCandidate>; // Publish ICE candidates
   subscribeIceCandidatesGathered: Array<RTCIceCandidate>; // Subscribe ICE candidates
   publishICECandidatePairSelected?: RTCIceCandidatePair; // publish ICE pair
