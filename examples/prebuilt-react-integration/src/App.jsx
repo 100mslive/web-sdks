@@ -3,7 +3,7 @@ import { getRoomCodeFromUrl } from './utils';
 
 export default function App() {
   const roomCode = getRoomCodeFromUrl();
-  const isDiagnostics = location.pathname.includes('diagnostics');
+  const isDiagnostics = location.pathname.startsWith('diagnostics');
 
   if (isDiagnostics) {
     return <Diagnostics />;
