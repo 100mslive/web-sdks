@@ -1,5 +1,5 @@
 import { tsvb } from 'effects-sdk';
-import { HMSMediaStreamPlugin } from '@100mslive/hms-video-store';
+import { HMSMediaStreamPlugin, parsedUserAgent } from '@100mslive/hms-video-store';
 import { EFFECTS_SDK_ASSETS } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
@@ -33,6 +33,21 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
     });
+    this.effects.cache();
+    // mweb optimisation
+    if (parsedUserAgent.getDevice().type === 'mobile') {
+      this.effects.enableFrameSkipping();
+    }
+    this.effects.setBackgroundFitMode('fill');
+    this.effects.setSegmentationPreset(this.preset);
+
+    this.effects.onReady = () => {
+      if (this.effects) {
+        this.initialised = true;
+        this.onInit?.();
+        this.effects.run();
+      }
+    };
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // currently logging info type messages as well
@@ -138,20 +153,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
-    this.effects.onReady = () => {
-      if (this.effects) {
-        this.initialised = true;
-        this.onInit?.();
-        this.effects.run();
-        this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset(this.preset);
-        if (this.blurAmount) {
-          this.setBlur(this.blurAmount);
-        } else if (this.background) {
-          this.setBackground(this.background);
-        }
-      }
-    };
+    if (this.blurAmount) {
+      this.setBlur(this.blurAmount);
+    } else if (this.background) {
+      this.setBackground(this.background);
+    }
     this.effects.clear();
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Draggable from 'react-draggable';
+import Draggable, { ControlPosition } from 'react-draggable';
 import { useMedia } from 'react-use';
 import {
   HMSTranscript,
@@ -28,6 +28,9 @@ class SimpleQueue {
   private storage: TranscriptData[] = [];
   constructor(private capacity: number = 3, private MAX_STORAGE_TIME: number = 5000) {}
   enqueue(data: TranscriptData): void {
+    if (!data.transcript.trim()) {
+      return;
+    }
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue(this.storage[this.size() - 1]);
     }
@@ -165,7 +168,13 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
   );
 };
 
-export const CaptionsViewer = () => {
+export const CaptionsViewer = ({
+  defaultPosition,
+  setDefaultPosition,
+}: {
+  defaultPosition: ControlPosition;
+  setDefaultPosition: (position: ControlPosition) => void;
+}) => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
   const isMobile = useMedia(config.media.md);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
@@ -208,7 +217,14 @@ export const CaptionsViewer = () => {
     return null;
   }
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef} defaultPosition={{ x: isMobile ? 0 : -200, y: 0 }}>
+    <Draggable
+      bounds="parent"
+      nodeRef={nodeRef}
+      defaultPosition={defaultPosition}
+      onStop={(_, data) => {
+        setDefaultPosition({ x: data.lastX, y: data.lastY });
+      }}
+    >
       <Box
         ref={nodeRef}
         css={{
