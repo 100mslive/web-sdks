@@ -40,6 +40,16 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         console.error('[HMSEffectsPlugin]', err);
       }
     });
+    this.effects.onReady = () => {
+      if (this.effects) {
+        this.initialised = true;
+        this.onInit?.();
+        this.effects.run();
+        this.effects.setBackgroundFitMode('fill');
+        this.effects.setSegmentationPreset(this.preset);
+        this.applyEffect();
+      }
+    };
   }
 
   getName(): string {
@@ -138,28 +148,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
-    this.effects.onReady = () => {
-      if (this.effects) {
-        this.initialised = true;
-        this.onInit?.();
-        this.effects.run();
-        this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset(this.preset);
-        if (this.blurAmount) {
-          this.setBlur(this.blurAmount);
-        } else if (this.background) {
-          this.setBackground(this.background);
-        }
-      }
-    };
     this.effects.clear();
+    this.applyEffect();
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);
       const { height, width } = stream.getVideoTracks()[0].getSettings();
       this.onResolutionChangeCallback?.(width!, height!);
     });
     this.updateCanvas(stream);
-
     return this.canvas.captureStream(30) || stream;
   }
 
@@ -168,5 +164,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.executeAfterInit(() => {
       this.effects.stop();
     });
+  }
+
+  private applyEffect() {
+    if (this.blurAmount) {
+      this.setBlur(this.blurAmount);
+    } else if (this.background) {
+      this.setBackground(this.background);
+    }
   }
 }
