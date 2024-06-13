@@ -34,9 +34,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       },
     });
     this.effects.cache();
-    this.effects.setBackgroundFitMode('fill');
-    this.effects.setSegmentationPreset(this.preset);
-
     this.effects.onReady = () => {
       if (this.effects) {
         this.initialised = true;
@@ -149,6 +146,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
+    this.effects.setBackgroundFitMode('fill');
+    this.effects.setSegmentationPreset(this.preset);
     if (this.blurAmount) {
       this.setBlur(this.blurAmount);
     } else if (this.background) {
