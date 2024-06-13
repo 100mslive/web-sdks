@@ -58,7 +58,7 @@ export interface SignallingReport {
 
 export interface MediaServerReport {
   stats?: DiagnosticsRTCStatsReport; // represents the overall stats of the call
-  isPublishICEConnected: boolean; // True is ICE connected successfully for both publish and subscribe
+  isPublishICEConnected: boolean; // True if ICE connected successfully for both publish and subscribe
   isSubscribeICEConnected: boolean;
   connectionQualityScore?: number; // Average of all the downlink scores for this call for this peer
   publishIceCandidatesGathered?: Array<RTCIceCandidate>; // Publish ICE candidates
