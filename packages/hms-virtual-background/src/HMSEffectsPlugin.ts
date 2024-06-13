@@ -103,8 +103,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
    */
   async setPreset(preset: 'quality' | 'balanced') {
     this.preset = preset;
-    this.executeAfterInit(async () => {
-      await this.effects.setSegmentationPreset(this.preset);
+    return new Promise((resolve, reject) => {
+      this.executeAfterInit(() => {
+        this.effects.setSegmentationPreset(this.preset).then(resolve).catch(reject);
+      });
     });
   }
 
