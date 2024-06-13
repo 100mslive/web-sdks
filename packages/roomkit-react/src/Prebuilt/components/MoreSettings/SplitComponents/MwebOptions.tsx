@@ -15,6 +15,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import {
+  AudioLevelIcon,
   BrbIcon,
   ClosedCaptionIcon,
   CrossIcon,
@@ -54,8 +55,13 @@ import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/
 import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
-// @ts-ignore: No implicit Any
-import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
+import {
+  useNoiseCancellationPlugin,
+  useSetIsCaptionEnabled,
+  useSetNoiseCancellationEnabled,
+  useShowPolls,
+  // @ts-ignore: No implicit Any
+} from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -111,6 +117,8 @@ export const MwebOptions = ({
   const { startRecording, isRecordingLoading } = useRecordingHandler();
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const { isNoiseCancellationEnabled, setNoiseCancellation, inProgress } = useSetNoiseCancellationEnabled();
+  const { isKrispPluginAdded } = useNoiseCancellationPlugin();
 
   const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -185,6 +193,31 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
+            {elements.hand_raise ? (
+              <ActionTile.Root
+                active={isNoiseCancellationEnabled && isKrispPluginAdded}
+                disable={inProgress}
+                onClick={async () => {
+                  await setNoiseCancellation(!isNoiseCancellationEnabled);
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <AudioLevelIcon />
+                <ActionTile.Title>{isNoiseCancellationEnabled ? 'Noise Reduced' : 'Reduce Noise'}</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+            {elements?.noise_cancellation?.enabled_by_default ? (
+              <ActionTile.Root
+                active={isHandRaised}
+                onClick={() => {
+                  toggleHandRaise();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
+                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
             {elements.hand_raise ? (
               <ActionTile.Root
                 active={isHandRaised}

@@ -13,7 +13,7 @@ import {
   usePreviewJoin,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
+import { AudioLevelIcon, MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
@@ -30,8 +30,13 @@ import SettingsModal from '../Settings/SettingsModal';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 import PreviewForm from './PreviewForm';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore: No implicit Any
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+import {
+  useAuthToken,
+  useNoiseCancellationPlugin,
+  useSetNoiseCancellationEnabled,
+  useUISettings,
+  // @ts-ignore: No implicit Any
+} from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
@@ -252,6 +257,9 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
 
+  const { isNoiseCancellationEnabled } = useSetNoiseCancellationEnabled();
+  const { isKrispPluginAdded } = useNoiseCancellationPlugin();
+
   return (
     <Flex
       justify={hideSettings && isMobile ? 'center' : 'between'}
@@ -264,7 +272,14 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
         <AudioVideoToggle />
         {vbEnabled ? <VBToggle /> : null}
       </Flex>
-      {!hideSettings ? <PreviewSettings /> : null}
+      <Flex align="center" gap="1">
+        {isMobile && isNoiseCancellationEnabled && isKrispPluginAdded ? (
+          <IconButton css={{ flexShrink: 0, cursor: 'not-allowed' }}>
+            <AudioLevelIcon />
+          </IconButton>
+        ) : null}
+        {!hideSettings ? <PreviewSettings /> : null}
+      </Flex>
     </Flex>
   );
 };

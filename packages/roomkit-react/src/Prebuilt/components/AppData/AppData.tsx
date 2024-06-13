@@ -79,7 +79,7 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
-  const [, setNoiseCancellationEnabled] = useSetNoiseCancellationEnabled();
+  const { setNoiseCancellationEnabled } = useSetNoiseCancellationEnabled();
 
   useEffect(() => {
     if (elements?.noise_cancellation?.enabled_by_default) {
