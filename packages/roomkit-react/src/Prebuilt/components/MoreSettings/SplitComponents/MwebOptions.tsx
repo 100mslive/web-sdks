@@ -119,7 +119,7 @@ export const MwebOptions = ({
   const { startRecording, isRecordingLoading } = useRecordingHandler();
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-  const { isNoiseCancellationEnabled, setNoiseCancellation, inProgress } = useSetNoiseCancellationEnabled();
+  const { isNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress } = useSetNoiseCancellationEnabled();
   const { krispPlugin, isKrispPluginAdded } = useNoiseCancellationPlugin();
   const room = useHMSStore(selectRoom);
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
@@ -214,7 +214,7 @@ export const MwebOptions = ({
                 active={isNoiseCancellationEnabled && isKrispPluginAdded}
                 disable={inProgress}
                 onClick={async () => {
-                  await setNoiseCancellation(!isNoiseCancellationEnabled);
+                  await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
                   setOpenOptionsSheet(false);
                 }}
               >

@@ -104,7 +104,7 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
 const NoiseCancellation = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  const { isNoiseCancellationEnabled, setNoiseCancellation, inProgress } = useSetNoiseCancellationEnabled();
+  const { isNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress } = useSetNoiseCancellationEnabled();
   const room = useHMSStore(selectRoom);
   const { krispPlugin, isKrispPluginAdded } = useNoiseCancellationPlugin();
 
@@ -132,7 +132,7 @@ const NoiseCancellation = () => {
         }}
         onClick={async e => {
           e.preventDefault();
-          await setNoiseCancellation(!isNoiseCancellationEnabled);
+          await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
         }}
       >
         <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
@@ -145,7 +145,7 @@ const NoiseCancellation = () => {
           disabled={inProgress}
           onClick={e => e.stopPropagation()}
           onCheckedChange={async value => {
-            await setNoiseCancellation(value);
+            await setNoiseCancellationWithPlugin(value);
           }}
         />
       </Dropdown.Item>
@@ -218,13 +218,13 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { screenType } = useRoomLayoutConferencingScreen();
   const [showSettings, setShowSettings] = useState(false);
   const { isKrispPluginAdded } = useNoiseCancellationPlugin();
-  const { isNoiseCancellationEnabled, setNoiseCancellation } = useSetNoiseCancellationEnabled();
+  const { isNoiseCancellationEnabled, setNoiseCancellationWithPlugin } = useSetNoiseCancellationEnabled();
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
 
   useEffect(() => {
     (async () => {
       if (isNoiseCancellationEnabled && !isKrispPluginAdded) {
-        await setNoiseCancellation(true);
+        await setNoiseCancellationWithPlugin(true);
         // add any id to call it once only
         ToastManager.addToast({
           id: '__noise_cancellation_id',
@@ -235,7 +235,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         });
       }
     })();
-  }, [actions, isNoiseCancellationEnabled, isKrispPluginAdded, setNoiseCancellation]);
+  }, [actions, isNoiseCancellationEnabled, isKrispPluginAdded, setNoiseCancellationWithPlugin]);
   if (!toggleAudio && !toggleVideo) {
     return null;
   }
