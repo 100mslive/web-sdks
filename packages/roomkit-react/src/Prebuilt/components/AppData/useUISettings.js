@@ -213,7 +213,7 @@ export const useSetNoiseCancellationEnabled = () => {
   const actions = useHMSActions();
   const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
   const [inProgress, setInProgress] = useState(false);
-  const setNoiseCancellation = async enabled => {
+  const setNoiseCancellationWithPlugin = async enabled => {
     setInProgress(true);
     if (enabled) {
       setNoiseCancellationEnabled(enabled);
@@ -224,7 +224,7 @@ export const useSetNoiseCancellationEnabled = () => {
     }
     setInProgress(false);
   };
-  return { isNoiseCancellationEnabled, setNoiseCancellationEnabled, setNoiseCancellation, inProgress };
+  return { isNoiseCancellationEnabled, setNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress };
 };
 
 export const useNoiseCancellationPlugin = () => {
