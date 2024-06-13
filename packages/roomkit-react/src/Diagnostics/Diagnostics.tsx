@@ -6,7 +6,7 @@ import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
 import { ConnectivityTest } from './ConnectivityTest';
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
+import { hmsActions, hmsDiagnostics, hmsNotifications, hmsStats, hmsStore } from './hms';
 import { VideoTest } from './VideoTest';
 
 const DiagnosticsSteps: Record<string, string> = {
@@ -40,7 +40,7 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 );
 
 const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
-  let TestComponent;
+  let TestComponent = () => <></>;
   if (activeStep === 'audio') {
     TestComponent = AudioTest;
   } else if (activeStep === 'video') {
@@ -48,7 +48,11 @@ const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
   } else if (activeStep === 'connectivity') {
     TestComponent = ConnectivityTest;
   }
-  return <Box css={{ p: '$10' }}>{TestComponent && <TestComponent />}</Box>;
+  return (
+    <Box css={{ p: '$10' }}>
+      <TestComponent key={activeStep} />
+    </Box>
+  );
 };
 
 const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
@@ -76,6 +80,16 @@ const DiagnosticsStepsList = ({
   activeStep: string;
   setActiveStep: (step: string) => void;
 }) => {
+  const stopCurrentCheck = () => {
+    if (activeStep === 'audio') {
+      hmsDiagnostics.stopMicCheck();
+    } else if (activeStep === 'video') {
+      hmsDiagnostics.stopCameraCheck();
+    } else if (activeStep === 'connectivity') {
+      hmsDiagnostics.stopConnectivityCheck();
+    }
+  };
+
   return (
     <ul style={{ width: '25%', marginRight: '3.5rem' }}>
       {Object.keys(DiagnosticsSteps).map(key => (
@@ -83,6 +97,7 @@ const DiagnosticsStepsList = ({
           key={key}
           onClick={() => {
             if (activeStep !== key) {
+              stopCurrentCheck();
               setActiveStep(key);
             }
           }}
