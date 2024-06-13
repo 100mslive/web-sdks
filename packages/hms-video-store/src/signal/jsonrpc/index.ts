@@ -20,8 +20,10 @@ import {
   AcceptRoleChangeParams,
   BroadcastResponse,
   CreateWhiteboardResponse,
-  findPeersRequestParams,
-  getPeerRequestParams,
+  FindPeerByNameRequestParams,
+  FindPeerByNameResponse,
+  FindPeersRequestParams,
+  GetPeerRequestParams,
   GetSessionMetadataResponse,
   GetWhiteboardResponse,
   HLSRequestParams,
@@ -30,7 +32,7 @@ import {
   HMSWhiteboardCreateOptions,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterRequestParams,
+  PeerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -60,6 +62,7 @@ import {
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
+  StartTranscriptionRequestParams,
   Track,
   TrackUpdateRequestParams,
   UpdatePeerRequestParams,
@@ -364,6 +367,14 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { ...params });
   }
 
+  async startTranscription(params: StartTranscriptionRequestParams) {
+    await this.call(HMSSignalMethod.START_TRANSCRIPTION, { ...params });
+  }
+
+  async stopTranscription(params: StartTranscriptionRequestParams) {
+    await this.call(HMSSignalMethod.STOP_TRANSCRIPTION, { ...params });
+  }
+
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
     await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { ...params });
   }
@@ -372,7 +383,7 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { ...params });
   }
 
-  async getPeer(params: getPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
+  async getPeer(params: GetPeerRequestParams): Promise<PeerNotificationInfo | undefined> {
     return await this.call(HMSSignalMethod.GET_PEER, { ...params });
   }
 
@@ -392,12 +403,16 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.GROUP_REMOVE, { name, peer_id: peerId });
   }
 
-  async peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
+  async peerIterNext(params: PeerIterRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.PEER_ITER_NEXT, params);
   }
 
-  async findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
+  async findPeers(params: FindPeersRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
+  }
+
+  async findPeerByName(params: FindPeerByNameRequestParams): Promise<FindPeerByNameResponse> {
+    return await this.call(HMSSignalMethod.SEARCH_BY_NAME, params);
   }
 
   setSessionMetadata(params: SetSessionMetadataParams) {

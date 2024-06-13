@@ -37,6 +37,8 @@ import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
+import { useIsNoiseCancellationEnabled, useSetNoiseCancellationEnabled } from './AppData/useUISettings';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
 import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
@@ -97,8 +99,8 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
 const plugin = new HMSKrispPlugin();
 const NoiseCancellation = () => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  const [enabled, setEnabled] = useSetNoiseCancellationEnabled();
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
-  const [active, setActive] = useState(isPluginAdded);
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
   const room = useHMSStore(selectRoom);
@@ -106,15 +108,15 @@ const NoiseCancellation = () => {
   useEffect(() => {
     (async () => {
       setInProgress(true);
-      if (active && !isPluginAdded) {
+      if (enabled && !isPluginAdded) {
         await actions.addPluginToAudioTrack(plugin);
       }
-      if (!active && isPluginAdded) {
+      if (!enabled && isPluginAdded) {
         await actions.removePluginFromAudioTrack(plugin);
       }
       setInProgress(false);
     })();
-  }, [actions, active, isPluginAdded]);
+  }, [actions, enabled, isPluginAdded]);
 
   if (!plugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
     return null;
@@ -132,7 +134,7 @@ const NoiseCancellation = () => {
         }}
         onClick={e => {
           e.preventDefault();
-          setActive(value => !value);
+          setEnabled(!enabled);
         }}
       >
         <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
@@ -141,11 +143,11 @@ const NoiseCancellation = () => {
         </Text>
         <Switch
           id="noise_cancellation"
-          checked={active}
+          checked={enabled && isPluginAdded}
           disabled={inProgress}
           onClick={e => e.stopPropagation()}
           onCheckedChange={value => {
-            setActive(value);
+            setEnabled(value);
           }}
         />
       </Dropdown.Item>
@@ -216,11 +218,28 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype && Number(audioOutput?.length) > 0;
   const { screenType } = useRoomLayoutConferencingScreen();
   const [showSettings, setShowSettings] = useState(false);
+  const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
+  const isNoiseCancellationEnabled = useIsNoiseCancellationEnabled();
+
+  useEffect(() => {
+    (async () => {
+      if (isNoiseCancellationEnabled && !isPluginAdded) {
+        await actions.addPluginToAudioTrack(plugin);
+      }
+      if (isNoiseCancellationEnabled && isPluginAdded) {
+        ToastManager.addToast({
+          title: `Noise Reduction Enabled`,
+          variant: 'standard',
+          duration: 2000,
+          icon: <AudioLevelIcon />,
+        });
+      }
+    })();
+  }, [actions, isNoiseCancellationEnabled, isPluginAdded]);
 
   if (!toggleAudio && !toggleVideo) {
     return null;
   }
-
   return (
     <Fragment>
       {toggleAudio ? (
