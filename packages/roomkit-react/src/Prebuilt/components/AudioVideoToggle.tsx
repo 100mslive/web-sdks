@@ -4,6 +4,7 @@ import {
   DeviceType,
   HMSRoomState,
   selectLocalAudioTrackID,
+  selectLocalPeer,
   selectLocalVideoTrackID,
   selectRoom,
   selectRoomState,
@@ -29,6 +30,7 @@ import { IconButtonWithOptions } from './IconButtonWithOptions/IconButtonWithOpt
 import SettingsModal from './Settings/SettingsModal';
 // @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
+import { AudioLevel } from '../../AudioLevel';
 import { Dropdown } from '../../Dropdown';
 import { Box, Flex } from '../../Layout';
 import { Switch } from '../../Switch';
@@ -204,6 +206,7 @@ const AudioSettings = ({ onClick }: { onClick: () => void }) => {
 export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
+  const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
@@ -216,6 +219,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const [showSettings, setShowSettings] = useState(false);
   const { isKrispPluginAdded } = useNoiseCancellationPlugin();
   const { isNoiseCancellationEnabled, setNoiseCancellation } = useSetNoiseCancellationEnabled();
+  const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
 
   useEffect(() => {
     (async () => {
@@ -251,7 +255,10 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           key="toggleAudio"
         >
           <Dropdown.Group>
-            <OptionLabel icon={<MicOnIcon />}>{!shouldShowAudioOutput ? 'Audio' : 'Microphone'}</OptionLabel>
+            <OptionLabel icon={<MicOnIcon />}>
+              <Box css={{ flex: '1 1 0' }}>{!shouldShowAudioOutput ? 'Audio' : 'Microphone'}</Box>
+              {!showMuteIcon && <AudioLevel trackId={localPeer?.audioTrack} />}
+            </OptionLabel>
             <Options
               options={audioInput}
               selectedDeviceId={selectedDeviceIDs.audioInput}
