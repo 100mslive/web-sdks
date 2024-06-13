@@ -8,8 +8,10 @@ import {
   selectIsLocalVideoEnabled,
   selectIsTranscriptionAllowedByMode,
   selectIsTranscriptionEnabled,
+  selectLocalAudioTrackID,
   selectPeerCount,
   selectPermissions,
+  selectRoom,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -118,7 +120,9 @@ export const MwebOptions = ({
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
   const { isNoiseCancellationEnabled, setNoiseCancellation, inProgress } = useSetNoiseCancellationEnabled();
-  const { isKrispPluginAdded } = useNoiseCancellationPlugin();
+  const { krispPlugin, isKrispPluginAdded } = useNoiseCancellationPlugin();
+  const room = useHMSStore(selectRoom);
+  const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
 
   const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -195,6 +199,18 @@ export const MwebOptions = ({
 
             {elements.hand_raise ? (
               <ActionTile.Root
+                active={isHandRaised}
+                onClick={() => {
+                  toggleHandRaise();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
+                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+            {krispPlugin.isSupported() && room.isNoiseCancellationEnabled && localPeerAudioTrackID ? (
+              <ActionTile.Root
                 active={isNoiseCancellationEnabled && isKrispPluginAdded}
                 disable={inProgress}
                 onClick={async () => {
@@ -204,30 +220,6 @@ export const MwebOptions = ({
               >
                 <AudioLevelIcon />
                 <ActionTile.Title>{isNoiseCancellationEnabled ? 'Noise Reduced' : 'Reduce Noise'}</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
-            {elements?.noise_cancellation?.enabled_by_default ? (
-              <ActionTile.Root
-                active={isHandRaised}
-                onClick={() => {
-                  toggleHandRaise();
-                  setOpenOptionsSheet(false);
-                }}
-              >
-                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
-                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
-            {elements.hand_raise ? (
-              <ActionTile.Root
-                active={isHandRaised}
-                onClick={() => {
-                  toggleHandRaise();
-                  setOpenOptionsSheet(false);
-                }}
-              >
-                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
-                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
             {isTranscriptionAllowed ? (
