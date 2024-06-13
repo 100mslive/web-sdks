@@ -3,6 +3,7 @@ import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from 
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
+import { formatBytes } from '../Stats';
 import { Text } from '../Text';
 import { hmsDiagnostics } from './hms';
 
@@ -125,12 +126,30 @@ const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
     <ConnectivityTestStepResult title="Audio" success={!!stats?.bytesSent}>
       {stats && (
         <Flex css={{ flexWrap: 'wrap' }}>
-          <DetailedInfo title="Bytes Sent" value={stats.bytesSent.toString()} />
-          <DetailedInfo title="Bytes Received" value={stats.bytesReceived.toString()} />
+          <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
+          <DetailedInfo title="Bytes Received" value={formatBytes(stats.bytesReceived)} />
           <DetailedInfo title="Packets Received" value={stats.packetsReceived.toString()} />
           <DetailedInfo title="Packets Lost" value={stats.packetsLost.toString()} />
-          <DetailedInfo title="Bitrate Sent" value={stats.bitrateSent.toString()} />
-          <DetailedInfo title="Bitrate Received" value={stats.bitrateReceived.toString()} />
+          <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
+          <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
+          <DetailedInfo title="Round Trip Time" value={stats.roundTripTime.toString()} />
+        </Flex>
+      )}
+    </ConnectivityTestStepResult>
+  );
+};
+
+const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
+  return (
+    <ConnectivityTestStepResult title="Video" success={!!stats?.bytesSent}>
+      {stats && (
+        <Flex css={{ flexWrap: 'wrap' }}>
+          <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
+          <DetailedInfo title="Bytes Received" value={formatBytes(stats.bytesReceived)} />
+          <DetailedInfo title="Packets Received" value={stats.packetsReceived.toString()} />
+          <DetailedInfo title="Packets Lost" value={stats.packetsLost.toString()} />
+          <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
+          <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
           <DetailedInfo title="Round Trip Time" value={stats.roundTripTime.toString()} />
         </Flex>
       )}
@@ -180,6 +199,7 @@ export const ConnectivityTest = () => {
         <SignallingResult result={result?.signallingReport} />
         <MediaServerResult result={result?.mediaServerReport} />
         <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
+        <VideoStats stats={result?.mediaServerReport?.stats?.video} />
       </Box>
     );
   }
