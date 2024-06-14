@@ -32,7 +32,7 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
-      height: '100vh',
+      minHeight: '100vh',
     }}
   >
     {children}
