@@ -1,10 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
-import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
+import { useCallback, useMemo } from 'react';
 import {
   selectAppData,
   selectAppDataByPath,
   selectAudioTrackByPeerID,
-  selectIsLocalAudioPluginPresent,
   selectPermissions,
   selectPolls,
   selectSessionStore,
@@ -205,39 +203,10 @@ export const usePollViewState = () => {
 };
 
 export const useIsNoiseCancellationEnabled = () => {
-  const IsNoiseCancellationEnabled = useHMSStore(selectAppDataByPath(APP_DATA.noiseCancellation));
-  return IsNoiseCancellationEnabled;
+  const isNoiseCancellationEnabled = useHMSStore(selectAppDataByPath(APP_DATA.noiseCancellation));
+  return isNoiseCancellationEnabled;
 };
-const krispPlugin = new HMSKrispPlugin();
-export const useSetNoiseCancellationEnabled = () => {
-  const actions = useHMSActions();
+export const useSetNoiseCancellation = () => {
   const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
-  const [inProgress, setInProgress] = useState(false);
-  const setNoiseCancellationWithPlugin = async enabled => {
-    if (inProgress) {
-      return;
-    }
-    setInProgress(true);
-    if (enabled) {
-      await actions.addPluginToAudioTrack(krispPlugin);
-    } else {
-      await actions.removePluginFromAudioTrack(krispPlugin);
-    }
-    setNoiseCancellationEnabled(enabled);
-    setInProgress(false);
-  };
-  return {
-    isNoiseCancellationEnabled,
-    setNoiseCancellationEnabled,
-    setNoiseCancellationWithPlugin,
-    inProgress,
-  };
-};
-
-export const useNoiseCancellationPlugin = () => {
-  const isKrispPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(krispPlugin.getName()));
-  return {
-    krispPlugin,
-    isKrispPluginAdded,
-  };
+  return [isNoiseCancellationEnabled, setNoiseCancellationEnabled];
 };

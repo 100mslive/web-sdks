@@ -8,16 +8,13 @@ import {
   selectIsLocalVideoEnabled,
   selectIsTranscriptionAllowedByMode,
   selectIsTranscriptionEnabled,
-  selectLocalAudioTrackID,
   selectPeerCount,
   selectPermissions,
-  selectRoom,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import {
-  AudioLevelIcon,
   BrbIcon,
   ClosedCaptionIcon,
   CrossIcon,
@@ -38,6 +35,7 @@ import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
+import { NoiseCancellation } from '../../AudioVideoToggle';
 // @ts-ignore: No implicit any
 import { EmojiReaction } from '../../EmojiReaction';
 // @ts-ignore: No implicit any
@@ -58,9 +56,7 @@ import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 import {
-  useNoiseCancellationPlugin,
   useSetIsCaptionEnabled,
-  useSetNoiseCancellationEnabled,
   useShowPolls,
   // @ts-ignore: No implicit Any
 } from '../../AppData/useUISettings';
@@ -119,10 +115,6 @@ export const MwebOptions = ({
   const { startRecording, isRecordingLoading } = useRecordingHandler();
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-  const { isNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress } = useSetNoiseCancellationEnabled();
-  const { krispPlugin, isKrispPluginAdded } = useNoiseCancellationPlugin();
-  const room = useHMSStore(selectRoom);
-  const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
 
   const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -209,19 +201,7 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-            {krispPlugin.isSupported() && room.isNoiseCancellationEnabled && localPeerAudioTrackID ? (
-              <ActionTile.Root
-                active={isNoiseCancellationEnabled && isKrispPluginAdded}
-                disable={inProgress}
-                onClick={async () => {
-                  await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
-                  setOpenOptionsSheet(false);
-                }}
-              >
-                <AudioLevelIcon />
-                <ActionTile.Title>{isNoiseCancellationEnabled ? 'Noise Reduced' : 'Reduce Noise'}</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
+            <NoiseCancellation setOpenOptionsSheet={setOpenOptionsSheet} actionTile />
             {isTranscriptionAllowed ? (
               <ActionTile.Root
                 onClick={() => {
