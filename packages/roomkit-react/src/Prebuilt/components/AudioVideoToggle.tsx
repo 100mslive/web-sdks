@@ -203,7 +203,7 @@ const AudioSettings = ({ onClick }: { onClick: () => void }) => {
   );
 };
 
-export const AudioVideoToggle = ({ hideOptions = false }) => {
+export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolean }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const localPeer = useHMSStore(selectLocalPeer);
@@ -223,9 +223,8 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
 
   useEffect(() => {
     (async () => {
-      if (isNoiseCancellationEnabled && !isKrispPluginAdded) {
+      if (isNoiseCancellationEnabled && !isKrispPluginAdded && localPeer?.audioTrack) {
         await setNoiseCancellationWithPlugin(true);
-        // add any id to call it once only
         ToastManager.addToast({
           title: `Noise Reduction Enabled`,
           variant: 'standard',
@@ -235,7 +234,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNoiseCancellationEnabled, isKrispPluginAdded]);
+  }, [isNoiseCancellationEnabled, isKrispPluginAdded, localPeer?.audioTrack]);
 
   if (!toggleAudio && !toggleVideo) {
     return null;

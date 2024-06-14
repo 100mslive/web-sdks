@@ -226,7 +226,12 @@ export const useSetNoiseCancellationEnabled = () => {
     setNoiseCancellationEnabled(enabled);
     setInProgress(false);
   };
-  return { isNoiseCancellationEnabled, setNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress };
+  return {
+    isNoiseCancellationEnabled,
+    setNoiseCancellationEnabled,
+    setNoiseCancellationWithPlugin,
+    inProgress,
+  };
 };
 
 export const useNoiseCancellationPlugin = () => {
