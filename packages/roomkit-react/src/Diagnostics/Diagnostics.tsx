@@ -10,8 +10,8 @@ import { hmsActions, hmsDiagnostics, hmsNotifications, hmsStats, hmsStore } from
 import { VideoTest } from './VideoTest';
 
 const DiagnosticsSteps: Record<string, string> = {
-  audio: 'Test Audio',
   video: 'Test Video',
+  audio: 'Test Audio',
   // browser: 'Browser Support',
   connectivity: 'Connection Quality',
 };
@@ -48,11 +48,7 @@ const DiagnosticsStepTest = ({ activeStep }: { activeStep: string }) => {
   } else if (activeStep === 'connectivity') {
     TestComponent = ConnectivityTest;
   }
-  return (
-    <Box css={{ p: '$10' }}>
-      <TestComponent key={activeStep} />
-    </Box>
-  );
+  return <TestComponent key={activeStep} />;
 };
 
 const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
@@ -66,7 +62,7 @@ const DiagnosticsStepHeader = ({ activeStep }: { activeStep: string }) => {
 
 const DiagnosticsStep = ({ activeStep }: { activeStep: string }) => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1', w: '100%' }}>
+    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%' }}>
       <DiagnosticsStepHeader activeStep={activeStep} />
       <DiagnosticsStepTest activeStep={activeStep} />
     </Box>
@@ -91,23 +87,25 @@ const DiagnosticsStepsList = ({
   };
 
   return (
-    <ul style={{ width: '25%', marginRight: '3.5rem' }}>
-      {Object.keys(DiagnosticsSteps).map(key => (
-        <li
-          key={key}
-          onClick={() => {
-            if (activeStep !== key) {
-              stopCurrentCheck();
-              setActiveStep(key);
-            }
-          }}
-        >
-          <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
-            {DiagnosticsSteps[key]}
-          </Text>
-        </li>
-      ))}
-    </ul>
+    <Box css={{ w: '25%' }}>
+      <ul>
+        {Object.keys(DiagnosticsSteps).map(key => (
+          <li
+            key={key}
+            onClick={() => {
+              if (activeStep !== key) {
+                stopCurrentCheck();
+                setActiveStep(key);
+              }
+            }}
+          >
+            <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
+              {DiagnosticsSteps[key]}
+            </Text>
+          </li>
+        ))}
+      </ul>
+    </Box>
   );
 };
 
@@ -121,7 +119,7 @@ export const Diagnostics = () => {
           <Text variant="md" css={{ c: '$on_primary_medium' }}>
             Make sure your devices and network are good to go, let's get started.
           </Text>
-          <Flex css={{ direction: 'column', gap: '$14', mt: '$12', justifyItems: 'center' }}>
+          <Flex css={{ direction: 'column', mt: '$12', justifyItems: 'center' }}>
             <DiagnosticsStepsList activeStep={activeStep} setActiveStep={setActiveStep} />
             <DiagnosticsStep activeStep={activeStep} />
           </Flex>

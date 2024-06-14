@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   selectDevices,
   selectLocalAudioTrackID,
@@ -9,6 +9,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon } from '@100mslive/react-icons';
+import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Progress } from '../Progress';
@@ -86,7 +87,7 @@ const SpeakerTest = () => {
       <DeviceSelector
         title="Speaker(output)"
         devices={devices.audioOutput}
-        selection={audioOutputDeviceId}
+        selection={audioOutputDeviceId || 'default'}
         icon={<SpeakerIcon />}
         onChange={(deviceId: string) => {
           actions.setAudioOutputDevice(deviceId);
@@ -115,17 +116,33 @@ const SpeakerTest = () => {
 };
 
 export const AudioTest = () => {
-  return (
-    <Box>
-      <Text variant="body2" css={{ c: '$on_primary_medium' }}>
-        Record an audio clip and play it back to check that your microphone and speaker are working. If they aren't,
-        make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth settings.
-      </Text>
+  const [error, setError] = useState<Error | undefined>();
+  useEffect(() => {
+    hmsDiagnostics.requestPermission({ audio: true }).catch(error => setError(error));
+  }, []);
 
-      <Flex css={{ mt: '$10', gap: '$10' }}>
-        <MicTest />
-        <SpeakerTest />
-      </Flex>
-    </Box>
+  return (
+    <>
+      <TestContainer>
+        <Text variant="body2" css={{ c: '$on_primary_medium' }}>
+          Record an audio clip and play it back to check that your microphone and speaker are working. If they aren't,
+          make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth settings.
+        </Text>
+
+        <Flex css={{ mt: '$10', gap: '$10' }}>
+          <MicTest />
+          <SpeakerTest />
+        </Flex>
+      </TestContainer>
+      <TestFooter error={error}>
+        <Flex align="center" gap="4">
+          <Text css={{ c: '$on_primary_medium' }}>Does your audio sound good?</Text>
+          <Button variant="standard" outlined={true}>
+            No
+          </Button>
+          <Button>Yes</Button>
+        </Flex>
+      </TestFooter>
+    </>
   );
 };

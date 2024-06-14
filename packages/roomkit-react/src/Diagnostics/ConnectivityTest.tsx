@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
+import { TestContainer, TestFooter } from './components';
+import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { formatBytes } from '../Stats';
@@ -158,6 +160,17 @@ const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   );
 };
 
+const Footer = ({ error }: { error?: Error }) => {
+  return (
+    <TestFooter error={error}>
+      <Flex gap="4">
+        <Button variant="standard">Restart Test</Button>
+        <Button>Download Test Report</Button>
+      </Flex>
+    </TestFooter>
+  );
+};
+
 export const ConnectivityTest = () => {
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>(ConnectivityState.STARTING);
@@ -180,33 +193,39 @@ export const ConnectivityTest = () => {
 
   if (error) {
     return (
-      <Box css={{ w: '100%', textAlign: 'center' }}>
-        <Text css={{ c: '$alert_error_default', mb: '$4' }}>
-          <CrossCircleIcon />
-        </Text>
-        <Text variant="h6">Connectivity Test Failed</Text>
-        <Text variant="body2" css={{ c: '$on_primary_medium' }}>
-          {error.message}
-        </Text>
-      </Box>
+      <>
+        <TestContainer css={{ textAlign: 'center' }}>
+          <Text css={{ c: '$alert_error_default', mb: '$4' }}>
+            <CrossCircleIcon />
+          </Text>
+          <Text variant="h6">Connectivity Test Failed</Text>
+          <Text variant="body2" css={{ c: '$on_primary_medium' }}>
+            {error.message}
+          </Text>
+        </TestContainer>
+        <Footer error={error} />
+      </>
     );
   }
 
   if (result) {
     console.log(result);
     return (
-      <Box css={{ w: '100%' }}>
-        <Text css={{ c: '$on_primary_medium' }}>Connectivity test has been completed.</Text>
-        <SignallingResult result={result?.signallingReport} />
-        <MediaServerResult result={result?.mediaServerReport} />
-        <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
-        <VideoStats stats={result?.mediaServerReport?.stats?.video} />
-      </Box>
+      <>
+        <TestContainer>
+          <Text css={{ c: '$on_primary_medium' }}>Connectivity test has been completed.</Text>
+          <SignallingResult result={result?.signallingReport} />
+          <MediaServerResult result={result?.mediaServerReport} />
+          <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
+          <VideoStats stats={result?.mediaServerReport?.stats?.video} />
+        </TestContainer>
+        <Footer error={error} />
+      </>
     );
   }
 
   return (
-    <Box css={{ w: '100%', textAlign: 'center' }}>
+    <TestContainer css={{ textAlign: 'center' }}>
       <Text css={{ c: '$primary_bright' }}>
         <Loading size="3.5rem" color="currentColor" />
       </Text>
@@ -217,6 +236,6 @@ export const ConnectivityTest = () => {
         variant="body2"
         css={{ c: '$on_primary_medium', mt: '$4' }}
       >{`${ConnectivityStateMessage[progress]}...`}</Text>
-    </Box>
+    </TestContainer>
   );
 };
