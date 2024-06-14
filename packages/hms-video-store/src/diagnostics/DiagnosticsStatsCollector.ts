@@ -6,6 +6,9 @@ import { HMSSdk } from '../sdk';
 
 const isValidNumber = (num: number | undefined): boolean => !!num && !isNaN(num);
 const getLastElement = <T>(arr: T[]): T | undefined => arr[arr.length - 1];
+const calculateAverage = <T>(arr: T[], predicate: (val: T) => number | undefined): number =>
+  arr.reduce((acc, curr) => acc + (predicate(curr) || 0), 0) /
+  arr.filter(curr => isValidNumber(predicate(curr))).length;
 
 export class DiagnosticsStatsCollector {
   private peerStatsList: HMSPeerStats[] = [];
@@ -56,21 +59,13 @@ export class DiagnosticsStatsCollector {
     const audioPacketsReceived = getLastElement(this.remoteAudioTrackStatsList)?.packetsReceived || 0;
     const videoPacketsReceived = getLastElement(this.remoteVideoTrackStatsList)?.packetsReceived || 0;
 
-    const ridAveragedAudioBitrateList = this.localAudioTrackStatsList
-      .map(
-        trackStatsMap =>
-          Object.values(trackStatsMap).reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
-          Object.values(trackStatsMap).filter(curr => isValidNumber(curr.bitrate)).length,
-      )
-      .filter(isValidNumber);
+    const ridAveragedAudioBitrateList = this.localAudioTrackStatsList.map(trackStatsMap =>
+      trackStatsMap ? calculateAverage(Object.values(trackStatsMap), curr => curr.bitrate) : 0,
+    );
 
-    const ridAveragedVideoBitrateList = this.localVideoTrackStatsList
-      .map(
-        trackStatsMap =>
-          Object.values(trackStatsMap).reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
-          Object.values(trackStatsMap).filter(curr => isValidNumber(curr.bitrate)).length,
-      )
-      .filter(isValidNumber);
+    const ridAveragedVideoBitrateList = this.localVideoTrackStatsList.map(trackStatsMap =>
+      trackStatsMap ? calculateAverage(Object.values(trackStatsMap), curr => curr.bitrate) : 0,
+    );
 
     const lastLocalAudioTrackStats = getLastElement(this.localAudioTrackStatsList);
     const lastLocalVideoTrackStats = getLastElement(this.localVideoTrackStatsList);
@@ -82,23 +77,16 @@ export class DiagnosticsStatsCollector {
         packetsLost: lastSubscribeStats?.packetsLost || 0,
         bytesSent: lastPublishStats?.bytesSent || 0,
         bytesReceived: lastSubscribeStats?.bytesReceived || 0,
-        bitrateSent:
-          this.peerStatsList.reduce((acc, curr) => acc + (curr.publish?.bitrate || 0), 0) /
-          this.peerStatsList.filter(curr => isValidNumber(curr.publish?.bitrate)).length,
-        bitrateReceived:
-          this.peerStatsList.reduce((acc, curr) => acc + (curr.subscribe?.bitrate || 0), 0) /
-          this.peerStatsList.filter(curr => isValidNumber(curr.subscribe?.bitrate)).length,
+        bitrateSent: calculateAverage(this.peerStatsList, curr => curr.publish?.bitrate),
+        bitrateReceived: calculateAverage(this.peerStatsList, curr => curr.subscribe?.bitrate),
       },
       audio: {
         roundTripTime,
         packetsReceived: audioPacketsReceived,
         packetsLost: getLastElement(this.remoteAudioTrackStatsList)?.packetsLost || 0,
         bytesReceived: getLastElement(this.remoteAudioTrackStatsList)?.bytesReceived || 0,
-        bitrateSent:
-          ridAveragedAudioBitrateList.reduce((acc, curr) => acc + curr, 0) / ridAveragedAudioBitrateList.length,
-        bitrateReceived:
-          this.remoteAudioTrackStatsList.reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
-          this.remoteAudioTrackStatsList.filter(curr => isValidNumber(curr.bitrate)).length,
+        bitrateSent: calculateAverage(ridAveragedAudioBitrateList, curr => curr),
+        bitrateReceived: calculateAverage(this.remoteAudioTrackStatsList, curr => curr.bitrate),
         bytesSent: lastLocalAudioTrackStats
           ? Object.values(lastLocalAudioTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
           : 0,
@@ -108,11 +96,8 @@ export class DiagnosticsStatsCollector {
         packetsLost: getLastElement(this.remoteVideoTrackStatsList)?.packetsLost || 0,
         bytesReceived: getLastElement(this.remoteVideoTrackStatsList)?.bytesReceived || 0,
         packetsReceived: videoPacketsReceived,
-        bitrateSent:
-          ridAveragedVideoBitrateList.reduce((acc, curr) => acc + curr, 0) / ridAveragedVideoBitrateList.length,
-        bitrateReceived:
-          this.remoteVideoTrackStatsList.reduce((acc, curr) => acc + (curr.bitrate || 0), 0) /
-          this.remoteVideoTrackStatsList.filter(curr => isValidNumber(curr.bitrate)).length,
+        bitrateSent: calculateAverage(ridAveragedVideoBitrateList, curr => curr),
+        bitrateReceived: calculateAverage(this.remoteVideoTrackStatsList, curr => curr.bitrate),
         bytesSent: lastLocalVideoTrackStats
           ? Object.values(lastLocalVideoTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
           : 0,
