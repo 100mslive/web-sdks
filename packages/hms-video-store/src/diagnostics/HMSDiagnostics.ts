@@ -1,6 +1,11 @@
 import { ConnectivityCheck } from './ConnectivityCheck';
 import { DEFAULT_TEST_AUDIO_URL, diagnosticsRole, MIC_CHECK_RECORD_DURATION } from './constants';
-import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsInterface } from './interfaces';
+import {
+  ConnectivityCheckResult,
+  ConnectivityState,
+  HMSDiagnosticsInterface,
+  MediaPermissionCheck,
+} from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import {
@@ -32,7 +37,19 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     return this.sdk?.store.getLocalPeer();
   }
 
+  async requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck> {
+    const stream = await navigator.mediaDevices.getUserMedia(check);
+
+    stream.getTracks().forEach(track => track.stop());
+    await this.sdk.deviceManager.init(true);
+    return {
+      audio: stream.getAudioTracks().length > 0,
+      video: stream.getVideoTracks().length > 0,
+    };
+  }
+
   async startCameraCheck(inputDevice?: string) {
+    this.initSdkWithLocalPeer();
     if (!this.localPeer) {
       throw new Error('Local peer not found');
     }
@@ -66,6 +83,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   }
 
   async startMicCheck(inputDevice?: string, onStop?: () => void, time = MIC_CHECK_RECORD_DURATION) {
+    this.initSdkWithLocalPeer();
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
@@ -162,7 +180,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     const room = new HMSRoom('diagnostics-room');
     this.sdk.store.setRoom(room);
     this.sdkListener.onRoomUpdate(HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED, room);
-    this.sdk?.deviceManager.init();
+    this.sdk?.deviceManager.init(true);
   }
 
   private async getAuthToken(region?: string): Promise<string> {
@@ -198,7 +216,6 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       ...diagnosticsRole,
       publishParams: { ...diagnosticsRole.publishParams, allowed: ['audio'] },
     };
-    this.sdk?.deviceManager.init();
     const settings = new HMSTrackSettingsBuilder()
       .audio(new HMSAudioTrackSettingsBuilder().deviceId(inputDevice || 'default').build())
       .build();
