@@ -214,14 +214,16 @@ export const useSetNoiseCancellationEnabled = () => {
   const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
   const [inProgress, setInProgress] = useState(false);
   const setNoiseCancellationWithPlugin = async enabled => {
+    if (inProgress) {
+      return;
+    }
     setInProgress(true);
     if (enabled) {
-      setNoiseCancellationEnabled(enabled);
       await actions.addPluginToAudioTrack(krispPlugin);
     } else {
-      setNoiseCancellationEnabled(enabled);
       await actions.removePluginFromAudioTrack(krispPlugin);
     }
+    setNoiseCancellationEnabled(enabled);
     setInProgress(false);
   };
   return { isNoiseCancellationEnabled, setNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress };

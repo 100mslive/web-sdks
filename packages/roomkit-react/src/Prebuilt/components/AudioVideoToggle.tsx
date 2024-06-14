@@ -227,7 +227,6 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         await setNoiseCancellationWithPlugin(true);
         // add any id to call it once only
         ToastManager.addToast({
-          id: '__noise_cancellation_id',
           title: `Noise Reduction Enabled`,
           variant: 'standard',
           duration: 2000,
@@ -235,7 +234,9 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         });
       }
     })();
-  }, [actions, isNoiseCancellationEnabled, isKrispPluginAdded, setNoiseCancellationWithPlugin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNoiseCancellationEnabled, isKrispPluginAdded]);
+
   if (!toggleAudio && !toggleVideo) {
     return null;
   }
