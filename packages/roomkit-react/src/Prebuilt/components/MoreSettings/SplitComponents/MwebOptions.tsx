@@ -35,6 +35,7 @@ import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
+import { NoiseCancellation } from '../../AudioVideoToggle';
 // @ts-ignore: No implicit any
 import { EmojiReaction } from '../../EmojiReaction';
 // @ts-ignore: No implicit any
@@ -54,8 +55,11 @@ import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/
 import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
-// @ts-ignore: No implicit Any
-import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
+import {
+  useSetIsCaptionEnabled,
+  useShowPolls,
+  // @ts-ignore: No implicit Any
+} from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -197,6 +201,7 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
+            <NoiseCancellation setOpenOptionsSheet={setOpenOptionsSheet} actionTile />
             {isTranscriptionAllowed ? (
               <ActionTile.Root
                 onClick={() => {

@@ -17,7 +17,7 @@ import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPrefere
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 // @ts-ignore
-import { useSetAppDataByKey, useSetNoiseCancellationEnabled } from './useUISettings';
+import { useSetAppDataByKey, useSetNoiseCancellation } from './useUISettings';
 import {
   APP_DATA,
   CHAT_SELECTOR,
@@ -79,7 +79,7 @@ export const AppData = React.memo(() => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
-  const [, setNoiseCancellationEnabled] = useSetNoiseCancellationEnabled();
+  const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
 
   useEffect(() => {
     if (elements?.noise_cancellation?.enabled_by_default) {
