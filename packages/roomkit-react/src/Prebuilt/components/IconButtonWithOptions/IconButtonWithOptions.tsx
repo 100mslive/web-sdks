@@ -111,7 +111,7 @@ export const IconButtonWithOptions = ({
   const commonProps = { disabled, active };
   return (
     <Flex>
-      <IconSection {...commonProps} onClick={onClick} hideOptions={hideOptions}>
+      <IconSection {...commonProps} onClick={onClick} hideOptions={hideOptions} className="__cancel-drag-event">
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Icon {...commonProps}>{icon}</Icon>
         </Tooltip>
