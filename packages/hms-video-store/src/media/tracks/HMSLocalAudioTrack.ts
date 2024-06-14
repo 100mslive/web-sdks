@@ -7,6 +7,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
@@ -46,6 +47,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
+    room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -56,7 +58,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (settings.deviceId !== track.getSettings().deviceId && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
+    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
     if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);

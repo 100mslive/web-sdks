@@ -1,4 +1,6 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
+import { ControlPosition } from 'react-draggable';
+import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -16,6 +18,7 @@ import { PeopleAddIcon, ShareScreenIcon } from '@100mslive/react-icons';
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
+import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -25,11 +28,7 @@ import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
-import {
-  usePDFConfig,
-  useUrlToEmbed,
-  // @ts-ignore: No implicit Any
-} from '../components/AppData/useUISettings';
+import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
@@ -54,6 +53,8 @@ export const VideoStreamingSection = ({
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobile = useMedia(config.media.md);
+  const [captionPosition, setCaptionPosition] = useState<ControlPosition>({ x: isMobile ? 0 : -200, y: 0 });
   useCloseScreenshareWhiteboard();
 
   const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();
@@ -140,7 +141,7 @@ export const VideoStreamingSection = ({
             // @ts-ignore
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
-        <CaptionsViewer />
+        <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
         <Box
           css={{
             flex: match({ isLandscapeHLSStream, isMobileHLSStream })

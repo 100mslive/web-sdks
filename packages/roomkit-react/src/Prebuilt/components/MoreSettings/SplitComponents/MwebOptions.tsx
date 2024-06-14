@@ -35,6 +35,7 @@ import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
+import { NoiseCancellation } from '../../AudioVideoToggle';
 // @ts-ignore: No implicit any
 import { EmojiReaction } from '../../EmojiReaction';
 // @ts-ignore: No implicit any
@@ -197,6 +198,7 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
+            <NoiseCancellation setOpenOptionsSheet={setOpenOptionsSheet} actionTile />
             {isTranscriptionAllowed ? (
               <ActionTile.Root
                 onClick={() => {
