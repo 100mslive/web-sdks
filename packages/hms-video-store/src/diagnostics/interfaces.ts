@@ -1,5 +1,5 @@
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
-import { HMSException, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSUpdateListener } from '../internal';
+import { HMSException, HMSUpdateListener } from '../internal';
 
 export enum ConnectivityState {
   STARTING,
@@ -20,7 +20,13 @@ export interface HMSDiagnosticsConnectivityListener extends HMSUpdateListener {
   onSelectedICECandidatePairChange(candidatePair: RTCIceCandidatePair, isPublish: boolean): void;
 }
 
+export interface MediaPermissionCheck {
+  audio?: boolean;
+  video?: boolean;
+}
+
 export interface HMSDiagnosticsInterface {
+  requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck>;
   startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<void>;
   getRecordedAudio(): string | undefined;
   stopMicCheck(): void;
@@ -34,11 +40,6 @@ export interface HMSDiagnosticsInterface {
     region?: string,
   ): Promise<void>;
   stopConnectivityCheck(): Promise<void>;
-}
-
-export interface HMSDiagnosticsListener {
-  onAudioTrack(audioTrack: HMSLocalAudioTrack): void;
-  onVideoTrack(videoTrack: HMSLocalVideoTrack): void;
 }
 
 export interface ConnectivityCheckResult {
