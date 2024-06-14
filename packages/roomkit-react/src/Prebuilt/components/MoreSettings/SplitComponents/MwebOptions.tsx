@@ -55,11 +55,8 @@ import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/
 import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
-import {
-  useSetIsCaptionEnabled,
-  useShowPolls,
-  // @ts-ignore: No implicit Any
-} from '../../AppData/useUISettings';
+// @ts-ignore: No implicit Any
+import { useIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -116,7 +113,7 @@ export const MwebOptions = ({
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const [isCaptionEnabled] = useSetIsCaptionEnabled();
+  const isCaptionEnabled = useIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
