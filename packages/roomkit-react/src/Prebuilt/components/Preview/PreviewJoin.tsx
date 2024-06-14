@@ -13,13 +13,13 @@ import {
   usePreviewJoin,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { AudioLevelIcon, MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
+import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import SidePane from '../../layouts/SidePane';
-import { AudioVideoToggle } from '../AudioVideoToggle';
+import { AudioVideoToggle, NoiseCancellation } from '../AudioVideoToggle';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
@@ -32,8 +32,6 @@ import PreviewForm from './PreviewForm';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import {
   useAuthToken,
-  useNoiseCancellationPlugin,
-  useSetNoiseCancellationEnabled,
   useUISettings,
   // @ts-ignore: No implicit Any
 } from '../AppData/useUISettings';
@@ -256,10 +254,6 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
-
-  const { isNoiseCancellationEnabled } = useSetNoiseCancellationEnabled();
-  const { isKrispPluginAdded } = useNoiseCancellationPlugin();
-
   return (
     <Flex
       justify={hideSettings && isMobile ? 'center' : 'between'}
@@ -273,11 +267,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
         {vbEnabled ? <VBToggle /> : null}
       </Flex>
       <Flex align="center" gap="1">
-        {isMobile && isNoiseCancellationEnabled && isKrispPluginAdded ? (
-          <IconButton css={{ flexShrink: 0, cursor: 'not-allowed' }}>
-            <AudioLevelIcon />
-          </IconButton>
-        ) : null}
+        {isMobile && <NoiseCancellation iconOnly />}
         {!hideSettings ? <PreviewSettings /> : null}
       </Flex>
     </Flex>

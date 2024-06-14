@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   DeviceType,
   HMSRoomState,
@@ -27,6 +26,8 @@ import {
 } from '@100mslive/react-icons';
 import { IconButtonWithOptions } from './IconButtonWithOptions/IconButtonWithOptions';
 // @ts-ignore: No implicit Any
+import { ActionTile } from './MoreSettings/ActionTile';
+// @ts-ignore: No implicit Any
 import SettingsModal from './Settings/SettingsModal';
 // @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
@@ -35,7 +36,6 @@ import { Dropdown } from '../../Dropdown';
 import { Box, Flex } from '../../Layout';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -101,24 +101,51 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
   );
 };
 
-const NoiseCancellation = () => {
-  const isMobile = useMedia(cssConfig.media.md);
+export const NoiseCancellation = ({
+  actionTile,
+  iconOnly,
+  setOpenOptionsSheet,
+}: {
+  setOpenOptionsSheet?: (value: boolean) => void;
+  iconOnly?: boolean;
+  actionTile?: boolean;
+}) => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
   const { isNoiseCancellationEnabled, setNoiseCancellationWithPlugin, inProgress } = useSetNoiseCancellationEnabled();
   const room = useHMSStore(selectRoom);
   const { krispPlugin, isKrispPluginAdded } = useNoiseCancellationPlugin();
 
+  console.log(krispPlugin.isSupported());
   if (!krispPlugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
     return null;
   }
 
-  if (isMobile) {
+  if (actionTile) {
     return (
-      <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
+      <ActionTile.Root
+        active={isNoiseCancellationEnabled && isKrispPluginAdded}
+        disable={inProgress}
+        onClick={async () => {
+          await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
+          setOpenOptionsSheet?.(false);
+        }}
+      >
         <AudioLevelIcon />
-        Reduce Noise
-      </Text>
+        <ActionTile.Title>{isNoiseCancellationEnabled ? 'Noise Reduced' : 'Reduce Noise'}</ActionTile.Title>
+      </ActionTile.Root>
     );
+  }
+
+  if (iconOnly) {
+    <Tooltip title={isNoiseCancellationEnabled ? 'Noise Reduced' : 'Reduce Noise'}>
+      <Box
+        onClick={() => {
+          setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
+        }}
+      >
+        <AudioLevelIcon />
+      </Box>
+    </Tooltip>;
   }
   return (
     <>
