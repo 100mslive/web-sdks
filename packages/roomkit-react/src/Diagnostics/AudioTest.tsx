@@ -115,7 +115,7 @@ const SpeakerTest = () => {
   );
 };
 
-export const AudioTest = () => {
+export const AudioTest = ({ onNextStep }: { onNextStep: () => void }) => {
   const [error, setError] = useState<Error | undefined>();
   useEffect(() => {
     hmsDiagnostics.requestPermission({ audio: true }).catch(error => setError(error));
@@ -140,7 +140,7 @@ export const AudioTest = () => {
           <Button variant="standard" outlined={true}>
             No
           </Button>
-          <Button>Yes</Button>
+          <Button onClick={onNextStep}>Yes</Button>
         </Flex>
       </TestFooter>
     </>

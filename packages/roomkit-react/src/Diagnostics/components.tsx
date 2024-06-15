@@ -3,6 +3,16 @@ import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
 
+export const DiagnosticsContext = React.createContext<{
+  activeStep: string;
+  setActiveStep: React.Dispatch<React.SetStateAction<string>>;
+}>({
+  activeStep: 'video',
+  setActiveStep: () => {
+    return;
+  },
+});
+
 export const TestContainer = ({ css, children }: { css?: CSS; children: React.ReactNode }) => {
   return <Box css={{ p: '$10', ...css }}>{children}</Box>;
 };

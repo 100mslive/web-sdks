@@ -11,7 +11,7 @@ import { StyledVideoTile } from '../VideoTile';
 import { DeviceSelector } from './DeviceSelector';
 import { hmsDiagnostics } from './hms';
 
-export const VideoTest = () => {
+export const VideoTest = ({ onNextStep }: { onNextStep: () => void }) => {
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
@@ -60,7 +60,7 @@ export const VideoTest = () => {
           <Button variant="standard" outlined={true}>
             No
           </Button>
-          <Button>Yes</Button>
+          <Button onClick={onNextStep}>Yes</Button>
         </Flex>
       </TestFooter>
     </>
