@@ -69,6 +69,7 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
+          this.reTriggerPlay({ videoElement, stream: srcObject });
           return;
         } else {
           this.reduceSinkCount();
@@ -77,9 +78,23 @@ export class HMSVideoTrack extends HMSTrack {
         this.reduceSinkCount();
       }
     }
-    videoElement.srcObject = new MediaStream([track]);
+    const stream = new MediaStream([track]);
+    videoElement.srcObject = stream;
+    this.reTriggerPlay({ videoElement, stream });
     this.sinkCount++;
   }
+
+  private reTriggerPlay = ({ videoElement, stream }: { videoElement: HTMLVideoElement; stream: MediaStream }) => {
+    setTimeout(() => {
+      if (videoElement.paused) {
+        // This is needed for safari and firefox to work properly
+        videoElement.srcObject = stream;
+        videoElement.play().catch(() => {
+          //do nothing
+        });
+      }
+    }, 0);
+  };
 
   private reduceSinkCount() {
     if (this.sinkCount > 0) {

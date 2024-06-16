@@ -1,3 +1,4 @@
+import { HMSTranscriptionMode } from './room';
 import { SimulcastLayers } from './simulcast-layers';
 
 export type HMSRoleName = string;
@@ -23,6 +24,7 @@ export interface HMSRole {
     pollRead: boolean;
     pollWrite: boolean;
     whiteboard?: Array<HMSPermissionType>;
+    transcriptions?: Record<HMSTranscriptionMode, Array<HMSPermissionType>>;
   };
   priority: number;
 }

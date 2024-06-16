@@ -4,6 +4,7 @@ import {
   HMSPeer,
   HMSPeerType,
   HMSRoleName,
+  selectAvailableRoleNames,
   selectHandRaisedPeers,
   selectHasPeerHandRaised,
   selectIsLargeRoom,
@@ -85,6 +86,7 @@ export const ParticipantList = ({
       return { ...filterValue };
     });
   }, []);
+
   if (peerCount === 0) {
     return null;
   }
@@ -127,7 +129,7 @@ export const ParticipantList = ({
 export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const isPeerListOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
 
   if (peerCount === 0) {
     return null;
@@ -138,13 +140,13 @@ export const ParticipantCount = () => {
         w: 'auto',
         p: '$4',
         h: 'auto',
+        bg: isPeerListOpen ? '$surface_brighter' : '',
       }}
       onClick={() => {
         if (peerCount > 0) {
           toggleSidepane();
         }
       }}
-      active={!isParticipantsOpen}
       data-testid="participant_list"
     >
       <PeopleIcon />
@@ -372,6 +374,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
   } = usePeerOnStageActions({ peerId, role });
   const canChangeRole = !!useHMSStore(selectPermissions)?.changeRole;
   const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
+  const roles = useHMSStore(selectAvailableRoleNames);
 
   return (
     <>
@@ -409,7 +412,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
               </Dropdown.Item>
             ) : null}
 
-            {canChangeRole ? (
+            {canChangeRole && roles.length > 1 ? (
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => setOpenRoleChangeModal(true)}>
                 <PersonSettingsIcon />
                 <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
@@ -445,6 +448,7 @@ export const ParticipantSearch = ({
     300,
     [value, onSearch],
   );
+
   return (
     <Flex
       align="center"

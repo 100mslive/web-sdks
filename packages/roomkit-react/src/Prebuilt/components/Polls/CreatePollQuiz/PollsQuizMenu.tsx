@@ -186,8 +186,8 @@ const PrevMenu = () => {
   const sortedPolls = useMemo(
     () =>
       polls
-        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0)),
+        ?.sort((a, b) => (b?.createdAt?.getTime?.() || 0) - (a?.createdAt?.getTime?.() || 0))
+        ?.sort((a, b) => (b?.state === 'started' ? 1 : 0) - (a?.state === 'started' ? 1 : 0)),
     [polls],
   );
   const permissions = useHMSStore(selectPermissions);
@@ -196,7 +196,6 @@ const PrevMenu = () => {
     const updatePolls = async () => {
       await hmsActions.interactivityCenter.getPolls();
     };
-
     updatePolls();
   }, [hmsActions.interactivityCenter]);
 

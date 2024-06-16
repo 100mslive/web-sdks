@@ -1,6 +1,5 @@
 import { parsedUserAgent } from '@100mslive/react-sdk';
 
-export const DEFAULT_WAITING_VIEWER_ROLE = 'waiting-room';
 export const QUERY_PARAM_SKIP_PREVIEW = 'skip_preview';
 export const QUERY_PARAM_SKIP_PREVIEW_HEADFUL = 'skip_preview_headful';
 export const QUERY_PARAM_NAME = 'name';
@@ -30,7 +29,6 @@ export const APP_DATA = {
   appConfig: 'appConfig',
   sidePane: 'sidePane',
   hlsStats: 'hlsStats',
-  waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
   hlsStarted: 'hlsStarted',
@@ -49,6 +47,7 @@ export const APP_DATA = {
   sheet: 'sheet',
   caption: 'caption',
   loadingEffects: 'loadingEffects',
+  noiseCancellation: 'noiseCancellation',
 };
 
 export const UI_SETTINGS = {
@@ -88,6 +87,9 @@ export const POLL_VIEWS = {
   RESULTS: 'RESULTS',
 };
 
+export const CAPTION_TOAST = {
+  captionToast: 'captionToast',
+};
 export const SUBSCRIBED_NOTIFICATIONS = {
   PEER_JOINED: 'PEER_JOINED',
   PEER_LEFT: 'PEER_LEFT',

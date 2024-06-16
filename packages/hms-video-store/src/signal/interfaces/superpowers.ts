@@ -1,4 +1,4 @@
-import { HMSTrackSource } from '../..';
+import { HMSTrackSource, HMSTranscriptionMode } from '../..';
 import { HLSTimedMetadata, RTMPRecordingResolution } from '../../interfaces';
 
 /**
@@ -57,6 +57,9 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
+export interface StartTranscriptionRequestParams {
+  mode: HMSTranscriptionMode;
+}
 export interface SetSessionMetadataParams {
   key?: string;
   data: any;
@@ -81,18 +84,24 @@ export interface HLSVariant {
   metadata?: string;
 }
 
-export interface getPeerRequestParams {
+export interface GetPeerRequestParams {
   peer_id: string;
 }
 
-export interface findPeersRequestParams {
+export interface FindPeersRequestParams {
   peers?: string[];
   role?: string;
   group?: string;
   limit: number;
 }
 
-export interface peerIterRequestParams {
+export interface FindPeerByNameRequestParams {
+  query?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface PeerIterRequestParams {
   iterator: string;
   limit: number;
 }

@@ -16,6 +16,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isMobile } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
@@ -69,6 +70,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
+    room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -80,7 +82,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
-    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
+    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
     if (isBrowser && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -493,7 +495,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.replaceSenderTrack(this.nativeTrack);
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      this.replaceSenderTrack(this.nativeTrack);
+      this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
