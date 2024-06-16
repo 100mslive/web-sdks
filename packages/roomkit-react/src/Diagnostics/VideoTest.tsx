@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { selectDevices, selectLocalMediaSettings, selectLocalVideoTrackID, useHMSStore } from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
-import { Button } from '../Button';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
 import { Video } from '../Video';
@@ -11,7 +10,7 @@ import { StyledVideoTile } from '../VideoTile';
 import { DeviceSelector } from './DeviceSelector';
 import { hmsDiagnostics } from './hms';
 
-export const VideoTest = ({ onNextStep }: { onNextStep: () => void }) => {
+export const VideoTest = () => {
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
@@ -24,19 +23,20 @@ export const VideoTest = ({ onNextStep }: { onNextStep: () => void }) => {
 
   return (
     <>
-      <TestContainer css={{ display: 'flex' }}>
+      <TestContainer css={{ display: 'flex', '@lg': { flexDirection: 'column', alignItems: 'center' } }}>
         {trackID && (
           <StyledVideoTile.Container
             css={{
               w: '90%',
               height: '$48',
               mr: '$10',
+              '@lg': { mr: 0, mb: '$10' },
             }}
           >
             <Video mirror={true} trackId={trackID} />
           </StyledVideoTile.Container>
         )}
-        <Flex direction="column">
+        <Flex direction="column" css={{ w: '100%' }}>
           <Text variant="body2" css={{ c: '$on_primary_medium', mb: '$10' }}>
             Move in front of your camera to make sure it's working. If you don't see your video, try changing the
             selected camera. If the camera isn't part of your computer, check your settings to make sure your system
@@ -54,17 +54,7 @@ export const VideoTest = ({ onNextStep }: { onNextStep: () => void }) => {
           />
         </Flex>
       </TestContainer>
-      <TestFooter error={error}>
-        <Flex align="center" gap="4">
-          <Text css={{ c: '$on_primary_medium' }}>Does your video look good?</Text>
-          <Button onClick={onNextStep} variant="standard" outlined={true}>
-            Skip
-          </Button>
-          <Button disabled={!!error} onClick={onNextStep}>
-            Yes
-          </Button>
-        </Flex>
-      </TestFooter>
+      <TestFooter error={error} />
     </>
   );
 };

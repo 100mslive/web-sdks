@@ -1,21 +1,14 @@
 import React, { useContext } from 'react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
 import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
-import { DiagnosticsContext } from './components';
+import { DiagnosticsContext, DiagnosticsSteps } from './components';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
 import { ConnectivityTest } from './ConnectivityTest';
-import { hmsActions, hmsDiagnostics, hmsNotifications, hmsStats, hmsStore } from './hms';
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 import { VideoTest } from './VideoTest';
-
-const DiagnosticsSteps: Record<string, string> = {
-  video: 'Test Video',
-  audio: 'Test Audio',
-  // browser: 'Browser Support',
-  connectivity: 'Connection Quality',
-};
 
 const DiagnosticsStepIcon: Record<string, React.ReactNode> = {
   video: <VideoOnIcon width="2rem" height="2rem" />,
@@ -34,6 +27,9 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
       minHeight: '100vh',
+      '@lg': {
+        p: '$12',
+      },
     }}
   >
     {children}
@@ -41,34 +37,19 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 );
 
 const DiagnosticsStepTest = () => {
-  const { activeStep, setActiveStep } = useContext(DiagnosticsContext);
+  const { activeStep } = useContext(DiagnosticsContext);
 
-  let TestComponent = (_props: { onNextStep: () => void }) => <></>;
-  let stopCurrentCheck = () => {
-    return;
-  };
+  let TestComponent = () => <></>;
 
   if (activeStep === 'audio') {
     TestComponent = AudioTest;
-    stopCurrentCheck = () => hmsDiagnostics.stopMicCheck();
   } else if (activeStep === 'video') {
     TestComponent = VideoTest;
-    stopCurrentCheck = () => hmsDiagnostics.stopCameraCheck();
   } else if (activeStep === 'connectivity') {
     TestComponent = ConnectivityTest;
-    stopCurrentCheck = () => hmsDiagnostics.stopConnectivityCheck();
   }
 
-  return (
-    <TestComponent
-      key={activeStep}
-      onNextStep={() => {
-        stopCurrentCheck();
-        const keys = Object.keys(DiagnosticsSteps);
-        setActiveStep(step => keys[keys.indexOf(step) + 1]);
-      }}
-    />
-  );
+  return <TestComponent key={activeStep} />;
 };
 
 const DiagnosticsStepHeader = () => {
@@ -83,7 +64,7 @@ const DiagnosticsStepHeader = () => {
 
 const DiagnosticsStep = () => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%' }}>
+    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
       <DiagnosticsStepTest />
     </Box>
@@ -94,7 +75,7 @@ const DiagnosticsStepsList = () => {
   const { activeStep } = useContext(DiagnosticsContext);
 
   return (
-    <Box css={{ w: '25%' }}>
+    <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
       <ul>
         {Object.keys(DiagnosticsSteps).map(key => (
           <li key={key}>
