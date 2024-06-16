@@ -140,7 +140,9 @@ export const AudioTest = ({ onNextStep }: { onNextStep: () => void }) => {
           <Button onClick={onNextStep} variant="standard" outlined={true}>
             Skip
           </Button>
-          <Button onClick={onNextStep}>Yes</Button>
+          <Button disabled={!!error} onClick={onNextStep}>
+            Yes
+          </Button>
         </Flex>
       </TestFooter>
     </>
