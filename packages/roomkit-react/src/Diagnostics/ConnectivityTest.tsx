@@ -160,12 +160,24 @@ const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   );
 };
 
-const Footer = ({ error }: { error?: Error }) => {
+const Footer = ({
+  error,
+  result,
+  restart,
+}: {
+  result?: ConnectivityCheckResult;
+  restart: () => void;
+  error?: Error;
+}) => {
   return (
     <TestFooter error={error}>
       <Flex gap="4">
-        <Button variant="standard">Restart Test</Button>
-        <Button>Download Test Report</Button>
+        <Button variant="standard" onClick={restart}>
+          Restart Test
+        </Button>
+        <Button disabled={!result} onClick={() => result && downloadJson(result, 'hms_diagnostics_results')}>
+          Download Test Report
+        </Button>
       </Flex>
     </TestFooter>
   );
@@ -176,7 +188,10 @@ export const ConnectivityTest = () => {
   const [progress, setProgress] = useState<ConnectivityState>(ConnectivityState.STARTING);
   const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
 
-  useEffect(() => {
+  const startTest = () => {
+    setError(undefined);
+    setProgress(ConnectivityState.STARTING);
+    setResult(undefined);
     hmsDiagnostics
       .startConnectivityCheck(
         state => {
@@ -189,6 +204,10 @@ export const ConnectivityTest = () => {
       .catch(error => {
         setError(error);
       });
+  };
+
+  useEffect(() => {
+    startTest();
   }, []);
 
   if (error) {
@@ -203,7 +222,7 @@ export const ConnectivityTest = () => {
             {error.message}
           </Text>
         </TestContainer>
-        <Footer error={error} />
+        <Footer restart={startTest} error={error} />
       </>
     );
   }
@@ -219,7 +238,7 @@ export const ConnectivityTest = () => {
           <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
           <VideoStats stats={result?.mediaServerReport?.stats?.video} />
         </TestContainer>
-        <Footer error={error} />
+        <Footer restart={startTest} error={error} />
       </>
     );
   }
@@ -238,4 +257,14 @@ export const ConnectivityTest = () => {
       >{`${ConnectivityStateMessage[progress]}...`}</Text>
     </TestContainer>
   );
+};
+
+const downloadJson = (obj: object, fileName: string) => {
+  const a = document.createElement('a');
+  const file = new Blob([JSON.stringify(obj, null, 2)], {
+    type: 'application/json',
+  });
+  a.href = URL.createObjectURL(file);
+  a.download = `${fileName}.json`;
+  a.click();
 };

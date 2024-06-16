@@ -137,8 +137,8 @@ export const AudioTest = ({ onNextStep }: { onNextStep: () => void }) => {
       <TestFooter error={error}>
         <Flex align="center" gap="4">
           <Text css={{ c: '$on_primary_medium' }}>Does your audio sound good?</Text>
-          <Button variant="standard" outlined={true}>
-            No
+          <Button onClick={onNextStep} variant="standard" outlined={true}>
+            Skip
           </Button>
           <Button onClick={onNextStep}>Yes</Button>
         </Flex>

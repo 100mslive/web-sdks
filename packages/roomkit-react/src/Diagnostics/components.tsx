@@ -24,12 +24,13 @@ export const TestFooter = ({ error, children }: { error?: Error; children?: Reac
         py: '$8',
         px: '$10',
         justifyContent: 'space-between',
+        alignItems: 'center',
         borderTop: '1px solid $border_default',
         fontSize: '$sm',
         lineHeight: '$sm',
       }}
     >
-      <Box>{error && <Text css={{ c: '$alert_error_default' }}>{error.message}</Text>}</Box>
+      <Box>{error && <Text css={{ c: '$alert_error_default' }}>Error: {error.message}</Text>}</Box>
       {children}
     </Flex>
   );
