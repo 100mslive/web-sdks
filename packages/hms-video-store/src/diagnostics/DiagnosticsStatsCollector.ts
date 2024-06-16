@@ -6,9 +6,10 @@ import { HMSSdk } from '../sdk';
 
 const isValidNumber = (num: number | undefined): boolean => !!num && !isNaN(num);
 const getLastElement = <T>(arr: T[]): T | undefined => arr[arr.length - 1];
-const calculateAverage = <T>(arr: T[], predicate: (val: T) => number | undefined): number =>
-  arr.reduce((acc, curr) => acc + (predicate(curr) || 0), 0) /
-  arr.filter(curr => isValidNumber(predicate(curr))).length;
+const calculateAverage = <T>(arr: T[], predicate: (val: T) => number | undefined): number => {
+  const filteredArr = arr.filter(curr => isValidNumber(predicate(curr)));
+  return filteredArr.reduce((acc, curr) => acc + (predicate(curr) || 0), 0) / filteredArr.length;
+};
 
 export class DiagnosticsStatsCollector {
   private peerStatsList: HMSPeerStats[] = [];
