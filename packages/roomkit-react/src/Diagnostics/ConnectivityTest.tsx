@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
@@ -8,6 +8,12 @@ import { Loading } from '../Loading';
 import { formatBytes } from '../Stats';
 import { Text } from '../Text';
 import { hmsDiagnostics } from './hms';
+
+const Regions = {
+  in: 'India',
+  eu: 'Europe',
+  us: 'United States',
+};
 
 const ConnectivityStateMessage = {
   [ConnectivityState.STARTING]: 'Fetching Init',
@@ -183,33 +189,17 @@ const Footer = ({
   );
 };
 
-export const ConnectivityTest = () => {
-  const [error, setError] = useState<Error | undefined>();
-  const [progress, setProgress] = useState<ConnectivityState>(ConnectivityState.STARTING);
-  const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
-
-  const startTest = () => {
-    setError(undefined);
-    setProgress(ConnectivityState.STARTING);
-    setResult(undefined);
-    hmsDiagnostics
-      .startConnectivityCheck(
-        state => {
-          setProgress(state);
-        },
-        result => {
-          setResult(result);
-        },
-      )
-      .catch(error => {
-        setError(error);
-      });
-  };
-
-  useEffect(() => {
-    startTest();
-  }, []);
-
+const ConnectivityTestReport = ({
+  error,
+  result,
+  progress,
+  startTest,
+}: {
+  error?: Error;
+  result?: ConnectivityCheckResult;
+  progress?: ConnectivityState;
+  startTest: () => void;
+}) => {
   if (error) {
     return (
       <>
@@ -228,7 +218,6 @@ export const ConnectivityTest = () => {
   }
 
   if (result) {
-    console.log(result);
     return (
       <>
         <TestContainer>
@@ -238,24 +227,102 @@ export const ConnectivityTest = () => {
           <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
           <VideoStats stats={result?.mediaServerReport?.stats?.video} />
         </TestContainer>
-        <Footer restart={startTest} error={error} />
+        <Footer result={result} restart={startTest} error={error} />
       </>
     );
   }
 
+  if (progress) {
+    return (
+      <TestContainer css={{ textAlign: 'center' }}>
+        <Text css={{ c: '$primary_bright' }}>
+          <Loading size="3.5rem" color="currentColor" />
+        </Text>
+        <Text variant="h6" css={{ mt: '$8' }}>
+          Checking your connection...
+        </Text>
+        <Text
+          variant="body2"
+          css={{ c: '$on_primary_medium', mt: '$4' }}
+        >{`${ConnectivityStateMessage[progress]}...`}</Text>
+      </TestContainer>
+    );
+  }
+
+  return null;
+};
+
+const RegionSelector = ({
+  region,
+  setRegion,
+  startTest,
+}: {
+  region?: string;
+  startTest?: () => void;
+  setRegion: (region: string) => void;
+}) => {
   return (
-    <TestContainer css={{ textAlign: 'center' }}>
-      <Text css={{ c: '$primary_bright' }}>
-        <Loading size="3.5rem" color="currentColor" />
-      </Text>
-      <Text variant="h6" css={{ mt: '$8' }}>
-        Checking your connection...
-      </Text>
-      <Text
-        variant="body2"
-        css={{ c: '$on_primary_medium', mt: '$4' }}
-      >{`${ConnectivityStateMessage[progress]}...`}</Text>
+    <TestContainer css={{ borderBottom: '1px solid $border_default' }}>
+      <Text variant="body1">Select a region</Text>
+      <Flex justify="between" css={{ mt: '$md' }}>
+        <Flex css={{ gap: '$4' }}>
+          {Object.entries(Regions).map(([key, value]) => (
+            <Button
+              key={key}
+              outlined={region !== key}
+              variant={region === key ? 'primary' : 'standard'}
+              css={region === key ? { bg: '$primary_dim' } : {}}
+              onClick={() => setRegion(key)}
+            >
+              {value}
+            </Button>
+          ))}
+        </Flex>
+        <Box>
+          <Button variant="primary" onClick={startTest} disabled={!startTest}>
+            {startTest ? 'Start Test' : 'Testing...'}
+          </Button>
+        </Box>
+      </Flex>
+      <Text css={{ c: '$on_secondary_low', mt: '$md' }}>Select the closest region for best results</Text>
     </TestContainer>
+  );
+};
+
+export const ConnectivityTest = () => {
+  const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
+  const [error, setError] = useState<Error | undefined>();
+  const [progress, setProgress] = useState<ConnectivityState>();
+  const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
+
+  const startTest = () => {
+    setError(undefined);
+    setProgress(ConnectivityState.STARTING);
+    setResult(undefined);
+    hmsDiagnostics
+      .startConnectivityCheck(
+        state => {
+          setProgress(state);
+        },
+        result => {
+          setResult(result);
+        },
+        region,
+      )
+      .catch(error => {
+        setError(error);
+      });
+  };
+
+  return (
+    <>
+      <RegionSelector
+        region={region}
+        setRegion={setRegion}
+        startTest={!progress || progress === ConnectivityState.COMPLETED ? startTest : undefined}
+      />
+      <ConnectivityTestReport error={error} result={result} progress={progress} startTest={startTest} />
+    </>
   );
 };
 
