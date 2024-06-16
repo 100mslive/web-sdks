@@ -20,6 +20,10 @@ import { hmsDiagnostics } from './hms';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
+const SelectContainer = ({ children }: { children: React.ReactNode }) => (
+  <Box css={{ w: '50%', '@lg': { w: '100%' } }}>{children}</Box>
+);
+
 const MicTest = () => {
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
@@ -29,7 +33,7 @@ const MicTest = () => {
   const audioLevel = useHMSStore(selectTrackAudioByID(trackID));
 
   return (
-    <Box css={{ w: '50%' }}>
+    <SelectContainer>
       <DeviceSelector
         title="Microphone(Input)"
         devices={devices.audioInput}
@@ -72,7 +76,7 @@ const MicTest = () => {
           </>
         )}
       </Flex>
-    </Box>
+    </SelectContainer>
   );
 };
 
@@ -83,7 +87,7 @@ const SpeakerTest = () => {
   const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: audioOutputDeviceId || 'default' });
 
   return (
-    <Box css={{ w: '50%' }}>
+    <SelectContainer>
       <DeviceSelector
         title="Speaker(output)"
         devices={devices.audioOutput}
@@ -111,7 +115,7 @@ const SpeakerTest = () => {
         onPlay={() => setPlaying(true)}
         style={{ display: 'none' }}
       />
-    </Box>
+    </SelectContainer>
   );
 };
 
@@ -129,12 +133,21 @@ export const AudioTest = () => {
           make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth settings.
         </Text>
 
-        <Flex css={{ mt: '$10', gap: '$10' }}>
-          <MicTest />
+        <Flex
+          css={{
+            mt: '$10',
+            gap: '$10',
+            '@lg': {
+              flexDirection: 'column',
+              gap: '$8',
+            },
+          }}
+        >
+          {!error && <MicTest />}
           <SpeakerTest />
         </Flex>
       </TestContainer>
-      <TestFooter error={error} />
+      <TestFooter error={error} ctaText="Does your audio sound good?" />
     </>
   );
 };

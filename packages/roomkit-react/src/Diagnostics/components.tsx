@@ -67,14 +67,16 @@ export const TestFooter = ({
       {children ? (
         children
       ) : (
-        <Flex align="center" gap="4">
+        <Flex align="center" css={{ gap: '$8', '@lg': { flexDirection: 'column' } }}>
           <Text css={{ c: '$on_primary_medium' }}>{ctaText}</Text>
-          <Button onClick={onNextStep} variant="standard" outlined={true}>
-            Skip
-          </Button>
-          <Button disabled={!!error} onClick={onNextStep}>
-            Yes
-          </Button>
+          <Flex align="center" gap="4">
+            <Button onClick={onNextStep} variant="standard" outlined={true}>
+              Skip
+            </Button>
+            <Button disabled={!!error} onClick={onNextStep}>
+              Yes
+            </Button>
+          </Flex>
         </Flex>
       )}
     </Flex>

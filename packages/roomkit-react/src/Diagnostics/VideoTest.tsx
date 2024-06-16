@@ -54,7 +54,7 @@ export const VideoTest = () => {
           />
         </Flex>
       </TestContainer>
-      <TestFooter error={error} />
+      <TestFooter error={error} ctaText="Does your video look good?" />
     </>
   );
 };

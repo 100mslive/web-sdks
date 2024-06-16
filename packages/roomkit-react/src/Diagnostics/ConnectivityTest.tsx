@@ -177,7 +177,7 @@ const Footer = ({
 }) => {
   return (
     <TestFooter error={error}>
-      <Flex gap="4">
+      <Flex css={{ gap: '$8', '@lg': { flexDirection: 'column' } }}>
         <Button variant="standard" onClick={restart}>
           Restart Test
         </Button>
@@ -264,8 +264,27 @@ const RegionSelector = ({
   return (
     <TestContainer css={{ borderBottom: '1px solid $border_default' }}>
       <Text variant="body1">Select a region</Text>
-      <Flex justify="between" css={{ mt: '$md' }}>
-        <Flex css={{ gap: '$4' }}>
+      <Text variant="body2" css={{ c: '$on_secondary_low' }}>
+        Select the closest region for best results
+      </Text>
+      <Flex
+        justify="between"
+        css={{
+          mt: '$md',
+          '@lg': {
+            flexDirection: 'column',
+            gap: '$8',
+          },
+        }}
+      >
+        <Flex
+          css={{
+            gap: '$4',
+            '@lg': {
+              flexDirection: 'column',
+            },
+          }}
+        >
           {Object.entries(Regions).map(([key, value]) => (
             <Button
               key={key}
@@ -278,13 +297,12 @@ const RegionSelector = ({
             </Button>
           ))}
         </Flex>
-        <Box>
+        <Flex css={{ '@lg': { flexDirection: 'column' } }}>
           <Button variant="primary" onClick={startTest} disabled={!startTest}>
             {startTest ? 'Start Test' : 'Testing...'}
           </Button>
-        </Box>
+        </Flex>
       </Flex>
-      <Text css={{ c: '$on_secondary_low', mt: '$md' }}>Select the closest region for best results</Text>
     </TestContainer>
   );
 };
