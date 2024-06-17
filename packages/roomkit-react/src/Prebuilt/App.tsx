@@ -1,4 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -99,6 +100,11 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const reactiveStore = useRef<HMSPrebuiltRefType>();
     const [hydrated, setHydrated] = React.useState(false);
+
+    const swipeHandlers = useSwipeable({
+      onSwipedUp: () => alert('Swiped'),
+      onSwipedDown: () => alert('Swiped'),
+    });
 
     useEffect(() => {
       setHydrated(true);
@@ -218,6 +224,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
+                          {...swipeHandlers}
                           className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
                           css={{
                             bg: '$background_dim',
