@@ -17,7 +17,8 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   getVolume() {
-    return this.audioElement ? this.audioElement.volume * 100 : null;
+    // floor is required because of floating-point precision. e.g 0.55*100 gives 55.00000000000001
+    return this.audioElement ? Math.floor(this.audioElement.volume * 100) : null;
   }
 
   async setVolume(value: number) {

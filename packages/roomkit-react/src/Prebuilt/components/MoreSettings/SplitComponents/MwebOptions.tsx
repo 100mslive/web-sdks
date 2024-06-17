@@ -55,11 +55,8 @@ import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/
 import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
-import {
-  useSetIsCaptionEnabled,
-  useShowPolls,
-  // @ts-ignore: No implicit Any
-} from '../../AppData/useUISettings';
+// @ts-ignore: No implicit Any
+import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
