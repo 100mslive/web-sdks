@@ -1,5 +1,5 @@
 import { tsvb } from 'effects-sdk';
-import { HMSMediaStreamPlugin, parsedUserAgent } from '@100mslive/hms-video-store';
+import { HMSMediaStreamPlugin } from '@100mslive/hms-video-store';
 import { EFFECTS_SDK_ASSETS } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
@@ -33,21 +33,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
       },
     });
-    this.effects.cache();
-    // mweb optimisation
-    if (parsedUserAgent.getDevice().type === 'mobile') {
-      this.effects.enableFrameSkipping();
-    }
-    this.effects.setBackgroundFitMode('fill');
-    this.effects.setSegmentationPreset(this.preset);
-
-    this.effects.onReady = () => {
-      if (this.effects) {
-        this.initialised = true;
-        this.onInit?.();
-        this.effects.run();
-      }
-    };
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // currently logging info type messages as well
@@ -55,6 +40,16 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         console.error('[HMSEffectsPlugin]', err);
       }
     });
+    this.effects.onReady = () => {
+      if (this.effects) {
+        this.initialised = true;
+        this.onInit?.();
+        this.effects.run();
+        this.effects.setBackgroundFitMode('fill');
+        this.effects.setSegmentationPreset(this.preset);
+        this.applyEffect();
+      }
+    };
   }
 
   getName(): string {
@@ -108,8 +103,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
    */
   async setPreset(preset: 'quality' | 'balanced') {
     this.preset = preset;
-    this.executeAfterInit(async () => {
-      await this.effects.setSegmentationPreset(this.preset);
+    return new Promise((resolve, reject) => {
+      this.executeAfterInit(() => {
+        this.effects.setSegmentationPreset(this.preset).then(resolve).catch(reject);
+      });
     });
   }
 
@@ -153,19 +150,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   apply(stream: MediaStream): MediaStream {
-    if (this.blurAmount) {
-      this.setBlur(this.blurAmount);
-    } else if (this.background) {
-      this.setBackground(this.background);
-    }
     this.effects.clear();
+    this.applyEffect();
     this.effects.onChangeInputResolution(() => {
       this.updateCanvas(stream);
       const { height, width } = stream.getVideoTracks()[0].getSettings();
       this.onResolutionChangeCallback?.(width!, height!);
     });
     this.updateCanvas(stream);
-
     return this.canvas.captureStream(30) || stream;
   }
 
@@ -174,5 +166,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.executeAfterInit(() => {
       this.effects.stop();
     });
+  }
+
+  private applyEffect() {
+    if (this.blurAmount) {
+      this.setBlur(this.blurAmount);
+    } else if (this.background) {
+      this.setBackground(this.background);
+    }
   }
 }

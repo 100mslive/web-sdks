@@ -18,7 +18,7 @@ export const CaptionIcon = () => {
     return null;
   }
   return (
-    <Tooltip title={isCaption ? 'Disable caption' : 'Enable caption'}>
+    <Tooltip title={isCaption ? 'Hide closed captions' : 'Show closed captions'}>
       <IconButton data-testid="caption_btn" onClick={onClick}>
         {isCaption ? <ClosedCaptionIcon width="20" height="20px" /> : <OpenCaptionIcon width="20" height="20px" />}
       </IconButton>
