@@ -16,6 +16,7 @@ import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
+import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -107,19 +108,21 @@ const INITIAL_STATE = {
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport;
   private readonly TAG = '[HMSSdk]:';
-  private listener?: HMSUpdateListener;
+  public listener?: HMSUpdateListener;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
   public store!: Store;
   private notificationManager?: NotificationManager;
-  private deviceManager!: DeviceManager;
+  /** @internal */
+  public deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private playlistManager!: PlaylistManager;
   private audioOutput!: AudioOutputManager;
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
-  private localTrackManager!: LocalTrackManager;
+  /** @internal */
+  public localTrackManager!: LocalTrackManager;
   private analyticsEventsService!: AnalyticsEventsService;
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
@@ -151,7 +154,13 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private initStoreAndManagers() {
+  /** @internal */
+  initStoreAndManagers(listener: HMSPreviewListener | HMSUpdateListener | HMSDiagnosticsConnectivityListener) {
+    this.listener = listener as unknown as HMSUpdateListener;
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.store?.setErrorListener(this.errorListener);
+
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
@@ -191,6 +200,10 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer,
       this.pluginUsageTracker,
     );
+    // add diagnostics callbacks if present
+    if ((listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
+      this.transport.setConnectivityListener(listener as unknown as HMSDiagnosticsConnectivityListener);
+    }
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
     /**
@@ -529,7 +542,6 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     const previewRole = this.localPeer?.asRole?.name || this.localPeer?.role?.name;
     this.networkTestManager?.stop();
-    this.listener = listener;
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
@@ -1327,7 +1339,6 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
-    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
@@ -1400,10 +1411,8 @@ export class HMSSdk implements HMSInterface {
     if (!config.initEndpoint) {
       config.initEndpoint = 'https://prod-init.100ms.live';
     }
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-    this.store.setErrorListener(this.errorListener);
+
+    this.initStoreAndManagers(listener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId));
     }
