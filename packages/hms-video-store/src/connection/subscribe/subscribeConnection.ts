@@ -18,7 +18,7 @@ import { HMSConnectionRole } from '../model';
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
-  private readonly observer: ISubscribeConnectionObserver;
+  protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
   readonly nativeConnection: RTCPeerConnection;
@@ -60,6 +60,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = e => {
       if (e.candidate !== null) {
+        this.observer.onIceCandidate(e.candidate);
         this.signal.trickle(this.role, e.candidate);
       }
     };

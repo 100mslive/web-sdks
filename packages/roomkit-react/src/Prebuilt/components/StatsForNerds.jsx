@@ -13,6 +13,7 @@ import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
+import { formatBytes } from '../../Stats';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
@@ -245,16 +246,3 @@ const StatsRow = React.memo(({ label, value }) => (
     </Text>
   </Box>
 ));
-
-const formatBytes = (bytes, unit = 'B', decimals = 2) => {
-  if (bytes === undefined) return '-';
-  if (bytes === 0) return '0 ' + unit;
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'].map(size => size + unit);
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-};
