@@ -19,13 +19,7 @@ import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
 import { config } from '../../Theme';
-// @ts-ignore: No implicit Any
-import { EmbedView } from './EmbedView';
-// @ts-ignore: No implicit Any
-import { PDFView } from './PDFView';
 import SidePane from './SidePane';
-// @ts-ignore: No implicit Any
-import { WaitingView } from './WaitingView';
 import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
 import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
@@ -34,6 +28,11 @@ import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '.
 import { SESSION_STORE_KEY } from '../common/constants';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
+// @ts-ignore: No implicit Any
+const EmbedView = React.lazy(() => import('./EmbedView').then(module => ({ default: module.EmbedView })));
+// @ts-ignore: No implicit Any
+const PDFView = React.lazy(() => import('./PDFView').then(module => ({ default: module.PDFView })));
+const WaitingView = React.lazy(() => import('./WaitingView').then(module => ({ default: module.WaitingView })));
 
 export const VideoStreamingSection = ({
   screenType,
