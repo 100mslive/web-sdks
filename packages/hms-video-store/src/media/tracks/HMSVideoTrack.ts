@@ -89,7 +89,9 @@ export class HMSVideoTrack extends HMSTrack {
       if (videoElement.paused) {
         // This is needed for safari and firefox to work properly
         videoElement.srcObject = stream;
-        videoElement.play().catch(console.error);
+        videoElement.play().catch(() => {
+          //do nothing
+        });
       }
     }, 0);
   };
