@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { ControlPosition } from 'react-draggable';
+import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -17,6 +18,7 @@ import { PeopleAddIcon, ShareScreenIcon } from '@100mslive/react-icons';
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
+import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -51,7 +53,8 @@ export const VideoStreamingSection = ({
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
-  const [captionPosition, setCaptionPosition] = useState<ControlPosition>({ x: -200, y: 0 });
+  const isMobile = useMedia(config.media.md);
+  const [captionPosition, setCaptionPosition] = useState<ControlPosition>({ x: isMobile ? 0 : -200, y: 0 });
   useCloseScreenshareWhiteboard();
 
   const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();

@@ -573,7 +573,7 @@ export default class HMSTransport {
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
-        this.connectivityListener?.onMediaPublished();
+        this.connectivityListener?.onMediaPublished(track);
       } catch (error) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
