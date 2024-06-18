@@ -1502,6 +1502,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
+    // don't send analytics for diagnostics
+    if ((this.listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
+      return;
+    }
     this.analyticsEventsService.queue(event).flush();
   };
 
