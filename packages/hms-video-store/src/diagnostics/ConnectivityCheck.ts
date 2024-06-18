@@ -30,6 +30,8 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private errors: HMSException[] = [];
   private isAudioTrackCaptured = false;
   private isVideoTrackCaptured = false;
+  private isAudioTrackPublished = false;
+  private isVideoTrackPublished = false;
   private statsCollector: DiagnosticsStatsCollector;
 
   private cleanupTimer?: number;
@@ -105,8 +107,21 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     }
   }
 
-  onMediaPublished(): void {
-    this.state = ConnectivityState.MEDIA_PUBLISHED;
+  onMediaPublished(track: HMSTrack): void {
+    switch (track.type) {
+      case HMSTrackType.AUDIO:
+        this.isAudioTrackPublished = true;
+        break;
+      case HMSTrackType.VIDEO:
+        this.isVideoTrackPublished = true;
+        break;
+      default:
+        break;
+    }
+
+    if (this.isVideoTrackPublished && this.isAudioTrackPublished) {
+      this.state = ConnectivityState.MEDIA_PUBLISHED;
+    }
   }
 
   onInitSuccess(websocketURL: string): void {

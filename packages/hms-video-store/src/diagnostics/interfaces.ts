@@ -1,5 +1,5 @@
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
-import { HMSException, HMSUpdateListener } from '../internal';
+import { HMSException, HMSTrack, HMSUpdateListener } from '../internal';
 
 export enum ConnectivityState {
   STARTING,
@@ -15,7 +15,7 @@ export interface HMSDiagnosticsConnectivityListener extends HMSUpdateListener {
   onInitSuccess(websocketURL: string): void;
   onSignallingSuccess(): void;
   onICESuccess(isPublish: boolean): void;
-  onMediaPublished(): void;
+  onMediaPublished(track: HMSTrack): void;
   onICECandidate(candidate: RTCIceCandidate, isPublish: boolean): void;
   onSelectedICECandidatePairChange(candidatePair: RTCIceCandidatePair, isPublish: boolean): void;
 }
