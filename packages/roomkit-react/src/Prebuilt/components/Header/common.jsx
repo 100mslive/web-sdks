@@ -15,6 +15,7 @@ import {
   CrossIcon,
   HeadphonesIcon,
   SpeakerIcon,
+  TelePhoneIcon,
 } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { Label } from '../../../Label';
@@ -82,7 +83,10 @@ export const AudioActions = () => {
     AudioIcon = <BluetoothIcon />;
   } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
     AudioIcon = <HeadphonesIcon />;
+  } else if (currentSelection && currentSelection.label.toLowerCase().includes('headset')) {
+    AudioIcon = <TelePhoneIcon />;
   }
+  console.log('here ', selectedAudio, currentSelection);
   return (
     <AudioSelectionSheet
       audioDevices={availableAudioDevices}
