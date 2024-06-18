@@ -2,6 +2,7 @@ import { InitConfig } from './models';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSICEServer } from '../../interfaces';
+import { HMSException } from '../../internal';
 import { transformIceServerConfig } from '../../utils/ice-server-config';
 import HMSLogger from '../../utils/logger';
 
@@ -51,7 +52,9 @@ export default class InitService {
       } catch (err) {
         const text = await response.text();
         HMSLogger.e(TAG, 'json error', (err as Error).message, text);
-        throw ErrorFactory.APIErrors.ServerErrors(response.status, HMSAction.INIT, text);
+        throw err instanceof HMSException
+          ? err
+          : ErrorFactory.APIErrors.ServerErrors(response.status, HMSAction.INIT, (err as Error).message);
       }
     } catch (err) {
       const error = err as Error;
