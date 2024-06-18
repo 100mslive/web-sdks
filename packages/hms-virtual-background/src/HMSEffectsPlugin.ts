@@ -40,6 +40,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         console.error('[HMSEffectsPlugin]', err);
       }
     });
+    this.effects.cache();
     this.effects.onReady = () => {
       if (this.effects) {
         this.initialised = true;
