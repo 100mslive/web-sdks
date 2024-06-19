@@ -105,7 +105,7 @@ Once you have forked the repository and tested your changes on the local build, 
 
 For reference:
 
-[!Project Settings](./project-settings.png)
+![Project Settings](./project-settings.png)
 
 <br />
 
