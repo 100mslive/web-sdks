@@ -42,6 +42,8 @@ import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
 import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
+import { EmbedUrl, EmbedUrlModal } from '../EmbedUrl';
+// @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
@@ -169,9 +171,7 @@ export const DesktopOptions = ({
           ) : null}
 
           <FullScreenItem />
-          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )} */}
+          <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
 
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
 
@@ -252,9 +252,9 @@ export const DesktopOptions = ({
       {openModals.has(MODALS.CAPTION) && (
         <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
-      {/* {openModals.has(MODALS.EMBED_URL) && (
-        <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
-      )} */}
+      {openModals.has(MODALS.EMBED_URL) && (
+        <EmbedUrlModal onOpenChange={(value: boolean) => updateState(MODALS.EMBED_URL, value)} />
+      )}
     </Fragment>
   );
 };

@@ -61,7 +61,7 @@ export const useAuthToken = () => {
 };
 
 export const useUrlToEmbed = () => {
-  return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
+  return useHMSStore(selectAppData(APP_DATA.embedConfig));
 };
 
 export const usePDFConfig = () => {
@@ -76,6 +76,11 @@ export const useResetPDFConfig = () => {
 export const useResetEmbedConfig = () => {
   const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
   return () => setEmbedConfig();
+};
+
+export const useSetEmbedConfig = url => {
+  const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
+  setEmbedConfig(url);
 };
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
