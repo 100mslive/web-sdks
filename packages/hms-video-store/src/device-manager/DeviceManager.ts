@@ -326,6 +326,7 @@ export class DeviceManager implements HMSDeviceManager {
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
       .deviceId(newSelection.deviceId)
+      .audioMode(settings.audioMode)
       .build();
     try {
       await audioTrack.setSettings(newAudioTrackSettings, true);

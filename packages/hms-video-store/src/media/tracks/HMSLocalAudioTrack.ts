@@ -16,7 +16,7 @@ import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings
 import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
-  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
+  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced' | 'audioMode') {
     return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
@@ -249,19 +249,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
-    const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
+    const { volume, codec, maxBitrate, deviceId, advanced, audioMode } = { ...this.settings, ...settings };
+    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced, audioMode);
     return newSettings;
   }
 
   private handleSettingsChange = async (settings: HMSAudioTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrateAndFramerate(this);
+    if ((hasPropertyChanged('maxBitrate') || hasPropertyChanged('audioMode')) && settings.maxBitrate) {
+      await stream.setMaxBitrateAndFramerate(this, settings);
     }
 
-    if (hasPropertyChanged('advanced')) {
+    if (hasPropertyChanged('advanced') || hasPropertyChanged('audioMode')) {
       await this.replaceTrackWith(settings);
     }
   };
