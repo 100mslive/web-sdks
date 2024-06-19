@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
-import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { DiagnosticsContext, DiagnosticsSteps } from './components';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
+import { BrowserTest } from './BrowserTest';
 import { ConnectivityTest } from './ConnectivityTest';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 import { VideoTest } from './VideoTest';
@@ -45,6 +46,8 @@ const DiagnosticsStepTest = () => {
     TestComponent = AudioTest;
   } else if (activeStep === 'video') {
     TestComponent = VideoTest;
+  } else if (activeStep === 'browser') {
+    TestComponent = BrowserTest;
   } else if (activeStep === 'connectivity') {
     TestComponent = ConnectivityTest;
   }
@@ -66,7 +69,9 @@ const DiagnosticsStep = () => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
-      <DiagnosticsStepTest />
+      <Box css={{ maxHeight: '55vh', overflowY: 'auto' }}>
+        <DiagnosticsStepTest />
+      </Box>
     </Box>
   );
 };
@@ -76,15 +81,31 @@ const DiagnosticsStepsList = () => {
 
   return (
     <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
-      <ul>
-        {Object.keys(DiagnosticsSteps).map(key => (
-          <li key={key}>
-            <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
-              {DiagnosticsSteps[key]}
-            </Text>
-          </li>
-        ))}
-      </ul>
+      {Object.keys(DiagnosticsSteps).map(key => {
+        const keys = Object.keys(DiagnosticsSteps);
+        const activeStepIndex = keys.indexOf(activeStep);
+        const keyIndex = keys.indexOf(key);
+        const isStepCompleted = activeStepIndex > keyIndex;
+
+        let color = '$on_primary_low';
+        if (isStepCompleted) {
+          color = '$primary_bright';
+        }
+        if (activeStep === key) {
+          color = '$on_primary_high';
+        }
+
+        return (
+          <Flex css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
+            {isStepCompleted ? (
+              <CheckCircleIcon width="1rem" height="1rem" />
+            ) : (
+              <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>
+            )}
+            <Text css={{ c: color }}>{DiagnosticsSteps[key]}</Text>
+          </Flex>
+        );
+      })}
     </Box>
   );
 };
