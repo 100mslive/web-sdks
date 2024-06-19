@@ -37,7 +37,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     return this.sdk?.store.getLocalPeer();
   }
 
-  validateBrowserAPIs(): void {
+  checkBrowserSupport(): void {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
   }

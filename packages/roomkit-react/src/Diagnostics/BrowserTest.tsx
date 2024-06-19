@@ -101,7 +101,7 @@ export const BrowserTest = () => {
   const [error, setError] = useState<Error | undefined>();
   useEffect(() => {
     try {
-      hmsDiagnostics.validateBrowserAPIs();
+      hmsDiagnostics.checkBrowserSupport();
     } catch (err) {
       setError(err as Error);
     }

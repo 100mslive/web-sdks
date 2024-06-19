@@ -27,7 +27,7 @@ export interface MediaPermissionCheck {
 
 export interface HMSDiagnosticsInterface {
   requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck>;
-  validateBrowserAPIs(): void;
+  checkBrowserSupport(): void;
   startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<void>;
   getRecordedAudio(): string | undefined;
   stopMicCheck(): void;
