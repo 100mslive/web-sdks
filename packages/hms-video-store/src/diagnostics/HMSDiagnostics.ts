@@ -23,11 +23,11 @@ import { HMSLocalPeer } from '../sdk/models/peer';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import { sleep } from '../utils/timer-utils';
+import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
   private mediaRecorder?: MediaRecorder;
-  private isConnectivityCheckInProgress = false;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
     this.initSdkWithLocalPeer();
@@ -35,6 +35,11 @@ export class Diagnostics implements HMSDiagnosticsInterface {
 
   get localPeer() {
     return this.sdk?.store.getLocalPeer();
+  }
+
+  validateBrowserAPIs(): void {
+    validateMediaDevicesExistence();
+    validateRTCPeerConnection();
   }
 
   async requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck> {
@@ -138,10 +143,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('SDK not found');
     }
 
-    if (this.isConnectivityCheckInProgress) {
-      return;
-    }
-    this.isConnectivityCheckInProgress = true;
+    const connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
 
     const authToken = await this.getAuthToken(region);
     const { roomId } = decodeJWT(authToken);
@@ -149,10 +151,6 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk?.store.setRoom(new HMSRoom(roomId));
     await this.sdk.leave();
 
-    const connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, result => {
-      this.isConnectivityCheckInProgress = false;
-      completed(result);
-    });
     await this.sdk.join(
       { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
       connectivityCheck,

@@ -27,6 +27,7 @@ export interface MediaPermissionCheck {
 
 export interface HMSDiagnosticsInterface {
   requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck>;
+  validateBrowserAPIs(): void;
   startMicCheck(inputDevice?: string, onStop?: () => void, time?: number): Promise<void>;
   getRecordedAudio(): string | undefined;
   stopMicCheck(): void;
@@ -44,7 +45,7 @@ export interface HMSDiagnosticsInterface {
 
 export interface ConnectivityCheckResult {
   testTimestamp: number; // System time in millis (UTC)
-  connectivityState: ConnectivityState; // This is the initial state
+  connectivityState?: ConnectivityState; // This is the initial state
   signallingReport?: SignallingReport;
   mediaServerReport?: MediaServerReport;
   // deviceTestReport?: DeviceTestReport;
