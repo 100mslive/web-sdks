@@ -1,5 +1,10 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import {
+  HMSDiagnosticsInterface,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
+} from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -65,6 +70,7 @@ export type HMSPrebuiltProps = {
   options?: HMSPrebuiltOptions;
   screens?: Screens;
   authToken?: string;
+  leaveOnUnload?: boolean;
   onLeave?: () => void;
   onJoin?: () => void;
   /**
@@ -79,6 +85,7 @@ export type HMSPrebuiltRefType = {
   hmsStore: HMSStoreWrapper;
   hmsStats: HMSStatsStoreWrapper;
   hmsNotifications: IHMSNotifications;
+  hmsDiagnostics: HMSDiagnosticsInterface;
 };
 
 export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
@@ -92,6 +99,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       themes,
       options: { userName = '', userId = '', endpoints } = {},
       screens,
+      leaveOnUnload = true,
       onLeave,
       onJoin,
     },
@@ -107,6 +115,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       const hmsActions = hms.getActions();
       const hmsNotifications = hms.getNotifications();
       const hmsStats = hms.getStats();
+      const hmsDiagnostics = hms.getDiagnosticsSDK();
       hms.triggerOnSubscribe();
 
       reactiveStore.current = {
@@ -114,6 +123,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStats,
         hmsStore,
         hmsNotifications,
+        hmsDiagnostics,
       };
     }, []);
 
@@ -188,6 +198,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             store={reactiveStore.current?.hmsStore}
             notifications={reactiveStore.current?.hmsNotifications}
             stats={reactiveStore.current?.hmsStats}
+            leaveOnUnload={leaveOnUnload}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
