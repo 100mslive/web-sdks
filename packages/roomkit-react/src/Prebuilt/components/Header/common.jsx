@@ -83,7 +83,7 @@ export const AudioActions = () => {
     AudioIcon = <BluetoothIcon />;
   } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
     AudioIcon = <HeadphonesIcon />;
-  } else if (currentSelection && currentSelection.label.toLowerCase().includes('headset')) {
+  } else if (currentSelection && currentSelection.label.toLowerCase().includes('earpiece')) {
     AudioIcon = <TelePhoneIcon />;
   }
   return (
