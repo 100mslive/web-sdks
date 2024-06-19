@@ -251,7 +251,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
-                  if (!event.shiftKey || !messageLengthExceeded) {
+                  if (!event.shiftKey && !messageLengthExceeded) {
                     event.preventDefault();
                     await sendMessage();
                   }
