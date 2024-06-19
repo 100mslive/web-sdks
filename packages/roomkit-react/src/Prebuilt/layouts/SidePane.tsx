@@ -4,7 +4,6 @@ import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
-import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 import VideoTile from '../components/VideoTile';
 import { Flex } from '../../Layout';
@@ -20,6 +19,9 @@ import {
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
+const SidePaneTabs = React.lazy(() =>
+  import('../components/SidePaneTabs').then(module => ({ default: module.SidePaneTabs })),
+);
 const Polls = React.lazy(() => import('../components/Polls/Polls').then(module => ({ default: module.Polls })));
 const RoomDetailsPane = React.lazy(() =>
   import('../components/RoomDetails/RoomDetailsPane').then(module => ({ default: module.RoomDetailsPane })),
