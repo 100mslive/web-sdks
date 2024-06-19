@@ -82,26 +82,27 @@ const DiagnosticsStepsList = () => {
   return (
     <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
       {Object.keys(DiagnosticsSteps).map(key => {
-        const isStepCompleted =
-          Object.keys(DiagnosticsSteps).findIndex(step => step === activeStep) >
-          Object.keys(DiagnosticsSteps).findIndex(step => step === key);
+        const keys = Object.keys(DiagnosticsSteps);
+        const activeStepIndex = keys.indexOf(activeStep);
+        const keyIndex = keys.indexOf(key);
+        const isStepCompleted = activeStepIndex > keyIndex;
 
-        let c = '$on_primary_low';
+        let color = '$on_primary_low';
         if (isStepCompleted) {
-          c = '$primary_bright';
+          color = '$primary_bright';
         }
         if (activeStep === key) {
-          c = '$on_primary_high';
+          color = '$on_primary_high';
         }
 
         return (
-          <Flex css={{ mb: '$10', c, gap: '$4', alignItems: 'center' }}>
+          <Flex css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
             {isStepCompleted ? (
               <CheckCircleIcon width="1rem" height="1rem" />
             ) : (
-              <Text css={{ c, fontSize: '1.75rem' }}>&bull;</Text>
+              <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>
             )}
-            <Text css={{ c }}>{DiagnosticsSteps[key]}</Text>
+            <Text css={{ c: color }}>{DiagnosticsSteps[key]}</Text>
           </Flex>
         );
       })}
