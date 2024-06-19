@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
-import { ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { DiagnosticsContext, DiagnosticsSteps } from './components';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
@@ -81,15 +81,30 @@ const DiagnosticsStepsList = () => {
 
   return (
     <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
-      <ul>
-        {Object.keys(DiagnosticsSteps).map(key => (
-          <li key={key}>
-            <Text variant="md" css={{ mb: '$10', c: activeStep === key ? '$on_primary_high' : '$on_primary_low' }}>
-              {DiagnosticsSteps[key]}
-            </Text>
-          </li>
-        ))}
-      </ul>
+      {Object.keys(DiagnosticsSteps).map(key => {
+        const isStepCompleted =
+          Object.keys(DiagnosticsSteps).findIndex(step => step === activeStep) >
+          Object.keys(DiagnosticsSteps).findIndex(step => step === key);
+
+        let c = '$on_primary_low';
+        if (isStepCompleted) {
+          c = '$primary_bright';
+        }
+        if (activeStep === key) {
+          c = '$on_primary_high';
+        }
+
+        return (
+          <Flex css={{ mb: '$10', c, gap: '$4', alignItems: 'center' }}>
+            {isStepCompleted ? (
+              <CheckCircleIcon width="1rem" height="1rem" />
+            ) : (
+              <Text css={{ c, fontSize: '1.75rem' }}>&bull;</Text>
+            )}
+            <Text css={{ c }}>{DiagnosticsSteps[key]}</Text>
+          </Flex>
+        );
+      })}
     </Box>
   );
 };
