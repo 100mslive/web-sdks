@@ -40,8 +40,8 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private get state(): ConnectivityState | undefined {
     return this._state;
   }
-  private set state(value: ConnectivityState) {
-    if (isPresent(this._state) && value < this._state!) {
+  private set state(value: ConnectivityState | undefined) {
+    if (value === undefined || (this._state !== undefined && value < this._state)) {
       return;
     }
     this._state = value;
