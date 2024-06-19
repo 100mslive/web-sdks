@@ -6,9 +6,9 @@ import { CSS } from '../Theme';
 import { hmsDiagnostics } from './hms';
 
 export const DiagnosticsSteps: Record<string, string> = {
+  browser: 'Browser Support',
   video: 'Test Video',
   audio: 'Test Audio',
-  // browser: 'Browser Support',
   connectivity: 'Connection Quality',
 };
 

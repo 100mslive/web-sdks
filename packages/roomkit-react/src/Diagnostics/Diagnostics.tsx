@@ -6,6 +6,7 @@ import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
+import { BrowserTest } from './BrowserTest';
 import { ConnectivityTest } from './ConnectivityTest';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms';
 import { VideoTest } from './VideoTest';
@@ -45,6 +46,8 @@ const DiagnosticsStepTest = () => {
     TestComponent = AudioTest;
   } else if (activeStep === 'video') {
     TestComponent = VideoTest;
+  } else if (activeStep === 'browser') {
+    TestComponent = BrowserTest;
   } else if (activeStep === 'connectivity') {
     TestComponent = ConnectivityTest;
   }
