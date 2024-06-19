@@ -108,7 +108,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
 
   const resetInputHeight = useCallback(() => {
     if (inputRef.current) {
-      inputRef.current.style.height = `${Math.max(32, inputRef.current.value ? inputRef.current.scrollHeight : 0)}px`;
+      inputRef.current.style.height = `${Math.max(
+        32,
+        inputRef.current.value ? Math.min(inputRef.current.scrollHeight, 24 * 4) : 0,
+      )}px`;
     }
   }, []);
 
@@ -248,7 +251,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
-                  if (!event.shiftKey && !messageLengthExceeded) {
+                  if (!event.shiftKey || !messageLengthExceeded) {
                     event.preventDefault();
                     await sendMessage();
                   }
