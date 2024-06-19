@@ -9,14 +9,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  BluetoothIcon,
-  HeadphonesIcon,
-  MicOnIcon,
-  SpeakerIcon,
-  TelePhoneIcon,
-  VideoOnIcon,
-} from '@100mslive/react-icons';
+import { MicOnIcon, SpeakerIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { Box, Button, Dropdown, Flex, StyledVideoTile, Text, Video } from '../../../';
 import { config as cssConfig } from '../../../Theme';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
@@ -59,18 +52,7 @@ const Settings = ({ setHide }) => {
   if (!videoInput?.length && !audioInput?.length && !audioOutputFiltered?.length) {
     setHide(true);
   }
-  let AudioIcon = <SpeakerIcon />;
-  const currentAudioOuputDevice = audioOutput?.find(item => item.deviceId === selectedDeviceIDs.audioOutput);
-  if (audioOutputFiltered?.length && shouldShowAudioOutput && currentAudioOuputDevice) {
-    if (currentAudioOuputDevice.label.toLowerCase().includes('bluetooth')) {
-      AudioIcon = <BluetoothIcon />;
-    } else if (currentAudioOuputDevice.label.toLowerCase().includes('wired')) {
-      AudioIcon = <HeadphonesIcon />;
-    } else if (currentAudioOuputDevice.label.toLowerCase().includes('headset')) {
-      AudioIcon = <TelePhoneIcon />;
-    }
-  }
-  console.log('here ', currentAudioOuputDevice, audioOutput);
+
   return (
     <Box className={settingOverflow()}>
       {videoInput?.length ? (
@@ -121,7 +103,7 @@ const Settings = ({ setHide }) => {
       {audioOutputFiltered?.length && shouldShowAudioOutput ? (
         <DeviceSelector
           title="Speaker"
-          icon={AudioIcon}
+          icon={<SpeakerIcon />}
           devices={audioOutput}
           selection={selectedDeviceIDs.audioOutput}
           onChange={deviceId =>

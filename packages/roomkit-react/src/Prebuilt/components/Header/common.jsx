@@ -86,7 +86,6 @@ export const AudioActions = () => {
   } else if (currentSelection && currentSelection.label.toLowerCase().includes('headset')) {
     AudioIcon = <TelePhoneIcon />;
   }
-  console.log('here ', selectedAudio, currentSelection);
   return (
     <AudioSelectionSheet
       audioDevices={availableAudioDevices}
