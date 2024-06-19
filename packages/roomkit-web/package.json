@@ -33,11 +33,7 @@
     "build": "rm -rf dist && node ../../scripts/build-webapp"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@100mslive/roomkit-react": "0.3.13-alpha.1",
-=======
     "@100mslive/roomkit-react": "0.3.13",
->>>>>>> dev
     "@r2wc/react-to-web-component": "2.0.2"
   }
 }
