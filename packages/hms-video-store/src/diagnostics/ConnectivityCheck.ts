@@ -36,6 +36,17 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
 
   private cleanupTimer?: number;
   private timestamp = Date.now();
+  private _state?: ConnectivityState;
+  private get state(): ConnectivityState | undefined {
+    return this._state;
+  }
+  private set state(value: ConnectivityState | undefined) {
+    if (value === undefined || (this._state !== undefined && value < this._state)) {
+      return;
+    }
+    this._state = value;
+    this.progressCallback?.(value);
+  }
 
   constructor(
     private sdk: HMSSdk,
@@ -44,6 +55,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     private completionCallback: (state: ConnectivityCheckResult) => void,
   ) {
     this.statsCollector = new DiagnosticsStatsCollector(sdk);
+    this.state = ConnectivityState.STARTING;
   }
   onRoomUpdate = this.sdkListener.onRoomUpdate.bind(this.sdkListener);
   onPeerUpdate = this.sdkListener.onPeerUpdate.bind(this.sdkListener);
@@ -61,18 +73,6 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   onSessionStoreUpdate = this.sdkListener.onSessionStoreUpdate.bind(this.sdkListener);
   onPollsUpdate = this.sdkListener.onPollsUpdate.bind(this.sdkListener);
   onWhiteboardUpdate = this.sdkListener.onWhiteboardUpdate.bind(this.sdkListener);
-
-  private _state: ConnectivityState = ConnectivityState.STARTING;
-  private get state(): ConnectivityState {
-    return this._state;
-  }
-  private set state(value: ConnectivityState) {
-    if (value < this._state) {
-      return;
-    }
-    this._state = value;
-    this.progressCallback?.(value);
-  }
 
   handleConnectionQualityUpdate = (qualities: HMSConnectionQuality[]) => {
     const localPeerQuality = qualities.find(quality => quality.peerID === this.sdk?.store.getLocalPeer()?.peerId);

@@ -218,6 +218,8 @@ const ConnectivityTestReport = ({
   }
 
   if (result) {
+    // for debugging and quick view of results
+    console.log(result);
     return (
       <>
         <TestContainer>
@@ -232,7 +234,7 @@ const ConnectivityTestReport = ({
     );
   }
 
-  if (progress) {
+  if (progress !== undefined) {
     return (
       <TestContainer css={{ textAlign: 'center' }}>
         <Text css={{ c: '$primary_bright' }}>
@@ -315,7 +317,6 @@ export const ConnectivityTest = () => {
 
   const startTest = () => {
     setError(undefined);
-    setProgress(ConnectivityState.STARTING);
     setResult(undefined);
     hmsDiagnostics
       .startConnectivityCheck(
@@ -337,7 +338,7 @@ export const ConnectivityTest = () => {
       <RegionSelector
         region={region}
         setRegion={setRegion}
-        startTest={!progress || progress === ConnectivityState.COMPLETED ? startTest : undefined}
+        startTest={progress === undefined || progress === ConnectivityState.COMPLETED ? startTest : undefined}
       />
       <ConnectivityTestReport error={error} result={result} progress={progress} startTest={startTest} />
     </>
