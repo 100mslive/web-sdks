@@ -1,10 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import {
-  HMSDiagnosticsInterface,
-  HMSStatsStoreWrapper,
-  HMSStoreWrapper,
-  IHMSNotifications,
-} from '@100mslive/hms-video-store';
+import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -85,7 +80,6 @@ export type HMSPrebuiltRefType = {
   hmsStore: HMSStoreWrapper;
   hmsStats: HMSStatsStoreWrapper;
   hmsNotifications: IHMSNotifications;
-  hmsDiagnostics: HMSDiagnosticsInterface;
 };
 
 export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
@@ -115,7 +109,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       const hmsActions = hms.getActions();
       const hmsNotifications = hms.getNotifications();
       const hmsStats = hms.getStats();
-      const hmsDiagnostics = hms.getDiagnosticsSDK();
       hms.triggerOnSubscribe();
 
       reactiveStore.current = {
@@ -123,7 +116,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStats,
         hmsStore,
         hmsNotifications,
-        hmsDiagnostics,
       };
     }, []);
 
