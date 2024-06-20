@@ -14,7 +14,6 @@ import {
 } from '../internal';
 import { HMSSdk } from '../sdk';
 import { HMSPeer } from '../sdk/models/peer';
-import { isPresent } from '../utils/validations';
 
 export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private wsConnected = false;
@@ -27,7 +26,6 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private selectedSubscribeICECandidate?: RTCIceCandidatePair;
   private gatheredPublishICECandidates: RTCIceCandidate[] = [];
   private gatheredSubscribeICECandidates: RTCIceCandidate[] = [];
-  private networkScores: number[] = [];
   private errors: HMSException[] = [];
   private isAudioTrackCaptured = false;
   private isVideoTrackCaptured = false;
@@ -77,7 +75,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
 
   handleConnectionQualityUpdate = (qualities: HMSConnectionQuality[]) => {
     const localPeerQuality = qualities.find(quality => quality.peerID === this.sdk?.store.getLocalPeer()?.peerId);
-    this.networkScores.push(isPresent(localPeerQuality?.downlinkQuality) ? localPeerQuality!.downlinkQuality : -1);
+    this.cqsCalculator.pushScore(localPeerQuality?.downlinkQuality);
   };
 
   onICESuccess(isPublish: boolean): void {
