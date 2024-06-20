@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectDevices,
   selectLocalAudioTrackID,
@@ -14,11 +15,13 @@ import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Progress } from '../Progress';
 import { Text } from '../Text';
+import { config as cssConfig } from '../Theme';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
 import { hmsDiagnostics } from './hms';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
-import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
+import { isSafari, TEST_AUDIO_URL } from '../Prebuilt/common/constants';
+
 const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: '50%', '@lg': { w: '100%' } }}>{children}</Box>
 );
@@ -36,7 +39,7 @@ const MicTest = () => {
   return (
     <SelectContainer>
       <DeviceSelector
-        title="Microphone(Input)"
+        title="Microphone (Input)"
         devices={devices.audioInput}
         selection={selectedMic}
         icon={<MicOnIcon />}
@@ -88,7 +91,7 @@ const MicTest = () => {
         />
       </Flex>
 
-      <Flex align="center" css={{ mt: '$4', maxWidth: '10rem', opacity: isRecording ? '1' : '0' }}>
+      <Flex align="center" css={{ mt: '$4', maxWidth: '10rem', opacity: isRecording ? '1' : '0', gap: '$4' }}>
         <Text>
           <MicOnIcon />
         </Text>
@@ -109,11 +112,16 @@ const SpeakerTest = () => {
   const actions = useHMSActions();
   const devices = useHMSStore(selectDevices);
   const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
+  const isMobile = useMedia(cssConfig.media.md);
+
+  if (isMobile || isSafari) {
+    return <></>;
+  }
 
   return (
     <SelectContainer>
       <DeviceSelector
-        title="Speaker(output)"
+        title="Speaker (Output)"
         devices={devices.audioOutput}
         selection={audioOutputDeviceId || 'default'}
         icon={<SpeakerIcon />}
