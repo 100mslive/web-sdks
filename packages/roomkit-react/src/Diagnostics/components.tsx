@@ -61,11 +61,17 @@ export const TestFooter = ({
       css={{
         py: '$8',
         px: '$10',
+        position: 'sticky',
+        bottom: '0',
+        background: '$background_dim',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTop: '1px solid $border_default',
         fontSize: '$sm',
+        borderBottomLeftRadius: '$1',
+        borderBottomRightRadius: '$1',
         lineHeight: '$sm',
+        zIndex: 1001,
         '@lg': { flexDirection: 'column', gap: '$8' },
       }}
     >
