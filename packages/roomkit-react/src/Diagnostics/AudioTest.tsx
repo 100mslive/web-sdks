@@ -28,11 +28,13 @@ const MicTest = () => {
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
   const { audioInputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || 'default');
+  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || devices.audioInput[0]?.deviceId);
   const trackID = useHMSStore(selectLocalAudioTrackID);
   const audioLevel = useHMSStore(selectTrackAudioByID(trackID));
   const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: audioOutputDeviceId || 'default' });
+  const { playing, setPlaying, audioRef } = useAudioOutputTest({
+    deviceId: audioOutputDeviceId || devices.audioOutput[0]?.deviceId,
+  });
 
   return (
     <SelectContainer>
@@ -120,7 +122,7 @@ const SpeakerTest = () => {
       <DeviceSelector
         title="Speaker (Output)"
         devices={devices.audioOutput}
-        selection={audioOutputDeviceId || 'default'}
+        selection={audioOutputDeviceId || devices.audioOutput[0]?.deviceId}
         icon={<SpeakerIcon />}
         onChange={(deviceId: string) => {
           actions.setAudioOutputDevice(deviceId);

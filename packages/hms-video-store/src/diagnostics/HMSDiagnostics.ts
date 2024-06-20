@@ -28,6 +28,7 @@ import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../uti
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
   private mediaRecorder?: MediaRecorder;
+  private connectivityCheck?: ConnectivityCheck;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
     this.initSdkWithLocalPeer();
@@ -143,27 +144,27 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('SDK not found');
     }
 
-    const connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
+    this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
 
     const authToken = await this.getAuthToken(region);
     const { roomId } = decodeJWT(authToken);
 
-    this.sdk?.store.setRoom(new HMSRoom(roomId));
     await this.sdk.leave();
+    this.sdk?.store.setRoom(new HMSRoom(roomId));
 
     await this.sdk.join(
       { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
-      connectivityCheck,
+      this.connectivityCheck,
     );
     this.sdk.addConnectionQualityListener({
-      onConnectionQualityUpdate(qualityUpdates) {
-        connectivityCheck.handleConnectionQualityUpdate(qualityUpdates);
+      onConnectionQualityUpdate: qualityUpdates => {
+        this.connectivityCheck?.handleConnectionQualityUpdate(qualityUpdates);
       },
     });
   }
 
-  stopConnectivityCheck(): Promise<void> {
-    return this.sdk.leave();
+  async stopConnectivityCheck(): Promise<void> {
+    return this.connectivityCheck?.cleanupAndReport();
   }
 
   private initSdkWithLocalPeer() {

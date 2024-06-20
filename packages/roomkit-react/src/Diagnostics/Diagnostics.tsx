@@ -88,12 +88,15 @@ const DiagnosticsStepsList = () => {
         const isStepCompleted = activeStepIndex > keyIndex || (activeStep === 'connectivity' && connectivityTested);
 
         let color = '$on_primary_low';
+        if (activeStep === key) {
+          color = '$on_primary_high';
+        }
         if (isStepCompleted) {
           color = '$primary_bright';
         }
 
         return (
-          <Flex css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
+          <Flex key={key} css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
             {isStepCompleted ? (
               <CheckCircleIcon width="1rem" height="1rem" />
             ) : (
