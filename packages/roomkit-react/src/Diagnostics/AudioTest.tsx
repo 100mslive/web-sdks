@@ -19,7 +19,6 @@ import { DeviceSelector } from './DeviceSelector';
 import { hmsDiagnostics } from './hms';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
-
 const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: '50%', '@lg': { w: '100%' } }}>{children}</Box>
 );
@@ -31,6 +30,8 @@ const MicTest = () => {
   const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || 'default');
   const trackID = useHMSStore(selectLocalAudioTrackID);
   const audioLevel = useHMSStore(selectTrackAudioByID(trackID));
+  const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
+  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: audioOutputDeviceId || 'default' });
 
   return (
     <SelectContainer>
@@ -47,6 +48,8 @@ const MicTest = () => {
       />
       <Flex css={{ gap: '$6', alignItems: 'center' }}>
         <Button
+          variant="standard"
+          icon
           onClick={() =>
             hmsDiagnostics
               .startMicCheck(selectedMic, () => {
@@ -58,23 +61,45 @@ const MicTest = () => {
           }
           disabled={isRecording}
         >
+          <MicOnIcon />
           {isRecording ? 'Recording...' : 'Record'}
         </Button>
-        {isRecording && (
-          <>
-            <Text>
-              <MicOnIcon />
-            </Text>
-            <Progress.Root value={audioLevel} css={{ h: '$2' }}>
-              <Progress.Content
-                style={{
-                  transform: `translateX(-${100 - audioLevel}%)`,
-                  transition: 'transform 0.3s',
-                }}
-              />
-            </Progress.Root>
-          </>
-        )}
+
+        <Button
+          icon
+          variant="standard"
+          outlined={hmsDiagnostics.getRecordedAudio() === TEST_AUDIO_URL}
+          onClick={() => {
+            if (audioRef.current) {
+              audioRef.current.src = hmsDiagnostics.getRecordedAudio();
+              audioRef.current.play();
+            }
+          }}
+          disabled={playing || hmsDiagnostics.getRecordedAudio() === TEST_AUDIO_URL}
+        >
+          <SpeakerIcon />
+          {playing ? 'Playing...' : 'Playback'}
+        </Button>
+        <audio
+          ref={audioRef}
+          onEnded={() => setPlaying(false)}
+          onPlay={() => setPlaying(true)}
+          style={{ display: 'none' }}
+        />
+      </Flex>
+
+      <Flex align="center" css={{ mt: '$4', maxWidth: '10rem', opacity: isRecording ? '1' : '0' }}>
+        <Text>
+          <MicOnIcon />
+        </Text>
+        <Progress.Root value={audioLevel} css={{ h: '$2' }}>
+          <Progress.Content
+            style={{
+              transform: `translateX(-${100 - audioLevel}%)`,
+              transition: 'transform 0.3s',
+            }}
+          />
+        </Progress.Root>
       </Flex>
     </SelectContainer>
   );
@@ -84,7 +109,6 @@ const SpeakerTest = () => {
   const actions = useHMSActions();
   const devices = useHMSStore(selectDevices);
   const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId: audioOutputDeviceId || 'default' });
 
   return (
     <SelectContainer>
@@ -96,24 +120,6 @@ const SpeakerTest = () => {
         onChange={(deviceId: string) => {
           actions.setAudioOutputDevice(deviceId);
         }}
-      />
-      <Button
-        onClick={() => {
-          if (audioRef.current) {
-            audioRef.current.src = hmsDiagnostics.getRecordedAudio() || TEST_AUDIO_URL;
-            audioRef.current.play();
-          }
-        }}
-        disabled={playing}
-      >
-        <SpeakerIcon />
-        <Text css={{ ml: '$4' }}>{playing ? 'Playing' : 'Playback'}</Text>
-      </Button>
-      <audio
-        ref={audioRef}
-        onEnded={() => setPlaying(false)}
-        onPlay={() => setPlaying(true)}
-        style={{ display: 'none' }}
       />
     </SelectContainer>
   );
@@ -129,8 +135,9 @@ export const AudioTest = () => {
     <>
       <TestContainer>
         <Text variant="body2" css={{ c: '$on_primary_medium' }}>
-          Record an audio clip and play it back to check that your microphone and speaker are working. If they aren't,
-          make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth settings.
+          Record a 10 second audio clip and play it back to check that your microphone and speaker are working. If they
+          aren't, make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth
+          settings.
         </Text>
 
         <Flex
