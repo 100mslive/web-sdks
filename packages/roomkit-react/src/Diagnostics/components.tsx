@@ -55,6 +55,9 @@ export const TestFooter = ({
       css={{
         py: '$8',
         px: '$10',
+        position: 'sticky',
+        bottom: '0',
+        background: '$background_dim',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTop: '1px solid $border_default',

@@ -21,8 +21,8 @@ const DiagnosticsStepIcon: Record<string, React.ReactNode> = {
 const Container = ({ children }: { children: React.ReactNode }) => (
   <Box
     css={{
-      px: '155px',
-      py: '160px',
+      px: '120px',
+      py: '120px',
       bg: '$background_dim',
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
@@ -67,7 +67,7 @@ const DiagnosticsStepHeader = () => {
 
 const DiagnosticsStep = () => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', '@lg': { w: '100%' } }}>
+    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
       <Box css={{ maxHeight: '55vh', overflowY: 'auto' }}>
         <DiagnosticsStepTest />

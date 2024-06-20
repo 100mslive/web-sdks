@@ -27,8 +27,8 @@ export const VideoTest = () => {
         {trackID && (
           <StyledVideoTile.Container
             css={{
-              w: '90%',
-              height: '$48',
+              width: '90%',
+              height: 'calc(90% * 9 / 16)',
               mr: '$10',
               '@lg': { mr: 0, mb: '$10' },
             }}
