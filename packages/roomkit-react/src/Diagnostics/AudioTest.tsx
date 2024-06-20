@@ -71,7 +71,7 @@ const MicTest = () => {
           outlined={hmsDiagnostics.getRecordedAudio() === TEST_AUDIO_URL}
           onClick={() => {
             if (audioRef.current) {
-              audioRef.current.src = hmsDiagnostics.getRecordedAudio();
+              audioRef.current.src = hmsDiagnostics.getRecordedAudio() || '';
               audioRef.current.play();
             }
           }}
