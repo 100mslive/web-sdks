@@ -15,9 +15,15 @@ export const DiagnosticsSteps: Record<string, string> = {
 export const DiagnosticsContext = React.createContext<{
   activeStep: string;
   setActiveStep: React.Dispatch<React.SetStateAction<string>>;
+  connectivityTested: boolean;
+  setConnectivityTested: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   activeStep: 'video',
   setActiveStep: () => {
+    return;
+  },
+  connectivityTested: false,
+  setConnectivityTested: () => {
     return;
   },
 });

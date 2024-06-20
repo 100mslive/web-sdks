@@ -77,7 +77,7 @@ const DiagnosticsStep = () => {
 };
 
 const DiagnosticsStepsList = () => {
-  const { activeStep } = useContext(DiagnosticsContext);
+  const { activeStep, connectivityTested } = useContext(DiagnosticsContext);
 
   return (
     <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
@@ -85,14 +85,11 @@ const DiagnosticsStepsList = () => {
         const keys = Object.keys(DiagnosticsSteps);
         const activeStepIndex = keys.indexOf(activeStep);
         const keyIndex = keys.indexOf(key);
-        const isStepCompleted = activeStepIndex > keyIndex;
+        const isStepCompleted = activeStepIndex > keyIndex || (activeStep === 'connectivity' && connectivityTested);
 
         let color = '$on_primary_low';
         if (isStepCompleted) {
           color = '$primary_bright';
-        }
-        if (activeStep === key) {
-          color = '$on_primary_high';
         }
 
         return (
@@ -112,10 +109,11 @@ const DiagnosticsStepsList = () => {
 
 export const Diagnostics = () => {
   const [activeStep, setActiveStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
+  const [connectivityTested, setConnectivityTested] = React.useState(false);
   return (
     <HMSRoomProvider store={hmsStore} actions={hmsActions} notifications={hmsNotifications} stats={hmsStats}>
       <HMSThemeProvider themeType="default">
-        <DiagnosticsContext.Provider value={{ activeStep, setActiveStep }}>
+        <DiagnosticsContext.Provider value={{ activeStep, setActiveStep, connectivityTested, setConnectivityTested }}>
           <Container>
             <Text variant="h4">Pre-call Test</Text>
             <Text variant="md" css={{ c: '$on_primary_medium' }}>
