@@ -15,9 +15,15 @@ export const DiagnosticsSteps: Record<string, string> = {
 export const DiagnosticsContext = React.createContext<{
   activeStep: string;
   setActiveStep: React.Dispatch<React.SetStateAction<string>>;
+  connectivityTested: boolean;
+  setConnectivityTested: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   activeStep: 'video',
   setActiveStep: () => {
+    return;
+  },
+  connectivityTested: false,
+  setConnectivityTested: () => {
     return;
   },
 });
@@ -55,11 +61,17 @@ export const TestFooter = ({
       css={{
         py: '$8',
         px: '$10',
+        position: 'sticky',
+        bottom: '0',
+        background: '$background_dim',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTop: '1px solid $border_default',
         fontSize: '$sm',
+        borderBottomLeftRadius: '$1',
+        borderBottomRightRadius: '$1',
         lineHeight: '$sm',
+        zIndex: 1001,
         '@lg': { flexDirection: 'column', gap: '$8' },
       }}
     >
