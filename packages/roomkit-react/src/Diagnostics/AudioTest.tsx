@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectDevices,
   selectLocalAudioTrackID,
@@ -15,12 +14,11 @@ import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Progress } from '../Progress';
 import { Text } from '../Text';
-import { config as cssConfig } from '../Theme';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
 import { hmsDiagnostics } from './hms';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
-import { isSafari, TEST_AUDIO_URL } from '../Prebuilt/common/constants';
+import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
 const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: '50%', '@lg': { w: '100%' } }}>{children}</Box>
@@ -112,9 +110,8 @@ const SpeakerTest = () => {
   const actions = useHMSActions();
   const devices = useHMSStore(selectDevices);
   const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const isMobile = useMedia(cssConfig.media.md);
 
-  if (isMobile || isSafari) {
+  if (devices.audioOutput.length === 0) {
     return <></>;
   }
 
