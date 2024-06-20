@@ -28,9 +28,9 @@ export const VideoTest = () => {
           <StyledVideoTile.Container
             css={{
               width: '90%',
-              height: 'calc(90% * 9 / 16)',
+              aspectRatio: '16/9',
               mr: '$10',
-              '@lg': { mr: 0, mb: '$10' },
+              '@lg': { mr: 0, mb: '$10', aspectRatio: '1/1' },
             }}
           >
             <Video mirror={true} trackId={trackID} />
