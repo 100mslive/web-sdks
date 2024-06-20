@@ -88,6 +88,9 @@ const DiagnosticsStepsList = () => {
         const isStepCompleted = activeStepIndex > keyIndex || (activeStep === 'connectivity' && connectivityTested);
 
         let color = '$on_primary_low';
+        if (activeStep === key) {
+          color = '$on_primary_high';
+        }
         if (isStepCompleted) {
           color = '$primary_bright';
         }

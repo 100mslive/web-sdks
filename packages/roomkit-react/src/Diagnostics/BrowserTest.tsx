@@ -71,6 +71,11 @@ export const browserTypeIconInfo = {
     val: 'Safari',
     icon: `${CMS_MEDIA_SERVER}cms/Safari_254e74ed94/Safari_254e74ed94.svg`,
   },
+  'mobile safari': {
+    key: 'safari',
+    val: 'Safari',
+    icon: `${CMS_MEDIA_SERVER}cms/Safari_254e74ed94/Safari_254e74ed94.svg`,
+  },
   edge: {
     key: 'edge',
     val: 'Edge',
@@ -88,11 +93,11 @@ const CheckDetails = ({ title, value, iconURL }: { title: string; value: string;
     <Text css={{ c: '$on_primary_medium', mb: '$6' }}>{title}</Text>
     <Flex align="center">
       {iconURL && (
-        <Box css={{ size: '2rem', r: '$round', bg: '$surface_brighter' }}>
+        <Box css={{ size: '2rem', r: '$round', bg: '$surface_brighter', mr: '$4' }}>
           <img style={{ objectFit: 'contain', width: '2rem' }} src={iconURL} alt={value} />
         </Box>
       )}
-      <Text css={{ ml: '$4' }}>{value}</Text>
+      <Text>{value}</Text>
     </Flex>
   </Box>
 );
@@ -114,7 +119,7 @@ export const BrowserTest = () => {
           iconURL={
             parsedUserAgent.getBrowser().name &&
             browserTypeIconInfo[parsedUserAgent.getBrowser().name?.toLowerCase() as keyof typeof browserTypeIconInfo]
-              .icon
+              ?.icon
           }
           value={`${parsedUserAgent.getBrowser().name} ${parsedUserAgent.getBrowser().version}`}
         />
@@ -123,7 +128,7 @@ export const BrowserTest = () => {
           iconURL={
             parsedUserAgent.getOS().name &&
             operatingSystemIconInfo[parsedUserAgent.getOS().name?.toLowerCase() as keyof typeof operatingSystemIconInfo]
-              .icon
+              ?.icon
           }
           value={`${parsedUserAgent.getOS().name} ${parsedUserAgent.getOS().version}`}
         />
