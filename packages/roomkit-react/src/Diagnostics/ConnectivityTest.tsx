@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
-import { TestContainer, TestFooter } from './components';
+import { DiagnosticsContext, TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
@@ -310,12 +310,14 @@ const RegionSelector = ({
 };
 
 export const ConnectivityTest = () => {
+  const { setConnectivityTested } = useContext(DiagnosticsContext);
   const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>();
   const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
 
   const startTest = () => {
+    setConnectivityTested(false);
     setError(undefined);
     setResult(undefined);
     hmsDiagnostics
@@ -324,6 +326,7 @@ export const ConnectivityTest = () => {
           setProgress(state);
         },
         result => {
+          setConnectivityTested(true);
           setResult(result);
         },
         region,

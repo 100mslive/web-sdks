@@ -27,10 +27,10 @@ export const VideoTest = () => {
         {trackID && (
           <StyledVideoTile.Container
             css={{
-              w: '90%',
-              height: '$48',
+              width: '90%',
+              aspectRatio: '16/9',
               mr: '$10',
-              '@lg': { mr: 0, mb: '$10' },
+              '@lg': { mr: 0, mb: '$10', aspectRatio: '1/1' },
             }}
           >
             <Video mirror={true} trackId={trackID} />
