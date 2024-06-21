@@ -93,12 +93,17 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
   }
 
-  async startMicCheck(
-    inputDevice?: string,
-    onError?: (error: Error) => void,
-    onStop?: () => void,
+  async startMicCheck({
+    inputDevice,
+    onError,
+    onStop,
     time = MIC_CHECK_RECORD_DURATION,
-  ) {
+  }: {
+    inputDevice?: string;
+    onError?: (error: Error) => void;
+    onStop?: () => void;
+    time?: number;
+  }) {
     this.initSdkWithLocalPeer((err: Error) => {
       this.stopMicCheck();
       onError?.(err);
