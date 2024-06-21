@@ -163,8 +163,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     const authToken = await this.getAuthToken(region);
     const { roomId } = decodeJWT(authToken);
 
-    this.sdk?.store.setRoom(new HMSRoom(roomId));
     await this.sdk.leave();
+    this.sdk?.store.setRoom(new HMSRoom(roomId));
 
     await this.sdk.join(
       { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },

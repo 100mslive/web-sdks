@@ -96,7 +96,7 @@ const DiagnosticsStepsList = () => {
         }
 
         return (
-          <Flex css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
+          <Flex key={key} css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
             {isStepCompleted ? (
               <CheckCircleIcon width="1rem" height="1rem" />
             ) : (
