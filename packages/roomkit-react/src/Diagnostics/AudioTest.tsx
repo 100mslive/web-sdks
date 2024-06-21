@@ -8,7 +8,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { MicOnIcon, SpeakerIcon } from '@100mslive/react-icons';
+import { MicOnIcon, SpeakerIcon, StopIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
@@ -24,11 +24,10 @@ const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: '50%', '@lg': { w: '100%' } }}>{children}</Box>
 );
 
-const MicTest = () => {
+const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<Error | undefined>> }) => {
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
-  const { audioInputDeviceId } = useHMSStore(selectLocalMediaSettings);
-  const [selectedMic, setSelectedMic] = useState(audioInputDeviceId || devices.audioInput[0]?.deviceId);
+  const [selectedMic, setSelectedMic] = useState(devices.audioInput[0]?.deviceId || 'default');
   const trackID = useHMSStore(selectLocalAudioTrackID);
   const audioLevel = useHMSStore(selectTrackAudioByID(trackID));
   const { audioOutputDeviceId } = useHMSStore(selectLocalMediaSettings);
@@ -46,26 +45,32 @@ const MicTest = () => {
         onChange={(deviceId: string) => {
           setSelectedMic(deviceId);
           hmsDiagnostics.stopMicCheck();
-          setIsRecording(false);
         }}
       />
       <Flex css={{ gap: '$6', alignItems: 'center' }}>
         <Button
           variant="standard"
           icon
-          onClick={() =>
-            hmsDiagnostics
-              .startMicCheck(selectedMic, () => {
-                setIsRecording(false);
-              })
-              .then(() => {
-                setIsRecording(true);
-              })
-          }
-          disabled={isRecording}
+          onClick={() => {
+            isRecording
+              ? hmsDiagnostics.stopMicCheck()
+              : hmsDiagnostics
+                  .startMicCheck(
+                    selectedMic,
+                    (err: Error) => {
+                      setError(err);
+                    },
+                    () => {
+                      setIsRecording(false);
+                    },
+                  )
+                  .then(() => {
+                    setIsRecording(true);
+                  });
+          }}
         >
-          <MicOnIcon />
-          {isRecording ? 'Recording...' : 'Record'}
+          {isRecording ? <StopIcon /> : <MicOnIcon />}
+          {isRecording ? 'Stop Recording' : 'Record'}
         </Button>
 
         <Button
@@ -157,7 +162,7 @@ export const AudioTest = () => {
             },
           }}
         >
-          {!error && <MicTest />}
+          <MicTest setError={setError} />
           <SpeakerTest />
         </Flex>
       </TestContainer>

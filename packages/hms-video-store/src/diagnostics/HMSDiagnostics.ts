@@ -9,6 +9,7 @@ import {
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import {
+  HMSException,
   HMSLocalAudioTrack,
   HMSLocalVideoTrack,
   HMSPeerType,
@@ -22,13 +23,13 @@ import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSLocalPeer } from '../sdk/models/peer';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
-import { sleep } from '../utils/timer-utils';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
   private mediaRecorder?: MediaRecorder;
   private connectivityCheck?: ConnectivityCheck;
+  private onStopMicCheck?: () => void;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
     this.initSdkWithLocalPeer();
@@ -88,8 +89,16 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
   }
 
-  async startMicCheck(inputDevice?: string, onStop?: () => void, time = MIC_CHECK_RECORD_DURATION) {
-    this.initSdkWithLocalPeer();
+  async startMicCheck(
+    inputDevice?: string,
+    onError?: (error: Error) => void,
+    onStop?: () => void,
+    time = MIC_CHECK_RECORD_DURATION,
+  ) {
+    this.initSdkWithLocalPeer((err: Error) => {
+      this.stopMicCheck();
+      onError?.(err);
+    });
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
@@ -113,14 +122,19 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: this.mediaRecorder?.mimeType });
       this.recordedAudio = URL.createObjectURL(blob);
+      this.onStopMicCheck?.();
     };
 
     this.mediaRecorder.start();
 
-    sleep(time).then(() => {
+    const timeoutId = setTimeout(() => {
       this.stopMicCheck();
+    }, time);
+
+    this.onStopMicCheck = () => {
+      clearTimeout(timeoutId);
       onStop?.();
-    });
+    };
   }
 
   stopMicCheck(): void {
@@ -167,8 +181,15 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     return this.connectivityCheck?.cleanupAndReport();
   }
 
-  private initSdkWithLocalPeer() {
-    this.sdkListener && this.sdk?.initStoreAndManagers(this.sdkListener);
+  private initSdkWithLocalPeer(onError?: (error: Error) => void) {
+    this.sdkListener &&
+      this.sdk?.initStoreAndManagers({
+        ...this.sdkListener,
+        onError: (error: HMSException) => {
+          onError?.(error);
+          this.sdkListener.onError(error);
+        },
+      });
     const localPeer = new HMSLocalPeer({
       name: 'diagnostics-peer',
       role: diagnosticsRole,
