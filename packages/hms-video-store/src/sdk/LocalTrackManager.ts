@@ -464,7 +464,7 @@ export class LocalTrackManager {
     }
   }
 
-  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+  getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
     if (videoError && audioError) {
       return HMSGetMediaActions.AV;
     }
