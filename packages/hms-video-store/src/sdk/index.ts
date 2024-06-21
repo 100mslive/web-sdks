@@ -655,14 +655,15 @@ export class HMSSdk implements HMSInterface {
       const roomId = room.id;
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);
-      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
+      const peerId = this.localPeer?.peerId;
+      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}, peerId=${peerId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave(notifyServer);
       this.cleanup();
-      HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
+      HMSLogger.d(this.TAG, `✅ Left room ${roomId}, peerId=${peerId}`);
     }
   }
 
