@@ -57,15 +57,15 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
             isRecording
               ? hmsDiagnostics.stopMicCheck()
               : hmsDiagnostics
-                  .startMicCheck(
-                    selectedMic,
-                    (err: Error) => {
+                  .startMicCheck({
+                    inputDevice: selectedMic,
+                    onError: (err: Error) => {
                       setError(err);
                     },
-                    () => {
+                    onStop: () => {
                       setIsRecording(false);
                     },
-                  )
+                  })
                   .then(() => {
                     setIsRecording(true);
                   });
