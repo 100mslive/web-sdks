@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { selectDevices, selectLocalMediaSettings, selectLocalVideoTrackID, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSException,
+  selectDevices,
+  selectLocalMediaSettings,
+  selectLocalVideoTrackID,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
+import { PermissionErrorModal } from '../Prebuilt/components/Notifications/PermissionErrorModal';
 import { TestContainer, TestFooter } from './components';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
@@ -15,7 +22,7 @@ export const VideoTest = () => {
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<HMSException | undefined>();
 
   useEffect(() => {
     hmsDiagnostics.startCameraCheck().catch(err => setError(err));
@@ -55,6 +62,7 @@ export const VideoTest = () => {
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your video look good?" />
+      <PermissionErrorModal error={error} />
     </>
   );
 };
