@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import {
+  HMSException,
   selectDevices,
   selectLocalAudioTrackID,
   selectLocalMediaSettings,
@@ -9,6 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon, StopIcon } from '@100mslive/react-icons';
+import { PermissionErrorModal } from '../Prebuilt/components/Notifications/PermissionErrorModal';
 import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
@@ -68,6 +70,7 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
                     setIsRecording(true);
                   });
           }}
+          disabled={devices.audioInput.length === 0 || playing}
         >
           {isRecording ? <StopIcon /> : <MicOnIcon />}
           {isRecording ? 'Stop Recording' : 'Record'}
@@ -167,6 +170,7 @@ export const AudioTest = () => {
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your audio sound good?" />
+      <PermissionErrorModal error={error as HMSException} />
     </>
   );
 };

@@ -8,6 +8,7 @@ import {
 } from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { BuildGetMediaError } from '../error/utils';
 import {
   HMSException,
   HMSLocalAudioTrack,
@@ -45,14 +46,17 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   }
 
   async requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck> {
-    const stream = await navigator.mediaDevices.getUserMedia(check);
-
-    stream.getTracks().forEach(track => track.stop());
-    await this.sdk.deviceManager.init(true);
-    return {
-      audio: stream.getAudioTracks().length > 0,
-      video: stream.getVideoTracks().length > 0,
-    };
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(check);
+      stream.getTracks().forEach(track => track.stop());
+      await this.sdk.deviceManager.init(true);
+      return {
+        audio: stream.getAudioTracks().length > 0,
+        video: stream.getVideoTracks().length > 0,
+      };
+    } catch (err) {
+      throw BuildGetMediaError(err as Error, this.sdk.localTrackManager.getErrorType(!!check.video, !!check.audio));
+    }
   }
 
   async startCameraCheck(inputDevice?: string) {
