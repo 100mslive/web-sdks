@@ -25,6 +25,7 @@ export default class Room implements HMSRoom {
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
+  isDiagnosticsRoom?: boolean;
 
   constructor(id: string) {
     this.id = id;

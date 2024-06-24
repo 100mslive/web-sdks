@@ -173,7 +173,9 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     const { roomId } = decodeJWT(authToken);
 
     await this.sdk.leave();
-    this.sdk?.store.setRoom(new HMSRoom(roomId));
+    const room = new HMSRoom(roomId);
+    room.isDiagnosticsRoom = true;
+    this.sdk?.store.setRoom(room);
 
     await this.sdk.join({ authToken, userName: 'diagonistic-test' }, this.connectivityCheck);
     this.sdk.addConnectionQualityListener({
@@ -205,6 +207,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk?.store.addPeer(localPeer);
 
     const room = new HMSRoom('diagnostics-room');
+    room.isDiagnosticsRoom = true;
     this.sdk.store.setRoom(room);
     this.sdkListener.onRoomUpdate(HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED, room);
     this.sdk?.deviceManager.init(true);
