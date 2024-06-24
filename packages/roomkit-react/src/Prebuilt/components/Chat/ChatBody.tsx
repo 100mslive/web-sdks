@@ -169,7 +169,8 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '14ch',
+  // 10ch space for XY:ZZ AM and 2 spaces
+  maxWidth: 'calc(100% - 10ch)',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
@@ -261,7 +262,7 @@ const ChatMessage = React.memo(
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
-                <Tooltip title={message.senderName} side="top" align="start">
+                <Tooltip title={message.senderName} side="top" align="start" boxCss={{ zIndex: 50 }}>
                   <SenderName
                     as="span"
                     variant="sub2"
