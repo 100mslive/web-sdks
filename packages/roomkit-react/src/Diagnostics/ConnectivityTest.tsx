@@ -237,7 +237,7 @@ const ConnectivityTestReport = ({
   if (progress !== undefined) {
     return (
       <TestContainer css={{ textAlign: 'center' }}>
-        <Text css={{ c: '$primary_bright' }}>
+        <Text css={{ c: '$primary_bright', textAlign: 'center' }}>
           <Loading size="3.5rem" color="currentColor" />
         </Text>
         <Text variant="h6" css={{ mt: '$8' }}>

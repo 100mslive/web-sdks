@@ -23,7 +23,6 @@ import { HMSSdk } from '../sdk';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSLocalPeer } from '../sdk/models/peer';
 import { fetchWithRetry } from '../utils/fetch';
-import decodeJWT from '../utils/jwt';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
@@ -33,6 +32,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   private onStopMicCheck?: () => void;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
+    this.sdk.setIsDiagnostics(true);
     this.initSdkWithLocalPeer();
   }
 
@@ -170,15 +170,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
 
     const authToken = await this.getAuthToken(region);
-    const { roomId } = decodeJWT(authToken);
-
     await this.sdk.leave();
-    this.sdk?.store.setRoom(new HMSRoom(roomId));
-
-    await this.sdk.join(
-      { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
-      this.connectivityCheck,
-    );
+    await this.sdk.join({ authToken, userName: 'diagnostics-test' }, this.connectivityCheck);
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: qualityUpdates => {
         this.connectivityCheck?.handleConnectionQualityUpdate(qualityUpdates);
@@ -214,7 +207,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   }
 
   private async getAuthToken(region?: string): Promise<string> {
-    const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
+    const tokenAPIURL = new URL('https://api.100ms.live/v2/diagnostics/token');
     if (region) {
       tokenAPIURL.searchParams.append('region', region);
     }
