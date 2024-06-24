@@ -1152,12 +1152,13 @@ export default class HMSTransport {
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
-    Promise.all(Array.from(this.retryablePromises))
+    Promise.allSettled(Array.from(this.retryablePromises))
       .then(() => {
         this.retryablePromises.clear();
       })
-      .catch(() => {
+      .catch(errors => {
         // do nothing, mostly will be leaving the room at this point
+        HMSLogger.d(TAG, ...errors);
       });
 
     return ok;
