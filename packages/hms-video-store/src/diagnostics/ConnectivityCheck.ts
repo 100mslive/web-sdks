@@ -180,7 +180,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   cleanupAndReport() {
     clearTimeout(this.cleanupTimer);
     this.cleanupTimer = undefined;
-    if (this.state === ConnectivityState.MEDIA_PUBLISHED && this.errors.length === 0) {
+    if (this.state === ConnectivityState.MEDIA_PUBLISHED) {
       this.state = ConnectivityState.COMPLETED;
     }
     this.completionCallback?.(this.buildReport());
