@@ -80,6 +80,7 @@ export default class HMSTransport {
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
+  private retryablePromises = new Set<Promise<any>>();
   joinRetryCount = 0;
 
   constructor(
@@ -675,14 +676,22 @@ export default class HMSTransport {
         action: HMSAction.UNPUBLISH,
         extra: {},
       });
+    }).catch(err => {
+      if (err.code === 1003) {
+        throw err;
+      }
     });
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
-    await p;
-    await track.cleanup();
-    // remove track from store on unpublish
-    this.store.removeTrack(track);
-    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+    try {
+      await p;
+      await track.cleanup();
+      // remove track from store on unpublish
+      this.store.removeTrack(track);
+      HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+    } catch (ex) {
+      this.retryablePromises.add(p);
+    }
   }
 
   private waitForLocalRoleAvailability() {
@@ -891,7 +900,6 @@ export default class HMSTransport {
       } else {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
-
       callback!.promise.reject(ex);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
@@ -1135,6 +1143,9 @@ export default class HMSTransport {
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
+    Promise.all(Array.from(this.retryablePromises)).then(() => {
+      this.retryablePromises.clear();
+    });
 
     return ok;
   };

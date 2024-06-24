@@ -610,16 +610,16 @@ export default class JsonRpcSignal {
   private async call<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
     let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
-    this.validateConnection();
     let retry;
     for (retry = 1; retry <= MAX_RETRIES; retry++) {
       try {
+        this.validateConnection();
         HMSLogger.d(this.TAG, `Try number ${retry} sending ${method}`, params);
         return await this.internalCall(method, params);
       } catch (err) {
         error = err as HMSException;
         HMSLogger.e(this.TAG, `Failed sending ${method} try: ${retry}`, { method, params, error });
-        const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
+        const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429 || error.code === 1003;
         if (!shouldRetry) {
           break;
         }
