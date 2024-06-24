@@ -47,10 +47,10 @@ export class LocalTrackManager {
 
   constructor(
     private store: Store,
-    private observer: ITransportObserver,
+    private observer: Pick<ITransportObserver, 'onFailure'>,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
-    private analyticsTimer: AnalyticsTimer,
+    private analyticsTimer?: AnalyticsTimer,
   ) {
     this.setScreenCaptureHandleConfig();
   }
@@ -81,10 +81,10 @@ export class LocalTrackManager {
     };
 
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer?.start(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer?.start(TimedEvent.LOCAL_VIDEO_TRACK);
     }
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
@@ -98,10 +98,10 @@ export class LocalTrackManager {
       );
     }
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer?.end(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer?.end(TimedEvent.LOCAL_VIDEO_TRACK);
     }
 
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
@@ -236,7 +236,14 @@ export class LocalTrackManager {
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, screenSettings?.video);
+    const videoTrack = new HMSLocalVideoTrack(
+      local,
+      nativeVideoTrack,
+      'screen',
+      this.eventBus,
+      screenSettings?.video,
+      this.store.getRoom(),
+    );
     videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'screen'));
 
     try {
@@ -257,6 +264,7 @@ export class LocalTrackManager {
         'screen',
         this.eventBus,
         screenSettings?.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -623,6 +631,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -634,6 +643,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.video,
+        this.store.getRoom(),
       );
       videoTrack.setSimulcastDefinitons(
         this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'regular'),

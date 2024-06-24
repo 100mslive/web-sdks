@@ -1,9 +1,11 @@
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack } from '../../media/tracks';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
 const DEFAULT_SAMPLE_RATE = 48000;
@@ -40,12 +42,14 @@ export class HMSAudioPluginsManager {
   // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
+  private room?: Room;
 
-  constructor(track: HMSLocalAudioTrack, private eventBus: EventBus) {
+  constructor(track: HMSLocalAudioTrack, private eventBus: EventBus, room?: Room) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
     this.createAudioContext();
+    this.room = room;
   }
 
   getPlugins(): string[] {
@@ -69,6 +73,22 @@ export class HMSAudioPluginsManager {
       throw err;
     }
 
+    switch (plugin.getName()) {
+      case 'HMSKrispPlugin':
+        if (!this.room?.isNoiseCancellationEnabled) {
+          const errorMessage = 'Krisp Noise Cancellation is not enabled for this room';
+          if (this.pluginsMap.size === 0) {
+            throw Error(errorMessage);
+          } else {
+            HMSLogger.w(this.TAG, errorMessage);
+            return;
+          }
+        }
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
+        break;
+
+      default:
+    }
     this.pluginAddInProgress = true;
 
     try {
@@ -140,6 +160,13 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
+    switch (plugin.getName()) {
+      case 'HMSKrispPlugin':
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
+        break;
+      default:
+        break;
+    }
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes

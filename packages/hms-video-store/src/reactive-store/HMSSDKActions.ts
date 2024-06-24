@@ -16,6 +16,7 @@ import { HMSSessionStore } from './HMSSessionStore';
 import { NamedSetState } from './internalTypes';
 import { HMSLogger } from '../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../controller/beam/BeamSpeakerLabelsLogger';
+import { Diagnostics } from '../diagnostics';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -359,6 +360,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
+
     if (trackID) {
       await this.setSDKLocalAudioTrackSettings(trackID, settings);
       this.syncRoomState('setAudioSettings');
@@ -798,6 +800,36 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       this.beamSpeakerLabelsLogger = new BeamSpeakerLabelsLogger(this.store, this);
       await this.beamSpeakerLabelsLogger.start();
     }
+  }
+  initDiagnostics() {
+    const diagnostics = new Diagnostics(this.sdk, {
+      onJoin: this.onJoin.bind(this),
+      onPreview: this.onPreview.bind(this),
+      onRoomUpdate: this.onRoomUpdate.bind(this),
+      onPeerUpdate: this.onPeerUpdate.bind(this),
+      onTrackUpdate: this.onTrackUpdate.bind(this),
+      onMessageReceived: this.onMessageReceived.bind(this),
+      onError: this.onError.bind(this),
+      onReconnected: this.onReconnected.bind(this),
+      onReconnecting: this.onReconnecting.bind(this),
+      onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
+      onRoleUpdate: this.onRoleUpdate.bind(this),
+      onDeviceChange: this.onDeviceChange.bind(this),
+      onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
+      onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
+      onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
+      onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
+      onPollsUpdate: this.onPollsUpdate.bind(this),
+      onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
+    });
+    this.sdk.addAudioListener({
+      onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
+    });
+    return diagnostics;
   }
 
   private resetState(reason = 'resetState') {
