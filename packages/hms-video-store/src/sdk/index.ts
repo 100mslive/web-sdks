@@ -133,6 +133,7 @@ export class HMSSdk implements HMSInterface {
   private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private isDiagnostics = false;
   private playlistSettings: HMSPlaylistSettings = {
     video: {
       bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -931,6 +932,11 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager?.setConnectionQualityListener(qualityListener);
   }
 
+  /** @internal */
+  setIsDiagnostics(isDiagnostics: boolean) {
+    this.isDiagnostics = isDiagnostics;
+  }
+
   async changeRole(forPeerId: string, toRole: string, force = false) {
     await this.transport?.signal.requestRoleChange({
       requested_for: forPeerId,
@@ -1477,7 +1483,7 @@ export class HMSSdk implements HMSInterface {
     // this.sendAnalyticsEvent(
     //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
     // );
-    if (this.store.getRoom()?.isDiagnosticsRoom) {
+    if (this.isDiagnostics) {
       this.listener?.onError(error);
     }
   };
@@ -1506,7 +1512,7 @@ export class HMSSdk implements HMSInterface {
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
     // don't send analytics for diagnostics
-    if (this.store.getRoom()?.isDiagnosticsRoom) {
+    if (this.isDiagnostics) {
       return;
     }
     this.analyticsEventsService.queue(event).flush();

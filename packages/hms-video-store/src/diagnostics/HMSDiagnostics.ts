@@ -23,7 +23,6 @@ import { HMSSdk } from '../sdk';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSLocalPeer } from '../sdk/models/peer';
 import { fetchWithRetry } from '../utils/fetch';
-import decodeJWT from '../utils/jwt';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
@@ -33,6 +32,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   private onStopMicCheck?: () => void;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
+    this.sdk.setIsDiagnostics(true);
     this.initSdkWithLocalPeer();
   }
 
@@ -170,14 +170,8 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
 
     const authToken = await this.getAuthToken(region);
-    const { roomId } = decodeJWT(authToken);
-
     await this.sdk.leave();
-    const room = new HMSRoom(roomId);
-    room.isDiagnosticsRoom = true;
-    this.sdk?.store.setRoom(room);
-
-    await this.sdk.join({ authToken, userName: 'diagonistic-test' }, this.connectivityCheck);
+    await this.sdk.join({ authToken, userName: 'diagnostics-test' }, this.connectivityCheck);
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: qualityUpdates => {
         this.connectivityCheck?.handleConnectionQualityUpdate(qualityUpdates);
@@ -207,7 +201,6 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.sdk?.store.addPeer(localPeer);
 
     const room = new HMSRoom('diagnostics-room');
-    room.isDiagnosticsRoom = true;
     this.sdk.store.setRoom(room);
     this.sdkListener.onRoomUpdate(HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED, room);
     this.sdk?.deviceManager.init(true);
