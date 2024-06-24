@@ -619,6 +619,7 @@ export default class JsonRpcSignal {
       } catch (err) {
         error = err as HMSException;
         HMSLogger.e(this.TAG, `Failed sending ${method} try: ${retry}`, { method, params, error });
+        // 1003 is websocket disconnect - could be because you are offline - retry with delay in this case as well
         const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429 || error.code === 1003;
         if (!shouldRetry) {
           break;
