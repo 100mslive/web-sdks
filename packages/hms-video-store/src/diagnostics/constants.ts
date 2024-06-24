@@ -2,7 +2,7 @@ import { HMSRole } from '../internal';
 
 export const DIAGNOSTICS_ROOM_ID = '6669151f480e55c215299a4a';
 
-export const CONNECTIVITY_TEST_DURATION = 10_000;
+export const CONNECTIVITY_TEST_DURATION = 20_000;
 export const MIC_CHECK_RECORD_DURATION = 10_000;
 
 export const diagnosticsRole: HMSRole = {
