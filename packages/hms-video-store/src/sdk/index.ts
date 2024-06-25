@@ -202,8 +202,8 @@ export class HMSSdk implements HMSInterface {
       this.pluginUsageTracker,
     );
     // add diagnostics callbacks if present
-    if ((listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
-      this.transport.setConnectivityListener(listener as unknown as HMSDiagnosticsConnectivityListener);
+    if ('onInitSuccess' in listener) {
+      this.transport.setConnectivityListener(listener);
     }
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
