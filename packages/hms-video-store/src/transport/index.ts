@@ -685,7 +685,7 @@ export default class HMSTransport {
       });
     }).catch(err => {
       if (err instanceof HMSException && err.code === 1003) {
-        throw err;
+        // do nothing, it will be resolved when network connected
       }
     });
     const stream = track.stream as HMSLocalStream;
@@ -697,7 +697,7 @@ export default class HMSTransport {
       this.store.removeTrack(track);
       HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
     } catch (ex) {
-      HMSLogger.e(TAG, 'Failed unpublishing track, will be retried', ex);
+      HMSLogger.e(TAG, `Failed unpublishingTrack:  trackId=${track.trackId}, will be retried`, ex);
     }
   }
 
