@@ -53,6 +53,8 @@ export class HMSAudioTrackSettingsBuilder {
     this._audioMode = mode;
     if (this._audioMode === HMSAudioMode.MUSIC) {
       this._maxBitrate = 320;
+    } else {
+      this._maxBitrate = 32;
     }
     return this;
   }
@@ -98,6 +100,8 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
     this.audioMode = audioMode;
     if (this.audioMode === HMSAudioMode.MUSIC) {
       this.maxBitrate = 320;
+    } else {
+      this.maxBitrate = 32;
     }
   }
 
