@@ -47,10 +47,10 @@ export class LocalTrackManager {
 
   constructor(
     private store: Store,
-    private observer: Pick<ITransportObserver, 'onFailure'>,
+    private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
-    private analyticsTimer?: AnalyticsTimer,
+    private analyticsTimer: AnalyticsTimer,
   ) {
     this.setScreenCaptureHandleConfig();
   }
@@ -81,10 +81,10 @@ export class LocalTrackManager {
     };
 
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer?.start(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer?.start(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
     }
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
@@ -98,10 +98,10 @@ export class LocalTrackManager {
       );
     }
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer?.end(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer?.end(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
     }
 
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
