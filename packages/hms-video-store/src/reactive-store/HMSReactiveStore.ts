@@ -13,6 +13,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../common/storeName';
+import { HMSDiagnosticsInterface } from '../diagnostics/interfaces';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { isBrowser } from '../internal';
@@ -34,6 +35,7 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
   private readonly store: IHMSStore<T>;
   private readonly notifications: HMSNotifications<T>;
   private stats?: HMSStats;
+  private diagnostics?: HMSDiagnosticsInterface;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -131,6 +133,14 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
       this.stats = new HMSStats(this.store as unknown as IHMSStore, this.sdk);
     }
     return this.stats;
+  };
+
+  getDiagnosticsSDK = (): HMSDiagnosticsInterface => {
+    if (!this.diagnostics) {
+      this.diagnostics = this.actions.initDiagnostics();
+    }
+
+    return this.diagnostics;
   };
 
   /**

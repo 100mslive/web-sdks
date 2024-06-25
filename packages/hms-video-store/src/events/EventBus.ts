@@ -17,6 +17,10 @@ import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
+  readonly analytics: HMSInternalEvent<AnalyticsEvent> = new HMSInternalEvent<AnalyticsEvent>(
+    HMSEvents.ANALYTICS,
+    this.eventEmitter,
+  );
   readonly deviceChange = new HMSInternalEvent<HMSDeviceChangeEvent>(HMSEvents.DEVICE_CHANGE, this.eventEmitter);
   readonly localAudioEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalAudioTrack }>(
     HMSEvents.LOCAL_AUDIO_ENABLED,
@@ -49,8 +53,6 @@ export class EventBus {
     HMSEvents.LOCAL_AUDIO_SILENCE,
     this.eventEmitter,
   );
-
-  readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
 
   readonly policyChange = new HMSInternalEvent<PolicyParams>(HMSEvents.POLICY_CHANGE, this.eventEmitter);
 

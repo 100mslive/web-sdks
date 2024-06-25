@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { HMSException, HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import androidPermissionAlert from '../../images/android-perm-1.png';
@@ -9,22 +9,24 @@ import iosPermissions from '../../images/ios-perm-0.png';
 // @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../../common/constants';
 
-export function PermissionErrorModal() {
+export function PermissionErrorNotificationModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
+  return <PermissionErrorModal error={notification?.data} />;
+}
+
+export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
-
   useEffect(() => {
     if (
-      !notification ||
-      (notification.data?.code !== 3001 && notification.data?.code !== 3011) ||
-      (notification.data?.code === 3001 && notification.data?.message.includes('screen'))
+      !error ||
+      (error?.code !== 3001 && error?.code !== 3011) ||
+      (error?.code === 3001 && error?.message.includes('screen'))
     ) {
       return;
     }
-    console.error(`[${notification.type}]`, notification);
-    const errorMessage = notification.data?.message;
+    const errorMessage = error?.message;
     const hasAudio = errorMessage.includes('audio');
     const hasVideo = errorMessage.includes('video');
     const hasScreen = errorMessage.includes('screen');
@@ -37,8 +39,8 @@ export function PermissionErrorModal() {
     } else if (hasScreen) {
       setDeviceType('screen');
     }
-    setIsSystemError(notification.data.code === 3011);
-  }, [notification]);
+    setIsSystemError(error.code === 3011);
+  }, [error]);
 
   return deviceType ? (
     <Dialog.Root open={!!deviceType}>
@@ -131,4 +133,4 @@ export function PermissionErrorModal() {
       </Dialog.Portal>
     </Dialog.Root>
   ) : null;
-}
+};
