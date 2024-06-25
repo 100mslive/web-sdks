@@ -80,7 +80,6 @@ export default class HMSTransport {
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
-  private retryablePromises = new Set<Promise<any>>();
   joinRetryCount = 0;
 
   constructor(
@@ -658,7 +657,6 @@ export default class HMSTransport {
 
       HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
     } catch (err) {
-      this.retryablePromises.add(p);
       HMSLogger.e(TAG, 'Failed publishing track, will be retried', err);
     }
   }
@@ -699,7 +697,7 @@ export default class HMSTransport {
       this.store.removeTrack(track);
       HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
     } catch (ex) {
-      this.retryablePromises.add(p);
+      HMSLogger.e(TAG, 'Failed unpublishing track, will be retried', ex);
     }
   }
 
@@ -1152,15 +1150,6 @@ export default class HMSTransport {
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
-    Promise.allSettled(Array.from(this.retryablePromises))
-      .then(() => {
-        this.retryablePromises.clear();
-      })
-      .catch(errors => {
-        // do nothing, mostly will be leaving the room at this point
-        HMSLogger.d(TAG, ...errors);
-      });
-
     return ok;
   };
 
