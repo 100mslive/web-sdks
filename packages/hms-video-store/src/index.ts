@@ -11,6 +11,7 @@ export type { IHMSNotifications as HMSNotifications } from './schema/notificatio
 export * from './selectors';
 export * from './webrtc-stats';
 export {
+  HMSAudioMode,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
