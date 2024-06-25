@@ -95,8 +95,6 @@ export const GridLayout = ({
     objectFit: video_object_fit,
   };
 
-  console.log('ollo top level', { sortedPeers, updatedPeers, isInsetEnabled, peers });
-
   useEffect(() => {
     if (mainPage !== 0) {
       return;
