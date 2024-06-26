@@ -31,6 +31,21 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       '@lg': {
         p: '$12',
       },
+      overflowY: 'auto',
+      '::-webkit-scrollbar-track': {
+        WebkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+        boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+        backgroundColor: 'transparent',
+      },
+      '::-webkit-scrollbar': {
+        width: '6px',
+        height: '6px',
+        backgroundColor: 'transparent',
+      },
+      '::-webkit-scrollbar-thumb': {
+        backgroundColor: '#657080',
+        borderRadius: '5px',
+      },
     }}
   >
     {children}
@@ -69,7 +84,7 @@ const DiagnosticsStep = () => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
-      <Box css={{ maxHeight: '55vh', overflowY: 'auto' }}>
+      <Box css={{ maxHeight: '55vh' }}>
         <DiagnosticsStepTest />
       </Box>
     </Box>

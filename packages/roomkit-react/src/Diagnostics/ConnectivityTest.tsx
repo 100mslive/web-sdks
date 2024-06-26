@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
-import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, CrossCircleIcon, EyeCloseIcon, EyeOpenIcon, LinkIcon } from '@100mslive/react-icons';
 import { DiagnosticsContext, TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
@@ -27,13 +27,17 @@ const ConnectivityStateMessage = {
 
 export const ConnectivityTestStepResult = ({
   title,
+  status = 'Connected',
   success,
   children,
 }: {
   title: string;
+  status?: string;
   success?: boolean;
   children: React.ReactNode;
 }) => {
+  const [hideDetails, setHideDetails] = useState(false);
+
   return (
     <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
       <Text css={{ c: '$on_primary_medium', mb: '$6' }}>{title}</Text>
@@ -43,7 +47,7 @@ export const ConnectivityTestStepResult = ({
             <CheckCircleIcon width="1.5rem" height="1.5rem" />
           </Text>
           <Text variant="lg" css={{ ml: '$4' }}>
-            Connected
+            {status}
           </Text>
         </Flex>
       ) : (
@@ -56,7 +60,25 @@ export const ConnectivityTestStepResult = ({
           </Text>
         </Flex>
       )}
-      <Box>{children}</Box>
+      <Flex
+        onClick={() => setHideDetails(!hideDetails)}
+        align="center"
+        gap="2"
+        css={{
+          color: '$primary_bright',
+        }}
+      >
+        {hideDetails ? <EyeOpenIcon /> : <EyeCloseIcon />}
+        <Text
+          variant="caption"
+          css={{
+            color: '$primary_bright',
+          }}
+        >
+          {hideDetails ? 'View' : 'Hide'} detailed information
+        </Text>
+      </Flex>
+      {!hideDetails ? <Box>{children}</Box> : null}
     </Box>
   );
 };
@@ -132,7 +154,7 @@ const SignallingResult = ({ result }: { result?: ConnectivityCheckResult['signal
 
 const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   return (
-    <ConnectivityTestStepResult title="Audio" success={!!stats?.bytesSent}>
+    <ConnectivityTestStepResult title="Audio" status="Received" success={!!stats?.bytesSent}>
       {stats && (
         <Flex css={{ flexWrap: 'wrap' }}>
           <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
@@ -150,7 +172,7 @@ const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
 
 const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   return (
-    <ConnectivityTestStepResult title="Video" success={!!stats?.bytesSent}>
+    <ConnectivityTestStepResult title="Video" status="Received" success={!!stats?.bytesSent}>
       {stats && (
         <Flex css={{ flexWrap: 'wrap' }}>
           <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
@@ -218,8 +240,6 @@ const ConnectivityTestReport = ({
   }
 
   if (result) {
-    // for debugging and quick view of results
-    console.log(result);
     return (
       <>
         <TestContainer>
