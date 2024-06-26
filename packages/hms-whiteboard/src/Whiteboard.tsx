@@ -6,12 +6,18 @@ import './index.css';
 
 export interface WhiteboardProps {
   endpoint?: string;
-  token?: string;
+  token: string;
   zoomToContent?: boolean;
   transparentCanvas?: boolean;
   onMount?: (args: { store?: unknown; editor?: unknown }) => void;
 }
-export function Whiteboard({ onMount, endpoint, token, zoomToContent, transparentCanvas }: WhiteboardProps) {
+export function Whiteboard({
+  endpoint = 'https://store-prod-in3-grpc.100ms.live',
+  token,
+  zoomToContent,
+  transparentCanvas,
+  onMount,
+}: WhiteboardProps) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
