@@ -367,12 +367,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
+  getAudioSettings(): sdkTypes.HMSAudioTrackSettings | undefined {
+    return this.sdk.getLocalPeer()?.audioTrack?.settings;
+  }
+
   async setVideoSettings(settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
       await this.setSDKLocalVideoTrackSettings(trackID, settings);
       this.syncRoomState('setVideoSettings');
     }
+  }
+
+  getVideoSettings(): sdkTypes.HMSVideoTrackSettings | undefined {
+    return this.sdk.getLocalPeer()?.videoTrack?.settings;
   }
 
   async switchCamera(): Promise<void> {
