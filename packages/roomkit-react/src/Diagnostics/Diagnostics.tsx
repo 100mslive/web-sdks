@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { HMSDiagnosticsInterface, HMSReactiveStore, HMSRoomProvider } from '@100mslive/react-sdk';
+import React, { useContext, useRef, useState } from 'react';
+import { HMSRoomProvider, useHMSActions } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { DiagnosticsContext, DiagnosticsSteps } from './components';
 import { Box, Flex } from '../Layout';
-import { HMSPrebuiltRefType } from '../Prebuilt';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
@@ -110,57 +109,41 @@ const DiagnosticsStepsList = () => {
   );
 };
 
-export const Diagnostics = () => {
-  const [activeStep, setActiveStep] = React.useState(Object.keys(DiagnosticsSteps)[0]);
-  const [connectivityTested, setConnectivityTested] = React.useState(false);
-  const reactiveStore = useRef<HMSPrebuiltRefType & { hmsDiagnostics: HMSDiagnosticsInterface }>();
-
-  useEffect(() => {
-    const hms = new HMSReactiveStore();
-    const hmsStore = hms.getStore();
-    const hmsActions = hms.getActions();
-    const hmsNotifications = hms.getNotifications();
-    const hmsStats = hms.getStats();
-    const hmsDiagnostics = hms.getDiagnosticsSDK();
-    hms.triggerOnSubscribe();
-
-    reactiveStore.current = {
-      hmsActions,
-      hmsStats,
-      hmsStore,
-      hmsNotifications,
-      hmsDiagnostics,
-    };
-  }, []);
+const DiagnosticsProvider = () => {
+  const actions = useHMSActions();
+  const [activeStep, setActiveStep] = useState(Object.keys(DiagnosticsSteps)[0]);
+  const [connectivityTested, setConnectivityTested] = useState(false);
+  const diagnosticsRef = useRef(actions.initDiagnostics());
 
   return (
-    <HMSRoomProvider
-      store={reactiveStore.current?.hmsStore}
-      actions={reactiveStore.current?.hmsActions}
-      notifications={reactiveStore.current?.hmsNotifications}
-      stats={reactiveStore.current?.hmsStats}
+    <DiagnosticsContext.Provider
+      value={{
+        hmsDiagnostics: diagnosticsRef.current,
+        activeStep,
+        setActiveStep,
+        connectivityTested,
+        setConnectivityTested,
+      }}
     >
+      <Container>
+        <Text variant="h4">Pre-call Test</Text>
+        <Text variant="md" css={{ c: '$on_primary_medium' }}>
+          Make sure your devices and network are good to go, let's get started.
+        </Text>
+        <Flex css={{ direction: 'column', mt: '$12', justifyItems: 'center' }}>
+          <DiagnosticsStepsList />
+          <DiagnosticsStep />
+        </Flex>
+      </Container>
+    </DiagnosticsContext.Provider>
+  );
+};
+
+export const Diagnostics = () => {
+  return (
+    <HMSRoomProvider>
       <HMSThemeProvider themeType="default">
-        <DiagnosticsContext.Provider
-          value={{
-            hmsDiagnostics: reactiveStore.current?.hmsDiagnostics,
-            activeStep,
-            setActiveStep,
-            connectivityTested,
-            setConnectivityTested,
-          }}
-        >
-          <Container>
-            <Text variant="h4">Pre-call Test</Text>
-            <Text variant="md" css={{ c: '$on_primary_medium' }}>
-              Make sure your devices and network are good to go, let's get started.
-            </Text>
-            <Flex css={{ direction: 'column', mt: '$12', justifyItems: 'center' }}>
-              <DiagnosticsStepsList />
-              <DiagnosticsStep />
-            </Flex>
-          </Container>
-        </DiagnosticsContext.Provider>
+        <DiagnosticsProvider />
       </HMSThemeProvider>
     </HMSRoomProvider>
   );
