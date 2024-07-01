@@ -43,10 +43,10 @@ export function ShareScreenOptions() {
       {isSupported && pipWindow ? (
         <PIPWindow pipWindow={pipWindow}>
           {latestMessages.map(message => (
-            <Box key={message.id}>
-              <Text>{message.senderName}</Text>
-              <Text>{message.message}</Text>
-            </Box>
+            <div key={message.id}>
+              <p>{message.senderName}</p>
+              <p>{message.message}</p>
+            </div>
           ))}
         </PIPWindow>
       ) : (

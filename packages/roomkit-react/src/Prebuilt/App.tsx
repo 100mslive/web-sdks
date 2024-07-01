@@ -23,7 +23,6 @@ import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
-import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
@@ -169,82 +168,80 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
     return (
       <ErrorBoundary>
-        <PIPProvider>
-          <HMSPrebuiltContext.Provider
-            value={{
-              roomCode,
-              containerSelector,
-              onLeave,
-              onJoin,
-              userName,
-              userId,
-              endpoints: {
-                tokenByRoomCode: tokenByRoomCodeEndpoint,
-                init: initEndpoint,
-                roomLayout: roomLayoutEndpoint,
-              },
-            }}
+        <HMSPrebuiltContext.Provider
+          value={{
+            roomCode,
+            containerSelector,
+            onLeave,
+            onJoin,
+            userName,
+            userId,
+            endpoints: {
+              tokenByRoomCode: tokenByRoomCodeEndpoint,
+              init: initEndpoint,
+              roomLayout: roomLayoutEndpoint,
+            },
+          }}
+        >
+          <HMSRoomProvider
+            isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+            actions={reactiveStore.current?.hmsActions}
+            store={reactiveStore.current?.hmsStore}
+            notifications={reactiveStore.current?.hmsNotifications}
+            stats={reactiveStore.current?.hmsStats}
+            leaveOnUnload={leaveOnUnload}
           >
-            <HMSRoomProvider
-              isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-              actions={reactiveStore.current?.hmsActions}
-              store={reactiveStore.current?.hmsStore}
-              notifications={reactiveStore.current?.hmsNotifications}
-              stats={reactiveStore.current?.hmsStats}
-              leaveOnUnload={leaveOnUnload}
-            >
-              <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
-                <RoomLayoutContext.Consumer>
-                  {data => {
-                    const layout = data?.layout;
-                    const theme: Theme = layout?.themes?.[0] || ({} as Theme);
-                    const { typography } = layout || {};
-                    let fontFamily = ['sans-serif'];
-                    if (typography?.font_family) {
-                      fontFamily = [`${typography?.font_family}`, ...fontFamily];
-                    }
+            <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
+              <RoomLayoutContext.Consumer>
+                {data => {
+                  const layout = data?.layout;
+                  const theme: Theme = layout?.themes?.[0] || ({} as Theme);
+                  const { typography } = layout || {};
+                  let fontFamily = ['sans-serif'];
+                  if (typography?.font_family) {
+                    fontFamily = [`${typography?.font_family}`, ...fontFamily];
+                  }
 
-                    return (
-                      <HMSThemeProvider
-                        // issue is with stichtes caching the theme using the theme name / class
-                        // no updates to the themes are fired if the name is same.
-                        // TODO: cache the theme and do deep check to trigger name change in the theme
-                        themeType={`${theme.name}-${Date.now()}`}
-                        theme={{
-                          //@ts-ignore: Prebuilt theme to match stiches theme
-                          colors: theme.palette,
-                          fonts: {
-                            //@ts-ignore: font list to match token types of stiches
-                            sans: fontFamily,
-                          },
-                        }}
-                      >
-                        <Init />
-                        <DialogContainerProvider dialogContainerSelector={containerSelector}>
-                          <Box
-                            className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
-                            css={{
-                              bg: '$background_dim',
-                              size: '100%',
-                              lineHeight: '1.5',
-                              '-webkit-text-size-adjust': '100%',
-                              position: 'relative',
-                            }}
-                          >
-                            <AppRoutes
-                              authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                              defaultAuthToken={authToken}
-                            />
-                          </Box>
-                        </DialogContainerProvider>
-                      </HMSThemeProvider>
-                    );
-                  }}
-                </RoomLayoutContext.Consumer>
-              </RoomLayoutProvider>
-            </HMSRoomProvider>
-          </HMSPrebuiltContext.Provider>
-        </PIPProvider>
+                  return (
+                    <HMSThemeProvider
+                      // issue is with stichtes caching the theme using the theme name / class
+                      // no updates to the themes are fired if the name is same.
+                      // TODO: cache the theme and do deep check to trigger name change in the theme
+                      themeType={`${theme.name}-${Date.now()}`}
+                      theme={{
+                        //@ts-ignore: Prebuilt theme to match stiches theme
+                        colors: theme.palette,
+                        fonts: {
+                          //@ts-ignore: font list to match token types of stiches
+                          sans: fontFamily,
+                        },
+                      }}
+                    >
+                      <Init />
+                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
+                        <Box
+                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
+                          css={{
+                            bg: '$background_dim',
+                            size: '100%',
+                            lineHeight: '1.5',
+                            '-webkit-text-size-adjust': '100%',
+                            position: 'relative',
+                          }}
+                        >
+                          <AppRoutes
+                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                            defaultAuthToken={authToken}
+                          />
+                        </Box>
+                      </DialogContainerProvider>
+                    </HMSThemeProvider>
+                  );
+                }}
+              </RoomLayoutContext.Consumer>
+            </RoomLayoutProvider>
+          </HMSRoomProvider>
+        </HMSPrebuiltContext.Provider>
       </ErrorBoundary>
     );
   },
