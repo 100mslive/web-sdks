@@ -1,11 +1,13 @@
-import React, { Fragment, useState } from 'react';
-import { useScreenShare } from '@100mslive/react-sdk';
+import React, { Fragment, useCallback, useState } from 'react';
+import { selectHMSMessages, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
 import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
+import { PIPWindow } from '../PIP/PIPWindow';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
+import { usePIPWindow } from '../PIP/usePIPWindow';
 
 const MODALS = {
   SHARE: 'share',
@@ -16,6 +18,8 @@ const MODALS = {
 export function ShareScreenOptions() {
   const [openModals, setOpenModals] = useState(new Set());
   const { amIScreenSharing } = useScreenShare();
+  const latestMessages = useHMSStore(selectHMSMessages).slice(-5);
+  console.log(latestMessages, 'ollo');
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -28,8 +32,26 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
+  const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
+
+  const startPIP = useCallback(async () => {
+    await requestPipWindow(500, 500);
+  }, [requestPipWindow]);
+
   return (
     <Fragment>
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          {latestMessages.map(message => (
+            <Box key={message.id}>
+              <Text>{message.senderName}</Text>
+              <Text>{message.message}</Text>
+            </Box>
+          ))}
+        </PIPWindow>
+      ) : (
+        ''
+      )}
       <Dropdown.Root
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
@@ -92,7 +114,11 @@ export function ShareScreenOptions() {
             >
               <IconButton
                 as="div"
-                onClick={toggleScreenShare}
+                onClick={async () => {
+                  toggleScreenShare();
+                  console.log('ollo starting');
+                  await startPIP();
+                }}
                 css={{
                   p: '$6',
                   display: 'flex',
