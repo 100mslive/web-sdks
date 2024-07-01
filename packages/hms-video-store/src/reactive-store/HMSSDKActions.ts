@@ -1420,7 +1420,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
-      audioMode: audioTrack.settings.audioMode || HMSAudioMode.VOICE,
+      audioMode: audioTrack?.settings.audioMode || HMSAudioMode.VOICE,
     };
   }
 
