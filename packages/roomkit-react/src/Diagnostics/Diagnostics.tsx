@@ -84,9 +84,7 @@ const DiagnosticsStep = () => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
-      <Box>
-        <DiagnosticsStepTest />
-      </Box>
+      <DiagnosticsStepTest />
     </Box>
   );
 };

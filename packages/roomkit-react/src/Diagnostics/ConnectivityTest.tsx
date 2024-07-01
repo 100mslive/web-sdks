@@ -239,6 +239,8 @@ const ConnectivityTestReport = ({
   }
 
   if (result) {
+    // for debugging and quick view of results
+    console.log(result);
     return (
       <>
         <TestContainer>
