@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
+import { HMSDiagnosticsInterface } from '@100mslive/react-sdk';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
-import { hmsDiagnostics } from './hms';
 
 export const DiagnosticsSteps: Record<string, string> = {
   browser: 'Browser Support',
@@ -13,6 +13,7 @@ export const DiagnosticsSteps: Record<string, string> = {
 };
 
 export const DiagnosticsContext = React.createContext<{
+  hmsDiagnostics?: HMSDiagnosticsInterface;
   activeStep: string;
   setActiveStep: React.Dispatch<React.SetStateAction<string>>;
   connectivityTested: boolean;
@@ -41,15 +42,15 @@ export const TestFooter = ({
   error?: Error;
   children?: React.ReactNode;
 }) => {
-  const { activeStep, setActiveStep } = useContext(DiagnosticsContext);
+  const { hmsDiagnostics, activeStep, setActiveStep } = useContext(DiagnosticsContext);
 
   const onNextStep = () => {
     if (activeStep === 'audio') {
-      hmsDiagnostics.stopMicCheck();
+      hmsDiagnostics?.stopMicCheck();
     } else if (activeStep === 'video') {
-      hmsDiagnostics.stopCameraCheck();
+      hmsDiagnostics?.stopCameraCheck();
     } else if (activeStep === 'connectivity') {
-      hmsDiagnostics.stopConnectivityCheck();
+      hmsDiagnostics?.stopConnectivityCheck();
     }
 
     const keys = Object.keys(DiagnosticsSteps);

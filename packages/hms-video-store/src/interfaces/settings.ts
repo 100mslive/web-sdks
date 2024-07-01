@@ -1,9 +1,12 @@
+import { HMSAudioMode } from './track-settings';
+
 export default interface InitialSettings {
   isAudioMuted?: boolean;
   isVideoMuted?: boolean;
   audioInputDeviceId?: string;
   audioOutputDeviceId?: string;
   videoDeviceId?: string;
+  audioMode?: HMSAudioMode;
   /**
    * When a peer joins the room for the first time or when a device change happens,
    * after selecting the mic for audio input, we try to find the matching output device

@@ -5,7 +5,7 @@ import decodeJWT from '../utils';
 
 export const useSessionStore = ({
   token,
-  endpoint,
+  endpoint = 'https://store-prod-in3-grpc.100ms.live',
   handleError,
 }: {
   token?: string;
