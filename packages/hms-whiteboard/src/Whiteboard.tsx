@@ -11,13 +11,7 @@ export interface WhiteboardProps {
   transparentCanvas?: boolean;
   onMount?: (args: { store?: unknown; editor?: unknown }) => void;
 }
-export function Whiteboard({
-  endpoint = 'https://store-prod-in3-grpc.100ms.live',
-  token,
-  zoomToContent,
-  transparentCanvas,
-  onMount,
-}: WhiteboardProps) {
+export function Whiteboard({ endpoint, token, zoomToContent, transparentCanvas, onMount }: WhiteboardProps) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
