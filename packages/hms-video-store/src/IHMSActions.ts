@@ -168,12 +168,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
+
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+
   /**
    * Toggle the camera between front and back if the both the camera's exist
    */

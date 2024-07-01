@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { parsedUserAgent } from '@100mslive/react-sdk';
-import { TestContainer, TestFooter } from './components';
+import { DiagnosticsContext, TestContainer, TestFooter } from './components';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
-import { hmsDiagnostics } from './hms';
 
 const CMS_MEDIA_SERVER = 'https://storage.googleapis.com/100ms-cms-prod/';
 
@@ -103,14 +102,15 @@ const CheckDetails = ({ title, value, iconURL }: { title: string; value: string;
 );
 
 export const BrowserTest = () => {
+  const { hmsDiagnostics } = useContext(DiagnosticsContext);
   const [error, setError] = useState<Error | undefined>();
   useEffect(() => {
     try {
-      hmsDiagnostics.checkBrowserSupport();
+      hmsDiagnostics?.checkBrowserSupport();
     } catch (err) {
       setError(err as Error);
     }
-  }, []);
+  }, [hmsDiagnostics]);
   return (
     <>
       <TestContainer css={{ display: 'flex', gap: '$8', '@lg': { display: 'block' } }}>

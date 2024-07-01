@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   HMSException,
   selectDevices,
@@ -8,16 +8,16 @@ import {
 } from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
 import { PermissionErrorModal } from '../Prebuilt/components/Notifications/PermissionErrorModal';
-import { TestContainer, TestFooter } from './components';
+import { DiagnosticsContext, TestContainer, TestFooter } from './components';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
 import { Video } from '../Video';
 import { StyledVideoTile } from '../VideoTile';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
-import { hmsDiagnostics } from './hms';
 
 export const VideoTest = () => {
+  const { hmsDiagnostics } = useContext(DiagnosticsContext);
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
@@ -25,8 +25,8 @@ export const VideoTest = () => {
   const [error, setError] = useState<HMSException | undefined>();
 
   useEffect(() => {
-    hmsDiagnostics.startCameraCheck().catch(err => setError(err));
-  }, []);
+    hmsDiagnostics?.startCameraCheck().catch(err => setError(err));
+  }, [hmsDiagnostics]);
 
   return (
     <>
@@ -55,8 +55,8 @@ export const VideoTest = () => {
             icon={<VideoOnIcon />}
             selection={sdkSelectedDevices.videoInputDeviceId}
             onChange={async (deviceId: string) => {
-              hmsDiagnostics.stopCameraCheck();
-              hmsDiagnostics.startCameraCheck(deviceId);
+              hmsDiagnostics?.stopCameraCheck();
+              hmsDiagnostics?.startCameraCheck(deviceId);
             }}
           />
         </Flex>
