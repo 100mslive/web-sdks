@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Editor, Tldraw } from '@tldraw/tldraw';
+import { Editor, Tldraw, TLStore } from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
 import './index.css';
@@ -9,15 +9,9 @@ export interface WhiteboardProps {
   token: string;
   zoomToContent?: boolean;
   transparentCanvas?: boolean;
-  onMount?: (args: { store?: unknown; editor?: unknown }) => void;
+  onMount?: (args: { store?: TLStore; editor?: Editor }) => void;
 }
-export function Whiteboard({
-  endpoint = 'https://store-prod-in3-grpc.100ms.live',
-  token,
-  zoomToContent,
-  transparentCanvas,
-  onMount,
-}: WhiteboardProps) {
+export function Whiteboard({ endpoint, token, zoomToContent, transparentCanvas, onMount }: WhiteboardProps) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
