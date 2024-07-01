@@ -22,12 +22,13 @@ const Container = ({ children }: { children: React.ReactNode }) => (
   <Box
     css={{
       px: '120px',
-      py: '120px',
+      pt: '120px',
+      pb: '24px',
       bg: '$background_dim',
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
-      minHeight: '100vh',
+      h: `calc(100% - 108px)`,
       '@lg': {
         p: '$12',
       },
@@ -84,7 +85,7 @@ const DiagnosticsStep = () => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
-      <Box css={{ maxHeight: '55vh' }}>
+      <Box>
         <DiagnosticsStepTest />
       </Box>
     </Box>
