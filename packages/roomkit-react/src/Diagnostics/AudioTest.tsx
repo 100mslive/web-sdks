@@ -45,6 +45,7 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
         selection={selectedMic}
         icon={<MicOnIcon />}
         onChange={(deviceId: string) => {
+          setError(undefined);
           setSelectedMic(deviceId);
           hmsDiagnostics.stopMicCheck();
         }}
