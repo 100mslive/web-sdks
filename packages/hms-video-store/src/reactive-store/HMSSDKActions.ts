@@ -20,6 +20,7 @@ import { Diagnostics } from '../diagnostics';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
+  HMSAudioMode,
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
@@ -1427,6 +1428,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
+      audioMode: this.getAudioSettings()?.audioMode || HMSAudioMode.VOICE,
     };
   }
 
