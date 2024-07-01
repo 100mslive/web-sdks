@@ -75,28 +75,35 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
         ml: '$2',
         mr: '$4',
         gap: '$space$2',
+        flexWrap: 'nowrap',
       }}
     >
       {left && (
-        <SenderName
+        <Text
           variant="xs"
           as="span"
-          css={{ color: '$on_surface_medium', textTransform: 'capitalize', fontWeight: '$regular' }}
+          css={{
+            color: '$on_surface_medium',
+            textTransform: 'capitalize',
+            fontWeight: '$regular',
+            whiteSpace: 'nowrap',
+          }}
         >
           {left}
-        </SenderName>
+        </Text>
       )}
       {right && (
-        <SenderName
+        <Text
           as="span"
           variant="overline"
           css={{
             color: '$on_surface_medium',
             fontWeight: '$regular',
+            whiteSpace: 'nowrap',
           }}
         >
           {right}
-        </SenderName>
+        </Text>
       )}
     </Flex>
   );
@@ -169,7 +176,7 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '14ch',
+  width: '100%',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
@@ -251,7 +258,15 @@ const ChatMessage = React.memo(
             }}
             as="div"
           >
-            <Flex align="baseline">
+            <Flex
+              align="baseline"
+              css={{
+                flexWrap: 'nowrap',
+                maxWidth: 'calc(100% - 10ch)',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               {message.senderName === 'You' || !message.senderName ? (
                 <SenderName
                   as="span"
@@ -261,7 +276,7 @@ const ChatMessage = React.memo(
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
-                <Tooltip title={message.senderName} side="top" align="start">
+                <Tooltip title={message.senderName} side="top" align="start" boxCss={{ zIndex: 50 }}>
                   <SenderName
                     as="span"
                     variant="sub2"
