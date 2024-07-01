@@ -7,7 +7,6 @@ import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { formatBytes } from '../Stats';
 import { Text } from '../Text';
-import { hmsDiagnostics } from './hms';
 
 const Regions = {
   in: 'India',
@@ -310,7 +309,7 @@ const RegionSelector = ({
 };
 
 export const ConnectivityTest = () => {
-  const { setConnectivityTested } = useContext(DiagnosticsContext);
+  const { hmsDiagnostics, setConnectivityTested } = useContext(DiagnosticsContext);
   const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>();
@@ -321,7 +320,7 @@ export const ConnectivityTest = () => {
     setError(undefined);
     setResult(undefined);
     hmsDiagnostics
-      .startConnectivityCheck(
+      ?.startConnectivityCheck(
         state => {
           setProgress(state);
         },
