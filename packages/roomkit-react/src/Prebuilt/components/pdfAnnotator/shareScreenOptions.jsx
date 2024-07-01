@@ -19,7 +19,6 @@ export function ShareScreenOptions() {
   const [openModals, setOpenModals] = useState(new Set());
   const { amIScreenSharing } = useScreenShare();
   const latestMessages = useHMSStore(selectHMSMessages).slice(-5);
-  console.log(latestMessages, 'ollo');
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
       const copy = new Set(modals);

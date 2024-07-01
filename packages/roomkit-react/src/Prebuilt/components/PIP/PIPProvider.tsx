@@ -76,7 +76,5 @@ export const PIPProvider = ({ children }: PIPProviderProps) => {
     };
   }, [closePipWindow, isSupported, pipWindow, requestPipWindow]);
 
-  console.log(value, 'ollo');
-
   return <PIPContext.Provider value={value}>{children}</PIPContext.Provider>;
 };
