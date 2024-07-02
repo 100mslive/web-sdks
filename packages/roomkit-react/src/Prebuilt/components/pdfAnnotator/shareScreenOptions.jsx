@@ -1,11 +1,14 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
-import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
+import { Box, Dropdown, Flex, getCssText, IconButton, Text, Tooltip } from '../../../';
+import { Chat } from '../Chat/Chat';
+import { PIPWindow } from '../PIP/PIPWindow';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
+import { usePIPWindow } from '../PIP/usePIPWindow';
 
 const MODALS = {
   SHARE: 'share',
@@ -28,8 +31,30 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
+  const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
+  const style = document.createElement('style');
+  style.id = 'stitches';
+  style.textContent = getCssText();
+
+  useEffect(() => {
+    if (pipWindow) {
+      pipWindow.document.head.appendChild(style);
+    }
+  }, [pipWindow, style]);
+
+  const startPIP = useCallback(async () => {
+    await requestPipWindow(500, 1000);
+  }, [requestPipWindow]);
+
   return (
     <Fragment>
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          <Chat />
+        </PIPWindow>
+      ) : (
+        ''
+      )}
       <Dropdown.Root
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
@@ -92,7 +117,10 @@ export function ShareScreenOptions() {
             >
               <IconButton
                 as="div"
-                onClick={toggleScreenShare}
+                onClick={async () => {
+                  toggleScreenShare();
+                  await startPIP();
+                }}
                 css={{
                   p: '$6',
                   display: 'flex',
