@@ -1,20 +1,33 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { HMSRoomProvider, useHMSActions } from '@100mslive/react-sdk';
-import { CheckCircleIcon, ConnectivityIcon, GlobeIcon, MicOnIcon, VideoOnIcon } from '@100mslive/react-icons';
-import { DiagnosticsContext, DiagnosticsSteps } from './components';
+import {
+  CheckCircleIcon,
+  ConnectivityIcon,
+  CrossCircleIcon,
+  GlobeIcon,
+  MicOnIcon,
+  VideoOnIcon,
+} from '@100mslive/react-icons';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { HMSThemeProvider } from '../Theme';
 import { AudioTest } from './AudioTest';
 import { BrowserTest } from './BrowserTest';
 import { ConnectivityTest } from './ConnectivityTest';
+import {
+  DiagnosticsContext,
+  DiagnosticsStep,
+  DiagnosticsStepInfo,
+  initialSteps,
+  useDiagnostics,
+} from './DiagnosticsContext';
 import { VideoTest } from './VideoTest';
 
-const DiagnosticsStepIcon: Record<string, React.ReactNode> = {
-  video: <VideoOnIcon width="2rem" height="2rem" />,
-  audio: <MicOnIcon width="2rem" height="2rem" />,
-  browser: <GlobeIcon width="2rem" height="2rem" />,
-  connectivity: <ConnectivityIcon width="2rem" height="2rem" />,
+const DiagnosticsStepIcon: Record<DiagnosticsStep, React.ReactNode> = {
+  [DiagnosticsStep.VIDEO]: <VideoOnIcon width="2rem" height="2rem" />,
+  [DiagnosticsStep.AUDIO]: <MicOnIcon width="2rem" height="2rem" />,
+  [DiagnosticsStep.BROWSER]: <GlobeIcon width="2rem" height="2rem" />,
+  [DiagnosticsStep.CONNECTIVITY]: <ConnectivityIcon width="2rem" height="2rem" />,
 };
 
 const Container = ({ children }: { children: React.ReactNode }) => (
@@ -53,34 +66,34 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 );
 
 const DiagnosticsStepTest = () => {
-  const { activeStep } = useContext(DiagnosticsContext);
+  const { activeStepIndex } = useDiagnostics();
 
   let TestComponent = () => <></>;
 
-  if (activeStep === 'audio') {
+  if (activeStepIndex === DiagnosticsStep.AUDIO) {
     TestComponent = AudioTest;
-  } else if (activeStep === 'video') {
+  } else if (activeStepIndex === DiagnosticsStep.VIDEO) {
     TestComponent = VideoTest;
-  } else if (activeStep === 'browser') {
+  } else if (activeStepIndex === DiagnosticsStep.BROWSER) {
     TestComponent = BrowserTest;
-  } else if (activeStep === 'connectivity') {
+  } else if (activeStepIndex === DiagnosticsStep.CONNECTIVITY) {
     TestComponent = ConnectivityTest;
   }
 
-  return <TestComponent key={activeStep} />;
+  return <TestComponent key={activeStepIndex} />;
 };
 
 const DiagnosticsStepHeader = () => {
-  const { activeStep } = useContext(DiagnosticsContext);
+  const { activeStepIndex, activeStep } = useDiagnostics();
   return (
     <Flex css={{ py: '$8', px: '$10', alignItems: 'center', borderBottom: '1px solid $border_default' }}>
-      <Text css={{ c: '$primary_bright', mt: '$xs' }}>{DiagnosticsStepIcon[activeStep]}</Text>
-      <Text css={{ fontSize: '$h6', ml: '$9' }}>{DiagnosticsSteps[activeStep]}</Text>
+      <Text css={{ c: '$primary_bright', mt: '$xs' }}>{DiagnosticsStepIcon[activeStepIndex]}</Text>
+      <Text css={{ fontSize: '$h6', ml: '$9' }}>{activeStep.name}</Text>
     </Flex>
   );
 };
 
-const DiagnosticsStep = () => {
+const DiagnosticsStepContainer = () => {
   return (
     <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
@@ -90,53 +103,62 @@ const DiagnosticsStep = () => {
 };
 
 const DiagnosticsStepsList = () => {
-  const { activeStep, connectivityTested } = useContext(DiagnosticsContext);
+  const { activeStepIndex, activeStep, steps } = useDiagnostics();
 
   return (
     <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
-      {Object.keys(DiagnosticsSteps).map(key => {
-        const keys = Object.keys(DiagnosticsSteps);
-        const activeStepIndex = keys.indexOf(activeStep);
-        const keyIndex = keys.indexOf(key);
-        const isStepCompleted = activeStepIndex > keyIndex || (activeStep === 'connectivity' && connectivityTested);
+      {Object.keys(DiagnosticsStep)
+        .filter(key => !isNaN(Number(key)))
+        .map(key => {
+          const keyIndex = Number(key);
+          const step = steps[keyIndex as DiagnosticsStep];
+          const isStepCompleted = activeStepIndex > keyIndex || activeStep.isCompleted;
 
-        let color = '$on_primary_low';
-        if (activeStep === key) {
-          color = '$on_primary_high';
-        }
-        if (isStepCompleted) {
-          color = '$primary_bright';
-        }
+          let color = '$on_primary_low';
+          let icon = <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>;
 
-        return (
-          <Flex key={key} css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
-            {isStepCompleted ? (
-              <CheckCircleIcon width="1rem" height="1rem" />
-            ) : (
-              <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>
-            )}
-            <Text css={{ c: color }}>{DiagnosticsSteps[key]}</Text>
-          </Flex>
-        );
-      })}
+          if (activeStepIndex === keyIndex) {
+            color = '$on_primary_high';
+            icon = <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>;
+          }
+          if (isStepCompleted) {
+            color = '$primary_bright';
+            icon = <CheckCircleIcon width="1rem" height="1rem" />;
+          }
+          if (step.hasFailed) {
+            color = '$alert_error_default';
+            icon = <CrossCircleIcon width="1rem" height="1rem" />;
+          }
+
+          return (
+            <Flex key={key} css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
+              {icon}
+              <Text css={{ c: color }}>{step.name}</Text>
+            </Flex>
+          );
+        })}
     </Box>
   );
 };
 
 const DiagnosticsProvider = () => {
   const actions = useHMSActions();
-  const [activeStep, setActiveStep] = useState(Object.keys(DiagnosticsSteps)[0]);
-  const [connectivityTested, setConnectivityTested] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+  const [steps, setSteps] = useState(initialSteps);
   const diagnosticsRef = useRef(actions.initDiagnostics());
+
+  const updateStep = useCallback((step: DiagnosticsStep, value: Omit<DiagnosticsStepInfo, 'name'>) => {
+    setSteps(prevSteps => ({ ...prevSteps, [step]: { ...prevSteps[step], ...value } }));
+  }, []);
 
   return (
     <DiagnosticsContext.Provider
       value={{
         hmsDiagnostics: diagnosticsRef.current,
-        activeStep,
+        activeStepIndex: activeStep,
         setActiveStep,
-        connectivityTested,
-        setConnectivityTested,
+        steps,
+        updateStep,
       }}
     >
       <Container>
@@ -146,7 +168,7 @@ const DiagnosticsProvider = () => {
         </Text>
         <Flex css={{ direction: 'column', mt: '$12', justifyItems: 'center' }}>
           <DiagnosticsStepsList />
-          <DiagnosticsStep />
+          <DiagnosticsStepContainer />
         </Flex>
       </Container>
     </DiagnosticsContext.Provider>

@@ -1,33 +1,9 @@
-import React, { useContext } from 'react';
-import { HMSDiagnosticsInterface } from '@100mslive/react-sdk';
+import React from 'react';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
-
-export const DiagnosticsSteps: Record<string, string> = {
-  browser: 'Browser Support',
-  video: 'Test Video',
-  audio: 'Test Audio',
-  connectivity: 'Connection Quality',
-};
-
-export const DiagnosticsContext = React.createContext<{
-  hmsDiagnostics?: HMSDiagnosticsInterface;
-  activeStep: string;
-  setActiveStep: React.Dispatch<React.SetStateAction<string>>;
-  connectivityTested: boolean;
-  setConnectivityTested: React.Dispatch<React.SetStateAction<boolean>>;
-}>({
-  activeStep: 'video',
-  setActiveStep: () => {
-    return;
-  },
-  connectivityTested: false,
-  setConnectivityTested: () => {
-    return;
-  },
-});
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 export const TestContainer = ({ css, children }: { css?: CSS; children: React.ReactNode }) => {
   return <Box css={{ p: '$10', ...css }}>{children}</Box>;
@@ -42,19 +18,18 @@ export const TestFooter = ({
   error?: Error;
   children?: React.ReactNode;
 }) => {
-  const { hmsDiagnostics, activeStep, setActiveStep } = useContext(DiagnosticsContext);
+  const { hmsDiagnostics, activeStepIndex: activeStep, setActiveStep } = useDiagnostics();
 
   const onNextStep = () => {
-    if (activeStep === 'audio') {
+    if (activeStep === DiagnosticsStep.AUDIO) {
       hmsDiagnostics?.stopMicCheck();
-    } else if (activeStep === 'video') {
+    } else if (activeStep === DiagnosticsStep.VIDEO) {
       hmsDiagnostics?.stopCameraCheck();
-    } else if (activeStep === 'connectivity') {
+    } else if (activeStep === DiagnosticsStep.CONNECTIVITY) {
       hmsDiagnostics?.stopConnectivityCheck();
     }
 
-    const keys = Object.keys(DiagnosticsSteps);
-    setActiveStep(step => keys[keys.indexOf(step) + 1]);
+    setActiveStep(step => step + 1);
   };
 
   return (
