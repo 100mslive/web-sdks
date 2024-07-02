@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { selectDevices, selectLocalMediaSettings, selectLocalVideoTrackID, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSException,
+  selectDevices,
+  selectLocalMediaSettings,
+  selectLocalVideoTrackID,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { VideoOnIcon } from '@100mslive/react-icons';
+import { PermissionErrorModal } from '../Prebuilt/components/Notifications/PermissionErrorModal';
 import { TestContainer, TestFooter } from './components';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
@@ -8,18 +15,22 @@ import { Video } from '../Video';
 import { StyledVideoTile } from '../VideoTile';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
-import { hmsDiagnostics } from './hms';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 export const VideoTest = () => {
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<HMSException | undefined>();
 
   useEffect(() => {
-    hmsDiagnostics.startCameraCheck().catch(err => setError(err));
-  }, []);
+    hmsDiagnostics?.startCameraCheck().catch(err => {
+      updateStep(DiagnosticsStep.VIDEO, { hasFailed: true });
+      setError(err);
+    });
+  }, [hmsDiagnostics, updateStep]);
 
   return (
     <>
@@ -27,10 +38,10 @@ export const VideoTest = () => {
         {trackID && (
           <StyledVideoTile.Container
             css={{
-              w: '90%',
-              height: '$48',
+              width: '90%',
+              aspectRatio: '16/9',
               mr: '$10',
-              '@lg': { mr: 0, mb: '$10' },
+              '@lg': { mr: 0, mb: '$10', aspectRatio: '1/1' },
             }}
           >
             <Video mirror={true} trackId={trackID} />
@@ -48,13 +59,14 @@ export const VideoTest = () => {
             icon={<VideoOnIcon />}
             selection={sdkSelectedDevices.videoInputDeviceId}
             onChange={async (deviceId: string) => {
-              hmsDiagnostics.stopCameraCheck();
-              hmsDiagnostics.startCameraCheck(deviceId);
+              hmsDiagnostics?.stopCameraCheck();
+              hmsDiagnostics?.startCameraCheck(deviceId);
             }}
           />
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your video look good?" />
+      <PermissionErrorModal error={error} />
     </>
   );
 };

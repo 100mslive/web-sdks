@@ -8,7 +8,9 @@ import {
 } from './interfaces';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { BuildGetMediaError } from '../error/utils';
 import {
+  HMSException,
   HMSLocalAudioTrack,
   HMSLocalVideoTrack,
   HMSPeerType,
@@ -21,15 +23,16 @@ import { HMSSdk } from '../sdk';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSLocalPeer } from '../sdk/models/peer';
 import { fetchWithRetry } from '../utils/fetch';
-import decodeJWT from '../utils/jwt';
-import { sleep } from '../utils/timer-utils';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 export class Diagnostics implements HMSDiagnosticsInterface {
   private recordedAudio?: string = DEFAULT_TEST_AUDIO_URL;
   private mediaRecorder?: MediaRecorder;
+  private connectivityCheck?: ConnectivityCheck;
+  private onStopMicCheck?: () => void;
 
   constructor(private sdk: HMSSdk, private sdkListener: HMSUpdateListener) {
+    this.sdk.setIsDiagnostics(true);
     this.initSdkWithLocalPeer();
   }
 
@@ -43,14 +46,17 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   }
 
   async requestPermission(check: MediaPermissionCheck): Promise<MediaPermissionCheck> {
-    const stream = await navigator.mediaDevices.getUserMedia(check);
-
-    stream.getTracks().forEach(track => track.stop());
-    await this.sdk.deviceManager.init(true);
-    return {
-      audio: stream.getAudioTracks().length > 0,
-      video: stream.getVideoTracks().length > 0,
-    };
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(check);
+      stream.getTracks().forEach(track => track.stop());
+      await this.sdk.deviceManager.init(true);
+      return {
+        audio: stream.getAudioTracks().length > 0,
+        video: stream.getVideoTracks().length > 0,
+      };
+    } catch (err) {
+      throw BuildGetMediaError(err as Error, this.sdk.localTrackManager.getErrorType(!!check.video, !!check.audio));
+    }
   }
 
   async startCameraCheck(inputDevice?: string) {
@@ -87,8 +93,21 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     }
   }
 
-  async startMicCheck(inputDevice?: string, onStop?: () => void, time = MIC_CHECK_RECORD_DURATION) {
-    this.initSdkWithLocalPeer();
+  async startMicCheck({
+    inputDevice,
+    onError,
+    onStop,
+    time = MIC_CHECK_RECORD_DURATION,
+  }: {
+    inputDevice?: string;
+    onError?: (error: Error) => void;
+    onStop?: () => void;
+    time?: number;
+  }) {
+    this.initSdkWithLocalPeer((err: Error) => {
+      this.stopMicCheck();
+      onError?.(err);
+    });
     const track = await this.getLocalAudioTrack(inputDevice);
     this.sdk?.deviceManager.init(true);
     if (!this.localPeer) {
@@ -112,14 +131,19 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     this.mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: this.mediaRecorder?.mimeType });
       this.recordedAudio = URL.createObjectURL(blob);
+      this.onStopMicCheck?.();
     };
 
     this.mediaRecorder.start();
 
-    sleep(time).then(() => {
+    const timeoutId = setTimeout(() => {
       this.stopMicCheck();
+    }, time);
+
+    this.onStopMicCheck = () => {
+      clearTimeout(timeoutId);
       onStop?.();
-    });
+    };
   }
 
   stopMicCheck(): void {
@@ -143,31 +167,31 @@ export class Diagnostics implements HMSDiagnosticsInterface {
       throw new Error('SDK not found');
     }
 
-    const connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
+    this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
 
     const authToken = await this.getAuthToken(region);
-    const { roomId } = decodeJWT(authToken);
-
-    this.sdk?.store.setRoom(new HMSRoom(roomId));
     await this.sdk.leave();
-
-    await this.sdk.join(
-      { authToken, userName: 'diagonistic-test', initEndpoint: 'https://qa-in2-ipv6.100ms.live/init' },
-      connectivityCheck,
-    );
+    await this.sdk.join({ authToken, userName: 'diagnostics-test' }, this.connectivityCheck);
     this.sdk.addConnectionQualityListener({
-      onConnectionQualityUpdate(qualityUpdates) {
-        connectivityCheck.handleConnectionQualityUpdate(qualityUpdates);
+      onConnectionQualityUpdate: qualityUpdates => {
+        this.connectivityCheck?.handleConnectionQualityUpdate(qualityUpdates);
       },
     });
   }
 
-  stopConnectivityCheck(): Promise<void> {
-    return this.sdk.leave();
+  async stopConnectivityCheck(): Promise<void> {
+    return this.connectivityCheck?.cleanupAndReport();
   }
 
-  private initSdkWithLocalPeer() {
-    this.sdkListener && this.sdk?.initStoreAndManagers(this.sdkListener);
+  private initSdkWithLocalPeer(onError?: (error: Error) => void) {
+    this.sdkListener &&
+      this.sdk?.initStoreAndManagers({
+        ...this.sdkListener,
+        onError: (error: HMSException) => {
+          onError?.(error);
+          this.sdkListener.onError(error);
+        },
+      });
     const localPeer = new HMSLocalPeer({
       name: 'diagnostics-peer',
       role: diagnosticsRole,
@@ -183,7 +207,7 @@ export class Diagnostics implements HMSDiagnosticsInterface {
   }
 
   private async getAuthToken(region?: string): Promise<string> {
-    const tokenAPIURL = new URL('https://api-nonprod.100ms.live/v2/diagnostics/token');
+    const tokenAPIURL = new URL('https://api.100ms.live/v2/diagnostics/token');
     if (region) {
       tokenAPIURL.searchParams.append('region', region);
     }

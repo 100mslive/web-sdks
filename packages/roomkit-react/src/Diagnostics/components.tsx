@@ -1,26 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
-import { hmsDiagnostics } from './hms';
-
-export const DiagnosticsSteps: Record<string, string> = {
-  browser: 'Browser Support',
-  video: 'Test Video',
-  audio: 'Test Audio',
-  connectivity: 'Connection Quality',
-};
-
-export const DiagnosticsContext = React.createContext<{
-  activeStep: string;
-  setActiveStep: React.Dispatch<React.SetStateAction<string>>;
-}>({
-  activeStep: 'video',
-  setActiveStep: () => {
-    return;
-  },
-});
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 export const TestContainer = ({ css, children }: { css?: CSS; children: React.ReactNode }) => {
   return <Box css={{ p: '$10', ...css }}>{children}</Box>;
@@ -35,19 +18,18 @@ export const TestFooter = ({
   error?: Error;
   children?: React.ReactNode;
 }) => {
-  const { activeStep, setActiveStep } = useContext(DiagnosticsContext);
+  const { hmsDiagnostics, activeStepIndex: activeStep, setActiveStep } = useDiagnostics();
 
   const onNextStep = () => {
-    if (activeStep === 'audio') {
-      hmsDiagnostics.stopMicCheck();
-    } else if (activeStep === 'video') {
-      hmsDiagnostics.stopCameraCheck();
-    } else if (activeStep === 'connectivity') {
-      hmsDiagnostics.stopConnectivityCheck();
+    if (activeStep === DiagnosticsStep.AUDIO) {
+      hmsDiagnostics?.stopMicCheck();
+    } else if (activeStep === DiagnosticsStep.VIDEO) {
+      hmsDiagnostics?.stopCameraCheck();
+    } else if (activeStep === DiagnosticsStep.CONNECTIVITY) {
+      hmsDiagnostics?.stopConnectivityCheck();
     }
 
-    const keys = Object.keys(DiagnosticsSteps);
-    setActiveStep(step => keys[keys.indexOf(step) + 1]);
+    setActiveStep(step => step + 1);
   };
 
   return (
@@ -55,11 +37,15 @@ export const TestFooter = ({
       css={{
         py: '$8',
         px: '$10',
+        background: '$background_dim',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTop: '1px solid $border_default',
         fontSize: '$sm',
+        borderBottomLeftRadius: '$1',
+        borderBottomRightRadius: '$1',
         lineHeight: '$sm',
+        zIndex: 1001,
         '@lg': { flexDirection: 'column', gap: '$8' },
       }}
     >

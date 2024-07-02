@@ -9,7 +9,13 @@ import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
+import {
+  HMSAudioCodec,
+  HMSAudioMode,
+  HMSScreenShareConfig,
+  HMSVideoCodec,
+  ScreenCaptureHandleConfig,
+} from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
@@ -31,6 +37,7 @@ const defaultSettings = {
   audioInputDeviceId: 'default',
   audioOutputDeviceId: 'default',
   videoDeviceId: 'default',
+  audioMode: HMSAudioMode.VOICE,
 };
 type IFetchTrackOptions = boolean | 'empty';
 interface IFetchAVTrackOptions {
@@ -47,10 +54,10 @@ export class LocalTrackManager {
 
   constructor(
     private store: Store,
-    private observer: Pick<ITransportObserver, 'onFailure'>,
+    private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
-    private analyticsTimer?: AnalyticsTimer,
+    private analyticsTimer: AnalyticsTimer,
   ) {
     this.setScreenCaptureHandleConfig();
   }
@@ -81,10 +88,10 @@ export class LocalTrackManager {
     };
 
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer?.start(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer?.start(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
     }
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
@@ -98,10 +105,10 @@ export class LocalTrackManager {
       );
     }
     if (fetchTrackOptions.audio) {
-      this.analyticsTimer?.end(TimedEvent.LOCAL_AUDIO_TRACK);
+      this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
     }
     if (fetchTrackOptions.video) {
-      this.analyticsTimer?.end(TimedEvent.LOCAL_VIDEO_TRACK);
+      this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
     }
 
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
@@ -464,7 +471,7 @@ export class LocalTrackManager {
     }
   }
 
-  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+  getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
     if (videoError && audioError) {
       return HMSGetMediaActions.AV;
     }

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
-import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, CrossCircleIcon, EyeCloseIcon, EyeOpenIcon, LinkIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { formatBytes } from '../Stats';
 import { Text } from '../Text';
-import { hmsDiagnostics } from './hms';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 const Regions = {
   in: 'India',
@@ -27,13 +27,17 @@ const ConnectivityStateMessage = {
 
 export const ConnectivityTestStepResult = ({
   title,
+  status = 'Connected',
   success,
   children,
 }: {
   title: string;
+  status?: string;
   success?: boolean;
   children: React.ReactNode;
 }) => {
+  const [hideDetails, setHideDetails] = useState(true);
+
   return (
     <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
       <Text css={{ c: '$on_primary_medium', mb: '$6' }}>{title}</Text>
@@ -43,7 +47,7 @@ export const ConnectivityTestStepResult = ({
             <CheckCircleIcon width="1.5rem" height="1.5rem" />
           </Text>
           <Text variant="lg" css={{ ml: '$4' }}>
-            Connected
+            {status}
           </Text>
         </Flex>
       ) : (
@@ -56,7 +60,25 @@ export const ConnectivityTestStepResult = ({
           </Text>
         </Flex>
       )}
-      <Box>{children}</Box>
+      <Flex
+        onClick={() => setHideDetails(!hideDetails)}
+        align="center"
+        gap="2"
+        css={{
+          color: '$primary_bright',
+        }}
+      >
+        {hideDetails ? <EyeOpenIcon /> : <EyeCloseIcon />}
+        <Text
+          variant="caption"
+          css={{
+            color: '$primary_bright',
+          }}
+        >
+          {hideDetails ? 'View' : 'Hide'} detailed information
+        </Text>
+      </Flex>
+      {!hideDetails ? <Box>{children}</Box> : null}
     </Box>
   );
 };
@@ -132,7 +154,7 @@ const SignallingResult = ({ result }: { result?: ConnectivityCheckResult['signal
 
 const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   return (
-    <ConnectivityTestStepResult title="Audio" success={!!stats?.bytesSent}>
+    <ConnectivityTestStepResult title="Audio" status="Received" success={!!stats?.bytesSent}>
       {stats && (
         <Flex css={{ flexWrap: 'wrap' }}>
           <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
@@ -150,7 +172,7 @@ const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
 
 const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
   return (
-    <ConnectivityTestStepResult title="Video" success={!!stats?.bytesSent}>
+    <ConnectivityTestStepResult title="Video" status="Received" success={!!stats?.bytesSent}>
       {stats && (
         <Flex css={{ flexWrap: 'wrap' }}>
           <DetailedInfo title="Bytes Sent" value={formatBytes(stats.bytesSent)} />
@@ -237,7 +259,7 @@ const ConnectivityTestReport = ({
   if (progress !== undefined) {
     return (
       <TestContainer css={{ textAlign: 'center' }}>
-        <Text css={{ c: '$primary_bright' }}>
+        <Text css={{ c: '$primary_bright', display: 'flex', justifyContent: 'center' }}>
           <Loading size="3.5rem" color="currentColor" />
         </Text>
         <Text variant="h6" css={{ mt: '$8' }}>
@@ -310,25 +332,29 @@ const RegionSelector = ({
 };
 
 export const ConnectivityTest = () => {
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
   const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>();
   const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
 
   const startTest = () => {
+    updateStep(DiagnosticsStep.CONNECTIVITY, { hasFailed: false, isCompleted: false });
     setError(undefined);
     setResult(undefined);
     hmsDiagnostics
-      .startConnectivityCheck(
+      ?.startConnectivityCheck(
         state => {
           setProgress(state);
         },
         result => {
+          updateStep(DiagnosticsStep.CONNECTIVITY, { isCompleted: true });
           setResult(result);
         },
         region,
       )
       .catch(error => {
+        updateStep(DiagnosticsStep.CONNECTIVITY, { hasFailed: true });
         setError(error);
       });
   };

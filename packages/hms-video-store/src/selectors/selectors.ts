@@ -63,7 +63,7 @@ export const selectTracksMap = (store: HMSStore) => store.tracks;
 
 /**
  * Select your media settings
- * i.e., choosen audio input device, audio output device and video input device.
+ * i.e., choosen audio input device, audio output device and video input device, audio mode
  * @param store
  */
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;

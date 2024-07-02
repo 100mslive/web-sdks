@@ -1,4 +1,5 @@
 import { CONNECTIVITY_TEST_DURATION } from './constants';
+import { CQSCalculator } from './CQSCalculator';
 import { DiagnosticsStatsCollector } from './DiagnosticsStatsCollector';
 import { ConnectivityCheckResult, ConnectivityState, HMSDiagnosticsConnectivityListener } from './interfaces';
 import { RTCIceCandidatePair } from '../connection/IConnectionObserver';
@@ -13,7 +14,6 @@ import {
 } from '../internal';
 import { HMSSdk } from '../sdk';
 import { HMSPeer } from '../sdk/models/peer';
-import { isPresent } from '../utils/validations';
 
 export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private wsConnected = false;
@@ -26,13 +26,13 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   private selectedSubscribeICECandidate?: RTCIceCandidatePair;
   private gatheredPublishICECandidates: RTCIceCandidate[] = [];
   private gatheredSubscribeICECandidates: RTCIceCandidate[] = [];
-  private networkScores: number[] = [];
   private errors: HMSException[] = [];
   private isAudioTrackCaptured = false;
   private isVideoTrackCaptured = false;
   private isAudioTrackPublished = false;
   private isVideoTrackPublished = false;
   private statsCollector: DiagnosticsStatsCollector;
+  private cqsCalculator = new CQSCalculator();
 
   private cleanupTimer?: number;
   private timestamp = Date.now();
@@ -60,7 +60,6 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   onRoomUpdate = this.sdkListener.onRoomUpdate.bind(this.sdkListener);
   onPeerUpdate = this.sdkListener.onPeerUpdate.bind(this.sdkListener);
   onMessageReceived = this.sdkListener.onMessageReceived.bind(this.sdkListener);
-  onReconnecting = this.sdkListener.onReconnecting.bind(this.sdkListener);
   onReconnected = this.sdkListener.onReconnected.bind(this.sdkListener);
   onRoleChangeRequest = this.sdkListener.onRoleChangeRequest.bind(this.sdkListener);
   onRoleUpdate = this.sdkListener.onRoleUpdate.bind(this.sdkListener);
@@ -76,7 +75,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
 
   handleConnectionQualityUpdate = (qualities: HMSConnectionQuality[]) => {
     const localPeerQuality = qualities.find(quality => quality.peerID === this.sdk?.store.getLocalPeer()?.peerId);
-    this.networkScores.push(isPresent(localPeerQuality?.downlinkQuality) ? localPeerQuality!.downlinkQuality : -1);
+    this.cqsCalculator.pushScore(localPeerQuality?.downlinkQuality);
   };
 
   onICESuccess(isPublish: boolean): void {
@@ -173,10 +172,15 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     }
   }
 
-  private cleanupAndReport() {
+  onReconnecting(error: HMSException): void {
+    this.sdkListener.onReconnecting(error);
+    this.cqsCalculator.addPendingCQSTillNow();
+  }
+
+  cleanupAndReport() {
     clearTimeout(this.cleanupTimer);
     this.cleanupTimer = undefined;
-    if (this.state === ConnectivityState.MEDIA_PUBLISHED && this.errors.length === 0) {
+    if (this.state === ConnectivityState.MEDIA_PUBLISHED) {
       this.state = ConnectivityState.COMPLETED;
     }
     this.completionCallback?.(this.buildReport());
@@ -184,7 +188,8 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
   }
 
   private buildReport(): ConnectivityCheckResult {
-    const connectionQualityScore = this.networkScores.reduce((a, b) => a + b, 0) / this.networkScores.length;
+    this.cqsCalculator.addPendingCQSTillNow();
+    const connectionQualityScore = this.cqsCalculator.getCQS();
     const stats = this.statsCollector.buildReport();
     return {
       testTimestamp: this.timestamp,
