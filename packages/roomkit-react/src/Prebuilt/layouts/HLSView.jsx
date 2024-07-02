@@ -286,7 +286,7 @@ const HLSView = () => {
         hlsPlayer.reset();
       };
     }
-  }, [hlsUrl, vanillaStore, hmsActions]);
+  }, [hlsUrl, vanillaStore, hmsActions, hoverControlsVisible]);
 
   /**
    * initialize and subscribe to hlsState
