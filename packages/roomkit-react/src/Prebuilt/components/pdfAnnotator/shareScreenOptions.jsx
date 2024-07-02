@@ -1,9 +1,10 @@
 import React, { Fragment, useCallback, useState } from 'react';
-import { selectHMSMessages, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
+import { useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
 import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
+import { Chat } from '../Chat/Chat';
 import { PIPWindow } from '../PIP/PIPWindow';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
@@ -18,7 +19,6 @@ const MODALS = {
 export function ShareScreenOptions() {
   const [openModals, setOpenModals] = useState(new Set());
   const { amIScreenSharing } = useScreenShare();
-  const latestMessages = useHMSStore(selectHMSMessages).slice(-5);
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -34,19 +34,14 @@ export function ShareScreenOptions() {
   const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
 
   const startPIP = useCallback(async () => {
-    await requestPipWindow(500, 500);
+    await requestPipWindow(500, 1000);
   }, [requestPipWindow]);
 
   return (
     <Fragment>
       {isSupported && pipWindow ? (
         <PIPWindow pipWindow={pipWindow}>
-          {latestMessages.map(message => (
-            <div key={message.id}>
-              <p>{message.senderName}</p>
-              <p>{message.message}</p>
-            </div>
-          ))}
+          <Chat />
         </PIPWindow>
       ) : (
         ''
@@ -115,7 +110,6 @@ export function ShareScreenOptions() {
                 as="div"
                 onClick={async () => {
                   toggleScreenShare();
-                  console.log('ollo starting');
                   await startPIP();
                 }}
                 css={{
