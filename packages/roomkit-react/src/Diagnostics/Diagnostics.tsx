@@ -27,11 +27,15 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
-      h: `calc(100% - 108px)`,
+      h: '100%',
       '@lg': {
         p: '$12',
       },
       overflowY: 'auto',
+      boxSizing: 'border-box',
+      '& *': {
+        boxSizing: 'border-box',
+      },
       '::-webkit-scrollbar-track': {
         WebkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
         boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
