@@ -60,8 +60,9 @@ export const TestFooter = ({
   return (
     <Flex
       css={{
-        py: '$8',
+        pt: '$8',
         px: '$10',
+        pb: '$32',
         background: '$background_dim',
         justifyContent: 'space-between',
         alignItems: 'center',

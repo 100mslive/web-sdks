@@ -20,14 +20,14 @@ const DiagnosticsStepIcon: Record<string, React.ReactNode> = {
 const Container = ({ children }: { children: React.ReactNode }) => (
   <Box
     css={{
-      px: '120px',
-      pt: '120px',
-      pb: '24px',
+      px: '$32',
+      pt: '$32',
+      pb: '$10',
       bg: '$background_dim',
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
-      h: `calc(100% - 108px)`,
+      h: '100%',
       '@lg': {
         p: '$12',
       },
