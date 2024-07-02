@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, EyeCloseIcon, EyeOpenIcon, LinkIcon } from '@100mslive/react-icons';
-import { DiagnosticsContext, TestContainer, TestFooter } from './components';
+import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { formatBytes } from '../Stats';
 import { Text } from '../Text';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 const Regions = {
   in: 'India',
@@ -35,7 +36,7 @@ export const ConnectivityTestStepResult = ({
   success?: boolean;
   children: React.ReactNode;
 }) => {
-  const [hideDetails, setHideDetails] = useState(false);
+  const [hideDetails, setHideDetails] = useState(true);
 
   return (
     <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
@@ -331,14 +332,14 @@ const RegionSelector = ({
 };
 
 export const ConnectivityTest = () => {
-  const { hmsDiagnostics, setConnectivityTested } = useContext(DiagnosticsContext);
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
   const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>();
   const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
 
   const startTest = () => {
-    setConnectivityTested(false);
+    updateStep(DiagnosticsStep.CONNECTIVITY, { hasFailed: false, isCompleted: false });
     setError(undefined);
     setResult(undefined);
     hmsDiagnostics
@@ -347,12 +348,13 @@ export const ConnectivityTest = () => {
           setProgress(state);
         },
         result => {
-          setConnectivityTested(true);
+          updateStep(DiagnosticsStep.CONNECTIVITY, { isCompleted: true });
           setResult(result);
         },
         region,
       )
       .catch(error => {
+        updateStep(DiagnosticsStep.CONNECTIVITY, { hasFailed: true });
         setError(error);
       });
   };

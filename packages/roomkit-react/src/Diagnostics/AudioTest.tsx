@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   HMSException,
   selectDevices,
@@ -11,13 +11,14 @@ import {
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon, StopIcon } from '@100mslive/react-icons';
 import { PermissionErrorModal } from '../Prebuilt/components/Notifications/PermissionErrorModal';
-import { DiagnosticsContext, TestContainer, TestFooter } from './components';
+import { TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Progress } from '../Progress';
 import { Text } from '../Text';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
@@ -25,8 +26,8 @@ const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: 'calc(50% - 0.75rem)', '@lg': { w: '100%' } }}>{children}</Box>
 );
 
-const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<Error | undefined>> }) => {
-  const { hmsDiagnostics } = useContext(DiagnosticsContext);
+const MicTest = ({ setError }: { setError: (err?: Error) => void }) => {
+  const { hmsDiagnostics } = useDiagnostics();
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedMic, setSelectedMic] = useState(devices.audioInput[0]?.deviceId || 'default');
@@ -142,11 +143,20 @@ const SpeakerTest = () => {
 };
 
 export const AudioTest = () => {
-  const { hmsDiagnostics } = useContext(DiagnosticsContext);
-  const [error, setError] = useState<Error | undefined>();
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
+  const [error, setErrorAlone] = useState<Error | undefined>();
+
+  const setError = useCallback(
+    (err?: Error) => {
+      updateStep(DiagnosticsStep.AUDIO, { hasFailed: !!err });
+      setErrorAlone(err);
+    },
+    [updateStep, setErrorAlone],
+  );
+
   useEffect(() => {
     hmsDiagnostics?.requestPermission({ audio: true }).catch(error => setError(error));
-  }, [hmsDiagnostics]);
+  }, [hmsDiagnostics, setError]);
 
   return (
     <>
