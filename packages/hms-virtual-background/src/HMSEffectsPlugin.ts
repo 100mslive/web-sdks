@@ -14,13 +14,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private preset: 'balanced' | 'quality' = 'balanced';
   private initialised = false;
   private intervalId: NodeJS.Timer | null = null;
-  private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
-    this.onInit = onInit;
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -41,10 +39,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       }
     });
     this.effects.cache();
+    this.effects.preload().then(() => {
+      this.initialised = true;
+      onInit?.();
+    });
     this.effects.onReady = () => {
       if (this.effects) {
-        this.initialised = true;
-        this.onInit?.();
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
