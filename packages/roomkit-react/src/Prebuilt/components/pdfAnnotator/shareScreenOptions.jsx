@@ -1,9 +1,9 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
-import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
+import { Box, Dropdown, Flex, getCssText, IconButton, Text, Tooltip } from '../../../';
 import { Chat } from '../Chat/Chat';
 import { PIPWindow } from '../PIP/PIPWindow';
 import { ShareMenuIcon } from '../ShareMenuIcon';
@@ -32,6 +32,15 @@ export function ShareScreenOptions() {
   };
   const { toggleScreenShare } = useScreenShare();
   const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
+  const style = document.createElement('style');
+  style.id = 'stitches';
+  style.textContent = getCssText();
+
+  useEffect(() => {
+    if (pipWindow) {
+      pipWindow.document.head.appendChild(style);
+    }
+  }, [pipWindow, style]);
 
   const startPIP = useCallback(async () => {
     await requestPipWindow(500, 1000);
