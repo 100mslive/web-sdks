@@ -36,7 +36,7 @@ export const ConnectivityTestStepResult = ({
   success?: boolean;
   children: React.ReactNode;
 }) => {
-  const [hideDetails, setHideDetails] = useState(false);
+  const [hideDetails, setHideDetails] = useState(true);
 
   return (
     <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
