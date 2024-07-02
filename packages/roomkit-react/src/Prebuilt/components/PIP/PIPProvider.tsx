@@ -38,30 +38,6 @@ export const PIPProvider = ({ children }: PIPProviderProps) => {
         setPipWindow(null);
       });
 
-      // It is important to copy all parent widnow styles. Otherwise, there would be no CSS available at all
-      // https://developer.chrome.com/docs/web-platform/document-picture-in-picture/#copy-style-sheets-to-the-picture-in-picture-window
-      //   @ts-ignore for stylesheets iterator
-      [...document.styleSheets].forEach(styleSheet => {
-        try {
-          const cssRules = [...styleSheet.cssRules].map(rule => rule.cssText).join('');
-          const style = document.createElement('style');
-
-          style.textContent = cssRules;
-          pip.document.head.appendChild(style);
-        } catch (e) {
-          const link = document.createElement('link');
-          if (styleSheet.href == null) {
-            return;
-          }
-
-          link.rel = 'stylesheet';
-          link.type = styleSheet.type;
-          link.media = styleSheet.media.toString();
-          link.href = styleSheet.href;
-          pip.document.head.appendChild(link);
-        }
-      });
-
       setPipWindow(pip);
     },
     [pipWindow],
