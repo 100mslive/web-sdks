@@ -219,7 +219,10 @@ export class LocalTrackManager {
         echoCancellation: false,
       };
     } else {
-      constraints.audio = true;
+      constraints.audio = {
+        noiseSuppression: false,
+        echoCancellation: false,
+      };
     }
     let stream;
     try {
