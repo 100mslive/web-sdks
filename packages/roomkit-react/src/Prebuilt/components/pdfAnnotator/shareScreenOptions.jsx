@@ -4,7 +4,7 @@ import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
 import { Box, Dropdown, Flex, getCssText, IconButton, Text, Tooltip } from '../../../';
-import { Chat } from '../Chat/Chat';
+import { PIPChat } from '../PIP/PIPChat';
 import { PIPWindow } from '../PIP/PIPWindow';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
@@ -35,10 +35,12 @@ export function ShareScreenOptions() {
   const style = document.createElement('style');
   style.id = 'stitches';
   style.textContent = getCssText();
+  const [loadedStyles, setLoadedStyles] = useState(false);
 
   useEffect(() => {
     if (pipWindow) {
       pipWindow.document.head.appendChild(style);
+      setLoadedStyles(true);
     }
   }, [pipWindow, style]);
 
@@ -48,13 +50,7 @@ export function ShareScreenOptions() {
 
   return (
     <Fragment>
-      {isSupported && pipWindow ? (
-        <PIPWindow pipWindow={pipWindow}>
-          <Chat />
-        </PIPWindow>
-      ) : (
-        ''
-      )}
+      {isSupported && pipWindow ? <PIPWindow pipWindow={pipWindow}>{loadedStyles && <PIPChat />}</PIPWindow> : ''}
       <Dropdown.Root
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}

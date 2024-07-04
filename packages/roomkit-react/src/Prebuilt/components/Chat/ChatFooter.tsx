@@ -4,7 +4,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
+import { Box, config as cssConfig, CSS, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
@@ -20,9 +20,8 @@ import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
+import { CHAT_MESSAGE_LIMIT } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-
-const CHAT_MESSAGE_LIMIT = 2000;
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -76,7 +75,15 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
+export const ChatFooter = ({
+  onSend,
+  css = {},
+  children,
+}: {
+  onSend: (count: number) => void;
+  css?: CSS;
+  children?: ReactNode;
+}) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -168,7 +175,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box css={{ position: 'relative' }}>
+    <Box css={{ position: 'relative', ...css }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
