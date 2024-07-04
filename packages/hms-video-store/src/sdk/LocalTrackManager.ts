@@ -220,8 +220,8 @@ export class LocalTrackManager {
       };
     } else {
       constraints.audio = {
-        noiseSuppression: false,
-        echoCancellation: false,
+        noiseSuppression: true,
+        echoCancellation: true,
       };
     }
     let stream;
