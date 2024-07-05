@@ -218,11 +218,6 @@ export class LocalTrackManager {
         googAutoGainControl: false,
         echoCancellation: false,
       };
-    } else {
-      constraints.audio = {
-        noiseSuppression: true,
-        echoCancellation: true,
-      };
     }
     let stream;
     try {

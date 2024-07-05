@@ -2,10 +2,79 @@
 # yarn lockfile v1
 
 
+"@100mslive/hls-player@0.3.15-alpha.4":
+  version "0.3.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-player/-/hls-player-0.3.15-alpha.4.tgz#883818183995a1938373a54f99e6f066e2124116"
+  integrity sha512-Ug0+AkWbe5BC5cLSOwj9XjigAeMfxswt7gE0dbv0vbHxJJTslr4iyZ23eBpQursU/NCfFNcFmVrci8jRELK1/Q==
+  dependencies:
+    "@100mslive/hls-stats" "0.4.15-alpha.4"
+    eventemitter2 "^6.4.9"
+    hls.js "1.4.12"
+
+"@100mslive/hls-stats@0.4.15-alpha.4":
+  version "0.4.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-stats/-/hls-stats-0.4.15-alpha.4.tgz#dbd4cd755f764ff8d2bc56f4ef60a858695812a4"
+  integrity sha512-I1AjKuohoB6klHQd3XPn1ew8VpSJeZMExlJemO0MERRvo4BPVZcmaoBzVN4QRPYcG3MWia9NTTGxfMs6xQjv5Q==
+
 "@100mslive/hms-noise-cancellation@0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.1.tgz#037c8bdfb6b2d7bf12f9d257422150fe6ca43acb"
   integrity sha512-DGnzcXRDJREWypIjGX70er+f2k/XLLRF41lrXPs1+PtB1imdEkECPPS0Fg4BA0BCWKDNAGTZBHZPrBDgUmr9Lw==
+
+"@100mslive/hms-video-store@0.12.15-alpha.4":
+  version "0.12.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.12.15-alpha.4.tgz#e16f1024297b2c9eeaff62c3111f84c55d1f2b16"
+  integrity sha512-TVjdFXDg03LawIVzKU88Uchu1b0uJvXpnch4y5vtisR4EKvwWuP4SB1RWdvk0SJOLMCg+aZGW+3u6NWL5UsFUg==
+  dependencies:
+    eventemitter2 "^6.4.9"
+    immer "^9.0.6"
+    lodash.isequal "^4.5.0"
+    reselect "4.0.0"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-virtual-background@1.13.15-alpha.4":
+  version "1.13.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.13.15-alpha.4.tgz#a4c50d4858f01d1a42e08998dad16544ad8a3efb"
+  integrity sha512-3O+Kpbjnngr7XEGIqKNlnTwWQzdk27+guB98lqbYEKgibGpdhkWnN58yk1/6bw6+VEgGXLAn5oSKmnvgW/akVg==
+  dependencies:
+    "@mediapipe/selfie_segmentation" "^0.1.1632777926"
+    "@tensorflow-models/body-segmentation" "^1.0.1"
+    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
+    "@tensorflow/tfjs-converter" "^3.19.0"
+    "@tensorflow/tfjs-core" "^3.19.0"
+    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
+    "@webassemblyjs/wasm-gen" "1.11.1"
+    effects-sdk "3.2.3"
+    gifuct-js "^2.1.2"
+    wasm-check "^2.0.2"
+
+"@100mslive/hms-whiteboard@0.0.5-alpha.4":
+  version "0.0.5-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-whiteboard/-/hms-whiteboard-0.0.5-alpha.4.tgz#9ad7b7a2d938ed1199f7eb94dff02ac7908e60f8"
+  integrity sha512-XwTAS6xF2HNfGo+JT3+BnM2hJbtyMp7N0CenHiEPWNj41jHuGHsGoX7ML6WX6zpbhb6DgfrnhrAarqRwNBWklQ==
+  dependencies:
+    "@protobuf-ts/grpcweb-transport" "^2.9.1"
+    "@protobuf-ts/runtime" "^2.9.1"
+    "@protobuf-ts/runtime-rpc" "^2.9.1"
+    "@tldraw/tldraw" "2.0.0-alpha.19"
+
+"@100mslive/react-icons@0.10.15-alpha.4":
+  version "0.10.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.10.15-alpha.4.tgz#948812167a67a15067dbd3b3d1da5bf691c0b0d1"
+  integrity sha512-OIvurk/f3fV9kvNCOGqO8VAjJHhJf1Hmz1xy+cAlGT1brgzjTs7cyiFC+76P/wiMfFcKdiAbEbg9SCFrMJhFGA==
+
+"@100mslive/react-sdk@0.10.15-alpha.4":
+  version "0.10.15-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.10.15-alpha.4.tgz#71cfe24330bf87238d43daf9517a9a6a97335e20"
+  integrity sha512-javeSaIxi4PVjgirQ25c8AH62Ck0Mv23eNJmVVjv0eEPwZU53lagzGFz71xgjpZV5wHYKhxpf/YF3w1Nfs5jfw==
+  dependencies:
+    "@100mslive/hms-video-store" "0.12.15-alpha.4"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
 
 "@100mslive/types-prebuilt@0.12.9":
   version "0.12.9"
