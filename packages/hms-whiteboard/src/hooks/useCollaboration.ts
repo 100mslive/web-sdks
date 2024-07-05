@@ -55,12 +55,23 @@ export function useCollaboration({
     status: 'loading',
   });
 
-  const handleError = useCallback((error: Error) => {
-    setStoreWithStatus({
-      status: 'error',
-      error,
-    });
-  }, []);
+  const handleError = useCallback(
+    (error: Error, isTerminal?: boolean) => {
+      setStoreWithStatus(
+        isTerminal
+          ? {
+              error,
+              status: 'error',
+            }
+          : {
+              store,
+              status: 'synced-remote',
+              connectionStatus: 'offline',
+            },
+      );
+    },
+    [store],
+  );
 
   const sessionStore = useSessionStore({ token, endpoint, handleError });
   const permissions = useSetEditorPermissions({ token, editor, zoomToContent, handleError });
@@ -71,6 +82,8 @@ export function useCollaboration({
         return;
       }
 
+      console.log(initialRecords);
+
       // Initialize the tldraw store with the session store server records—or, if the session store
       // is empty, initialize the session store server with the default tldraw store records.
       const shouldUseServerRecords = FULL_SYNC_REQUIRED_RECORD_TYPES.every(
@@ -78,7 +91,7 @@ export function useCollaboration({
       );
       if (shouldUseServerRecords) {
         // Replace the tldraw store records with session store
-        transact(() => {
+        store.mergeRemoteChanges(() => {
           // The records here should be compatible with what's in the store
           store.clear();
           store.put(initialRecords);
@@ -90,6 +103,7 @@ export function useCollaboration({
           sessionStore.set(record.id, record);
         }
       }
+      console.log('handle open', shouldUseServerRecords);
       setStoreWithStatus({
         store,
         status: 'synced-remote',

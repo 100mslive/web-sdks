@@ -6,14 +6,14 @@ import { OPEN_WAIT_TIMEOUT } from '../utils';
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
   handleChange: (key: string, value?: T) => void;
-  handleError: (error: Error) => void;
+  handleError: (error: Error, isTerminal?: boolean) => void;
 }
 
 const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
+const RETRY_ERROR_MESSAGES = ['network error', 'failed to fetch'];
 
 export class SessionStore<T> {
   private storeClient: StoreClient;
-  private abortController = new AbortController();
 
   constructor(endpoint: string, token: string) {
     const transport = new GrpcWebFetchTransport({
@@ -24,24 +24,29 @@ export class SessionStore<T> {
     this.storeClient = new StoreClient(transport);
   }
 
-  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
+  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>, retry = 0) {
+    const abortController = new AbortController();
     const call = this.storeClient.open(
       {
         changeId: '',
         select: [],
       },
-      { abort: this.abortController.signal },
+      { abort: abortController.signal },
     );
     const initialValues: T[] = [];
     let initialised = false;
 
     // on open, wait to call handleOpen with the pre-existing values from the store
-    setTimeout(() => {
+    const openTimeoutID = setTimeout(() => {
+      console.log('handle open', openTimeoutID);
       handleOpen(initialValues);
       initialised = true;
     }, OPEN_WAIT_TIMEOUT);
 
+    console.log('opening', openTimeoutID);
+
     call.responses.onMessage(message => {
+      console.log(openTimeoutID, message);
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
@@ -57,13 +62,26 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
+      console.log(openTimeoutID, error);
+      const canRecover = RETRY_ERROR_MESSAGES.includes(error.message.toLowerCase());
+
+      clearTimeout(openTimeoutID);
+      const openCallback = () => {
+        abortController.abort(`closing ${openTimeoutID} to open new conn`);
+        this.open({ handleOpen, handleChange, handleError });
+        window.removeEventListener('online', openCallback);
+      };
+      if (canRecover) {
+        window.addEventListener('online', openCallback);
+      }
+
       if (!error.message.includes('abort')) {
-        handleError(error);
+        handleError(error, !canRecover);
       }
     });
 
     return () => {
-      this.abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
+      abortController.abort(WHITEBOARD_CLOSE_MESSAGE + ' ' + openTimeoutID);
     };
   }
 
