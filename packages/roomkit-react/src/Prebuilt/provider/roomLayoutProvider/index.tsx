@@ -14,7 +14,7 @@ export const RoomLayoutContext = React.createContext<
   | {
       layout: Layout | undefined;
       updateRoomLayoutForRole: useFetchRoomLayoutResponse['updateRoomLayoutForRole'] | undefined;
-      useSetOriginalLayout: useFetchRoomLayoutResponse['setOriginalLayout'] | undefined;
+      setOriginalLayout: useFetchRoomLayoutResponse['setOriginalLayout'] | undefined;
     }
   | undefined
 >(undefined);
