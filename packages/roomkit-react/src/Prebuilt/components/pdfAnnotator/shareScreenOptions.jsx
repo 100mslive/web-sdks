@@ -1,5 +1,5 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useScreenShare } from '@100mslive/react-sdk';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useHMSActions, useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
@@ -31,6 +31,8 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
+  const hmsActions = useHMSActions();
+  const sendFuncAdded = useRef();
   const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
   const style = document.createElement('style');
   style.id = 'stitches';
@@ -41,11 +43,24 @@ export function ShareScreenOptions() {
     if (pipWindow) {
       pipWindow.document.head.appendChild(style);
       setLoadedStyles(true);
+      const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
+      const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
+
+      const sendMessage = async () => {
+        await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
+        pipChatInput.value = '';
+      };
+
+      if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
+        // remove on cleanup
+        sendBtn.addEventListener('click', sendMessage);
+        sendFuncAdded.current = true;
+      }
     }
-  }, [pipWindow, style]);
+  }, [pipWindow, style, hmsActions]);
 
   const startPIP = useCallback(async () => {
-    await requestPipWindow(500, 1000);
+    await requestPipWindow(400, 600);
   }, [requestPipWindow]);
 
   return (

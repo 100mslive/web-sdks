@@ -1,5 +1,4 @@
 import React, { useMemo, useRef } from 'react';
-// import EmojiPicker from '@emoji-mart/react';
 import {
   selectHMSMessages,
   selectLocalPeerID,
@@ -49,7 +48,7 @@ export const PIPChat = () => {
         <EmptyChat />
       ) : (
         filteredMessages.map(message => (
-          <Box css={{ margin: '$4 $1', p: '$1 $2' }}>
+          <Box style={{ margin: '8px 2px', padding: '4px' }}>
             <Flex align="center" css={{ w: '100%' }}>
               <Text
                 css={{
@@ -119,15 +118,12 @@ export const PIPChat = () => {
         css={{
           bg: '$surface_default',
           minHeight: '$16',
-          position: 'relative',
+          width: '100%',
           py: '$6',
           pl: '$8',
           flexGrow: 1,
           r: '$1',
-          '@md': {
-            minHeight: '$14',
-            boxSizing: 'border-box',
-          },
+          boxSizing: 'border-box',
         }}
       >
         <TextArea
@@ -157,15 +153,6 @@ export const PIPChat = () => {
           onCut={e => e.stopPropagation()}
           onCopy={e => e.stopPropagation()}
         />
-
-        {/* <EmojiPicker
-          // @ts-ignore
-          onSelect={emoji => {
-            if (inputRef.current) {
-              inputRef.current.value += ` ${emoji.native} `;
-            }
-          }}
-        /> */}
 
         <IconButton
           className="send-msg"
