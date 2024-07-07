@@ -49,11 +49,11 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
     };
   }, [isMobile]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
+    setActiveScreenSharePeer(activeSharePeer?.id);
     return () => {
       setActiveScreenSharePeer('');
     };
-  }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
+  }, [activeSharePeer?.id, setActiveScreenSharePeer]);
 
   return (
     <ProminenceLayout.Root edgeToEdge={edgeToEdge} hasSidebar={hasSidebar}>

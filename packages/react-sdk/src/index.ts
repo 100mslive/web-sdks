@@ -26,6 +26,7 @@ export { usePaginatedParticipants } from './hooks/usePaginatedParticipants';
 export { useWhiteboard } from './hooks/useWhiteboard';
 export { useAwayNotifications } from './hooks/useAwayNotifications';
 export { useTranscript } from './hooks/useTranscript';
+export { useAudioMode } from './hooks/useAudioMode';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
