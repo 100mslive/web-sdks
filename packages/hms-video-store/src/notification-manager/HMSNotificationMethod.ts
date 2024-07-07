@@ -36,4 +36,5 @@ export enum HMSNotificationMethod {
   ROOM_INFO = 'room-info',
   SESSION_INFO = 'session-info',
   WHITEBOARD_UPDATE = 'on-whiteboard-update',
+  ON_PEER_SFU_MIGRATE = "on-peer-sfu-migrate",
 }

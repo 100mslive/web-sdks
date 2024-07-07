@@ -168,6 +168,12 @@ export class NotificationManager {
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
+      case HMSNotificationMethod.ON_PEER_SFU_MIGRATE:
+        this.transport.perfomManualRenegotiation().catch(error => {
+          console.error('Error during manual renegotiation:', error);
+        })
+      break;  
+
       default:
         break;
     }

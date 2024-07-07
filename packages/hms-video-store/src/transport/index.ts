@@ -585,6 +585,10 @@ export default class HMSTransport {
     }
   }
 
+  async perfomManualRenegotiation(): Promise<void> {
+       await this.performPublishRenegotiation();
+  }
+
   async unpublish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
       await this.unpublishTrack(track);
