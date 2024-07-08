@@ -69,6 +69,7 @@ export type HMSPrebuiltProps = {
   options?: HMSPrebuiltOptions;
   screens?: Screens;
   authToken?: string;
+  leaveOnUnload?: boolean;
   onLeave?: () => void;
   onJoin?: () => void;
   /**
@@ -96,6 +97,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       themes,
       options: { userName = '', userId = '', endpoints } = {},
       screens,
+      leaveOnUnload = true,
       onLeave,
       onJoin,
     },
@@ -192,6 +194,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             store={reactiveStore.current?.hmsStore}
             notifications={reactiveStore.current?.hmsNotifications}
             stats={reactiveStore.current?.hmsStats}
+            leaveOnUnload={leaveOnUnload}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>

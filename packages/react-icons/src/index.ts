@@ -238,6 +238,7 @@ export { default as SupportIcon } from './SupportIcon';
 export { default as TabletIcon } from './TabletIcon';
 export { default as TagIcon } from './TagIcon';
 export { default as TargetIcon } from './TargetIcon';
+export { default as TelePhoneIcon } from './TelePhoneIcon';
 export { default as TerminalIcon } from './TerminalIcon';
 export { default as TextFormatIcon } from './TextFormatIcon';
 export { default as TextboxIcon } from './TextboxIcon';
