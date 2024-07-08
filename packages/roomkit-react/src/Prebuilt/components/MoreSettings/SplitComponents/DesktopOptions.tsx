@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   ConferencingScreen,
@@ -17,6 +17,7 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
+  ChatIcon,
   CheckIcon,
   HamburgerMenuIcon,
   InfoIcon,
@@ -24,12 +25,14 @@ import {
   PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
+import { Checkbox, Dropdown, Flex, getCssText, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
+import { PIPChat } from '../../PIP/PIPChat';
 // @ts-ignore: No implicit any
 import { PictureInPicture } from '../../PIP/PIPManager';
+import { PIPWindow } from '../../PIP/PIPWindow';
 // @ts-ignore: No implicit any
 import { RoleChangeModal } from '../../RoleChangeModal';
 // @ts-ignore: No implicit any
@@ -47,6 +50,7 @@ import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
+import { usePIPWindow } from '../../PIP/usePIPWindow';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS } from '../../../common/constants';
 
@@ -79,8 +83,38 @@ export const DesktopOptions = ({
   const isBRBEnabled = !!elements?.brb;
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
+  const sendFuncAdded = useRef<boolean>();
+  const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
+
+  useEffect(() => {
+    if (document && pipWindow) {
+      const style = document.createElement('style');
+      style.id = 'stitches';
+      style.textContent = getCssText();
+      pipWindow.document.head.appendChild(style);
+    }
+  }, [pipWindow]);
+
+  useEffect(() => {
+    if (pipWindow) {
+      const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
+      const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
+
+      const sendMessage = async () => {
+        await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
+        pipChatInput.value = '';
+      };
+
+      if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
+        // remove on cleanup
+        sendBtn.addEventListener('click', sendMessage);
+        sendFuncAdded.current = true;
+      }
+    }
+  }, [pipWindow, hmsActions]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
@@ -98,6 +132,11 @@ export const DesktopOptions = ({
 
   return (
     <Fragment>
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          <PIPChat />
+        </PIPWindow>
+      ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
@@ -167,6 +206,15 @@ export const DesktopOptions = ({
               />
             </Dropdown.Item>
           ) : null}
+
+          {showPipChatOption && (
+            <Dropdown.Item onClick={async () => await requestPipWindow(400, 600)} data-testid="brb_btn">
+              <ChatIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                PIP Chat
+              </Text>
+            </Dropdown.Item>
+          )}
 
           <FullScreenItem />
           {/* {isAllowedToPublish.screen && isEmbedEnabled && (

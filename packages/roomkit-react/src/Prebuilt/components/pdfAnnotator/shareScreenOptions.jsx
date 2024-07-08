@@ -1,14 +1,11 @@
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { useHMSActions, useScreenShare } from '@100mslive/react-sdk';
+import React, { Fragment, useState } from 'react';
+import { useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
-import { Box, Dropdown, Flex, getCssText, IconButton, Text, Tooltip } from '../../../';
-import { PIPChat } from '../PIP/PIPChat';
-import { PIPWindow } from '../PIP/PIPWindow';
+import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
-import { usePIPWindow } from '../PIP/usePIPWindow';
 
 const MODALS = {
   SHARE: 'share',
@@ -31,43 +28,9 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
-  const hmsActions = useHMSActions();
-  const sendFuncAdded = useRef();
-  const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
-  const style = document.createElement('style');
-  style.id = 'stitches';
-  style.textContent = getCssText();
-
-  useEffect(() => {
-    if (pipWindow) {
-      pipWindow.document.head.appendChild(style);
-      const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
-      const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
-
-      const sendMessage = async () => {
-        await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
-        pipChatInput.value = '';
-      };
-
-      if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
-        // remove on cleanup
-        sendBtn.addEventListener('click', sendMessage);
-        sendFuncAdded.current = true;
-      }
-    }
-  }, [pipWindow, style, hmsActions]);
-
-  const startPIP = useCallback(async () => {
-    await requestPipWindow(400, 600);
-  }, [requestPipWindow]);
 
   return (
     <Fragment>
-      {isSupported && pipWindow ? (
-        <PIPWindow pipWindow={pipWindow}>
-          <PIPChat />
-        </PIPWindow>
-      ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
@@ -130,10 +93,7 @@ export function ShareScreenOptions() {
             >
               <IconButton
                 as="div"
-                onClick={async () => {
-                  toggleScreenShare();
-                  await startPIP();
-                }}
+                onClick={toggleScreenShare}
                 css={{
                   p: '$6',
                   display: 'flex',
