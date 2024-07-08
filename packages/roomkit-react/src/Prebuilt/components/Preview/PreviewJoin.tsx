@@ -19,7 +19,7 @@ import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import SidePane from '../../layouts/SidePane';
-import { AudioVideoToggle } from '../AudioVideoToggle';
+import { AudioVideoToggle, NoiseCancellation } from '../AudioVideoToggle';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
@@ -30,8 +30,11 @@ import SettingsModal from '../Settings/SettingsModal';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 import PreviewForm from './PreviewForm';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore: No implicit Any
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+import {
+  useAuthToken,
+  useUISettings,
+  // @ts-ignore: No implicit Any
+} from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
@@ -251,7 +254,6 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
-
   return (
     <Flex
       justify={hideSettings && isMobile ? 'center' : 'between'}
@@ -264,7 +266,10 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
         <AudioVideoToggle />
         {vbEnabled ? <VBToggle /> : null}
       </Flex>
-      {!hideSettings ? <PreviewSettings /> : null}
+      <Flex align="center" gap="1">
+        {isMobile && <NoiseCancellation iconOnly />}
+        {!hideSettings ? <PreviewSettings /> : null}
+      </Flex>
     </Flex>
   );
 };

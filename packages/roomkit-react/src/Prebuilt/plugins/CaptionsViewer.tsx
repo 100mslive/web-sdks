@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Draggable, { ControlPosition } from 'react-draggable';
 import { useMedia } from 'react-use';
 import {
   HMSTranscript,
@@ -27,6 +28,9 @@ class SimpleQueue {
   private storage: TranscriptData[] = [];
   constructor(private capacity: number = 3, private MAX_STORAGE_TIME: number = 5000) {}
   enqueue(data: TranscriptData): void {
+    if (!data.transcript.trim()) {
+      return;
+    }
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue(this.storage[this.size() - 1]);
     }
@@ -164,7 +168,13 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
   );
 };
 
-export const CaptionsViewer = () => {
+export const CaptionsViewer = ({
+  defaultPosition,
+  setDefaultPosition,
+}: {
+  defaultPosition: ControlPosition;
+  setDefaultPosition: (position: ControlPosition) => void;
+}) => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
   const isMobile = useMedia(config.media.md);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
@@ -177,6 +187,8 @@ export const CaptionsViewer = () => {
   const isCaptionEnabled = useIsCaptionEnabled();
 
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+
+  const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timeInterval = setInterval(() => {
@@ -205,30 +217,40 @@ export const CaptionsViewer = () => {
     return null;
   }
   return (
-    <Box
-      css={{
-        position: 'absolute',
-        w: isMobile ? '100%' : '40%',
-        bottom: showCaptionAtTop ? '' : '0',
-        top: showCaptionAtTop ? '0' : '',
-        left: isMobile ? 0 : '50%',
-        transform: isMobile ? '' : 'translateX(-50%)',
-        background: '#000000A3',
-        overflow: 'clip',
-        zIndex: 10,
-        height: 'fit-content',
-        r: '$1',
-        p: '$6',
-        transition: 'bottom 0.3s ease-in-out',
-        '&:empty': { display: 'none' },
+    <Draggable
+      bounds="parent"
+      nodeRef={nodeRef}
+      defaultPosition={defaultPosition}
+      onStop={(_, data) => {
+        setDefaultPosition({ x: data.lastX, y: data.lastY });
       }}
     >
-      <Flex direction="column">
-        {dataToShow.map((data: { [key: string]: string }, index: number) => {
-          const key = Object.keys(data)[0];
-          return <TranscriptView key={index} peer_id={key} data={data[key]} />;
-        })}
-      </Flex>
-    </Box>
+      <Box
+        ref={nodeRef}
+        css={{
+          position: 'absolute',
+          w: isMobile ? '100%' : '40%',
+          bottom: showCaptionAtTop ? '' : '0',
+          top: showCaptionAtTop ? '0' : '',
+          left: isMobile ? 0 : '50%',
+          transform: isMobile ? '' : 'translateX(-50%)',
+          background: '#000000A3',
+          overflow: 'clip',
+          zIndex: 10,
+          height: 'fit-content',
+          r: '$1',
+          p: '$6',
+          transition: 'bottom 0.3s ease-in-out',
+          '&:empty': { display: 'none' },
+        }}
+      >
+        <Flex direction="column">
+          {dataToShow.map((data: { [key: string]: string }, index: number) => {
+            const key = Object.keys(data)[0];
+            return <TranscriptView key={index} peer_id={key} data={data[key]} />;
+          })}
+        </Flex>
+      </Box>
+    </Draggable>
   );
 };

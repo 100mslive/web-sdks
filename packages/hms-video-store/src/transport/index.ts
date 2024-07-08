@@ -18,6 +18,7 @@ import HMSPublishConnection from '../connection/publish/publishConnection';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
+import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -78,6 +79,7 @@ export default class HMSTransport {
   private publishStatsAnalytics?: PublishStatsAnalytics;
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
+  private connectivityListener?: HMSDiagnosticsConnectivityListener;
   joinRetryCount = 0;
 
   constructor(
@@ -283,7 +285,8 @@ export default class HMSTransport {
       log(TAG, `Publish connection state change: ${newState}`);
 
       if (newState === 'connected') {
-        this.publishConnection?.logSelectedIceCandidatePairs();
+        this.connectivityListener?.onICESuccess(true);
+        this.publishConnection?.handleSelectedIceCandidatePairs();
       }
 
       if (newState === 'disconnected') {
@@ -294,7 +297,7 @@ export default class HMSTransport {
               HMSConnectionRole.Publish,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.PUBLISH,
-                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
           }
@@ -306,10 +309,18 @@ export default class HMSTransport {
           HMSConnectionRole.Publish,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.PUBLISH,
-            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
           ),
         );
       }
+    },
+
+    onIceCandidate: candidate => {
+      this.connectivityListener?.onICECandidate(candidate, true);
+    },
+
+    onSelectedCandidatePairChange: candidatePair => {
+      this.connectivityListener?.onSelectedICECandidatePairChange(candidatePair, true);
     },
   };
 
@@ -340,6 +351,7 @@ export default class HMSTransport {
         const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
         this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
+        this.connectivityListener?.onICESuccess(false);
         if (callback) {
           callback.promise.resolve(true);
         }
@@ -356,7 +368,7 @@ export default class HMSTransport {
           HMSConnectionRole.Subscribe,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.SUBSCRIBE,
-            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
           ),
         );
       }
@@ -368,7 +380,7 @@ export default class HMSTransport {
               HMSConnectionRole.Subscribe,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.SUBSCRIBE,
-                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
           }
@@ -378,6 +390,14 @@ export default class HMSTransport {
       if (newState === 'connected') {
         this.handleSubscribeConnectionConnected();
       }
+    },
+
+    onIceCandidate: candidate => {
+      this.connectivityListener?.onICECandidate(candidate, false);
+    },
+
+    onSelectedCandidatePairChange: candidatePair => {
+      this.connectivityListener?.onSelectedICECandidatePairChange(candidatePair, false);
     },
   };
 
@@ -389,6 +409,10 @@ export default class HMSTransport {
     const config = this.initConfig?.config;
     const flags = config?.enabledFlags || [];
     return flags.includes(flag);
+  }
+
+  setConnectivityListener(listener: HMSDiagnosticsConnectivityListener) {
+    this.connectivityListener = listener;
   }
 
   async preview(
@@ -549,6 +573,7 @@ export default class HMSTransport {
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
+        this.connectivityListener?.onMediaPublished(track);
       } catch (error) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
@@ -600,32 +625,40 @@ export default class HMSTransport {
         action: HMSAction.PUBLISH,
         extra: {},
       });
+    }).catch(err => {
+      if (err instanceof HMSException && err.code === 1003) {
+        throw err;
+      }
     });
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    await p;
-    HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
-    // add track to store after publish
-    this.store.addTrack(track);
+    try {
+      await p;
+      HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
+      // add track to store after publish
+      this.store.addTrack(track);
 
-    await stream
-      .setMaxBitrateAndFramerate(track)
-      .then(() => {
-        HMSLogger.d(
-          TAG,
-          `Setting maxBitrate=${track.settings.maxBitrate} kpbs${
-            track instanceof HMSLocalVideoTrack ? ` and maxFramerate=${track.settings.maxFramerate}` : ''
-          } for ${track.source} ${track.type} ${track.trackId}`,
-        );
-      })
-      .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
+      await stream
+        .setMaxBitrateAndFramerate(track)
+        .then(() => {
+          HMSLogger.d(
+            TAG,
+            `Setting maxBitrate=${track.settings.maxBitrate} kpbs${
+              track instanceof HMSLocalVideoTrack ? ` and maxFramerate=${track.settings.maxFramerate}` : ''
+            } for ${track.source} ${track.type} ${track.trackId}`,
+          );
+        })
+        .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
-    track.isPublished = true;
+      track.isPublished = true;
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
+      HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
+    } catch (err) {
+      HMSLogger.e(TAG, 'Failed publishing track, will be retried', err);
+    }
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
@@ -650,14 +683,22 @@ export default class HMSTransport {
         action: HMSAction.UNPUBLISH,
         extra: {},
       });
+    }).catch(err => {
+      if (err instanceof HMSException && err.code === 1003) {
+        // do nothing, it will be resolved when network connected
+      }
     });
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
-    await p;
-    await track.cleanup();
-    // remove track from store on unpublish
-    this.store.removeTrack(track);
-    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+    try {
+      await p;
+      await track.cleanup();
+      // remove track from store on unpublish
+      this.store.removeTrack(track);
+      HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+    } catch (ex) {
+      HMSLogger.e(TAG, `Failed unpublishingTrack:  trackId=${track.trackId}, will be retried`, ex);
+    }
   }
 
   private waitForLocalRoleAvailability() {
@@ -868,7 +909,6 @@ export default class HMSTransport {
       } else {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
-
       callback!.promise.reject(ex);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
@@ -916,6 +956,7 @@ export default class HMSTransport {
         initEndpoint,
         iceServers,
       });
+      this.connectivityListener?.onInitSuccess(this.initConfig.endpoint);
       const room = this.store.getRoom();
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
@@ -929,6 +970,7 @@ export default class HMSTransport {
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       this.observer.onConnected();
+      this.connectivityListener?.onSignallingSuccess();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
@@ -1116,12 +1158,11 @@ export default class HMSTransport {
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
-
     return ok;
   };
 
   private handleSubscribeConnectionConnected() {
-    this.subscribeConnection?.logSelectedIceCandidatePairs();
+    this.subscribeConnection?.handleSelectedIceCandidatePairs();
     const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
     this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 

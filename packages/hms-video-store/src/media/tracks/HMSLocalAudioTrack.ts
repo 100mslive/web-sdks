@@ -7,6 +7,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
+import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
@@ -15,7 +16,7 @@ import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings
 import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
-  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
+  return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced' | 'audioMode') {
     return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
@@ -46,6 +47,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
+    room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -56,7 +58,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (settings.deviceId !== track.getSettings().deviceId && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
+    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
     if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -247,19 +249,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
-    const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
+    const { volume, codec, maxBitrate, deviceId, advanced, audioMode } = { ...this.settings, ...settings };
+    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced, audioMode);
     return newSettings;
   }
 
   private handleSettingsChange = async (settings: HMSAudioTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrateAndFramerate(this);
+    if ((hasPropertyChanged('maxBitrate') || hasPropertyChanged('audioMode')) && settings.maxBitrate) {
+      await stream.setMaxBitrateAndFramerate(this, settings);
     }
 
-    if (hasPropertyChanged('advanced')) {
+    if (hasPropertyChanged('advanced') || hasPropertyChanged('audioMode')) {
       await this.replaceTrackWith(settings);
     }
   };

@@ -22,6 +22,8 @@ import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
+const CHAT_MESSAGE_LIMIT = 2000;
+
 const TextArea = styled('textarea', {
   width: '100%',
   bg: 'transparent',
@@ -90,6 +92,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   const isMwebHLSStream = useMobileHLSStream();
+  const [messageLengthExceeded, setMessageLengthExceeded] = useState(false);
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
@@ -105,7 +108,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
 
   const resetInputHeight = useCallback(() => {
     if (inputRef.current) {
-      inputRef.current.style.height = `${Math.max(32, inputRef.current.value ? inputRef.current.scrollHeight : 0)}px`;
+      inputRef.current.style.height = `${Math.max(
+        32,
+        inputRef.current.value ? Math.min(inputRef.current.scrollHeight, 24 * 4) : 0,
+      )}px`;
     }
   }, []);
 
@@ -146,6 +152,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (messageElement) {
       messageElement.value = draftMessage;
       updateInputHeight();
+      setMessageLengthExceeded(draftMessage.length > CHAT_MESSAGE_LIMIT);
     }
   }, [draftMessage]);
 
@@ -230,6 +237,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
           >
             {children}
             <TextArea
+              maxLength={CHAT_MESSAGE_LIMIT + 10}
               css={{
                 c: '$on_surface_high',
                 '&:valid ~ .send-msg': { color: '$on_surface_high' },
@@ -243,7 +251,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
-                  if (!event.shiftKey) {
+                  if (!event.shiftKey && !messageLengthExceeded) {
                     event.preventDefault();
                     await sendMessage();
                   }
@@ -251,7 +259,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               }}
               autoComplete="off"
               aria-autocomplete="none"
-              onChange={updateInputHeight}
+              onChange={e => {
+                updateInputHeight();
+                setMessageLengthExceeded(e.target.value.length > CHAT_MESSAGE_LIMIT);
+              }}
               onBlur={resetInputHeight}
               onPaste={e => e.stopPropagation()}
               onCut={e => e.stopPropagation()}
@@ -269,6 +280,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             <BaseIconButton
               className="send-msg"
               onClick={sendMessage}
+              disabled={messageLengthExceeded}
               css={{
                 ml: 'auto',
                 height: 'max-content',
@@ -294,6 +306,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             </>
           )}
         </Flex>
+      )}
+      {messageLengthExceeded && (
+        <Text variant="xs" css={{ color: '$alert_error_default', fontWeight: '$semiBold', mt: '$1', ml: '$7' }}>
+          Message cannot exceed 2000 characters
+        </Text>
       )}
     </Box>
   );

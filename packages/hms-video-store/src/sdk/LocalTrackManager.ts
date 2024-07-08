@@ -9,7 +9,13 @@ import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
+import {
+  HMSAudioCodec,
+  HMSAudioMode,
+  HMSScreenShareConfig,
+  HMSVideoCodec,
+  ScreenCaptureHandleConfig,
+} from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
@@ -31,6 +37,7 @@ const defaultSettings = {
   audioInputDeviceId: 'default',
   audioOutputDeviceId: 'default',
   videoDeviceId: 'default',
+  audioMode: HMSAudioMode.VOICE,
 };
 type IFetchTrackOptions = boolean | 'empty';
 interface IFetchAVTrackOptions {
@@ -236,7 +243,14 @@ export class LocalTrackManager {
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, screenSettings?.video);
+    const videoTrack = new HMSLocalVideoTrack(
+      local,
+      nativeVideoTrack,
+      'screen',
+      this.eventBus,
+      screenSettings?.video,
+      this.store.getRoom(),
+    );
     videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'screen'));
 
     try {
@@ -257,6 +271,7 @@ export class LocalTrackManager {
         'screen',
         this.eventBus,
         screenSettings?.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -456,7 +471,7 @@ export class LocalTrackManager {
     }
   }
 
-  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+  getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
     if (videoError && audioError) {
       return HMSGetMediaActions.AV;
     }
@@ -623,6 +638,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -634,6 +650,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.video,
+        this.store.getRoom(),
       );
       videoTrack.setSimulcastDefinitons(
         this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'regular'),

@@ -10,7 +10,7 @@
     "prebuilt",
     "roomkit"
   ],
-  "version": "0.3.11",
+  "version": "0.3.14",
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -57,6 +57,7 @@
     "@storybook/addon-interactions": "^7.0.27",
     "@storybook/addon-links": "^7.0.27",
     "@storybook/cli": "^7.0.27",
+    "knip": "^5.11.0",
     "@storybook/react": "^7.0.27",
     "@storybook/react-webpack5": "^7.0.27",
     "@storybook/testing-library": "^0.2.0",
@@ -74,13 +75,13 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hls-player": "0.3.11",
+    "@100mslive/hls-player": "0.3.14",
     "@100mslive/hms-noise-cancellation": "0.0.1",
-    "@100mslive/hms-virtual-background": "1.13.11",
-    "@100mslive/hms-whiteboard": "0.0.1",
-    "@100mslive/react-icons": "0.10.11",
-    "@100mslive/react-sdk": "0.10.11",
-    "@100mslive/types-prebuilt": "0.12.8",
+    "@100mslive/hms-virtual-background": "1.13.14",
+    "@100mslive/hms-whiteboard": "0.0.4",
+    "@100mslive/react-icons": "0.10.14",
+    "@100mslive/react-sdk": "0.10.14",
+    "@100mslive/types-prebuilt": "0.12.9",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@radix-ui/react-accordion": "1.0.0",
