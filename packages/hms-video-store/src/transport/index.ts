@@ -1129,8 +1129,10 @@ export default class HMSTransport {
       return Promise.race([p, timeout]).then(value => {
         // value is false if the timeout got resolved before the subscribe connection
         if (!value && this.initConfig) {
-          this.initConfig.rtcConfiguration.iceTransportPolicy = 'relay';
-          this.subscribeConnection?.setConfiguration(this.initConfig.rtcConfiguration);
+          this.subscribeConnection?.setConfiguration({
+            ...this.initConfig.rtcConfiguration,
+            iceTransportPolicy: 'relay',
+          });
         }
         return value;
       }) as Promise<boolean>;
