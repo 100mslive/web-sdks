@@ -846,6 +846,7 @@ export default class HMSTransport {
       const answer = await this.signal.offer(offer, this.trackStates);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       await this.publishConnection.setRemoteDescription(answer);
+      this.eventEmitter.emit(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
       let ex: HMSException;
@@ -1043,7 +1044,7 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
-      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
+      this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
       // @ts-ignore
       await this.eventEmitter.waitFor(RENEGOTIATION_CALLBACK_ID, { handleError: true });
     }
