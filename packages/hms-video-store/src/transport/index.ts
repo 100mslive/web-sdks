@@ -1,4 +1,4 @@
-import EventEmitter2 from 'eventemitter2';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { JoinParameters } from './models/JoinParameters';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
@@ -73,7 +73,7 @@ export default class HMSTransport {
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
-  private eventEmitter = new EventEmitter2();
+  private eventEmitter = new EventEmitter();
   joinRetryCount = 0;
 
   constructor(
