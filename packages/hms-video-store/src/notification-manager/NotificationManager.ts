@@ -172,7 +172,7 @@ export class NotificationManager {
         this.transport.perfomManualRenegotiation().catch(error => {
           console.error('Error during manual renegotiation:', error);
         });
-      break;  
+       break;  
 
       default:
         break;
