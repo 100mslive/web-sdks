@@ -171,7 +171,7 @@ export class NotificationManager {
       case HMSNotificationMethod.ON_PEER_SFU_MIGRATE:
         this.transport.perfomManualRenegotiation().catch(error => {
           console.error('Error during manual renegotiation:', error);
-        })
+        });
       break;  
 
       default:

@@ -593,7 +593,7 @@ export default class HMSTransport {
         extra: {},
       });
     });
-    console.log('Switching SFU ')
+    console.log('Switching SFU ');
     await this.performPublishRenegotiation({ iceRestart: true });
     await p;
   }
