@@ -631,6 +631,7 @@ export default class HMSTransport {
       }
     });
     const stream = track.stream as HMSLocalStream;
+    console.log(this.publishConnection?.connectionState);
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
@@ -731,6 +732,7 @@ export default class HMSTransport {
   }
 
   private createPeerConnections() {
+    console.log('create peerconnection', JSON.stringify(this.initConfig));
     if (this.initConfig) {
       if (!this.publishConnection) {
         this.publishConnection = new HMSPublishConnection(

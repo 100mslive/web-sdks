@@ -1255,7 +1255,13 @@ export class HMSSdk implements HMSInterface {
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
     for (const track of tracks) {
-      await this.transport.publish([track]);
+      console.log('adding track');
+      await this.transport
+        .publish([track])
+        .catch(console.error)
+        .then(() => {
+          console.log('published');
+        });
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
