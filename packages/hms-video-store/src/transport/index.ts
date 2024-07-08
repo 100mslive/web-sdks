@@ -1129,6 +1129,8 @@ export default class HMSTransport {
 
       return Promise.race([p, timeout]).then(value => {
         if (!value) {
+          // close and reset subscribe connection to retry with relay
+          this.subscribeConnection?.close();
           this.subscribeConnection = null;
           this.createPeerConnections('relay');
         }
