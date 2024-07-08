@@ -165,7 +165,7 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
-        console.log("xyzz");
+        console.log('xyzz');
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
@@ -173,7 +173,7 @@ export class NotificationManager {
         this.transport.perfomManualRenegotiation().catch(error => {
           console.error('Error during manual renegotiation:', error);
         });
-       break;  
+        break;  
 
       default:
         break;
