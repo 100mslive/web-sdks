@@ -60,15 +60,11 @@ export const PIPChat = () => {
             <Box key={message.id} style={{ margin: '8px 2px', padding: '4px' }}>
               <Flex align="center" css={{ w: '100%' }}>
                 <Text
+                  style={{ display: 'flex', alignItems: 'center', alignSelf: 'stretch', width: '100%' }}
                   css={{
                     color: '$on_surface_high',
                     fontWeight: '$semiBold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    alignSelf: 'stretch',
-                    width: '100%',
                   }}
-                  as="div"
                 >
                   <Flex align="baseline">
                     {message.senderName === 'You' || !message.senderName ? (
