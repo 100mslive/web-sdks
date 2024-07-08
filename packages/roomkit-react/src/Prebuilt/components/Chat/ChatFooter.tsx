@@ -167,7 +167,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box css={{ position: 'relative', ...css }}>
+    <Box css={{ position: 'relative' }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (

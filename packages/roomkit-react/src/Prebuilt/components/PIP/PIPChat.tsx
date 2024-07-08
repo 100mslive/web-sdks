@@ -131,9 +131,6 @@ export const PIPChat = () => {
           css={{
             w: '100%',
             c: '$on_surface_high',
-            '&:valid ~ .send-msg': { color: '$on_surface_high' },
-            '& ~ .send-msg': { color: '$on_surface_low' },
-            '&::placeholder': { color: '$on_surface_medium' },
             border: 'none',
             outline: 'none',
           }}
@@ -149,9 +146,6 @@ export const PIPChat = () => {
           }}
           autoComplete="off"
           aria-autocomplete="none"
-          onPaste={e => e.stopPropagation()}
-          onCut={e => e.stopPropagation()}
-          onCopy={e => e.stopPropagation()}
         />
 
         <IconButton

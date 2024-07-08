@@ -37,12 +37,10 @@ export function ShareScreenOptions() {
   const style = document.createElement('style');
   style.id = 'stitches';
   style.textContent = getCssText();
-  const [loadedStyles, setLoadedStyles] = useState(false);
 
   useEffect(() => {
     if (pipWindow) {
       pipWindow.document.head.appendChild(style);
-      setLoadedStyles(true);
       const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
       const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
 
@@ -65,7 +63,11 @@ export function ShareScreenOptions() {
 
   return (
     <Fragment>
-      {isSupported && pipWindow ? <PIPWindow pipWindow={pipWindow}>{loadedStyles && <PIPChat />}</PIPWindow> : ''}
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          <PIPChat />
+        </PIPWindow>
+      ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
