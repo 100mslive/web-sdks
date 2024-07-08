@@ -627,7 +627,7 @@ export default class HMSTransport {
       });
     }).catch(err => {
       if (err instanceof HMSException && err.code === 1003) {
-        throw err;
+        // catch the promise, retry will happen
       }
     });
     const stream = track.stream as HMSLocalStream;
