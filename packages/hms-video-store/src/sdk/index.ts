@@ -133,6 +133,7 @@ export class HMSSdk implements HMSInterface {
   private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private isDiagnostics = false;
   private playlistSettings: HMSPlaylistSettings = {
     video: {
       bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -201,8 +202,8 @@ export class HMSSdk implements HMSInterface {
       this.pluginUsageTracker,
     );
     // add diagnostics callbacks if present
-    if ((listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
-      this.transport.setConnectivityListener(listener as unknown as HMSDiagnosticsConnectivityListener);
+    if ('onInitSuccess' in listener) {
+      this.transport.setConnectivityListener(listener);
     }
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
@@ -655,14 +656,15 @@ export class HMSSdk implements HMSInterface {
       const roomId = room.id;
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);
-      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
+      const peerId = this.localPeer?.peerId;
+      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}, peerId=${peerId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave(notifyServer);
       this.cleanup();
-      HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
+      HMSLogger.d(this.TAG, `✅ Left room ${roomId}, peerId=${peerId}`);
     }
   }
 
@@ -928,6 +930,11 @@ export class HMSSdk implements HMSInterface {
 
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {
     this.notificationManager?.setConnectionQualityListener(qualityListener);
+  }
+
+  /** @internal */
+  setIsDiagnostics(isDiagnostics: boolean) {
+    this.isDiagnostics = isDiagnostics;
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
@@ -1476,7 +1483,9 @@ export class HMSSdk implements HMSInterface {
     // this.sendAnalyticsEvent(
     //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
     // );
-    // this.listener?.onError(error);
+    if (this.isDiagnostics) {
+      this.listener?.onError(error);
+    }
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {
@@ -1503,7 +1512,7 @@ export class HMSSdk implements HMSInterface {
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
     // don't send analytics for diagnostics
-    if ((this.listener as unknown as HMSDiagnosticsConnectivityListener).onInitSuccess) {
+    if (this.isDiagnostics) {
       return;
     }
     this.analyticsEventsService.queue(event).flush();

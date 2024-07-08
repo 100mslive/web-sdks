@@ -13,7 +13,6 @@ body {
 
 #root {
   overscroll-behavior-y: none;
-  overflow-y: auto;
   position: fixed;
   top: 0;
   left: 0;

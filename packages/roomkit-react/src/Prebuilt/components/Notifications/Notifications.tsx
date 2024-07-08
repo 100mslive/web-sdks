@@ -24,7 +24,7 @@ import { ChatNotifications } from './ChatNotifications';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
-import { PermissionErrorModal } from './PermissionErrorModal';
+import { PermissionErrorNotificationModal } from './PermissionErrorModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
@@ -197,7 +197,7 @@ export function Notifications() {
       {roomState === HMSRoomState.Connected ? <PeerNotifications /> : null}
       <ReconnectNotifications />
       <AutoplayBlockedModal />
-      <PermissionErrorModal />
+      <PermissionErrorNotificationModal />
       <InitErrorModal />
       <ChatNotifications />
       <HandRaisedNotifications />

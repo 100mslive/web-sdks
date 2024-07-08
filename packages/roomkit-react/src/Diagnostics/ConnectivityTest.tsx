@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, LinkIcon } from '@100mslive/react-icons';
-import { TestContainer, TestFooter } from './components';
+import { DiagnosticsContext, TestContainer, TestFooter } from './components';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
@@ -218,6 +218,8 @@ const ConnectivityTestReport = ({
   }
 
   if (result) {
+    // for debugging and quick view of results
+    console.log(result);
     return (
       <>
         <TestContainer>
@@ -232,10 +234,10 @@ const ConnectivityTestReport = ({
     );
   }
 
-  if (progress) {
+  if (progress !== undefined) {
     return (
       <TestContainer css={{ textAlign: 'center' }}>
-        <Text css={{ c: '$primary_bright' }}>
+        <Text css={{ c: '$primary_bright', textAlign: 'center' }}>
           <Loading size="3.5rem" color="currentColor" />
         </Text>
         <Text variant="h6" css={{ mt: '$8' }}>
@@ -308,14 +310,15 @@ const RegionSelector = ({
 };
 
 export const ConnectivityTest = () => {
+  const { setConnectivityTested } = useContext(DiagnosticsContext);
   const [region, setRegion] = useState<string | undefined>(Object.keys(Regions)[0]);
   const [error, setError] = useState<Error | undefined>();
   const [progress, setProgress] = useState<ConnectivityState>();
   const [result, setResult] = useState<ConnectivityCheckResult | undefined>();
 
   const startTest = () => {
+    setConnectivityTested(false);
     setError(undefined);
-    setProgress(ConnectivityState.STARTING);
     setResult(undefined);
     hmsDiagnostics
       .startConnectivityCheck(
@@ -323,6 +326,7 @@ export const ConnectivityTest = () => {
           setProgress(state);
         },
         result => {
+          setConnectivityTested(true);
           setResult(result);
         },
         region,
@@ -337,7 +341,7 @@ export const ConnectivityTest = () => {
       <RegionSelector
         region={region}
         setRegion={setRegion}
-        startTest={!progress || progress === ConnectivityState.COMPLETED ? startTest : undefined}
+        startTest={progress === undefined || progress === ConnectivityState.COMPLETED ? startTest : undefined}
       />
       <ConnectivityTestReport error={error} result={result} progress={progress} startTest={startTest} />
     </>

@@ -26,8 +26,8 @@ export class DiagnosticsStatsCollector {
       this.peerStatsList.push(localPeerStats);
     }
 
-    const localAudioTrackID = this.sdk.getLocalPeer()?.audioTrack?.trackId;
-    const localVideoTrackID = this.sdk.getLocalPeer()?.videoTrack?.trackId;
+    const localAudioTrackID = this.sdk.getLocalPeer()?.audioTrack?.nativeTrack?.id;
+    const localVideoTrackID = this.sdk.getLocalPeer()?.videoTrack?.nativeTrack?.id;
 
     const localTrackStats = stats.getLocalTrackStats();
     if (localTrackStats) {

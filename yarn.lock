@@ -8900,10 +8900,10 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-effects-sdk@3.1.5:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.1.5.tgz#1cbfdb6ecf6381bc1dfd5b49b6552783a89f495a"
-  integrity sha512-X95BOoc8GGkvlxxSO+PhS3RTH17JNAiF3cTLRLx2MsQp5zMO9zsi67xjo3q8OTyNKuSGHzK+QOg8E+voMN213g==
+effects-sdk@3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.2.3.tgz#9887b98c32abdbf13d4a41dc42396ba101e1db44"
+  integrity sha512-mjkcHaSqW6hZdDILOVG+Ju/hJDGcF9ZVsQ4wrTk7np2EPBOh6hoNogr6R4uiYaIZdkR9pgxUPxvBgTbCUkOhUQ==
 
 ejs@^3.1.7, ejs@^3.1.8:
   version "3.1.9"

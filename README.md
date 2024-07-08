@@ -90,6 +90,27 @@ For example, if you are making changes in roomkit-react(prebuilt), run `yarn sta
 > Note: Make sure `yarn build` is run atleast once before using `yarn start`
 
 
+
+<br>
+
+### Deploying Your Changes
+
+Once you have forked the repository and tested your changes on the local build, you can follow the steps below to deploy to Vercel as an example:
+
+- Import the fork repository
+- Set `examples/prebuilt-react-integration` as the root directory
+- Use the Create React App preset and update the build and install commands `Project Settings` to use the root level scripts
+	- install: `cd ../../ && yarn install`
+	- build: `cd ../../ && yarn build`
+
+For reference:
+
+![Project Settings](./project-settings.png)
+
+<br />
+
+Once the app has been deployed, you can append the room code at the end of the deployment URL to preview your changes 
+
 <br>
 
 ## Contributing
