@@ -1059,7 +1059,7 @@ export default class HMSTransport {
         setTimeout(() => resolve(false), SUBSCRIBE_TIMEOUT);
       });
 
-      return Promise.race([p, timeout]).then(value => !!value);
+      return Promise.race([p.then(value => value[0] as boolean), timeout]);
     }
 
     return true;
