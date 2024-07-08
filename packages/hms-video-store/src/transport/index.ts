@@ -1124,10 +1124,11 @@ export default class HMSTransport {
       });
 
       const timeout = new Promise(resolve => {
-        setTimeout(() => resolve({ success: false, type: 'timeout' }), SUBSCRIBE_TIMEOUT);
+        setTimeout(() => resolve(false), SUBSCRIBE_TIMEOUT);
       });
 
       return Promise.race([p, timeout]).then(value => {
+        // value is false if the timeout got resolved before the subscribe connection
         if (!value) {
           // close and reset subscribe connection to retry with relay
           this.subscribeConnection?.close();
