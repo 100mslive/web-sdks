@@ -4,7 +4,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, CSS, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
+import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
@@ -75,15 +75,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({
-  onSend,
-  css = {},
-  children,
-}: {
-  onSend: (count: number) => void;
-  css?: CSS;
-  children?: ReactNode;
-}) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children?: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
