@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { selectIsAllowedToPublish, useAwayNotifications, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
-import { PIPProvider } from './PIP/PIPProvider';
 import { Box, Flex } from '../../Layout';
 import { Tooltip } from '../../Tooltip';
 import { ScreenShareButton } from './ShareMenuIcon';
@@ -41,9 +40,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
             </Box>
           </Tooltip>
         </ScreenShareButton>
-        <PIPProvider>
-          <ShareScreenOptions />
-        </PIPProvider>
+        <ShareScreenOptions />
       </Flex>
     </Fragment>
   );
