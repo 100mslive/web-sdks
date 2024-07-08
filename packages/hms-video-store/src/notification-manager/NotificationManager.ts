@@ -165,6 +165,7 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
+        console.log("xyzz");
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
