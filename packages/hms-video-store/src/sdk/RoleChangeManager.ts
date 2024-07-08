@@ -48,7 +48,6 @@ export default class RoleChangeManager {
 
     const prevVideoEnabled = this.store.getLocalPeer()?.videoTrack?.enabled;
 
-    console.log('before remove tracks');
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
@@ -59,7 +58,6 @@ export default class RoleChangeManager {
       settings.isVideoMuted = !prevVideoEnabled;
     }
 
-    console.log('prev tracks removed', { removeAudio, removeVideo, publishParams: newRole.publishParams });
     // call publish with new settings, local track manager will diff policies
     await this.publish(settings);
     await this.syncDevices(settings, newRole);

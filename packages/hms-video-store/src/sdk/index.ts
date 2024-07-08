@@ -1241,7 +1241,6 @@ export class HMSSdk implements HMSInterface {
 
   private async getAndPublishTracks(initialSettings?: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
-    console.log({ tracks });
     await this.setAndPublishTracks(tracks);
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
     this.sdkState.published = true;
