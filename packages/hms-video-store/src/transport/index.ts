@@ -335,7 +335,7 @@ export default class HMSTransport {
       }
 
       if (newState === 'connected') {
-        this.connectivityListener?.onICESuccess(true);
+        this.connectivityListener?.onICESuccess(false);
         this.eventEmitter.emit(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, true);
       }
     },
