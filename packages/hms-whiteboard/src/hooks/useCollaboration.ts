@@ -82,8 +82,6 @@ export function useCollaboration({
         return;
       }
 
-      console.log(initialRecords);
-
       // Initialize the tldraw store with the session store server records—or, if the session store
       // is empty, initialize the session store server with the default tldraw store records.
       const shouldUseServerRecords = FULL_SYNC_REQUIRED_RECORD_TYPES.every(
@@ -103,7 +101,6 @@ export function useCollaboration({
           sessionStore.set(record.id, record);
         }
       }
-      console.log('handle open', shouldUseServerRecords);
       setStoreWithStatus({
         store,
         status: 'synced-remote',
