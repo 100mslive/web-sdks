@@ -38,7 +38,7 @@ export class SessionStore<T> {
 
     // on open, wait to call handleOpen with the pre-existing values from the store
     const openTimeoutID = setTimeout(() => {
-      console.log('handle open', openTimeoutID);
+      console.log('handle open', openTimeoutID, initialValues);
       handleOpen(initialValues);
       initialised = true;
     }, OPEN_WAIT_TIMEOUT);
@@ -46,7 +46,6 @@ export class SessionStore<T> {
     console.log('opening', openTimeoutID);
 
     call.responses.onMessage(message => {
-      console.log(openTimeoutID, message);
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
@@ -64,6 +63,7 @@ export class SessionStore<T> {
     call.responses.onError(error => {
       console.log(openTimeoutID, error);
       const canRecover = RETRY_ERROR_MESSAGES.includes(error.message.toLowerCase());
+      const shouldRetryInstantly = error.message.toLowerCase() === 'network error';
 
       clearTimeout(openTimeoutID);
       const openCallback = () => {
@@ -72,7 +72,7 @@ export class SessionStore<T> {
         window.removeEventListener('online', openCallback);
       };
       if (canRecover) {
-        openCallback();
+        shouldRetryInstantly && openCallback();
         window.addEventListener('online', openCallback);
       }
 
