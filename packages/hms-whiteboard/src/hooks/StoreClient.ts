@@ -72,6 +72,7 @@ export class SessionStore<T> {
         window.removeEventListener('online', openCallback);
       };
       if (canRecover) {
+        openCallback();
         window.addEventListener('online', openCallback);
       }
 
