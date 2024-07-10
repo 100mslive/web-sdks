@@ -14,6 +14,7 @@ export const RoomLayoutContext = React.createContext<
   | {
       layout: Layout | undefined;
       updateRoomLayoutForRole: useFetchRoomLayoutResponse['updateRoomLayoutForRole'] | undefined;
+      setOriginalLayout: useFetchRoomLayoutResponse['setOriginalLayout'] | undefined;
     }
   | undefined
 >(undefined);
@@ -35,10 +36,13 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
   overrideLayout,
 }) => {
   const authToken: string = useAuthToken();
-  const { layout, updateRoomLayoutForRole } = useFetchRoomLayout({ authToken, endpoint: roomLayoutEndpoint });
+  const { layout, updateRoomLayoutForRole, setOriginalLayout } = useFetchRoomLayout({
+    authToken,
+    endpoint: roomLayoutEndpoint,
+  });
   const mergedLayout = authToken && layout ? mergeWith(layout, overrideLayout, customizer) : layout;
   return (
-    <RoomLayoutContext.Provider value={{ layout: mergedLayout, updateRoomLayoutForRole }}>
+    <RoomLayoutContext.Provider value={{ layout: mergedLayout, updateRoomLayoutForRole, setOriginalLayout }}>
       {children}
     </RoomLayoutContext.Provider>
   );
@@ -46,3 +50,4 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
 
 export const useRoomLayout = () => React.useContext(RoomLayoutContext)?.layout;
 export const useUpdateRoomLayout = () => React.useContext(RoomLayoutContext)?.updateRoomLayoutForRole;
+export const useSetOriginalLayout = () => React.useContext(RoomLayoutContext)?.setOriginalLayout;

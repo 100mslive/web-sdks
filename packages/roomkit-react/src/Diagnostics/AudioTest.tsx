@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   HMSException,
   selectDevices,
@@ -18,7 +18,7 @@ import { Progress } from '../Progress';
 import { Text } from '../Text';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
-import { hmsDiagnostics } from './hms';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
@@ -26,7 +26,8 @@ const SelectContainer = ({ children }: { children: React.ReactNode }) => (
   <Box css={{ w: 'calc(50% - 0.75rem)', '@lg': { w: '100%' } }}>{children}</Box>
 );
 
-const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<Error | undefined>> }) => {
+const MicTest = ({ setError }: { setError: (err?: Error) => void }) => {
+  const { hmsDiagnostics } = useDiagnostics();
   const devices = useHMSStore(selectDevices);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedMic, setSelectedMic] = useState(devices.audioInput[0]?.deviceId || 'default');
@@ -45,8 +46,9 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
         selection={selectedMic}
         icon={<MicOnIcon />}
         onChange={(deviceId: string) => {
+          setError(undefined);
           setSelectedMic(deviceId);
-          hmsDiagnostics.stopMicCheck();
+          hmsDiagnostics?.stopMicCheck();
         }}
       />
       <Flex css={{ gap: '$6', alignItems: 'center' }}>
@@ -55,9 +57,9 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
           icon
           onClick={() => {
             isRecording
-              ? hmsDiagnostics.stopMicCheck()
+              ? hmsDiagnostics?.stopMicCheck()
               : hmsDiagnostics
-                  .startMicCheck({
+                  ?.startMicCheck({
                     inputDevice: selectedMic,
                     onError: (err: Error) => {
                       setError(err);
@@ -79,14 +81,14 @@ const MicTest = ({ setError }: { setError: React.Dispatch<React.SetStateAction<E
         <Button
           icon
           variant="standard"
-          outlined={hmsDiagnostics.getRecordedAudio() === TEST_AUDIO_URL}
+          outlined={hmsDiagnostics?.getRecordedAudio() === TEST_AUDIO_URL}
           onClick={() => {
             if (audioRef.current) {
-              audioRef.current.src = hmsDiagnostics.getRecordedAudio() || '';
+              audioRef.current.src = hmsDiagnostics?.getRecordedAudio() || '';
               audioRef.current.play();
             }
           }}
-          disabled={playing || hmsDiagnostics.getRecordedAudio() === TEST_AUDIO_URL}
+          disabled={playing || hmsDiagnostics?.getRecordedAudio() === TEST_AUDIO_URL}
         >
           <SpeakerIcon />
           {playing ? 'Playing...' : 'Playback'}
@@ -141,10 +143,20 @@ const SpeakerTest = () => {
 };
 
 export const AudioTest = () => {
-  const [error, setError] = useState<Error | undefined>();
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
+  const [error, setErrorAlone] = useState<Error | undefined>();
+
+  const setError = useCallback(
+    (err?: Error) => {
+      updateStep(DiagnosticsStep.AUDIO, { hasFailed: !!err });
+      setErrorAlone(err);
+    },
+    [updateStep, setErrorAlone],
+  );
+
   useEffect(() => {
-    hmsDiagnostics.requestPermission({ audio: true }).catch(error => setError(error));
-  }, []);
+    hmsDiagnostics?.requestPermission({ audio: true }).catch(error => setError(error));
+  }, [hmsDiagnostics, setError]);
 
   return (
     <>
