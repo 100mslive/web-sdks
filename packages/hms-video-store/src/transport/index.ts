@@ -606,8 +606,7 @@ export default class HMSTransport {
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    // @ts-ignore
-    await this.eventEmitter.waitFor(RENEGOTIATION_CALLBACK_ID, { handleError: true });
+    await this.getPromiseForRenegotiation();
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
     // add track to store after publish
     this.store.addTrack(track);
@@ -646,8 +645,7 @@ export default class HMSTransport {
     }
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
-    // @ts-ignore
-    await this.eventEmitter.waitFor(RENEGOTIATION_CALLBACK_ID, { handleError: true });
+    await this.getPromiseForRenegotiation();
     await track.cleanup();
     // remove track from store on unpublish
     this.store.removeTrack(track);
@@ -1044,9 +1042,7 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
-      this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
-      // @ts-ignore
-      await this.eventEmitter.waitFor(RENEGOTIATION_CALLBACK_ID, { handleError: true });
+      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
     }
 
     return true;
@@ -1109,6 +1105,18 @@ export default class HMSTransport {
       this.state = TransportState.Connecting;
       this.observer.onStateChange(this.state);
     }
+  }
+
+  private getPromiseForRenegotiation() {
+    return new Promise((resolve, reject) => {
+      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, value => {
+        if (value instanceof HMSException) {
+          reject(value);
+        } else {
+          resolve(value);
+        }
+      });
+    });
   }
 
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
