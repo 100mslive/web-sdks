@@ -19,6 +19,10 @@ const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
 
+  if (!token) {
+    return null;
+  }
+
   return (
     <Box
       css={{

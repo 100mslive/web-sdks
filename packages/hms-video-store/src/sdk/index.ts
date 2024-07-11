@@ -174,6 +174,7 @@ export class HMSSdk implements HMSInterface {
 
     this.sdkState.isInitialised = true;
     this.store = new Store();
+    this.store.setErrorListener(this.errorListener);
     this.eventBus = new EventBus();
     this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();

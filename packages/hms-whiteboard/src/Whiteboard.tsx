@@ -6,12 +6,25 @@ import './index.css';
 
 export interface WhiteboardProps {
   endpoint?: string;
-  token?: string;
+  token: string;
   zoomToContent?: boolean;
   transparentCanvas?: boolean;
   onMount?: (args: { store?: unknown; editor?: unknown }) => void;
 }
-export function Whiteboard({ onMount, endpoint, token, zoomToContent, transparentCanvas }: WhiteboardProps) {
+export function Whiteboard(props: WhiteboardProps) {
+  const [key, setKey] = useState(Date.now() + props.token);
+
+  return <CollaborativeEditor key={key} refresh={() => setKey(Date.now() + props.token)} {...props} />;
+}
+
+function CollaborativeEditor({
+  endpoint,
+  token,
+  zoomToContent,
+  transparentCanvas,
+  onMount,
+  refresh,
+}: WhiteboardProps & { refresh: () => void }) {
   const [editor, setEditor] = useState<Editor>();
   const store = useCollaboration({
     endpoint,
@@ -33,7 +46,9 @@ export function Whiteboard({ onMount, endpoint, token, zoomToContent, transparen
       autoFocus
       store={store}
       onMount={handleMount}
-      components={{ ErrorFallback }}
+      components={{
+        ErrorFallback: ({ error, editor }) => <ErrorFallback editor={editor} error={error} refresh={refresh} />,
+      }}
       hideUi={editor?.getInstanceState()?.isReadonly}
       initialState={editor?.getInstanceState()?.isReadonly ? 'hand' : 'select'}
     />

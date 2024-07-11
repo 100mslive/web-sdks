@@ -15,9 +15,10 @@ import { Video } from '../Video';
 import { StyledVideoTile } from '../VideoTile';
 // @ts-ignore: No implicit any
 import { DeviceSelector } from './DeviceSelector';
-import { hmsDiagnostics } from './hms';
+import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
 export const VideoTest = () => {
+  const { hmsDiagnostics, updateStep } = useDiagnostics();
   const allDevices = useHMSStore(selectDevices);
   const { videoInput } = allDevices;
   const trackID = useHMSStore(selectLocalVideoTrackID);
@@ -25,8 +26,11 @@ export const VideoTest = () => {
   const [error, setError] = useState<HMSException | undefined>();
 
   useEffect(() => {
-    hmsDiagnostics.startCameraCheck().catch(err => setError(err));
-  }, []);
+    hmsDiagnostics?.startCameraCheck().catch(err => {
+      updateStep(DiagnosticsStep.VIDEO, { hasFailed: true });
+      setError(err);
+    });
+  }, [hmsDiagnostics, updateStep]);
 
   return (
     <>
@@ -55,8 +59,8 @@ export const VideoTest = () => {
             icon={<VideoOnIcon />}
             selection={sdkSelectedDevices.videoInputDeviceId}
             onChange={async (deviceId: string) => {
-              hmsDiagnostics.stopCameraCheck();
-              hmsDiagnostics.startCameraCheck(deviceId);
+              hmsDiagnostics?.stopCameraCheck();
+              hmsDiagnostics?.startCameraCheck(deviceId);
             }}
           />
         </Flex>

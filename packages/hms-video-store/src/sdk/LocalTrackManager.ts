@@ -9,7 +9,13 @@ import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
+import {
+  HMSAudioCodec,
+  HMSAudioMode,
+  HMSScreenShareConfig,
+  HMSVideoCodec,
+  ScreenCaptureHandleConfig,
+} from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
@@ -31,6 +37,7 @@ const defaultSettings = {
   audioInputDeviceId: 'default',
   audioOutputDeviceId: 'default',
   videoDeviceId: 'default',
+  audioMode: HMSAudioMode.VOICE,
 };
 type IFetchTrackOptions = boolean | 'empty';
 interface IFetchAVTrackOptions {
