@@ -21,6 +21,7 @@ export const PIPChat = () => {
   }, [blacklistedMessageIDs, messages]);
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
+  const canSendChatMessages = !!elements?.chat?.public_chat_enabled;
 
   return (
     <div style={{ height: '100%' }}>
@@ -29,7 +30,7 @@ export const PIPChat = () => {
         css={{
           bg: '$surface_dim',
           overflowY: 'auto',
-          h: 'calc(500px - 78px)',
+          h: canSendChatMessages ? 'calc(500px - 78px)' : '500px',
           position: 'relative',
         }}
       >
@@ -107,44 +108,46 @@ export const PIPChat = () => {
         )}
         <div id="marker" style={{ height: filteredMessages.length ? '1px' : 0 }} />
       </Box>
-      <Flex
-        align="center"
-        css={{
-          bg: '$surface_default',
-          minHeight: '$16',
-          width: '100%',
-          py: '$6',
-          pl: '$8',
-          boxSizing: 'border-box',
-          gap: '$2',
-        }}
-      >
-        <TextArea
-          maxLength={CHAT_MESSAGE_LIMIT}
-          style={{ border: 'none', resize: 'none' }}
+      {canSendChatMessages && (
+        <Flex
+          align="center"
           css={{
-            w: '100%',
-            c: '$on_surface_high',
+            bg: '$surface_default',
+            minHeight: '$16',
+            width: '100%',
+            py: '$6',
+            pl: '$8',
+            boxSizing: 'border-box',
+            gap: '$2',
           }}
-          placeholder={message_placeholder}
-          required
-          autoComplete="off"
-          aria-autocomplete="none"
-        />
-
-        <IconButton
-          className="send-msg"
-          css={{
-            ml: 'auto',
-            height: 'max-content',
-            mr: '$4',
-            '&:hover': { c: '$on_surface_medium' },
-          }}
-          data-testid="send_msg_btn"
         >
-          <SendIcon />
-        </IconButton>
-      </Flex>
+          <TextArea
+            maxLength={CHAT_MESSAGE_LIMIT}
+            style={{ border: 'none', resize: 'none' }}
+            css={{
+              w: '100%',
+              c: '$on_surface_high',
+            }}
+            placeholder={message_placeholder}
+            required
+            autoComplete="off"
+            aria-autocomplete="none"
+          />
+
+          <IconButton
+            className="send-msg"
+            css={{
+              ml: 'auto',
+              height: 'max-content',
+              mr: '$4',
+              '&:hover': { c: '$on_surface_medium' },
+            }}
+            data-testid="send_msg_btn"
+          >
+            <SendIcon />
+          </IconButton>
+        </Flex>
+      )}
     </div>
   );
 };
