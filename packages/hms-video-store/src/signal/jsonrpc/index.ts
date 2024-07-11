@@ -1,3 +1,4 @@
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
@@ -90,6 +91,7 @@ export default class JsonRpcSignal {
   private callbacks = new Map<string, PromiseCallbacks<string, { method: HMSSignalMethod }>>();
 
   private _isConnected = false;
+  private eventEmitter = new EventEmitter();
   private id = 0;
 
   private onCloseHandler: (event: CloseEvent) => void = () => {};
@@ -109,10 +111,12 @@ export default class JsonRpcSignal {
       this._isConnected = newValue;
       this.rejectPendingCalls(reason);
       this.observer.onOffline(reason);
+      this.eventEmitter.emit('offline');
     } else if (!this._isConnected && newValue) {
       // went online
       this._isConnected = newValue;
       this.observer.onOnline();
+      this.eventEmitter.emit('online');
     }
   }
 
@@ -613,14 +617,15 @@ export default class JsonRpcSignal {
     let retry;
     for (retry = 1; retry <= MAX_RETRIES; retry++) {
       try {
-        this.validateConnection();
+        if (!this.isConnected) {
+          await this.eventEmitter.waitFor('online');
+        }
         HMSLogger.d(this.TAG, `Try number ${retry} sending ${method}`, params);
         return await this.internalCall(method, params);
       } catch (err) {
         error = err as HMSException;
         HMSLogger.e(this.TAG, `Failed sending ${method} try: ${retry}`, { method, params, error });
-        // 1003 is websocket disconnect - could be because you are offline - retry with delay in this case as well
-        const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429 || error.code === 1003;
+        const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
         if (!shouldRetry) {
           break;
         }
