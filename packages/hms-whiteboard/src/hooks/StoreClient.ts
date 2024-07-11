@@ -1,7 +1,6 @@
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
-import { OPEN_WAIT_TIMEOUT } from '../utils';
 
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
@@ -24,7 +23,7 @@ export class SessionStore<T> {
     this.storeClient = new StoreClient(transport);
   }
 
-  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>, retry = 0) {
+  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
     const abortController = new AbortController();
     const call = this.storeClient.open(
       {
@@ -33,26 +32,20 @@ export class SessionStore<T> {
       },
       { abort: abortController.signal },
     );
+    let count: number | undefined = undefined;
     const initialValues: T[] = [];
-    let initialised = false;
-
-    // on open, wait to call handleOpen with the pre-existing values from the store
-    const openTimeoutID = setTimeout(() => {
-      console.log('handle open', openTimeoutID, initialValues);
-      handleOpen(initialValues);
-      initialised = true;
-    }, OPEN_WAIT_TIMEOUT);
-
-    console.log('opening', openTimeoutID);
 
     call.responses.onMessage(message => {
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
-          if (initialised) {
+          if (initialValues.length === count) {
             handleChange(message.key, record);
           } else {
             initialValues.push(record);
+            if (initialValues.length === count) {
+              handleOpen(initialValues);
+            }
           }
         }
       } else {
@@ -61,13 +54,11 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
-      console.log(openTimeoutID, error);
       const canRecover = RETRY_ERROR_MESSAGES.includes(error.message.toLowerCase());
       const shouldRetryInstantly = error.message.toLowerCase() === 'network error';
 
-      clearTimeout(openTimeoutID);
       const openCallback = () => {
-        abortController.abort(`closing ${openTimeoutID} to open new conn`);
+        abortController.abort(`closing to open new conn`);
         this.open({ handleOpen, handleChange, handleError });
         window.removeEventListener('online', openCallback);
       };
@@ -81,8 +72,13 @@ export class SessionStore<T> {
       }
     });
 
+    count = await this.getKeysCount();
+    if (!count) {
+      handleOpen([]);
+    }
+
     return () => {
-      abortController.abort(WHITEBOARD_CLOSE_MESSAGE + ' ' + openTimeoutID);
+      abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
     };
   }
 
