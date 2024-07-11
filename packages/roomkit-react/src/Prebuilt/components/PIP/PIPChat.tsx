@@ -25,6 +25,7 @@ export const PIPChat = () => {
   return (
     <div style={{ height: '100%' }}>
       <Box
+        id="chat-container"
         css={{
           bg: '$surface_dim',
           overflowY: 'auto',
@@ -40,7 +41,7 @@ export const PIPChat = () => {
           </div>
         ) : (
           filteredMessages.map(message => (
-            <Box key={message.id} style={{ padding: '8px' }}>
+            <Box key={message.id} id={message.id} style={{ padding: '8px' }}>
               <Flex align="center" css={{ w: '100%' }}>
                 <Text
                   style={{ display: 'flex', alignItems: 'between', alignSelf: 'stretch', width: '100%' }}
