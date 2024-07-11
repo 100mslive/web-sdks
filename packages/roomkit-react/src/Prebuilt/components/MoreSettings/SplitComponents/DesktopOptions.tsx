@@ -100,10 +100,38 @@ export const DesktopOptions = ({
 
   useEffect(() => {
     if (pipWindow) {
+      const chatContainer = pipWindow.document.getElementById('chat-container');
       const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
       const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
-
       const marker = pipWindow.document.getElementById('marker');
+
+      const mutationObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.addedNodes.length > 0) {
+            const newMessages = mutation.addedNodes;
+            newMessages.forEach(message => {
+              const messageId = (message as Element)?.id;
+              const observer = new IntersectionObserver(
+                entries => {
+                  if (entries[0].isIntersecting && messageId) {
+                    hmsActions.setMessageRead(true, messageId);
+                    // Your logic to mark the message as read goes here
+                  }
+                },
+                {
+                  root: chatContainer,
+                  threshold: 1.0,
+                },
+              );
+              if (messageId) observer.observe(message as Element);
+            });
+          }
+        });
+      });
+      mutationObserver.observe(chatContainer as Node, {
+        childList: true,
+      });
+
       const sendMessage = async () => {
         await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
         pipChatInput.value = '';
