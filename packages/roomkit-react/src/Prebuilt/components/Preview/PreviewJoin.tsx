@@ -117,8 +117,7 @@ const PreviewJoin = ({
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
-        preview();
-        requestPermission();
+        preview().then(() => requestPermission());
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
