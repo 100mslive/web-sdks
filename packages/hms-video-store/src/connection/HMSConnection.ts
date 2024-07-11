@@ -2,8 +2,6 @@ import IConnectionObserver, { RTCIceCandidatePair } from './IConnectionObserver'
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import JsonRpcSignal from '../signal/jsonrpc';
 import HMSLogger from '../utils/logger';
@@ -154,42 +152,6 @@ export default abstract class HMSConnection {
         TAG,
         `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
         error,
-      );
-    }
-  }
-
-  removeTrack(sender: RTCRtpSender) {
-    if (this.nativeConnection.signalingState !== 'closed') {
-      this.nativeConnection.removeTrack(sender);
-    }
-  }
-
-  // eslint-disable-next-line
-  async setMaxBitrateAndFramerate(
-    track: HMSLocalTrack,
-    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
-  ) {
-    const maxBitrate = updatedSettings?.maxBitrate || track.settings.maxBitrate;
-    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
-    const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
-
-    if (sender) {
-      const params = sender.getParameters();
-      // modify only for non-simulcast encodings
-      if (params.encodings.length === 1) {
-        if (maxBitrate) {
-          params.encodings[0].maxBitrate = maxBitrate * 1000;
-        }
-        if (maxFramerate) {
-          // @ts-ignore
-          params.encodings[0].maxFramerate = maxFramerate;
-        }
-      }
-      await sender.setParameters(params);
-    } else {
-      HMSLogger.w(
-        TAG,
-        `no sender found to setMaxBitrate for track - ${track.trackId}, sentTrackId - ${track.getTrackIDBeingSent()}`,
       );
     }
   }

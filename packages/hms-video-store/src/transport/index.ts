@@ -136,7 +136,7 @@ export default class HMSTransport {
         if (err instanceof HMSException) {
           ex = err;
         } else {
-          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
+          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.SUBSCRIBE, (err as Error).message);
         }
         this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
@@ -206,8 +206,8 @@ export default class HMSTransport {
   private lastPublishDtlsState: RTCDtlsTransportState = 'new';
 
   private publishConnectionObserver: IPublishConnectionObserver = {
-    onRenegotiationNeeded: async () => {
-      await this.performPublishRenegotiation();
+    onRenegotiationNeeded: () => {
+      this.performPublishRenegotiation();
     },
 
     // eslint-disable-next-line complexity
@@ -611,8 +611,8 @@ export default class HMSTransport {
     // add track to store after publish
     this.store.addTrack(track);
 
-    await stream
-      .setMaxBitrateAndFramerate(track)
+    await this.publishConnection
+      ?.setMaxBitrateAndFramerate(track)
       .then(() => {
         HMSLogger.d(
           TAG,
@@ -629,6 +629,9 @@ export default class HMSTransport {
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
+    if (!track.transceiver) {
+      return;
+    }
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
@@ -644,8 +647,7 @@ export default class HMSTransport {
         this.trackStates.delete(originalTrackState.track_id);
       }
     }
-    const stream = track.stream as HMSLocalStream;
-    stream.removeSender(track);
+    this.publishConnection?.removeTrack(track.transceiver?.sender);
     await this.getPromiseForRenegotiation();
     await track.cleanup();
     // remove track from store on unpublish
@@ -1051,7 +1053,7 @@ export default class HMSTransport {
   private retrySubscribeIceFailedTask = async () => {
     if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
       const p = new Promise<boolean>(resolve => {
-        this.eventEmitter.on(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, value => {
+        this.eventEmitter.once(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, value => {
           resolve(value);
         });
       });

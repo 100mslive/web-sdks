@@ -1,4 +1,6 @@
 import { IPublishConnectionObserver } from './IPublishConnectionObserver';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../../internal';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../../media/settings';
 import JsonRpcSignal from '../../signal/jsonrpc';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
@@ -56,5 +58,42 @@ export default class HMSPublishConnection extends HMSConnection {
       HMSLogger.d(this.TAG, `onnegotiationneeded`);
       await this.observer.onRenegotiationNeeded();
     };
+  }
+
+  removeTrack(sender: RTCRtpSender) {
+    console.log('remvoe track', this.nativeConnection.signalingState);
+    if (this.nativeConnection.signalingState !== 'closed') {
+      this.nativeConnection.removeTrack(sender);
+    }
+  }
+
+  // eslint-disable-next-line
+  async setMaxBitrateAndFramerate(
+    track: HMSLocalTrack,
+    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
+  ) {
+    const maxBitrate = updatedSettings?.maxBitrate || track.settings.maxBitrate;
+    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
+    const sender = track.transceiver?.sender;
+
+    if (sender) {
+      const params = sender.getParameters();
+      // modify only for non-simulcast encodings
+      if (params.encodings.length === 1) {
+        if (maxBitrate) {
+          params.encodings[0].maxBitrate = maxBitrate * 1000;
+        }
+        if (maxFramerate) {
+          // @ts-ignore
+          params.encodings[0].maxFramerate = maxFramerate;
+        }
+      }
+      await sender.setParameters(params);
+    } else {
+      HMSLogger.w(
+        this.TAG,
+        `no sender found to setMaxBitrate for track - ${track.trackId}, sentTrackId - ${track.getTrackIDBeingSent()}`,
+      );
+    }
   }
 }

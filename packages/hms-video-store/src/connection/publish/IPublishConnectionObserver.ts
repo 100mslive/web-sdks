@@ -5,7 +5,7 @@ export interface IPublishConnectionObserver extends IConnectionObserver {
    * - A new local track/stream is added/removed
    * - A new data-channel is added/removed
    */
-  onRenegotiationNeeded(): Promise<void>;
+  onRenegotiationNeeded(): void;
 
   onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => void;
 
