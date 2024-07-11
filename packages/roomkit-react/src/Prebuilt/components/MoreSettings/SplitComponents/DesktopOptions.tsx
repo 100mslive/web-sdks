@@ -103,9 +103,11 @@ export const DesktopOptions = ({
       const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
       const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
 
+      const marker = pipWindow.document.getElementById('marker');
       const sendMessage = async () => {
         await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
         pipChatInput.value = '';
+        setTimeout(() => marker?.scrollIntoView({ block: 'end' }), 0);
       };
 
       if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
@@ -208,7 +210,7 @@ export const DesktopOptions = ({
           ) : null}
 
           {showPipChatOption && (
-            <Dropdown.Item onClick={async () => await requestPipWindow(400, 600)} data-testid="brb_btn">
+            <Dropdown.Item onClick={async () => await requestPipWindow(350, 500)} data-testid="brb_btn">
               <ChatIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
                 PIP Chat
