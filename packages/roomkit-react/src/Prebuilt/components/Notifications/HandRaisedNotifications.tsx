@@ -3,6 +3,7 @@ import {
   HMSNotificationTypes,
   HMSRoomState,
   selectHasPeerHandRaised,
+  selectIsLocalScreenShared,
   selectPeerByID,
   selectRoomState,
   useAwayNotifications,
@@ -24,6 +25,7 @@ export const HandRaisedNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const { on_stage_exp } = useRoomLayoutConferencingScreen().elements || {};
   const isSubscribing = !!useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED);
+  const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const { showNotification } = useAwayNotifications();
   const logoURL = useRoomLayout()?.logo?.url;
 
@@ -43,11 +45,13 @@ export const HandRaisedNotifications = () => {
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
 
-      showNotification(`${peer?.name} raised hand`, {
-        icon: logoURL,
-      });
+      if (amIScreenSharing) {
+        showNotification(`${peer?.name} raised hand`, {
+          icon: logoURL,
+        });
+      }
     }
-  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL]);
+  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL, amIScreenSharing]);
 
   return null;
 };
