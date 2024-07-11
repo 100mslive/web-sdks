@@ -83,7 +83,7 @@ export const DesktopOptions = ({
   const isBRBEnabled = !!elements?.brb;
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-  const { isSupported, requestPipWindow, pipWindow } = usePIPWindow();
+  const { isSupported, requestPipWindow, pipWindow, closePipWindow } = usePIPWindow();
   const sendFuncAdded = useRef<boolean>();
   const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
 
@@ -145,6 +145,12 @@ export const DesktopOptions = ({
       }
     }
   }, [pipWindow, hmsActions]);
+
+  useEffect(() => {
+    return () => {
+      pipWindow && closePipWindow();
+    };
+  }, [closePipWindow, pipWindow]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
@@ -247,9 +253,6 @@ export const DesktopOptions = ({
           )}
 
           <FullScreenItem />
-          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )} */}
 
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
 
