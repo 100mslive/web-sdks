@@ -5,10 +5,12 @@ import {
   selectHasPeerHandRaised,
   selectPeerByID,
   selectRoomState,
+  useAwayNotifications,
   useHMSNotifications,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -22,6 +24,8 @@ export const HandRaisedNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const { on_stage_exp } = useRoomLayoutConferencingScreen().elements || {};
   const isSubscribing = !!useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED);
+  const { showNotification } = useAwayNotifications();
+  const logoURL = useRoomLayout()?.logo?.url;
 
   useEffect(() => {
     if (!notification?.data) {
@@ -38,8 +42,12 @@ export const HandRaisedNotifications = () => {
       const showCTA = peer?.roleName && (on_stage_exp?.off_stage_roles || [])?.includes(peer.roleName);
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
+
+      showNotification(`${peer?.name} raised hand`, {
+        icon: logoURL,
+      });
     }
-  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore]);
+  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL]);
 
   return null;
 };
