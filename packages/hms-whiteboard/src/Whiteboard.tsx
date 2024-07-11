@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Editor, Tldraw } from '@tldraw/tldraw';
+import {
+  AssetRecordType,
+  createShapeId,
+  Editor,
+  getHashForString,
+  MediaHelpers,
+  TLAsset,
+  Tldraw,
+} from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
 import './index.css';
@@ -38,6 +46,54 @@ function CollaborativeEditor({
     // @ts-expect-error - for debugging
     window.editor = editor;
     onMount?.({ store: store.store, editor });
+
+    editor.updateShapes(
+      editor.getSelectedShapes().map(shape => {
+        return {
+          ...shape,
+          props: {
+            ...shape.props,
+            size: '',
+          },
+        };
+      }),
+    );
+
+    const url = `https://media.istockphoto.com/id/1471999877/photo/man-hand-on-laptop-with-exclamation-mark-on-virtual-screen-online-safety-warning-caution.jpg?s=2048x2048&w=is&k=20&c=cqqBdO0bO7ODVGawy0ZK7LMwWfbDS09l4uofqu7P6mw=`;
+
+    const assetId = AssetRecordType.createId(getHashForString(url));
+
+    MediaHelpers.getImageSizeFromSrc(url).then(size => {
+      const asset: TLAsset = AssetRecordType.create({
+        id: assetId,
+        type: 'image',
+        typeName: 'asset',
+        props: {
+          name: 'prebuilt',
+          src: url,
+          w: size.w,
+          h: size.h,
+          mimeType: 'image/png',
+          isAnimated: false,
+        },
+      });
+      console.log({ asset });
+      editor.createAssets([asset]);
+
+      const shapeId = createShapeId();
+      editor.createShape({
+        id: shapeId,
+        type: 'image',
+        x: 0,
+        y: 0,
+        isLocked: true,
+        props: {
+          w: editor.getViewportPageBounds().width,
+          h: editor.getViewportPageBounds().height,
+          assetId,
+        },
+      });
+    });
   };
 
   return (
