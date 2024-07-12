@@ -17,8 +17,8 @@ import {
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
-  ChatIcon,
   CheckIcon,
+  ExternalLinkIcon,
   HamburgerMenuIcon,
   InfoIcon,
   OpenCaptionIcon,
@@ -141,8 +141,13 @@ export const DesktopOptions = ({
       if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
         // remove on cleanup
         sendBtn.addEventListener('click', sendMessage);
+        pipChatInput.addEventListener('keypress', e => {
+          if (e.key === 'Enter') sendMessage();
+        });
         sendFuncAdded.current = true;
       }
+    } else {
+      sendFuncAdded.current = false;
     }
   }, [pipWindow, hmsActions]);
 
@@ -245,9 +250,9 @@ export const DesktopOptions = ({
 
           {showPipChatOption && (
             <Dropdown.Item onClick={async () => await requestPipWindow(350, 500)} data-testid="brb_btn">
-              <ChatIcon />
+              <ExternalLinkIcon height={18} width={18} style={{ padding: '0 $2' }} />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
-                PIP Chat
+                Pop out Chat
               </Text>
             </Dropdown.Item>
           )}
