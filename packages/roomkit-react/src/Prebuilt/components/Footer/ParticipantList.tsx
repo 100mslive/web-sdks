@@ -194,7 +194,6 @@ export const Participant = ({
         <ParticipantActions
           peerId={peer.id}
           peerType={peer.type}
-          isLocal={peer.id === localPeerId}
           role={peer.roleName}
           isHandRaisedAccordion={isHandRaisedAccordion}
         />
@@ -273,12 +272,10 @@ const ParticipantActions = React.memo(
     peerId,
     peerType,
     role,
-    isLocal,
     isHandRaisedAccordion,
   }: {
     peerId: string;
     role: string;
-    isLocal: boolean;
     isHandRaisedAccordion?: boolean;
     peerType: HMSPeerType;
   }) => {
@@ -331,7 +328,7 @@ const ParticipantActions = React.memo(
               </Flex>
             ) : null}
 
-            {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
+            {shouldShowMoreActions ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
           </>
         )}
       </Flex>
@@ -372,6 +369,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
     isInStage,
     shouldShowStageRoleChange,
   } = usePeerOnStageActions({ peerId, role });
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const canChangeRole = !!useHMSStore(selectPermissions)?.changeRole;
   const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
   const roles = useHMSStore(selectAvailableRoleNames);
@@ -403,7 +401,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-            {shouldShowStageRoleChange ? (
+            {shouldShowStageRoleChange && localPeerId !== peerId ? (
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
                 <ChangeRoleIcon />
                 <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>

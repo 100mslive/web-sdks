@@ -281,6 +281,20 @@ export const TileMenuContent = ({
             </Text>
           </StyledMenuTile.ItemButton>
         )}
+        {canChangeRole && roles.length > 1 ? (
+          <StyledMenuTile.ItemButton
+            className={dragClassName}
+            css={spacingCSS}
+            onClick={() => {
+              openRoleChangeModal();
+              closeSheetOnClick();
+            }}
+            data-testid="change_role_btn"
+          >
+            <PersonSettingsIcon height={20} width={20} />
+            <span>Switch Role</span>
+          </StyledMenuTile.ItemButton>
+        ) : null}
       </>
     ) : null;
   }
