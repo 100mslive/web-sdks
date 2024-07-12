@@ -6,7 +6,7 @@ import { Text } from '../../../Text';
 import { TextArea } from '../../../TextArea';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
-import { AnnotisedMessage, MessageType } from '../Chat/ChatBody';
+import { AnnotisedMessage } from '../Chat/ChatBody';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { CHAT_MESSAGE_LIMIT, formatTime } from '../Chat/utils';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -68,11 +68,11 @@ export const PIPChat = () => {
                         </Text>
                       </Tooltip>
                     )}
-                    <MessageType
-                      hasCurrentUserSent={message.sender === localPeerID}
-                      receiver={message.recipientPeer}
-                      roles={message.recipientRoles}
-                    />
+                    {message.recipientRoles ? (
+                      <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                        (Group)
+                      </Text>
+                    ) : null}
                   </Flex>
 
                   <Text
