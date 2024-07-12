@@ -44,7 +44,7 @@ export const PIPChat = () => {
         ) : (
           filteredMessages.map(message => (
             <Box key={message.id} id={message.id} style={{ padding: '8px 0.75rem' }}>
-              <Flex align="center" justify="between" css={{ w: '100%' }}>
+              <Flex style={{ width: '100%', alignItems: 'center', justifyContent: 'between' }}>
                 <Text
                   style={{ display: 'flex', justifyContent: 'between', width: '100%', alignItems: 'center' }}
                   css={{
@@ -52,7 +52,7 @@ export const PIPChat = () => {
                     fontWeight: '$semiBold',
                   }}
                 >
-                  <Flex align="center" css={{ flexGrow: 1, gap: '$1' }}>
+                  <Flex style={{ flexGrow: 1, gap: '2px', alignItems: 'center' }}>
                     {message.senderName === 'You' || !message.senderName ? (
                       <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                         {message.senderName || 'Anonymous'}
