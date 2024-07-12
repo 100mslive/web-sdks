@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   selectHMSMessages,
   selectLocalPeerID,
@@ -22,6 +22,14 @@ export const PIPChat = () => {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const count = useHMSStore(selectUnreadHMSMessagesCount);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  const getSenderName = useCallback(
+    (senderName: string, senderID?: string) => {
+      const slicedName = senderName.length > 10 ? senderName.slice(0, 10) + '...' : senderName;
+      return slicedName + senderID === localPeerID ? ' (You)' : '';
+    },
+    [localPeerID],
+  );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -56,13 +64,13 @@ export const PIPChat = () => {
             id="new-message-notif"
             style={{
               position: 'fixed',
-              bottom: '80px',
+              bottom: '78px',
               right: '4px',
             }}
           >
             <Text
               variant="xs"
-              style={{ color: 'white', cursor: 'pointer', background: 'black', padding: '4px', borderRadius: '4px' }}
+              style={{ color: 'white', cursor: 'pointer', background: 'gray', padding: '4px', borderRadius: '4px' }}
             >
               {unreadMessageCount === 1 ? 'New message' : `${unreadMessageCount} new messages`}
             </Text>
@@ -95,11 +103,7 @@ export const PIPChat = () => {
                     ) : (
                       <Tooltip title={message.senderName} side="top" align="start">
                         <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                          {message.sender === localPeerID
-                            ? `You`
-                            : message.senderName.length > 10
-                            ? message.senderName.slice(0, 10) + '...'
-                            : message.senderName}
+                          {getSenderName(message.senderName, message?.sender)}
                         </Text>
                       </Tooltip>
                     )}
