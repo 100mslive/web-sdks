@@ -70,7 +70,7 @@ export const PIPChat = () => {
                     )}
                     {message.recipientRoles ? (
                       <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                        (Group)
+                        To {message.recipientRoles} (Group)
                       </Text>
                     ) : null}
                   </Flex>
