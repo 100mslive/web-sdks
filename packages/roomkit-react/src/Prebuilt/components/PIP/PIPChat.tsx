@@ -1,5 +1,11 @@
-import React, { useMemo } from 'react';
-import { selectHMSMessages, selectLocalPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectSessionStore,
+  selectUnreadHMSMessagesCount,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { SendIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -14,6 +20,16 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 export const PIPChat = () => {
   const messages = useHMSStore(selectHMSMessages);
   const localPeerID = useHMSStore(selectLocalPeerID);
+  const count = useHMSStore(selectUnreadHMSMessagesCount);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setUnreadMessageCount(count);
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, [count]);
+
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
   const filteredMessages = useMemo(() => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs || []);
@@ -35,6 +51,25 @@ export const PIPChat = () => {
           position: 'relative',
         }}
       >
+        {unreadMessageCount ? (
+          <Box
+            id="new-message-notif"
+            style={{
+              position: 'fixed',
+              bottom: '80px',
+              right: '4px',
+            }}
+          >
+            <Text
+              variant="xs"
+              style={{ color: 'white', cursor: 'pointer', background: 'black', padding: '4px', borderRadius: '4px' }}
+            >
+              {unreadMessageCount === 1 ? 'New message' : `${unreadMessageCount} new messages`}
+            </Text>
+          </Box>
+        ) : (
+          ''
+        )}
         {filteredMessages.length === 0 ? (
           <div
             style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}

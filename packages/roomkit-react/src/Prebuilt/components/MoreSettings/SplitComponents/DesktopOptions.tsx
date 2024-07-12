@@ -112,6 +112,9 @@ export const DesktopOptions = ({
             const newMessages = mutation.addedNodes;
             newMessages.forEach(message => {
               const messageId = (message as Element)?.id;
+              if (messageId === 'new-message-notif') {
+                message.addEventListener('click', () => setTimeout(() => marker?.scrollIntoView({ block: 'end' }), 0));
+              }
               const observer = new IntersectionObserver(
                 entries => {
                   if (entries[0].isIntersecting && messageId) {
