@@ -26,6 +26,7 @@ export type useFetchRoomLayoutProps = {
 export type useFetchRoomLayoutResponse = {
   layout: Layout | undefined;
   updateRoomLayoutForRole: (role: string) => void;
+  setOriginalLayout: () => void;
 };
 
 export const useFetchRoomLayout = ({
@@ -34,7 +35,11 @@ export const useFetchRoomLayout = ({
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
   const layoutResp = useRef<GetResponse>();
+  const originalLayout = useRef<Layout>();
   const isFetchInProgress = useRef(false);
+
+  const setOriginalLayout = useCallback(() => setLayout(originalLayout.current), []);
+
   const updateRoomLayoutForRole = useCallback((role: string) => {
     if (!layoutResp.current) {
       return;
@@ -71,10 +76,13 @@ export const useFetchRoomLayout = ({
         layoutForRole = defaultLayout;
       }
       const layout = layoutForRole;
+      if (!originalLayout.current) {
+        originalLayout.current = layout;
+      }
       setLayout(layout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);
 
-  return { layout, updateRoomLayoutForRole };
+  return { layout, updateRoomLayoutForRole, setOriginalLayout };
 };
