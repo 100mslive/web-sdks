@@ -54,12 +54,12 @@ export const PIPChat = () => {
                 >
                   <Flex style={{ flexGrow: 1, gap: '2px', alignItems: 'center' }}>
                     {message.senderName === 'You' || !message.senderName ? (
-                      <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                         {message.senderName || 'Anonymous'}
                       </Text>
                     ) : (
                       <Tooltip title={message.senderName} side="top" align="start">
-                        <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                           {message.sender === localPeerID
                             ? `You`
                             : message.senderName.length > 10
@@ -110,7 +110,7 @@ export const PIPChat = () => {
         <Box css={{ bg: '$surface_dim' }}>
           <Flex css={{ px: '$4', pb: '3px', gap: '$2', alignItems: 'center' }}>
             <Text variant="caption">To:</Text>
-            <Flex css={{ bg: '$primary_bright', color: '$on_primary_high' }}>
+            <Flex css={{ bg: '$primary_bright', color: '$on_primary_high', r: '$2' }}>
               <select
                 id="selector"
                 style={{
@@ -119,6 +119,7 @@ export const PIPChat = () => {
                   border: 'none',
                   outline: 'none',
                   borderRadius: '4px',
+                  padding: '0 2px',
                 }}
                 defaultValue={elements.chat?.public_chat_enabled ? 'Everyone' : elements.chat?.roles_whitelist?.[0]}
               >
@@ -141,6 +142,7 @@ export const PIPChat = () => {
               pl: '$4',
               boxSizing: 'border-box',
               gap: '$2',
+              r: '$2',
             }}
           >
             <TextArea
