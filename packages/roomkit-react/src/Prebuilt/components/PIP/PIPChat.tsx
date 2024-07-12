@@ -30,7 +30,8 @@ export const PIPChat = () => {
         css={{
           bg: '$surface_dim',
           overflowY: 'auto',
-          h: canSendChatMessages ? 'calc(500px - 78px)' : '500px',
+          // Subtracting height of footer
+          h: canSendChatMessages ? 'calc(100% - 70px)' : '100%',
           position: 'relative',
         }}
       >
@@ -42,16 +43,16 @@ export const PIPChat = () => {
           </div>
         ) : (
           filteredMessages.map(message => (
-            <Box key={message.id} id={message.id} style={{ padding: '8px' }}>
+            <Box key={message.id} id={message.id} style={{ padding: '8px 0.75rem' }}>
               <Flex align="center" css={{ w: '100%' }}>
                 <Text
-                  style={{ display: 'flex', alignItems: 'between', alignSelf: 'stretch', width: '100%' }}
+                  style={{ display: 'flex', justifyContent: 'between', width: '100%' }}
                   css={{
                     color: '$on_surface_high',
                     fontWeight: '$semiBold',
                   }}
                 >
-                  <Flex align="baseline">
+                  <Flex align="center" css={{ flexGrow: 1 }}>
                     {message.senderName === 'You' || !message.senderName ? (
                       <SenderName as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                         {message.senderName || 'Anonymous'}
@@ -79,10 +80,6 @@ export const PIPChat = () => {
                     css={{
                       color: '$on_surface_medium',
                       flexShrink: 0,
-                      position: 'absolute',
-                      right: 0,
-                      zIndex: 1,
-                      mr: '$4',
                       p: '$2',
                     }}
                   >
@@ -116,7 +113,7 @@ export const PIPChat = () => {
             minHeight: '$16',
             width: '100%',
             py: '$6',
-            pl: '$8',
+            pl: '$4',
             boxSizing: 'border-box',
             gap: '$2',
           }}
@@ -127,6 +124,7 @@ export const PIPChat = () => {
             css={{
               w: '100%',
               c: '$on_surface_high',
+              padding: '0.25rem !important',
             }}
             placeholder={message_placeholder}
             required
