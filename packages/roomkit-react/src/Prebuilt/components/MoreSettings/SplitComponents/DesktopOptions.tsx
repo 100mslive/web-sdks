@@ -85,7 +85,7 @@ export const DesktopOptions = ({
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
   const { isSupported, requestPipWindow, pipWindow, closePipWindow } = usePIPWindow();
   const sendFuncAdded = useRef<boolean>();
-  const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
+  const showPipChatOption = !!elements?.chat && isSupported;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -101,6 +101,7 @@ export const DesktopOptions = ({
   useEffect(() => {
     if (pipWindow) {
       const chatContainer = pipWindow.document.getElementById('chat-container');
+      const selector = pipWindow.document.getElementsByTagName('select')[0];
       const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
       const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
       const marker = pipWindow.document.getElementById('marker');
@@ -133,7 +134,12 @@ export const DesktopOptions = ({
       });
 
       const sendMessage = async () => {
-        await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
+        const selection = selector?.value || 'Everyone';
+        if (selection === 'Everyone') {
+          await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
+        } else {
+          await hmsActions.sendGroupMessage(pipChatInput.value.trim(), [selection]);
+        }
         pipChatInput.value = '';
         setTimeout(() => marker?.scrollIntoView({ block: 'end' }), 0);
       };
