@@ -69,7 +69,7 @@ export const PIPChat = () => {
                       </Tooltip>
                     )}
                     {message.recipientRoles ? (
-                      <Text as="span" variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                         to {message.recipientRoles} (Group)
                       </Text>
                     ) : null}
