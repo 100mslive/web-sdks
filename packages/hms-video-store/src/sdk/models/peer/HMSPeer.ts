@@ -35,6 +35,7 @@ export class HMSPeer implements IHMSPeer {
   groups?: string[];
   realtime?: boolean;
   type: HMSPeerType;
+  handRaisedAt = -1;
 
   constructor({
     peerId,
@@ -93,6 +94,11 @@ export class HMSPeer implements IHMSPeer {
 
   updateGroups(groups: string[]) {
     this.groups = groups;
+    if (groups.includes(HAND_RAISE_GROUP_NAME) && this.handRaisedAt === -1) {
+      this.handRaisedAt = Date.now();
+    } else if (!this.groups?.includes(HAND_RAISE_GROUP_NAME)) {
+      this.handRaisedAt = -1;
+    }
   }
 
   toString() {

@@ -99,6 +99,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{}',
         groups: [],
         isHandRaised: false,
+        handRaisedAt: -1,
         type: HMSPeerType.REGULAR,
       },
       '2': {
@@ -112,6 +113,7 @@ export const makeFakeStore = (): HMSStore => {
         metadata: '{"hello":"world"}',
         groups: [],
         isHandRaised: false,
+        handRaisedAt: -1,
         type: HMSPeerType.REGULAR,
       },
       '3': {
@@ -124,6 +126,7 @@ export const makeFakeStore = (): HMSStore => {
         auxiliaryTracks: [],
         groups: [],
         isHandRaised: false,
+        handRaisedAt: -1,
         type: HMSPeerType.REGULAR,
       },
     },
