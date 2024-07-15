@@ -28,7 +28,6 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
-
   return (
     <Fragment>
       <Dropdown.Root

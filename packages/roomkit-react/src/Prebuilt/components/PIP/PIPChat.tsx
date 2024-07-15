@@ -64,7 +64,7 @@ export const PIPChat = () => {
             id="new-message-notif"
             style={{
               position: 'fixed',
-              bottom: '78px',
+              bottom: '76px',
               right: '4px',
             }}
           >
