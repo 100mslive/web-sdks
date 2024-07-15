@@ -21,7 +21,6 @@ export const makeFakePeer = (): HMSPeer => {
     videoTrack: '',
     groups: [],
     isHandRaised: false,
-    handRaisedAt: -1,
     type: HMSPeerType.REGULAR,
   };
 };

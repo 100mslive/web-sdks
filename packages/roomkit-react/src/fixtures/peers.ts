@@ -11,7 +11,6 @@ export const makeFakeParticipant = (name: string, role = 'Student'): HMSPeerWith
       isLocal: counter === 1,
       groups: [],
       isHandRaised: false,
-      handRaisedAt: -1,
       type: HMSPeerType.REGULAR,
     },
     isAudioEnabled: false,

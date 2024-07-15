@@ -30,9 +30,10 @@ export const useMyMetadata = () => {
   const toggleHandRaise = useCallback(async () => {
     if (isHandRaised) {
       await hmsActions.lowerLocalPeerHand();
+      await update({ handRaisedAt: -1 });
     } else {
       await hmsActions.raiseLocalPeerHand();
-      await update({ isBRBOn: false });
+      await update({ isBRBOn: false, handRaisedAt: Date.now() });
     }
   }, [isHandRaised]); //eslint-disable-line
 

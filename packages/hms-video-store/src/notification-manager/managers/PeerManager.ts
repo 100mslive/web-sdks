@@ -159,7 +159,6 @@ export class PeerManager {
       hmsPeer = createRemotePeer(peer, this.store);
       hmsPeer.realtime = peer.realtime;
       hmsPeer.joinedAt = convertDateNumToDate(peer.joined_at);
-      hmsPeer.handRaisedAt = hmsPeer.isHandRaised ? Date.now() : -1;
       hmsPeer.fromRoomState = !!peer.is_from_room_state;
       this.store.addPeer(hmsPeer);
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);

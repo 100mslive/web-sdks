@@ -124,7 +124,15 @@ export const RoleAccordion = ({
           itemSize={ROW_HEIGHT}
           itemData={{
             peerList: isHandRaisedAccordion
-              ? peersInAccordion.sort((a, b) => a.handRaisedAt - b.handRaisedAt)
+              ? peersInAccordion.sort((a, b) => {
+                  try {
+                    const aHandRaisedAt = JSON.parse(a.metadata || '{}').handRaisedAt;
+                    const bHandRaisedAt = JSON.parse(b.metadata || '{}').handRaisedAt;
+                    return aHandRaisedAt - bHandRaisedAt;
+                  } catch (err) {
+                    return 0;
+                  }
+                })
               : peersInAccordion,
             isConnected,
             isHandRaisedAccordion,

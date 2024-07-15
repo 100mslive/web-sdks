@@ -43,11 +43,6 @@ export interface HMSPeer {
   joinedAt?: Date;
   groups?: HMSGroupName[];
   isHandRaised: boolean;
-  /*
-   * Note: This is not an accurate value of the handraise time, this is only the time relative to this peer when the remote peer hand raised
-   * For example, if the remote peer already has raised the hand, this will have a timestamp after you get the initial peerlist
-   */
-  handRaisedAt: number;
   type: HMSPeerType;
 }
 
