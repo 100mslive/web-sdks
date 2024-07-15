@@ -26,7 +26,7 @@ export const PIPChat = () => {
   const getSenderName = useCallback(
     (senderName: string, senderID?: string) => {
       const slicedName = senderName.length > 10 ? senderName.slice(0, 10) + '...' : senderName;
-      return slicedName + senderID === localPeerID ? ' (You)' : '';
+      return slicedName + (senderID === localPeerID ? ' (You)' : '');
     },
     [localPeerID],
   );
