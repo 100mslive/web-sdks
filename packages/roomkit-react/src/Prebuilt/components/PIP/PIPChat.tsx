@@ -87,7 +87,7 @@ export const PIPChat = () => {
           </div>
         ) : (
           filteredMessages.map(message => (
-            <Box key={message.id} id={message.id} style={{ padding: '8px 0.75rem' }}>
+            <Box className="pip-message" key={message.id} id={message.id} style={{ padding: '8px 0.75rem' }}>
               <Flex style={{ width: '100%', alignItems: 'center', justifyContent: 'between' }}>
                 <Text
                   style={{ display: 'flex', justifyContent: 'between', width: '100%', alignItems: 'center' }}
