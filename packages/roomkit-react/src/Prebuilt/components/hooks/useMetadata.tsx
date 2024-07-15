@@ -30,7 +30,7 @@ export const useMyMetadata = () => {
   const toggleHandRaise = useCallback(async () => {
     if (isHandRaised) {
       await hmsActions.lowerLocalPeerHand();
-      await update({ handRaisedAt: -1 });
+      await update({ handRaisedAt: undefined });
     } else {
       await hmsActions.raiseLocalPeerHand();
       await update({ isBRBOn: false, handRaisedAt: Date.now() });
