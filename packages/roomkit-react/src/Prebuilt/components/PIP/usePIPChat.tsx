@@ -50,7 +50,6 @@ export const usePIPChat = () => {
                   setTimeout(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' }), 0),
                 );
               }
-
               if (messageId) observer.observe(message as Element);
             });
           }
@@ -72,7 +71,14 @@ export const usePIPChat = () => {
       };
 
       if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
-        // remove on cleanup
+        const pipMessages = pipWindow.document.getElementsByClassName('pip-message');
+        // @ts-ignore
+        [...pipMessages].forEach(message => {
+          if (message.id) {
+            hmsActions.setMessageRead(true, message.id);
+          }
+        });
+
         sendBtn.addEventListener('click', sendMessage);
         pipChatInput.addEventListener('keypress', e => {
           if (e.key === 'Enter') sendMessage();
