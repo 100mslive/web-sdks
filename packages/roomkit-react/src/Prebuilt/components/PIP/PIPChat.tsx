@@ -185,6 +185,7 @@ export const PIPChat = () => {
             }}
           >
             <TextArea
+              id="chat-input"
               maxLength={CHAT_MESSAGE_LIMIT}
               style={{ border: 'none', resize: 'none' }}
               css={{
@@ -199,7 +200,7 @@ export const PIPChat = () => {
             />
 
             <IconButton
-              className="send-msg"
+              id="send-btn"
               css={{
                 ml: 'auto',
                 height: 'max-content',

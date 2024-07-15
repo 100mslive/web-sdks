@@ -101,9 +101,9 @@ export const DesktopOptions = ({
   useEffect(() => {
     if (pipWindow) {
       const chatContainer = pipWindow.document.getElementById('chat-container');
-      const selector = pipWindow.document.getElementsByTagName('select')[0];
-      const sendBtn = pipWindow.document.getElementsByClassName('send-msg')[0];
-      const pipChatInput = pipWindow.document.getElementsByTagName('textarea')[0];
+      const selector = pipWindow.document.getElementById('selector') as HTMLSelectElement;
+      const sendBtn = pipWindow.document.getElementById('send-btn');
+      const pipChatInput = pipWindow.document.getElementById('chat-input') as HTMLTextAreaElement;
       const marker = pipWindow.document.getElementById('marker');
 
       const mutationObserver = new MutationObserver(mutations => {
