@@ -70,7 +70,8 @@ export const PIPChat = () => {
           >
             <Text
               variant="xs"
-              style={{ color: 'white', cursor: 'pointer', background: 'gray', padding: '4px', borderRadius: '4px' }}
+              css={{ cursor: 'pointer' }}
+              style={{ color: 'white', background: 'gray', padding: '4px', borderRadius: '4px' }}
             >
               {unreadMessageCount === 1 ? 'New message' : `${unreadMessageCount} new messages`}
             </Text>
@@ -110,6 +111,11 @@ export const PIPChat = () => {
                     {message.recipientRoles ? (
                       <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
                         to {message.recipientRoles} (Group)
+                      </Text>
+                    ) : null}
+                    {message.recipientPeer ? (
+                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                        (DM)
                       </Text>
                     ) : null}
                   </Flex>

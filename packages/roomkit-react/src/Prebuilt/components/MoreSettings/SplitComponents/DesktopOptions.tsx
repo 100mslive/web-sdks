@@ -113,7 +113,9 @@ export const DesktopOptions = ({
             newMessages.forEach(message => {
               const messageId = (message as Element)?.id;
               if (messageId === 'new-message-notif') {
-                message.addEventListener('click', () => setTimeout(() => marker?.scrollIntoView({ block: 'end' }), 0));
+                message.addEventListener('click', () =>
+                  requestAnimationFrame(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' })),
+                );
               }
               const observer = new IntersectionObserver(
                 entries => {
@@ -144,7 +146,7 @@ export const DesktopOptions = ({
           await hmsActions.sendGroupMessage(pipChatInput.value.trim(), [selection]);
         }
         pipChatInput.value = '';
-        setTimeout(() => marker?.scrollIntoView({ block: 'end' }), 0);
+        requestAnimationFrame(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' }));
       };
 
       if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
