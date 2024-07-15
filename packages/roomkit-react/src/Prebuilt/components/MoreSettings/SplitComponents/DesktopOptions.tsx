@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   ConferencingScreen,
@@ -25,7 +25,7 @@ import {
   PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, getCssText, Switch, Text, Tooltip } from '../../../..';
+import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -50,7 +50,8 @@ import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { usePIPWindow } from '../../PIP/usePIPWindow';
+// @ts-ignore: No implicit any
+import { usePIPChat } from '../../PIP/usePIPChat';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS } from '../../../common/constants';
 
@@ -83,90 +84,10 @@ export const DesktopOptions = ({
   const isBRBEnabled = !!elements?.brb;
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
-  const { isSupported, requestPipWindow, pipWindow, closePipWindow } = usePIPWindow();
-  const sendFuncAdded = useRef<boolean>();
+  const { isSupported, pipWindow, requestPipWindow } = usePIPChat();
   const showPipChatOption = !!elements?.chat && isSupported;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
-
-  useEffect(() => {
-    if (document && pipWindow) {
-      const style = document.createElement('style');
-      style.id = 'stitches';
-      style.textContent = getCssText();
-      pipWindow.document.head.appendChild(style);
-    }
-  }, [pipWindow]);
-
-  useEffect(() => {
-    if (pipWindow) {
-      const chatContainer = pipWindow.document.getElementById('chat-container');
-      const selector = pipWindow.document.getElementById('selector') as HTMLSelectElement;
-      const sendBtn = pipWindow.document.getElementById('send-btn');
-      const pipChatInput = pipWindow.document.getElementById('chat-input') as HTMLTextAreaElement;
-      const marker = pipWindow.document.getElementById('marker');
-
-      const mutationObserver = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-          if (mutation.addedNodes.length > 0) {
-            const newMessages = mutation.addedNodes;
-            newMessages.forEach(message => {
-              const messageId = (message as Element)?.id;
-              if (messageId === 'new-message-notif') {
-                message.addEventListener('click', () =>
-                  requestAnimationFrame(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' })),
-                );
-              }
-              const observer = new IntersectionObserver(
-                entries => {
-                  if (entries[0].isIntersecting && messageId) {
-                    hmsActions.setMessageRead(true, messageId);
-                    // Your logic to mark the message as read goes here
-                  }
-                },
-                {
-                  root: chatContainer,
-                  threshold: 1.0,
-                },
-              );
-              if (messageId) observer.observe(message as Element);
-            });
-          }
-        });
-      });
-      mutationObserver.observe(chatContainer as Node, {
-        childList: true,
-      });
-
-      const sendMessage = async () => {
-        const selection = selector?.value || 'Everyone';
-        if (selection === 'Everyone') {
-          await hmsActions.sendBroadcastMessage(pipChatInput.value.trim());
-        } else {
-          await hmsActions.sendGroupMessage(pipChatInput.value.trim(), [selection]);
-        }
-        pipChatInput.value = '';
-        requestAnimationFrame(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' }));
-      };
-
-      if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
-        // remove on cleanup
-        sendBtn.addEventListener('click', sendMessage);
-        pipChatInput.addEventListener('keypress', e => {
-          if (e.key === 'Enter') sendMessage();
-        });
-        sendFuncAdded.current = true;
-      }
-    } else {
-      sendFuncAdded.current = false;
-    }
-  }, [pipWindow, hmsActions]);
-
-  useEffect(() => {
-    return () => {
-      pipWindow && closePipWindow();
-    };
-  }, [closePipWindow, pipWindow]);
 
   const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
