@@ -72,10 +72,8 @@ export class SessionStore<T> {
       }
     });
 
-    count = await this.getKeysCount();
-    if (!count) {
-      handleOpen([]);
-    }
+    count = await this.getKeysCountWithDelay();
+    handleOpen(count ? initialValues : []);
 
     return () => {
       abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
@@ -113,5 +111,21 @@ export class SessionStore<T> {
 
   delete(key: string) {
     return this.storeClient.delete({ key });
+  }
+
+  private async getKeysCountWithDelay() {
+    const MAX_RETRIES = 3;
+    const DELAY = 200;
+    for (let i = 0; i < MAX_RETRIES; i++) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, DELAY));
+        return await this.getKeysCount();
+      } catch (error) {
+        console.log(error);
+        if ((error as unknown as Error).message !== 'peer not found' || i === MAX_RETRIES - 1) {
+          throw error;
+        }
+      }
+    }
   }
 }
