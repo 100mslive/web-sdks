@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { getCssText } from '../../../Theme';
 import { usePIPWindow } from './usePIPWindow';
@@ -6,7 +6,6 @@ import { usePIPWindow } from './usePIPWindow';
 export const usePIPChat = () => {
   const hmsActions = useHMSActions();
   const { isSupported, requestPipWindow, pipWindow, closePipWindow } = usePIPWindow();
-  const sendFuncAdded = useRef<boolean>();
 
   useEffect(() => {
     if (document && pipWindow) {
@@ -17,6 +16,7 @@ export const usePIPChat = () => {
     }
   }, [pipWindow]);
 
+  // @ts-ignore
   useEffect(() => {
     if (pipWindow) {
       const chatContainer = pipWindow.document.getElementById('chat-container');
@@ -70,7 +70,7 @@ export const usePIPChat = () => {
         setTimeout(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' }), 0);
       };
 
-      if (sendBtn && hmsActions && pipChatInput && !sendFuncAdded.current) {
+      if (sendBtn && hmsActions && pipChatInput) {
         const pipMessages = pipWindow.document.getElementsByClassName('pip-message');
         // @ts-ignore
         [...pipMessages].forEach(message => {
@@ -78,15 +78,19 @@ export const usePIPChat = () => {
             hmsActions.setMessageRead(true, message.id);
           }
         });
-
-        sendBtn.addEventListener('click', sendMessage);
-        pipChatInput.addEventListener('keypress', e => {
+        // @ts-ignore
+        const sendOnEnter = e => {
           if (e.key === 'Enter') sendMessage();
-        });
-        sendFuncAdded.current = true;
+        };
+        sendBtn.addEventListener('click', sendMessage);
+        pipChatInput.addEventListener('keypress', sendOnEnter);
+        return () => {
+          sendBtn.removeEventListener('click', sendMessage);
+          pipChatInput.removeEventListener('keypress', sendOnEnter);
+          mutationObserver.disconnect();
+          observer.disconnect();
+        };
       }
-    } else {
-      sendFuncAdded.current = false;
     }
   }, [pipWindow, hmsActions]);
 
