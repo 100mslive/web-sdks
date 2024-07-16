@@ -28,8 +28,11 @@ import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
+import { PIPChat } from '../../PIP/PIPChat';
 // @ts-ignore: No implicit any
+import { PIPChatOption } from '../../PIP/PIPChatOption';
 import { PictureInPicture } from '../../PIP/PIPManager';
+import { PIPWindow } from '../../PIP/PIPWindow';
 // @ts-ignore: No implicit any
 import { RoleChangeModal } from '../../RoleChangeModal';
 // @ts-ignore: No implicit any
@@ -47,6 +50,8 @@ import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
+// @ts-ignore: No implicit any
+import { usePIPChat } from '../../PIP/usePIPChat';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS } from '../../../common/constants';
 
@@ -79,6 +84,8 @@ export const DesktopOptions = ({
   const isBRBEnabled = !!elements?.brb;
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const { isSupported, pipWindow, requestPipWindow } = usePIPChat();
+  const showPipChatOption = !!elements?.chat && isSupported;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -98,6 +105,11 @@ export const DesktopOptions = ({
 
   return (
     <Fragment>
+      {isSupported && pipWindow ? (
+        <PIPWindow pipWindow={pipWindow}>
+          <PIPChat />
+        </PIPWindow>
+      ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
@@ -168,13 +180,9 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
+          <PIPChatOption showPIPChat={showPipChatOption} openChat={async () => await requestPipWindow(350, 500)} />
           <FullScreenItem />
-          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )} */}
-
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
-
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>

@@ -55,12 +55,23 @@ export function useCollaboration({
     status: 'loading',
   });
 
-  const handleError = useCallback((error: Error) => {
-    setStoreWithStatus({
-      status: 'error',
-      error,
-    });
-  }, []);
+  const handleError = useCallback(
+    (error: Error, isTerminal?: boolean) => {
+      setStoreWithStatus(
+        isTerminal
+          ? {
+              error,
+              status: 'error',
+            }
+          : {
+              store,
+              status: 'synced-remote',
+              connectionStatus: 'offline',
+            },
+      );
+    },
+    [store],
+  );
 
   const sessionStore = useSessionStore({ token, endpoint, handleError });
   const permissions = useSetEditorPermissions({ token, editor, zoomToContent, handleError });
@@ -78,7 +89,7 @@ export function useCollaboration({
       );
       if (shouldUseServerRecords) {
         // Replace the tldraw store records with session store
-        transact(() => {
+        store.mergeRemoteChanges(() => {
           // The records here should be compatible with what's in the store
           store.clear();
           store.put(initialRecords);
