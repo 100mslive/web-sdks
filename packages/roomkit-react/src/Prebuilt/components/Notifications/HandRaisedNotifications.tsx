@@ -48,7 +48,7 @@ export const HandRaisedNotifications = () => {
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
     }
-  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, amIScreenSharing]);
+  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore]);
 
   useDebounce(
     () => {
@@ -73,7 +73,7 @@ export const HandRaisedNotifications = () => {
       }
     },
     1000,
-    [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL],
+    [isSubscribing, notification, roomState, vanillaStore, amIScreenSharing],
   );
   return null;
 };
