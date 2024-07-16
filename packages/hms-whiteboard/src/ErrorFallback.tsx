@@ -102,6 +102,7 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
         // isDarkMode === null ? '' : isDarkMode ? 'tl-theme__dark' : 'tl-theme__light',
         'tl-theme__light',
       )}
+      style={{ position: 'static' }}
     >
       <div className="tl-error-boundary__overlay" />
       {/* {editor && (
