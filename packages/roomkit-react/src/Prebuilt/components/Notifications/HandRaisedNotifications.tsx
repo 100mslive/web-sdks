@@ -68,7 +68,6 @@ export const HandRaisedNotifications = () => {
         const title = `${peer?.name} ${
           handRaisedPeers.length > 1 ? `and ${handRaisedPeers.length - 1} others` : ''
         } raised hand`;
-        console.log(title);
         showNotification(title, { icon: logoURL });
       }
     },
