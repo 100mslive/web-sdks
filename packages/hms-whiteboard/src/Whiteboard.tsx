@@ -40,6 +40,10 @@ function CollaborativeEditor({
     onMount?.({ store: store.store, editor });
   };
 
+  if (store.status === 'synced-remote' && store.connectionStatus === 'offline') {
+    return <ErrorFallback error={Error('Network connection lost')} editor={editor} refresh={refresh} />;
+  }
+
   return (
     <Tldraw
       className={transparentCanvas ? 'transparent-canvas' : ''}
