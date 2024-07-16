@@ -49,8 +49,7 @@ export const usePIPChat = () => {
                 message.addEventListener('click', () =>
                   setTimeout(() => marker?.scrollIntoView({ block: 'end', behavior: 'smooth' }), 0),
                 );
-              }
-              if (messageId) observer.observe(message as Element);
+              } else if (messageId) observer.observe(message as Element);
             });
           }
         });
