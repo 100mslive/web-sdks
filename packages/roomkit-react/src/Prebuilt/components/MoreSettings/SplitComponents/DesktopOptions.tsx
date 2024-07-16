@@ -18,7 +18,6 @@ import {
 import {
   BrbIcon,
   CheckIcon,
-  ExternalLinkIcon,
   HamburgerMenuIcon,
   InfoIcon,
   OpenCaptionIcon,
@@ -31,6 +30,7 @@ import IconButton from '../../../IconButton';
 import { PIP } from '../../PIP';
 import { PIPChat } from '../../PIP/PIPChat';
 // @ts-ignore: No implicit any
+import { PIPChatOption } from '../../PIP/PIPChatOption';
 import { PictureInPicture } from '../../PIP/PIPManager';
 import { PIPWindow } from '../../PIP/PIPWindow';
 // @ts-ignore: No implicit any
@@ -180,19 +180,9 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
-          {showPipChatOption && (
-            <Dropdown.Item onClick={async () => await requestPipWindow(350, 500)} data-testid="brb_btn">
-              <ExternalLinkIcon height={18} width={18} style={{ padding: '0 $2' }} />
-              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
-                Pop out Chat
-              </Text>
-            </Dropdown.Item>
-          )}
-
+          <PIPChatOption showPIPChat={showPipChatOption} openChat={async () => await requestPipWindow(350, 500)} />
           <FullScreenItem />
-
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
-
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
