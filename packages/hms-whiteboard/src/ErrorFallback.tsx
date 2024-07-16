@@ -1,16 +1,17 @@
 import React, { ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useValue } from '@tldraw/state';
-import { Editor, hardResetEditor, refreshPage } from '@tldraw/tldraw';
+import { Editor, hardResetEditor } from '@tldraw/tldraw';
 import classNames from 'classnames';
 
 const DISCORD_URL = 'https://discord.gg/pTge2BwDBq';
 
 export type TLErrorFallbackComponent = ComponentType<{
   error: unknown;
+  refresh: () => void;
   editor?: Editor;
 }>;
 
-export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
+export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldShowError, setShouldShowError] = useState(process.env.NODE_ENV !== 'production');
   const [didCopy, setDidCopy] = useState(false);
@@ -81,10 +82,6 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
     setDidCopy(true);
   };
 
-  const refresh = () => {
-    refreshPage();
-  };
-
   const resetLocalState = async () => {
     hardResetEditor();
   };
@@ -152,11 +149,8 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
                 {shouldShowError ? 'Hide details' : 'Show details'}
               </button>
               <div className="tl-error-boundary__content__actions__group">
-                <button className="tl-error-boundary__reset" onClick={() => setShouldShowResetConfirmation(true)}>
-                  Reset data
-                </button>
                 <button className="tl-error-boundary__refresh" onClick={refresh}>
-                  Refresh Page
+                  Refresh
                 </button>
               </div>
             </div>
