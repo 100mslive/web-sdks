@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'react-use';
 import {
   HMSNotificationTypes,
+  HMSPeerNotification,
   HMSRoomState,
   selectHasPeerHandRaised,
   selectIsLocalScreenShared,
@@ -28,6 +30,7 @@ export const HandRaisedNotifications = () => {
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const { showNotification } = useAwayNotifications();
   const logoURL = useRoomLayout()?.logo?.url;
+  const [pendingNotifications, setPendingNotifications] = useState<HMSPeerNotification[]>([]);
 
   useEffect(() => {
     if (!notification?.data) {
@@ -38,20 +41,44 @@ export const HandRaisedNotifications = () => {
     if (roomState !== HMSRoomState.Connected || notification.data.isLocal || !isSubscribing) {
       return;
     }
+
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
     const peer = vanillaStore.getState(selectPeerByID(notification.data.id));
     if (hasPeerHandRaised) {
       const showCTA = peer?.roleName && (on_stage_exp?.off_stage_roles || [])?.includes(peer.roleName);
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
-
       if (amIScreenSharing) {
-        showNotification(`${peer?.name} raised hand`, {
-          icon: logoURL,
-        });
+        setPendingNotifications(pending => [...pending, notification]);
       }
     }
-  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL, amIScreenSharing]);
+  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, amIScreenSharing]);
 
+  useDebounce(
+    () => {
+      if (!notification?.data) {
+        return;
+      }
+
+      // Don't show toast message in case of local peer.
+      if (roomState !== HMSRoomState.Connected || notification.data.isLocal || !isSubscribing) {
+        return;
+      }
+
+      const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
+      const peer = vanillaStore.getState(selectPeerByID(notification.data.id));
+
+      if (amIScreenSharing && hasPeerHandRaised) {
+        const title = `${peer?.name} ${
+          pendingNotifications.length > 1 ? `and ${pendingNotifications.length - 1} others` : ''
+        } raised hand`;
+        console.log(title);
+        showNotification(title, { icon: logoURL });
+        setPendingNotifications([]);
+      }
+    },
+    1000,
+    [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, showNotification, logoURL],
+  );
   return null;
 };
