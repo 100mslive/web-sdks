@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDebounce } from 'react-use';
 import {
   HMSNotificationTypes,
-  HMSPeerNotification,
   HMSRoomState,
+  selectHandRaisedPeers,
   selectHasPeerHandRaised,
   selectIsLocalScreenShared,
   selectPeerByID,
@@ -30,7 +30,6 @@ export const HandRaisedNotifications = () => {
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const { showNotification } = useAwayNotifications();
   const logoURL = useRoomLayout()?.logo?.url;
-  const [pendingNotifications, setPendingNotifications] = useState<HMSPeerNotification[]>([]);
 
   useEffect(() => {
     if (!notification?.data) {
@@ -48,9 +47,6 @@ export const HandRaisedNotifications = () => {
       const showCTA = peer?.roleName && (on_stage_exp?.off_stage_roles || [])?.includes(peer.roleName);
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
-      if (amIScreenSharing) {
-        setPendingNotifications(pending => [...pending, notification]);
-      }
     }
   }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore, amIScreenSharing]);
 
@@ -67,14 +63,13 @@ export const HandRaisedNotifications = () => {
 
       const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
       const peer = vanillaStore.getState(selectPeerByID(notification.data.id));
-
+      const handRaisedPeers = vanillaStore.getState(selectHandRaisedPeers);
       if (amIScreenSharing && hasPeerHandRaised) {
         const title = `${peer?.name} ${
-          pendingNotifications.length > 1 ? `and ${pendingNotifications.length - 1} others` : ''
+          handRaisedPeers.length > 1 ? `and ${handRaisedPeers.length - 1} others` : ''
         } raised hand`;
         console.log(title);
         showNotification(title, { icon: logoURL });
-        setPendingNotifications([]);
       }
     },
     1000,
