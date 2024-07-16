@@ -109,6 +109,9 @@ const useNoiseCancellationWithPlugin = () => {
     if (inProgress) {
       return;
     }
+    if (!krispPlugin.checkSupport().isSupported) {
+      throw Error('Krisp plugin is not supported');
+    }
     setInProgress(true);
     if (enabled) {
       await actions.addPluginToAudioTrack(krispPlugin);
@@ -281,13 +284,17 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   useEffect(() => {
     (async () => {
       if (isNoiseCancellationEnabled && !isKrispPluginAdded && !inProgress && localPeer?.audioTrack) {
-        await setNoiseCancellationWithPlugin(true);
-        ToastManager.addToast({
-          title: `Noise Reduction Enabled`,
-          variant: 'standard',
-          duration: 2000,
-          icon: <AudioLevelIcon />,
-        });
+        try {
+          await setNoiseCancellationWithPlugin(true);
+          ToastManager.addToast({
+            title: `Noise Reduction Enabled`,
+            variant: 'standard',
+            duration: 2000,
+            icon: <AudioLevelIcon />,
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
