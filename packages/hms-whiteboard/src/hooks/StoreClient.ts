@@ -72,8 +72,13 @@ export class SessionStore<T> {
       }
     });
 
-    count = await this.getKeysCountWithDelay();
-    handleOpen(count ? initialValues : []);
+    try {
+      count = await this.getKeysCountWithDelay();
+      handleOpen(count ? initialValues : []);
+    } catch (error) {
+      const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
+      handleError(error as unknown as Error, canRecover);
+    }
 
     return () => {
       abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
@@ -121,7 +126,7 @@ export class SessionStore<T> {
         await new Promise(resolve => setTimeout(resolve, DELAY));
         return await this.getKeysCount();
       } catch (error) {
-        console.log(error);
+        console.warn(error);
         if ((error as unknown as Error).message !== 'peer not found' || i === MAX_RETRIES - 1) {
           throw error;
         }
