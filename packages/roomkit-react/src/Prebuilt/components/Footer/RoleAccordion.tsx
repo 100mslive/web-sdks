@@ -122,7 +122,21 @@ export const RoleAccordion = ({
       <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
         <FixedSizeList
           itemSize={ROW_HEIGHT}
-          itemData={{ peerList: peersInAccordion, isConnected, isHandRaisedAccordion }}
+          itemData={{
+            peerList: isHandRaisedAccordion
+              ? peersInAccordion.sort((a, b) => {
+                  try {
+                    const aHandRaisedAt = JSON.parse(a.metadata || '{}').handRaisedAt;
+                    const bHandRaisedAt = JSON.parse(b.metadata || '{}').handRaisedAt;
+                    return aHandRaisedAt - bHandRaisedAt;
+                  } catch (err) {
+                    return 0;
+                  }
+                })
+              : peersInAccordion,
+            isConnected,
+            isHandRaisedAccordion,
+          }}
           itemKey={itemKey}
           itemCount={peersInAccordion.length}
           width={width}
