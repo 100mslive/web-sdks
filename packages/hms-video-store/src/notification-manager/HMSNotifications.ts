@@ -393,3 +393,9 @@ export interface WhiteboardInfo {
   state?: string;
   attributes?: Array<{ name: string; value: unknown }>;
 }
+
+export interface NodeInfo {
+  params: {
+    sfu_node_id: string;
+  };
+}

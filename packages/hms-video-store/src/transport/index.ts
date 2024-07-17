@@ -80,6 +80,7 @@ export default class HMSTransport {
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
+  private sfuNodeId?: string;
   joinRetryCount = 0;
 
   constructor(
@@ -220,6 +221,7 @@ export default class HMSTransport {
 
   private publishConnectionObserver: IPublishConnectionObserver = {
     onRenegotiationNeeded: async () => {
+      console.log('publish', 'onrenegotiationNeeded');
       await this.performPublishRenegotiation();
     },
 
@@ -533,8 +535,7 @@ export default class HMSTransport {
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();
       this.webrtcInternals?.cleanup();
-      await this.publishConnection?.close();
-      await this.subscribeConnection?.close();
+      this.clearPeerConnections();
       if (notifyServer) {
         try {
           this.signal.leave();
@@ -585,22 +586,26 @@ export default class HMSTransport {
     }
   }
 
-  async perfomManualRenegotiation(): Promise<void> {
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.RESTART_ICE,
-        extra: {},
-      });
-    });
-    console.log('Switching SFU ');
-    await this.performPublishRenegotiation({ iceRestart: true });
-    await p;
-  }
-
   async unpublish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
       await this.unpublishTrack(track);
+    }
+  }
+
+  setSFUNodeId(id: string) {
+    this.sfuNodeId = id;
+  }
+
+  async handleSFUMigration() {
+    const localPeerTracks = this.store.getLocalPeerTracks();
+    for (const track of localPeerTracks) {
+      await this.unpublishTrack(track, true);
+    }
+    this.clearPeerConnections();
+    this.createPeerConnections();
+    await this.negotiateOnFirstPublish();
+    for (const track of localPeerTracks) {
+      this.publishTrack(track);
     }
   }
 
@@ -666,7 +671,7 @@ export default class HMSTransport {
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
-  private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
+  private async unpublishTrack(track: HMSLocalTrack, sfuMigration = false): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
@@ -692,10 +697,22 @@ export default class HMSTransport {
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
     await p;
-    await track.cleanup();
-    // remove track from store on unpublish
-    this.store.removeTrack(track);
+    if (!sfuMigration) {
+      await track.cleanup();
+      // remove track from store on unpublish
+      this.store.removeTrack(track);
+    }
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+  }
+
+  private async clearPeerConnections() {
+    clearTimeout(this.publishDtlsStateTimer);
+    this.publishDtlsStateTimer = 0;
+    this.lastPublishDtlsState = 'new';
+    this.publishConnection?.close();
+    this.subscribeConnection?.close();
+    this.publishConnection = null;
+    this.subscribeConnection = null;
   }
 
   private waitForLocalRoleAvailability() {
@@ -829,6 +846,7 @@ export default class HMSTransport {
       onDemandTracks,
       offer,
     );
+    this.sfuNodeId = answer.sfu_node_id;
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -851,6 +869,7 @@ export default class HMSTransport {
       simulcast,
       onDemandTracks,
     );
+    this.sfuNodeId = response.sfu_node_id;
     return !!response;
   }
 
@@ -865,7 +884,7 @@ export default class HMSTransport {
     }
     const offer = await this.publishConnection.createOffer(this.trackStates);
     await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.offer(offer, this.trackStates);
+    const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -891,7 +910,7 @@ export default class HMSTransport {
       const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
       await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
-      const answer = await this.signal.offer(offer, this.trackStates);
+      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       await this.publishConnection.setRemoteDescription(answer);

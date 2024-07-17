@@ -14,6 +14,7 @@ import { WhiteboardManager } from './managers/WhiteboardManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
+  NodeInfo,
   OnTrackLayerUpdateNotification,
   PolicyParams,
   SpeakerList,
@@ -165,15 +166,16 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
-        console.log('xyzz');
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
       case HMSNotificationMethod.ON_PEER_SFU_MIGRATE:
-        this.transport.perfomManualRenegotiation().catch(error => {
-          console.error('Error during manual renegotiation:', error);
-        });
-        break;  
+        this.transport.handleSFUMigration();
+        break;
+
+      case HMSNotificationMethod.NODE_INFO:
+        this.transport.setSFUNodeId((notification as NodeInfo).params.sfu_node_id);
+        break;
 
       default:
         break;
