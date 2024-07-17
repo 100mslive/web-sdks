@@ -733,6 +733,16 @@ export default class HMSTransport {
         this.isFlagEnabled.bind(this),
         this.subscribeConnectionObserver,
       );
+
+      const timer = setTimeout(() => {
+        if (this.initConfig && !this.subscribeConnection?.selectedCandidatePair) {
+          this.subscribeConnection?.setConfiguration({
+            ...this.initConfig.rtcConfiguration,
+            iceTransportPolicy: 'relay',
+          });
+        }
+        clearTimeout(timer);
+      }, SUBSCRIBE_TIMEOUT);
     }
   }
 
@@ -1111,16 +1121,7 @@ export default class HMSTransport {
         setTimeout(() => resolve(false), SUBSCRIBE_TIMEOUT);
       });
 
-      return Promise.race([p, timeout]).then(value => {
-        // value is false if the timeout got resolved before the subscribe connection
-        if (!value && this.initConfig) {
-          this.subscribeConnection?.setConfiguration({
-            ...this.initConfig.rtcConfiguration,
-            iceTransportPolicy: 'relay',
-          });
-        }
-        return value;
-      }) as Promise<boolean>;
+      return Promise.race([p, timeout]) as Promise<boolean>;
     }
 
     return true;
