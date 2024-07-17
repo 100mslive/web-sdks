@@ -6,6 +6,7 @@ import {
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
+  useAwayNotifications,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -50,6 +51,7 @@ export const ConferenceScreen = () => {
   const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const { requestPermission } = useAwayNotifications();
 
   // using it in hls stream to show action button when chat is disabled
   const showChat = !!screenProps.elements?.chat;
@@ -99,10 +101,20 @@ export const ConferenceScreen = () => {
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
+        .then(() => requestPermission())
         .catch(console.error);
       autoRoomJoined.current = true;
     }
-  }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
+  }, [
+    authTokenInAppData,
+    endpoints?.init,
+    hmsActions,
+    isConnectedToRoom,
+    isPreviewScreenEnabled,
+    roomState,
+    userName,
+    requestPermission,
+  ]);
 
   useEffect(() => {
     onJoinFunc?.();
