@@ -369,7 +369,6 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
     isInStage,
     shouldShowStageRoleChange,
   } = usePeerOnStageActions({ peerId, role });
-  const localPeerId = useHMSStore(selectLocalPeerID);
   const canChangeRole = !!useHMSStore(selectPermissions)?.changeRole;
   const [openRoleChangeModal, setOpenRoleChangeModal] = useState(false);
   const roles = useHMSStore(selectAvailableRoleNames);
@@ -401,7 +400,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-            {shouldShowStageRoleChange && localPeerId !== peerId ? (
+            {shouldShowStageRoleChange ? (
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
                 <ChangeRoleIcon />
                 <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
