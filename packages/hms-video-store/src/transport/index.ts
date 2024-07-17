@@ -625,40 +625,32 @@ export default class HMSTransport {
         action: HMSAction.PUBLISH,
         extra: {},
       });
-    }).catch(err => {
-      if (err instanceof HMSException && err.code === 1003) {
-        throw err;
-      }
     });
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    try {
-      await p;
-      HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
-      // add track to store after publish
-      this.store.addTrack(track);
+    await p;
+    HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
+    // add track to store after publish
+    this.store.addTrack(track);
 
-      await stream
-        .setMaxBitrateAndFramerate(track)
-        .then(() => {
-          HMSLogger.d(
-            TAG,
-            `Setting maxBitrate=${track.settings.maxBitrate} kpbs${
-              track instanceof HMSLocalVideoTrack ? ` and maxFramerate=${track.settings.maxFramerate}` : ''
-            } for ${track.source} ${track.type} ${track.trackId}`,
-          );
-        })
-        .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
+    await stream
+      .setMaxBitrateAndFramerate(track)
+      .then(() => {
+        HMSLogger.d(
+          TAG,
+          `Setting maxBitrate=${track.settings.maxBitrate} kpbs${
+            track instanceof HMSLocalVideoTrack ? ` and maxFramerate=${track.settings.maxFramerate}` : ''
+          } for ${track.source} ${track.type} ${track.trackId}`,
+        );
+      })
+      .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
-      track.isPublished = true;
+    track.isPublished = true;
 
-      HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
-    } catch (err) {
-      HMSLogger.e(TAG, 'Failed publishing track, will be retried', err);
-    }
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
@@ -683,22 +675,14 @@ export default class HMSTransport {
         action: HMSAction.UNPUBLISH,
         extra: {},
       });
-    }).catch(err => {
-      if (err instanceof HMSException && err.code === 1003) {
-        // do nothing, it will be resolved when network connected
-      }
     });
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
-    try {
-      await p;
-      await track.cleanup();
-      // remove track from store on unpublish
-      this.store.removeTrack(track);
-      HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
-    } catch (ex) {
-      HMSLogger.e(TAG, `Failed unpublishingTrack:  trackId=${track.trackId}, will be retried`, ex);
-    }
+    await p;
+    await track.cleanup();
+    // remove track from store on unpublish
+    this.store.removeTrack(track);
+    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
   private waitForLocalRoleAvailability() {
@@ -908,6 +892,7 @@ export default class HMSTransport {
       } else {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
+
       callback!.promise.reject(ex);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
@@ -1160,6 +1145,7 @@ export default class HMSTransport {
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
+
     return ok;
   };
 
