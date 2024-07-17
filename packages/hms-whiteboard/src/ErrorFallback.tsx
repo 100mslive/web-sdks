@@ -25,7 +25,7 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
     () => {
       try {
         if (editor) {
-          return editor.user.isDarkMode;
+          return editor.user.getIsDarkMode();
         }
       } catch {
         // we're in a funky error state so this might not work for spooky
@@ -35,7 +35,11 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
     },
     [editor],
   );
-  const [isDarkMode, setIsDarkMode] = useState<null | boolean>(null);
+  const [
+    ,
+    // isDarkMode
+    setIsDarkMode,
+  ] = useState<null | boolean>(null);
   useLayoutEffect(() => {
     // if we found a theme class from the app, we can just use that
     if (isDarkModeFromApp !== null) {
@@ -94,8 +98,11 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
         // error-boundary is sometimes used outside of the theme
         // container, so we need to provide it with a theme for our
         // styles to work correctly
-        isDarkMode === null ? '' : isDarkMode ? 'tl-theme__dark' : 'tl-theme__light',
+        // 100ms: default light theme
+        // isDarkMode === null ? '' : isDarkMode ? 'tl-theme__dark' : 'tl-theme__light',
+        'tl-theme__light',
       )}
+      style={{ position: 'static' }}
     >
       <div className="tl-error-boundary__overlay" />
       {/* {editor && (
