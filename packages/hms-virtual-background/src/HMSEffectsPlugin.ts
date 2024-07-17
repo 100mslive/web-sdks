@@ -7,7 +7,7 @@ export type HMSEffectsBackground = string | MediaStream | MediaStreamTrack | HTM
 
 export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
-  // Ranges from 0 to 1
+  // Ranges from 0 to 1, inclusive
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
