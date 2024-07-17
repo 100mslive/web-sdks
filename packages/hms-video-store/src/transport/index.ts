@@ -735,12 +735,7 @@ export default class HMSTransport {
       );
 
       const timer = setTimeout(() => {
-        if (this.initConfig && !this.subscribeConnection?.selectedCandidatePair) {
-          this.subscribeConnection?.setConfiguration({
-            ...this.initConfig.rtcConfiguration,
-            iceTransportPolicy: 'relay',
-          });
-        }
+        this.forceRelayAsTransportPolicy();
         clearTimeout(timer);
       }, SUBSCRIBE_TIMEOUT);
     }
@@ -1121,7 +1116,12 @@ export default class HMSTransport {
         setTimeout(() => resolve(false), SUBSCRIBE_TIMEOUT);
       });
 
-      return Promise.race([p, timeout]) as Promise<boolean>;
+      return Promise.race([p, timeout]).then(value => {
+        if (!value) {
+          this.forceRelayAsTransportPolicy();
+        }
+        return value;
+      }) as Promise<boolean>;
     }
 
     return true;
@@ -1149,6 +1149,15 @@ export default class HMSTransport {
 
     return ok;
   };
+
+  private forceRelayAsTransportPolicy() {
+    if (this.initConfig && this.store.getPeers().length > 1 && !this.subscribeConnection?.selectedCandidatePair) {
+      this.subscribeConnection?.setConfiguration({
+        ...this.initConfig.rtcConfiguration,
+        iceTransportPolicy: 'relay',
+      });
+    }
+  }
 
   private handleSubscribeConnectionConnected() {
     this.subscribeConnection?.handleSelectedIceCandidatePairs();
