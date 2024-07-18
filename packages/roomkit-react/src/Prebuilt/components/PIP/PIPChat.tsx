@@ -227,7 +227,7 @@ export const PIPChat = () => {
             <IconButton
               id="send-btn"
               disabled={!isChatEnabled || isLocalPeerBlacklisted}
-              title={getChatStats()}
+              title={getChatStatus()}
               css={{
                 ml: 'auto',
                 height: 'max-content',
