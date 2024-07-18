@@ -52,6 +52,22 @@ export const PIPChat = () => {
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const canSendChatMessages = !!elements?.chat?.public_chat_enabled || !!elements?.chat?.roles_whitelist?.length;
 
+  const getChatStatus = useCallback(() => {
+    if (isLocalPeerBlacklisted) return "You've been blocked from sending messages";
+    if (!isChatEnabled)
+      return `Chat has been paused by ${
+        chatStateUpdatedBy.peerId === localPeerID ? 'you' : chatStateUpdatedBy?.userName
+      }`;
+    return message_placeholder;
+  }, [
+    chatStateUpdatedBy.peerId,
+    chatStateUpdatedBy?.userName,
+    isChatEnabled,
+    isLocalPeerBlacklisted,
+    localPeerID,
+    message_placeholder,
+  ]);
+
   return (
     <div style={{ height: '100%' }}>
       <Box
@@ -193,23 +209,16 @@ export const PIPChat = () => {
             <TextArea
               id="chat-input"
               maxLength={CHAT_MESSAGE_LIMIT}
-              disabled={!isChatEnabled || !isLocalPeerBlacklisted}
+              disabled={!isChatEnabled || isLocalPeerBlacklisted}
               rows={1}
-              style={{ border: 'none', resize: 'none' }}
               css={{
                 w: '100%',
                 c: '$on_surface_high',
                 p: '0.75rem 0.75rem !important',
+                border: 'none',
+                resize: 'none',
               }}
-              placeholder={
-                isLocalPeerBlacklisted
-                  ? 'You have been blocked from chat'
-                  : isChatEnabled
-                  ? message_placeholder
-                  : `Chat has been paused by ${
-                      chatStateUpdatedBy.peerId === localPeerID ? 'you' : chatStateUpdatedBy?.userName
-                    }`
-              }
+              placeholder={getChatStatus()}
               required
               autoComplete="off"
               aria-autocomplete="none"
@@ -217,12 +226,8 @@ export const PIPChat = () => {
 
             <IconButton
               id="send-btn"
-              disabled={!isChatEnabled}
-              title={
-                !isChatEnabled
-                  ? `Chat paused by ${chatStateUpdatedBy.peerId === localPeerID ? 'you' : chatStateUpdatedBy?.userName}`
-                  : 'Send message'
-              }
+              disabled={!isChatEnabled || isLocalPeerBlacklisted}
+              title={getChatStats()}
               css={{
                 ml: 'auto',
                 height: 'max-content',

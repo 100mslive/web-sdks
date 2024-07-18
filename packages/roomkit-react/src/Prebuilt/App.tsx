@@ -23,6 +23,7 @@ import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
+import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
@@ -293,7 +294,9 @@ function AppRoutes({
       <>
         {activeState !== PrebuiltStates.LEAVE && <AppData />}
         <ToastContainer />
-        <Notifications />
+        <PIPProvider>
+          <Notifications />
+        </PIPProvider>
         <MwebLandscapePrompt />
         <Sheet />
         <BackSwipe />
