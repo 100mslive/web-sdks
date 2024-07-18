@@ -10,7 +10,6 @@ import { DesktopOptions } from './SplitComponents/DesktopOptions';
 // @ts-ignore: No implicit Any
 import { MwebOptions } from './SplitComponents/MwebOptions';
 import { config as cssConfig } from '../../..';
-import { PIPProvider } from '../PIP/PIPProvider';
 import { useLandscapeHLSStream } from '../../common/hooks';
 
 export const MoreSettings = ({
@@ -25,8 +24,6 @@ export const MoreSettings = ({
   return isMobile || isLandscapeHLSStream ? (
     <MwebOptions elements={elements} screenType={screenType} />
   ) : (
-    <PIPProvider>
-      <DesktopOptions elements={elements} screenType={screenType} />
-    </PIPProvider>
+    <DesktopOptions elements={elements} screenType={screenType} />
   );
 };
