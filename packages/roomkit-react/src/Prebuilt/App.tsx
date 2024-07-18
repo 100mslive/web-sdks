@@ -219,24 +219,26 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <Init />
-                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
-                        <Box
-                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
-                          css={{
-                            bg: '$background_dim',
-                            size: '100%',
-                            lineHeight: '1.5',
-                            '-webkit-text-size-adjust': '100%',
-                            position: 'relative',
-                          }}
-                        >
-                          <AppRoutes
-                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                            defaultAuthToken={authToken}
-                          />
-                        </Box>
-                      </DialogContainerProvider>
+                      <PIPProvider>
+                        <Init />
+                        <DialogContainerProvider dialogContainerSelector={containerSelector}>
+                          <Box
+                            className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
+                            css={{
+                              bg: '$background_dim',
+                              size: '100%',
+                              lineHeight: '1.5',
+                              '-webkit-text-size-adjust': '100%',
+                              position: 'relative',
+                            }}
+                          >
+                            <AppRoutes
+                              authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                              defaultAuthToken={authToken}
+                            />
+                          </Box>
+                        </DialogContainerProvider>
+                      </PIPProvider>
                     </HMSThemeProvider>
                   );
                 }}
@@ -294,9 +296,7 @@ function AppRoutes({
       <>
         {activeState !== PrebuiltStates.LEAVE && <AppData />}
         <ToastContainer />
-        <PIPProvider>
-          <Notifications />
-        </PIPProvider>
+        <Notifications />
         <MwebLandscapePrompt />
         <Sheet />
         <BackSwipe />
