@@ -44,7 +44,7 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { useIsNoiseCancellationEnabled, useSetNoiseCancellation } from './AppData/useUISettings';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
-import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
+import { isAndroid, isIOS, isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 const krispPlugin = new HMSKrispPlugin();
 // const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
@@ -303,6 +303,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   if (!toggleAudio && !toggleVideo) {
     return null;
   }
+  console.log('local video track ', localVideoTrack);
   return (
     <Fragment>
       {toggleAudio ? (
@@ -372,7 +373,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
         </IconButtonWithOptions>
       ) : null}
 
-      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview && (isIOS || isAndroid) ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
