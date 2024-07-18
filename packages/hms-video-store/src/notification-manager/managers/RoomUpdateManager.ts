@@ -218,6 +218,7 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
   }
   private convertHls(hlsNotification?: HLSNotification) {
+    // only checking for zeroth variant intialized
     const isInitialised =
       hlsNotification?.variants && hlsNotification.variants.length > 0
         ? hlsNotification.variants.some(variant => variant.state === HMSStreamingState.INITIALISED)
