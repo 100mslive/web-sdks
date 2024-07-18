@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   selectHMSMessages,
   selectLocalPeerID,
+  selectPeerNameByID,
   selectSessionStore,
   selectUnreadHMSMessagesCount,
   useHMSStore,
@@ -14,6 +15,7 @@ import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
 import { AnnotisedMessage } from '../Chat/ChatBody';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { CHAT_MESSAGE_LIMIT, formatTime } from '../Chat/utils';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -43,9 +45,28 @@ export const PIPChat = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs || []);
     return messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [];
   }, [blacklistedMessageIDs, messages]);
+  const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
+  const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const canSendChatMessages = !!elements?.chat?.public_chat_enabled || !!elements?.chat?.roles_whitelist?.length;
+
+  const getChatStatus = useCallback(() => {
+    if (isLocalPeerBlacklisted) return "You've been blocked from sending messages";
+    if (!isChatEnabled)
+      return `Chat has been paused by ${
+        chatStateUpdatedBy.peerId === localPeerID ? 'you' : chatStateUpdatedBy?.userName
+      }`;
+    return message_placeholder;
+  }, [
+    chatStateUpdatedBy.peerId,
+    chatStateUpdatedBy?.userName,
+    isChatEnabled,
+    isLocalPeerBlacklisted,
+    localPeerID,
+    message_placeholder,
+  ]);
 
   return (
     <div style={{ height: '100%' }}>
@@ -55,7 +76,7 @@ export const PIPChat = () => {
           bg: '$surface_dim',
           overflowY: 'auto',
           // Subtracting height of footer
-          h: canSendChatMessages ? 'calc(100% - 90px)' : '100%',
+          h: canSendChatMessages ? 'calc(100% - 87px)' : '100%',
           position: 'relative',
         }}
       >
@@ -108,16 +129,11 @@ export const PIPChat = () => {
                         </Text>
                       </Tooltip>
                     )}
-                    {message.recipientRoles ? (
-                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                        to {message.recipientRoles} (Group)
-                      </Text>
-                    ) : null}
-                    {message.recipientPeer ? (
-                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                        (DM)
-                      </Text>
-                    ) : null}
+                    <MessageTitle
+                      localPeerID={localPeerID}
+                      recipientPeer={message.recipientPeer}
+                      recipientRoles={message.recipientRoles}
+                    />
                   </Flex>
 
                   <Text
@@ -193,13 +209,16 @@ export const PIPChat = () => {
             <TextArea
               id="chat-input"
               maxLength={CHAT_MESSAGE_LIMIT}
-              style={{ border: 'none', resize: 'none' }}
+              disabled={!isChatEnabled || isLocalPeerBlacklisted}
+              rows={1}
               css={{
                 w: '100%',
                 c: '$on_surface_high',
-                padding: '0.25rem !important',
+                p: '0.75rem 0.75rem !important',
+                border: 'none',
+                resize: 'none',
               }}
-              placeholder={message_placeholder}
+              placeholder={getChatStatus()}
               required
               autoComplete="off"
               aria-autocomplete="none"
@@ -207,6 +226,8 @@ export const PIPChat = () => {
 
             <IconButton
               id="send-btn"
+              disabled={!isChatEnabled || isLocalPeerBlacklisted}
+              title={getChatStatus()}
               css={{
                 ml: 'auto',
                 height: 'max-content',
@@ -221,5 +242,32 @@ export const PIPChat = () => {
         </Box>
       )}
     </div>
+  );
+};
+
+const MessageTitle = ({
+  recipientPeer,
+  recipientRoles,
+  localPeerID,
+}: {
+  recipientPeer?: string;
+  recipientRoles?: string[];
+  localPeerID: string;
+}) => {
+  const peerName = useHMSStore(selectPeerNameByID(recipientPeer));
+
+  return (
+    <>
+      {recipientRoles ? (
+        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+          to {recipientRoles} (Group)
+        </Text>
+      ) : null}
+      {recipientPeer ? (
+        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+          to {recipientPeer === localPeerID ? 'You' : peerName} (DM)
+        </Text>
+      ) : null}
+    </>
   );
 };
