@@ -303,7 +303,6 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   if (!toggleAudio && !toggleVideo) {
     return null;
   }
-  console.log('local video track ', localVideoTrack);
   return (
     <Fragment>
       {toggleAudio ? (
