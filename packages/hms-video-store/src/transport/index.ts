@@ -130,7 +130,7 @@ export default class HMSTransport {
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
       try {
-        if (!this.subscribeConnection || this.sfuMigrationInProgress) {
+        if (!this.subscribeConnection) {
           return;
         }
         console.log('subscribe conection', this.subscribeConnection.nativeConnection);
@@ -420,12 +420,11 @@ export default class HMSTransport {
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
     console.log('sfu migration triggered');
-    this.sfuMigrationInProgress = true;
-    const localPeerTracks = this.store.getLocalPeerTracks();
-    for (const track of localPeerTracks) {
-      console.log('old track', track.nativeTrack.id);
-      await this.unpublishTrack(track, true);
-    }
+    // const localPeerTracks = this.store.getLocalPeerTracks();
+    // for (const track of localPeerTracks) {
+    //   console.log('old track', track.nativeTrack.id);
+    //   await this.unpublishTrack(track, true);
+    // }
     const localPeer = this.store.getLocalPeer();
     if (localPeer) {
       localPeer.videoTrack = undefined;
@@ -435,6 +434,56 @@ export default class HMSTransport {
     console.log('sfu migration closing peer connections');
     this.clearPeerConnections();
     this.createPeerConnections(1234);
+    /*  const pc1 = new RTCPeerConnection(this.initConfig?.rtcConfiguration);
+    pc1.createDataChannel('ion-sfu', { protocol: 'SCTP' });
+    pc1.oniceconnectionstatechange = () => {
+      if (pc1.iceConnectionState === 'connected') {
+        console.log('pc1 ice connected');
+      }
+    };
+    pc1.onconnectionstatechange = () => {
+      console.log('pc1 conection state', pc1.connectionState);
+    };
+    //@ts-ignore
+    window.pc1 = pc1;
+    pc1.onnegotiationneeded = async () => {
+      const nativeOffer = await pc1.createOffer();
+      const offer = await enableOpusDtx(fixMsid(nativeOffer, this.trackStates));
+      await pc1.setLocalDescription(offer);
+      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
+      await pc1.setRemoteDescription(answer);
+    };
+    pc1.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        this.signal.trickle(HMSConnectionRole.Publish, candidate);
+        pc1.addIceCandidate(candidate);
+      }
+    };
+
+    const nativeOffer = await pc1.createOffer();
+    const offer = await enableOpusDtx(fixMsid(nativeOffer, this.trackStates));
+    await pc1.setLocalDescription(offer);
+    const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
+    await pc1.setRemoteDescription(answer);
+
+    const pc2 = new RTCPeerConnection(this.initConfig?.rtcConfiguration);
+    //@ts-ignore
+    window.pc2 = pc2;
+    pc2.createDataChannel('ion-sfu', { protocol: 'SCTP' });
+    pc2.oniceconnectionstatechange = () => {
+      if (pc2.iceConnectionState === 'connected') {
+        console.log('pc2 ice connected');
+      }
+    };
+    pc2.onconnectionstatechange = () => {
+      console.log('pc2 conection state', pc1.connectionState);
+    };
+    pc2.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        console.log('pc2 ice candidate', candidate);
+        // this.signal.trickle(HMSConnectionRole.Publish, candidate);
+      }
+    }; */
     await this.negotiateOnFirstPublish();
     console.log('first negotiation done');
     const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
@@ -448,7 +497,6 @@ export default class HMSTransport {
         await this.publishTrack(track);
       }
     }
-    this.sfuMigrationInProgress = false;
     // for (const track of localPeerTracks) {
     //   const stream = new HMSLocalStream(new MediaStream());
     //   if (track.type === 'video') {
@@ -783,6 +831,7 @@ export default class HMSTransport {
         },
 
         onIceCandidate: candidate => {
+          console.log(`onIceCandidate: ${candidate}`);
           this.connectivityListener?.onICECandidate(candidate, false);
         },
 
