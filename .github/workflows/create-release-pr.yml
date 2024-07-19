@@ -6,6 +6,10 @@ on:
         description: 'which version to bump eg: prerelease, patch'
         required: true
         default: 'prerelease'
+      branch:
+        description: 'Target branch'
+        required: true
+        default: 'dev'
 
 jobs:
   create_pr:
