@@ -164,6 +164,7 @@ export default class HMSTransport {
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
         trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
+      console.log({ trickle, connection });
       if (!connection?.remoteDescription) {
         // ICE candidates can't be added without any remote session description
         connection?.candidates.push(trickle.candidate);
@@ -419,74 +420,20 @@ export default class HMSTransport {
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
     console.log('sfu migration triggered');
-    // const localPeerTracks = this.store.getLocalPeerTracks();
-    // for (const track of localPeerTracks) {
-    //   console.log('old track', track.nativeTrack.id);
-    //   await this.unpublishTrack(track, true);
-    // }
-    const localPeer = this.store.getLocalPeer();
-    if (localPeer) {
-      localPeer.videoTrack = undefined;
-      localPeer.audioTrack = undefined;
-      localPeer.auxiliaryTracks = [];
-    }
+    const peers = this.store.getPeers();
+    peers.forEach(peer => {
+      peer.audioTrack = undefined;
+      peer.videoTrack = undefined;
+      peer.auxiliaryTracks = [];
+    });
     console.log('sfu migration closing peer connections');
     this.clearPeerConnections();
-    this.createPeerConnections(1234);
-    /*  const pc1 = new RTCPeerConnection(this.initConfig?.rtcConfiguration);
-    pc1.createDataChannel('ion-sfu', { protocol: 'SCTP' });
-    pc1.oniceconnectionstatechange = () => {
-      if (pc1.iceConnectionState === 'connected') {
-        console.log('pc1 ice connected');
-      }
-    };
-    pc1.onconnectionstatechange = () => {
-      console.log('pc1 conection state', pc1.connectionState);
-    };
-    //@ts-ignore
-    window.pc1 = pc1;
-    pc1.onnegotiationneeded = async () => {
-      const nativeOffer = await pc1.createOffer();
-      const offer = await enableOpusDtx(fixMsid(nativeOffer, this.trackStates));
-      await pc1.setLocalDescription(offer);
-      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
-      await pc1.setRemoteDescription(answer);
-    };
-    pc1.onicecandidate = ({ candidate }) => {
-      if (candidate) {
-        this.signal.trickle(HMSConnectionRole.Publish, candidate);
-        pc1.addIceCandidate(candidate);
-      }
-    };
-
-    const nativeOffer = await pc1.createOffer();
-    const offer = await enableOpusDtx(fixMsid(nativeOffer, this.trackStates));
-    await pc1.setLocalDescription(offer);
-    const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
-    await pc1.setRemoteDescription(answer);
-
-    const pc2 = new RTCPeerConnection(this.initConfig?.rtcConfiguration);
-    //@ts-ignore
-    window.pc2 = pc2;
-    pc2.createDataChannel('ion-sfu', { protocol: 'SCTP' });
-    pc2.oniceconnectionstatechange = () => {
-      if (pc2.iceConnectionState === 'connected') {
-        console.log('pc2 ice connected');
-      }
-    };
-    pc2.onconnectionstatechange = () => {
-      console.log('pc2 conection state', pc1.connectionState);
-    };
-    pc2.onicecandidate = ({ candidate }) => {
-      if (candidate) {
-        console.log('pc2 ice candidate', candidate);
-        // this.signal.trickle(HMSConnectionRole.Publish, candidate);
-      }
-    }; */
+    this.createPeerConnections();
     await this.negotiateOnFirstPublish();
     console.log('first negotiation done');
     const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
     console.log('get new tracks', tracks[0].nativeTrack, tracks[1].nativeTrack);
+    const localPeer = this.store.getLocalPeer();
     for (const track of tracks) {
       console.log('publishing track', track);
       if (track.type === 'audio' && localPeer) {
@@ -659,7 +606,7 @@ export default class HMSTransport {
     this.analyticsTimer.end(TimedEvent.JOIN_RESPONSE);
   }
 
-  private createPeerConnections(id?: number) {
+  private createPeerConnections() {
     if (this.initConfig) {
       const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
@@ -844,7 +791,6 @@ export default class HMSTransport {
           this.signal,
           this.initConfig.rtcConfiguration,
           publishConnectionObserver,
-          id,
         );
       }
 

@@ -11,14 +11,13 @@ export default class HMSPublishConnection extends HMSConnection {
   readonly nativeConnection: RTCPeerConnection;
   readonly channel: RTCDataChannel;
 
-  constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver, id?: number) {
+  constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.channel = this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
       protocol: 'SCTP',
-      id: id,
     });
     console.log('creating new channel', this.channel.readyState);
     this.channel.onerror = ev => HMSLogger.e(this.TAG, `publish data channel onerror ${ev}`, ev);
