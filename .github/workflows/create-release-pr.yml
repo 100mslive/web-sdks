@@ -6,13 +6,14 @@ on:
         description: 'which version to bump eg: prerelease, patch'
         required: true
         default: 'prerelease'
+      
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
-        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/main'
+        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/dev'
         run: exit 1
 
       - uses: actions/checkout@v3

@@ -1,19 +1,18 @@
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
-import { OPEN_WAIT_TIMEOUT } from '../utils';
 
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
   handleChange: (key: string, value?: T) => void;
-  handleError: (error: Error) => void;
+  handleError: (error: Error, isTerminal?: boolean) => void;
 }
 
 const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
+const RETRY_ERROR_MESSAGES = ['network error', 'failed to fetch'];
 
 export class SessionStore<T> {
   private storeClient: StoreClient;
-  private abortController = new AbortController();
 
   constructor(endpoint: string, token: string) {
     const transport = new GrpcWebFetchTransport({
@@ -25,30 +24,28 @@ export class SessionStore<T> {
   }
 
   async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
+    const abortController = new AbortController();
     const call = this.storeClient.open(
       {
         changeId: '',
         select: [],
       },
-      { abort: this.abortController.signal },
+      { abort: abortController.signal },
     );
+    let count: number | undefined = undefined;
     const initialValues: T[] = [];
-    let initialised = false;
-
-    // on open, wait to call handleOpen with the pre-existing values from the store
-    setTimeout(() => {
-      handleOpen(initialValues);
-      initialised = true;
-    }, OPEN_WAIT_TIMEOUT);
 
     call.responses.onMessage(message => {
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
-          if (initialised) {
+          if (initialValues.length === count) {
             handleChange(message.key, record);
           } else {
             initialValues.push(record);
+            if (initialValues.length === count) {
+              handleOpen(initialValues);
+            }
           }
         }
       } else {
@@ -57,13 +54,34 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
+      const canRecover = RETRY_ERROR_MESSAGES.includes(error.message.toLowerCase());
+      const shouldRetryInstantly = error.message.toLowerCase() === 'network error';
+
+      const openCallback = () => {
+        abortController.abort(`closing to open new conn`);
+        this.open({ handleOpen, handleChange, handleError });
+        window.removeEventListener('online', openCallback);
+      };
+      if (canRecover) {
+        shouldRetryInstantly && openCallback();
+        window.addEventListener('online', openCallback);
+      }
+
       if (!error.message.includes('abort')) {
-        handleError(error);
+        handleError(error, !canRecover);
       }
     });
 
+    try {
+      count = await this.getKeysCountWithDelay();
+      handleOpen(count ? initialValues : []);
+    } catch (error) {
+      const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
+      handleError(error as unknown as Error, canRecover);
+    }
+
     return () => {
-      this.abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
+      abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
     };
   }
 
@@ -98,5 +116,21 @@ export class SessionStore<T> {
 
   delete(key: string) {
     return this.storeClient.delete({ key });
+  }
+
+  private async getKeysCountWithDelay() {
+    const MAX_RETRIES = 3;
+    const DELAY = 200;
+    for (let i = 0; i < MAX_RETRIES; i++) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, DELAY));
+        return await this.getKeysCount();
+      } catch (error) {
+        console.warn(error);
+        if ((error as unknown as Error).message !== 'peer not found' || i === MAX_RETRIES - 1) {
+          throw error;
+        }
+      }
+    }
   }
 }

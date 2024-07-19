@@ -194,7 +194,6 @@ export const Participant = ({
         <ParticipantActions
           peerId={peer.id}
           peerType={peer.type}
-          isLocal={peer.id === localPeerId}
           role={peer.roleName}
           isHandRaisedAccordion={isHandRaisedAccordion}
         />
@@ -273,12 +272,10 @@ const ParticipantActions = React.memo(
     peerId,
     peerType,
     role,
-    isLocal,
     isHandRaisedAccordion,
   }: {
     peerId: string;
     role: string;
-    isLocal: boolean;
     isHandRaisedAccordion?: boolean;
     peerType: HMSPeerType;
   }) => {
@@ -331,7 +328,7 @@ const ParticipantActions = React.memo(
               </Flex>
             ) : null}
 
-            {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
+            {shouldShowMoreActions ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
           </>
         )}
       </Flex>

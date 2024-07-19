@@ -28,17 +28,8 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { usePinnedBy } from '../hooks/usePinnedBy';
+import { formatTime } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-
-const formatTime = (date: Date) => {
-  if (!(date instanceof Date)) {
-    return '';
-  }
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const suffix = hours > 11 ? 'PM' : 'AM';
-  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}`;
-};
 
 const rowHeights: Record<number, { size: number; id: string }> = {};
 let listInstance: VariableSizeList | null = null; //eslint-disable-line
@@ -109,7 +100,7 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
   );
 };
 
-const MessageType = ({
+export const MessageType = ({
   roles,
   hasCurrentUserSent,
   receiver,
@@ -172,7 +163,8 @@ const getMessageType = ({ roles, receiver }: { roles?: HMSRoleName[]; receiver?:
   }
   return receiver ? 'private' : '';
 };
-const SenderName = styled(Text, {
+
+export const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',

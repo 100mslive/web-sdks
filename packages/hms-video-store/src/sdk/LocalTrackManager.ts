@@ -196,6 +196,7 @@ export class LocalTrackManager {
       }
     });
   }
+  // eslint-disable-next-line complexity
   async getLocalScreen(partialConfig?: HMSScreenShareConfig, optimise = false) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
@@ -217,6 +218,12 @@ export class LocalTrackManager {
         // @ts-ignore
         googAutoGainControl: false,
         echoCancellation: false,
+      };
+    } else if (partialConfig?.forceCurrentTab && partialConfig.preferCurrentTab && partialConfig.cropElement) {
+      // only need if crop element with prefer and force current tab
+      constraints.audio = {
+        echoCancellation: true,
+        noiseSuppression: true,
       };
     }
     let stream;

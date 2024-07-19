@@ -1,16 +1,17 @@
 import React, { ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useValue } from '@tldraw/state';
-import { Editor, hardResetEditor, refreshPage } from '@tldraw/tldraw';
+import { Editor, hardResetEditor } from '@tldraw/tldraw';
 import classNames from 'classnames';
 
 const DISCORD_URL = 'https://discord.gg/pTge2BwDBq';
 
 export type TLErrorFallbackComponent = ComponentType<{
   error: unknown;
+  refresh: () => void;
   editor?: Editor;
 }>;
 
-export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
+export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldShowError, setShouldShowError] = useState(process.env.NODE_ENV !== 'production');
   const [didCopy, setDidCopy] = useState(false);
@@ -24,7 +25,7 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
     () => {
       try {
         if (editor) {
-          return editor.user.isDarkMode;
+          return editor.user.getIsDarkMode();
         }
       } catch {
         // we're in a funky error state so this might not work for spooky
@@ -34,7 +35,11 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
     },
     [editor],
   );
-  const [isDarkMode, setIsDarkMode] = useState<null | boolean>(null);
+  const [
+    ,
+    // isDarkMode
+    setIsDarkMode,
+  ] = useState<null | boolean>(null);
   useLayoutEffect(() => {
     // if we found a theme class from the app, we can just use that
     if (isDarkModeFromApp !== null) {
@@ -81,10 +86,6 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
     setDidCopy(true);
   };
 
-  const refresh = () => {
-    refreshPage();
-  };
-
   const resetLocalState = async () => {
     hardResetEditor();
   };
@@ -97,8 +98,11 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
         // error-boundary is sometimes used outside of the theme
         // container, so we need to provide it with a theme for our
         // styles to work correctly
-        isDarkMode === null ? '' : isDarkMode ? 'tl-theme__dark' : 'tl-theme__light',
+        // 100ms: default light theme
+        // isDarkMode === null ? '' : isDarkMode ? 'tl-theme__dark' : 'tl-theme__light',
+        'tl-theme__light',
       )}
+      style={{ position: 'static' }}
     >
       <div className="tl-error-boundary__overlay" />
       {/* {editor && (
@@ -152,11 +156,8 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor }) => {
                 {shouldShowError ? 'Hide details' : 'Show details'}
               </button>
               <div className="tl-error-boundary__content__actions__group">
-                <button className="tl-error-boundary__reset" onClick={() => setShouldShowResetConfirmation(true)}>
-                  Reset data
-                </button>
                 <button className="tl-error-boundary__refresh" onClick={refresh}>
-                  Refresh Page
+                  Refresh
                 </button>
               </div>
             </div>

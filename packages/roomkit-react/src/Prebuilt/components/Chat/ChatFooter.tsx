@@ -20,9 +20,8 @@ import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
+import { CHAT_MESSAGE_LIMIT } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-
-const CHAT_MESSAGE_LIMIT = 2000;
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -76,7 +75,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children?: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();

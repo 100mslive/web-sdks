@@ -8,6 +8,7 @@ import {
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
+  useAwayNotifications,
   useHMSStore,
   useParticipants,
   usePreviewJoin,
@@ -100,6 +101,7 @@ const PreviewJoin = ({
     },
     asRole,
   });
+  const { requestPermission } = useAwayNotifications();
   const roomState = useHMSStore(selectRoomState);
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -115,7 +117,7 @@ const PreviewJoin = ({
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
-        preview();
+        preview().then(() => requestPermission());
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
