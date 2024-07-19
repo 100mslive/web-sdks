@@ -1,13 +1,14 @@
 // write a hook to use the MDN notifications API to show a notification when the user is away from the page
 import { useCallback } from 'react';
 
-export const useAwayNotifications = () => {
+// Do not prompt if preview is not available. Skips for beam
+export const useAwayNotifications = ({ allowPrompts = true }: { allowPrompts?: boolean } = {}) => {
   const requestPermission = useCallback(async () => {
-    if (!Notification || Notification?.permission === 'granted') {
+    if (!Notification || Notification?.permission === 'granted' || !allowPrompts) {
       return;
     }
     await Notification.requestPermission();
-  }, []);
+  }, [allowPrompts]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
     if (
