@@ -83,7 +83,6 @@ export default class HMSTransport {
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
   private sfuNodeId?: string;
   joinRetryCount = 0;
-  private sfuMigrationInProgress = false;
   private publishDisconnectTimer = 0;
 
   constructor(
