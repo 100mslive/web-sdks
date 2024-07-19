@@ -139,10 +139,12 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           init: string;
           tokenByRoomCode: string;
           roomLayout: string;
+          event: string;
         }
       | undefined;
     const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
     const initEndpoint: string = endpointsObj?.init || '';
+    const eventEndpoint: string = endpointsObj?.event || '';
     const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
 
     const overrideLayout: Partial<Layout> = {
@@ -181,6 +183,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
+              event: eventEndpoint,
             },
           }}
         >
