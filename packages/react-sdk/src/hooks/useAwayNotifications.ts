@@ -7,7 +7,12 @@ import { useHMSStore } from '../primitives/HmsRoomProvider';
 export const useAwayNotifications = () => {
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const requestPermission = useCallback(async () => {
-    if (!Notification || Notification?.permission === 'granted' || localPeerRoleName === '__internal_recorder') {
+    if (
+      !Notification ||
+      Notification?.permission === 'granted' ||
+      !localPeerRoleName ||
+      localPeerRoleName === '__internal_recorder'
+    ) {
       return;
     }
     await Notification.requestPermission();
