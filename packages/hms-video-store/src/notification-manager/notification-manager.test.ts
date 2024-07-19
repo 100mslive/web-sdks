@@ -12,6 +12,7 @@ import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSTransport from '../transport';
+import ITransportObserver from '../transport/ITransportObserver';
 
 let joinHandler: jest.Mock<any, any>;
 let previewHandler: jest.Mock<any, any>;
@@ -38,6 +39,9 @@ const store: Store = new Store();
 let notificationManager: NotificationManager;
 let eventBus: EventBus;
 let transport: HMSTransport;
+let deviceManager: DeviceManager;
+let analyticsTimer: AnalyticsTimer;
+let observer: ITransportObserver;
 
 beforeEach(() => {
   joinHandler = jest.fn();
@@ -59,6 +63,16 @@ beforeEach(() => {
   pollsUpdateHandler = jest.fn();
   whiteboardUpdateHandler = jest.fn();
   eventBus = new EventBus();
+  deviceManager = new DeviceManager(store, eventBus);
+  analyticsTimer = new AnalyticsTimer();
+  observer = {
+    onNotification: jest.fn(),
+    onTrackAdd: jest.fn(),
+    onTrackRemove: jest.fn(),
+    onFailure: jest.fn(),
+    onStateChange: jest.fn(),
+    onConnected: jest.fn(),
+  };
   const mockMediaStream = {
     id: 'native-stream-id',
     getVideoTracks: jest.fn(() => [
@@ -84,34 +98,15 @@ beforeEach(() => {
   global.HTMLCanvasElement.prototype.captureStream = jest.fn().mockImplementation(() => mockMediaStream);
 
   transport = new HMSTransport(
-    {
-      onNotification: jest.fn(),
-      onTrackAdd: jest.fn(),
-      onTrackRemove: jest.fn(),
-      onFailure: jest.fn(),
-      onStateChange: jest.fn(),
-      onConnected: jest.fn(),
-    },
-    new DeviceManager(store, eventBus),
+    observer,
+    deviceManager,
     store,
     eventBus,
-    new LocalTrackManager(
-      store,
-      {
-        onNotification: jest.fn(),
-        onTrackAdd: jest.fn(),
-        onTrackRemove: jest.fn(),
-        onFailure: jest.fn(),
-        onStateChange: jest.fn(),
-        onConnected: jest.fn(),
-      },
-      new DeviceManager(store, eventBus),
-      eventBus,
-      new AnalyticsTimer(),
-    ),
+    new LocalTrackManager(store, observer, deviceManager, eventBus, analyticsTimer),
     new AnalyticsEventsService(store),
-    new AnalyticsTimer(),
+    analyticsTimer,
     new PluginUsageTracker(eventBus),
+    listener,
   );
   store.setRoom(new HMSRoom('1234'));
 
