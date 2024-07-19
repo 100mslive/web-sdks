@@ -669,27 +669,29 @@ export default class HMSTransport {
         onIceConnectionChange: async (newState: RTCIceConnectionState) => {
           const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
           log(TAG, `Publish ice connection state change: ${newState}`);
-
-          // @TODO: Uncomment this and remove connectionstatechange
-          if (newState === 'failed') {
-            // await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
-          }
         },
 
-        // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
           const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
           log(TAG, `Publish connection state change: ${newState}`);
+          if (newState === 'new') {
+            return;
+          }
 
           if (newState === 'connected') {
             this.connectivityListener?.onICESuccess(true);
             this.publishConnection?.handleSelectedIceCandidatePairs();
-          }
-
-          if (newState === 'disconnected') {
-            // if state stays disconnected for 5 seconds, retry
+          } else if (newState === 'failed') {
+            await this.handleIceConnectionFailure(
+              HMSConnectionRole.Publish,
+              ErrorFactory.WebrtcErrors.ICEFailure(
+                HMSAction.PUBLISH,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+              ),
+            );
+          } else {
             this.publishDisconnectTimer = window.setTimeout(() => {
-              if (this.publishConnection?.connectionState === 'disconnected') {
+              if (this.publishConnection?.connectionState !== 'connected') {
                 this.handleIceConnectionFailure(
                   HMSConnectionRole.Publish,
                   ErrorFactory.WebrtcErrors.ICEDisconnected(
@@ -699,16 +701,6 @@ export default class HMSTransport {
                 );
               }
             }, ICE_DISCONNECTION_TIMEOUT);
-          }
-
-          if (newState === 'failed') {
-            await this.handleIceConnectionFailure(
-              HMSConnectionRole.Publish,
-              ErrorFactory.WebrtcErrors.ICEFailure(
-                HMSAction.PUBLISH,
-                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-              ),
-            );
           }
         },
 
@@ -740,22 +732,21 @@ export default class HMSTransport {
           const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
           log(TAG, `Subscribe ice connection state change: ${newState}`);
 
-          if (newState === 'failed') {
-            // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
-          }
+          // if (newState === 'failed') {
+          //   // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+          // }
 
-          if (newState === 'connected') {
-            const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-            this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+          // if (newState === 'connected') {
+          //   const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+          //   this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
-            this.connectivityListener?.onICESuccess(false);
-            if (callback) {
-              callback.promise.resolve(true);
-            }
-          }
+          //   this.connectivityListener?.onICESuccess(false);
+          //   if (callback) {
+          //     callback.promise.resolve(true);
+          //   }
+          // }
         },
 
-        // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
           const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
           log(TAG, `Subscribe connection state change: ${newState}`);
@@ -768,9 +759,7 @@ export default class HMSTransport {
                 `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
-          }
-
-          if (newState === 'disconnected') {
+          } else if (newState === 'disconnected') {
             setTimeout(() => {
               if (this.subscribeConnection?.connectionState === 'disconnected') {
                 this.handleIceConnectionFailure(
@@ -782,10 +771,14 @@ export default class HMSTransport {
                 );
               }
             }, ICE_DISCONNECTION_TIMEOUT);
-          }
+          } else if (newState === 'connected') {
+            this.subscribeConnection?.handleSelectedIceCandidatePairs();
+            const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+            this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
-          if (newState === 'connected') {
-            this.handleSubscribeConnectionConnected();
+            if (callback) {
+              callback.promise.resolve(true);
+            }
           }
         },
 
@@ -1223,16 +1216,6 @@ export default class HMSTransport {
 
     return ok;
   };
-
-  private handleSubscribeConnectionConnected() {
-    this.subscribeConnection?.handleSelectedIceCandidatePairs();
-    const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-    this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-
-    if (callback) {
-      callback.promise.resolve(true);
-    }
-  }
 
   private setTransportStateForConnect() {
     if (this.state === TransportState.Failed) {
