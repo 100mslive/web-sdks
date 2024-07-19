@@ -24,7 +24,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSICEServer, HMSRole } from '../interfaces';
+import { HMSICEServer, HMSRole, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -94,6 +94,7 @@ export default class HMSTransport {
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
     private pluginUsageTracker: PluginUsageTracker,
+    private listener: HMSUpdateListener,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -419,24 +420,39 @@ export default class HMSTransport {
 
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
-    const peers = this.store.getRemotePeers();
+    const peers = this.store.getPeers();
     peers.forEach(peer => {
-      peer.audioTrack = undefined;
-      peer.videoTrack = undefined;
-      peer.auxiliaryTracks = [];
+      if (peer.audioTrack) {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.audioTrack, peer);
+        peer.audioTrack = undefined;
+      }
+      if (peer.videoTrack) {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.videoTrack, peer);
+        peer.videoTrack = undefined;
+      }
+      while (peer.auxiliaryTracks.length > 0) {
+        const track = peer.auxiliaryTracks.shift();
+        if (track) {
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
+        }
+      }
     });
     this.clearPeerConnections();
     this.createPeerConnections();
     await this.negotiateOnFirstPublish();
     const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
     const localPeer = this.store.getLocalPeer();
+    if (!localPeer) {
+      return;
+    }
     for (const track of tracks) {
-      if (track.type === 'audio' && localPeer) {
+      if (track.type === 'audio') {
         localPeer.audioTrack = track as HMSLocalAudioTrack;
-      } else if (localPeer) {
+      } else {
         localPeer.videoTrack = track as HMSLocalVideoTrack;
-        await this.publishTrack(track);
       }
+      await this.publishTrack(track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
     }
   }
 

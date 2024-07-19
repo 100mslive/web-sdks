@@ -202,6 +202,7 @@ export class HMSSdk implements HMSInterface {
       this.analyticsEventsService,
       this.analyticsTimer,
       this.pluginUsageTracker,
+      this.listener,
     );
     // add diagnostics callbacks if present
     if ('onInitSuccess' in listener) {
