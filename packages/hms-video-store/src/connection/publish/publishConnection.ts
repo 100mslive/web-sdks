@@ -11,14 +11,16 @@ export default class HMSPublishConnection extends HMSConnection {
   readonly nativeConnection: RTCPeerConnection;
   readonly channel: RTCDataChannel;
 
-  constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
+  constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver, id?: number) {
     super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.channel = this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
       protocol: 'SCTP',
+      id: id,
     });
+    console.log('creating new channel', this.channel.readyState);
     this.channel.onerror = ev => HMSLogger.e(this.TAG, `publish data channel onerror ${ev}`, ev);
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
@@ -38,17 +40,23 @@ export default class HMSPublishConnection extends HMSConnection {
 
       // here it replaces the original listener if already present and
       // handles cases where sctp transport is reinitialised
-      if (this.nativeConnection.sctp) {
-        this.nativeConnection.sctp.transport.onstatechange = () => {
-          this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
-        };
-        this.nativeConnection.sctp.transport.onerror = (event: Event) => {
-          this.observer.onDTLSTransportError(
-            new Error((event as RTCErrorEvent)?.error?.errorDetail) || 'DTLS Transport failed',
-          );
-        };
-      }
+      // if (this.nativeConnection.sctp) {
+      //   this.nativeConnection.sctp.transport.onstatechange = () => {
+      //     this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
+      //   };
+      //   this.nativeConnection.sctp.transport.onerror = (event: Event) => {
+      //     this.observer.onDTLSTransportError(
+      //       new Error((event as RTCErrorEvent)?.error?.errorDetail) || 'DTLS Transport failed',
+      //     );
+      //   };
+      // }
     };
+  }
+
+  close() {
+    super.close();
+    this.channel.close();
+    console.log('closing publish channel', this.channel.readyState);
   }
 
   initAfterJoin() {

@@ -434,7 +434,7 @@ export default class HMSTransport {
     }
     console.log('sfu migration closing peer connections');
     this.clearPeerConnections();
-    this.createPeerConnections();
+    this.createPeerConnections(1234);
     await this.negotiateOnFirstPublish();
     console.log('first negotiation done');
     const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
@@ -612,7 +612,7 @@ export default class HMSTransport {
     this.analyticsTimer.end(TimedEvent.JOIN_RESPONSE);
   }
 
-  private createPeerConnections() {
+  private createPeerConnections(id?: number) {
     if (this.initConfig) {
       const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
@@ -796,6 +796,7 @@ export default class HMSTransport {
           this.signal,
           this.initConfig.rtcConfiguration,
           publishConnectionObserver,
+          id,
         );
       }
 

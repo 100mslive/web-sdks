@@ -7,6 +7,7 @@ import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
+import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -94,6 +95,20 @@ beforeEach(() => {
     new DeviceManager(store, eventBus),
     store,
     eventBus,
+    new LocalTrackManager(
+      store,
+      {
+        onNotification: jest.fn(),
+        onTrackAdd: jest.fn(),
+        onTrackRemove: jest.fn(),
+        onFailure: jest.fn(),
+        onStateChange: jest.fn(),
+        onConnected: jest.fn(),
+      },
+      new DeviceManager(store, eventBus),
+      eventBus,
+      new AnalyticsTimer(),
+    ),
     new AnalyticsEventsService(store),
     new AnalyticsTimer(),
     new PluginUsageTracker(eventBus),
