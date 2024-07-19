@@ -35,7 +35,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-import { usePIPChat } from '../PIP/usePIPChat';
+import { usePIPWindow } from '../PIP/usePIPWindow';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
@@ -53,7 +53,7 @@ export function Notifications() {
   const { showNotification } = useAwayNotifications();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const logoURL = useRoomLayout()?.logo?.url;
-  const { pipWindow } = usePIPChat();
+  const { pipWindow } = usePIPWindow();
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
