@@ -419,23 +419,18 @@ export default class HMSTransport {
 
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
-    console.log('sfu migration triggered');
-    const peers = this.store.getPeers();
+    const peers = this.store.getRemotePeers();
     peers.forEach(peer => {
       peer.audioTrack = undefined;
       peer.videoTrack = undefined;
       peer.auxiliaryTracks = [];
     });
-    console.log('sfu migration closing peer connections');
     this.clearPeerConnections();
     this.createPeerConnections();
     await this.negotiateOnFirstPublish();
-    console.log('first negotiation done');
     const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
-    console.log('get new tracks', tracks[0].nativeTrack, tracks[1].nativeTrack);
     const localPeer = this.store.getLocalPeer();
     for (const track of tracks) {
-      console.log('publishing track', track);
       if (track.type === 'audio' && localPeer) {
         localPeer.audioTrack = track as HMSLocalAudioTrack;
       } else if (localPeer) {
@@ -443,30 +438,6 @@ export default class HMSTransport {
         await this.publishTrack(track);
       }
     }
-    // for (const track of localPeerTracks) {
-    //   const stream = new HMSLocalStream(new MediaStream());
-    //   if (track.type === 'video') {
-    //     const newTrack = new HMSLocalVideoTrack(
-    //       stream,
-    //       track.nativeTrack.clone(),
-    //       track.source!,
-    //       this.eventBus,
-    //       track.settings as HMSVideoTrackSettings,
-    //       this.store.getRoom(),
-    //     );
-    //     await this.publishTrack(newTrack);
-    //   } else {
-    //     const newTrack = new HMSLocalAudioTrack(
-    //       stream,
-    //       track.nativeTrack.clone(),
-    //       track.source!,
-    //       this.eventBus,
-    //       track.settings as HMSAudioTrackSettings,
-    //       this.store.getRoom(),
-    //     );
-    //     await this.publishTrack(newTrack);
-    //   }
-    // }
   }
 
   /**
