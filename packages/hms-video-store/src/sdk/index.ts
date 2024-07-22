@@ -798,7 +798,6 @@ export class HMSSdk implements HMSInterface {
     }
 
     FeedbackService.sendFeedback({
-      eventEndpoint: process.env.STORYBOOK_EVENT_API_ENDPOINT || undefined,
       token: token,
       info: this.sessionPeerInfo,
       feedback,

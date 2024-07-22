@@ -144,6 +144,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       | undefined;
     const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
     const initEndpoint: string = endpointsObj?.init || '';
+    // TODO use it when leave room is implemented
     const eventEndpoint: string = endpointsObj?.event || '';
     const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
 
