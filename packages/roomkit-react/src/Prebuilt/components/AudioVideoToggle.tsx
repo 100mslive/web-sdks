@@ -310,10 +310,9 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           disabled={!toggleAudio}
           hideOptions={hideOptions || !hasAudioDevices}
           onDisabledClick={toggleAudio}
+          testid={!isLocalAudioEnabled ? 'audio_off_btn' : 'audio_on_btn'}
           tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
-          icon={
-            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
-          }
+          icon={!isLocalAudioEnabled ? <MicOffIcon /> : <MicOnIcon />}
           active={isLocalAudioEnabled}
           onClick={toggleAudio}
           key="toggleAudio"
@@ -353,13 +352,8 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           hideOptions={hideOptions || !hasVideoDevices}
           onDisabledClick={toggleVideo}
           tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
-          icon={
-            !isLocalVideoEnabled ? (
-              <VideoOffIcon data-testid="video_off_btn" />
-            ) : (
-              <VideoOnIcon data-testid="video_on_btn" />
-            )
-          }
+          testid={!isLocalVideoEnabled ? 'video_off_btn' : 'video_on_btn'}
+          icon={!isLocalVideoEnabled ? <VideoOffIcon /> : <VideoOnIcon />}
           key="toggleVideo"
           active={isLocalVideoEnabled}
           onClick={toggleVideo}
