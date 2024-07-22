@@ -10,10 +10,12 @@ export const useAwayNotifications = () => {
     if (!Notification || Notification?.permission === 'granted') {
       return;
     }
-    const role = vanillaStore.getState(selectLocalPeerRoleName);
-    if (role && role !== '__internal_recorder') {
-      await Notification.requestPermission();
-    }
+    const unsubscribe = vanillaStore.subscribe(async role => {
+      if (role && role !== '__internal_recorder') {
+        await Notification.requestPermission();
+        unsubscribe?.();
+      }
+    }, selectLocalPeerRoleName);
   }, [vanillaStore]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
@@ -33,7 +35,7 @@ export const useAwayNotifications = () => {
     const closeNotification = () => {
       if (document.visibilityState === 'visible' && document.hasFocus()) {
         notification?.close();
-        document.removeEventListener('visibilitychange', closeNotification);
+        // document.removeEventListener('visibilitychange', closeNotification);
       }
     };
     document.addEventListener('visibilitychange', closeNotification);
