@@ -51,6 +51,6 @@ jobs:
           title: 'ci: update versions for release'
           body: |
             - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
-          branch: release
+          branch: ci/release
           branch-suffix: short-commit-hash
           delete-branch: true
