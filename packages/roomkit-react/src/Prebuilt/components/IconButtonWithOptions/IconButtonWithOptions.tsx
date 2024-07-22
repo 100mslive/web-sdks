@@ -90,6 +90,7 @@ export const IconButtonWithOptions = ({
   onDisabledClick = () => {
     return;
   },
+  testid = '',
   tooltipMessage = '',
   icon,
   children,
@@ -103,6 +104,7 @@ export const IconButtonWithOptions = ({
   onDisabledClick: () => void;
   icon: React.ReactNode;
   children: React.ReactNode;
+  testid?: string;
   hideOptions?: boolean;
   active: boolean;
   disabled?: boolean;
@@ -111,7 +113,13 @@ export const IconButtonWithOptions = ({
   const commonProps = { disabled, active };
   return (
     <Flex>
-      <IconSection {...commonProps} onClick={onClick} hideOptions={hideOptions} className="__cancel-drag-event">
+      <IconSection
+        data-testid={testid}
+        {...commonProps}
+        onClick={onClick}
+        hideOptions={hideOptions}
+        className="__cancel-drag-event"
+      >
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Icon {...commonProps}>{icon}</Icon>
         </Tooltip>

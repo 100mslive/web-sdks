@@ -44,7 +44,7 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { useIsNoiseCancellationEnabled, useSetNoiseCancellation } from './AppData/useUISettings';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
-import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
+import { isAndroid, isIOS, isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 const krispPlugin = new HMSKrispPlugin();
 // const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
@@ -108,6 +108,9 @@ const useNoiseCancellationWithPlugin = () => {
   const setNoiseCancellationWithPlugin = async (enabled: boolean) => {
     if (inProgress) {
       return;
+    }
+    if (!krispPlugin.checkSupport().isSupported) {
+      throw Error('Krisp plugin is not supported');
     }
     setInProgress(true);
     if (enabled) {
@@ -281,13 +284,17 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   useEffect(() => {
     (async () => {
       if (isNoiseCancellationEnabled && !isKrispPluginAdded && !inProgress && localPeer?.audioTrack) {
-        await setNoiseCancellationWithPlugin(true);
-        ToastManager.addToast({
-          title: `Noise Reduction Enabled`,
-          variant: 'standard',
-          duration: 2000,
-          icon: <AudioLevelIcon />,
-        });
+        try {
+          await setNoiseCancellationWithPlugin(true);
+          ToastManager.addToast({
+            title: `Noise Reduction Enabled`,
+            variant: 'standard',
+            duration: 2000,
+            icon: <AudioLevelIcon />,
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -303,10 +310,9 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           disabled={!toggleAudio}
           hideOptions={hideOptions || !hasAudioDevices}
           onDisabledClick={toggleAudio}
+          testid="audio_toggle_btn"
           tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
-          icon={
-            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
-          }
+          icon={!isLocalAudioEnabled ? <MicOffIcon /> : <MicOnIcon />}
           active={isLocalAudioEnabled}
           onClick={toggleAudio}
           key="toggleAudio"
@@ -346,13 +352,8 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           hideOptions={hideOptions || !hasVideoDevices}
           onDisabledClick={toggleVideo}
           tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
-          icon={
-            !isLocalVideoEnabled ? (
-              <VideoOffIcon data-testid="video_off_btn" />
-            ) : (
-              <VideoOnIcon data-testid="video_on_btn" />
-            )
-          }
+          testid="video_toggle_btn"
+          icon={!isLocalVideoEnabled ? <VideoOffIcon /> : <VideoOnIcon />}
           key="toggleVideo"
           active={isLocalVideoEnabled}
           onClick={toggleVideo}
@@ -365,7 +366,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
         </IconButtonWithOptions>
       ) : null}
 
-      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview && (isIOS || isAndroid) ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
