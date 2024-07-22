@@ -12,8 +12,8 @@ export const useAwayNotifications = () => {
     }
     const unsubscribe = vanillaStore.subscribe(async role => {
       if (role && role !== '__internal_recorder') {
-        unsubscribe?.();
         await Notification.requestPermission();
+        unsubscribe?.();
       }
     }, selectLocalPeerRoleName);
   }, [vanillaStore]);
