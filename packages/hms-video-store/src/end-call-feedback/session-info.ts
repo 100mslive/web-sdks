@@ -4,9 +4,9 @@ export interface HMSSessionFeedback {
   // The rating given for the Session experience.
   rating: number;
   // The minimum rating allowed.
-  minRating?: number;
+  min_rating?: number;
   // The maximum rating allowed.
-  maxRating?: number;
+  max_rating?: number;
   // Reasons for the given rating.
   reasons?: string[];
   // Additional comments provided by the user.
@@ -18,25 +18,25 @@ export interface HMSSessionInfo {
   agent: string;
   device_id: string;
   cluster: HMSSessionCluster;
-  timestamp: Date;
+  timestamp: number;
 }
 
 // Data structure for peer data in a session.
 export interface HMSSessionPeerInfo {
-  peerID: string;
+  peer_id: string;
   role?: string;
-  joinedAt?: Date;
-  leftAt?: Date; // to be filled later | can backend set it?
-  roomName?: string;
-  sessionStartedAt?: Date;
-  userData?: string;
-  userName?: string;
-  templateId?: string;
-  sessionId?: string;
+  joined_at?: number;
+  left_at?: number; // to be filled later | can backend set it?
+  room_name?: string;
+  session_started_at?: number;
+  user_data?: string;
+  user_name?: string;
+  template_id?: string;
+  session_id?: string;
   token?: string;
 }
 
 // Data structure for session cluster.
 export interface HMSSessionCluster {
-  websocketUrl: string;
+  websocket_url: string;
 }

@@ -150,30 +150,31 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
-  private setSessionPeerInfo(websocketURL: string, peer?: HMSLocalPeer, room?: HMSRoom) {
+  private setSessionPeerInfo(websocketURL: string, peer?: HMSLocalPeer) {
+    const room = this.store.getRoom();
     if (!peer || !room) {
       HMSLogger.e(this.TAG, 'setSessionPeerInfo> Local peer or room is undefined');
       return;
     }
     this.sessionPeerInfo = {
       peer: {
-        peerID: peer.peerId,
+        peer_id: peer.peerId,
         role: peer.role?.name,
-        joinedAt: peer.joinedAt,
-        roomName: room.name,
-        sessionStartedAt: room.startedAt,
-        userData: peer.customerUserId,
-        userName: peer.name,
-        templateId: room.templateId,
-        sessionId: room.sessionId,
+        joined_at: peer.joinedAt?.valueOf() || 0,
+        room_name: room.name,
+        session_started_at: room.startedAt?.valueOf() || 0,
+        user_data: peer.customerUserId,
+        user_name: peer.name,
+        template_id: room.templateId,
+        session_id: room.sessionId,
         token: this.store.getConfig()?.authToken,
       },
       agent: this.store.getUserAgent(),
       device_id: getAnalyticsDeviceId(),
       cluster: {
-        websocketUrl: websocketURL,
+        websocket_url: websocketURL,
       },
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
   }
   private initNotificationManager() {
@@ -625,10 +626,10 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
-      // setSessionJoin
-      this.setSessionPeerInfo(config.initEndpoint || '', this.localPeer, this.store.getRoom());
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
+      // setSessionJoin
+      this.setSessionPeerInfo(config.initEndpoint || '', this.localPeer);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
