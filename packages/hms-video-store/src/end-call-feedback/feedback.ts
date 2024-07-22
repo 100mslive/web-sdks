@@ -32,7 +32,7 @@ export class FeedbackService {
       this.TAG,
       `sendFeednbck: feedbackEndpoint=${eventEndpoint} token=${token} peerId=${info.peer.peerID} session=${info.peer.sessionId} `,
     );
-    const url = new URL('/client/feedback', eventEndpoint);
+    const url = new URL('v2/client/feedback', eventEndpoint);
     const body = {
       ...info,
       payload: JSON.stringify(feedback),
