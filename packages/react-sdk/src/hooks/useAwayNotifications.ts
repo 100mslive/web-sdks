@@ -10,12 +10,10 @@ export const useAwayNotifications = () => {
     if (!Notification || Notification?.permission === 'granted') {
       return;
     }
-    const unsubscribe = vanillaStore.subscribe(async role => {
-      if (role && role !== '__internal_recorder') {
-        unsubscribe?.();
-        await Notification.requestPermission();
-      }
-    }, selectLocalPeerRoleName);
+    const role = vanillaStore.getState(selectLocalPeerRoleName);
+    if (role && role !== '__internal_recorder') {
+      await Notification.requestPermission();
+    }
   }, [vanillaStore]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
