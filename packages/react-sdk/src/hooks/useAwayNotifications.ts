@@ -35,7 +35,7 @@ export const useAwayNotifications = () => {
     const closeNotification = () => {
       if (document.visibilityState === 'visible' && document.hasFocus()) {
         notification?.close();
-        // document.removeEventListener('visibilitychange', closeNotification);
+        document.removeEventListener('visibilitychange', closeNotification);
       }
     };
     document.addEventListener('visibilitychange', closeNotification);
