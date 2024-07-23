@@ -38,6 +38,9 @@ function CollaborativeEditor({
     // @ts-expect-error - for debugging
     window.editor = editor;
     onMount?.({ store: store.store, editor });
+    if (zoomToContent) {
+      editor.zoomToFit();
+    }
   };
 
   if (store.status === 'synced-remote' && store.connectionStatus === 'offline') {
