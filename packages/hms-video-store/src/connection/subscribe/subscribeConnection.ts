@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
-import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
@@ -18,7 +17,6 @@ import { HMSConnectionRole } from '../model';
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
-  protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
   readonly nativeConnection: RTCPeerConnection;
@@ -30,12 +28,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
-      this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
+      this.connectionEventBus.iceConnectionStateChange.publish(this.nativeConnection.iceConnectionState);
     };
 
-    // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     this.nativeConnection.onconnectionstatechange = () => {
-      this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
+      this.connectionEventBus.connectionStateChange.publish(this.nativeConnection.connectionState);
     };
 
     this.nativeConnection.ondatachannel = e => {
@@ -49,7 +46,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         {
           onMessage: (value: string) => {
             this.eventEmitter.emit('message', value);
-            this.observer.onApiChannelMessage(value);
+            this.connectionEventBus.apiChannelMessage.publish(value);
           },
         },
         `role=${this.role}`,
@@ -61,7 +58,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.nativeConnection.onicecandidate = e => {
       if (e.candidate !== null) {
         console.log('on ice candidate', e.candidate);
-        this.observer.onIceCandidate(e.candidate);
+        this.connectionEventBus.iceCandidate.publish(e.candidate);
         this.signal.trickle(this.role, e.candidate);
       }
     };
@@ -89,7 +86,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         );
         if (toRemoveTrackIdx >= 0) {
           const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
-          this.observer.onTrackRemove(toRemoveTrack);
+          this.connectionEventBus.trackRemove.publish(toRemoveTrack);
           remote.tracks.splice(toRemoveTrackIdx, 1);
           // If the length becomes 0 we assume that stream is removed entirely
           if (remote.tracks.length === 0) {
@@ -109,18 +106,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);
-      this.observer.onTrackAdd(track);
+      this.connectionEventBus.trackAdd.publish(track);
     };
   }
 
-  constructor(
-    signal: JsonRpcSignal,
-    config: RTCConfiguration,
-    private isFlagEnabled: (flag: InitFlags) => boolean,
-    observer: ISubscribeConnectionObserver,
-  ) {
+  constructor(signal: JsonRpcSignal, config: RTCConfiguration, private isFlagEnabled: (flag: InitFlags) => boolean) {
     super(HMSConnectionRole.Subscribe, signal);
-    this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.initNativeConnectionCallbacks();

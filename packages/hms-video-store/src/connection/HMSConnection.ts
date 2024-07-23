@@ -1,4 +1,6 @@
-import IConnectionObserver, { RTCIceCandidatePair } from './IConnectionObserver';
+import { ConnectionEventBus } from './ConnectEventBus';
+import { HMSConnectionEvents } from './constants';
+import { RTCIceCandidatePair } from './IConnectionObserver';
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -15,8 +17,9 @@ export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: JsonRpcSignal;
 
-  protected abstract readonly observer: IConnectionObserver;
+  // protected abstract readonly observer: IConnectionObserver;
   abstract readonly nativeConnection: RTCPeerConnection;
+
   /**
    * We keep a list of pending IceCandidates received
    * from the signalling server. When the peer-connection
@@ -30,6 +33,7 @@ export default abstract class HMSConnection {
   readonly candidates = new Array<RTCIceCandidateInit>();
 
   selectedCandidatePair?: RTCIceCandidatePair;
+  readonly connectionEventBus = new ConnectionEventBus();
 
   protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
     this.role = role;
@@ -130,7 +134,8 @@ export default abstract class HMSConnection {
               // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
               if (this.selectedCandidatePair) {
-                this.observer.onSelectedCandidatePairChange(this.selectedCandidatePair);
+                this.connectionEventBus.selectedCandidatePairChange.publish(this.selectedCandidatePair);
+                // this.observer.onSelectedCandidatePairChange(this.selectedCandidatePair);
                 HMSLogger.d(
                   TAG,
                   `${HMSConnectionRole[this.role]} connection`,
@@ -198,8 +203,13 @@ export default abstract class HMSConnection {
     return await this.nativeConnection.getStats();
   }
 
+  on(eventName: HMSConnectionEvents, listener: any) {
+    this.connectionEventBus[eventName].subscribe(listener);
+  }
+
   close() {
     this.nativeConnection.close();
+    this.connectionEventBus.removeAllListeners();
   }
 
   private getReceivers() {

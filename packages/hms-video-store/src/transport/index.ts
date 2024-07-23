@@ -12,10 +12,9 @@ import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
 import { PluginUsageTracker } from '../common/PluginUsageTracker';
+import { HMSConnectionEvents } from '../connection/constants';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
-import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
-import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
@@ -594,52 +593,13 @@ export default class HMSTransport {
   }
 
   private createPeerConnections() {
-    if (this.initConfig) {
-      const publishConnectionObserver: IPublishConnectionObserver = {
+    if (!this.initConfig) {
+      return;
+    }
+    /*  const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
           console.log('publish', 'onrenegotiationNeeded');
           await this.performPublishRenegotiation();
-        },
-
-        // eslint-disable-next-line complexity
-        onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
-          const log = state === 'failed' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Publisher on dtls transport state change: ${state}`);
-
-          if (!state || this.lastPublishDtlsState === state) {
-            return;
-          }
-
-          this.lastPublishDtlsState = state;
-          if (this.publishDtlsStateTimer !== 0) {
-            clearTimeout(this.publishDtlsStateTimer);
-            this.publishDtlsStateTimer = 0;
-          }
-
-          if (state !== 'connecting' && state !== 'failed') {
-            return;
-          }
-
-          const timeout = this.initConfig?.config?.dtlsStateTimeouts?.[state];
-          if (!timeout || timeout <= 0) {
-            return;
-          }
-
-          // if we're in connecting check again after timeout
-          // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
-          this.publishDtlsStateTimer = window.setTimeout(() => {
-            const newState = this.publishConnection?.nativeConnection.connectionState;
-            if (newState && state && newState === state) {
-              // stuck in either `connecting` or `failed` state for long time
-              const err = ErrorFactory.WebrtcErrors.ICEFailure(
-                HMSAction.PUBLISH,
-                `DTLS transport state ${state} timeout:${timeout}ms`,
-                true,
-              );
-              this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
-              this.observer.onFailure(err);
-            }
-          }, timeout);
         },
 
         onDTLSTransportError: (error: Error) => {
@@ -771,27 +731,52 @@ export default class HMSTransport {
         onSelectedCandidatePairChange: candidatePair => {
           this.connectivityListener?.onSelectedICECandidatePairChange(candidatePair, false);
         },
-      };
-      if (!this.publishConnection) {
-        console.log('creating publish connection');
-        this.publishConnection = new HMSPublishConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          publishConnectionObserver,
-        );
-      }
+      }; */
+    if (!this.publishConnection) {
+      console.log('creating publish connection');
+      this.publishConnection = new HMSPublishConnection(this.signal, this.initConfig.rtcConfiguration);
+      this.publishConnection.on(HMSConnectionEvents.DTLS_ERROR, (error: Error) => {
+        HMSLogger.e(TAG, `onDTLSTransportError ${error.name} ${error.message}`, error);
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
+      });
+      this.publishConnection.on(HMSConnectionEvents.ICE_CONNECTION_STATE_CHANGE, this.iceConnectionChange);
+      this.publishConnection.on(HMSConnectionEvents.DTLS_STATE_CHANGE, this.onDTLSTransportStateChange);
+      this.publishConnection.on(
+        HMSConnectionEvents.CONNECTION_STATE_CHANGE,
+        this.onConnectionStateChange(HMSConnectionRole.Publish),
+      );
+    }
 
-      if (!this.subscribeConnection) {
-        console.log('creating subscribe connection');
-        this.subscribeConnection = new HMSSubscribeConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.isFlagEnabled.bind(this),
-          subscribeConnectionObserver,
-        );
-      }
+    if (!this.subscribeConnection) {
+      this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.isFlagEnabled.bind(this),
+      );
+
+      this.subscribeConnection.on(HMSConnectionEvents.ICE_CONNECTION_STATE_CHANGE, this.iceConnectionChange);
+      this.subscribeConnection.on(HMSConnectionEvents.ON_API_CHANNEL_MESSAGE, (message: string) => {
+        this.observer.onNotification(JSON.parse(message));
+      });
+      this.subscribeConnection.on(HMSConnectionEvents.ON_TRACK_ADD, (track: HMSTrack) => {
+        HMSLogger.d(TAG, '[Subscribe] onTrackAdd', `${track}`);
+        this.observer.onTrackAdd(track);
+      });
+      this.subscribeConnection.on(HMSConnectionEvents.ON_TRACK_REMOVE, (track: HMSTrack) => {
+        HMSLogger.d(TAG, '[Subscribe] onTrackRemove', `${track}`);
+        this.observer.onTrackRemove(track);
+      });
+      this.subscribeConnection.on(
+        HMSConnectionEvents.CONNECTION_STATE_CHANGE,
+        this.onConnectionStateChange(HMSConnectionRole.Subscribe),
+      );
     }
   }
+
+  private iceConnectionChange = (role: HMSConnectionRole) => (newState: RTCIceConnectionState) => {
+    const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+    log(TAG, role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe', ` ice connection state change: ${newState}`);
+  };
 
   private async negotiateJoinWithRetry({
     name,
@@ -841,6 +826,39 @@ export default class HMSTransport {
     }
   }
 
+  private onConnectionStateChange = (role: HMSConnectionRole) => async (newState: RTCPeerConnectionState) => {
+    const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+    log(TAG, role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe', ` connection state change: ${newState}`);
+    if (newState === 'new') {
+      return;
+    }
+
+    if (newState === 'connected') {
+      this.connectivityListener?.onICESuccess(true);
+      this.publishConnection?.handleSelectedIceCandidatePairs();
+    } else if (newState === 'failed') {
+      await this.handleIceConnectionFailure(
+        HMSConnectionRole.Publish,
+        ErrorFactory.WebrtcErrors.ICEFailure(
+          HMSAction.PUBLISH,
+          `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+        ),
+      );
+    } else {
+      this.publishDisconnectTimer = window.setTimeout(() => {
+        if (this.publishConnection?.connectionState === 'disconnected') {
+          this.handleIceConnectionFailure(
+            HMSConnectionRole.Publish,
+            ErrorFactory.WebrtcErrors.ICEDisconnected(
+              HMSAction.PUBLISH,
+              `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+            ),
+          );
+        }
+      }, ICE_DISCONNECTION_TIMEOUT);
+    }
+  };
+
   private async negotiateJoin({
     name,
     data,
@@ -852,6 +870,47 @@ export default class HMSTransport {
     } else {
       return await this.negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo });
     }
+  }
+
+  // eslint-disable-next-line complexity
+  private onDTLSTransportStateChange(state?: RTCDtlsTransportState) {
+    const log = state === 'failed' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+    log(TAG, `Publisher on dtls transport state change: ${state}`);
+
+    if (!state || this.lastPublishDtlsState === state) {
+      return;
+    }
+
+    this.lastPublishDtlsState = state;
+    if (this.publishDtlsStateTimer !== 0) {
+      clearTimeout(this.publishDtlsStateTimer);
+      this.publishDtlsStateTimer = 0;
+    }
+
+    if (state !== 'connecting' && state !== 'failed') {
+      return;
+    }
+
+    const timeout = this.initConfig?.config?.dtlsStateTimeouts?.[state];
+    if (!timeout || timeout <= 0) {
+      return;
+    }
+
+    // if we're in connecting check again after timeout
+    // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
+    this.publishDtlsStateTimer = window.setTimeout(() => {
+      const newState = this.publishConnection?.nativeConnection.connectionState;
+      if (newState && state && newState === state) {
+        // stuck in either `connecting` or `failed` state for long time
+        const err = ErrorFactory.WebrtcErrors.ICEFailure(
+          HMSAction.PUBLISH,
+          `DTLS transport state ${state} timeout:${timeout}ms`,
+          true,
+        );
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
+        this.observer.onFailure(err);
+      }
+    }, timeout);
   }
 
   private async negotiateJoinWebRTC({ name, data, autoSubscribeVideo }: NegotiateJoinParams): Promise<boolean> {
