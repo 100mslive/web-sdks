@@ -115,6 +115,7 @@
     "screenfull": "^5.1.0",
     "ts-pattern": "4.3.0",
     "uuid": "^8.3.2",
-    "worker-timers": "^7.0.40"
+    "worker-timers": "^7.0.40",
+    "compare-versions": "6.1.1"
   }
 }
