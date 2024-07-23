@@ -23,7 +23,7 @@ import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react
 import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-import { VBHandler } from './VBHandler';
+import { isEffectsSupported, VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
@@ -70,13 +70,15 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       if (!vbObject) {
         VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
         vbObject = VBHandler.getVBObject();
-        if (isEffectsEnabled && effectsKey) {
+        console.log('ollo', vbObject);
+        if (isEffectsEnabled && effectsKey && isEffectsSupported()) {
           hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
         } else {
           setLoadingEffects(false);
           if (!role) {
             return;
           }
+          console.log('ollo adding hmsvb');
           hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
       }

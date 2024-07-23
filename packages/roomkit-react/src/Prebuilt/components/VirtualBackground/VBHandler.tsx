@@ -3,7 +3,7 @@ import { compareVersions } from 'compare-versions';
 import { parsedUserAgent } from '@100mslive/react-sdk';
 import { isSafari } from '../../common/constants';
 
-const isSupported = () => {
+export const isEffectsSupported = () => {
   return !(isSafari && compareVersions(parsedUserAgent?.getBrowser()?.version || '0.0.0', '16.5.1'));
 };
 
@@ -15,7 +15,7 @@ export class VBPlugin {
     if (this.getVBObject()) {
       return;
     }
-    if (effectsSDKKey && isSupported()) {
+    if (effectsSDKKey && isEffectsSupported()) {
       this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);

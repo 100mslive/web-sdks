@@ -44,7 +44,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
 
   checkSupport(): HMSPluginSupportResult {
     const browserResult = {} as HMSPluginSupportResult;
-    if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+    if (['Chrome', 'Firefox', 'Edg', 'Edge', 'Safari'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
       browserResult.isSupported = true;
     } else {
       browserResult.isSupported = false;
