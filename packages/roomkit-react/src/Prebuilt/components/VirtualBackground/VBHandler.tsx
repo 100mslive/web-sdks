@@ -1,4 +1,11 @@
 import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { compareVersions } from 'compare-versions';
+import { parsedUserAgent } from '@100mslive/react-sdk';
+import { isSafari } from '../../common/constants';
+
+const isSupported = () => {
+  return !(isSafari && compareVersions(parsedUserAgent?.getBrowser()?.version || '0.0.0', '16.5.1'));
+};
 
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
@@ -8,7 +15,7 @@ export class VBPlugin {
     if (this.getVBObject()) {
       return;
     }
-    if (effectsSDKKey) {
+    if (effectsSDKKey && isSupported()) {
       this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
