@@ -296,8 +296,8 @@ export class DeviceManager implements HMSDeviceManager {
       } as HMSDeviceChangeEvent);
     }
   }
-
-  private handleAudioInputDeviceChange = async (audioTrack?: HMSLocalAudioTrack) => {
+  // eslint-disable-next-line complexity
+  private handleAudioInputDeviceChange = async (audioTrack?: HMSLocalAudioTrack, useDefaultSelection = false) => {
     if (!audioTrack) {
       HMSLogger.d(this.TAG, 'No Audio track on local peer');
       return;
@@ -307,7 +307,10 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.d(this.TAG, 'No Change in AudioInput Device');
       return;
     }
-    const newSelection = this.getNewAudioInputDevice();
+    let newSelection: MediaDeviceInfo | undefined = this.audioInput[0];
+    if (!useDefaultSelection) {
+      newSelection = this.getNewAudioInputDevice();
+    }
     if (!newSelection || !newSelection.deviceId) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
@@ -352,6 +355,9 @@ export class DeviceManager implements HMSDeviceManager {
         type: 'audioInput',
         devices: this.getDevices(),
       } as HMSDeviceChangeEvent);
+      if (newSelection.deviceId !== this.audioInput[0].deviceId) {
+        this.handleAudioInputDeviceChange(audioTrack, true);
+      }
     }
   };
 
