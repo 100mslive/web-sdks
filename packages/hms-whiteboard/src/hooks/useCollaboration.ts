@@ -247,7 +247,7 @@ export function useCollaboration({
 
     store.listen(
       () => {
-        editor.zoomToContent();
+        editor.zoomToFit();
       },
       { source: 'remote', scope: 'document' },
     );
