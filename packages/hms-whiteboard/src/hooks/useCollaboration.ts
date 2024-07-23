@@ -247,7 +247,11 @@ export function useCollaboration({
 
     store.listen(
       () => {
-        editor.zoomToFit();
+        const ids = store
+          .allRecords()
+          .filter(r => r.typeName === 'shape')
+          .map(r => r.id);
+        editor.panZoomIntoView(ids);
       },
       { source: 'remote', scope: 'document' },
     );
