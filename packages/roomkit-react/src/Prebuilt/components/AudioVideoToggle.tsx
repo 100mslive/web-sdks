@@ -268,7 +268,6 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
       title: error.message,
       variant: 'error',
       duration: 2000,
-      icon: <MicOnIcon />,
     });
   });
   const { videoInput, audioInput, audioOutput } = allDevices;
