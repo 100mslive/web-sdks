@@ -79,6 +79,20 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   };
 
+  /**
+   * Replace the new track in stream and update native track
+   * @param track
+   */
+  private async updateTrack(track: MediaStreamTrack) {
+    const localStream = this.stream as HMSLocalStream;
+    await localStream.replaceStreamTrack(this.nativeTrack, track);
+    // change nativeTrack so plugin can start its work
+    this.nativeTrack = track;
+    await this.replaceSenderTrack();
+    const isLevelMonitored = Boolean(this.audioLevelMonitor);
+    isLevelMonitored && this.initAudioLevelMonitor();
+  }
+
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
     /*
@@ -87,19 +101,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
-    const isLevelMonitored = Boolean(this.audioLevelMonitor);
     try {
       const newTrack = await getAudioTrack(settings);
       newTrack.enabled = this.enabled;
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-
-      const localStream = this.stream as HMSLocalStream;
-      await localStream.replaceStreamTrack(prevTrack, newTrack);
-      // change nativeTrack so plugin can start its work
-      this.nativeTrack = newTrack;
-      await this.replaceSenderTrack();
-      isLevelMonitored && this.initAudioLevelMonitor();
+      await this.updateTrack(newTrack);
     } catch (e) {
+      // Generate a new track from previous settings so there will be audio because previous track is stopped
+      const newTrack = await getAudioTrack(this.settings);
+      await this.updateTrack(newTrack);
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({

@@ -358,6 +358,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (error) {
+      // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
+      const track = await getVideoTrack(this.settings);
+      await this.replaceSender(track, this.enabled);
+      this.nativeTrack = track;
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
