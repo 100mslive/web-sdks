@@ -499,6 +499,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
       this.replaceSenderTrack(this.nativeTrack);
+      console.log('video invisible');
       // started interruption
       AnalyticsEventFactory.interrupionStart(this.type, {
         deviceId: this.settings.deviceId,
@@ -507,6 +508,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
       this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      console.log('video visible');
       // stopped
       AnalyticsEventFactory.interrupionStop(this.type, {
         deviceId: this.settings.deviceId,

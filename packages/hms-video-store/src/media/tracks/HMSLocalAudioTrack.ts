@@ -9,7 +9,7 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
+import { isBrowser, isMobile } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -60,7 +60,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    if (isIOS() && isBrowser) {
+    if (isMobile() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -240,7 +240,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
-    if (isIOS() && isBrowser) {
+    if (isMobile() && isBrowser) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
