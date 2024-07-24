@@ -33,10 +33,12 @@ export class DeviceManager implements HMSDeviceManager {
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
+  private lastAudioDevice: MediaDeviceInfo | null;
 
   constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
+    this.lastAudioDevice = null;
     this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
       await this.enumerateDevices();
       if (this.videoInputChanged) {
@@ -206,6 +208,7 @@ export class DeviceManager implements HMSDeviceManager {
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
     if (!audioDeviceId && localPeer?.audioTrack) {
       await localPeer.audioTrack.setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
+      this.lastAudioDevice = this.audioInput[0];
     }
   };
 
@@ -307,7 +310,7 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.d(this.TAG, 'No Change in AudioInput Device');
       return;
     }
-    let newSelection: MediaDeviceInfo | undefined = this.audioInput[0];
+    let newSelection = this.lastAudioDevice || undefined;
     if (!useDefaultSelection) {
       newSelection = this.getNewAudioInputDevice();
     }
@@ -333,6 +336,7 @@ export class DeviceManager implements HMSDeviceManager {
       .build();
     try {
       await audioTrack.setSettings(newAudioTrackSettings, true);
+      this.lastAudioDevice = newSelection;
       this.eventBus.deviceChange.publish({
         devices: this.getDevices(),
         selection: newSelection,
@@ -355,7 +359,7 @@ export class DeviceManager implements HMSDeviceManager {
         type: 'audioInput',
         devices: this.getDevices(),
       } as HMSDeviceChangeEvent);
-      if (newSelection.deviceId !== this.audioInput[0].deviceId) {
+      if (newSelection.deviceId !== this.lastAudioDevice?.deviceId) {
         this.handleAudioInputDeviceChange(audioTrack, true);
       }
     }
