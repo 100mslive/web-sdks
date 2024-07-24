@@ -263,7 +263,13 @@ const AudioSettings = ({ onClick }: { onClick: () => void }) => {
   );
 };
 export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolean }) => {
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices(error => {
+    ToastManager.addToast({
+      title: error.message,
+      variant: 'error',
+      duration: 2000,
+    });
+  });
   const { videoInput, audioInput, audioOutput } = allDevices;
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
