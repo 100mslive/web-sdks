@@ -7,7 +7,6 @@ import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
-import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -102,7 +101,6 @@ beforeEach(() => {
     deviceManager,
     store,
     eventBus,
-    new LocalTrackManager(store, observer, deviceManager, eventBus, analyticsTimer),
     new AnalyticsEventsService(store),
     analyticsTimer,
     new PluginUsageTracker(eventBus),

@@ -47,7 +47,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
-    room?: Room,
+    private room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -63,6 +63,17 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  clone() {
+    return new HMSLocalAudioTrack(
+      (this.stream as HMSLocalStream).clone(),
+      this.nativeTrack.clone(),
+      this.source!,
+      this.eventBus,
+      this.settings,
+      this.room,
+    );
   }
 
   getManuallySelectedDeviceId() {

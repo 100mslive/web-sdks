@@ -198,7 +198,6 @@ export class HMSSdk implements HMSInterface {
       this.deviceManager,
       this.store,
       this.eventBus,
-      this.localTrackManager,
       this.analyticsEventsService,
       this.analyticsTimer,
       this.pluginUsageTracker,

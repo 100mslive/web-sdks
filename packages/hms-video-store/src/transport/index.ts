@@ -26,10 +26,9 @@ import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { HMSICEServer, HMSRole, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
-import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { Store } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
@@ -90,7 +89,6 @@ export default class HMSTransport {
     private deviceManager: DeviceManager,
     private store: Store,
     private eventBus: EventBus,
-    private localTrackManager: LocalTrackManager,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
     private pluginUsageTracker: PluginUsageTracker,
@@ -420,7 +418,7 @@ export default class HMSTransport {
 
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
-    const peers = this.store.getPeers();
+    const peers = this.store.getRemotePeers();
     peers.forEach(peer => {
       if (peer.audioTrack) {
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.audioTrack, peer);
@@ -440,17 +438,40 @@ export default class HMSTransport {
     this.clearPeerConnections();
     this.createPeerConnections();
     await this.negotiateOnFirstPublish();
-    const tracks = await this.localTrackManager.getTracksToPublish(this.store.getConfig()?.settings);
     const localPeer = this.store.getLocalPeer();
     if (!localPeer) {
       return;
     }
-    for (const track of tracks) {
-      if (track.type === 'audio') {
-        localPeer.audioTrack = track as HMSLocalAudioTrack;
-      } else {
-        localPeer.videoTrack = track as HMSLocalVideoTrack;
+
+    let tracksToPublish = [];
+
+    if (localPeer.audioTrack) {
+      const newTrack = localPeer.audioTrack.clone();
+      tracksToPublish.push(newTrack);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
+      localPeer.audioTrack = newTrack;
+    }
+
+    if (localPeer.videoTrack) {
+      const newTrack = localPeer.videoTrack.clone();
+      tracksToPublish.push(newTrack);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
+      localPeer.videoTrack = newTrack;
+    }
+
+    const auxTracks = [];
+    while (localPeer.auxiliaryTracks.length > 0) {
+      const track = localPeer.auxiliaryTracks.shift();
+      if (track) {
+        const newTrack = track.clone();
+        auxTracks.push(newTrack);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
       }
+    }
+    localPeer.auxiliaryTracks = auxTracks;
+    tracksToPublish = tracksToPublish.concat(auxTracks);
+
+    for (const track of tracksToPublish) {
       await this.publishTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
     }
