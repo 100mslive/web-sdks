@@ -362,6 +362,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       const track = await getVideoTrack(this.settings);
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
