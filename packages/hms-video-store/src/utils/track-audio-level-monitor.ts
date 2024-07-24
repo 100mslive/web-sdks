@@ -16,7 +16,7 @@ export interface ITrackAudioLevelUpdate {
   audioLevel: number;
 }
 
-// 🥰Audio level algorithm referenced from official MDN example - https://github.com/mdn/dom-examples/tree/main/media/web-dictaphone
+// Audio level algorithm referenced from official MDN example - https://github.com/mdn/dom-examples/tree/main/media/web-dictaphone
 export class TrackAudioLevelMonitor {
   private readonly TAG = '[TrackAudioLevelMonitor]';
   private audioLevel = 0;
