@@ -499,9 +499,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
       this.replaceSenderTrack(this.nativeTrack);
+      // started interruption
+      AnalyticsEventFactory.interrupionStart(this.type, {
+        deviceId: this.settings.deviceId,
+        groupId: this.nativeTrack.getSettings().groupId,
+      });
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
       this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      // stopped
+      AnalyticsEventFactory.interrupionStop(this.type, {
+        deviceId: this.settings.deviceId,
+        groupId: this.nativeTrack.getSettings().groupId,
+      });
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };

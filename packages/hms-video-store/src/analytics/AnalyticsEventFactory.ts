@@ -7,6 +7,7 @@ import { HMSException } from '../error/HMSException';
 import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
+import { HMSTrackType } from '../schema';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -254,6 +255,28 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({
       name: 'krisp.stop',
       level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static interrupionStart(type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
+    return new AnalyticsEvent({
+      name: 'interruption.start',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        type,
+        ...deviceInfo,
+      },
+    });
+  }
+
+  static interrupionStop(type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
+    return new AnalyticsEvent({
+      name: 'interruption.stop',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        type,
+        ...deviceInfo,
+      },
     });
   }
   private static eventNameFor(name: string, ok: boolean) {
