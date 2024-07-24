@@ -6,6 +6,11 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: settings ? settings.toConstraints() : false,
     });
+    const random = Math.floor(Math.random() * 10);
+    console.log({ random });
+    if (random === 5) {
+      throw BuildGetMediaError(new Error('NotReadableError'), HMSGetMediaActions.AUDIO);
+    }
     return stream.getAudioTracks()[0];
   } catch (err) {
     throw BuildGetMediaError(err as Error, HMSGetMediaActions.AUDIO);
