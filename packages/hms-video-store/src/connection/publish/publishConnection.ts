@@ -19,7 +19,6 @@ export default class HMSPublishConnection extends HMSConnection {
     this.channel = this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
       protocol: 'SCTP',
     });
-    console.log('creating new channel', this.channel.readyState);
     this.channel.onerror = ev => HMSLogger.e(this.TAG, `publish data channel onerror ${ev}`, ev);
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
@@ -54,7 +53,6 @@ export default class HMSPublishConnection extends HMSConnection {
   close() {
     super.close();
     this.channel.close();
-    console.log('closing publish channel', this.channel.readyState);
   }
 
   initAfterJoin() {
