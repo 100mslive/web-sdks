@@ -81,7 +81,7 @@
     "@100mslive/hms-whiteboard": "0.0.6",
     "@100mslive/react-icons": "0.10.16",
     "@100mslive/react-sdk": "0.10.16",
-    "@100mslive/types-prebuilt": "0.12.9",
+    "@100mslive/types-prebuilt": "0.12.10",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@radix-ui/react-accordion": "1.0.0",
