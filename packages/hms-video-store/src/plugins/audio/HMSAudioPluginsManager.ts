@@ -283,12 +283,12 @@ export class HMSAudioPluginsManager {
     plugin.stop();
     this.analytics.removed(name);
   }
-  private handleAudioContextState() {
-    console.log('interruption> context state ', this.audioContext);
-
-    if (this.audioContext?.state === 'suspended') {
+  private handleAudioContextState(ev: Event) {
+    const context = ev.currentTarget as AudioContext;
+    console.log('interruption> context state ', this.audioContext, context);
+    if (context?.state === 'suspended') {
       this.hmsTrack.sendInterruptionEvent(true);
-    } else if (this.audioContext?.state === 'running') {
+    } else if (context.state === 'running') {
       this.hmsTrack.sendInterruptionEvent(false);
     }
   }
