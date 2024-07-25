@@ -413,7 +413,12 @@ export default class HMSTransport {
   }
 
   setSFUNodeId(id: string) {
-    this.sfuNodeId = id;
+    if (!this.sfuNodeId) {
+      this.sfuNodeId = id;
+    } else if (this.sfuNodeId !== id) {
+      this.sfuNodeId = id;
+      this.handleSFUMigration();
+    }
   }
 
   // eslint-disable-next-line complexity
