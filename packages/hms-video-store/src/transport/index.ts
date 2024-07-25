@@ -100,11 +100,17 @@ export default class HMSTransport {
 
     const onStateChange = async (state: TransportState, error?: HMSException) => {
       // @ts-ignore
-      consolere.log(
-        this.state,
-        state,
-        this.publishConnection?.nativeConnection.connectionState,
-        this.publishConnection?.nativeConnection?.iceConnectionState,
+      window.alert(
+        JSON.stringify(
+          {
+            prev: this.state,
+            curr: state,
+            connectionState: this.publishConnection?.nativeConnection.connectionState,
+            iceState: this.publishConnection?.nativeConnection?.iceConnectionState,
+          },
+          null,
+          1,
+        ),
       );
       if (state !== this.state) {
         this.state = state;
