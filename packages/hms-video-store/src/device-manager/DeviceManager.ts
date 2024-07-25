@@ -206,7 +206,7 @@ export class DeviceManager implements HMSDeviceManager {
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
     if (!audioDeviceId && localPeer?.audioTrack) {
       const getInitialDeviceId = () => {
-        const isMobile = 'setSinkId' in HTMLMediaElement.prototype;
+        const isMobile = !('setSinkId' in HTMLMediaElement.prototype);
         const { bluetoothDevice } = this.categorizeAudioInputDevices();
         return isMobile && bluetoothDevice ? bluetoothDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
       };
