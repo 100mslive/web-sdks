@@ -100,7 +100,7 @@ export default class HMSTransport {
 
     const onStateChange = async (state: TransportState, error?: HMSException) => {
       // @ts-ignore
-      console.re.log(
+      consolere.log(
         this.state,
         state,
         this.publishConnection?.nativeConnection.connectionState,
