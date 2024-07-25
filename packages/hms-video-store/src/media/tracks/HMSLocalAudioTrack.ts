@@ -76,16 +76,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'visible') {
       await this.replaceTrackWith(this.settings);
-      // stopped
-      AnalyticsEventFactory.interrupionStop(this.type, {
-        deviceId: this.settings.deviceId,
-        groupId: this.nativeTrack.getSettings().groupId,
-      });
+      // stopped interruption event
+      this.sendInterruptionEvent(false);
     } else {
-      AnalyticsEventFactory.interrupionStart(this.type, {
-        deviceId: this.settings.deviceId,
-        groupId: this.nativeTrack.getSettings().groupId,
-      });
+      // started interruption event
+      this.sendInterruptionEvent(true);
     }
   };
 

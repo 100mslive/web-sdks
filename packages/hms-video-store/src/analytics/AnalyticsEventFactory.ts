@@ -258,18 +258,17 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static interrupionStart(type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
-    return new AnalyticsEvent({
-      name: 'interruption.start',
-      level: AnalyticsEventLevel.INFO,
-      properties: {
-        type,
-        ...deviceInfo,
-      },
-    });
-  }
-
-  static interrupionStop(type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
+  static interrupion(started: boolean, type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
+    if (started) {
+      return new AnalyticsEvent({
+        name: 'interruption.start',
+        level: AnalyticsEventLevel.INFO,
+        properties: {
+          type,
+          ...deviceInfo,
+        },
+      });
+    }
     return new AnalyticsEvent({
       name: 'interruption.stop',
       level: AnalyticsEventLevel.INFO,
@@ -279,6 +278,7 @@ export default class AnalyticsEventFactory {
       },
     });
   }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

@@ -1,4 +1,5 @@
 import { HMSTrackType } from './HMSTrackType';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { HMSMediaStream } from '../streams';
@@ -84,7 +85,16 @@ export abstract class HMSTrack {
   protected setFirstTrackId(trackId: string) {
     this.firstTrackId = trackId;
   }
-
+  /**
+   * @internal
+   * It will send event to analytics when interruption start/stop
+   */
+  protected sendInterruptionEvent(started: boolean) {
+    AnalyticsEventFactory.interrupion(started, this.type, {
+      deviceId: this.nativeTrack.getSettings().deviceId,
+      groupId: this.nativeTrack.getSettings().groupId,
+    });
+  }
   /**
    * @internal
    * take care of -
