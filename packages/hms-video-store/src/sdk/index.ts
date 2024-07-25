@@ -349,7 +349,7 @@ export class HMSSdk implements HMSInterface {
           this.initNotificationManager();
           if (this.transportState === TransportState.Reconnecting) {
             // @ts-ignore
-            console.re.trace('reconnected');
+            console.re.log('reconnected');
             this.listener?.onReconnected();
           }
           break;
