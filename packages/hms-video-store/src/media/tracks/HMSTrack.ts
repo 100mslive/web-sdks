@@ -89,7 +89,9 @@ export abstract class HMSTrack {
    * @internal
    * It will send event to analytics when interruption start/stop
    */
-  protected sendInterruptionEvent(started: boolean) {
+  sendInterruptionEvent(started: boolean) {
+    // @ts-ignore
+    console.log('interruption started ', started, this.type);
     AnalyticsEventFactory.interrupion(started, this.type, {
       deviceId: this.nativeTrack.getSettings().deviceId,
       groupId: this.nativeTrack.getSettings().groupId,

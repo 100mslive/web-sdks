@@ -9,7 +9,7 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isMobile } from '../../utils/support';
+import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -60,7 +60,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    if (isMobile() && isBrowser) {
+    if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -76,11 +76,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'visible') {
       await this.replaceTrackWith(this.settings);
-      // stopped interruption event
-      this.sendInterruptionEvent(false);
+      // this.sendInterruptionEvent(false);
     } else {
       // started interruption event
-      this.sendInterruptionEvent(true);
+      // this.sendInterruptionEvent(true);
     }
   };
 
@@ -235,7 +234,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
-    if (isMobile() && isBrowser) {
+    if (isIOS() && isBrowser) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }

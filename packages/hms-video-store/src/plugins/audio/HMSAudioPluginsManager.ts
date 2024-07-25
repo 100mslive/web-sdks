@@ -200,6 +200,7 @@ export class HMSAudioPluginsManager {
 
   //Keeping it separate since we are initializing context only once
   async closeContext() {
+    this.audioContext?.removeEventListener('statechange', this.handleAudioContextState);
     this.audioContext?.close();
     this.audioContext = undefined;
   }
@@ -282,9 +283,19 @@ export class HMSAudioPluginsManager {
     plugin.stop();
     this.analytics.removed(name);
   }
+  private handleAudioContextState() {
+    console.log('interruption> context state ', this.audioContext);
 
+    if (this.audioContext?.state === 'suspended') {
+      this.hmsTrack.sendInterruptionEvent(true);
+    } else if (this.audioContext?.state === 'running') {
+      this.hmsTrack.sendInterruptionEvent(false);
+    }
+  }
   private createAudioContext() {
+    console.log('interruption> here context');
     if (!this.audioContext) {
+      console.log('interruption> present context');
       if (checkBrowserSupport()) {
         /**
         Not setting default sample rate for firefox since connecting
@@ -295,6 +306,7 @@ export class HMSAudioPluginsManager {
       } else {
         this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
       }
+      this.audioContext.addEventListener('statechange', this.handleAudioContextState);
     }
   }
 }

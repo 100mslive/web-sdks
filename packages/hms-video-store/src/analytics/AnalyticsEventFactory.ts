@@ -259,18 +259,8 @@ export default class AnalyticsEventFactory {
   }
 
   static interrupion(started: boolean, type: HMSTrackType, deviceInfo: Partial<MediaDeviceInfo>) {
-    if (started) {
-      return new AnalyticsEvent({
-        name: 'interruption.start',
-        level: AnalyticsEventLevel.INFO,
-        properties: {
-          type,
-          ...deviceInfo,
-        },
-      });
-    }
     return new AnalyticsEvent({
-      name: 'interruption.stop',
+      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
       level: AnalyticsEventLevel.INFO,
       properties: {
         type,
