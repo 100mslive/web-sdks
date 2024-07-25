@@ -169,10 +169,6 @@ export class NotificationManager {
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
-      case HMSNotificationMethod.ON_PEER_SFU_MIGRATE:
-        this.transport.handleSFUMigration();
-        break;
-
       case HMSNotificationMethod.NODE_INFO:
         this.transport.setSFUNodeId((notification as NodeInfo).params.sfu_node_id);
         break;
