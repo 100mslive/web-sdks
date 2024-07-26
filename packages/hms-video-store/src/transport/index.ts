@@ -778,6 +778,36 @@ export default class HMSTransport {
     log(TAG, role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe', ` ice connection state change: ${newState}`);
   };
 
+  private onConnectionStateChange = (role: HMSConnectionRole) => async (newState: RTCPeerConnectionState) => {
+    const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+    log(TAG, role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe', ` connection state change: ${newState}`);
+
+    if (newState === 'connected') {
+      this.connectivityListener?.onICESuccess(true);
+      this.publishConnection?.handleSelectedIceCandidatePairs();
+    } else if (newState === 'failed') {
+      await this.handleIceConnectionFailure(
+        role,
+        ErrorFactory.WebrtcErrors.ICEFailure(
+          role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE,
+          `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+        ),
+      );
+    } else {
+      this.publishDisconnectTimer = window.setTimeout(() => {
+        if (this.publishConnection?.connectionState === 'disconnected') {
+          this.handleIceConnectionFailure(
+            HMSConnectionRole.Publish,
+            ErrorFactory.WebrtcErrors.ICEDisconnected(
+              HMSAction.PUBLISH,
+              `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+            ),
+          );
+        }
+      }, ICE_DISCONNECTION_TIMEOUT);
+    }
+  };
+
   private async negotiateJoinWithRetry({
     name,
     data,
@@ -825,39 +855,6 @@ export default class HMSTransport {
       }
     }
   }
-
-  private onConnectionStateChange = (role: HMSConnectionRole) => async (newState: RTCPeerConnectionState) => {
-    const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-    log(TAG, role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe', ` connection state change: ${newState}`);
-    if (newState === 'new') {
-      return;
-    }
-
-    if (newState === 'connected') {
-      this.connectivityListener?.onICESuccess(true);
-      this.publishConnection?.handleSelectedIceCandidatePairs();
-    } else if (newState === 'failed') {
-      await this.handleIceConnectionFailure(
-        HMSConnectionRole.Publish,
-        ErrorFactory.WebrtcErrors.ICEFailure(
-          HMSAction.PUBLISH,
-          `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-        ),
-      );
-    } else {
-      this.publishDisconnectTimer = window.setTimeout(() => {
-        if (this.publishConnection?.connectionState === 'disconnected') {
-          this.handleIceConnectionFailure(
-            HMSConnectionRole.Publish,
-            ErrorFactory.WebrtcErrors.ICEDisconnected(
-              HMSAction.PUBLISH,
-              `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-            ),
-          );
-        }
-      }, ICE_DISCONNECTION_TIMEOUT);
-    }
-  };
 
   private async negotiateJoin({
     name,
