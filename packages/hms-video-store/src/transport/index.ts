@@ -456,15 +456,20 @@ export default class HMSTransport {
 
     let tracksToPublish = [];
 
+    let stream: HMSLocalStream | undefined = undefined;
     if (localPeer.audioTrack) {
-      const newTrack = localPeer.audioTrack.clone();
+      stream = (localPeer.audioTrack.stream as HMSLocalStream).clone();
+      const newTrack = localPeer.audioTrack.clone(stream);
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = newTrack;
     }
 
     if (localPeer.videoTrack) {
-      const newTrack = localPeer.videoTrack.clone();
+      if (!stream) {
+        stream = (localPeer.videoTrack.stream as HMSLocalStream).clone();
+      }
+      const newTrack = localPeer.videoTrack.clone(stream);
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = newTrack;
