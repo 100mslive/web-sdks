@@ -169,6 +169,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       this.interactivityCenter.setListener(this.listener);
+      this.transport.setListener(this.listener);
       return;
     }
 
@@ -201,7 +202,6 @@ export class HMSSdk implements HMSInterface {
       this.analyticsEventsService,
       this.analyticsTimer,
       this.pluginUsageTracker,
-      this.listener,
     );
     // add diagnostics callbacks if present
     if ('onInitSuccess' in listener) {

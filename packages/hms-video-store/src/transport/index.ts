@@ -83,6 +83,7 @@ export default class HMSTransport {
   private sfuNodeId?: string;
   joinRetryCount = 0;
   private publishDisconnectTimer = 0;
+  private listener?: HMSUpdateListener;
 
   constructor(
     private observer: ITransportObserver,
@@ -92,7 +93,6 @@ export default class HMSTransport {
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
     private pluginUsageTracker: PluginUsageTracker,
-    private listener: HMSUpdateListener,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -124,6 +124,10 @@ export default class HMSTransport {
    *  1. publish/unpublish waits for [IPublishConnectionObserver.onRenegotiationNeeded] to complete
    */
   private readonly callbacks = new Map<string, CallbackTriple>();
+
+  setListener = (listener: HMSUpdateListener) => {
+    this.listener = listener;
+  };
 
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
@@ -900,7 +904,6 @@ export default class HMSTransport {
       onDemandTracks,
       offer,
     );
-    this.sfuNodeId = answer.sfu_node_id;
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -923,7 +926,7 @@ export default class HMSTransport {
       simulcast,
       onDemandTracks,
     );
-    this.sfuNodeId = response.sfu_node_id;
+    this.sfuNodeId = response?.sfu_node_id;
     return !!response;
   }
 

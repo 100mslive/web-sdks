@@ -395,7 +395,5 @@ export interface WhiteboardInfo {
 }
 
 export interface NodeInfo {
-  params: {
-    sfu_node_id: string;
-  };
+  sfu_node_id: string;
 }

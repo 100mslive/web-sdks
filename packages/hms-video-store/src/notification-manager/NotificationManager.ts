@@ -170,7 +170,8 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.NODE_INFO:
-        this.transport.setSFUNodeId((notification as NodeInfo).params.sfu_node_id);
+        console.log({ notification });
+        this.transport.setSFUNodeId((notification as NodeInfo).sfu_node_id);
         break;
 
       default:
