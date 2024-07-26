@@ -9,7 +9,6 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -41,6 +40,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   isPublished = false;
 
+  /**
+   * mark true when interrupted
+   * @internal
+   */
+  isInterrupted = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -60,9 +65,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    if (isIOS() && isBrowser) {
-      document.addEventListener('visibilitychange', this.handleVisibilityChange);
-    }
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   getManuallySelectedDeviceId() {
@@ -74,12 +77,21 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'visible') {
+    console.log(
+      'interruption> audio visible ',
+      this.nativeTrack.readyState,
+      this.nativeTrack.muted,
+      document.visibilityState,
+      this.isInterrupted,
+    );
+    if (this.nativeTrack.readyState !== 'ended' && !this.nativeTrack.muted && document.visibilityState !== 'visible') {
+      this.sendInterruptionEvent(true);
+      this.isInterrupted = true;
+    }
+    if (document.visibilityState === 'visible' && this.isInterrupted) {
       await this.replaceTrackWith(this.settings);
       this.sendInterruptionEvent(false);
-    } else {
-      // started interruption event
-      this.sendInterruptionEvent(true);
+      this.isInterrupted = false;
     }
   };
 
@@ -234,9 +246,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
-    if (isIOS() && isBrowser) {
-      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    }
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   /**
