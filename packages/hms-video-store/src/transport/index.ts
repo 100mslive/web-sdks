@@ -438,7 +438,7 @@ export default class HMSTransport {
         peer.videoTrack = undefined;
       }
       let i = 0;
-      while (i < peer.auxiliaryTracks.length) {
+      while (peer.auxiliaryTracks.length > 0) {
         const track = peer.auxiliaryTracks.splice(i, 1)[0];
         if (track) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
@@ -456,37 +456,47 @@ export default class HMSTransport {
 
     let tracksToPublish = [];
 
-    let stream: HMSLocalStream | undefined = undefined;
+    const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
-      stream = (localPeer.audioTrack.stream as HMSLocalStream).clone();
-      const newTrack = localPeer.audioTrack.clone(stream);
+      const stream = localPeer.audioTrack.stream as HMSLocalStream;
+      if (!streamMap.get(stream.id)) {
+        streamMap.set(stream.id, stream.clone());
+      }
+      const newTrack = localPeer.audioTrack.clone(streamMap.get(stream.id));
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = newTrack;
     }
 
     if (localPeer.videoTrack) {
-      if (!stream) {
-        stream = (localPeer.videoTrack.stream as HMSLocalStream).clone();
+      const stream = localPeer.videoTrack.stream as HMSLocalStream;
+      if (!streamMap.get(stream.id)) {
+        streamMap.set(stream.id, stream.clone());
       }
-      const newTrack = localPeer.videoTrack.clone(stream);
+      const newTrack = localPeer.videoTrack.clone(streamMap.get(stream.id));
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = newTrack;
     }
 
     const auxTracks = [];
+    let i = 0;
     while (localPeer.auxiliaryTracks.length > 0) {
-      const track = localPeer.auxiliaryTracks.shift();
+      const track = localPeer.auxiliaryTracks.splice(i, 1)[0];
       if (track) {
-        const newTrack = track.clone();
+        const stream = track.stream as HMSLocalStream;
+        if (!streamMap.get(stream.id)) {
+          streamMap.set(stream.id, stream.clone());
+        }
+        const newTrack = track.clone(streamMap.get(stream.id));
         auxTracks.push(newTrack);
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
       }
+      i++;
     }
     localPeer.auxiliaryTracks = auxTracks;
     tracksToPublish = tracksToPublish.concat(auxTracks);
-
+    streamMap.clear();
     for (const track of tracksToPublish) {
       await this.publishTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
