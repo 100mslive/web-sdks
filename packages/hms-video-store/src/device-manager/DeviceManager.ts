@@ -4,6 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
+import { isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -206,9 +207,8 @@ export class DeviceManager implements HMSDeviceManager {
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
     if (!audioDeviceId && localPeer?.audioTrack) {
       const getInitialDeviceId = () => {
-        const isMobile = !('setSinkId' in HTMLMediaElement.prototype);
-        const { bluetoothDevice } = this.categorizeAudioInputDevices();
-        return isMobile && bluetoothDevice ? bluetoothDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
+        const nonIPhoneDevice = this.audioInput.find(device => !device.label.toLowerCase().includes('iphone'));
+        return isIOS() && nonIPhoneDevice ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
       };
       await localPeer.audioTrack.setSettings({ deviceId: getInitialDeviceId() }, true);
     }
