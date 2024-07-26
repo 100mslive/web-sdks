@@ -437,11 +437,13 @@ export default class HMSTransport {
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.videoTrack, peer);
         peer.videoTrack = undefined;
       }
-      while (peer.auxiliaryTracks.length > 0) {
-        const track = peer.auxiliaryTracks.shift();
+      let i = 0;
+      while (i < peer.auxiliaryTracks.length) {
+        const track = peer.auxiliaryTracks.splice(i, 1)[0];
         if (track) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
         }
+        i++;
       }
     });
     this.clearPeerConnections();
