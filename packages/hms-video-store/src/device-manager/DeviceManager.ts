@@ -434,7 +434,7 @@ export class DeviceManager implements HMSDeviceManager {
         speakerPhone = device;
       } else if (label.includes('wired')) {
         wired = device;
-      } else if (/airpods|buds|bluetooth/.test(label)) {
+      } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
         bluetoothDevice = device;
       } else if (label.includes('earpiece')) {
         earpiece = device;
