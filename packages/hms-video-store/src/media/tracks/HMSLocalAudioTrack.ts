@@ -76,10 +76,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'visible') {
       await this.replaceTrackWith(this.settings);
-      // this.sendInterruptionEvent(false);
+      this.sendInterruptionEvent(false);
     } else {
       // started interruption event
-      // this.sendInterruptionEvent(true);
+      this.sendInterruptionEvent(true);
     }
   };
 

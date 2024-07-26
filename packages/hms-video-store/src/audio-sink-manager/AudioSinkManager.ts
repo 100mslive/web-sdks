@@ -116,22 +116,20 @@ export class AudioSinkManager {
 
   private handleAudioPaused = async (event: any) => {
     // this means the audio paused because of external factors(headset removal, incoming phone call)
-    HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
       this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       // started interruption event
-      // audioTrack.sendInterruptionEvent(true);
+      audioTrack.sendInterruptionEvent(true, true);
     }
   };
 
   private handleAudioPlay = async (event: any) => {
     // this means the audio replayed because of external factors(headset removal, incoming phone call)
-    HMSLogger.d(this.TAG, 'Audio Play', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
       // stopped interruption event
-      // audioTrack.sendInterruptionEvent(false);
+      audioTrack.sendInterruptionEvent(false, true);
     }
   };
   private handleTrackUpdate = ({ track }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
