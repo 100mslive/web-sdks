@@ -764,15 +764,15 @@ export default class HMSTransport {
           //   // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
           // }
 
-          // if (newState === 'connected') {
-          //   const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-          //   this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+          if (newState === 'connected') {
+            const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+            this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
-          //   this.connectivityListener?.onICESuccess(false);
-          //   if (callback) {
-          //     callback.promise.resolve(true);
-          //   }
-          // }
+            this.connectivityListener?.onICESuccess(false);
+            if (callback) {
+              callback.promise.resolve(true);
+            }
+          }
         },
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
