@@ -9,12 +9,31 @@ export abstract class AnalyticsTransport {
   abstract failedEvents: Queue<AnalyticsEvent>;
   private readonly TAG = '[AnalyticsTransport]';
 
+  private eventCount = 0;
+  private lastResetTime: number = Date.now();
+  private readonly MAX_EVENTS_PER_MINUTE: number = 1000;
+  private readonly RESET_INTERVAL_MS: number = 60000;
+
+  private checkRateLimit() {
+    const now = Date.now();
+    if (now - this.lastResetTime >= this.RESET_INTERVAL_MS) {
+      this.eventCount = 0;
+      this.lastResetTime = now;
+    }
+    if (this.eventCount >= this.MAX_EVENTS_PER_MINUTE) {
+      throw new Error('Too many events being sent, please check your implementation');
+    }
+    this.eventCount++;
+  }
+
   sendEvent(event: AnalyticsEvent) {
     try {
+      this.checkRateLimit();
       this.sendSingleEvent(event);
       this.flushFailedEvents();
     } catch (error) {
       HMSLogger.w(this.TAG, 'sendEvent failed', error);
+      throw error;
     }
   }
 
