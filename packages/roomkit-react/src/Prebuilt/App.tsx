@@ -135,6 +135,19 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       };
     }, []);
 
+    useEffect(() => {
+      // @ts-ignore
+      const handleSecurityError = event => {
+        if (event.error.name === 'SecurityError') {
+          console.warn('A security error occurred:', event.error.message);
+          console.log(JSON.stringify(event));
+          event.preventDefault();
+        }
+      };
+      window.addEventListener('error', handleSecurityError);
+      return () => window.removeEventListener('error', handleSecurityError);
+    }, []);
+
     const endpointsObj = endpoints as
       | {
           init: string;
