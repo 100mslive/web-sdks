@@ -11,7 +11,7 @@ export abstract class AnalyticsTransport {
 
   private eventCount = 0;
   private lastResetTime: number = Date.now();
-  private readonly MAX_EVENTS_PER_MINUTE: number = 1000;
+  private readonly MAX_EVENTS_PER_MINUTE: number = 200;
   private readonly RESET_INTERVAL_MS: number = 60000;
 
   private checkRateLimit() {
