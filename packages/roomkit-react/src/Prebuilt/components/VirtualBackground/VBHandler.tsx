@@ -1,24 +1,25 @@
-import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { compareVersions } from 'compare-versions';
 import { parsedUserAgent } from '@100mslive/react-sdk';
 import { isSafari } from '../../common/constants';
 
 export const isEffectsSupported = () => {
-  return !(isSafari && compareVersions(parsedUserAgent?.getBrowser()?.version || '0.0.0', '16.5.1'));
+  return !(isSafari && compareVersions(parsedUserAgent?.getBrowser()?.version || '0.0.0', '16.5.1') === -1);
 };
 
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
-  private effectsPlugin?: HMSEffectsPlugin | undefined;
+  private effectsPlugin?: any = undefined;
 
   initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {
       return;
     }
     if (effectsSDKKey && isEffectsSupported()) {
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      // this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+      onInit?.();
     }
   };
 
@@ -55,6 +56,10 @@ export class VBPlugin {
     } else {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
     }
+  };
+
+  isEffectsPlugin = () => {
+    return !!this.effectsPlugin;
   };
 
   setBackground = async (mediaURL: string) => {

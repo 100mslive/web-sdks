@@ -42,6 +42,11 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     return this.checkSupport().isSupported;
   }
 
+  isBlurSupported(): boolean {
+    // Not supported in Safari
+    return !(navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome'));
+  }
+
   checkSupport(): HMSPluginSupportResult {
     const browserResult = {} as HMSPluginSupportResult;
     if (['Chrome', 'Firefox', 'Edg', 'Edge', 'Safari'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
