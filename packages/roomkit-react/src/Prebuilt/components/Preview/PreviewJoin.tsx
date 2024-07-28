@@ -131,13 +131,13 @@ const PreviewJoin = ({
 
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
-      <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
+      <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
         {toggleVideo ? null : <Box />}
-        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
+        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px' }}>
           <Logo />
           <Text
             variant="h4"
-            css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
+            css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$8', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
           >
             {previewHeader.title}
           </Text>
@@ -147,7 +147,7 @@ const PreviewJoin = ({
           >
             {previewHeader.sub_title}
           </Text>
-          <Flex justify="center" css={{ mt: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
+          <Flex justify="center" css={{ mt: '$10', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
             {isStreamingOn ? (
               <Chip
                 content="LIVE"
@@ -160,7 +160,7 @@ const PreviewJoin = ({
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
+        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 340}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
@@ -210,11 +210,11 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       css={{
         bg: '$surface_default',
         aspectRatio,
-        height: 'min(360px, 70vh)',
+        height: 'min(340px, 70vh)',
         width: 'auto',
-        maxWidth: '640px',
+        maxWidth: '600px',
         overflow: 'clip',
-        mt: '$14',
+        mt: '$10',
         '@md': {
           mt: 0,
           width: 'min(220px, 70vw)',
@@ -261,7 +261,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
       justify={hideSettings && isMobile ? 'center' : 'between'}
       css={{
         width: '100%',
-        mt: '$8',
+        mt: '$6',
       }}
     >
       <Flex css={{ gap: '$4' }}>
