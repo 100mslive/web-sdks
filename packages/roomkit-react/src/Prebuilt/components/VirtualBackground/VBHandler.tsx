@@ -9,7 +9,7 @@ export const isEffectsSupported = () => {
 
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
-  private effectsPlugin?: HMSEffectsPlugin | undefined;
+  private effectsPlugin?: HMSEffectsPlugin;
 
   initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {

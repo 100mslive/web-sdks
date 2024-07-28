@@ -6,7 +6,7 @@ import {
   selectIsEffectsEnabled,
   selectLocalPeerRole,
 } from '@100mslive/hms-video-store';
-import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -72,7 +72,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
         vbObject = VBHandler.getVBObject();
         if (isEffectsEnabled && effectsKey && isEffectsSupported()) {
-          hmsActions.addPluginsToVideoStream([vbObject]);
+          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
         } else {
           setLoadingEffects(false);
           if (!role) {
