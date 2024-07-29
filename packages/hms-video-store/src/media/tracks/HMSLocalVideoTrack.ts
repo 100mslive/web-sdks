@@ -509,8 +509,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
+      if (this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') {
+        const track = await this.replaceTrackWith(this.settings);
+        this.nativeTrack?.stop();
+        this.nativeTrack = track;
+      }
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      // this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       // stopped interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
