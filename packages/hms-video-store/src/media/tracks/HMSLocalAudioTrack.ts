@@ -78,7 +78,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (this.source !== 'regular') {
       return;
     }
-    if (!this.isTrackNotPublishing()) {
+    if (this.isTrackNotPublishing()) {
       if (document.visibilityState !== 'visible') {
         this.eventBus.analytics.publish(
           this.sendInterruptionEvent({
