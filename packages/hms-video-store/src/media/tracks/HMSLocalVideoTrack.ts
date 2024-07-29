@@ -501,7 +501,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
-      this.replaceSenderTrack(this.nativeTrack);
+      // this.replaceSenderTrack(this.nativeTrack);
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -510,7 +510,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       );
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      // this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
       // stopped interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
