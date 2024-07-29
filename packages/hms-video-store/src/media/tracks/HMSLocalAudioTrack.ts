@@ -40,12 +40,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   isPublished = false;
 
-  /**
-   * mark true when interrupted
-   * @internal
-   */
-  isInterrupted = false;
-
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -75,7 +69,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   resetManuallySelectedDeviceId() {
     this.manuallySelectedDeviceId = undefined;
   }
-
+  // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
     if ((this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted) && document.visibilityState !== 'visible') {
       this.eventBus.analytics.publish(
@@ -83,16 +77,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           started: true,
         }),
       );
-      this.isInterrupted = true;
     }
-    if (document.visibilityState === 'visible' && this.isInterrupted) {
+    if (document.visibilityState === 'visible' && (this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted)) {
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
         }),
       );
-      this.isInterrupted = false;
     }
   };
 
