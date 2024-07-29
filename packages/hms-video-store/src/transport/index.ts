@@ -434,11 +434,13 @@ export default class HMSTransport {
     const peers = this.store.getPeerMap();
     for (const peerId in peers) {
       const peer = peers[peerId];
+      if (peer.isLocal) {
+        continue;
+      }
       if (peer.audioTrack) {
         const track = peer.audioTrack;
         this.store.removeTrack(peer.audioTrack);
         peer.audioTrack = undefined;
-        this.store.addPeer(peer);
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
       }
       if (peer.videoTrack) {
@@ -451,7 +453,6 @@ export default class HMSTransport {
         const track = peer.auxiliaryTracks.shift();
         if (track) {
           this.store.removeTrack(track);
-          this.store.addPeer(peer);
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
         }
       }
