@@ -430,6 +430,7 @@ export default class HMSTransport {
 
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
+    HMSLogger.time('sfu migration');
     const peers = this.store.getRemotePeers();
     peers.forEach(peer => {
       if (peer.audioTrack) {
@@ -458,7 +459,6 @@ export default class HMSTransport {
     }
 
     let tracksToPublish = [];
-
     const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
       const stream = localPeer.audioTrack.stream as HMSLocalStream;
@@ -507,6 +507,7 @@ export default class HMSTransport {
       await this.publishTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
     }
+    HMSLogger.timeEnd('sfu migration');
   }
 
   /**
