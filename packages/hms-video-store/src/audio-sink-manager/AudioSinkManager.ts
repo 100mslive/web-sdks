@@ -116,6 +116,7 @@ export class AudioSinkManager {
 
   private handleAudioPaused = async (event: any) => {
     // this means the audio paused because of external factors(headset removal, incoming phone call)
+    HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
       this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
