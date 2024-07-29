@@ -257,7 +257,7 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static interrupion(started: boolean, type: string, deviceInfo: Partial<MediaDeviceInfo>) {
+  static interruption(started: boolean, type: string, deviceInfo: Partial<MediaDeviceInfo>) {
     return new AnalyticsEvent({
       name: `${started ? 'interruption.start' : 'interruption.stop'}`,
       level: AnalyticsEventLevel.INFO,
