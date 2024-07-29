@@ -120,10 +120,12 @@ export class AudioSinkManager {
     if (audioTrack) {
       this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       // started interruption event
-      audioTrack.sendInterruptionEvent({
-        started: true,
-        isRemoteAudio: true,
-      });
+      this.eventBus.analytics.publish(
+        audioTrack.sendInterruptionEvent({
+          started: true,
+          isRemoteAudio: true,
+        }),
+      );
     }
   };
 

@@ -77,23 +77,21 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private handleVisibilityChange = async () => {
-    console.log(
-      `interruption> video visible readyState=> ${this.nativeTrack.readyState},
-      muted=> ${this.nativeTrack.muted},
-      visiblity=> ${document.visibilityState},
-      isInterrupted=> ${this.isInterrupted}`,
-    );
     if (this.nativeTrack.readyState === 'ended' && this.nativeTrack.muted && document.visibilityState !== 'visible') {
-      this.sendInterruptionEvent({
-        started: true,
-      });
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: true,
+        }),
+      );
       this.isInterrupted = true;
     }
     if (document.visibilityState === 'visible' && this.isInterrupted) {
       await this.replaceTrackWith(this.settings);
-      this.sendInterruptionEvent({
-        started: false,
-      });
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+        }),
+      );
       this.isInterrupted = false;
     }
   };
