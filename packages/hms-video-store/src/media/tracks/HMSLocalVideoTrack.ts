@@ -495,17 +495,26 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private handleVisibilityChange = async () => {
+    console.log(
+      `interruption> video visible readyState=> ${this.nativeTrack.readyState},
+      muted=> ${this.nativeTrack.muted},
+      visiblity=> ${document.visibilityState},`,
+    );
     if (document.visibilityState === 'hidden' && this.source === 'regular') {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
       this.replaceSenderTrack(this.nativeTrack);
       // started interruption event
-      this.sendInterruptionEvent(true);
+      this.sendInterruptionEvent({
+        started: true,
+      });
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
       this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
       // stopped interruption event
-      this.sendInterruptionEvent(false);
+      this.sendInterruptionEvent({
+        started: false,
+      });
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };

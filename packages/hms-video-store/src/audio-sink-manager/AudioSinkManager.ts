@@ -120,18 +120,13 @@ export class AudioSinkManager {
     if (audioTrack) {
       this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       // started interruption event
-      audioTrack.sendInterruptionEvent(true, true);
+      audioTrack.sendInterruptionEvent({
+        started: true,
+        isRemoteAudio: true,
+      });
     }
   };
 
-  private handleAudioPlay = async (event: any) => {
-    // this means the audio replayed because of external factors(headset removal, incoming phone call)
-    const audioTrack = this.store.getTrackById(event.target.id);
-    if (audioTrack) {
-      // stopped interruption event
-      audioTrack.sendInterruptionEvent(false, true);
-    }
-  };
   private handleTrackUpdate = ({ track }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
     HMSLogger.d(this.TAG, 'Track updated', `${track}`);
   };
@@ -149,7 +144,6 @@ export class AudioSinkManager {
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
-    audioEl.addEventListener('play', this.handleAudioPlay);
 
     audioEl.onerror = async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
@@ -269,7 +263,6 @@ export class AudioSinkManager {
     if (audioEl) {
       HMSLogger.d(this.TAG, 'removing audio element', `${track}`);
       audioEl.removeEventListener('pause', this.handleAudioPaused);
-      audioEl.removeEventListener('play', this.handleAudioPlay);
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
