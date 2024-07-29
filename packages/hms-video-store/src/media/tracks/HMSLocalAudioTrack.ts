@@ -85,6 +85,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
+      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
