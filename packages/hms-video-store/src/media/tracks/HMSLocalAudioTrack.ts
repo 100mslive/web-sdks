@@ -75,6 +75,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private handleVisibilityChange = async () => {
+    if (this.source !== 'regular') {
+      return;
+    }
     if (!this.isTrackNotPublishing()) {
       if (document.visibilityState !== 'visible') {
         this.eventBus.analytics.publish(
