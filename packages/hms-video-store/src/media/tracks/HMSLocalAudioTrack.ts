@@ -75,24 +75,22 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private handleVisibilityChange = async () => {
-    if (this.source !== 'regular') {
+    if (this.source !== 'regular' || !this.isTrackNotPublishing()) {
       return;
     }
-    if (this.isTrackNotPublishing()) {
-      if (document.visibilityState !== 'visible') {
-        this.eventBus.analytics.publish(
-          this.sendInterruptionEvent({
-            started: true,
-          }),
-        );
-      } else {
-        await this.replaceTrackWith(this.settings);
-        this.eventBus.analytics.publish(
-          this.sendInterruptionEvent({
-            started: false,
-          }),
-        );
-      }
+    if (document.visibilityState !== 'visible') {
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: true,
+        }),
+      );
+    } else {
+      await this.replaceTrackWith(this.settings);
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+        }),
+      );
     }
   };
 
