@@ -77,7 +77,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private handleVisibilityChange = async () => {
-    if (this.nativeTrack.readyState === 'ended' && this.nativeTrack.muted && document.visibilityState !== 'visible') {
+    if ((this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted) && document.visibilityState !== 'visible') {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
