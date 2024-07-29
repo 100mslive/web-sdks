@@ -133,21 +133,18 @@ const PreviewJoin = ({
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
       <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
         {toggleVideo ? null : <Box />}
-        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px' }}>
+        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '$8' }}>
           <Logo />
-          <Text
-            variant="h4"
-            css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$8', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
-          >
+          <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
             {previewHeader.title}
           </Text>
           <Text
-            css={{ c: '$on_surface_medium', my: '0', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
+            css={{ c: '$on_surface_medium', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
             variant="sm"
           >
             {previewHeader.sub_title}
           </Text>
-          <Flex justify="center" css={{ mt: '$10', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
+          <Flex justify="center" css={{ gap: '$4' }}>
             {isStreamingOn ? (
               <Chip
                 content="LIVE"
