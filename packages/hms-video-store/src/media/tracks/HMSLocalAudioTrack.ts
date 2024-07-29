@@ -69,22 +69,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   resetManuallySelectedDeviceId() {
     this.manuallySelectedDeviceId = undefined;
   }
-  // eslint-disable-next-line complexity
+
+  private isTrackNotPublishing = () => {
+    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
+  };
+
   private handleVisibilityChange = async () => {
-    if ((this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted) && document.visibilityState !== 'visible') {
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: true,
-        }),
-      );
-    }
-    if (document.visibilityState === 'visible' && (this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted)) {
-      await this.replaceTrackWith(this.settings);
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-        }),
-      );
+    if (!this.isTrackNotPublishing()) {
+      if (document.visibilityState !== 'visible') {
+        this.eventBus.analytics.publish(
+          this.sendInterruptionEvent({
+            started: true,
+          }),
+        );
+      } else {
+        await this.replaceTrackWith(this.settings);
+        this.eventBus.analytics.publish(
+          this.sendInterruptionEvent({
+            started: false,
+          }),
+        );
+      }
     }
   };
 
