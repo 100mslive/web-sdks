@@ -59,7 +59,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    if (source === 'regular') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   getManuallySelectedDeviceId() {
@@ -75,10 +77,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private handleVisibilityChange = async () => {
-    if (this.source !== 'regular' || !this.isTrackNotPublishing()) {
+    // track state is fine do nothing
+    if (!this.isTrackNotPublishing()) {
+      HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
       return;
     }
-    if (document.visibilityState !== 'visible') {
+    if (document.visibilityState === 'hidden') {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
