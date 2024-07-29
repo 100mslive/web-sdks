@@ -30,7 +30,6 @@ import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLay
 // @ts-ignore
 import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -53,9 +52,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const [isBlurSupported, setIsBlurSupported] = useState(VBHandler.isEffectsPlugin());
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
-  const mediaList = backgroundMedia.length
-    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
-    : defaultMedia;
+  const mediaList = backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '');
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile

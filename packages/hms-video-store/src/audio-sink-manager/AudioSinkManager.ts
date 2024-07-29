@@ -295,23 +295,7 @@ export class AudioSinkManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
-    let bluetoothDevice: InputDeviceInfo | null = null;
-    let speakerPhone: InputDeviceInfo | null = null;
-    let wired: InputDeviceInfo | null = null;
-    let earpiece: InputDeviceInfo | null = null;
-
-    for (const device of this.deviceManager.audioInput) {
-      const label = device.label.toLowerCase();
-      if (label.includes('speakerphone')) {
-        speakerPhone = device;
-      } else if (label.includes('wired')) {
-        wired = device;
-      } else if (label.includes('bluetooth')) {
-        bluetoothDevice = device;
-      } else if (label.includes('earpiece')) {
-        earpiece = device;
-      }
-    }
+    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (localAudioTrack && earpiece) {
       const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
