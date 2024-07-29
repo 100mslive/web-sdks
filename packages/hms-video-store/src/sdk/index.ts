@@ -839,6 +839,9 @@ export class HMSSdk implements HMSInterface {
       });
       return;
     }
+    this.transport.setOnScreenshareStop(() => {
+      this.stopEndedScreenshare(onStop);
+    });
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;

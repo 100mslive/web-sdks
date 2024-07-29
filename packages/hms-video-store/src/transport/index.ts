@@ -84,6 +84,7 @@ export default class HMSTransport {
   joinRetryCount = 0;
   private publishDisconnectTimer = 0;
   private listener?: HMSUpdateListener;
+  private onScreenshareStop = () => {};
 
   constructor(
     private observer: ITransportObserver,
@@ -127,6 +128,10 @@ export default class HMSTransport {
 
   setListener = (listener: HMSUpdateListener) => {
     this.listener = listener;
+  };
+
+  setOnScreenshareStop = (onStop: () => void) => {
+    this.onScreenshareStop = onStop;
   };
 
   private signalObserver: ISignalEventsObserver = {
@@ -489,6 +494,9 @@ export default class HMSTransport {
           streamMap.set(stream.id, stream.clone());
         }
         const newTrack = track.clone(streamMap.get(stream.id));
+        if (newTrack.type === 'video' && newTrack.source === 'screen') {
+          newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
+        }
         auxTracks.push(newTrack);
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
       }
