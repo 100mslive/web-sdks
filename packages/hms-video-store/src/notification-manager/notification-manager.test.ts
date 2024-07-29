@@ -104,7 +104,6 @@ beforeEach(() => {
     new AnalyticsEventsService(store),
     analyticsTimer,
     new PluginUsageTracker(eventBus),
-    listener,
   );
   store.setRoom(new HMSRoom('1234'));
 
@@ -127,6 +126,8 @@ beforeEach(() => {
     onPollsUpdate: pollsUpdateHandler,
     onWhiteboardUpdate: whiteboardUpdateHandler,
   };
+
+  transport.setListener(listener);
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
 
