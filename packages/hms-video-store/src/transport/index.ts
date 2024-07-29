@@ -140,7 +140,6 @@ export default class HMSTransport {
         if (!this.subscribeConnection) {
           return;
         }
-        console.log('subscribe conection', this.subscribeConnection.nativeConnection);
         await this.subscribeConnection.setRemoteDescription(jsep);
         HMSLogger.d(
           TAG,
@@ -172,7 +171,6 @@ export default class HMSTransport {
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
         trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
-      console.log({ trickle, connection });
       if (!connection?.remoteDescription) {
         // ICE candidates can't be added without any remote session description
         connection?.candidates.push(trickle.candidate);
@@ -652,7 +650,6 @@ export default class HMSTransport {
     if (this.initConfig) {
       const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
-          console.log('publish', 'onrenegotiationNeeded');
           await this.performPublishRenegotiation();
         },
 
@@ -819,7 +816,6 @@ export default class HMSTransport {
         },
 
         onIceCandidate: candidate => {
-          console.log(`onIceCandidate: ${candidate}`);
           this.connectivityListener?.onICECandidate(candidate, false);
         },
 
@@ -828,7 +824,6 @@ export default class HMSTransport {
         },
       };
       if (!this.publishConnection) {
-        console.log('creating publish connection');
         this.publishConnection = new HMSPublishConnection(
           this.signal,
           this.initConfig.rtcConfiguration,
@@ -837,7 +832,6 @@ export default class HMSTransport {
       }
 
       if (!this.subscribeConnection) {
-        console.log('creating subscribe connection');
         this.subscribeConnection = new HMSSubscribeConnection(
           this.signal,
           this.initConfig.rtcConfiguration,
