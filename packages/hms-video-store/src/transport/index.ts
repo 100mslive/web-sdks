@@ -431,23 +431,31 @@ export default class HMSTransport {
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
     HMSLogger.time('sfu migration');
-    const peers = this.store.getRemotePeers();
-    peers.forEach(peer => {
+    const peers = this.store.getPeerMap();
+    for (const peerId in peers) {
+      const peer = peers[peerId];
       if (peer.audioTrack) {
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.audioTrack, peer);
+        const track = peer.audioTrack;
+        this.store.removeTrack(peer.audioTrack);
         peer.audioTrack = undefined;
+        this.store.addPeer(peer);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
       }
       if (peer.videoTrack) {
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.videoTrack, peer);
+        const track = peer.videoTrack;
+        this.store.removeTrack(peer.videoTrack);
         peer.videoTrack = undefined;
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
       }
       while (peer.auxiliaryTracks.length > 0) {
         const track = peer.auxiliaryTracks.shift();
         if (track) {
+          this.store.removeTrack(track);
+          this.store.addPeer(peer);
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
         }
       }
-    });
+    }
     this.clearPeerConnections();
     this.createPeerConnections();
     await this.negotiateOnFirstPublish();
@@ -464,6 +472,7 @@ export default class HMSTransport {
         streamMap.set(stream.id, stream.clone());
       }
       const newTrack = localPeer.audioTrack.clone(streamMap.get(stream.id));
+      this.store.removeTrack(localPeer.audioTrack);
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = newTrack;
@@ -474,6 +483,7 @@ export default class HMSTransport {
       if (!streamMap.get(stream.id)) {
         streamMap.set(stream.id, stream.clone());
       }
+      this.store.removeTrack(localPeer.videoTrack);
       const newTrack = localPeer.videoTrack.clone(streamMap.get(stream.id));
       tracksToPublish.push(newTrack);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
@@ -488,6 +498,7 @@ export default class HMSTransport {
         if (!streamMap.get(stream.id)) {
           streamMap.set(stream.id, stream.clone());
         }
+        this.store.removeTrack(track);
         const newTrack = track.clone(streamMap.get(stream.id));
         if (newTrack.type === 'video' && newTrack.source === 'screen') {
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
