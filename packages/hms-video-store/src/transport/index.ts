@@ -441,13 +441,11 @@ export default class HMSTransport {
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, peer.videoTrack, peer);
         peer.videoTrack = undefined;
       }
-      let i = 0;
       while (peer.auxiliaryTracks.length > 0) {
-        const track = peer.auxiliaryTracks.splice(i, 1)[0];
+        const track = peer.auxiliaryTracks.shift();
         if (track) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
         }
-        i++;
       }
     });
     this.clearPeerConnections();
@@ -483,9 +481,8 @@ export default class HMSTransport {
     }
 
     const auxTracks = [];
-    let i = 0;
     while (localPeer.auxiliaryTracks.length > 0) {
-      const track = localPeer.auxiliaryTracks.splice(i, 1)[0];
+      const track = localPeer.auxiliaryTracks.shift();
       if (track) {
         const stream = track.stream as HMSLocalStream;
         if (!streamMap.get(stream.id)) {
@@ -498,7 +495,6 @@ export default class HMSTransport {
         auxTracks.push(newTrack);
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
       }
-      i++;
     }
     localPeer.auxiliaryTracks = auxTracks;
     tracksToPublish = tracksToPublish.concat(auxTracks);
