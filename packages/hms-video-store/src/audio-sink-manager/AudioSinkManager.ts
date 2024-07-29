@@ -119,13 +119,6 @@ export class AudioSinkManager {
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
       this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
-      // started interruption event
-      this.eventBus.analytics.publish(
-        audioTrack.sendInterruptionEvent({
-          started: true,
-          isRemoteAudio: true,
-        }),
-      );
     }
   };
 
