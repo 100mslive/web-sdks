@@ -117,7 +117,7 @@ export const IconButtonWithOptions = ({
         </Tooltip>
       </IconSection>
       {!hideOptions && children ? (
-        <Dropdown.Root>
+        <Dropdown.Root modal={false}>
           <Dropdown.Trigger
             asChild
             // onClick does not work
