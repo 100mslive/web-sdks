@@ -521,6 +521,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         await this.replaceSender(this.nativeTrack, this.enabled);
       }
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
