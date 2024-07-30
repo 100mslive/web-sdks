@@ -24,7 +24,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSICEServer, HMSRole, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSICEServer, HMSRole, HMSUpdateListener } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -438,22 +438,17 @@ export default class HMSTransport {
         continue;
       }
       if (peer.audioTrack) {
-        const track = peer.audioTrack;
         this.store.removeTrack(peer.audioTrack);
         peer.audioTrack = undefined;
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
       }
       if (peer.videoTrack) {
-        const track = peer.videoTrack;
         this.store.removeTrack(peer.videoTrack);
         peer.videoTrack = undefined;
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
       }
       while (peer.auxiliaryTracks.length > 0) {
         const track = peer.auxiliaryTracks.shift();
         if (track) {
           this.store.removeTrack(track);
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
         }
       }
     }
@@ -475,7 +470,6 @@ export default class HMSTransport {
       const newTrack = localPeer.audioTrack.clone(streamMap.get(stream.id));
       this.store.removeTrack(localPeer.audioTrack);
       tracksToPublish.push(newTrack);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = newTrack;
     }
 
@@ -487,7 +481,6 @@ export default class HMSTransport {
       this.store.removeTrack(localPeer.videoTrack);
       const newTrack = localPeer.videoTrack.clone(streamMap.get(stream.id));
       tracksToPublish.push(newTrack);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = newTrack;
     }
 
@@ -505,7 +498,6 @@ export default class HMSTransport {
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         auxTracks.push(newTrack);
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
       }
     }
     localPeer.auxiliaryTracks = auxTracks;
@@ -513,8 +505,9 @@ export default class HMSTransport {
     streamMap.clear();
     for (const track of tracksToPublish) {
       await this.publishTrack(track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
+      // this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, localPeer);
     }
+    this.listener?.onSFUMigration?.();
     HMSLogger.timeEnd('sfu migration');
   }
 
