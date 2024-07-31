@@ -70,7 +70,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
-    room?: Room,
+    private room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -87,6 +87,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (isBrowser && source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  clone(stream?: HMSLocalStream) {
+    return new HMSLocalVideoTrack(
+      stream || (this.stream as HMSLocalStream).clone(),
+      this.nativeTrack.clone(),
+      this.source!,
+      this.eventBus,
+      this.settings,
+      this.room,
+    );
   }
 
   /** @internal */

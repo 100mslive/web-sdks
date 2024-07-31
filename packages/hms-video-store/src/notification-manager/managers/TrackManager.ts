@@ -205,6 +205,7 @@ export class TrackManager {
       track.type === HMSTrackType.AUDIO
         ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
         : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
+      this.store.removeTrackState(track.trackId);
       this.tracksToProcess.delete(track.trackId);
     });
   };

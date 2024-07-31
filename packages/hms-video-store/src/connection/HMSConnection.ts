@@ -198,7 +198,7 @@ export default abstract class HMSConnection {
     return await this.nativeConnection.getStats();
   }
 
-  async close() {
+  close() {
     this.nativeConnection.close();
   }
 
