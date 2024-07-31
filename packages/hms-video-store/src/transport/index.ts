@@ -944,6 +944,7 @@ export default class HMSTransport {
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
         room.isEffectsEnabled = this.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
+        room.isVBEnabled = this.isFlagEnabled(InitFlags.FLAG_VB_ENABLED);
         room.isHipaaEnabled = this.isFlagEnabled(InitFlags.FLAG_HIPAA_ENABLED);
         room.isNoiseCancellationEnabled = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
       }

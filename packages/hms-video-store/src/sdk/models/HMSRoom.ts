@@ -22,6 +22,10 @@ export default class Room implements HMSRoom {
   /**
    * @alpha
    */
+  isVBEnabled?: boolean;
+  /**
+   * @alpha
+   */
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
