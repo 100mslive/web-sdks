@@ -9,7 +9,6 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -60,7 +59,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    if (isIOS() && isBrowser) {
+    if (source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -84,9 +83,30 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.manuallySelectedDeviceId = undefined;
   }
 
+  private isTrackNotPublishing = () => {
+    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
+  };
+
   private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'visible') {
+    // track state is fine do nothing
+    if (!this.isTrackNotPublishing()) {
+      HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
+      return;
+    }
+    if (document.visibilityState === 'hidden') {
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: true,
+        }),
+      );
+    } else {
+      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+        }),
+      );
     }
   };
 
@@ -241,9 +261,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
-    if (isIOS() && isBrowser) {
-      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    }
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   /**
