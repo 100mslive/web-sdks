@@ -33,7 +33,7 @@ import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RemoveParticipant } from '../RemoveParticipant';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { RoleAccordion } from './RoleAccordion';
-import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
@@ -282,9 +282,9 @@ const ParticipantActions = React.memo(
     const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
     const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
     const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
-    const { elements } = useRoomLayoutConferencingScreen();
-    const { on_stage_exp } = elements || {};
-    const shouldShowMoreActions = (on_stage_exp && canChangeRole) || canRemoveOthers;
+    // const { elements } = useRoomLayoutConferencingScreen();
+    // const { on_stage_exp } = elements || {};
+    const shouldShowMoreActions = canChangeRole || canRemoveOthers;
     const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
     return (

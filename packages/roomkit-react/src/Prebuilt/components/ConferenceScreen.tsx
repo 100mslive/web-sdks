@@ -33,6 +33,7 @@ import {
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+import { useHMSVirtualBackground } from './useHMSPlugin';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
@@ -59,12 +60,19 @@ export const ConferenceScreen = () => {
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
+  const { addBlur } = useHMSVirtualBackground();
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
       setHideControls(value => !value);
     }
   };
+
+  useEffect(() => {
+    if (isConnectedToRoom) {
+      addBlur();
+    }
+  }, [isConnectedToRoom, addBlur]);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
