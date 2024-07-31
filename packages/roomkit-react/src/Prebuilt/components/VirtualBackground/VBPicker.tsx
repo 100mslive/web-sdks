@@ -6,7 +6,7 @@ import {
   selectIsEffectsEnabled,
   selectLocalPeerRole,
 } from '@100mslive/hms-video-store';
-import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSEffectsPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -23,7 +23,7 @@ import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react
 import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-import { isEffectsSupported, VBHandler } from './VBHandler';
+import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
@@ -49,7 +49,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const effectsKey = useHMSStore(selectEffectsKey);
   const isMobile = useMedia(cssConfig.media.md);
   const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
-  const [isBlurSupported, setIsBlurSupported] = useState(VBHandler.isEffectsPlugin());
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '');
@@ -69,17 +68,15 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       if (!vbObject) {
         VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
         vbObject = VBHandler.getVBObject();
-        if (isEffectsEnabled && effectsKey && isEffectsSupported()) {
+        if (isEffectsEnabled && effectsKey) {
           hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
         } else {
           setLoadingEffects(false);
           if (!role) {
             return;
           }
-          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
       }
-      setIsBlurSupported(VBHandler.isEffectsPlugin());
       const handleDefaultBackground = async () => {
         switch (background) {
           case HMSVirtualBackgroundTypes.NONE: {
@@ -154,7 +151,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               title: 'No effect',
               icon: <CrossCircleIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.NONE,
-              supported: true,
               onClick: async () => {
                 await VBHandler.removeEffects();
                 hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
@@ -162,7 +158,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             },
             {
               title: 'Blur',
-              supported: isBlurSupported,
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => {
@@ -175,43 +170,41 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         />
 
         {/* Slider */}
-        {VBHandler.isEffectsPlugin() ? (
-          <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
-            {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
-              <Box>
-                <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
-                  Blur intensity
+
+        <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+          {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+            <Box>
+              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+                Blur intensity
+              </Text>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  Low
                 </Text>
-                <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
-                  <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
-                    Low
-                  </Text>
-                  <Slider
-                    showTooltip={false}
-                    value={[blurAmount]}
-                    onValueChange={async e => {
-                      setBlurAmount(e[0]);
-                      await VBHandler.setBlur(e[0]);
-                    }}
-                    step={0.1}
-                    min={0.1}
-                    max={1}
-                  />
-                  <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
-                    High
-                  </Text>
-                </Flex>
-              </Box>
-            ) : null}
-          </Flex>
-        ) : null}
+                <Slider
+                  showTooltip={false}
+                  value={[blurAmount]}
+                  onValueChange={async e => {
+                    setBlurAmount(e[0]);
+                    await VBHandler.setBlur(e[0]);
+                  }}
+                  step={0.1}
+                  min={0.1}
+                  max={1}
+                />
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  High
+                </Text>
+              </Flex>
+            </Box>
+          ) : null}
+        </Flex>
 
         <VBCollection
           title="Backgrounds"
           options={mediaList.map(mediaURL => ({
             mediaURL,
             value: mediaURL,
-            supported: true,
             onClick: async () => {
               await VBHandler?.setBackground(mediaURL);
               hmsActions.setAppData(APP_DATA.background, mediaURL);
