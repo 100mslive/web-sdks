@@ -125,6 +125,10 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.initNativeConnectionCallbacks();
   }
 
+  setConfiguration(config: RTCConfiguration) {
+    this.nativeConnection.setConfiguration(config);
+  }
+
   sendOverApiDataChannel(message: string) {
     if (this.apiChannel && this.apiChannel.readyState === 'open') {
       this.apiChannel.send(message);

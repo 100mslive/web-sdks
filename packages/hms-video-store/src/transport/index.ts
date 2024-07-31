@@ -715,23 +715,29 @@ export default class HMSTransport {
   }
 
   private createPeerConnections() {
-    if (this.initConfig) {
-      if (!this.publishConnection) {
-        this.publishConnection = new HMSPublishConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.publishConnectionObserver,
-        );
-      }
+    if (!this.initConfig) {
+      return;
+    }
+    if (!this.publishConnection) {
+      this.publishConnection = new HMSPublishConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.publishConnectionObserver,
+      );
+    }
 
-      if (!this.subscribeConnection) {
-        this.subscribeConnection = new HMSSubscribeConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.isFlagEnabled.bind(this),
-          this.subscribeConnectionObserver,
-        );
-      }
+    if (!this.subscribeConnection) {
+      this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.isFlagEnabled.bind(this),
+        this.subscribeConnectionObserver,
+      );
+
+      const timer = setTimeout(() => {
+        this.forceRelayAsTransportPolicy();
+        clearTimeout(timer);
+      }, SUBSCRIBE_TIMEOUT);
     }
   }
 
@@ -1096,7 +1102,7 @@ export default class HMSTransport {
   };
 
   private retrySubscribeIceFailedTask = async () => {
-    if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
+    if (this.subscribeConnection?.connectionState !== 'connected') {
       const p = new Promise<boolean>((resolve, reject) => {
         // Use subscribe constant string
         this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {
@@ -1107,10 +1113,15 @@ export default class HMSTransport {
       });
 
       const timeout = new Promise(resolve => {
-        setTimeout(resolve, SUBSCRIBE_TIMEOUT, false);
+        setTimeout(() => resolve(false), SUBSCRIBE_TIMEOUT);
       });
 
-      return Promise.race([p, timeout]) as Promise<boolean>;
+      return Promise.race([p, timeout]).then(value => {
+        if (!value) {
+          this.forceRelayAsTransportPolicy();
+        }
+        return value;
+      }) as Promise<boolean>;
     }
 
     return true;
@@ -1138,6 +1149,15 @@ export default class HMSTransport {
 
     return ok;
   };
+
+  private forceRelayAsTransportPolicy() {
+    if (this.initConfig && this.store.getPeers().length > 1 && !this.subscribeConnection?.selectedCandidatePair) {
+      this.subscribeConnection?.setConfiguration({
+        ...this.initConfig.rtcConfiguration,
+        iceTransportPolicy: 'relay',
+      });
+    }
+  }
 
   private handleSubscribeConnectionConnected() {
     this.subscribeConnection?.handleSelectedIceCandidatePairs();
