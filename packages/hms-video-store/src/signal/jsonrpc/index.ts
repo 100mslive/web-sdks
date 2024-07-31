@@ -244,7 +244,7 @@ export default class JsonRpcSignal {
     simulcast: boolean,
     onDemandTracks: boolean,
     offer?: RTCSessionDescriptionInit,
-  ): Promise<RTCSessionDescriptionInit> {
+  ): Promise<RTCSessionDescriptionInit & { sfu_node_id: string | undefined }> {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
         HMSAction.JOIN,
@@ -260,7 +260,10 @@ export default class JsonRpcSignal {
       simulcast,
       onDemandTracks,
     };
-    const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
+    const response: RTCSessionDescriptionInit & { sfu_node_id: string | undefined } = await this.internalCall(
+      HMSSignalMethod.JOIN,
+      params,
+    );
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -278,10 +281,15 @@ export default class JsonRpcSignal {
     }
   }
 
-  async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
+  async offer(
+    desc: RTCSessionDescriptionInit,
+    tracks: Map<string, any>,
+    sfuNodeId?: string,
+  ): Promise<RTCSessionDescriptionInit> {
     const response = await this.call(HMSSignalMethod.OFFER, {
       desc,
       tracks: Object.fromEntries(tracks),
+      sfu_node_id: sfuNodeId,
     });
     return response as RTCSessionDescriptionInit;
   }

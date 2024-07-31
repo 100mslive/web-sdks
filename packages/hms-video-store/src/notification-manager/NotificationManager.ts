@@ -14,6 +14,7 @@ import { WhiteboardManager } from './managers/WhiteboardManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
+  NodeInfo,
   OnTrackLayerUpdateNotification,
   PolicyParams,
   SpeakerList,
@@ -166,6 +167,10 @@ export class NotificationManager {
 
       case HMSNotificationMethod.POLICY_CHANGE:
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
+        break;
+
+      case HMSNotificationMethod.NODE_INFO:
+        this.transport.setSFUNodeId((notification as NodeInfo).sfu_node_id);
         break;
 
       default:

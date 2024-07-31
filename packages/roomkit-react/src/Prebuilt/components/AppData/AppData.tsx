@@ -117,7 +117,7 @@ export const AppData = React.memo(() => {
       ...uiSettings,
       [UI_SETTINGS.isAudioOnly]: undefined,
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
-      [UI_SETTINGS.maxTileCount]: elements?.video_tile_layout?.grid?.tiles_in_view || 9,
+      [UI_SETTINGS.maxTileCount]: Number(elements?.video_tile_layout?.grid?.tiles_in_view) || 9,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
   }, [preferences, hmsActions, elements?.video_tile_layout]);
