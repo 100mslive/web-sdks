@@ -154,8 +154,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
     return this.sendMessage(request, id);
   }
 
-  async close() {
-    await super.close();
+  close() {
+    super.close();
     this.apiChannel?.close();
   }
 
