@@ -237,16 +237,12 @@ export class DeviceManager implements HMSDeviceManager {
    * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
-    const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
-    const manualSelection = this.audioInput.find(
-      device => device.deviceId === audioTrack?.getManuallySelectedDeviceId(),
-    );
+    const manualSelection = this.getManuallySelectedAudioDevice();
     if (manualSelection) {
       return manualSelection;
     }
     // if manually selected device is not available, reset on the track
-    audioTrack?.resetManuallySelectedDeviceId();
+    this.store.getLocalPeer()?.audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
@@ -420,6 +416,12 @@ export class DeviceManager implements HMSDeviceManager {
       } as HMSDeviceChangeEvent);
     }
   };
+
+  getManuallySelectedAudioDevice() {
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    return this.audioInput.find(device => device.deviceId === audioTrack?.getManuallySelectedDeviceId());
+  }
 
   // specifically used for mweb
   categorizeAudioInputDevices() {
