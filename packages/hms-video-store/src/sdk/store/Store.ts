@@ -280,6 +280,10 @@ class Store {
     this.peerTrackStates[trackStateEntry.trackInfo.track_id] = trackStateEntry;
   }
 
+  removeTrackState(trackId: string) {
+    delete this.peerTrackStates[trackId];
+  }
+
   removePeer(peerId: string) {
     if (this.localPeerId === peerId) {
       this.localPeerId = undefined;
