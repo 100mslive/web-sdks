@@ -56,12 +56,11 @@ export class TrackManager {
   };
 
   handleTrackRemovedPermanently = (notification: TrackStateNotification) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, notification);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE permanently`, notification);
     const trackIds = Object.keys(notification.tracks);
 
     trackIds.forEach(trackId => {
       const trackStateEntry = this.store.getTrackState(trackId);
-
       if (!trackStateEntry) {
         return;
       }
@@ -205,7 +204,6 @@ export class TrackManager {
       track.type === HMSTrackType.AUDIO
         ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
         : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
-      this.store.removeTrackState(track.trackId);
       this.tracksToProcess.delete(track.trackId);
     });
   };

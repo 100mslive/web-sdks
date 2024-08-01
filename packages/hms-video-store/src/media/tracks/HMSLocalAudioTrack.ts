@@ -65,7 +65,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   clone(stream?: HMSLocalStream) {
-    return new HMSLocalAudioTrack(
+    const track = new HMSLocalAudioTrack(
       stream || (this.stream as HMSLocalStream).clone(),
       this.nativeTrack.clone(),
       this.source!,
@@ -73,6 +73,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.settings,
       this.room,
     );
+
+    if (this.pluginsManager.pluginsMap.size > 0) {
+      this.pluginsManager.pluginsMap.forEach(value => {
+        track
+          .addPlugin(value)
+          .catch((e: Error) => HMSLogger.e(this.TAG, 'Plugin add failed while migrating', value, e));
+      });
+    }
+    return track;
   }
 
   getManuallySelectedDeviceId() {
