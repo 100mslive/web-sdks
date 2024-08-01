@@ -12,6 +12,7 @@ import {
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
 } from '../../interfaces';
+import { HMSException } from '../../internal';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
@@ -100,7 +101,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     );
     if (this.pluginsManager.pluginsMap.size > 0) {
       this.pluginsManager.pluginsMap.forEach(value => {
-        track.addPlugin(value);
+        track
+          .addPlugin(value)
+          .catch((e: HMSException) => HMSLogger.e(this.TAG, 'Plugin add failed while migrating', value, e));
       });
     }
     if (this.mediaStreamPluginsManager.plugins.size > 0) {
