@@ -79,6 +79,7 @@ class Store {
     this.tracks.forEach(track => {
       if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
         this.removeTrack(track);
+        delete this.peerTrackStates[track.trackId];
       }
     });
   }
