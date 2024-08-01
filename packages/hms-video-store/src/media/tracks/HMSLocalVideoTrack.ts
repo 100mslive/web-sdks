@@ -90,7 +90,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   clone(stream?: HMSLocalStream) {
-    return new HMSLocalVideoTrack(
+    const track = new HMSLocalVideoTrack(
       stream || (this.stream as HMSLocalStream).clone(),
       this.nativeTrack.clone(),
       this.source!,
@@ -98,6 +98,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings,
       this.room,
     );
+    if (this.pluginsManager.pluginsMap.size > 0) {
+      this.pluginsManager.pluginsMap.forEach(value => {
+        track.addPlugin(value);
+      });
+    }
+    if (this.mediaStreamPluginsManager.plugins.size > 0) {
+      track.addStreamPlugins(Array.from(this.mediaStreamPluginsManager.plugins));
+    }
+    return track;
   }
 
   /** @internal */
