@@ -6,7 +6,7 @@ import {
   selectIsEffectsEnabled,
   selectLocalPeerRole,
 } from '@100mslive/hms-video-store';
-import { HMSEffectsPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
