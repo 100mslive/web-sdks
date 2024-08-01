@@ -14,6 +14,7 @@ import {
   useDevices,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import {
   AudioLevelIcon,
@@ -278,6 +279,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
+  const vanillaStore = useHMSVanillaStore();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const roomState = useHMSStore(selectRoomState);
@@ -293,7 +295,14 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
 
   useEffect(() => {
     (async () => {
-      if (isNoiseCancellationEnabled && !isKrispPluginAdded && !inProgress && localPeer?.audioTrack) {
+      const isEnabledForRoom = vanillaStore.getState(selectRoom)?.isNoiseCancellationEnabled;
+      if (
+        isEnabledForRoom &&
+        isNoiseCancellationEnabled &&
+        !isKrispPluginAdded &&
+        !inProgress &&
+        localPeer?.audioTrack
+      ) {
         try {
           await setNoiseCancellationWithPlugin(true);
           ToastManager.addToast({
