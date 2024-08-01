@@ -516,6 +516,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
   };
 
+  // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden') {
       if (isMobile()) {
@@ -531,20 +532,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         );
       }
     } else {
+      const newEnabledState = isMobile() ? this.enabledStateBeforeBackground : this.enabled;
       if (this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') {
         HMSLogger.d(this.TAG, 'visibility visible, restarting track', `${this}`);
         const track = await this.replaceTrackWith(this.settings);
         this.nativeTrack?.stop();
         this.nativeTrack = track;
-      }
-      if (isMobile()) {
+        if (newEnabledState) {
+          await this.processPlugins();
+          await this.pluginsManager.waitForRestart();
+        }
+        await this.replaceSender(this.nativeTrack, newEnabledState);
+        this.videoHandler.updateSinks();
+      } else if (isMobile()) {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
-      } else {
-        await this.replaceSender(this.nativeTrack, this.enabled);
       }
-      await this.processPlugins();
-      this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
