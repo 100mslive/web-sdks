@@ -75,6 +75,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           if (!role) {
             return;
           }
+          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
       }
       const handleDefaultBackground = async () => {
@@ -170,7 +171,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         />
 
         {/* Slider */}
-
         <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
           {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
             <Box>

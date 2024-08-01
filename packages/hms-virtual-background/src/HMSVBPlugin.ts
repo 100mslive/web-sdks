@@ -43,8 +43,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   isBlurSupported(): boolean {
-    // Not supported in Safari
-    return !(navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome'));
+    const gl = this.outputCanvas?.getContext('webgl');
+    return !!gl?.getSupportedExtensions()?.includes('WEBGL_2D_storage');
   }
 
   checkSupport(): HMSPluginSupportResult {
