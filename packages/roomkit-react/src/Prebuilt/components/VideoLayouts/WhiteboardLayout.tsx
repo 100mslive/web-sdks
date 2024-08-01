@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
 import { Whiteboard } from '@100mslive/hms-whiteboard';
-import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
+import {
+  selectAppData,
+  selectPeerByCondition,
+  selectWhiteboard,
+  useHMSStore,
+  useWhiteboard,
+} from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -17,7 +23,10 @@ import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
+  const { token, endpoint, permissions } = useWhiteboard(isMobile);
+  const isHeadless = useHMSStore(selectAppData('disableNotifications'));
+
+  const isReadonly = !permissions.includes('write');
 
   if (!token) {
     return null;
@@ -36,7 +45,11 @@ const WhiteboardEmbed = () => {
       }}
     >
       <Box css={{ size: '100%' }}>
-        <Whiteboard token={token} endpoint={`https://${endpoint}`} zoomToContent={zoomToContent} />
+        <Whiteboard
+          token={token}
+          endpoint={`https://${endpoint}`}
+          zoomToContent={isHeadless || (isMobile && isReadonly)}
+        />
       </Box>
     </Box>
   );
