@@ -70,7 +70,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
-    room?: Room,
+    private room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -84,9 +84,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
-    if (isBrowser && isMobile()) {
+    if (isBrowser && source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  clone(stream?: HMSLocalStream) {
+    return new HMSLocalVideoTrack(
+      stream || (this.stream as HMSLocalStream).clone(),
+      this.nativeTrack.clone(),
+      this.source!,
+      this.eventBus,
+      this.settings,
+      this.room,
+    );
   }
 
   /** @internal */
@@ -358,6 +369,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (error) {
+      // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
+      const track = await getVideoTrack(this.settings);
+      await this.replaceSender(track, this.enabled);
+      this.nativeTrack = track;
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
@@ -489,13 +506,34 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'hidden' && this.source === 'regular') {
-      this.enabledStateBeforeBackground = this.enabled;
-      this.nativeTrack.enabled = false;
-      this.replaceSenderTrack(this.nativeTrack);
+    if (document.visibilityState === 'hidden') {
+      if (isMobile()) {
+        this.enabledStateBeforeBackground = this.enabled;
+        this.nativeTrack.enabled = false;
+        HMSLogger.d(this.TAG, 'visibility hidden muting track');
+        this.replaceSenderTrack(this.nativeTrack);
+        // started interruption event
+        this.eventBus.analytics.publish(
+          this.sendInterruptionEvent({
+            started: true,
+          }),
+        );
+      }
     } else {
-      this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      if (this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') {
+        HMSLogger.d(this.TAG, 'visibility visible, restarting track', `${this}`);
+        const track = await this.replaceTrackWith(this.settings);
+        this.nativeTrack?.stop();
+        this.nativeTrack = track;
+      }
+      if (isMobile()) {
+        this.nativeTrack.enabled = this.enabledStateBeforeBackground;
+        await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      } else {
+        await this.replaceSender(this.nativeTrack, this.enabled);
+      }
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };

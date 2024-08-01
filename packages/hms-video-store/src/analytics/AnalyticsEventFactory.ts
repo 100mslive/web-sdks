@@ -256,6 +256,18 @@ export default class AnalyticsEventFactory {
       level: AnalyticsEventLevel.INFO,
     });
   }
+
+  static interruption(started: boolean, type: string, deviceInfo: Partial<MediaDeviceInfo>) {
+    return new AnalyticsEvent({
+      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        type,
+        ...deviceInfo,
+      },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
