@@ -43,8 +43,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   isBlurSupported(): boolean {
-    const gl = this.outputCanvas?.getContext('webgl');
-    return !!gl?.getSupportedExtensions()?.includes('WEBGL_2D_storage');
+    return 'filter' in CanvasRenderingContext2D.prototype;
   }
 
   checkSupport(): HMSPluginSupportResult {
