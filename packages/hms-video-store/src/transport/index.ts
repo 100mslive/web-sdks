@@ -450,6 +450,7 @@ export default class HMSTransport {
     }
     console.log('creating peer connections');
     this.createPeerConnections();
+    this.trackStates.clear();
     await this.negotiateOnFirstPublish();
     const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
