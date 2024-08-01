@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
 import {
   DeviceType,
@@ -105,22 +105,26 @@ const useNoiseCancellationWithPlugin = () => {
   const actions = useHMSActions();
   const [inProgress, setInProgress] = useState(false);
   const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
-  const setNoiseCancellationWithPlugin = async (enabled: boolean) => {
-    if (inProgress) {
-      return;
-    }
-    if (!krispPlugin.checkSupport().isSupported) {
-      throw Error('Krisp plugin is not supported');
-    }
-    setInProgress(true);
-    if (enabled) {
-      await actions.addPluginToAudioTrack(krispPlugin);
-    } else {
-      await actions.removePluginFromAudioTrack(krispPlugin);
-    }
-    setNoiseCancellationEnabled(enabled);
-    setInProgress(false);
-  };
+  const isEnabledForRoom = useHMSStore(selectRoom)?.isNoiseCancellationEnabled;
+  const setNoiseCancellationWithPlugin = useCallback(
+    async (enabled: boolean) => {
+      if (!isEnabledForRoom || inProgress) {
+        return;
+      }
+      if (!krispPlugin.checkSupport().isSupported) {
+        throw Error('Krisp plugin is not supported');
+      }
+      setInProgress(true);
+      if (enabled) {
+        await actions.addPluginToAudioTrack(krispPlugin);
+      } else {
+        await actions.removePluginFromAudioTrack(krispPlugin);
+      }
+      setNoiseCancellationEnabled(enabled);
+      setInProgress(false);
+    },
+    [actions, inProgress, isEnabledForRoom, setNoiseCancellationEnabled],
+  );
   return {
     setNoiseCancellationWithPlugin,
     inProgress,
