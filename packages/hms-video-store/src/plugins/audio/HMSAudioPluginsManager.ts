@@ -32,7 +32,7 @@ export class HMSAudioPluginsManager {
   private readonly TAG = '[AudioPluginsManager]';
   private readonly hmsTrack: HMSLocalAudioTrack;
   // Map maintains the insertion order
-  private readonly pluginsMap: Map<string, HMSAudioPlugin>;
+  readonly pluginsMap: Map<string, HMSAudioPlugin>;
   private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
