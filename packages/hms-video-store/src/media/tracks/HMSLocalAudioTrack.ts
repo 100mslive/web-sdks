@@ -76,7 +76,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     if (this.pluginsManager.pluginsMap.size > 0) {
       this.pluginsManager.pluginsMap.forEach(value => {
-        track.addPlugin(value);
+        track
+          .addPlugin(value)
+          .catch((e: Error) => HMSLogger.e(this.TAG, 'Plugin add failed while migrating', value, e));
       });
     }
     return track;

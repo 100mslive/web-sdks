@@ -448,7 +448,6 @@ export default class HMSTransport {
     if (!localPeer) {
       return;
     }
-    console.log('creating peer connections');
     this.createPeerConnections();
     this.trackStates.clear();
     await this.negotiateOnFirstPublish();
