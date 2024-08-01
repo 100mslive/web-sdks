@@ -42,13 +42,15 @@ export class AudioSinkManager {
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
   private autoUnpauseTimer: ReturnType<typeof setInterval> | null = null;
-  private earpieceSelected = false;
+  private earpieceSelected;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
+    console.log('called ');
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.earpieceSelected = false;
     this.startPollingForDevices();
     this.startPollingToCheckPausedAudio();
   }
@@ -297,13 +299,15 @@ export class AudioSinkManager {
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+    console.log('autoSelectAudioOutput> earpiece ', earpiece);
     if (localAudioTrack && earpiece) {
       const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
+      console.log('autoSelectAudioOutput> maunal selection ', manualSelection, this.earpieceSelected);
       const externalDeviceID =
         manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID, localAudioTrack.settings.deviceId);
       // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
       if (!this.earpieceSelected) {

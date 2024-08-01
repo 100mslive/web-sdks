@@ -244,6 +244,7 @@ export class DeviceManager implements HMSDeviceManager {
     // if manually selected device is not available, reset on the track
     this.store.getLocalPeer()?.audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
+    console.log('getNewAudioInputDevice> default device ', defaultDevice);
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
       // false positives when device is removed, because the other available device
@@ -251,8 +252,10 @@ export class DeviceManager implements HMSDeviceManager {
       const nextDevice = this.audioInput.find(device => {
         return device.deviceId !== 'default' && defaultDevice.label.includes(device.label);
       });
+      console.log('getNewAudioInputDevice> default device ', nextDevice);
       return nextDevice;
     }
+    console.log('getNewAudioInputDevice> input zeor device ', this.audioInput[0]);
     return this.audioInput[0];
   }
 
@@ -272,6 +275,7 @@ export class DeviceManager implements HMSDeviceManager {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
     this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
+    console.log('setoutputDevice> input device, prevSelection ', inputDevice, prevSelection);
     if (!this.outputDevice) {
       // there is no matching device, let's revert back to the prev selected device
       this.outputDevice = this.audioOutput.find(device => this.createIdentifier(device) === prevSelection);
@@ -280,6 +284,7 @@ export class DeviceManager implements HMSDeviceManager {
         this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
       }
     }
+    console.log('setoutputDevice> outputDevice ', this.outputDevice);
     await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
