@@ -75,6 +75,14 @@ class Store {
     this.simulcastEnabled = enabled;
   }
 
+  removeRemoteTracks() {
+    this.tracks.forEach(track => {
+      if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
+        this.removeTrack(track);
+      }
+    });
+  }
+
   getEnv() {
     return this.env;
   }
