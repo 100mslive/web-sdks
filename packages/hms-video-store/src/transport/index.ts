@@ -50,7 +50,6 @@ import {
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
-import { sleep } from '../utils/timer-utils';
 
 const TAG = '[HMSTransport]:';
 
@@ -104,33 +103,9 @@ export default class HMSTransport {
     );
 
     const onStateChange = async (state: TransportState, error?: HMSException) => {
-      if (this.publishConnection) {
-        const wasConnected = this.publishConnection.connectionState === 'connected';
-        if (!wasConnected) {
-          // don't show reconnect if not connected
-          return;
-        }
-        await sleep(3000);
-        const isConnected = this.publishConnection.connectionState === 'connected';
-        if (!isConnected) {
-          return;
-        }
-      }
       if (state !== this.state) {
-        // @ts-ignore
-        window.alert(
-          JSON.stringify(
-            {
-              prev: this.state,
-              curr: state,
-              connectionState: this.publishConnection?.nativeConnection.connectionState,
-              iceState: this.publishConnection?.nativeConnection?.iceConnectionState,
-            },
-            null,
-            1,
-          ),
-        );
         this.state = state;
+        window.alert({ inProgress: this.retryScheduler.inProgress.size });
         await this.observer.onStateChange(this.state, error);
       }
     };
@@ -513,6 +488,7 @@ export default class HMSTransport {
         this.store.removeTrack(track);
         const newTrack = track.clone(streamMap.get(stream.id));
         if (newTrack.type === 'video' && newTrack.source === 'screen') {
+          track.nativeTrack.removeEventListener('ended', this.onScreenshareStop);
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         track.cleanup();
