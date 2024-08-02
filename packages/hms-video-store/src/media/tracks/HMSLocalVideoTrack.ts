@@ -89,9 +89,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
   }
 
-  clone(stream?: HMSLocalStream) {
+  clone(stream: HMSLocalStream) {
     const track = new HMSLocalVideoTrack(
-      stream || (this.stream as HMSLocalStream).clone(),
+      stream,
       this.nativeTrack.clone(),
       this.source!,
       this.eventBus,
