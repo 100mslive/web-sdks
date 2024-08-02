@@ -913,6 +913,8 @@ export default class HMSTransport {
       onDemandTracks,
       offer,
     );
+    this.sfuNodeId = answer?.sfu_node_id;
+    this.signal.setSfuNodeId(this.sfuNodeId);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -936,6 +938,7 @@ export default class HMSTransport {
       onDemandTracks,
     );
     this.sfuNodeId = response?.sfu_node_id;
+    this.signal.setSfuNodeId(this.sfuNodeId);
     return !!response;
   }
 
