@@ -487,7 +487,6 @@ export default class HMSTransport {
         this.store.removeTrack(track);
         const newTrack = track.clone(streamMap.get(stream.id));
         if (newTrack.type === 'video' && newTrack.source === 'screen') {
-          track.nativeTrack.removeEventListener('ended', this.onScreenshareStop);
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         track.cleanup();
