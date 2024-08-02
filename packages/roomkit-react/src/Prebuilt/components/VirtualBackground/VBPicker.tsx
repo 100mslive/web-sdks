@@ -6,7 +6,7 @@ import {
   selectIsEffectsEnabled,
   selectLocalPeerRole,
 } from '@100mslive/hms-video-store';
-import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -58,49 +58,38 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
   useEffect(() => {
-    if (!track?.id) {
-      return;
-    }
-    if (!isPluginAdded) {
-      setLoadingEffects(true);
-      let vbObject = VBHandler.getVBObject();
-      if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
-        vbObject = VBHandler.getVBObject();
-        if (isEffectsEnabled && effectsKey) {
-          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
-        } else {
-          setLoadingEffects(false);
-          if (!role) {
-            return;
-          }
-          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
-        }
+    if (!track?.id || isPluginAdded || !role) return;
+
+    setLoadingEffects(true);
+    const initAndApplyVB = async () => {
+      await VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () =>
+        setLoadingEffects(false),
+      );
+      const vbObject = VBHandler.getVBObject();
+
+      if (isEffectsEnabled && effectsKey) {
+        hmsActions.addPluginsToVideoStream([vbObject]);
+      } else if (role) {
+        hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
       }
-      const handleDefaultBackground = async () => {
-        switch (background) {
-          case HMSVirtualBackgroundTypes.NONE: {
-            break;
-          }
-          case HMSVirtualBackgroundTypes.BLUR: {
-            await VBHandler.setBlur(blurAmount);
-            break;
-          }
-          default:
-            await VBHandler.setBackground(background);
-        }
-      };
-      handleDefaultBackground();
-    }
+
+      if (background === HMSVirtualBackgroundTypes.BLUR) {
+        await VBHandler.setBlur(blurAmount);
+      } else if (background !== HMSVirtualBackgroundTypes.NONE) {
+        await VBHandler.setBackground(background);
+      }
+    };
+
+    initAndApplyVB();
   }, [
-    hmsActions,
-    role,
+    track?.id,
     isPluginAdded,
     isEffectsEnabled,
     effectsKey,
-    track?.id,
+    role,
     background,
     blurAmount,
+    hmsActions,
     setLoadingEffects,
   ]);
 
