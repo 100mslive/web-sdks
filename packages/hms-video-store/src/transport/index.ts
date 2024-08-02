@@ -947,16 +947,23 @@ export default class HMSTransport {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
       return false;
     }
-    const offer = await this.publishConnection.createOffer(this.trackStates);
-    await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
-    await this.publishConnection.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection.candidates) {
-      await this.publishConnection.addIceCandidate(candidate);
-    }
+    try {
+      const offer = await this.publishConnection.createOffer(this.trackStates);
+      await this.publishConnection.setLocalDescription(offer);
+      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
+      await this.publishConnection.setRemoteDescription(answer);
+      for (const candidate of this.publishConnection.candidates) {
+        await this.publishConnection.addIceCandidate(candidate);
+      }
 
-    this.publishConnection.initAfterJoin();
-    return !!answer;
+      this.publishConnection.initAfterJoin();
+      return !!answer;
+    } catch (ex) {
+      if (ex instanceof HMSException && ex.code === 400) {
+        return true;
+      }
+      throw ex;
+    }
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
@@ -989,7 +996,11 @@ export default class HMSTransport {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
 
-      callback!.promise.reject(ex);
+      if (ex.code === 400) {
+        callback!.promise.resolve(true);
+      } else {
+        callback!.promise.reject(ex);
+      }
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
   }
