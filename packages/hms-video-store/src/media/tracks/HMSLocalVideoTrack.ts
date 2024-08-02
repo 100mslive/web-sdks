@@ -533,7 +533,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       );
     } else {
       if ((this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') && this.enabledStateBeforeBackground) {
-        await this.setEnabled(true);
+        setTimeout(async () => {
+          await this.setEnabled(true);
+        }, 0);
       } else {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
