@@ -522,9 +522,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     console.log('here ', this.nativeTrack, this.nativeTrack.muted, this.nativeTrack.enabled, document.visibilityState);
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
-      this.nativeTrack.enabled = false;
-      HMSLogger.d(this.TAG, 'visibility hidden muting track');
-      this.replaceSender(this.nativeTrack, false);
+      if (!this.enabled) {
+        this.nativeTrack.enabled = false;
+        HMSLogger.d(this.TAG, 'visibility hidden muting track');
+        this.replaceSender(this.nativeTrack, false);
+        this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
+      } else {
+        await this.setEnabled(false);
+        this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+      }
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -535,7 +541,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       if ((this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') && this.enabledStateBeforeBackground) {
         setTimeout(async () => {
           await this.setEnabled(true);
-          this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
+          this.eventBus.localVideoEnabled.publish({ enabled: true, track: this });
         }, 0);
       } else {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
