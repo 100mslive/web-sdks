@@ -23,10 +23,10 @@ import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const { token, endpoint, permissions } = useWhiteboard(isMobile);
+  const { token, endpoint, permissions } = useWhiteboard();
   const isHeadless = useHMSStore(selectAppData('disableNotifications'));
 
-  const isReadonly = !permissions.includes('write');
+  const isReadonly = !permissions?.includes('write');
 
   if (!token) {
     return null;
