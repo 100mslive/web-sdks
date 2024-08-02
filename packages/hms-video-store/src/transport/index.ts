@@ -420,6 +420,7 @@ export default class HMSTransport {
   }
 
   setSFUNodeId(id: string) {
+    this.signal.setSfuNodeId(id);
     if (!this.sfuNodeId) {
       this.sfuNodeId = id;
     } else if (this.sfuNodeId !== id) {
@@ -950,7 +951,7 @@ export default class HMSTransport {
     try {
       const offer = await this.publishConnection.createOffer(this.trackStates);
       await this.publishConnection.setLocalDescription(offer);
-      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
+      const answer = await this.signal.offer(offer, this.trackStates);
       await this.publishConnection.setRemoteDescription(answer);
       for (const candidate of this.publishConnection.candidates) {
         await this.publishConnection.addIceCandidate(candidate);
@@ -959,7 +960,8 @@ export default class HMSTransport {
       this.publishConnection.initAfterJoin();
       return !!answer;
     } catch (ex) {
-      if (ex instanceof HMSException && ex.code === 400) {
+      // resolve for now as this might happen during migration
+      if (ex instanceof HMSException && ex.code === 421) {
         return true;
       }
       throw ex;
@@ -982,7 +984,7 @@ export default class HMSTransport {
       const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
       await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
-      const answer = await this.signal.offer(offer, this.trackStates, this.sfuNodeId);
+      const answer = await this.signal.offer(offer, this.trackStates);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       await this.publishConnection.setRemoteDescription(answer);
@@ -996,7 +998,8 @@ export default class HMSTransport {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
 
-      if (ex.code === 400) {
+      // resolve for now as this might happen during migration
+      if (ex.code === 421) {
         callback!.promise.resolve(true);
       } else {
         callback!.promise.reject(ex);
