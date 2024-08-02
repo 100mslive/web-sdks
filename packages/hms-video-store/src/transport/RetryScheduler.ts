@@ -29,7 +29,7 @@ interface ScheduleTaskParams {
 
 export class RetryScheduler {
   private readonly TAG = '[RetryScheduler]';
-  readonly inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
+  private readonly inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(

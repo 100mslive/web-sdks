@@ -105,7 +105,6 @@ export default class HMSTransport {
     const onStateChange = async (state: TransportState, error?: HMSException) => {
       if (state !== this.state) {
         this.state = state;
-        window.alert({ inProgress: this.retryScheduler.inProgress.size });
         await this.observer.onStateChange(this.state, error);
       }
     };
