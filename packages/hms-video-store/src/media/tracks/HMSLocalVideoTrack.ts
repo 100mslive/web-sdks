@@ -411,6 +411,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
+    console.log('here ', this.nativeTrack, this.nativeTrack.muted, newTrack, newTrack.muted, enabled);
     if (enabled) {
       await this.replaceSenderTrack(this.processedTrack || newTrack);
     } else {
@@ -518,11 +519,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
+    console.log('here ', this.nativeTrack, this.nativeTrack.muted, this.nativeTrack.enabled, document.visibilityState);
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
       HMSLogger.d(this.TAG, 'visibility hidden muting track');
-      this.replaceSenderTrack(this.nativeTrack);
+      this.replaceSender(this.nativeTrack, false);
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -530,9 +532,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
-      this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
-      this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      if ((this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') && this.enabledStateBeforeBackground) {
+        await this.setEnabled(true);
+      } else {
+        this.nativeTrack.enabled = this.enabledStateBeforeBackground;
+        HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
+        this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      }
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
