@@ -431,7 +431,7 @@ export default class HMSTransport {
   // eslint-disable-next-line complexity
   async handleSFUMigration() {
     HMSLogger.time('sfu migration');
-    // this.clearPeerConnections();
+    this.clearPeerConnections();
     const peers = this.store.getPeerMap();
     this.store.removeRemoteTracks();
     for (const peerId in peers) {
@@ -448,9 +448,9 @@ export default class HMSTransport {
     if (!localPeer) {
       return;
     }
-    // this.createPeerConnections();
+    this.createPeerConnections();
     this.trackStates.clear();
-    // await this.negotiateOnFirstPublish();
+    await this.negotiateOnFirstPublish();
     const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
       const stream = localPeer.audioTrack.stream as HMSLocalStream;
@@ -471,9 +471,7 @@ export default class HMSTransport {
       }
       this.store.removeTrack(localPeer.videoTrack);
       const newTrack = localPeer.videoTrack.clone(streamMap.get(stream.id));
-      const oldTrack = localPeer.videoTrack;
       localPeer.videoTrack.cleanup();
-      console.log({ newTrack, oldTrack });
       await this.publishTrack(newTrack);
       localPeer.videoTrack = newTrack;
     }
