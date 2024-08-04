@@ -32,7 +32,7 @@ export class HMSAudioPluginsManager {
   private readonly TAG = '[AudioPluginsManager]';
   private readonly hmsTrack: HMSLocalAudioTrack;
   // Map maintains the insertion order
-  private readonly pluginsMap: Map<string, HMSAudioPlugin>;
+  readonly pluginsMap: Map<string, HMSAudioPlugin>;
   private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
@@ -122,6 +122,7 @@ export class HMSAudioPluginsManager {
       this.pluginsMap.set(name, plugin);
       await this.processPlugin(plugin);
       await this.connectToDestination();
+      await this.updateProcessedTrack();
     } catch (err) {
       HMSLogger.e(this.TAG, 'failed to add plugin', err);
       throw err;
@@ -213,6 +214,7 @@ export class HMSAudioPluginsManager {
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
+    this.updateProcessedTrack();
   }
 
   private async initAudioNodes() {
@@ -224,13 +226,16 @@ export class HMSAudioPluginsManager {
       if (!this.destinationNode) {
         this.destinationNode = this.audioContext.createMediaStreamDestination();
         this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
-        try {
-          await this.hmsTrack.setProcessedTrack(this.outputTrack);
-        } catch (err) {
-          HMSLogger.e(this.TAG, 'error in setting processed track', err);
-          throw err;
-        }
       }
+    }
+  }
+
+  private async updateProcessedTrack() {
+    try {
+      await this.hmsTrack.setProcessedTrack(this.outputTrack);
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'error in setting processed track', err);
+      throw err;
     }
   }
 

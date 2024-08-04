@@ -34,7 +34,6 @@ export default class HMSPublishConnection extends HMSConnection {
       this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
 
-    // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     this.nativeConnection.onconnectionstatechange = () => {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
 
@@ -51,6 +50,11 @@ export default class HMSPublishConnection extends HMSConnection {
         };
       }
     };
+  }
+
+  close() {
+    super.close();
+    this.channel.close();
   }
 
   initAfterJoin() {
