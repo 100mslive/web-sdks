@@ -10,3 +10,4 @@ export const trackTypeOptions = [
   { label: 'audio', value: 'audio' },
   { label: 'video', value: 'video' },
 ];
+export const DEFAULT_TILES_IN_VIEW = 9;
