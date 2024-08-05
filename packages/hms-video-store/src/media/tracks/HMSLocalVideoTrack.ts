@@ -536,11 +536,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
+      HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
         await this.setEnabled(true);
       } else {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-        HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
         await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       }
       // started interruption event
