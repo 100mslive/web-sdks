@@ -303,7 +303,7 @@ export class AudioSinkManager {
         manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
       HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
       // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
       if (!this.earpieceSelected) {
