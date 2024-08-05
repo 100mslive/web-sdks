@@ -527,7 +527,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.nativeTrack = track;
       } else {
         this.nativeTrack.enabled = false;
-        this.replaceSenderTrack(this.nativeTrack);
+        await this.replaceSender(this.nativeTrack, false);
       }
       // started interruption event
       this.eventBus.analytics.publish(
@@ -541,7 +541,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
-        this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+        await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       }
       // started interruption event
       this.eventBus.analytics.publish(
