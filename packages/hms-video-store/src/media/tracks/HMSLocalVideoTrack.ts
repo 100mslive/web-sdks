@@ -129,7 +129,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   async setEnabled(value: boolean): Promise<void> {
-    console.log('this.enabled ', this.enabled);
     if (value === this.enabled) {
       return;
     }
@@ -412,7 +411,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
-    console.log('here ', this.nativeTrack, this.nativeTrack.muted, newTrack, newTrack.muted, enabled);
     if (enabled) {
       await this.replaceSenderTrack(this.processedTrack || newTrack);
     } else {
@@ -520,7 +518,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
-    console.log('here ', this.nativeTrack, this.nativeTrack.muted, this.nativeTrack.enabled, document.visibilityState);
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       if (this.enabled) {
