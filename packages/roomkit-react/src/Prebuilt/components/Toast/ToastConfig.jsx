@@ -153,9 +153,9 @@ export const ToastConfig = {
     },
   },
   RECONNECTED: {
-    single: () => {
+    single: online => {
       return {
-        title: `You are now connected`,
+        title: `You are now ${online ? 'online' : 'connected'}`,
         icon: <ConnectivityIcon />,
         variant: 'success',
         duration: 3000,
