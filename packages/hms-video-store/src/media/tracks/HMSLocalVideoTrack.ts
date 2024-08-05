@@ -129,6 +129,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   async setEnabled(value: boolean): Promise<void> {
+    console.log('this.enabled ', this.enabled);
     if (value === this.enabled) {
       return;
     }
@@ -522,15 +523,16 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     console.log('here ', this.nativeTrack, this.nativeTrack.muted, this.nativeTrack.enabled, document.visibilityState);
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
-      if (!this.enabled) {
-        this.nativeTrack.enabled = false;
-        HMSLogger.d(this.TAG, 'visibility hidden muting track');
-        this.replaceSender(this.nativeTrack, false);
-        this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
+      if (this.enabled) {
+        const track = await this.replaceTrackWithBlank();
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack?.stop();
+        this.nativeTrack = track;
       } else {
-        await this.setEnabled(false);
-        this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+        this.nativeTrack.enabled = false;
+        this.replaceSenderTrack(this.nativeTrack);
       }
+      this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -538,11 +540,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
-      if ((this.nativeTrack.muted || this.nativeTrack.readyState === 'ended') && this.enabledStateBeforeBackground) {
-        setTimeout(async () => {
-          await this.setEnabled(true);
-          this.eventBus.localVideoEnabled.publish({ enabled: true, track: this });
-        }, 0);
+      if (this.enabledStateBeforeBackground) {
+        await this.setEnabled(true);
+        this.eventBus.localVideoEnabled.publish({ enabled: true, track: this });
       } else {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
