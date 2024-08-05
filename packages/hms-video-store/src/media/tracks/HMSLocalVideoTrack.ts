@@ -526,7 +526,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.nativeTrack?.stop();
         this.nativeTrack = track;
       } else {
-        this.nativeTrack.enabled = false;
         await this.replaceSender(this.nativeTrack, false);
       }
       // started interruption event
