@@ -72,18 +72,22 @@ export default abstract class HMSConnection {
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
     try {
+      console.log(TAG, 'setlocaldescription', this.nativeConnection.signalingState, this.action);
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
+      console.error(TAG, 'local description error', error);
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
     }
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
     try {
+      console.log(TAG, 'setRemoteDescription', this.nativeConnection.signalingState, this.action);
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
+      console.error(TAG, 'remote description error', error);
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
     }
   }
@@ -103,6 +107,10 @@ export default abstract class HMSConnection {
 
   getSenders(): Array<RTCRtpSender> {
     return this.nativeConnection.getSenders();
+  }
+
+  getTransceivers(): Array<RTCRtpTransceiver> {
+    return this.nativeConnection.getTransceivers();
   }
 
   handleSelectedIceCandidatePairs() {

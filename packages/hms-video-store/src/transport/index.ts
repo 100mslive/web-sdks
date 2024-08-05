@@ -109,8 +109,8 @@ export default class HMSTransport {
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
 
-    this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
-    this.eventBus.localVideoEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localAudioEnabled.subscribe(this.trackUpdate);
+    this.eventBus.localVideoEnabled.subscribe(this.trackUpdate);
   }
 
   setListener = (listener: HMSUpdateListener) => {
@@ -158,11 +158,13 @@ export default class HMSTransport {
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
         trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
-      if (!connection?.remoteDescription) {
-        // ICE candidates can't be added without any remote session description
-        connection?.candidates.push(trickle.candidate);
-      } else {
-        await connection.addIceCandidate(trickle.candidate);
+      if (connection) {
+        if (!connection.remoteDescription) {
+          // ICE candidates can't be added without any remote session description
+          connection?.candidates.push(trickle.candidate);
+        } else {
+          await connection.addIceCandidate(trickle.candidate);
+        }
       }
     },
 
@@ -361,6 +363,9 @@ export default class HMSTransport {
       this.analyticsEventsService.flushFailedClientEvents();
       this.analyticsEventsService.reset();
       await this.signal.close();
+      this.eventBus.localAudioEnabled.unsubscribe(this.trackUpdate);
+      this.eventBus.localVideoEnabled.unsubscribe(this.trackUpdate);
+      this.eventBus.statsUpdate.removeAllListeners();
     } catch (err) {
       this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err as Error));
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
@@ -492,7 +497,7 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate(track: HMSLocalTrack) {
+  trackUpdate = ({ track }: { track: HMSLocalTrack }) => {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
@@ -506,7 +511,7 @@ export default class HMSTransport {
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
-  }
+  };
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();
@@ -521,7 +526,18 @@ export default class HMSTransport {
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    await this.getPromiseForRenegotiation();
+    await new Promise<void>((resolve, reject) => {
+      const listener = (trackId: string) => {
+        if (trackId === track.publishedTrackId) {
+          this.eventEmitter.off('publish', listener);
+          this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
+          resolve();
+        }
+      };
+      this.eventEmitter.on('published', listener);
+      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, reject);
+    });
+    // await this.getPromiseForRenegotiation();
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
     // add track to store after publish
     this.store.addTrack(track);
@@ -563,7 +579,18 @@ export default class HMSTransport {
       }
     }
     this.publishConnection?.removeTrack(track.transceiver?.sender);
-    await this.getPromiseForRenegotiation();
+    // await this.getPromiseForRenegotiation();
+    await new Promise<void>((resolve, reject) => {
+      const listener = (mid: string) => {
+        if (track.transceiver?.mid === mid) {
+          this.eventEmitter.off('unpublished', listener);
+          this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
+          resolve();
+        }
+      };
+      this.eventEmitter.on('unpublished', listener);
+      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, reject);
+    });
     await track.cleanup();
     // remove track from store on unpublish
     this.store.removeTrack(track);
@@ -880,7 +907,9 @@ export default class HMSTransport {
     );
     this.sfuNodeId = answer?.sfu_node_id;
     this.signal.setSfuNodeId(this.sfuNodeId);
+    console.log(TAG, this.publishConnection.nativeConnection.signalingState);
     await this.publishConnection.setRemoteDescription(answer);
+    console.log(TAG, this.publishConnection.nativeConnection.signalingState);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
     }
@@ -936,6 +965,16 @@ export default class HMSTransport {
     }
   }
 
+  private sendPublishEvents = () => {
+    this.publishConnection?.getTransceivers().forEach(transceiver => {
+      if (transceiver.direction === 'inactive') {
+        this.eventEmitter.emit('unpublished', transceiver.mid);
+      } else if (transceiver.direction === 'sendonly' && transceiver.mid !== null) {
+        this.eventEmitter.emit('published', transceiver.sender.track?.id);
+      }
+    });
+  };
+
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     if (!this.publishConnection) {
@@ -947,10 +986,12 @@ export default class HMSTransport {
       const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
       await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
+      console.log(TAG, this.publishConnection.nativeConnection.signalingState);
       const answer = await this.signal.offer(offer, this.trackStates);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
+      console.log(TAG, this.publishConnection.nativeConnection.signalingState);
       await this.publishConnection.setRemoteDescription(answer);
-      this.eventEmitter.emit(RENEGOTIATION_CALLBACK_ID, true);
+      this.sendPublishEvents();
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
       let ex: HMSException;
@@ -962,7 +1003,7 @@ export default class HMSTransport {
 
       // resolve for now as this might happen during migration
       if (ex.code === 421) {
-        this.eventEmitter.emit(RENEGOTIATION_CALLBACK_ID, true);
+        this.sendPublishEvents();
       } else {
         this.eventEmitter.emit(RENEGOTIATION_CALLBACK_ID, ex);
       }
@@ -1217,18 +1258,6 @@ export default class HMSTransport {
       this.state = TransportState.Connecting;
       this.observer.onStateChange(this.state);
     }
-  }
-
-  private getPromiseForRenegotiation() {
-    return new Promise((resolve, reject) => {
-      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, value => {
-        if (value instanceof HMSException) {
-          reject(value);
-        } else {
-          resolve(value);
-        }
-      });
-    });
   }
 
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
