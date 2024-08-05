@@ -15,10 +15,6 @@ export class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  clone() {
-    return new HMSLocalStream(this.nativeStream.clone());
-  }
-
   addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
