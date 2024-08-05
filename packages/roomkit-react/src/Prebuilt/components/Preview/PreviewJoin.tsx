@@ -4,6 +4,7 @@ import {
   HMSRoomState,
   selectAppData,
   selectIsLocalVideoEnabled,
+  selectIsVBEnabled,
   selectLocalPeer,
   selectRoomState,
   selectVideoTrackByID,
@@ -253,6 +254,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
+  const isVBEnabledForUser = useHMSStore(selectIsVBEnabled);
   return (
     <Flex
       justify={hideSettings && isMobile ? 'center' : 'between'}
@@ -263,7 +265,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {vbEnabled ? <VBToggle /> : null}
+        {vbEnabled && isVBEnabledForUser ? <VBToggle /> : null}
       </Flex>
       <Flex align="center" gap="1">
         {isMobile && <NoiseCancellation iconOnly />}

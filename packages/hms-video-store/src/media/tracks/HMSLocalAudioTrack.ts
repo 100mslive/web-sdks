@@ -64,9 +64,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
-  clone(stream?: HMSLocalStream) {
+  clone(stream: HMSLocalStream) {
     const track = new HMSLocalAudioTrack(
-      stream || (this.stream as HMSLocalStream).clone(),
+      stream,
       this.nativeTrack.clone(),
       this.source!,
       this.eventBus,

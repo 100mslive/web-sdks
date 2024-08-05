@@ -33,13 +33,8 @@ export interface HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
-  /**
-   * @alpha
-   */
   isEffectsEnabled?: boolean;
-  /**
-   * @alpha
-   */
+  isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;

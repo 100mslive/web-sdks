@@ -61,7 +61,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     if (!track?.id) {
       return;
     }
-    if (!isPluginAdded) {
+    const vbObject = VBHandler.getVBObject();
+    if (!isPluginAdded && !vbObject) {
       setLoadingEffects(true);
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
