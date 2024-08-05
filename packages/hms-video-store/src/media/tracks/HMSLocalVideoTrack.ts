@@ -166,6 +166,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         await this.setProcessedTrack();
       }
+      this.videoHandler.updateSinks();
     } catch (e) {
       console.error('error in processing plugin(s)', e);
     }
