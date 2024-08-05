@@ -47,7 +47,7 @@ export class HMSVideoPluginsManager {
   private pluginsLoopRunning = false;
   private pluginsLoopState: 'paused' | 'running' = 'paused';
   private readonly hmsTrack: HMSLocalVideoTrack;
-  private readonly pluginsMap: Map<string, HMSVideoPlugin>; // plugin names to their instance mapping
+  readonly pluginsMap: Map<string, HMSVideoPlugin>; // plugin names to their instance mapping
   private inputVideo?: HTMLVideoElement;
   private inputCanvas?: CanvasElement;
   private outputCanvas?: CanvasElement;

@@ -23,6 +23,7 @@ import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
+import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
@@ -222,24 +223,26 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <Init />
-                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
-                        <Box
-                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
-                          css={{
-                            bg: '$background_dim',
-                            size: '100%',
-                            lineHeight: '1.5',
-                            '-webkit-text-size-adjust': '100%',
-                            position: 'relative',
-                          }}
-                        >
-                          <AppRoutes
-                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                            defaultAuthToken={authToken}
-                          />
-                        </Box>
-                      </DialogContainerProvider>
+                      <PIPProvider>
+                        <Init />
+                        <DialogContainerProvider dialogContainerSelector={containerSelector}>
+                          <Box
+                            className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
+                            css={{
+                              bg: '$background_dim',
+                              size: '100%',
+                              lineHeight: '1.5',
+                              '-webkit-text-size-adjust': '100%',
+                              position: 'relative',
+                            }}
+                          >
+                            <AppRoutes
+                              authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                              defaultAuthToken={authToken}
+                            />
+                          </Box>
+                        </DialogContainerProvider>
+                      </PIPProvider>
                     </HMSThemeProvider>
                   );
                 }}

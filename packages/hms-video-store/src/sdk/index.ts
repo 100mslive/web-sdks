@@ -203,6 +203,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       this.interactivityCenter.setListener(this.listener);
+      this.transport.setListener(this.listener);
       return;
     }
 
@@ -892,6 +893,9 @@ export class HMSSdk implements HMSInterface {
       });
       return;
     }
+    this.transport.setOnScreenshareStop(() => {
+      this.stopEndedScreenshare(onStop);
+    });
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;

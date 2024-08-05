@@ -25,6 +25,8 @@ export const usePIPChat = () => {
       const pipChatInput = pipWindow.document.getElementById('chat-input') as HTMLTextAreaElement;
       const marker = pipWindow.document.getElementById('marker');
 
+      marker?.scrollIntoView({ block: 'end' });
+
       const observer = new IntersectionObserver(
         entries => {
           entries.forEach(entry => {

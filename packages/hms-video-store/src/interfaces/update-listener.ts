@@ -83,6 +83,7 @@ export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreLis
   onError(error: HMSException): void;
   onReconnecting(error: HMSException): void;
   onReconnected(): void;
+  onSFUMigration?: () => void;
   onRoleChangeRequest(request: HMSRoleChangeRequest): void;
   onRoleUpdate(newRole: string): void;
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
