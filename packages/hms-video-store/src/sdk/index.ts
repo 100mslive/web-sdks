@@ -169,6 +169,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       this.interactivityCenter.setListener(this.listener);
+      this.transport.setListener(this.listener);
       return;
     }
 
@@ -428,16 +429,9 @@ export class HMSSdk implements HMSInterface {
         resolve();
       };
 
-      const errorHandler = (ex?: HMSException) => {
-        this.analyticsTimer.end(TimedEvent.PREVIEW);
-        ex && this.errorListener?.onError(ex);
-        this.sendPreviewAnalyticsEvent(ex);
-        this.sdkState.isPreviewInProgress = false;
-        reject(ex as HMSException);
-      };
-
       this.eventBus.policyChange.subscribeOnce(policyHandler);
-      this.eventBus.leave.subscribeOnce(errorHandler);
+      this.eventBus.leave.subscribeOnce(this.handlePreviewError);
+      this.eventBus.leave.subscribeOnce(ex => reject(ex as HMSException));
 
       this.transport
         .preview(
@@ -457,9 +451,19 @@ export class HMSSdk implements HMSInterface {
             });
           }
         })
-        .catch(errorHandler);
+        .catch(ex => {
+          this.handlePreviewError(ex);
+          reject(ex);
+        });
     });
   }
+
+  private handlePreviewError = (ex?: HMSException) => {
+    this.analyticsTimer.end(TimedEvent.PREVIEW);
+    ex && this.errorListener?.onError(ex);
+    this.sendPreviewAnalyticsEvent(ex);
+    this.sdkState.isPreviewInProgress = false;
+  };
 
   private async midCallPreview(asRole?: string, settings?: InitialSettings): Promise<void> {
     if (!this.localPeer || this.transportState !== TransportState.Joined) {
@@ -538,6 +542,8 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
+    // remove terminal error handling from preview(do not send preview.failed after join on disconnect)
+    this.eventBus.leave.unsubscribe(this.handlePreviewError);
     this.analyticsTimer.start(TimedEvent.JOIN);
     this.sdkState.isJoinInProgress = true;
 
@@ -838,6 +844,9 @@ export class HMSSdk implements HMSInterface {
       });
       return;
     }
+    this.transport.setOnScreenshareStop(() => {
+      this.stopEndedScreenshare(onStop);
+    });
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;

@@ -70,7 +70,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
-    room?: Room,
+    private room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -84,9 +84,31 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
-    if (isBrowser && isMobile()) {
+    if (isBrowser && source === 'regular' && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  clone(stream: HMSLocalStream) {
+    const track = new HMSLocalVideoTrack(
+      stream,
+      this.nativeTrack.clone(),
+      this.source!,
+      this.eventBus,
+      this.settings,
+      this.room,
+    );
+    if (this.pluginsManager.pluginsMap.size > 0) {
+      this.pluginsManager.pluginsMap.forEach(value => {
+        track
+          .addPlugin(value)
+          .catch((e: Error) => HMSLogger.e(this.TAG, 'Plugin add failed while migrating', value, e));
+      });
+    }
+    if (this.mediaStreamPluginsManager.plugins.size > 0) {
+      track.addStreamPlugins(Array.from(this.mediaStreamPluginsManager.plugins));
+    }
+    return track;
   }
 
   /** @internal */
@@ -494,14 +516,29 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
   };
 
+  // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'hidden' && this.source === 'regular') {
+    if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       this.nativeTrack.enabled = false;
+      HMSLogger.d(this.TAG, 'visibility hidden muting track');
       this.replaceSenderTrack(this.nativeTrack);
+      // started interruption event
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: true,
+        }),
+      );
     } else {
       this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-      this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+      HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
+      this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      // started interruption event
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+        }),
+      );
     }
     this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
