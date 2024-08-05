@@ -21,7 +21,7 @@ export abstract class AnalyticsTransport {
       this.lastResetTime = now;
     }
     if (this.eventCount >= this.MAX_EVENTS_PER_MINUTE) {
-      throw new Error('Too many events being sent, please check your implementation');
+      throw new Error('Too many events being sent, please check the implementation.');
     }
     this.eventCount++;
   }
@@ -29,11 +29,15 @@ export abstract class AnalyticsTransport {
   sendEvent(event: AnalyticsEvent) {
     try {
       this.checkRateLimit();
+    } catch (e) {
+      HMSLogger.w(this.TAG, 'Rate limit exceeded', e);
+      throw e;
+    }
+    try {
       this.sendSingleEvent(event);
       this.flushFailedEvents();
     } catch (error) {
       HMSLogger.w(this.TAG, 'sendEvent failed', error);
-      throw error;
     }
   }
 
