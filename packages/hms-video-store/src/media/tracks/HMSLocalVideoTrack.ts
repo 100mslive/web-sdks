@@ -521,9 +521,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
-      this.nativeTrack.enabled = false;
-      HMSLogger.d(this.TAG, 'visibility hidden muting track');
-      this.replaceSenderTrack(this.nativeTrack);
+      if (this.enabled) {
+        const track = await this.replaceTrackWithBlank();
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack?.stop();
+        this.nativeTrack = track;
+      } else {
+        await this.replaceSender(this.nativeTrack, false);
+      }
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -531,9 +536,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
-      this.nativeTrack.enabled = this.enabledStateBeforeBackground;
       HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
-      this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      if (this.enabledStateBeforeBackground) {
+        await this.setEnabled(true);
+      } else {
+        this.nativeTrack.enabled = this.enabledStateBeforeBackground;
+        await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
+      }
       // started interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
