@@ -111,6 +111,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
+    this.earpieceSelected = false;
     this.state = { ...INITIAL_STATE };
   }
 
