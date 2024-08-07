@@ -53,8 +53,8 @@ export const LeaveScreen = () => {
             Left by mistake?
           </Text>
           <Button
-            onClick={() => {
-              rejoin();
+            onClick={async () => {
+              await rejoin();
               ToastManager.clearAllToast();
             }}
             data-testid="join_again_btn"

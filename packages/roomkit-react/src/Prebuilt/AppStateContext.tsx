@@ -23,11 +23,11 @@ export enum PrebuiltStates {
 }
 
 type AppStateContextType = {
-  rejoin: () => void;
+  rejoin: () => Promise<void>;
 };
 
 export const AppStateContext = React.createContext<AppStateContextType>({
-  rejoin: () => {
+  rejoin: async () => {
     console.log('Rejoin');
   },
 });
@@ -54,10 +54,10 @@ export const useAppStateManager = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { redirectToLeave } = useRedirectToLeave();
 
-  const rejoin = () => {
+  const rejoin = async () => {
     setOriginalLayout?.();
     console.log('settings ', settings);
-    hmsActions.setAudioSettings({ deviceId: 'default' });
+    await hmsActions.setAudioSettings({ deviceId: 'default' });
     setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
   };
 
