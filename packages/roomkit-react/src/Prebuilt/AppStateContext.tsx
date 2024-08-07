@@ -57,8 +57,10 @@ export const useAppStateManager = () => {
   const rejoin = async () => {
     setOriginalLayout?.();
     console.log('settings ', settings);
-    await hmsActions.setAudioSettings({ deviceId: 'default' });
     setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    setTimeout(async () => {
+      await hmsActions.setAudioSettings({ deviceId: 'default' });
+    }, 1000);
   };
 
   useEffect(() => {
