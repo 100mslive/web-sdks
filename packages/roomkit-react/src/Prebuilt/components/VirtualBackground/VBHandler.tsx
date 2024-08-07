@@ -1,8 +1,7 @@
 import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
-  private effectsPlugin?: HMSEffectsPlugin | undefined;
+  private effectsPlugin?: HMSEffectsPlugin;
 
   initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {

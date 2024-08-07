@@ -1,5 +1,11 @@
 import React from 'react';
-import { selectAppData, selectIsEffectsEnabled, selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectAppData,
+  selectIsEffectsEnabled,
+  selectIsLocalVideoEnabled,
+  selectIsVBEnabled,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Loading } from '../../../Loading';
 import { Tooltip } from '../../../Tooltip';
@@ -12,10 +18,11 @@ export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isVBOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VB);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const isVBEnabled = useHMSStore(selectIsVBEnabled);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const loadingEffects = useHMSStore(selectAppData(APP_DATA.loadingEffects));
 
-  if (!isVideoOn || (!isEffectsEnabled && isSafari)) {
+  if (!isVideoOn || (!isEffectsEnabled && isSafari) || !isVBEnabled) {
     return null;
   }
 

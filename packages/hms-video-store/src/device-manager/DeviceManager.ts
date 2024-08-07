@@ -4,6 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
+import { isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -205,7 +206,11 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
     if (!audioDeviceId && localPeer?.audioTrack) {
-      await localPeer.audioTrack.setSettings({ deviceId: this.audioInput[0]?.deviceId }, true);
+      const getInitialDeviceId = () => {
+        const nonIPhoneDevice = this.audioInput.find(device => !device.label.toLowerCase().includes('iphone'));
+        return isIOS() && nonIPhoneDevice ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
+      };
+      await localPeer.audioTrack.setSettings({ deviceId: getInitialDeviceId() }, true);
     }
   };
 
@@ -232,16 +237,12 @@ export class DeviceManager implements HMSDeviceManager {
    * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
-    const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
-    const manualSelection = this.audioInput.find(
-      device => device.deviceId === audioTrack?.getManuallySelectedDeviceId(),
-    );
+    const manualSelection = this.getManuallySelectedAudioDevice();
     if (manualSelection) {
       return manualSelection;
     }
     // if manually selected device is not available, reset on the track
-    audioTrack?.resetManuallySelectedDeviceId();
+    this.store.getLocalPeer()?.audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
@@ -415,6 +416,35 @@ export class DeviceManager implements HMSDeviceManager {
       } as HMSDeviceChangeEvent);
     }
   };
+
+  getManuallySelectedAudioDevice() {
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    return this.audioInput.find(device => device.deviceId === audioTrack?.getManuallySelectedDeviceId());
+  }
+
+  // specifically used for mweb
+  categorizeAudioInputDevices() {
+    let bluetoothDevice: InputDeviceInfo | null = null;
+    let speakerPhone: InputDeviceInfo | null = null;
+    let wired: InputDeviceInfo | null = null;
+    let earpiece: InputDeviceInfo | null = null;
+
+    for (const device of this.audioInput) {
+      const label = device.label.toLowerCase();
+      if (label.includes('speakerphone')) {
+        speakerPhone = device;
+      } else if (label.includes('wired')) {
+        wired = device;
+      } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
+        bluetoothDevice = device;
+      } else if (label.includes('earpiece')) {
+        earpiece = device;
+      }
+    }
+
+    return { bluetoothDevice, speakerPhone, wired, earpiece };
+  }
 
   // eslint-disable-next-line complexity
   private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {

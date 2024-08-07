@@ -862,6 +862,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
       onPollsUpdate: this.onPollsUpdate.bind(this),
       onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
+      onSFUMigration: this.onSFUMigration.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -871,6 +872,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     });
   }
 
+  private onSFUMigration() {
+    this.syncRoomState('SFUMigration');
+  }
   private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
     const requestedBy = this.store.getState(selectPeerByID(request.requestedBy?.peerId));
     this.hmsNotifications.sendLeaveRoom({

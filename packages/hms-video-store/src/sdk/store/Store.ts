@@ -75,6 +75,15 @@ class Store {
     this.simulcastEnabled = enabled;
   }
 
+  removeRemoteTracks() {
+    this.tracks.forEach(track => {
+      if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
+        this.removeTrack(track);
+        delete this.peerTrackStates[track.trackId];
+      }
+    });
+  }
+
   getEnv() {
     return this.env;
   }
@@ -278,6 +287,10 @@ class Store {
 
   setTrackState(trackStateEntry: TrackStateEntry) {
     this.peerTrackStates[trackStateEntry.trackInfo.track_id] = trackStateEntry;
+  }
+
+  removeTrackState(trackId: string) {
+    delete this.peerTrackStates[trackId];
   }
 
   removePeer(peerId: string) {

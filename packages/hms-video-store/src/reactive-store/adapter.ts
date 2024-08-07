@@ -159,6 +159,7 @@ export class SDKToHMS {
       peerCount: sdkRoom.peerCount,
       isLargeRoom: sdkRoom.large_room_optimization,
       isEffectsEnabled: sdkRoom.isEffectsEnabled,
+      isVBEnabled: sdkRoom.isVBEnabled,
       effectsKey: sdkRoom.effectsKey,
       isHipaaEnabled: sdkRoom.isHipaaEnabled,
       isNoiseCancellationEnabled: sdkRoom.isNoiseCancellationEnabled,

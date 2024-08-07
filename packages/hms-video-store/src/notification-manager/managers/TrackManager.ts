@@ -56,12 +56,11 @@ export class TrackManager {
   };
 
   handleTrackRemovedPermanently = (notification: TrackStateNotification) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, notification);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE permanently`, notification);
     const trackIds = Object.keys(notification.tracks);
 
     trackIds.forEach(trackId => {
       const trackStateEntry = this.store.getTrackState(trackId);
-
       if (!trackStateEntry) {
         return;
       }

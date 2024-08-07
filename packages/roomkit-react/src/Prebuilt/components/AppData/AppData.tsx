@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -10,6 +11,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
@@ -26,6 +28,7 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
+import { DEFAULT_TILES_IN_VIEW } from '../MoreSettings/constants';
 
 const initialAppData = {
   [APP_DATA.uiSettings]: {
@@ -80,6 +83,7 @@ export const AppData = React.memo(() => {
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
   const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
+  const isMobile = useMedia(cssConfig.media.md);
 
   useEffect(() => {
     if (elements?.noise_cancellation?.enabled_by_default) {
@@ -117,9 +121,12 @@ export const AppData = React.memo(() => {
       ...uiSettings,
       [UI_SETTINGS.isAudioOnly]: undefined,
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
+      [UI_SETTINGS.maxTileCount]: isMobile
+        ? DEFAULT_TILES_IN_VIEW.MWEB
+        : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, hmsActions]);
+  }, [preferences, hmsActions, elements?.video_tile_layout, isMobile]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {
