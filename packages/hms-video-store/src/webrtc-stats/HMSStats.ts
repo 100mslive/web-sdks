@@ -29,11 +29,11 @@ export class HMSStats implements IHMSStatsStoreReadOnly {
     this.getPublishPeerConnection = () =>
       new Promise<RTCPeerConnection | undefined>(resolve => {
         if (this.hmsStore.getState(selectRoomState) === 'Connected') {
-          resolve(this.sdk?.getWebrtcInternals()?.getPublishPeerConnection());
+          resolve(this.sdk?.getWebrtcInternals()?.getCurrentStats()?.getPublishPeerConnection());
         } else {
           this.hmsStore.subscribe(roomState => {
             if (roomState === 'Connected') {
-              resolve(this.sdk?.getWebrtcInternals()?.getPublishPeerConnection());
+              resolve(this.sdk?.getWebrtcInternals()?.getCurrentStats()?.getPublishPeerConnection());
             }
           }, selectRoomState);
         }
@@ -42,11 +42,11 @@ export class HMSStats implements IHMSStatsStoreReadOnly {
     this.getSubscribePeerConnection = () =>
       new Promise<RTCPeerConnection | undefined>(resolve => {
         if (this.hmsStore.getState(selectRoomState) === 'Connected') {
-          resolve(this.sdk?.getWebrtcInternals()?.getSubscribePeerConnection());
+          resolve(this.sdk?.getWebrtcInternals()?.getCurrentStats()?.getSubscribePeerConnection());
         } else {
           this.hmsStore.subscribe(roomState => {
             if (roomState === 'Connected') {
-              resolve(this.sdk?.getWebrtcInternals()?.getSubscribePeerConnection());
+              resolve(this.sdk?.getWebrtcInternals()?.getCurrentStats()?.getSubscribePeerConnection());
             }
           }, selectRoomState);
         }

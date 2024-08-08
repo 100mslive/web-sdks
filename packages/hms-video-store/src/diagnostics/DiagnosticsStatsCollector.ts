@@ -35,7 +35,11 @@ export class DiagnosticsStatsCollector {
       localVideoTrackID && this.localVideoTrackStatsList.push(localTrackStats[localVideoTrackID]);
     }
 
-    const subscribeStatsReport = await this.sdk.getWebrtcInternals()?.getSubscribePeerConnection()?.getStats();
+    const subscribeStatsReport = await this.sdk
+      .getWebrtcInternals()
+      ?.getCurrentStats()
+      ?.getSubscribePeerConnection()
+      ?.getStats();
     subscribeStatsReport?.forEach(stat => {
       if (stat.type === 'inbound-rtp') {
         const list = stat.kind === 'audio' ? this.remoteAudioTrackStatsList : this.remoteVideoTrackStatsList;
