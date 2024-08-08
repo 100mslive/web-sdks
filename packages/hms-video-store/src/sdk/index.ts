@@ -543,7 +543,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     // remove terminal error handling from preview(do not send preview.failed after join on disconnect)
-    this.eventBus.leave.unsubscribe(this.handlePreviewError);
+    this.eventBus?.leave?.unsubscribe(this.handlePreviewError);
     this.analyticsTimer.start(TimedEvent.JOIN);
     this.sdkState.isJoinInProgress = true;
 
