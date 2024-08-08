@@ -20,6 +20,14 @@ export class HMSWebrtcInternals {
     return this.hmsStats;
   }
 
+  getPublishPeerConnection() {
+    return this.hmsStats?.getPublishPeerConnection();
+  }
+
+  getSubscribePeerConnection() {
+    return this.hmsStats?.getSubscribePeerConnection();
+  }
+
   onStatsChange(statsChangeCb: (stats: HMSWebrtcStats) => void) {
     this.eventBus.statsUpdate.subscribe(statsChangeCb);
     return () => {
@@ -63,7 +71,6 @@ export class HMSWebrtcInternals {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.PUBLISH, e.message)),
         );
-        console.error(e);
         HMSLogger.e(this.TAG, e.message);
       });
   }
