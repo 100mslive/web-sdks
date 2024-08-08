@@ -1,13 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
 import { match, P } from 'ts-pattern';
-import {
-  HMSRoomState,
-  selectLocalMediaSettings,
-  selectRoomState,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { useRoomLayout, useSetOriginalLayout } from './provider/roomLayoutProvider';
 import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
@@ -23,11 +17,11 @@ export enum PrebuiltStates {
 }
 
 type AppStateContextType = {
-  rejoin: () => Promise<void>;
+  rejoin: () => void;
 };
 
 export const AppStateContext = React.createContext<AppStateContextType>({
-  rejoin: async () => {
+  rejoin: () => {
     console.log('Rejoin');
   },
 });
@@ -45,8 +39,6 @@ export const useHMSAppStateContext = () => {
 export const useAppStateManager = () => {
   const roomLayout = useRoomLayout();
   const setOriginalLayout = useSetOriginalLayout();
-  const hmsActions = useHMSActions();
-  const settings = useHMSStore(selectLocalMediaSettings);
   const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
   const roomState = useHMSStore(selectRoomState);
   const prevRoomState = usePreviousDistinct(roomState);
@@ -54,13 +46,9 @@ export const useAppStateManager = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { redirectToLeave } = useRedirectToLeave();
 
-  const rejoin = async () => {
+  const rejoin = () => {
     setOriginalLayout?.();
-    console.log('settings ', settings);
     setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
-    setTimeout(async () => {
-      await hmsActions.setAudioSettings({ deviceId: 'default' });
-    }, 1000);
   };
 
   useEffect(() => {

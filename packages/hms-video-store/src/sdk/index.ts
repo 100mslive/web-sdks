@@ -619,13 +619,13 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private cleanup() {
+  private async cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
-    this.wakeLockManager?.cleanup();
+    await this.wakeLockManager?.cleanup();
     LocalTrackManager.cleanup();
     this.notificationManager = undefined;
     HMSLogger.cleanup();
@@ -635,9 +635,9 @@ export class HMSSdk implements HMSInterface {
      * Store won't have the tracks in this case
      */
     if (this.localPeer) {
-      this.localPeer.audioTrack?.cleanup();
+      await this.localPeer.audioTrack?.cleanup();
       this.localPeer.audioTrack = undefined;
-      this.localPeer.videoTrack?.cleanup();
+      await this.localPeer.videoTrack?.cleanup();
       this.localPeer.videoTrack = undefined;
     }
     this.store.cleanup();
@@ -670,7 +670,7 @@ export class HMSSdk implements HMSInterface {
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave(notifyServer);
-      this.cleanup();
+      await this.cleanup();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}, peerId=${peerId}`);
     }
   }
