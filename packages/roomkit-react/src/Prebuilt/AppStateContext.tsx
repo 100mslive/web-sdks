@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
 import { match, P } from 'ts-pattern';
 import { HMSRoomState, selectRoomState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { useRoomLayout, useSetOriginalLayout } from './provider/roomLayoutProvider';
 import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
 import {
@@ -72,6 +73,7 @@ export const useAppStateManager = () => {
               .with({ isPreviewScreenEnabled: true }, () => PrebuiltStates.PREVIEW)
               .otherwise(() => PrebuiltStates.MEETING),
           );
+          VBHandler.reset();
           hmsActions.setAppData(APP_DATA.authToken, '');
           redirectToLeave(1000); // to clear toasts after 1 second
         },
