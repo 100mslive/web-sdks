@@ -3,10 +3,11 @@ import { match, P } from 'ts-pattern';
 import {
   selectHMSStats,
   selectLocalPeerID,
-  selectPeersMap,
+  selectPeerNameByID,
   selectTracksMap,
   useHMSStatsStore,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { HorizontalDivider } from '../../Divider';
 import { Dropdown } from '../../Dropdown';
@@ -127,12 +128,12 @@ export const StatsForNerds = ({ onOpenChange }) => {
 
 const useTracksWithLabel = () => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const peersMap = useHMSStore(selectPeersMap);
+  const vanillaStore = useHMSVanillaStore();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const tracksWithLabels = useMemo(
     () =>
       Object.values(tracksMap).reduce((res, track) => {
-        const peerName = peersMap[track.peerId]?.name;
+        const peerName = vanillaStore.getState(selectPeerNameByID(track.peerId));
         const isLocalTrack = track.peerId === localPeerID;
         if (isLocalTrack && track.layerDefinitions?.length) {
           res = res.concat(
@@ -154,7 +155,7 @@ const useTracksWithLabel = () => {
         });
         return res;
       }, []),
-    [tracksMap, peersMap, localPeerID],
+    [tracksMap, vanillaStore, localPeerID],
   );
   return tracksWithLabels;
 };
