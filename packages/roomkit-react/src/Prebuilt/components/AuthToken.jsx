@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSessionStorage } from 'react-use';
 import { match } from 'ts-pattern';
 import { v4 as uuid } from 'uuid';
@@ -25,8 +25,9 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
   const { roomCode, userId } = useHMSPrebuiltContext();
   const [error, setError] = useState({ title: '', body: '' });
   let authToken = defaultAuthToken;
-  const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
+  const [tokenInAppData, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
   const [savedUserId, setSavedUserId] = useSessionStorage(UserPreferencesKeys.USER_ID);
+  const progressRef = useRef(null);
 
   useEffect(() => {
     if (authToken) {
@@ -34,19 +35,29 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       return;
     }
 
+    if (tokenInAppData || progressRef.current) {
+      return;
+    }
+
     if (!roomCode) {
+      console.error('room code not provided');
       return;
     }
 
-    if (!savedUserId && !userId) {
-      setSavedUserId(uuid());
-      return;
+    let userIdForAuthToken = userId || savedUserId;
+    if (!userIdForAuthToken) {
+      userIdForAuthToken = uuid();
+      setSavedUserId(userIdForAuthToken);
     }
 
+    progressRef.current = true;
     hmsActions
-      .getAuthTokenByRoomCode({ roomCode, userId: userId || savedUserId }, { endpoint: authTokenByRoomCodeEndpoint })
+      .getAuthTokenByRoomCode({ roomCode, userId: userIdForAuthToken }, { endpoint: authTokenByRoomCodeEndpoint })
       .then(token => setAuthTokenInAppData(token))
-      .catch(error => setError(convertError(error)));
+      .catch(error => setError(convertError(error)))
+      .finally(() => {
+        progressRef.current = false;
+      });
   }, [
     hmsActions,
     authToken,
@@ -55,6 +66,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
     roomCode,
     userId,
     savedUserId,
+    tokenInAppData,
     setSavedUserId,
   ]);
 

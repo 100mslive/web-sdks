@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
 import { match, P } from 'ts-pattern';
-import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import { HMSRoomState, selectRoomState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { useRoomLayout, useSetOriginalLayout } from './provider/roomLayoutProvider';
 import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
@@ -9,6 +9,7 @@ import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { APP_DATA } from './common/constants';
 
 export enum PrebuiltStates {
   MEETING = 'meeting',
@@ -42,6 +43,7 @@ export const useAppStateManager = () => {
   const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
   const roomState = useHMSStore(selectRoomState);
   const prevRoomState = usePreviousDistinct(roomState);
+  const hmsActions = useHMSActions();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { redirectToLeave } = useRedirectToLeave();
@@ -72,6 +74,7 @@ export const useAppStateManager = () => {
               .otherwise(() => PrebuiltStates.MEETING),
           );
           VBHandler.reset();
+          hmsActions.setAppData(APP_DATA.authToken, '');
           redirectToLeave(1000); // to clear toasts after 1 second
         },
       )
@@ -81,7 +84,7 @@ export const useAppStateManager = () => {
       .otherwise(() => {
         // do nothing
       });
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave, hmsActions]);
 
   return { activeState, rejoin };
 };
