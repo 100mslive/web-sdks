@@ -125,7 +125,7 @@ export const AppData = React.memo(() => {
         ? DEFAULT_TILES_IN_VIEW.MWEB
         : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
     };
-    hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
+    hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, false);
   }, [preferences, hmsActions, elements?.video_tile_layout, isMobile]);
 
   useEffect(() => {
