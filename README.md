@@ -1,7 +1,22 @@
+## Azodha specific readme
 
+### Steps to edit and publish
+1. Do changes on whatever files you want.
+2. Preview those - `yarn ybys` -> It will open storybook
+3. Create a build - `yarn build`
+4. To Publish a package
+   1. Check `name` in `package.json` of the package you wish to modify. It must start with `@azodha`
+   2. Increment the Azo-version, that is `0.3.16-azo0.0.1` will become `0.3.16-azo0.0.2`
+   3. If the origin package is updated make changes to origin version as well. e.g. `0.3.17-azo0.0.1` will become `0.3.17-azo0.0.2`
+      - Do not decrease the azo-version, keep it increasing will help track better.
+   4. Make sure valid .npmrc file is present on root (ideally) - see .npmrc.example for reference
+   5. Run `npm publish` to publish a package
+
+================================
+# 100ms Readme below
 # Web SDKs
 
-This monorepo contains all the packages required to integrate 100ms on the web. 
+This monorepo contains all the packages required to integrate 100ms on the web.
 
 ## What is included?
 The packages folder contains all the SDK's of 100ms. Here is a brief overview of them:
@@ -18,7 +33,7 @@ For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 <br>
 
 ## How to integrate?
-The 100ms SDK gives you everything you need to build scalable, high-quality live video and audio experiences. 
+The 100ms SDK gives you everything you need to build scalable, high-quality live video and audio experiences.
 
 **There are two ways you can add 100ms to your apps:**
 
@@ -29,7 +44,7 @@ The 100ms SDK gives you everything you need to build scalable, high-quality live
 
 > Navigate to `react-sdk` for the base React Hooks and some commonly used functionalities by clicking [here](./packages/react-sdk).
 
-2.  ## 100ms Prebuilt 
+2.  ## 100ms Prebuilt
 	- 100ms Prebuilt is a high-level abstraction with no-code customization that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
 	- **Related packages include:** `roomkit-react` and `roomkit-web`.
 	- Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
@@ -109,7 +124,7 @@ For reference:
 
 <br />
 
-Once the app has been deployed, you can append the room code at the end of the deployment URL to preview your changes 
+Once the app has been deployed, you can append the room code at the end of the deployment URL to preview your changes
 
 <br>
 
