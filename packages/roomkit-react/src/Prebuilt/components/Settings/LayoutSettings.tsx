@@ -41,34 +41,6 @@ export const LayoutSettings = () => {
 
   return (
     <Box className={settingOverflow()}>
-      <Box>
-        {/* <Text variant="md" css={{ fontWeight: '$semiBold' }}>
-          Layout Modes
-        </Text>
-         <RadioGroup.Root
-          css={{ flexDirection: 'column', alignItems: 'start', gap: '$10', my: '$2', py: '$8' }}
-          value={layoutMode}
-          onValueChange={value =>
-            setUISettings({
-              [UI_SETTINGS.layoutMode]: value,
-            })
-          }
-        >
-          {Object.keys(LayoutMode).map(key => {
-            return (
-              <Flex align="center" key={key} css={{ mr: '$8', gap: '$8' }}>
-                <RadioGroup.Item value={LayoutMode[key as LayoutModeKeys]} id={`layoutMode-${key}`} css={{ mr: '$4' }}>
-                  <RadioGroup.Indicator />
-                </RadioGroup.Item>
-                <Label htmlFor={`layoutMode-${key}`} css={{ display: 'flex', gap: '$8', cursor: 'pointer' }}>
-                  {LayoutModeIconMapping[LayoutMode[key as LayoutModeKeys]]}
-                  {LayoutMode[key as LayoutModeKeys]}
-                </Label>
-              </Flex>
-            );
-          })}
-        </RadioGroup.Root> */}
-      </Box>
       <Flex align="center" css={{ w: '100%', my: '$2', py: '$8', '@md': { display: 'none' } }}>
         <Text variant="md" css={{ fontWeight: '$semiBold' }}>
           Tiles In View({maxTileCount})
