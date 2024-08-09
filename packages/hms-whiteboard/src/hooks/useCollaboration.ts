@@ -243,11 +243,11 @@ export function useCollaboration({
 
   // zoom to fit on remote changes for hls viewer
   useEffect(() => {
-    if (!editor || !editor.getInstanceState()?.isReadonly || !zoomToContent) return;
+    if (!editor || !zoomToContent) return;
 
     store.listen(
       () => {
-        editor.zoomToFit();
+        editor.zoomToContent();
       },
       { source: 'remote', scope: 'document' },
     );

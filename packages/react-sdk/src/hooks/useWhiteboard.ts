@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  selectAppData,
   selectIsConnectedToRoom,
   selectLocalPeer,
   selectPermissions,
@@ -8,11 +7,10 @@ import {
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
-export const useWhiteboard = (isMobile = false) => {
+export const useWhiteboard = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
   const whiteboard = useHMSStore(selectWhiteboard);
-  const isHeadless = useHMSStore(selectAppData('disableNotifications'));
   const open = !!whiteboard?.open;
   const isOwner = whiteboard?.owner === localPeerUserId;
   const actions = useHMSActions();
@@ -44,7 +42,7 @@ export const useWhiteboard = (isMobile = false) => {
     endpoint: whiteboard?.addr,
     isOwner,
     isAdmin,
-    zoomToContent: isHeadless || isMobile,
+    permissions,
     toggle: isEnabled && isAdmin ? toggle : undefined,
   };
 };
