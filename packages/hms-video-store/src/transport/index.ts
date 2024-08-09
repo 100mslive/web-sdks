@@ -96,12 +96,7 @@ export default class HMSTransport {
     private analyticsTimer: AnalyticsTimer,
     private pluginUsageTracker: PluginUsageTracker,
   ) {
-    this.webrtcInternals = new HMSWebrtcInternals(
-      this.store,
-      this.eventBus,
-      this.publishConnection?.nativeConnection,
-      this.subscribeConnection?.nativeConnection,
-    );
+    this.webrtcInternals = new HMSWebrtcInternals(this.store, this.eventBus);
 
     const onStateChange = async (state: TransportState, error?: HMSException) => {
       if (state !== this.state) {
@@ -282,7 +277,7 @@ export default class HMSTransport {
       if (this.initConfig) {
         await this.waitForLocalRoleAvailability();
         await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo);
-        await this.initRtcStatsMonitor();
+        this.initStatsAnalytics();
 
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
@@ -858,6 +853,11 @@ export default class HMSTransport {
         );
       }
     }
+
+    this.webrtcInternals?.setPeerConnections({
+      publish: this.publishConnection?.nativeConnection,
+      subscribe: this.subscribeConnection?.nativeConnection,
+    });
   }
 
   private async negotiateJoinWithRetry({
@@ -1146,15 +1146,6 @@ export default class HMSTransport {
     this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
     this.analyticsTimer.start(TimedEvent.ROOM_STATE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
-  }
-
-  private async initRtcStatsMonitor() {
-    this.webrtcInternals?.setPeerConnections({
-      publish: this.publishConnection?.nativeConnection,
-      subscribe: this.subscribeConnection?.nativeConnection,
-    });
-
-    this.initStatsAnalytics();
   }
 
   private initStatsAnalytics() {
