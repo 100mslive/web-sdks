@@ -17,6 +17,7 @@ import { NamedSetState } from './internalTypes';
 import { HMSLogger } from '../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../controller/beam/BeamSpeakerLabelsLogger';
 import { Diagnostics } from '../diagnostics';
+import { HMSSessionFeedback } from '../end-call-feedback';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -133,6 +134,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.actionBatcher = new ActionBatcher(store);
+  }
+  submitSessionFeedback(feedback: HMSSessionFeedback): Promise<void> {
+    return this.sdk.submitSessionFeedback(feedback);
   }
 
   getLocalTrack(trackID: string) {
