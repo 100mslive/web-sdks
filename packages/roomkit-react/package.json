@@ -1,5 +1,5 @@
 {
-  "name": "@100mslive/roomkit-react",
+  "name": "@azodha/roomkit-react",
   "source": "src/index.ts",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -10,7 +10,7 @@
     "prebuilt",
     "roomkit"
   ],
-  "version": "0.3.16",
+  "version": "0.3.16-azo0.0.1",
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -22,6 +22,9 @@
     "dist",
     "src"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/azodha"
+  },
   "exports": {
     ".": {
       "require": "./dist/index.cjs.js",

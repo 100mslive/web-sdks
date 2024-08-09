@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {
   HMSRoomState,
   selectFullAppData,
   selectHLSState,
   selectRoomState,
   selectRTMPState,
-  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -26,7 +25,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
-
 const initialAppData = {
   [APP_DATA.uiSettings]: {
     [UI_SETTINGS.isAudioOnly]: false,
@@ -76,9 +74,6 @@ export const AppData = React.memo(() => {
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const appData = useHMSStore(selectFullAppData);
   const { elements } = useRoomLayoutConferencingScreen();
-  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const { isLocalVideoEnabled } = useAVToggle();
-  const sidepaneOpenedRef = useRef(false);
   const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
 
   useEffect(() => {
@@ -86,16 +81,6 @@ export const AppData = React.memo(() => {
       setNoiseCancellationEnabled(true);
     }
   }, [elements?.noise_cancellation?.enabled_by_default, setNoiseCancellationEnabled]);
-
-  const defaultMediaURL = useMemo(() => {
-    const media = elements?.virtual_background?.background_media || [];
-    for (let i = 0; i < media.length; i++) {
-      if (media[i].default && media[i].url) {
-        return media[i].url;
-      }
-    }
-    return '';
-  }, [elements?.virtual_background?.background_media]);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -127,14 +112,6 @@ export const AppData = React.memo(() => {
     }
     hmsActions.setAppData(APP_DATA.subscribedNotifications, preferences.subscribedNotifications, true);
   }, [preferences.subscribedNotifications, hmsActions]);
-
-  useEffect(() => {
-    if (defaultMediaURL && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
-      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      sidepaneOpenedRef.current = true;
-      toggleVB();
-    }
-  }, [hmsActions, toggleVB, isLocalVideoEnabled, defaultMediaURL]);
 
   return <ResetStreamingStart />;
 });
