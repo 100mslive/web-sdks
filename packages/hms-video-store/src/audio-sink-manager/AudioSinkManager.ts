@@ -111,6 +111,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
+    this.earpieceSelected = false;
     this.state = { ...INITIAL_STATE };
   }
 
@@ -188,11 +189,11 @@ export class AudioSinkManager {
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
     // this means the initial load
     if (!event.selection) {
       HMSLogger.d(this.TAG, 'device change called');
-      this.autoSelectAudioOutput();
+      await this.autoSelectAudioOutput();
     }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
@@ -301,7 +302,13 @@ export class AudioSinkManager {
       const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
       const externalDeviceID =
         manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+      HMSLogger.d(
+        this.TAG,
+        'externalDeviceID',
+        externalDeviceID,
+        this.earpieceSelected,
+        localAudioTrack.settings.deviceId,
+      );
       // already selected appropriate device
       if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
