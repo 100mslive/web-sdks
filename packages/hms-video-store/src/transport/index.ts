@@ -85,6 +85,7 @@ export default class HMSTransport {
   private publishDisconnectTimer = 0;
   private listener?: HMSUpdateListener;
   private onScreenshareStop = () => {};
+  private screenStream = new Set<MediaStream>();
 
   constructor(
     private observer: ITransportObserver,
@@ -424,7 +425,7 @@ export default class HMSTransport {
       this.sfuNodeId = id;
       this.publishConnection?.setSfuNodeId(id);
       this.subscribeConnection?.setSfuNodeId(id);
-    } else if (this.sfuNodeId !== id) {
+    } else if (id && this.sfuNodeId !== id) {
       this.sfuNodeId = id;
       this.handleSFUMigration();
     }
@@ -484,11 +485,23 @@ export default class HMSTransport {
       if (track) {
         const stream = track.stream as HMSLocalStream;
         if (!streamMap.get(stream.id)) {
-          streamMap.set(stream.id, new HMSLocalStream(new MediaStream()));
+          /**
+           *  For screenshare, you need to clone the current stream only, cloning the track will not work otherwise, it will have all
+           *  correct states but bytes sent and all other stats would be 0
+           **/
+          streamMap.set(
+            stream.id,
+            new HMSLocalStream(track.source === 'screen' ? stream.nativeStream.clone() : new MediaStream()),
+          );
         }
         this.store.removeTrack(track);
         const newTrack = track.clone(streamMap.get(stream.id)!);
         if (newTrack.type === 'video' && newTrack.source === 'screen') {
+          /**
+           * Store all the stream so they can be stopped when screenshare stopped. Stopping before is not helping
+           */
+          this.screenStream.add(stream.nativeStream);
+          this.screenStream.add(newTrack.stream.nativeStream);
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         track.cleanup();
@@ -591,6 +604,15 @@ export default class HMSTransport {
     stream.removeSender(track);
     await p;
     await track.cleanup();
+    if (track.source === 'screen' && this.screenStream) {
+      // stop older screenshare tracks to remove the screenshare banner
+      this.screenStream.forEach(stream => {
+        stream.getTracks().forEach(_track => {
+          _track.stop();
+        });
+        this.screenStream.delete(stream);
+      });
+    }
     // remove track from store on unpublish
     this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
