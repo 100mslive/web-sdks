@@ -10,7 +10,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
-import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
+import { HMSPeerStats, HMSTrackStats } from '../interfaces/webrtc-stats';
 import { HMSLocalTrack, HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
@@ -27,11 +27,25 @@ export class HMSWebrtcStats {
    * this is initialized
    */
   constructor(
-    private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
     private store: Store,
     private readonly eventBus: EventBus,
+    private publishConnection?: RTCPeerConnection,
+    private subscribeConnection?: RTCPeerConnection,
   ) {
     this.localPeerID = this.store.getLocalPeer()?.peerId;
+  }
+
+  setPeerConnections({ publish, subscribe }: { publish?: RTCPeerConnection; subscribe?: RTCPeerConnection }) {
+    this.publishConnection = publish;
+    this.subscribeConnection = subscribe;
+  }
+
+  getPublishPeerConnection() {
+    return this.publishConnection;
+  }
+
+  getSubscribePeerConnection() {
+    return this.subscribeConnection;
   }
 
   getLocalPeerStats = (): HMSPeerStats | undefined => {
@@ -63,7 +77,7 @@ export class HMSWebrtcStats {
     const prevLocalPeerStats = this.getLocalPeerStats();
     let publishReport: RTCStatsReport | undefined;
     try {
-      publishReport = await this.getStats.publish?.();
+      publishReport = await this.publishConnection?.getStats();
     } catch (err: any) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.PUBLISH, err.message)),
@@ -72,10 +86,9 @@ export class HMSWebrtcStats {
     }
     const publishStats: HMSPeerStats['publish'] | undefined =
       publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
-
     let subscribeReport: RTCStatsReport | undefined;
     try {
-      subscribeReport = await this.getStats.subscribe?.();
+      subscribeReport = await this.subscribeConnection?.getStats();
     } catch (err: any) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.SUBSCRIBE, err.message)),

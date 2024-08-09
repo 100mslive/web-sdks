@@ -98,6 +98,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings,
       this.room,
     );
+    track.peerId = this.peerId;
+
     if (this.pluginsManager.pluginsMap.size > 0) {
       this.pluginsManager.pluginsMap.forEach(value => {
         track
