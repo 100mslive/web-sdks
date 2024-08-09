@@ -126,7 +126,8 @@ export const AppData = React.memo(() => {
         : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, hmsActions, elements?.video_tile_layout, isMobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences, hmsActions, elements?.video_tile_layout]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {
