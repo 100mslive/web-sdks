@@ -1,5 +1,13 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import {
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
+  selectEffectsKey,
+  selectIsEffectsEnabled,
+  selectIsLocalVideoPluginPresent,
+} from '@100mslive/hms-video-store';
+import { HMSEffectsPlugin } from '@100mslive/hms-virtual-background';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -7,6 +15,7 @@ import {
   HMSReactiveStore,
   HMSRoomProvider,
   selectIsConnectedToRoom,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -40,7 +49,7 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
-import { useIsNotificationDisabled } from './components/AppData/useUISettings';
+import { useIsNotificationDisabled, useSetAppDataByKey } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
   useRoomLayoutLeaveScreen,
@@ -49,7 +58,7 @@ import {
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
-import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
+import { APP_DATA, DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -155,7 +164,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
     if (!roomCode && !authToken) {
       console.error(`
-          HMSPrebuilt can be initialised by providing: 
+          HMSPrebuilt can be initialised by providing:
           either "roomCode" or "authToken".
           Please check if you are providing the above values for initialising prebuilt.
         `);
@@ -291,6 +300,34 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
+
+  const { isLocalVideoEnabled } = useAVToggle();
+
+  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
+  const [, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
+  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+  const effectsKey = useHMSStore(selectEffectsKey);
+  const hmsActions = useHMSActions();
+
+  useEffect(() => {
+    const setBackground = async () => {
+      if (!isPluginAdded && isEffectsEnabled && effectsKey && isLocalVideoEnabled) {
+        setLoadingEffects(true);
+        let vbObject = VBHandler.getVBObject();
+
+        if (!vbObject) {
+          VBHandler.initialisePlugin(effectsKey, () => setLoadingEffects(false));
+          vbObject = VBHandler.getVBObject();
+
+          await hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
+          await VBHandler.setBackground('https://img-vb.100ms.live/layouts/defaults/vb-2.jpg');
+          setLoadingEffects(false);
+        }
+      }
+    };
+
+    setBackground();
+  }, [hmsActions, isLocalVideoEnabled, isPluginAdded, setLoadingEffects, isEffectsEnabled, effectsKey]);
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
