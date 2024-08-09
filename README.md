@@ -12,6 +12,9 @@
    4. Make sure valid .npmrc file is present on root (ideally) - see .npmrc.example for reference
    5. Run `npm publish` to publish a package
 
+5. To create a PR - git remote add fork <URL-of-your-fork> -> `git remote add fork https://github.com/azodha/100ms-web-sdks`
+6. To push - `git push fork <Branch-Name>`
+
 ================================
 # 100ms Readme below
 # Web SDKs
