@@ -24,7 +24,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSICEServer, HMSRole, HMSUpdateListener } from '../interfaces';
+import { HMSICEServer, HMSRole, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -523,6 +523,10 @@ export default class HMSTransport {
       });
       this.trackStates.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
+      const peer = this.store.getLocalPeer();
+      if (track.enabled && peer) {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, peer);
+      }
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
   }
