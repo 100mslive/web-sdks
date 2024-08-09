@@ -24,7 +24,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSICEServer, HMSRole, HMSUpdateListener } from '../interfaces';
+import { HMSICEServer, HMSRole, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
@@ -85,6 +85,7 @@ export default class HMSTransport {
   private publishDisconnectTimer = 0;
   private listener?: HMSUpdateListener;
   private onScreenshareStop = () => {};
+  private screenStream = new Set<MediaStream>();
 
   constructor(
     private observer: ITransportObserver,
@@ -95,12 +96,7 @@ export default class HMSTransport {
     private analyticsTimer: AnalyticsTimer,
     private pluginUsageTracker: PluginUsageTracker,
   ) {
-    this.webrtcInternals = new HMSWebrtcInternals(
-      this.store,
-      this.eventBus,
-      this.publishConnection?.nativeConnection,
-      this.subscribeConnection?.nativeConnection,
-    );
+    this.webrtcInternals = new HMSWebrtcInternals(this.store, this.eventBus);
 
     const onStateChange = async (state: TransportState, error?: HMSException) => {
       if (state !== this.state) {
@@ -281,7 +277,7 @@ export default class HMSTransport {
       if (this.initConfig) {
         await this.waitForLocalRoleAvailability();
         await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo);
-        await this.initRtcStatsMonitor();
+        this.initStatsAnalytics();
 
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
@@ -429,7 +425,7 @@ export default class HMSTransport {
       this.sfuNodeId = id;
       this.publishConnection?.setSfuNodeId(id);
       this.subscribeConnection?.setSfuNodeId(id);
-    } else if (this.sfuNodeId !== id) {
+    } else if (id && this.sfuNodeId !== id) {
       this.sfuNodeId = id;
       this.handleSFUMigration();
     }
@@ -489,11 +485,23 @@ export default class HMSTransport {
       if (track) {
         const stream = track.stream as HMSLocalStream;
         if (!streamMap.get(stream.id)) {
-          streamMap.set(stream.id, new HMSLocalStream(new MediaStream()));
+          /**
+           *  For screenshare, you need to clone the current stream only, cloning the track will not work otherwise, it will have all
+           *  correct states but bytes sent and all other stats would be 0
+           **/
+          streamMap.set(
+            stream.id,
+            new HMSLocalStream(track.source === 'screen' ? stream.nativeStream.clone() : new MediaStream()),
+          );
         }
         this.store.removeTrack(track);
         const newTrack = track.clone(streamMap.get(stream.id)!);
         if (newTrack.type === 'video' && newTrack.source === 'screen') {
+          /**
+           * Store all the stream so they can be stopped when screenshare stopped. Stopping before is not helping
+           */
+          this.screenStream.add(stream.nativeStream);
+          this.screenStream.add(newTrack.stream.nativeStream);
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         track.cleanup();
@@ -524,6 +532,14 @@ export default class HMSTransport {
       this.trackStates.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
+      const peer = this.store.getLocalPeer();
+      if (peer) {
+        this.listener?.onTrackUpdate(
+          track.enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED,
+          track,
+          peer,
+        );
+      }
     }
   }
 
@@ -596,6 +612,15 @@ export default class HMSTransport {
     stream.removeSender(track);
     await p;
     await track.cleanup();
+    if (track.source === 'screen' && this.screenStream) {
+      // stop older screenshare tracks to remove the screenshare banner
+      this.screenStream.forEach(stream => {
+        stream.getTracks().forEach(_track => {
+          _track.stop();
+        });
+        this.screenStream.delete(stream);
+      });
+    }
     // remove track from store on unpublish
     this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
@@ -836,6 +861,11 @@ export default class HMSTransport {
         );
       }
     }
+
+    this.webrtcInternals?.setPeerConnections({
+      publish: this.publishConnection?.nativeConnection,
+      subscribe: this.subscribeConnection?.nativeConnection,
+    });
   }
 
   private async negotiateJoinWithRetry({
@@ -1124,15 +1154,6 @@ export default class HMSTransport {
     this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
     this.analyticsTimer.start(TimedEvent.ROOM_STATE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
-  }
-
-  private async initRtcStatsMonitor() {
-    this.webrtcInternals?.setPeerConnections({
-      publish: this.publishConnection?.nativeConnection,
-      subscribe: this.subscribeConnection?.nativeConnection,
-    });
-
-    this.initStatsAnalytics();
   }
 
   private initStatsAnalytics() {
