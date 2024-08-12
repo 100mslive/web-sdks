@@ -7,7 +7,7 @@ import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 export const useAwayNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const requestPermission = useCallback(async () => {
-    if (!Notification || Notification?.permission === 'granted') {
+    if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
       return;
     }
     const unsubscribe = vanillaStore.subscribe(async role => {
