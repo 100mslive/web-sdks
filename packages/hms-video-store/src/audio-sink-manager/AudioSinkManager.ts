@@ -49,6 +49,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.autoSelectAudioOutput();
     this.startPollingForDevices();
     this.startPollingToCheckPausedAudio();
   }
@@ -316,13 +317,6 @@ export class AudioSinkManager {
       if (!this.earpieceSelected) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
-      } else {
-        await localAudioTrack.setSettings(
-          {
-            deviceId: 'default',
-          },
-          true,
-        );
       }
       await localAudioTrack.setSettings(
         {
