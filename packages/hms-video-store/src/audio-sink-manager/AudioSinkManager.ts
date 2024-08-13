@@ -319,7 +319,7 @@ export class AudioSinkManager {
       }
       await localAudioTrack.setSettings(
         {
-          deviceId: externalDeviceID,
+          deviceId: 'default',
         },
         true,
       );
