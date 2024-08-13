@@ -267,6 +267,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
+    this.nativeTrack.stop();
     this.transceiver = undefined;
     this.processedTrack?.stop();
     this.isPublished = false;

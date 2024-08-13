@@ -106,12 +106,12 @@ export class AudioSinkManager {
       clearInterval(this.autoUnpauseTimer);
       this.autoUnpauseTimer = null;
     }
+    this.earpieceSelected = false;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
-    this.earpieceSelected = false;
     this.state = { ...INITIAL_STATE };
   }
 
