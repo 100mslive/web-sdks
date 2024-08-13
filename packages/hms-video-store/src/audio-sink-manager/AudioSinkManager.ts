@@ -189,11 +189,11 @@ export class AudioSinkManager {
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
+  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // this means the initial load
     if (!event.selection) {
       HMSLogger.d(this.TAG, 'device change called');
-      await this.autoSelectAudioOutput();
+      this.autoSelectAudioOutput();
     }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
