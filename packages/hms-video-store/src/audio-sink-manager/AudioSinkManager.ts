@@ -302,6 +302,7 @@ export class AudioSinkManager {
       const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
       const externalDeviceID =
         manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
       // already selected appropriate device
       if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
