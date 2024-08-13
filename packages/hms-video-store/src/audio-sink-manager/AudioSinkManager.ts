@@ -49,6 +49,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.deviceManager.enumerateDevices();
     this.startPollingForDevices();
     this.startPollingToCheckPausedAudio();
   }
