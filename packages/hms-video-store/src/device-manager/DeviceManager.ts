@@ -161,7 +161,7 @@ export class DeviceManager implements HMSDeviceManager {
     return currentDevices.some(device => !prevDevices.includes(this.createIdentifier(device)));
   };
 
-  enumerateDevices = async () => {
+  private enumerateDevices = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const prevVideoInput = this.videoInput.map(this.createIdentifier);
