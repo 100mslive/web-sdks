@@ -289,9 +289,6 @@ export class AudioSinkManager {
     }, 5000);
   };
 
-  public setEarpieceSelected(value = false) {
-    this.earpieceSelected = value;
-  }
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
