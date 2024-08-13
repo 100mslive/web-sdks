@@ -786,10 +786,6 @@ export default class HMSTransport {
           const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
           log(TAG, `Subscribe ice connection state change: ${newState}`);
 
-          // if (newState === 'failed') {
-          //   // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
-          // }
-
           if (newState === 'connected') {
             const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
             this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
