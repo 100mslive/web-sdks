@@ -161,6 +161,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.store?.setErrorListener(this.errorListener);
+
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners

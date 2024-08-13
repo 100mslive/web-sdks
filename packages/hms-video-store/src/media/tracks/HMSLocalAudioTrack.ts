@@ -192,6 +192,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
+
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
