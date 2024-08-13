@@ -97,6 +97,7 @@ export class AudioSinkManager {
 
   cleanup() {
     this.audioSink?.remove();
+    this.earpieceSelected = false;
     this.audioSink = undefined;
     if (this.timer) {
       clearInterval(this.timer);
@@ -106,7 +107,6 @@ export class AudioSinkManager {
       clearInterval(this.autoUnpauseTimer);
       this.autoUnpauseTimer = null;
     }
-    this.earpieceSelected = false;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -288,9 +288,6 @@ export class AudioSinkManager {
     }, 5000);
   };
 
-  public setEarpieceSelected(value = false) {
-    this.earpieceSelected = value;
-  }
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
