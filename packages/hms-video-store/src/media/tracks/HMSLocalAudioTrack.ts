@@ -265,6 +265,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async cleanup() {
     super.cleanup();
+    this.settings = this.buildNewSettings({ deviceId: 'default' });
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
     this.transceiver = undefined;

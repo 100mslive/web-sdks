@@ -313,6 +313,7 @@ export class AudioSinkManager {
       if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
+      // if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
       if (!this.earpieceSelected || bluetoothDevice?.deviceId === externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
