@@ -161,7 +161,6 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.store?.setErrorListener(this.errorListener);
-    console.log('here audioSinkManager ', this.sdkState.isInitialised, this.audioSinkManager);
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
@@ -177,11 +176,11 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.store.setErrorListener(this.errorListener);
     this.eventBus = new EventBus();
-    this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
+    this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.setListener(this.listener);
