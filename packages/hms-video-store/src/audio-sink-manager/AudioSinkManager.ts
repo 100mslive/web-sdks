@@ -302,19 +302,11 @@ export class AudioSinkManager {
       const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
       const externalDeviceID =
         manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(
-        this.TAG,
-        'externalDeviceID',
-        externalDeviceID,
-        this.earpieceSelected,
-        localAudioTrack.settings.deviceId,
-      );
       // already selected appropriate device
       if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
-      // if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
-      if (!this.earpieceSelected) {
+      if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }
