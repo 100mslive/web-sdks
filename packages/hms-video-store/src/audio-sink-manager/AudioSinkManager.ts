@@ -310,7 +310,7 @@ export class AudioSinkManager {
         localAudioTrack.settings.deviceId,
       );
       // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
       if (!this.earpieceSelected) {
