@@ -49,7 +49,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
-    this.autoSelectAudioOutput();
+    this.autoSelectAudioOutput(false);
     this.startPollingForDevices();
     this.startPollingToCheckPausedAudio();
   }
@@ -293,7 +293,7 @@ export class AudioSinkManager {
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
+  private autoSelectAudioOutput = async (shouldMarkSelected = true) => {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
@@ -316,7 +316,7 @@ export class AudioSinkManager {
       }
       if (!this.earpieceSelected) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        this.earpieceSelected = true;
+        this.earpieceSelected = shouldMarkSelected;
       }
       await localAudioTrack.setSettings(
         {
