@@ -668,6 +668,17 @@ export default class HMSTransport {
   }
 
   private createPeerConnections() {
+    const logConnectionState = (
+      role: HMSConnectionRole,
+      newState: RTCIceConnectionState | RTCPeerConnectionState,
+      ice = false,
+    ) => {
+      const log = ['disconnected', 'failed'].includes(newState)
+        ? HMSLogger.w.bind(HMSLogger)
+        : HMSLogger.d.bind(HMSLogger);
+
+      log(TAG, `${HMSConnectionRole[role]} ${ice ? 'ice' : ''} connection state change: ${newState}`);
+    };
     if (this.initConfig) {
       const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
@@ -721,13 +732,11 @@ export default class HMSTransport {
         },
 
         onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Publish ice connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Publish, newState, true);
         },
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Publish connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Publish, newState, false);
           if (newState === 'new') {
             return;
           }
@@ -783,8 +792,7 @@ export default class HMSTransport {
         },
 
         onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Subscribe ice connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Subscribe, newState, true);
 
           if (newState === 'connected') {
             const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
@@ -798,8 +806,7 @@ export default class HMSTransport {
         },
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Subscribe connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Subscribe, newState, false);
 
           if (newState === 'failed') {
             await this.handleIceConnectionFailure(
