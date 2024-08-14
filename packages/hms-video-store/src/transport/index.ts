@@ -1005,6 +1005,7 @@ export default class HMSTransport {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
     if (!callback) {
+      HMSLogger.w(TAG, 'no callback found for renegotiation');
       return;
     }
 
@@ -1033,9 +1034,9 @@ export default class HMSTransport {
 
       // resolve for now as this might happen during migration
       if (ex.code === 421) {
-        callback!.promise.resolve(true);
+        callback.promise.resolve(true);
       } else {
-        callback!.promise.reject(ex);
+        callback.promise.reject(ex);
       }
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
@@ -1217,7 +1218,15 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
+      const p = new Promise<boolean>((resolve, reject) => {
+        this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
+          promise: { resolve, reject },
+          action: HMSAction.RESTART_ICE,
+          extra: {},
+        });
+      });
       await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
+      await p;
     }
 
     return true;
