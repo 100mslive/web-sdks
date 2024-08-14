@@ -277,7 +277,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
-      // Below one are network related errors
+      // Below ones are network related errors
       case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
