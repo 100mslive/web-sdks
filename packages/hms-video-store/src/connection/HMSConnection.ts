@@ -29,7 +29,7 @@ export default abstract class HMSConnection {
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
   // @ts-ignore
-  private sfuNodeId?: string;
+  sfuNodeId?: string;
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
