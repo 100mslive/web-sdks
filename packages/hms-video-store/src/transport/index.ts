@@ -668,6 +668,17 @@ export default class HMSTransport {
   }
 
   private createPeerConnections() {
+    const logConnectionState = (
+      role: HMSConnectionRole,
+      newState: RTCIceConnectionState | RTCPeerConnectionState,
+      ice = false,
+    ) => {
+      const log = ['disconnected', 'failed'].includes(newState)
+        ? HMSLogger.w.bind(HMSLogger)
+        : HMSLogger.d.bind(HMSLogger);
+
+      log(TAG, `${HMSConnectionRole[role]} ${ice ? 'ice' : ''} connection state change: ${newState}`);
+    };
     if (this.initConfig) {
       const publishConnectionObserver: IPublishConnectionObserver = {
         onRenegotiationNeeded: async () => {
@@ -721,29 +732,18 @@ export default class HMSTransport {
         },
 
         onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Publish ice connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Publish, newState, true);
         },
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Publish connection state change: ${newState}`);
-          if (newState === 'new') {
-            return;
-          }
+          logConnectionState(HMSConnectionRole.Publish, newState, false);
 
           if (newState === 'connected') {
             this.connectivityListener?.onICESuccess(true);
             this.publishConnection?.handleSelectedIceCandidatePairs();
-          } else if (newState === 'failed') {
-            await this.handleIceConnectionFailure(
-              HMSConnectionRole.Publish,
-              ErrorFactory.WebrtcErrors.ICEFailure(
-                HMSAction.PUBLISH,
-                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-              ),
-            );
-          } else {
+          }
+
+          if (newState === 'disconnected') {
             this.publishDisconnectTimer = window.setTimeout(() => {
               if (this.publishConnection?.connectionState !== 'connected') {
                 this.handleIceConnectionFailure(
@@ -755,6 +755,16 @@ export default class HMSTransport {
                 );
               }
             }, ICE_DISCONNECTION_TIMEOUT);
+          }
+
+          if (newState === 'failed') {
+            await this.handleIceConnectionFailure(
+              HMSConnectionRole.Publish,
+              ErrorFactory.WebrtcErrors.ICEFailure(
+                HMSAction.PUBLISH,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
+              ),
+            );
           }
         },
 
@@ -783,8 +793,7 @@ export default class HMSTransport {
         },
 
         onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Subscribe ice connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Subscribe, newState, true);
 
           if (newState === 'connected') {
             const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
@@ -798,8 +807,7 @@ export default class HMSTransport {
         },
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-          const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-          log(TAG, `Subscribe connection state change: ${newState}`);
+          logConnectionState(HMSConnectionRole.Subscribe, newState, false);
 
           if (newState === 'failed') {
             await this.handleIceConnectionFailure(
@@ -809,7 +817,9 @@ export default class HMSTransport {
                 `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
-          } else if (newState === 'disconnected') {
+          }
+
+          if (newState === 'disconnected') {
             setTimeout(() => {
               if (this.subscribeConnection?.connectionState === 'disconnected') {
                 this.handleIceConnectionFailure(
@@ -821,7 +831,9 @@ export default class HMSTransport {
                 );
               }
             }, ICE_DISCONNECTION_TIMEOUT);
-          } else if (newState === 'connected') {
+          }
+
+          if (newState === 'connected') {
             this.subscribeConnection?.handleSelectedIceCandidatePairs();
             const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
             this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
