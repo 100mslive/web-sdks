@@ -9,7 +9,6 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -47,7 +46,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
-    room?: Room,
+    private room?: Room,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -60,9 +59,30 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    if (isIOS() && isBrowser) {
+    if (source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  clone(stream: HMSLocalStream) {
+    const track = new HMSLocalAudioTrack(
+      stream,
+      this.nativeTrack.clone(),
+      this.source!,
+      this.eventBus,
+      this.settings,
+      this.room,
+    );
+    track.peerId = this.peerId;
+
+    if (this.pluginsManager.pluginsMap.size > 0) {
+      this.pluginsManager.pluginsMap.forEach(value => {
+        track
+          .addPlugin(value)
+          .catch((e: Error) => HMSLogger.e(this.TAG, 'Plugin add failed while migrating', value, e));
+      });
+    }
+    return track;
   }
 
   getManuallySelectedDeviceId() {
@@ -73,11 +93,46 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.manuallySelectedDeviceId = undefined;
   }
 
+  private isTrackNotPublishing = () => {
+    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
+  };
+
   private handleVisibilityChange = async () => {
-    if (document.visibilityState === 'visible') {
+    // track state is fine do nothing
+    if (!this.isTrackNotPublishing()) {
+      HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
+      return;
+    }
+    if (document.visibilityState === 'hidden') {
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: true,
+        }),
+      );
+    } else {
+      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+        }),
+      );
     }
   };
+
+  /**
+   * Replace the new track in stream and update native track
+   * @param track
+   */
+  private async updateTrack(track: MediaStreamTrack) {
+    const localStream = this.stream as HMSLocalStream;
+    await localStream.replaceStreamTrack(this.nativeTrack, track);
+    // change nativeTrack so plugin can start its work
+    this.nativeTrack = track;
+    await this.replaceSenderTrack();
+    const isLevelMonitored = Boolean(this.audioLevelMonitor);
+    isLevelMonitored && this.initAudioLevelMonitor();
+  }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
@@ -87,19 +142,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
-    const isLevelMonitored = Boolean(this.audioLevelMonitor);
     try {
       const newTrack = await getAudioTrack(settings);
       newTrack.enabled = this.enabled;
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-
-      const localStream = this.stream as HMSLocalStream;
-      await localStream.replaceStreamTrack(prevTrack, newTrack);
-      // change nativeTrack so plugin can start its work
-      this.nativeTrack = newTrack;
-      await this.replaceSenderTrack();
-      isLevelMonitored && this.initAudioLevelMonitor();
+      await this.updateTrack(newTrack);
     } catch (e) {
+      // Generate a new track from previous settings so there will be audio because previous track is stopped
+      const newTrack = await getAudioTrack(this.settings);
+      await this.updateTrack(newTrack);
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
@@ -220,9 +271,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
-    if (isIOS() && isBrowser) {
-      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    }
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   /**
