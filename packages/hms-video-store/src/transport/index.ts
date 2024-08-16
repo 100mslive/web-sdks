@@ -131,12 +131,17 @@ export default class HMSTransport {
   };
 
   private signalObserver: ISignalEventsObserver = {
-    onOffer: async (jsep: RTCSessionDescriptionInit & { sfu_node_id: string }) => {
+    // eslint-disable-next-line complexity
+    onOffer: async (jsep: RTCSessionDescriptionInit & { sfu_node_id?: string }) => {
       try {
         if (!this.subscribeConnection) {
           return;
         }
-        if (this.sfuNodeId !== jsep.sfu_node_id) {
+        if (
+          jsep.sfu_node_id &&
+          this.subscribeConnection.sfuNodeId &&
+          this.subscribeConnection.sfuNodeId !== jsep.sfu_node_id
+        ) {
           HMSLogger.d(TAG, 'ignoring old offer');
           return;
         }
