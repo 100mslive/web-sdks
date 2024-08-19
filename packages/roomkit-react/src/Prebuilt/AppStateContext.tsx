@@ -50,6 +50,7 @@ export const useAppStateManager = () => {
 
   const rejoin = () => {
     setOriginalLayout?.();
+    hmsActions.setAppData(APP_DATA.authToken, '');
     setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
   };
 
@@ -74,7 +75,6 @@ export const useAppStateManager = () => {
               .otherwise(() => PrebuiltStates.MEETING),
           );
           VBHandler.reset();
-          hmsActions.setAppData(APP_DATA.authToken, '');
           redirectToLeave(1000); // to clear toasts after 1 second
         },
       )
