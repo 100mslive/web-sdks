@@ -121,12 +121,21 @@ export const AppData = React.memo(() => {
       ...uiSettings,
       [UI_SETTINGS.isAudioOnly]: undefined,
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
-      [UI_SETTINGS.maxTileCount]: isMobile
-        ? DEFAULT_TILES_IN_VIEW.MWEB
-        : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, hmsActions, elements?.video_tile_layout, isMobile]);
+  }, [hmsActions, preferences]);
+
+  useEffect(() => {
+    hmsActions.setAppData(
+      APP_DATA.uiSettings,
+      {
+        [UI_SETTINGS.maxTileCount]: isMobile
+          ? DEFAULT_TILES_IN_VIEW.MWEB
+          : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
+      },
+      true,
+    );
+  }, [hmsActions, isMobile, elements?.video_tile_layout?.grid?.tiles_in_view]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {
