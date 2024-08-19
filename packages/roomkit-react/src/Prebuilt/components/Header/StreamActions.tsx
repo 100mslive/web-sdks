@@ -17,12 +17,34 @@ import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Pop
 import { Sheet } from '../../../Sheet';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore
-import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useRecordingHandler } from '../../common/hooks';
 // @ts-ignore
 import { formatTime } from '../../common/utils';
+
+export const getRecordingText = (
+  {
+    isBrowserRecordingOn,
+    isServerRecordingOn,
+    isHLSRecordingOn,
+  }: { isBrowserRecordingOn: boolean; isServerRecordingOn: boolean; isHLSRecordingOn: boolean },
+  delimiter = ', ',
+) => {
+  if (!isBrowserRecordingOn && !isServerRecordingOn && !isHLSRecordingOn) {
+    return '';
+  }
+  const title: string[] = [];
+  if (isBrowserRecordingOn) {
+    title.push('Browser');
+  }
+  if (isServerRecordingOn) {
+    title.push('Server');
+  }
+  if (isHLSRecordingOn) {
+    title.push('HLS');
+  }
+  return title.join(delimiter);
+};
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -219,7 +241,6 @@ export const StreamActions = () => {
 
   return (
     <Flex align="center" css={{ gap: '$4' }}>
-      <AdditionalRoomState />
       {!isMobile && (
         <Flex align="center" css={{ gap: '$4' }}>
           <RecordingPauseStatus />
