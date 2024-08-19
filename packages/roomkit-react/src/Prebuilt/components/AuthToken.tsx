@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSessionStorage } from 'react-use';
 import { match } from 'ts-pattern';
 import { v4 as uuid } from 'uuid';
-import { useHMSActions } from '@100mslive/react-sdk';
+import { HMSException, useHMSActions } from '@100mslive/react-sdk';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
+import { PrebuiltStates } from '../AppStateContext';
+// @ts-ignore: No implicit Any
 import errorImage from '../images/transaction_error.svg';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { UserPreferencesKeys } from './hooks/useUserPreferences';
 import { APP_DATA } from '../common/constants';
 
@@ -20,14 +24,18 @@ import { APP_DATA } from '../common/constants';
  * auth_token=123 => uses the passed in token to join instead of fetching from token endpoint
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
-const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken }) => {
+const AuthToken = React.memo<{
+  authTokenByRoomCodeEndpoint: string;
+  defaultAuthToken?: string;
+  activeState?: PrebuiltStates;
+}>(({ authTokenByRoomCodeEndpoint, defaultAuthToken, activeState }) => {
   const hmsActions = useHMSActions();
   const { roomCode, userId } = useHMSPrebuiltContext();
   const [error, setError] = useState({ title: '', body: '' });
-  let authToken = defaultAuthToken;
+  const authToken = defaultAuthToken;
   const [tokenInAppData, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
-  const [savedUserId, setSavedUserId] = useSessionStorage(UserPreferencesKeys.USER_ID);
-  const progressRef = useRef(null);
+  const [savedUserId, setSavedUserId] = useSessionStorage<string>(UserPreferencesKeys.USER_ID);
+  const progressRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     if (authToken) {
@@ -35,7 +43,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       return;
     }
 
-    if (tokenInAppData || progressRef.current) {
+    if (tokenInAppData || progressRef.current || activeState === PrebuiltStates.LEAVE) {
       return;
     }
 
@@ -68,6 +76,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
     savedUserId,
     tokenInAppData,
     setSavedUserId,
+    activeState,
   ]);
 
   if (error.title) {
@@ -95,7 +104,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
   return null;
 });
 
-const convertError = error => {
+const convertError = (error: HMSException) => {
   console.error('[error]', { error });
   console.warn(
     'If you think this is a mistake on our side, please reach out to us over Discord:',
@@ -116,6 +125,7 @@ const convertError = error => {
       body: `Endpoint is not reachable. ${error.description}.`,
     }))
     .otherwise(() =>
+      // @ts-ignore
       match(error.response?.status)
         .with(404, () => ({
           title: 'Room does not exist',
