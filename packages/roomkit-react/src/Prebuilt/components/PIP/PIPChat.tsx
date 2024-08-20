@@ -102,9 +102,21 @@ export const PIPChat = () => {
         )}
         {filteredMessages.length === 0 ? (
           <div
-            style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <Text>No messages here yet</Text>
+            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+              {canSendChatMessages ? 'Start a conversation' : 'No messages yet'}
+            </Text>
+            <Text variant="sm" style={{ maxWidth: '80%', textAlign: 'center', marginTop: '4px' }}>
+              There are no messages here yet. Start a conversation by sending a message.
+            </Text>
           </div>
         ) : (
           filteredMessages.map(message => (

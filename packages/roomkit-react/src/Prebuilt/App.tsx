@@ -307,7 +307,11 @@ function AppRoutes({
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        <AuthToken
+          authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+          defaultAuthToken={defaultAuthToken}
+          activeState={activeState}
+        />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
     </AppStateContext.Provider>
