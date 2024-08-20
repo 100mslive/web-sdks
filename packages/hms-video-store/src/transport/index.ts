@@ -419,7 +419,21 @@ export default class HMSTransport {
 
   async unpublish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
-      await this.unpublishTrack(track);
+      try {
+        await this.unpublishTrack(track);
+      } catch (error) {
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.UnpublishFailed,
+          error: error as HMSException,
+          task: () =>
+            this.unpublishTrack(track)
+              .then(() => true)
+              .catch(() => false),
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
+      }
     }
   }
 
@@ -1276,7 +1290,7 @@ export default class HMSTransport {
   // eslint-disable-next-line complexity
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
     const additionalProps = this.getAdditionalAnalyticsProperties();
-    let event: AnalyticsEvent;
+    let event: AnalyticsEvent | undefined = undefined;
     switch (category) {
       case TransportFailureCategory.ConnectFailed:
         event = AnalyticsEventFactory.connect(error, additionalProps);
@@ -1304,7 +1318,9 @@ export default class HMSTransport {
         event = AnalyticsEventFactory.subscribeFail(error);
         break;
     }
-    this.eventBus.analytics.publish(event!);
+    if (event) {
+      this.eventBus.analytics.publish(event);
+    }
   }
 
   getSubscribeConnection() {

@@ -5,6 +5,7 @@ export enum TransportFailureCategory {
   PublishIceConnectionFailed,
   SubscribeIceConnectionFailed,
   PublishFailed,
+  UnpublishFailed,
 }
 
 export const Dependencies = {
@@ -14,4 +15,5 @@ export const Dependencies = {
   [TransportFailureCategory.PublishIceConnectionFailed]: [TransportFailureCategory.SignalDisconnect],
   [TransportFailureCategory.SubscribeIceConnectionFailed]: [TransportFailureCategory.SignalDisconnect],
   [TransportFailureCategory.PublishFailed]: [TransportFailureCategory.SignalDisconnect],
+  [TransportFailureCategory.UnpublishFailed]: [TransportFailureCategory.SignalDisconnect],
 };
