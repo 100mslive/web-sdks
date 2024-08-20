@@ -402,7 +402,6 @@ export default class HMSTransport {
             error: error as Error,
           }),
         );
-        console.error({ error, isHMSEXception: error instanceof HMSException });
         await this.retryScheduler.schedule({
           category: TransportFailureCategory.PublishFailed,
           error: error as HMSException,
