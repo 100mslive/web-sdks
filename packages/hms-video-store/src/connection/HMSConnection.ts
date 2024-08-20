@@ -26,6 +26,8 @@ export default abstract class HMSConnection {
    *  - [HMSSubscribeConnection] clears this list as soon as we call [addIceCandidate]
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
+  // @ts-ignore
+  sfuNodeId?: string;
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
@@ -44,6 +46,10 @@ export default abstract class HMSConnection {
 
   private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
+  }
+
+  setSfuNodeId(nodeId?: string) {
+    this.sfuNodeId = nodeId;
   }
 
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
