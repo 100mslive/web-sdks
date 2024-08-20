@@ -50,6 +50,7 @@ import {
 } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
+import { sleep } from '../utils/timer-utils';
 
 const TAG = '[HMSTransport]:';
 
@@ -401,6 +402,18 @@ export default class HMSTransport {
             error: error as Error,
           }),
         );
+        console.error({ error, isHMSEXception: error instanceof HMSException });
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.PublishFailed,
+          error: error as HMSException,
+          task: () =>
+            this.publishTrack(track)
+              .then(() => true)
+              .catch(() => false),
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
       }
     }
   }
@@ -521,14 +534,15 @@ export default class HMSTransport {
       `${track}`,
     );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
+    await sleep(3000);
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
     await new Promise<void>((resolve, reject) => {
-      const listener = (trackId: string) => {
-        if (trackId === track.publishedTrackId) {
+      const listener = (transceiver: RTCRtpTransceiver) => {
+        if (transceiver === track.transceiver) {
           this.eventEmitter.off('publish', listener);
           this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
           resolve();
@@ -970,7 +984,7 @@ export default class HMSTransport {
       if (transceiver.direction === 'inactive') {
         this.eventEmitter.emit('unpublished', transceiver.mid);
       } else if (transceiver.direction === 'sendonly' && transceiver.mid !== null) {
-        this.eventEmitter.emit('published', transceiver.sender.track?.id);
+        this.eventEmitter.emit('published', transceiver);
       }
     });
   };
@@ -1260,6 +1274,7 @@ export default class HMSTransport {
     }
   }
 
+  // eslint-disable-next-line complexity
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
     const additionalProps = this.getAdditionalAnalyticsProperties();
     let event: AnalyticsEvent;
@@ -1283,6 +1298,7 @@ export default class HMSTransport {
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
+      case TransportFailureCategory.PublishFailed:
         event = AnalyticsEventFactory.publish({ error });
         break;
       case TransportFailureCategory.SubscribeIceConnectionFailed:
