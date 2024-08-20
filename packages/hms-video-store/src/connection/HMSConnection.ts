@@ -62,6 +62,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
       return enableOpusDtx(fixMsid(offer, tracks));
     } catch (error) {
+      HMSLogger.d(TAG, `error creating offer - ${error}`);
       throw ErrorFactory.WebrtcErrors.CreateOfferFailed(this.action, (error as Error).message);
     }
   }
@@ -72,6 +73,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
       return answer;
     } catch (error) {
+      HMSLogger.d(TAG, `error creating answer - ${error}`);
       throw ErrorFactory.WebrtcErrors.CreateAnswerFailed(this.action, (error as Error).message);
     }
   }
@@ -82,7 +84,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
-      console.error(TAG, 'local description error', error);
+      HMSLogger.e(TAG, 'local description error', error);
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
     }
   }
@@ -93,7 +95,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
-      console.error(TAG, 'remote description error', error);
+      HMSLogger.e(TAG, 'remote description error', error);
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
     }
   }
