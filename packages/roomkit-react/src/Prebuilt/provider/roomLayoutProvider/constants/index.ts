@@ -55,6 +55,58 @@ export const defaultLayout: Layout = {
         },
       },
     },
-    leave: {},
+    leave: {
+      skip_leave_screen: false,
+      default: {
+        elements: {
+          feedback: {
+            title: 'How was your experience?',
+            sub_title: 'How was your experience in the meeting?',
+            ratings: [
+              {
+                label: 'Great',
+                value: 5,
+                emoji: '😍',
+                question: 'How likely are you to recommend 100ms to a friend or colleague?',
+                reasons: ['Video Quality', 'Audio Quality', 'Ease of Use', 'Features'],
+              },
+              {
+                label: 'Good',
+                value: 4,
+                emoji: '😊',
+                question: 'What can we do to improve your experience?',
+                reasons: ['Video Quality', 'Audio Quality', 'Ease of Use', 'Features', 'Latency'],
+              },
+              {
+                label: 'Fair',
+                value: 3,
+                emoji: '😐',
+                question: 'What can we do to improve your experience?',
+                reasons: ['Video Quality', 'Audio Quality', 'Frame drops', 'Choppy audio'],
+              },
+              {
+                label: 'Bad',
+                value: 2,
+                emoji: '😞',
+                question: 'What went wrong?',
+                reasons: ['Stuck Video', 'Robotic Audio'],
+              },
+              {
+                label: 'Awful',
+                value: 1,
+                emoji: '😡',
+                question: 'What went wrong?',
+                reasons: ['Video Quality', 'Audio Quality'],
+              },
+            ],
+            comment: {
+              label: 'Additional Comments',
+              placeholder: 'Share your feedback',
+            },
+            submit_btn_label: 'Submit',
+          },
+        },
+      },
+    },
   },
 };
