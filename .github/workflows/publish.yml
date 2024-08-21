@@ -93,6 +93,13 @@ jobs:
           status: Failed
           color: danger
 
+  run_api_reference:
+    needs: publish_packages
+    if: github.event.inputs.publishFlag == 'latest'
+    uses: ./.github/workflows/generate-docs.yml
+    secrets:
+      DOCKER_GIT_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN}}
+
   notify_100ms_links:
    runs-on: ubuntu-latest
    needs: publish_packages
