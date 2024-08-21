@@ -3,9 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       publishFlag:
-        description: 'which version to publish eg: alpha, beta, latest, experimental'
+        description: 'which version to publish eg: alpha, latest'
         required: true
         default: 'alpha'
+        type: choice
+        options:
+          - alpha
+          - latest
   repository_dispatch:
     types: [publish-command]
 
