@@ -71,10 +71,10 @@ export const ConferenceScreen = () => {
   };
 
   useEffect(() => {
-    if (isConnectedToRoom) {
+    if (isConnectedToRoom && localPeerVideoTrackID) {
       addBlur();
     }
-  }, [isConnectedToRoom, addBlur]);
+  }, [isConnectedToRoom, addBlur, localPeerVideoTrackID]);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
