@@ -91,11 +91,16 @@ export default class JsonRpcSignal {
 
   private _isConnected = false;
   private id = 0;
+  private sfuNodeId: string | undefined;
 
   private onCloseHandler: (event: CloseEvent) => void = () => {};
 
   public get isConnected(): boolean {
     return this._isConnected;
+  }
+
+  setSfuNodeId(sfuNodeId?: string) {
+    this.sfuNodeId = sfuNodeId;
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
@@ -275,27 +280,23 @@ export default class JsonRpcSignal {
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit) {
     if (this.isJoinCompleted) {
-      this.notify(HMSSignalMethod.TRICKLE, { target, candidate });
+      this.notify(HMSSignalMethod.TRICKLE, { target, candidate, sfu_node_id: this.sfuNodeId });
     } else {
       this.pendingTrickle.push({ target, candidate });
     }
   }
 
-  async offer(
-    desc: RTCSessionDescriptionInit,
-    tracks: Map<string, any>,
-    sfuNodeId?: string,
-  ): Promise<RTCSessionDescriptionInit> {
+  async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
     const response = await this.call(HMSSignalMethod.OFFER, {
       desc,
       tracks: Object.fromEntries(tracks),
-      sfu_node_id: sfuNodeId,
+      sfu_node_id: this.sfuNodeId,
     });
     return response as RTCSessionDescriptionInit;
   }
 
   answer(desc: RTCSessionDescriptionInit) {
-    this.notify(HMSSignalMethod.ANSWER, { desc });
+    this.notify(HMSSignalMethod.ANSWER, { desc, sfu_node_id: this.sfuNodeId });
   }
 
   trackUpdate(tracks: Map<string, Track>) {
