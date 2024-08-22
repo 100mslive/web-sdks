@@ -65,8 +65,8 @@ export const useHMSVirtualBackground = () => {
 
   const addBlur = useCallback(() => {
     console.log('>>>>>>> addBlur', { isEnabled, VBPlugin });
-    isEnabled && VBPlugin?.setBlur(BLUR_POWER);
-  }, [VBPlugin, isEnabled]);
+    localPeerVideoTrackID && isEnabled && VBPlugin?.setBlur(BLUR_POWER);
+  }, [VBPlugin, isEnabled, localPeerVideoTrackID]);
 
   const removeBlur = useCallback(() => {
     isEnabled && VBPlugin?.removeBlur();

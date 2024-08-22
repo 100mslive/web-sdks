@@ -5,7 +5,6 @@ import {
   HMSRoomState,
   selectAppData,
   selectIsConnectedToRoom,
-  selectLocalVideoTrackID,
   selectRoomState,
   useAwayNotifications,
   useHMSActions,
@@ -54,7 +53,6 @@ export const ConferenceScreen = () => {
   const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const { requestPermission } = useAwayNotifications();
-  const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
 
   // using it in hls stream to show action button when chat is disabled
   const showChat = !!screenProps.elements?.chat;
@@ -71,10 +69,10 @@ export const ConferenceScreen = () => {
   };
 
   useEffect(() => {
-    if (isConnectedToRoom && localPeerVideoTrackID) {
+    if (isConnectedToRoom) {
       addBlur();
     }
-  }, [isConnectedToRoom, addBlur, localPeerVideoTrackID]);
+  }, [isConnectedToRoom, addBlur]);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
