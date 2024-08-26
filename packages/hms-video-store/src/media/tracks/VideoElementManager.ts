@@ -5,7 +5,7 @@ import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '../../internal';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
-import { isBrowser, isMobile } from '../../utils/support';
+import { isBrowser } from '../../utils/support';
 
 /**
  * This class is to manager video elements for video tracks.
@@ -45,7 +45,6 @@ export class VideoElementManager {
     this.init();
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
-    this.track.nativeTrack.addEventListener('mute', this.resumeVideoPlayback);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
         this.TAG,
@@ -73,7 +72,6 @@ export class VideoElementManager {
   removeVideoElement(videoElement: HTMLVideoElement): void {
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
-    this.track.nativeTrack.removeEventListener('mute', this.resumeVideoPlayback);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
@@ -83,14 +81,6 @@ export class VideoElementManager {
   getVideoElements(): HTMLVideoElement[] {
     return Array.from(this.videoElements);
   }
-
-  private resumeVideoPlayback = (e: Event) => {
-    const element = e.target as HTMLVideoElement;
-    if (!document.hidden && isMobile() && element.paused) {
-      // add sink again to play the video specially in safari iOS
-      this.track.addSink(element);
-    }
-  };
 
   private init() {
     if (isBrowser) {
@@ -182,7 +172,6 @@ export class VideoElementManager {
   cleanup = () => {
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
-      videoElement.removeEventListener('pause', this.resumeVideoPlayback);
       this.resizeObserver?.unobserve(videoElement);
       this.intersectionObserver?.unobserve(videoElement);
     });
