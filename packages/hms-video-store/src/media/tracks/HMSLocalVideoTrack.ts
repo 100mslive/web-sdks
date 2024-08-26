@@ -73,6 +73,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     private room?: Room,
   ) {
     super(stream, track, source);
+    this.addTrackEventListeners(track);
     stream.tracks.push(this);
     this.setVideoHandler(new VideoElementManager(this));
     this.settings = settings;
@@ -259,6 +260,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @internal
    */
   async cleanup() {
+    this.removeTrackEventListeners(this.nativeTrack);
     super.cleanup();
     this.transceiver = undefined;
     await this.pluginsManager.cleanup();
@@ -507,6 +509,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         });
       }
     }
+  };
+
+  private addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  /** @internal */
+  handleTrackUnmute = () => {
+    super.handleTrackUnmute();
+    this.eventBus.localVideoUnmutedNatively.publish();
   };
 
   /**

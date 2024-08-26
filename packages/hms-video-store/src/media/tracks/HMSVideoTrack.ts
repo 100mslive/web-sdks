@@ -13,7 +13,6 @@ export class HMSVideoTrack extends HMSTrack {
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
-    this.addTrackEventListeners(track);
   }
 
   setVideoHandler(videoHandler: VideoElementManager) {
@@ -59,7 +58,6 @@ export class HMSVideoTrack extends HMSTrack {
   }
 
   cleanup(): void {
-    this.removeTrackEventListeners(this.nativeTrack);
     super.cleanup();
     this.videoHandler.cleanup();
   }
@@ -86,17 +84,9 @@ export class HMSVideoTrack extends HMSTrack {
     this.sinkCount++;
   }
 
-  protected addTrackEventListeners(track: MediaStreamTrack) {
-    track.addEventListener('unmute', this.handleTrackUnmute);
-  }
-
-  protected removeTrackEventListeners(track: MediaStreamTrack) {
-    track.removeEventListener('unmute', this.handleTrackUnmute);
-  }
-
-  private handleTrackUnmute = () => {
+  handleTrackUnmute() {
     this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
-  };
+  }
 
   private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {

@@ -22,7 +22,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source);
     this.setVideoHandler(new VideoElementManager(this));
-    this.addTrackEventListeners(track);
   }
 
   setTrackId(trackId: string) {
