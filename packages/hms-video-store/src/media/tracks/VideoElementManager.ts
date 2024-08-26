@@ -73,7 +73,7 @@ export class VideoElementManager {
   removeVideoElement(videoElement: HTMLVideoElement): void {
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
-    videoElement.removeEventListener('pause', this.resumeVideoPlayback);
+    this.track.nativeTrack.removeEventListener('mute', this.resumeVideoPlayback);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
