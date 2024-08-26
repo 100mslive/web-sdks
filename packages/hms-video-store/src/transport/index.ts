@@ -542,7 +542,8 @@ export default class HMSTransport {
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
       const peer = this.store.getLocalPeer();
-      if (peer) {
+      // don't send update in case of call interruption
+      if (peer && enabled === track.enabled) {
         this.listener?.onTrackUpdate(enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED, track, peer);
       }
     }
