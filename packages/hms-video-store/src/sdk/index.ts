@@ -1271,6 +1271,9 @@ export class HMSSdk implements HMSInterface {
   }
 
   private setLocalPeerTrack(track: HMSLocalTrack) {
+    if (!this.localPeer) {
+      return;
+    }
     track.peerId = this.localPeer?.peerId;
     switch (track.type) {
       case HMSTrackType.AUDIO:
