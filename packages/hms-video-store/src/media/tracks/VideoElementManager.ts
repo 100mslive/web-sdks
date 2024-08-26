@@ -45,7 +45,7 @@ export class VideoElementManager {
     this.init();
     HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
-    videoElement.addEventListener('pause', this.resumeVideoPlayback);
+    this.track.nativeTrack.addEventListener('mute', this.resumeVideoPlayback);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
         this.TAG,
