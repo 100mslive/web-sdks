@@ -111,7 +111,7 @@ export default class HMSTransport {
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
 
-    this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localAudioEnabled.subscribe(({ track, enabled }) => this.trackUpdate(track, enabled));
     this.eventBus.localVideoEnabled.subscribe(({ track, enabled }) => this.trackUpdate(track, enabled));
   }
 
@@ -524,7 +524,7 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate(track: HMSLocalTrack, enabled?: boolean) {
+  trackUpdate(track: HMSLocalTrack, enabled: boolean) {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
@@ -533,11 +533,10 @@ export default class HMSTransport {
      * on call interruption, we just send disabled track update to biz to send to remote peers WITHOUT sending to the local peer
      * in this case, track.enabled would still be true which is why we are using the value from the localVideoEnabled event
      *  */
-    enabled = enabled === undefined ? !track.enabled : enabled;
     if (originalTrackState) {
       const newTrackState = new TrackState({
         ...originalTrackState,
-        mute: enabled,
+        mute: !enabled,
       });
       this.trackStates.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
