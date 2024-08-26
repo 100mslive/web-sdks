@@ -112,7 +112,7 @@ export default class HMSTransport {
     });
 
     this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
-    this.eventBus.localVideoEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localVideoEnabled.subscribe(({ track, enabled }) => this.trackUpdate(track, enabled));
   }
 
   /**
@@ -524,26 +524,23 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate(track: HMSLocalTrack) {
+  trackUpdate(track: HMSLocalTrack, enabled?: boolean) {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
     );
+    enabled = enabled === undefined ? !track.enabled : enabled;
     if (originalTrackState) {
       const newTrackState = new TrackState({
         ...originalTrackState,
-        mute: !track.enabled,
+        mute: enabled,
       });
       this.trackStates.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
       const peer = this.store.getLocalPeer();
       if (peer) {
-        this.listener?.onTrackUpdate(
-          track.enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED,
-          track,
-          peer,
-        );
+        this.listener?.onTrackUpdate(enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED, track, peer);
       }
     }
   }
