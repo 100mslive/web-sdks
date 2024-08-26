@@ -373,9 +373,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * you are requesting for a new device.
      * Note: Do not change the order of this.
      */
+    this.removeTrackEventListeners(prevTrack);
     prevTrack?.stop();
     try {
       const newTrack = await getVideoTrack(settings);
+      this.addTrackEventListeners(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
@@ -385,6 +387,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
+      this.addTrackEventListeners(track);
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();
@@ -408,6 +411,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    this.removeTrackEventListeners(prevTrack);
+    this.addTrackEventListeners(newTrack);
     prevTrack?.stop();
     HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
     return newTrack;

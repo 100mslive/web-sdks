@@ -13,6 +13,7 @@ export class HMSVideoTrack extends HMSTrack {
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
+    this.addTrackEventListeners(track);
   }
 
   setVideoHandler(videoHandler: VideoElementManager) {
@@ -58,6 +59,7 @@ export class HMSVideoTrack extends HMSTrack {
   }
 
   cleanup(): void {
+    this.removeTrackEventListeners(this.nativeTrack);
     super.cleanup();
     this.videoHandler.cleanup();
   }
@@ -69,7 +71,7 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
-          this.reTriggerPlay({ videoElement, stream: srcObject });
+          this.reTriggerPlay({ videoElement });
           return;
         } else {
           this.reduceSinkCount();
@@ -80,19 +82,27 @@ export class HMSVideoTrack extends HMSTrack {
     }
     const stream = new MediaStream([track]);
     videoElement.srcObject = stream;
-    this.reTriggerPlay({ videoElement, stream });
+    this.reTriggerPlay({ videoElement });
     this.sinkCount++;
   }
 
-  private reTriggerPlay = ({ videoElement, stream }: { videoElement: HTMLVideoElement; stream: MediaStream }) => {
+  protected addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  protected removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private handleTrackUnmute = () => {
+    this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
+  };
+
+  private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
-      if (videoElement.paused) {
-        // This is needed for safari and firefox to work properly
-        videoElement.srcObject = stream;
-        videoElement.play().catch(() => {
-          //do nothing
-        });
-      }
+      videoElement.play().catch(() => {
+        //do nothing
+      });
     }, 0);
   };
 
