@@ -512,16 +512,23 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('mute', this.handleTrackMute);
     track.addEventListener('unmute', this.handleTrackUnmute);
   }
 
   private removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmute);
   }
+
+  private handleTrackMute = () => {
+    this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+  };
 
   /** @internal */
   handleTrackUnmute = () => {
     super.handleTrackUnmute();
+    this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
   };
 
