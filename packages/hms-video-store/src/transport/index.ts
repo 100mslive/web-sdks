@@ -529,6 +529,10 @@ export default class HMSTransport {
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
     );
+    /**
+     * on call interruption, we just send disabled track update to biz to send to remote peers WITHOUT sending to the local peer
+     * in this case, track.enabled would still be true which is why we are using the value from the localVideoEnabled event
+     *  */
     enabled = enabled === undefined ? !track.enabled : enabled;
     if (originalTrackState) {
       const newTrackState = new TrackState({

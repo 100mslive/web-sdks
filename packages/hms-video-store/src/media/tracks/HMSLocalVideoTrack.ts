@@ -522,11 +522,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private handleTrackMute = () => {
+    HMSLogger.d(this.TAG, 'muted natively');
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
   handleTrackUnmute = () => {
+    HMSLogger.d(this.TAG, 'unmuted natively');
     super.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
