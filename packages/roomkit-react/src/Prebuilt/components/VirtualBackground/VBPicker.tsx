@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import {
-  selectAppData,
-  selectEffectsKey,
-  selectIsEffectsEnabled,
-  selectLocalPeerRole,
-} from '@100mslive/hms-video-store';
-import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -47,8 +42,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const [isBlurSupported, setIsBlurSupported] = useState(false);
-  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
-  const effectsKey = useHMSStore(selectEffectsKey);
   const isMobile = useMedia(cssConfig.media.md);
   const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
@@ -70,17 +63,13 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       setLoadingEffects(true);
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () => setLoadingEffects(false));
+        VBHandler.initialisePlugin('', () => setLoadingEffects(false));
         vbObject = VBHandler.getVBObject();
-        if (isEffectsEnabled && isEffectsSupported && effectsKey) {
-          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
-        } else {
-          setLoadingEffects(false);
-          if (!role) {
-            return;
-          }
-          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+        setLoadingEffects(false);
+        if (!role) {
+          return;
         }
+        hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
       }
       const handleDefaultBackground = async () => {
         switch (background) {
@@ -97,17 +86,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       };
       handleDefaultBackground();
     }
-  }, [
-    hmsActions,
-    role,
-    isPluginAdded,
-    isEffectsEnabled,
-    effectsKey,
-    track?.id,
-    background,
-    blurAmount,
-    setLoadingEffects,
-  ]);
+  }, [hmsActions, role, isPluginAdded, track?.id, background, blurAmount, setLoadingEffects]);
 
   useEffect(() => {
     if (!isVideoOn) {
@@ -178,7 +157,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
 
         {/* Slider */}
         <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
-          {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+          {background === HMSVirtualBackgroundTypes.BLUR ? (
             <Box>
               <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
                 Blur intensity

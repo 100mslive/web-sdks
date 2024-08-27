@@ -2,7 +2,6 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
-  selectAppData,
   selectIsLocalVideoEnabled,
   selectIsVBEnabled,
   selectLocalPeer,
@@ -41,7 +40,7 @@ import {
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
-import { APP_DATA, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
@@ -84,7 +83,7 @@ const PreviewJoin = ({
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
-  const loadingEffects = useHMSStore(selectAppData(APP_DATA.loadingEffects));
+  const loadingEffects = false;
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
