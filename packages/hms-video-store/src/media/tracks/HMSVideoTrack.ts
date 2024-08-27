@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
+import HMSLogger from '../../utils/logger';
 import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
@@ -91,7 +92,7 @@ export class HMSVideoTrack extends HMSTrack {
   private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
       videoElement.play().catch(() => {
-        //do nothing
+        HMSLogger.w('[HMSVideoTrack]', 'failed to play');
       });
     }, 0);
   };

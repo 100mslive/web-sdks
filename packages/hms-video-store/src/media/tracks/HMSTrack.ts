@@ -89,18 +89,10 @@ export abstract class HMSTrack {
    * @internal
    * It will send event to analytics when interruption start/stop
    */
-  sendInterruptionEvent({
-    started,
-    reason,
-    isRemoteAudio = false,
-  }: {
-    started: boolean;
-    reason: string;
-    isRemoteAudio?: boolean;
-  }) {
+  sendInterruptionEvent({ started, reason }: { started: boolean; reason: string }) {
     return AnalyticsEventFactory.interruption({
       started,
-      type: isRemoteAudio ? 'remote.audio' : this.type,
+      type: this.type,
       reason,
       deviceInfo: {
         deviceId: this.nativeTrack.getSettings().deviceId,
