@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
+import HMSLogger from '../../utils/logger';
 import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
@@ -69,7 +70,7 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
-          this.reTriggerPlay({ videoElement, stream: srcObject });
+          this.reTriggerPlay({ videoElement });
           return;
         } else {
           this.reduceSinkCount();
@@ -80,19 +81,19 @@ export class HMSVideoTrack extends HMSTrack {
     }
     const stream = new MediaStream([track]);
     videoElement.srcObject = stream;
-    this.reTriggerPlay({ videoElement, stream });
+    this.reTriggerPlay({ videoElement });
     this.sinkCount++;
   }
 
-  private reTriggerPlay = ({ videoElement, stream }: { videoElement: HTMLVideoElement; stream: MediaStream }) => {
+  handleTrackUnmute() {
+    this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
+  }
+
+  private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
-      if (videoElement.paused) {
-        // This is needed for safari and firefox to work properly
-        videoElement.srcObject = stream;
-        videoElement.play().catch(() => {
-          //do nothing
-        });
-      }
+      videoElement.play().catch(() => {
+        HMSLogger.w('[HMSVideoTrack]', 'failed to play');
+      });
     }, 0);
   };
 

@@ -215,6 +215,7 @@ export class HMSSdk implements HMSInterface {
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
@@ -622,6 +623,7 @@ export class HMSSdk implements HMSInterface {
   private cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
@@ -1486,6 +1488,10 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
+
+  private unpauseRemoteVideoTracks = () => {
+    this.store.getRemoteVideoTracks().forEach(track => track.handleTrackUnmute());
+  };
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
