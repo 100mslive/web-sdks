@@ -577,6 +577,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
+          reason: 'visibility-change',
         }),
       );
     } else {
@@ -591,6 +592,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
+          reason: 'visibility-change',
         }),
       );
     }

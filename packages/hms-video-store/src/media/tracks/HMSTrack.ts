@@ -91,11 +91,11 @@ export abstract class HMSTrack {
    */
   sendInterruptionEvent({
     started,
-    reason = 'background',
+    reason,
     isRemoteAudio = false,
   }: {
     started: boolean;
-    reason?: string;
+    reason: string;
     isRemoteAudio?: boolean;
   }) {
     return AnalyticsEventFactory.interruption({
