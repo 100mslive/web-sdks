@@ -523,12 +523,24 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: true,
+        reason: 'incoming-call',
+      }),
+    );
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
   handleTrackUnmute = () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: false,
+        reason: 'incoming-call',
+      }),
+    );
     super.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
@@ -575,7 +587,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       }
-      // started interruption event
+      // ended interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
