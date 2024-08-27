@@ -84,7 +84,7 @@ export const useAppStateManager = () => {
       .otherwise(() => {
         // do nothing
       });
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave, hmsActions]);
-
+    setActiveState(PrebuiltStates.LEAVE);
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
   return { activeState, rejoin };
 };

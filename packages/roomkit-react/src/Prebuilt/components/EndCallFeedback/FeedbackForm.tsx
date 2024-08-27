@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMedia } from 'react-use';
+import { Rating } from '@100mslive/types-prebuilt/elements/feedback';
 import { CheckIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Checkbox } from '../../../Checkbox';
@@ -10,13 +11,14 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { TextArea } from '../../../TextArea';
 import { config as cssConfig } from '../../../Theme';
+import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const FeedbackModal = ({
   ratings,
   index,
   setIndex,
 }: {
-  ratings: any[];
+  ratings: Rating[];
   index: number;
   setIndex: (index: number) => void;
 }) => {
@@ -24,10 +26,17 @@ export const FeedbackModal = ({
   const onOpenChange = () => {
     setIndex(-1);
   };
+  const avoidDefaultDomBehavior = (e: Event) => {
+    e.preventDefault();
+  };
   if (isMobile) {
     return (
       <Sheet.Root open={index !== -1} onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$12' }}>
+        <Sheet.Content
+          css={{ bg: '$surface_dim', p: '$12' }}
+          onPointerDownOutside={avoidDefaultDomBehavior}
+          onInteractOutside={avoidDefaultDomBehavior}
+        >
           <FeedbackContent ratings={ratings} indexSelected={index} setIndex={setIndex} />
         </Sheet.Content>
       </Sheet.Root>
@@ -37,7 +46,11 @@ export const FeedbackModal = ({
     <Dialog.Root open={index !== -1} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ bg: '$surface_dim', maxWidth: '528px', p: '$8' }}>
+        <Dialog.Content
+          css={{ bg: '$surface_dim', maxWidth: '528px', p: '$8' }}
+          onPointerDownOutside={avoidDefaultDomBehavior}
+          onInteractOutside={avoidDefaultDomBehavior}
+        >
           <FeedbackContent ratings={ratings} indexSelected={index} setIndex={setIndex} />
         </Dialog.Content>
       </Dialog.Portal>
@@ -50,10 +63,21 @@ export const FeedbackContent = ({
   indexSelected,
   setIndex,
 }: {
-  ratings: any[];
+  ratings: Rating[];
   indexSelected: number;
   setIndex: (index: number) => void;
 }) => {
+  const [comment, setComment] = useState('');
+  const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
+  const handleCheckedChange = (checked: boolean | string, index: number) => {
+    const newSelected = new Set(selectedReasons);
+    if (checked) {
+      newSelected.add(index);
+    } else {
+      newSelected.delete(index);
+    }
+    setSelectedReasons(newSelected);
+  };
   return (
     <Flex
       css={{
@@ -65,9 +89,26 @@ export const FeedbackContent = ({
       }}
       direction="column"
     >
-      <FeedbackHeader ratings={ratings} indexSelected={indexSelected} onEmojiClicked={setIndex} />
-      <FeedbackForm rating={ratings[indexSelected]} />
-      <SubmitFeedback />
+      <FeedbackHeader
+        ratings={ratings}
+        indexSelected={indexSelected}
+        onEmojiClicked={(value: number) => {
+          setSelectedReasons(new Set<number>());
+          setIndex(value);
+        }}
+      />
+      <FeedbackForm
+        rating={ratings[indexSelected]}
+        comment={comment}
+        setComment={setComment}
+        selectedReasons={selectedReasons}
+        handleCheckedChange={handleCheckedChange}
+      />
+      <SubmitFeedback
+        onSubmitFeedback={() => {
+          console.log('index, reasons, comment ', indexSelected, selectedReasons, comment);
+        }}
+      />
     </Flex>
   );
 };
@@ -77,9 +118,10 @@ export const FeedbackHeader = ({
   indexSelected = -1,
 }: {
   onEmojiClicked: (index: number) => void;
-  ratings: any[];
+  ratings: Rating[];
   indexSelected?: number;
 }) => {
+  const { feedback } = useRoomLayoutLeaveScreen();
   return (
     <>
       <Flex align="center">
@@ -95,7 +137,7 @@ export const FeedbackHeader = ({
               c: '$on_surface_high',
             }}
           >
-            How was your experience?
+            {feedback?.title || 'How was your experience?'}
           </Text>
           <Text
             variant="body1"
@@ -105,7 +147,7 @@ export const FeedbackHeader = ({
               fontWeight: '$regular',
             }}
           >
-            Your answers help us improve the quality.
+            {feedback?.sub_title || 'Your answers help us improve the quality.'}
           </Text>
         </Flex>
         {indexSelected !== -1 ? (
@@ -155,94 +197,115 @@ export const FeedbackHeader = ({
     </>
   );
 };
-export const FeedbackForm = ({ rating }: { rating: any }) => {
+export const FeedbackForm = ({
+  rating,
+  comment,
+  setComment,
+  selectedReasons,
+  handleCheckedChange,
+}: {
+  rating: Rating;
+  comment: string;
+  setComment: (value: string) => void;
+  selectedReasons: Set<number>;
+  handleCheckedChange: (checked: string | boolean, index: number) => void;
+}) => {
+  const { feedback } = useRoomLayoutLeaveScreen();
   return (
     <>
-      <Flex
-        direction="column"
-        css={{
-          gap: '$4',
-        }}
-      >
-        <Text
-          variant="sub2"
-          css={{
-            c: '$on_surface_high',
-            fontWeight: '$semiBold',
-            fontSize: '$sm',
-            px: '$2',
-          }}
-        >
-          {rating.question}
-        </Text>
+      {rating.reasons && rating.reasons.length > 0 && (
         <Flex
-          justify="between"
+          direction="column"
           css={{
-            r: '$2',
-            border: '1px solid $border_bright',
-            alignItems: 'center',
-            gap: '$3',
-            p: '$6',
-            flexWrap: 'wrap',
-            flex: '1 1 calc(33.333% - 12px)',
-            '@md': {
-              flex: '1 1 calc(50% - 12px)',
-            },
-            '@sm': {
-              flex: '1 1 100%',
-            },
+            gap: '$4',
           }}
         >
-          {rating.reasons.map((option: string) => {
-            return (
-              <Flex align="center" gap="2">
-                <Checkbox.Root
-                  css={{
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Checkbox.Indicator>
-                    <CheckIcon width={16} height={16} />
-                  </Checkbox.Indicator>
-                </Checkbox.Root>
-                <Label>{option}</Label>
-              </Flex>
-            );
-          })}
+          <Text
+            variant="sub2"
+            css={{
+              c: '$on_surface_high',
+              fontWeight: '$semiBold',
+              fontSize: '$sm',
+              px: '$2',
+            }}
+          >
+            {rating.question || 'What do you like/unlike here?'}
+          </Text>
+          <Flex
+            justify="between"
+            css={{
+              r: '$2',
+              border: '1px solid $border_bright',
+              alignItems: 'center',
+              gap: '$3',
+              p: '$6',
+              flexWrap: 'wrap',
+              flex: '1 1 calc(33.333% - 12px)',
+              '@md': {
+                flex: '1 1 calc(50% - 12px)',
+              },
+              '@sm': {
+                flex: '1 1 100%',
+              },
+            }}
+          >
+            {rating.reasons.map((option: string, index: number) => {
+              return (
+                <Flex align="center" gap="2">
+                  <Checkbox.Root
+                    id={`${option}-${index}`}
+                    checked={selectedReasons.has(index)}
+                    onCheckedChange={checked => handleCheckedChange(checked, index)}
+                    css={{
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Checkbox.Indicator>
+                      <CheckIcon width={16} height={16} />
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                  <Label>{option}</Label>
+                </Flex>
+              );
+            })}
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex direction="column">
-        <Text
-          variant="body2"
-          css={{
-            c: '$on_surface_high',
-            fontWeight: '$regular',
-            fontSize: '$sm',
-          }}
-        >
-          Additional comments (optional)
-        </Text>
-        <TextArea
-          maxLength={1024}
-          placeholder="Ask a question"
-          css={{
-            mt: '$md',
-            backgroundColor: '$surface_bright',
-            border: '1px solid $border_bright',
-            minHeight: '$14',
-            resize: 'vertical',
-            maxHeight: '$32',
-          }}
-          // value={"here"}
-          // onChange={event => setText(event.target.value.trimStart())}
-        />
-      </Flex>
+      )}
+      {feedback?.comment && (
+        <Flex direction="column">
+          <Text
+            variant="body2"
+            css={{
+              c: '$on_surface_high',
+              fontWeight: '$regular',
+              fontSize: '$sm',
+            }}
+          >
+            {feedback?.comment.label || 'Additional comments (optional)'}
+          </Text>
+          <TextArea
+            maxLength={1024}
+            placeholder={feedback?.comment.placeholder || 'Ask a question'}
+            css={{
+              mt: '$md',
+              backgroundColor: '$surface_bright',
+              border: '1px solid $border_bright',
+              minHeight: '$14',
+              resize: 'vertical',
+              maxHeight: '$32',
+            }}
+            value={comment}
+            onChange={event => setComment(event.target.value.trimStart())}
+          />
+        </Flex>
+      )}
     </>
   );
 };
 
-export const SubmitFeedback = () => {
+export const SubmitFeedback = ({ onSubmitFeedback }: { onSubmitFeedback: () => void }) => {
+  const { feedback } = useRoomLayoutLeaveScreen();
   return (
     <Button
       type="submit"
@@ -250,8 +313,9 @@ export const SubmitFeedback = () => {
       css={{
         alignSelf: 'end',
       }}
+      onClick={onSubmitFeedback}
     >
-      Submit Feedback
+      {feedback?.submit_btn_label || 'Submit Feedback'}
     </Button>
   );
 };

@@ -1,47 +1,26 @@
 import React, { useState } from 'react';
 import { Flex } from '../../../Layout';
 import { FeedbackHeader, FeedbackModal } from './FeedbackForm';
+import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const Feedback = () => {
   // TODO - use roomLayoutLeaveScreen
-  const ratings = [
-    {
-      label: 'Great',
-      value: 5,
-      emoji: '😍',
-      question: 'How likely are you to recommend 100ms to a friend or colleague? ',
-      reasons: ['Video Quality', 'Audio Quality', 'Ease of Use', 'Features'],
-    },
-    {
-      label: 'Good',
-      value: 4,
-      emoji: '😊',
-      question: 'What can we do to improve your experience?',
-      reasons: ['Video Quality', 'Audio Quality', 'Ease of Use', 'Features', 'Latency'],
-    },
-    {
-      label: 'Fair',
-      value: 3,
-      emoji: '😐',
-      question: 'What can we do to improve your experience?',
-      reasons: ['Video Quality', 'Audio Quality', 'Frame drops', 'Choppy audio'],
-    },
-    {
-      label: 'Bad',
-      value: 2,
-      emoji: '😞',
-      question: 'What went wrong?',
-      reasons: ['Stuck Video', 'Robotic Audio'],
-    },
-    {
-      label: 'Awful',
-      value: 1,
-      emoji: '😡',
-      question: 'What went wrong?',
-      reasons: ['Video Quality', 'Audio Quality'],
-    },
-  ];
+  const { feedback } = useRoomLayoutLeaveScreen();
   const [index, setIndex] = useState(-1);
+
+  if (!feedback) {
+    return null;
+  }
+  const { ratings } = feedback;
+  if (!ratings) {
+    return null;
+  }
+  ratings.sort((a, b) => {
+    if (!a.value || !b.value) {
+      return 0;
+    }
+    return a.value - b.value;
+  });
   return (
     <Flex
       justify="center"

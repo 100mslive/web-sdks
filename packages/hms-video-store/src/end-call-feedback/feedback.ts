@@ -1,4 +1,4 @@
-import { HMSSessionFeedback, HMSSessionInfo } from './session-info';
+import { HMSSessionFeedback, HMSSessionInfo } from './interface';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../internal';
@@ -30,7 +30,7 @@ export class FeedbackService {
   }): Promise<void> {
     HMSLogger.d(
       this.TAG,
-      `sendFeednbck: feedbackEndpoint=${eventEndpoint} token=${token} peerId=${info.peer.peer_id} session=${info.peer.session_id} `,
+      `sendFeedback: feedbackEndpoint=${eventEndpoint} token=${token} peerId=${info.peer.peer_id} session=${info.peer.session_id} `,
     );
     const url = new URL('v2/client/feedback', eventEndpoint);
     const body = {

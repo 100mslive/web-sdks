@@ -1,2 +1,2 @@
-export * from './session-info';
+export * from './interface';
 export * from './feedback';
