@@ -57,5 +57,5 @@ interface Props {
 
 export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
   const { videoRef } = useVideo({ trackId, attach });
-  return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
+  return <StyledVideo muted controls={false} ref={videoRef} {...props} />;
 };
