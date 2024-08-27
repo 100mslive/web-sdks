@@ -107,6 +107,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
+          reason: 'visibility-change',
         }),
       );
     } else {
@@ -115,6 +116,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
+          reason: 'visibility-change',
         }),
       );
     }
