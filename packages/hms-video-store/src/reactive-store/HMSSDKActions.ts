@@ -135,8 +135,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.actionBatcher = new ActionBatcher(store);
   }
-  submitSessionFeedback(feedback: HMSSessionFeedback): Promise<void> {
-    return this.sdk.submitSessionFeedback(feedback);
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void> {
+    return this.sdk.submitSessionFeedback(feedback, eventEndpoint);
   }
 
   getLocalTrack(trackID: string) {

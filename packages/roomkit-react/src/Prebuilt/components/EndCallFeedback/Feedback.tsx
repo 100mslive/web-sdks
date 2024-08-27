@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
+import { config as cssConfig } from '../../../Theme';
 import { FeedbackHeader, FeedbackModal } from './FeedbackForm';
+import { ThankyouView } from './ThankyouView';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const Feedback = () => {
-  // TODO - use roomLayoutLeaveScreen
   const { feedback } = useRoomLayoutLeaveScreen();
   const [index, setIndex] = useState(-1);
+
+  const isMobile = useMedia(cssConfig.media.md);
 
   if (!feedback) {
     return null;
@@ -21,6 +25,18 @@ export const Feedback = () => {
     }
     return a.value - b.value;
   });
+  if (index === -10) {
+    return (
+      <Flex
+        justify="center"
+        css={{
+          pt: '$16',
+        }}
+      >
+        <ThankyouView />
+      </Flex>
+    );
+  }
   return (
     <Flex
       justify="center"
@@ -35,8 +51,12 @@ export const Feedback = () => {
             p: '$12',
             border: '1px solid $border_default',
             bg: '$surface_dim',
-            r: '$3',
+            borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
             gap: '$10',
+            '@md': {
+              position: 'absolute',
+              bottom: '0',
+            },
           }}
           direction="column"
         >

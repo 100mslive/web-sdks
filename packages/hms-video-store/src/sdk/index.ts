@@ -136,9 +136,12 @@ export class HMSSdk implements HMSInterface {
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private isDiagnostics = false;
-  // will be set post join
-  // this will not be reset on leave but after feedback success
-  // will be replaced when a newer join happens.
+  /**
+   * will be set post join
+   * this will not be reset on leave but after feedback success
+   * we will just clean token after successful submit feedback
+   * will be replaced when a newer join happens.
+   */
   private sessionPeerInfo?: HMSSessionInfo;
 
   private playlistSettings: HMSPlaylistSettings = {
@@ -633,9 +636,9 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
-      await this.publish(config.settings, previewRole);
       // setSessionJoin
-      this.setSessionPeerInfo(config.initEndpoint || '', this.localPeer);
+      this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
+      await this.publish(config.settings, previewRole);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
@@ -793,24 +796,29 @@ export class HMSSdk implements HMSInterface {
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
   }
-  async submitSessionFeedback(feedback: HMSSessionFeedback) {
+  async submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string) {
     if (!this.sessionPeerInfo) {
       HMSLogger.e(this.TAG, 'submitSessionFeedback> session is undefined');
-      return;
+      throw new Error('session is undefined');
     }
     const token = this.sessionPeerInfo.peer.token;
     if (!token) {
       HMSLogger.e(this.TAG, 'submitSessionFeedback> token is undefined');
-      return;
+      throw new Error('Internal error, token is not present');
     }
-
-    FeedbackService.sendFeedback({
-      token: token,
-      info: this.sessionPeerInfo,
-      feedback,
-    });
-    // fetch request
-    // after success, sessionPeerInfo can be reset.
+    try {
+      await FeedbackService.sendFeedback({
+        token: token,
+        info: this.sessionPeerInfo,
+        feedback,
+        eventEndpoint,
+      });
+      HMSLogger.i(this.TAG, 'submitSessionFeedback> submitted feedback');
+      this.sessionPeerInfo = undefined;
+    } catch (e) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> error occured ', e);
+      throw new Error('Unable to submit feedback');
+    }
   }
   async getPeer(peerId: string) {
     const response = await this.transport.signal.getPeer({ peer_id: peerId });

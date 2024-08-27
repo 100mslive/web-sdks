@@ -105,5 +105,5 @@ export interface HMSInterface {
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 
   updatePlaylistSettings(options: HMSPlaylistSettings): void;
-  submitSessionFeedback(feedback: HMSSessionFeedback): Promise<void>;
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 }

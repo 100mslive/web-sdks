@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { Rating } from '@100mslive/types-prebuilt/elements/feedback';
+import { useHMSActions } from '@100mslive/react-sdk';
 import { CheckIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Checkbox } from '../../../Checkbox';
@@ -11,6 +12,7 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { TextArea } from '../../../TextArea';
 import { config as cssConfig } from '../../../Theme';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const FeedbackModal = ({
@@ -67,6 +69,8 @@ export const FeedbackContent = ({
   indexSelected: number;
   setIndex: (index: number) => void;
 }) => {
+  const { endpoints } = useHMSPrebuiltContext();
+  const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
   const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
   const handleCheckedChange = (checked: boolean | string, index: number) => {
@@ -77,6 +81,29 @@ export const FeedbackContent = ({
       newSelected.delete(index);
     }
     setSelectedReasons(newSelected);
+  };
+  const submitFeedback = async () => {
+    if (indexSelected < 0 || ratings.length <= indexSelected) {
+      return;
+    }
+    try {
+      const reasons = [...selectedReasons].map((value: number) => ratings[indexSelected]?.reasons?.[value] || '');
+      await hmsActions.submitSessionFeedback(
+        {
+          question: ratings[indexSelected].question,
+          rating: ratings[indexSelected].value || 1,
+          min_rating: 1,
+          max_rating: ratings.length,
+          reasons: selectedReasons.size === 0 ? [] : reasons,
+          comment: comment,
+        },
+        endpoints?.event,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    // always submit and take it to thankyou page
+    setIndex(-10);
   };
   return (
     <Flex
@@ -104,11 +131,7 @@ export const FeedbackContent = ({
         selectedReasons={selectedReasons}
         handleCheckedChange={handleCheckedChange}
       />
-      <SubmitFeedback
-        onSubmitFeedback={() => {
-          console.log('index, reasons, comment ', indexSelected, selectedReasons, comment);
-        }}
-      />
+      <SubmitFeedback onSubmitFeedback={submitFeedback} />
     </Flex>
   );
 };
@@ -170,6 +193,7 @@ export const FeedbackHeader = ({
                 c: indexSelected === index || indexSelected === -1 ? '$on_surface_high' : '$on_surface_default',
               }}
               onClick={() => onEmojiClicked(index)}
+              key={`${index}`}
             >
               <Text
                 css={{
@@ -251,7 +275,7 @@ export const FeedbackForm = ({
           >
             {rating.reasons.map((option: string, index: number) => {
               return (
-                <Flex align="center" gap="2">
+                <Flex align="center" gap="2" key={`${index}`}>
                   <Checkbox.Root
                     id={`${option}-${index}`}
                     checked={selectedReasons.has(index)}

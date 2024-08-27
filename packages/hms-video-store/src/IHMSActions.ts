@@ -345,7 +345,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * After leave send feedback to backend for call quality purpose.
    * @param feedback
    */
-  submitSessionFeedback(feedback: HMSSessionFeedback): Promise<void>;
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 
   /**
    * If you have **removeOthers** permission, you can remove a peer from the room.
