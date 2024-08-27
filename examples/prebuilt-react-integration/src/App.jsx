@@ -9,5 +9,17 @@ export default function App() {
     return <Diagnostics />;
   }
 
-  return <HMSPrebuilt roomCode={roomCode} />;
+  return (
+    <HMSPrebuilt
+      roomCode={roomCode}
+      options={{
+        endpoints: {
+          tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
+          roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
+          init: 'https://qa-in2-ipv6.100ms.live/init',
+          event: 'https://event-nonprod.100ms.live',
+        },
+      }}
+    />
+  );
 }
