@@ -110,5 +110,7 @@ export class HMSVideoTrack extends HMSTrack {
       element.autoplay = true;
     }
     element.playsInline = true;
+    element.muted = true;
+    element.controls = false;
   }
 }
