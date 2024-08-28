@@ -71,7 +71,7 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
-          return this.reTriggerPlay({ videoElement });
+          return;
         } else {
           this.reduceSinkCount();
         }
