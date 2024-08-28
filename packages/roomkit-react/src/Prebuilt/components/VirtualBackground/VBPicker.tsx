@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-import { HMSVBPlugin } from '@100mslive/hms-virtual-background/dist/HMSVBPlugin';
+// eslint-disable-next-line
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,

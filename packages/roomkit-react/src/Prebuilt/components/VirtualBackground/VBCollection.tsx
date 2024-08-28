@@ -1,5 +1,6 @@
 import React from 'react';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+// eslint-disable-next-line
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { Box } from '../../../Layout';
 import { Text } from '../../../Text';
 import { VBOption } from './VBOption';

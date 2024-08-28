@@ -1,4 +1,6 @@
-import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+// eslint-disable-next-line
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
+
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
 

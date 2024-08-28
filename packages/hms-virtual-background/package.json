@@ -6,18 +6,27 @@
   "module": "dist/index.js",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "hmsvbplugin": [
+        "./dist/HMSVBPlugin.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs.js"
     },
-    "./HMSEffectsPlugin": {
+    "./hmseffectsplugin": {
       "import": "./dist/HMSEffectsPlugin.js",
-      "require": "./dist/HMSEffectsPlugin.cjs.js"
+      "require": "./dist/HMSEffectsPlugin.cjs.js",
+      "types": "./dist/HMSEffectsPlugin.d.ts"
     },
-    "./HMSVBPlugin": {
+    "./hmsvbplugin": {
       "import": "./dist/HMSVBPlugin.js",
-      "require": "./dist/HMSVBPlugin.cjs.js"
+      "require": "./dist/HMSVBPlugin.cjs.js",
+      "types": "./dist/HMSVBPlugin.d.ts"
     }
   },
   "repository": {

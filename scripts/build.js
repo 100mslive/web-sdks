@@ -34,6 +34,7 @@ async function main() {
     tsconfig: 'tsconfig.json',
     minify: true,
     sourcemap: true,
+    treeShaking: true,
   };
   try {
     let esmResult;
