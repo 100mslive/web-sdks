@@ -2,6 +2,7 @@ import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
 import HMSLogger from '../../utils/logger';
+import { isSafari } from '../../utils/support';
 import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
@@ -70,7 +71,6 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
-          this.reTriggerPlay({ videoElement });
           return;
         } else {
           this.reduceSinkCount();
@@ -79,6 +79,8 @@ export class HMSVideoTrack extends HMSTrack {
         this.reduceSinkCount();
       }
     }
+
+    this.addPropertiesToElement(videoElement);
     const stream = new MediaStream([track]);
     videoElement.srcObject = stream;
     this.reTriggerPlay({ videoElement });
@@ -101,5 +103,14 @@ export class HMSVideoTrack extends HMSTrack {
     if (this.sinkCount > 0) {
       this.sinkCount--;
     }
+  }
+
+  private addPropertiesToElement(element: HTMLVideoElement) {
+    if (!isSafari) {
+      element.autoplay = true;
+    }
+    element.playsInline = true;
+    element.muted = true;
+    element.controls = false;
   }
 }
