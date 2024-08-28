@@ -2,6 +2,16 @@ const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
 
+const getSourceForPackage = packageName => {
+  if (packageName === '@100mslive/react-icons') {
+    return ['./src/index.tsx'];
+  }
+  if (packageName === '@100mslive/hms-virtual-background') {
+    return ['./src/index.ts', './src/HMSEffectsPlugin.ts', './src/HMSVBPlugin.ts'];
+  }
+  return ['./src/index.ts'];
+};
+
 // eslint-disable-next-line complexity
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -12,12 +22,12 @@ async function main() {
     });
   }
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
+  const source = getSourceForPackage(pkg.name);
   const external = Object.keys(pkg.dependencies || {});
   external.push(...Object.keys(pkg.peerDependencies || {}));
 
   const commonOptions = {
-    entryPoints: [source],
+    entryPoints: source,
     bundle: true,
     target: 'es6',
     external,
@@ -26,18 +36,36 @@ async function main() {
     sourcemap: true,
   };
   try {
-    await esbuild.build({
-      ...commonOptions,
-      outfile: 'dist/index.cjs.js',
-      format: 'cjs',
-    });
+    let esmResult;
+    if (pkg.name !== '@100mslive/hms-virtual-background') {
+      await esbuild.build({
+        ...commonOptions,
+        outfile: 'dist/index.cjs.js',
+        format: 'cjs',
+      });
 
-    const esmResult = await esbuild.build({
-      ...commonOptions,
-      outfile: 'dist/index.js',
-      format: 'esm',
-      metafile: true,
-    });
+      esmResult = await esbuild.build({
+        ...commonOptions,
+        outfile: 'dist/index.js',
+        format: 'esm',
+        metafile: true,
+      });
+    } else {
+      await esbuild.build({
+        ...commonOptions,
+        outdir: 'dist',
+        format: 'cjs',
+      });
+
+      esmResult = await esbuild.build({
+        ...commonOptions,
+        outdir: 'dist',
+        format: 'esm',
+        splitting: true,
+        chunkNames: 'chunks/[name]-[hash]',
+        metafile: true,
+      });
+    }
 
     let esmSize = 0;
     Object.values(esmResult.metafile.outputs).forEach(output => {

@@ -6,6 +6,20 @@
   "module": "dist/index.js",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./HMSEffectsPlugin": {
+      "import": "./dist/HMSEffectsPlugin.js",
+      "require": "./dist/HMSEffectsPlugin.cjs.js"
+    },
+    "./HMSVBPlugin": {
+      "import": "./dist/HMSVBPlugin.js",
+      "require": "./dist/HMSVBPlugin.cjs.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/100mslive/web-sdks.git",

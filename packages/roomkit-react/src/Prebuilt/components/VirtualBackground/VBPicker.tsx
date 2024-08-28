@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
-import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSVBPlugin } from '@100mslive/hms-virtual-background/dist/HMSVBPlugin';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
