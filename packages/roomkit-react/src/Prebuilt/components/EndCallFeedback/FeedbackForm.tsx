@@ -49,7 +49,7 @@ export const FeedbackModal = ({
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
-          css={{ bg: '$surface_dim', maxWidth: '528px', p: '$8' }}
+          css={{ bg: '$surface_dim', width: '528px', p: '$12' }}
           onPointerDownOutside={avoidDefaultDomBehavior}
           onInteractOutside={avoidDefaultDomBehavior}
         >
@@ -69,6 +69,7 @@ export const FeedbackContent = ({
   indexSelected: number;
   setIndex: (index: number) => void;
 }) => {
+  const { feedback } = useRoomLayoutLeaveScreen();
   const { endpoints } = useHMSPrebuiltContext();
   const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
@@ -109,7 +110,6 @@ export const FeedbackContent = ({
     <Flex
       css={{
         p: indexSelected === -1 ? '$12 !important' : '0',
-        border: '1px solid $border_default',
         bg: '$surface_dim',
         r: '$3',
         gap: '$10',
@@ -131,7 +131,16 @@ export const FeedbackContent = ({
         selectedReasons={selectedReasons}
         handleCheckedChange={handleCheckedChange}
       />
-      <SubmitFeedback onSubmitFeedback={submitFeedback} />
+      <Button
+        type="submit"
+        icon
+        css={{
+          alignSelf: 'end',
+        }}
+        onClick={submitFeedback}
+      >
+        {feedback?.submit_btn_label || 'Submit Feedback'}
+      </Button>
     </Flex>
   );
 };
@@ -158,6 +167,7 @@ export const FeedbackHeader = ({
             variant="h5"
             css={{
               c: '$on_surface_high',
+              fontStyle: 'normal',
             }}
           >
             {feedback?.title || 'How was your experience?'}
@@ -178,7 +188,6 @@ export const FeedbackHeader = ({
         ) : null}
       </Flex>
       <Flex
-        justify="between"
         css={{
           gap: '$17',
           c: '$on_surface_high',
@@ -191,6 +200,7 @@ export const FeedbackHeader = ({
               direction="column"
               css={{
                 c: indexSelected === index || indexSelected === -1 ? '$on_surface_high' : '$on_surface_default',
+                gap: '$4',
               }}
               onClick={() => onEmojiClicked(index)}
               key={`${index}`}
@@ -256,15 +266,12 @@ export const FeedbackForm = ({
             {rating.question || 'What do you like/unlike here?'}
           </Text>
           <Flex
-            justify="between"
             css={{
-              r: '$2',
-              border: '1px solid $border_bright',
-              alignItems: 'center',
-              gap: '$3',
-              p: '$6',
+              alignItems: 'flex-start',
+              alignSelf: 'stretch',
               flexWrap: 'wrap',
-              flex: '1 1 calc(33.333% - 12px)',
+              gap: '$6',
+              flex: '1 1 calc(25% - 12px)',
               '@md': {
                 flex: '1 1 calc(50% - 12px)',
               },
@@ -275,7 +282,16 @@ export const FeedbackForm = ({
           >
             {rating.reasons.map((option: string, index: number) => {
               return (
-                <Flex align="center" gap="2" key={`${index}`}>
+                <Flex
+                  align="center"
+                  gap="2"
+                  key={`${index}`}
+                  css={{
+                    border: '1px solid $border_bright',
+                    r: '$1',
+                    p: '$6',
+                  }}
+                >
                   <Checkbox.Root
                     id={`${option}-${index}`}
                     checked={selectedReasons.has(index)}
@@ -283,13 +299,24 @@ export const FeedbackForm = ({
                     css={{
                       cursor: 'pointer',
                       flexShrink: 0,
+                      bg: '$on_secondary_low',
+                      border: '1px solid $border_bright',
                     }}
                   >
                     <Checkbox.Indicator>
-                      <CheckIcon width={16} height={16} />
+                      <CheckIcon width={12} height={12} />
                     </Checkbox.Indicator>
                   </Checkbox.Root>
-                  <Label>{option}</Label>
+                  <Label
+                    css={{
+                      color: '$on_surface_high',
+                      fontSize: '$sm',
+                      fontWeight: '$regular',
+                      lineHeight: '20px' /* 142.857% */,
+                    }}
+                  >
+                    {option}
+                  </Label>
                 </Flex>
               );
             })}
@@ -297,7 +324,12 @@ export const FeedbackForm = ({
         </Flex>
       )}
       {feedback?.comment && (
-        <Flex direction="column">
+        <Flex
+          direction="column"
+          css={{
+            gap: '$4',
+          }}
+        >
           <Text
             variant="body2"
             css={{
@@ -312,12 +344,11 @@ export const FeedbackForm = ({
             maxLength={1024}
             placeholder={feedback?.comment.placeholder || 'Ask a question'}
             css={{
-              mt: '$md',
               backgroundColor: '$surface_bright',
               border: '1px solid $border_bright',
-              minHeight: '$14',
-              resize: 'vertical',
-              maxHeight: '$32',
+              resize: 'none',
+              height: '$36',
+              display: 'flex',
             }}
             value={comment}
             onChange={event => setComment(event.target.value.trimStart())}
@@ -325,21 +356,5 @@ export const FeedbackForm = ({
         </Flex>
       )}
     </>
-  );
-};
-
-export const SubmitFeedback = ({ onSubmitFeedback }: { onSubmitFeedback: () => void }) => {
-  const { feedback } = useRoomLayoutLeaveScreen();
-  return (
-    <Button
-      type="submit"
-      icon
-      css={{
-        alignSelf: 'end',
-      }}
-      onClick={onSubmitFeedback}
-    >
-      {feedback?.submit_btn_label || 'Submit Feedback'}
-    </Button>
   );
 };

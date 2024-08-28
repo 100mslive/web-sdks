@@ -9,7 +9,6 @@ import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hook
 export const Feedback = () => {
   const { feedback } = useRoomLayoutLeaveScreen();
   const [index, setIndex] = useState(-1);
-
   const isMobile = useMedia(cssConfig.media.md);
 
   if (!feedback) {
