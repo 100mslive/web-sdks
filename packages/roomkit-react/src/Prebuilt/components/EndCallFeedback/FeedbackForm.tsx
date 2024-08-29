@@ -217,6 +217,7 @@ export const FeedbackHeader = ({
                   fontWeight: '$semiBold',
                   fontSize: '$h4',
                   pb: '$1',
+                  cursor: 'pointer',
                   opacity: indexSelected === index || indexSelected === FEEBACK_INDEX.INIT ? 1 : 0.2,
                 }}
               >
