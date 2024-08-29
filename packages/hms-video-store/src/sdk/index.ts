@@ -637,8 +637,6 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
-      // setSessionJoin
-      this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
       await this.publish(config.settings, previewRole);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
@@ -702,6 +700,8 @@ export class HMSSdk implements HMSInterface {
         await workerSleep(100);
       }
       const roomId = room.id;
+      // setSessionJoin
+      this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);
       const peerId = this.localPeer?.peerId;
