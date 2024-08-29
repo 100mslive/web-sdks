@@ -26,7 +26,7 @@ export interface HMSSessionPeerInfo {
   peer_id: string;
   role?: string;
   joined_at?: number;
-  left_at?: number; // to be filled later | can backend set it?
+  left_at?: number;
   room_name?: string;
   session_started_at?: number;
   user_data?: string;

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-import { FeedbackHeader, FeedbackModal } from './FeedbackForm';
+import { FEEBACK_INDEX, FeedbackHeader, FeedbackModal } from './FeedbackForm';
 import { ThankyouView } from './ThankyouView';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const Feedback = () => {
   const { feedback } = useRoomLayoutLeaveScreen();
-  const [index, setIndex] = useState(-1);
+  const [index, setIndex] = useState(FEEBACK_INDEX.INIT);
   const isMobile = useMedia(cssConfig.media.md);
 
   if (!feedback) {
@@ -24,7 +24,8 @@ export const Feedback = () => {
     }
     return a.value - b.value;
   });
-  if (index === -10) {
+  // TO show thank ypu page
+  if (index === FEEBACK_INDEX.THANK_YOU) {
     return (
       <Flex
         justify="center"
@@ -44,7 +45,7 @@ export const Feedback = () => {
         w: '528px',
       }}
     >
-      {index === -1 ? (
+      {index === FEEBACK_INDEX.INIT ? (
         <Flex
           css={{
             p: '$12',

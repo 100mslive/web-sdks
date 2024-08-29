@@ -15,6 +15,10 @@ import { config as cssConfig } from '../../../Theme';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
+export const FEEBACK_INDEX = {
+  THANK_YOU: -10,
+  INIT: -1,
+};
 export const FeedbackModal = ({
   ratings,
   index,
@@ -26,14 +30,14 @@ export const FeedbackModal = ({
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const onOpenChange = () => {
-    setIndex(-1);
+    setIndex(FEEBACK_INDEX.INIT);
   };
   const avoidDefaultDomBehavior = (e: Event) => {
     e.preventDefault();
   };
   if (isMobile) {
     return (
-      <Sheet.Root open={index !== -1} onOpenChange={onOpenChange}>
+      <Sheet.Root open={index !== FEEBACK_INDEX.INIT} onOpenChange={onOpenChange}>
         <Sheet.Content
           css={{ bg: '$surface_dim', p: '$12' }}
           onPointerDownOutside={avoidDefaultDomBehavior}
@@ -45,7 +49,7 @@ export const FeedbackModal = ({
     );
   }
   return (
-    <Dialog.Root open={index !== -1} onOpenChange={onOpenChange}>
+    <Dialog.Root open={index !== FEEBACK_INDEX.INIT} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
@@ -104,12 +108,12 @@ export const FeedbackContent = ({
       console.error(e);
     }
     // always submit and take it to thankyou page
-    setIndex(-10);
+    setIndex(FEEBACK_INDEX.THANK_YOU);
   };
   return (
     <Flex
       css={{
-        p: indexSelected === -1 ? '$12 !important' : '0',
+        p: indexSelected === FEEBACK_INDEX.INIT ? '$12 !important' : '0',
         bg: '$surface_dim',
         r: '$3',
         gap: '$10',
@@ -147,7 +151,7 @@ export const FeedbackContent = ({
 export const FeedbackHeader = ({
   onEmojiClicked,
   ratings,
-  indexSelected = -1,
+  indexSelected = FEEBACK_INDEX.INIT,
 }: {
   onEmojiClicked: (index: number) => void;
   ratings: Rating[];
@@ -183,8 +187,8 @@ export const FeedbackHeader = ({
             {feedback?.sub_title || 'Your answers help us improve the quality.'}
           </Text>
         </Flex>
-        {indexSelected !== -1 ? (
-          <CrossIcon width="24px" height="24px" color="white" onClick={() => onEmojiClicked(-1)} />
+        {indexSelected !== FEEBACK_INDEX.INIT ? (
+          <CrossIcon width="24px" height="24px" color="white" onClick={() => onEmojiClicked(FEEBACK_INDEX.INIT)} />
         ) : null}
       </Flex>
       <Flex
@@ -199,7 +203,10 @@ export const FeedbackHeader = ({
               align="center"
               direction="column"
               css={{
-                c: indexSelected === index || indexSelected === -1 ? '$on_surface_high' : '$on_surface_default',
+                c:
+                  indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
+                    ? '$on_surface_high'
+                    : '$on_surface_default',
                 gap: '$4',
               }}
               onClick={() => onEmojiClicked(index)}
@@ -210,7 +217,7 @@ export const FeedbackHeader = ({
                   fontWeight: '$semiBold',
                   fontSize: '$h4',
                   pb: '$1',
-                  opacity: indexSelected === index || indexSelected === -1 ? 1 : 0.2,
+                  opacity: indexSelected === index || indexSelected === FEEBACK_INDEX.INIT ? 1 : 0.2,
                 }}
               >
                 {element.emoji}
@@ -218,7 +225,10 @@ export const FeedbackHeader = ({
               <Text
                 variant="body1"
                 css={{
-                  c: indexSelected === index || indexSelected === -1 ? '$on_surface_medium' : '$on_surface_low',
+                  c:
+                    indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
+                      ? '$on_surface_medium'
+                      : '$on_surface_low',
                   fontWeight: '$regular',
                 }}
               >
@@ -263,7 +273,7 @@ export const FeedbackForm = ({
               px: '$2',
             }}
           >
-            {rating.question || 'What do you like/unlike here?'}
+            {rating.question || 'What do you like/dislike here?'}
           </Text>
           <Flex
             css={{
@@ -285,7 +295,7 @@ export const FeedbackForm = ({
                 <Flex
                   align="center"
                   gap="2"
-                  key={`${index}`}
+                  key={index}
                   css={{
                     border: '1px solid $border_bright',
                     r: '$1',
@@ -342,7 +352,7 @@ export const FeedbackForm = ({
           </Text>
           <TextArea
             maxLength={1024}
-            placeholder={feedback?.comment.placeholder || 'Ask a question'}
+            placeholder={feedback?.comment.placeholder || 'Tell us more...'}
             css={{
               backgroundColor: '$surface_bright',
               border: '1px solid $border_bright',
