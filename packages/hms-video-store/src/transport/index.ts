@@ -130,6 +130,13 @@ export default class HMSTransport {
     this.onScreenshareStop = onStop;
   };
 
+  getWebsocketEndpoint(): string | undefined {
+    if (!this.initConfig) {
+      return;
+    }
+    return this.initConfig.endpoint;
+  }
+
   private signalObserver: ISignalEventsObserver = {
     // eslint-disable-next-line complexity
     onOffer: async (jsep: RTCSessionDescriptionInit & { sfu_node_id?: string }) => {
