@@ -76,8 +76,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
 
         try {
           if (!vbObject) {
-            // Dynamically import HMSEffectsPlugin
-
             await VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () =>
               setLoadingEffects(false),
             );

@@ -1,12 +1,6 @@
 // eslint-disable-next-line
 import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 
-async function loadHMSEffectsPlugin() {
-  // eslint-disable-next-line
-  const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
-  return HMSEffectsPlugin;
-}
-
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: any;
@@ -16,7 +10,8 @@ export class VBPlugin {
       return;
     }
     if (effectsSDKKey) {
-      const HMSEffectsPlugin = await loadHMSEffectsPlugin();
+      // eslint-disable-next-line
+      const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
       this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
