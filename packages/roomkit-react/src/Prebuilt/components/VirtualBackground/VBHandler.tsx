@@ -1,70 +1,103 @@
 // eslint-disable-next-line
 import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 
+async function loadHMSEffectsPlugin() {
+  // eslint-disable-next-line
+  const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
+  return HMSEffectsPlugin;
+}
+
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
+  private effectsPlugin?: any;
 
-  initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
-    console.log({ effectsSDKKey, onInit });
+  initialisePlugin = async (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {
       return;
     }
-    this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+    if (effectsSDKKey) {
+      const HMSEffectsPlugin = await loadHMSEffectsPlugin();
+      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+    } else {
+      this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+    }
   };
 
   getBackground = () => {
-    const background = this.hmsPlugin?.getBackground();
-    // @ts-ignore
-    return background?.src || background;
+    if (this.effectsPlugin) {
+      return this.effectsPlugin?.getBackground();
+    } else {
+      const background = this.hmsPlugin?.getBackground();
+      // @ts-ignore
+      return background?.src || background;
+    }
   };
 
   getBlurAmount = () => {
-    // Treating HMS VB intensity as a fixed value
-    return this.hmsPlugin?.getBackground() === HMSVirtualBackgroundTypes.BLUR ? 1 : 0;
+    if (this.effectsPlugin) {
+      return this.effectsPlugin.getBlurAmount();
+    } else {
+      // Treating HMS VB intensity as a fixed value
+      return this.hmsPlugin?.getBackground() === HMSVirtualBackgroundTypes.BLUR ? 1 : 0;
+    }
   };
 
   getVBObject = () => {
-    return this.hmsPlugin;
+    return this.effectsPlugin || this.hmsPlugin;
   };
 
   getName = () => {
-    return this.hmsPlugin?.getName();
+    return this.effectsPlugin ? this.effectsPlugin?.getName() : this.hmsPlugin?.getName();
   };
 
   setBlur = async (blurPower: number) => {
-    console.log({ blurPower });
-    await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
+    if (this.effectsPlugin) {
+      this.effectsPlugin?.setBlur(blurPower);
+    } else {
+      await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
+    }
   };
 
   setBackground = async (mediaURL: string) => {
-    const img = document.createElement('img');
-    let retries = 0;
-    const MAX_RETRIES = 3;
-    img.alt = 'VB';
-    img.src = mediaURL;
-    try {
-      await this.hmsPlugin?.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
-    } catch (e) {
-      console.error(e);
-      if (retries++ < MAX_RETRIES) {
+    if (this.effectsPlugin) {
+      this.effectsPlugin?.setBackground(mediaURL);
+    } else {
+      const img = document.createElement('img');
+      let retries = 0;
+      const MAX_RETRIES = 3;
+      img.alt = 'VB';
+      img.src = mediaURL;
+      try {
         await this.hmsPlugin?.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
+      } catch (e) {
+        console.error(e);
+        if (retries++ < MAX_RETRIES) {
+          await this.hmsPlugin?.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
+        }
       }
     }
   };
 
   setPreset = async (preset: 'quality' | 'balanced') => {
-    console.log({ preset });
+    if (this.effectsPlugin) {
+      await this.effectsPlugin.setPreset(preset);
+    }
   };
 
   getPreset = () => {
-    return '';
+    return this.effectsPlugin?.getPreset() || '';
   };
 
   removeEffects = async () => {
-    await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+    if (this.effectsPlugin) {
+      this.effectsPlugin?.removeEffects();
+    } else {
+      await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+    }
   };
 
   reset = () => {
+    this.effectsPlugin = undefined;
     this.hmsPlugin = undefined;
   };
 }
