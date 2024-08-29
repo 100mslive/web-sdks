@@ -5,7 +5,7 @@ import { HMSException } from '../internal';
 import HMSLogger from '../utils/logger';
 
 export class FeedbackService {
-  private static TAG = '[FeedBackService]';
+  private static TAG = '[FeedbackService]';
   private static handleError(response: Response) {
     if (response.status === 404) {
       throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.FEEDBACK, response.statusText);
