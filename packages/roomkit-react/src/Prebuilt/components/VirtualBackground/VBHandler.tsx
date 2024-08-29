@@ -10,9 +10,14 @@ export class VBPlugin {
       return;
     }
     if (effectsSDKKey) {
-      // eslint-disable-next-line
-      const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      try {
+        // eslint-disable-next-line
+        const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
+        this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      } catch (error) {
+        console.error('Failed to initialise HMSEffectsPlugin:', error, 'Using HMSVBPlugin');
+        this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+      }
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
