@@ -6,6 +6,7 @@ const getSourceForPackage = packageName => {
   if (packageName === '@100mslive/react-icons') {
     return ['./src/index.tsx'];
   }
+  // Separate both vb packages for browser compatibility - effects plugin is not supported on Safari versions <= 16.5.1
   if (packageName === '@100mslive/hms-virtual-background') {
     return ['./src/index.ts', './src/HMSEffectsPlugin.ts', './src/HMSVBPlugin.ts'];
   }
@@ -38,6 +39,7 @@ async function main() {
   };
   try {
     let esmResult;
+    // outfile (single output) and outdir (multiple output files) cannot be used together
     if (pkg.name !== '@100mslive/hms-virtual-background') {
       await esbuild.build({
         ...commonOptions,
