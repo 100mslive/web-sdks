@@ -76,11 +76,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         ref.current = true;
         try {
           if (isEffectsEnabled && isEffectsSupported && effectsKey) {
-            console.log('efffects init called');
             setLoadingEffects(true);
             await VBHandler.initialisePlugin(effectsKey, () => {
               setLoadingEffects(false);
-              console.log('effects init successful');
             }).catch(console.error);
             if (!vbObject) {
               vbObject = VBHandler.getVBObject();
@@ -95,7 +93,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             if (!vbObject) {
               vbObject = VBHandler.getVBObject();
             }
-            console.log({ vbObject });
             await hmsActions.addPluginToVideoTrack(
               vbObject as HMSVBPlugin,
               Math.floor(role.publishParams.video.frameRate / 2),

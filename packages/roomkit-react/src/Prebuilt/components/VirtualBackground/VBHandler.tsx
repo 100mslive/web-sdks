@@ -13,16 +13,12 @@ export class VBPlugin {
       try {
         // eslint-disable-next-line
         const { HMSEffectsPlugin }  = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
-        this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, () => {
-          console.log('init called');
-          onInit?.();
-        });
+        this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
       } catch (error) {
         console.error('Failed to initialise HMSEffectsPlugin:', error, 'Using HMSVBPlugin');
         this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
       }
     } else {
-      console.log('hmsvb plugin', HMSVBPlugin);
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
   };
