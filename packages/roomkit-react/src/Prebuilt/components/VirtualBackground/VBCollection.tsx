@@ -1,4 +1,5 @@
 import React from 'react';
+// Open issue with eslint-plugin-import https://github.com/import-js/eslint-plugin-import/issues/1810
 // eslint-disable-next-line
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { Box } from '../../../Layout';

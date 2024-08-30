@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
+  selectAppData,
   selectIsLocalVideoEnabled,
   selectIsVBEnabled,
   selectLocalPeer,
