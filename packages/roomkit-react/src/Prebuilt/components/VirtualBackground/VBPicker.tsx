@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSMediaStreamPlugin,
@@ -8,7 +8,7 @@ import {
   selectLocalPeerRole,
 } from '@100mslive/hms-video-store';
 // eslint-disable-next-line
-import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -56,6 +56,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '');
+  const ref = useRef(false);
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
@@ -71,29 +72,33 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       setIsBlurSupported(isEffectsSupported);
 
       let vbObject = VBHandler.getVBObject();
-      if (!isPluginAdded && !vbObject) {
-        setLoadingEffects(true);
-
+      if (!isPluginAdded && !vbObject && !ref.current) {
+        ref.current = true;
         try {
-          if (!vbObject) {
-            await VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '', () =>
-              setLoadingEffects(false),
-            );
-
-            vbObject = VBHandler.getVBObject();
-
-            if (isEffectsEnabled && isEffectsSupported && effectsKey) {
-              await hmsActions.addPluginsToVideoStream([vbObject as HMSMediaStreamPlugin]);
-            } else {
+          if (isEffectsEnabled && isEffectsSupported && effectsKey) {
+            console.log('efffects init called');
+            setLoadingEffects(true);
+            await VBHandler.initialisePlugin(effectsKey, () => {
               setLoadingEffects(false);
-              if (!role) {
-                return;
-              }
-              await hmsActions.addPluginToVideoTrack(
-                vbObject as HMSVBPlugin,
-                Math.floor(role.publishParams.video.frameRate / 2),
-              );
+              console.log('effects init successful');
+            }).catch(console.error);
+            if (!vbObject) {
+              vbObject = VBHandler.getVBObject();
             }
+            hmsActions.addPluginsToVideoStream([vbObject as HMSMediaStreamPlugin]);
+          } else {
+            setLoadingEffects(false);
+            if (!role) {
+              return;
+            }
+            await VBHandler.initialisePlugin();
+            if (!vbObject) {
+              vbObject = VBHandler.getVBObject();
+            }
+            await hmsActions.addPluginToVideoTrack(
+              vbObject as HMSVBPlugin,
+              Math.floor(role.publishParams.video.frameRate / 2),
+            );
           }
 
           const handleDefaultBackground = async () => {
