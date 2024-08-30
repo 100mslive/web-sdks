@@ -64,58 +64,49 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
 
   useEffect(() => {
     const initializeVirtualBackground = async () => {
-      if (!track?.id) {
+      if (!track?.id || pluginLoadingRef.current || isPluginAdded) {
         return;
       }
 
       const isEffectsSupported = doesBrowserSupportEffectsSDK();
       setIsBlurSupported(isEffectsSupported);
 
-      let vbObject = VBHandler.getVBObject();
-      if (!isPluginAdded && !vbObject && !pluginLoadingRef.current) {
+      try {
         pluginLoadingRef.current = true;
-        try {
-          if (isEffectsEnabled && isEffectsSupported && effectsKey) {
-            setLoadingEffects(true);
-            await VBHandler.initialisePlugin(effectsKey, () => {
-              setLoadingEffects(false);
-            });
-            if (!vbObject) {
-              vbObject = VBHandler.getVBObject();
-            }
-            hmsActions.addPluginsToVideoStream([vbObject as HMSMediaStreamPlugin]);
-          } else {
+        if (isEffectsEnabled && isEffectsSupported && effectsKey) {
+          setLoadingEffects(true);
+          await VBHandler.initialisePlugin(effectsKey, () => {
             setLoadingEffects(false);
-            if (!role) {
-              return;
-            }
-            await VBHandler.initialisePlugin();
-            if (!vbObject) {
-              vbObject = VBHandler.getVBObject();
-            }
-            await hmsActions.addPluginToVideoTrack(
-              vbObject as HMSVBPlugin,
-              Math.floor(role.publishParams.video.frameRate / 2),
-            );
-          }
-
-          const handleDefaultBackground = async () => {
-            switch (background) {
-              case HMSVirtualBackgroundTypes.NONE:
-                break;
-              case HMSVirtualBackgroundTypes.BLUR:
-                await VBHandler.setBlur(blurAmount);
-                break;
-              default:
-                await VBHandler.setBackground(background);
-            }
-          };
-
-          await handleDefaultBackground();
-        } catch (error) {
-          console.error('Error initializing virtual background:', error);
+          });
+          hmsActions.addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin]);
+        } else {
           setLoadingEffects(false);
+          if (!role) {
+            return;
+          }
+          await VBHandler.initialisePlugin();
+          await hmsActions.addPluginToVideoTrack(
+            VBHandler.getVBObject() as HMSVBPlugin,
+            Math.floor(role.publishParams.video.frameRate / 2),
+          );
         }
+
+        const handleDefaultBackground = async () => {
+          switch (background) {
+            case HMSVirtualBackgroundTypes.NONE:
+              break;
+            case HMSVirtualBackgroundTypes.BLUR:
+              await VBHandler.setBlur(blurAmount);
+              break;
+            default:
+              await VBHandler.setBackground(background);
+          }
+        };
+
+        await handleDefaultBackground();
+      } catch (error) {
+        console.error('Error initializing virtual background:', error);
+        setLoadingEffects(false);
       }
     };
 
