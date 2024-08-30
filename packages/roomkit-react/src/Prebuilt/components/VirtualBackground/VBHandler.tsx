@@ -22,6 +22,7 @@ export class VBPlugin {
         this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
       }
     } else {
+      console.log('hmsvb plugin', HMSVBPlugin);
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
   };

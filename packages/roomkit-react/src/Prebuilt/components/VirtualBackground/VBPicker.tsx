@@ -95,6 +95,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             if (!vbObject) {
               vbObject = VBHandler.getVBObject();
             }
+            console.log({ vbObject });
             await hmsActions.addPluginToVideoTrack(
               vbObject as HMSVBPlugin,
               Math.floor(role.publishParams.video.frameRate / 2),
