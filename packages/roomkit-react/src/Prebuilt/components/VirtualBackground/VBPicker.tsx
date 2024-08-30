@@ -56,7 +56,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '');
-  const ref = useRef(false);
+  const pluginLoadingRef = useRef(false);
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
@@ -72,14 +72,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       setIsBlurSupported(isEffectsSupported);
 
       let vbObject = VBHandler.getVBObject();
-      if (!isPluginAdded && !vbObject && !ref.current) {
-        ref.current = true;
+      if (!isPluginAdded && !vbObject && !pluginLoadingRef.current) {
+        pluginLoadingRef.current = true;
         try {
           if (isEffectsEnabled && isEffectsSupported && effectsKey) {
             setLoadingEffects(true);
             await VBHandler.initialisePlugin(effectsKey, () => {
               setLoadingEffects(false);
-            }).catch(console.error);
+            });
             if (!vbObject) {
               vbObject = VBHandler.getVBObject();
             }
