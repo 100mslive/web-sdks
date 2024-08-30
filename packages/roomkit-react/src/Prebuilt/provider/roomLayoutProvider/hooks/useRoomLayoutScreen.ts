@@ -77,6 +77,7 @@ export function useRoomLayoutLeaveScreen() {
   const isLeaveScreenEnabled = !!screenProps;
   return {
     isLeaveScreenEnabled,
+    feedback: screenProps?.default?.elements?.feedback,
   };
 }
 

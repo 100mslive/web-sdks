@@ -36,6 +36,7 @@ describe('videoElementManager', () => {
       kind: 'video',
       enabled: true,
       getSettings: jest.fn(() => ({})),
+      addEventListener: jest.fn(() => {}),
     } as unknown as MediaStreamTrack;
     localTrack = new HMSLocalVideoTrack(localStream, localNativeTrack, 'regular', new EventBus());
 
@@ -43,7 +44,12 @@ describe('videoElementManager', () => {
     const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     remoteNativeStream = { id: remoteStreamId } as MediaStream;
     remoteStream = new HMSRemoteStream(remoteNativeStream, connection);
-    remoteNativeTrack = { id: remoteTrackId, kind: 'video', enabled: true } as MediaStreamTrack;
+    remoteNativeTrack = {
+      id: remoteTrackId,
+      kind: 'video',
+      enabled: true,
+      addEventListener: jest.fn(() => {}),
+    } as unknown as MediaStreamTrack;
     remoteTrack = new HMSRemoteVideoTrack(remoteStream, remoteNativeTrack, 'regular');
     window.MediaStream = jest.fn().mockImplementation(() => ({
       addTrack: jest.fn(),

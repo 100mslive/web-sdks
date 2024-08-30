@@ -28,6 +28,7 @@ const endpoints: HMSPrebuiltOptions['endpoints'] = {
   roomLayout: process.env.STORYBOOK_ROOM_LAYOUT_ENDPOINT,
   tokenByRoomCode: process.env.STORYBOOK_TOKEN_BY_ROOM_CODE_ENDPOINT,
   init: process.env.STORYBOOK_INIT_API_ENDPOINT,
+  event: process.env.STORYBOOK_EVENT_API_ENDPOINT,
 };
 
 const hasEndpoints = Object.values(endpoints).some(val => !!val);

@@ -73,6 +73,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     private room?: Room,
   ) {
     super(stream, track, source);
+    this.addTrackEventListeners(track);
     stream.tracks.push(this);
     this.setVideoHandler(new VideoElementManager(this));
     this.settings = settings;
@@ -259,6 +260,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @internal
    */
   async cleanup() {
+    this.removeTrackEventListeners(this.nativeTrack);
     super.cleanup();
     this.transceiver = undefined;
     await this.pluginsManager.cleanup();
@@ -373,9 +375,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * you are requesting for a new device.
      * Note: Do not change the order of this.
      */
+    this.removeTrackEventListeners(prevTrack);
     prevTrack?.stop();
     try {
       const newTrack = await getVideoTrack(settings);
+      this.addTrackEventListeners(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
@@ -385,6 +389,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
+      this.addTrackEventListeners(track);
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();
@@ -408,6 +413,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    this.removeTrackEventListeners(prevTrack);
+    this.addTrackEventListeners(newTrack);
     prevTrack?.stop();
     HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
     return newTrack;
@@ -504,6 +511,41 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
   };
 
+  private addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('mute', this.handleTrackMute);
+    track.addEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('mute', this.handleTrackMute);
+    track.removeEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private handleTrackMute = () => {
+    HMSLogger.d(this.TAG, 'muted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: true,
+        reason: 'incoming-call',
+      }),
+    );
+    this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+  };
+
+  /** @internal */
+  handleTrackUnmute = () => {
+    HMSLogger.d(this.TAG, 'unmuted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: false,
+        reason: 'incoming-call',
+      }),
+    );
+    super.handleTrackUnmute();
+    this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
+    this.eventBus.localVideoUnmutedNatively.publish();
+  };
+
   /**
    * This will either remove or update the processedTrack value on the class instance.
    * It will also replace sender if the processedTrack is updated
@@ -535,6 +577,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
+          reason: 'visibility-change',
         }),
       );
     } else {
@@ -545,10 +588,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.nativeTrack.enabled = this.enabledStateBeforeBackground;
         await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       }
-      // started interruption event
+      // ended interruption event
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
+          reason: 'visibility-change',
         }),
       );
     }

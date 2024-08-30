@@ -89,7 +89,8 @@ export const DesktopOptions = ({
   const { isSupported, pipWindow, requestPipWindow } = usePIPChat();
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-  const showPipChatOption = !!elements?.chat && isSupported;
+  // Hide if pip chat is already open
+  const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 

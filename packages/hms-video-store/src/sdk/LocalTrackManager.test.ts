@@ -425,7 +425,8 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
+          addEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
       );
@@ -457,7 +458,8 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
+          addEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
       );
