@@ -11,9 +11,8 @@ function mediapipe_workaround() {
         let code = fs.readFileSync(id, 'utf-8');
         code += 'exports.SelfieSegmentation = SelfieSegmentation;';
         return { code };
-      } else {
-        return null;
       }
+      return null;
     },
   };
 }
