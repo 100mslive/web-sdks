@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import { basename } from 'path';
 import fs from 'fs';
 
-// Context: https://github.com/google-ai-edge/mediapipe/issues/2756
+// Context: https://github.com/tensorflow/tfjs/issues/7165
 function mediapipe_workaround() {
   return {
     name: 'mediapipe_workaround',
