@@ -50,7 +50,6 @@ import {
 } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
-import { sleep } from '../utils/timer-utils';
 
 const TAG = '[HMSTransport]:';
 
@@ -582,7 +581,6 @@ export default class HMSTransport {
       `${track}`,
     );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
-    await sleep(3000);
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
@@ -597,7 +595,10 @@ export default class HMSTransport {
         }
       };
       this.eventEmitter.on('published', listener);
-      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, reject);
+      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+        console.log('publish error', ex);
+        reject(ex);
+      });
     });
     // await this.getPromiseForRenegotiation();
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
@@ -652,7 +653,10 @@ export default class HMSTransport {
         }
       };
       this.eventEmitter.on('unpublished', listener);
-      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, reject);
+      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+        console.log('unpublish error', ex);
+        reject(ex);
+      });
     });
     await track.cleanup();
     if (track.source === 'screen' && this.screenStream) {
