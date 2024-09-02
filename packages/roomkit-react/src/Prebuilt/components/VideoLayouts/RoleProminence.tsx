@@ -47,7 +47,7 @@ export function RoleProminence({
   }, [pageSize, onPageSize]);
 
   return (
-    <ProminenceLayout.Root hasSidebar={layoutMode === LayoutMode.SIDEBAR}>
+    <ProminenceLayout.Root>
       <ProminenceLayout.ProminentSection>
         <Grid ref={ref} tiles={pagesWithTiles[page]} />
       </ProminenceLayout.ProminentSection>
