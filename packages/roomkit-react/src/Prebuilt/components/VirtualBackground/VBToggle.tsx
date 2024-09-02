@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+// eslint-disable-next-line
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import {
   selectAppData,
   selectIsEffectsEnabled,
