@@ -65,7 +65,6 @@ export function RoleProminence({
         peers={layoutMode === LayoutMode.SPOTLIGHT ? [] : secondaryPeers}
         isInsetEnabled={isInsetEnabled}
         edgeToEdge={edgeToEdge}
-        hasSidebar={layoutMode === LayoutMode.SIDEBAR}
       />
       {isInsetEnabled && localPeer && prominentPeers.length > 0 && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
