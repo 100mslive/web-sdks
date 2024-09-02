@@ -1,0 +1,54 @@
+{
+  "name": "@100mslive/vue-sdk",
+  "version": "0.0.1",
+  "description": "Vue sdk for 100ms integration",
+  "source": "src/index.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "author": "100ms",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/vue-sdk"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@100mslive/hms-video-store": "^0.12.18",
+    "lodash.merge": "^4.6.2",
+    "zustand": "3.6.2"
+  },
+  "peerDependencies": {
+    "vue": ">3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.3",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-typescript": "^8.3.1",
+    "rollup": "^2.70.1",
+    "rollup-plugin-esbuild": "^4.9.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "vue": "^3.4.38"
+  },
+  "scripts": {
+    "prestart": "rm -rf dist",
+    "start": "rollup -c -w",
+    "build": "rm -rf dist && NODE_ENV=production rollup -c",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint src/** --fix",
+    "format": "prettier -w src/**"
+  }
+}
