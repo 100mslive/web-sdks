@@ -5,7 +5,6 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
-import { isMobile } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -41,7 +40,6 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
-  private autoUnpauseTimer: ReturnType<typeof setInterval> | null = null;
   private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
@@ -49,8 +47,8 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
     this.startPollingForDevices();
-    this.startPollingToCheckPausedAudio();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -103,14 +101,11 @@ export class AudioSinkManager {
       clearInterval(this.timer);
       this.timer = null;
     }
-    if (this.autoUnpauseTimer) {
-      clearInterval(this.autoUnpauseTimer);
-      this.autoUnpauseTimer = null;
-    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -263,14 +258,6 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
-    }
-  };
-
-  private startPollingToCheckPausedAudio = () => {
-    if (isMobile()) {
-      this.autoUnpauseTimer = setInterval(() => {
-        this.unpauseAudioTracks();
-      }, 5000);
     }
   };
 

@@ -17,6 +17,7 @@ import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
+import { FeedbackService, HMSSessionFeedback, HMSSessionInfo } from '../end-call-feedback';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -82,6 +83,7 @@ import {
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { getAnalyticsDeviceId } from '../utils/analytics-deviceId';
 import {
   DEFAULT_PLAYLIST_AUDIO_BITRATE,
   DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -134,6 +136,14 @@ export class HMSSdk implements HMSInterface {
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
   private isDiagnostics = false;
+  /**
+   * will be set post join
+   * this will not be reset on leave but after feedback success
+   * we will just clean token after successful submit feedback
+   * will be replaced when a newer join happens.
+   */
+  private sessionPeerInfo?: HMSSessionInfo;
+
   private playlistSettings: HMSPlaylistSettings = {
     video: {
       bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -143,6 +153,33 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
+  private setSessionPeerInfo(websocketURL: string, peer?: HMSLocalPeer) {
+    const room = this.store.getRoom();
+    if (!peer || !room) {
+      HMSLogger.e(this.TAG, 'setSessionPeerInfo> Local peer or room is undefined');
+      return;
+    }
+    this.sessionPeerInfo = {
+      peer: {
+        peer_id: peer.peerId,
+        role: peer.role?.name,
+        joined_at: peer.joinedAt?.valueOf() || 0,
+        room_name: room.name,
+        session_started_at: room.startedAt?.valueOf() || 0,
+        user_data: peer.customerUserId,
+        user_name: peer.name,
+        template_id: room.templateId,
+        session_id: room.sessionId,
+        token: this.store.getConfig()?.authToken,
+      },
+      agent: this.store.getUserAgent(),
+      device_id: getAnalyticsDeviceId(),
+      cluster: {
+        websocket_url: websocketURL,
+      },
+      timestamp: Date.now(),
+    };
+  }
   private initNotificationManager() {
     if (!this.notificationManager) {
       this.notificationManager = new NotificationManager(
@@ -215,6 +252,7 @@ export class HMSSdk implements HMSInterface {
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
@@ -622,6 +660,7 @@ export class HMSSdk implements HMSInterface {
   private cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
@@ -661,6 +700,8 @@ export class HMSSdk implements HMSInterface {
         await workerSleep(100);
       }
       const roomId = room.id;
+      // setSessionJoin
+      this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);
       const peerId = this.localPeer?.peerId;
@@ -757,7 +798,30 @@ export class HMSSdk implements HMSInterface {
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
   }
-
+  async submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string) {
+    if (!this.sessionPeerInfo) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> session is undefined');
+      throw new Error('session is undefined');
+    }
+    const token = this.sessionPeerInfo.peer.token;
+    if (!token) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> token is undefined');
+      throw new Error('Internal error, token is not present');
+    }
+    try {
+      await FeedbackService.sendFeedback({
+        token: token,
+        info: this.sessionPeerInfo,
+        feedback,
+        eventEndpoint,
+      });
+      HMSLogger.i(this.TAG, 'submitSessionFeedback> submitted feedback');
+      this.sessionPeerInfo = undefined;
+    } catch (e) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> error occured ', e);
+      throw new Error('Unable to submit feedback');
+    }
+  }
   async getPeer(peerId: string) {
     const response = await this.transport.signal.getPeer({ peer_id: peerId });
     if (response) {
@@ -1489,6 +1553,10 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
+
+  private unpauseRemoteVideoTracks = () => {
+    this.store.getRemoteVideoTracks().forEach(track => track.handleTrackUnmute());
+  };
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);

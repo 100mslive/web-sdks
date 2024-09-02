@@ -118,6 +118,13 @@ export default class HMSTransport {
     this.onScreenshareStop = onStop;
   };
 
+  getWebsocketEndpoint(): string | undefined {
+    if (!this.initConfig) {
+      return;
+    }
+    return this.initConfig.endpoint;
+  }
+
   private signalObserver: ISignalEventsObserver = {
     // eslint-disable-next-line complexity
     onOffer: async (jsep: RTCSessionDescriptionInit & { sfu_node_id?: string }) => {
@@ -542,29 +549,30 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate = ({ track }: { track: HMSLocalTrack }) => {
+  trackUpdate({ track, enabled }: { track: HMSLocalTrack; enabled: boolean }) {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
     );
+    /**
+     * on call interruption, we just send disabled track update to biz to send to remote peers WITHOUT sending to the local peer
+     * in this case, track.enabled would still be true which is why we are using the value from the localVideoEnabled event
+     *  */
     if (originalTrackState) {
       const newTrackState = new TrackState({
         ...originalTrackState,
-        mute: !track.enabled,
+        mute: !enabled,
       });
       this.trackStates.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
       const peer = this.store.getLocalPeer();
-      if (peer) {
-        this.listener?.onTrackUpdate(
-          track.enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED,
-          track,
-          peer,
-        );
+      // don't send update in case of call interruption
+      if (peer && enabled === track.enabled) {
+        this.listener?.onTrackUpdate(enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED, track, peer);
       }
     }
-  };
+  }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();

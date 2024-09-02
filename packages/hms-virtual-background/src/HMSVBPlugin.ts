@@ -300,3 +300,5 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.renderBackground(results, this.tempGifCanvas);
   }
 }
+
+export { HMSVirtualBackgroundTypes };
