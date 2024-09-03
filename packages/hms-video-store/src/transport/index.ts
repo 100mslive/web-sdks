@@ -413,6 +413,7 @@ export default class HMSTransport {
             error: error as Error,
           }),
         );
+        console.log('retrying in publish', error);
         await this.retryScheduler.schedule({
           category: TransportFailureCategory.PublishFailed,
           error: error as HMSException,
@@ -433,6 +434,7 @@ export default class HMSTransport {
       try {
         await this.unpublishTrack(track);
       } catch (error) {
+        console.log('retrying in unpublish', error);
         await this.retryScheduler.schedule({
           category: TransportFailureCategory.UnpublishFailed,
           error: error as HMSException,

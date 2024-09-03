@@ -39,7 +39,7 @@ export default class HMSPublishConnection extends HMSConnection {
 
       // here it replaces the original listener if already present and
       // handles cases where sctp transport is reinitialised
-      if (this.nativeConnection.sctp) {
+      if (this.nativeConnection.sctp && this.nativeConnection.sctp.transport) {
         this.nativeConnection.sctp.transport.onstatechange = () => {
           this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
         };
