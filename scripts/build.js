@@ -30,7 +30,7 @@ async function main() {
   const commonOptions = {
     entryPoints: source,
     bundle: true,
-    target: ['es2015', 'chrome58', 'firefox57', 'safari11', 'edge16', 'node12', 'es6'],
+    target: ['es2015', 'safari11', 'es6'],
     external,
     tsconfig: 'tsconfig.json',
     minify: true,
