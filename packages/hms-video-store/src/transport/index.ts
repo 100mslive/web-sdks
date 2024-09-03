@@ -1253,7 +1253,7 @@ export default class HMSTransport {
   };
 
   private retrySubscribeIceFailedTask = async () => {
-    if (this.subscribeConnection?.connectionState !== 'connected') {
+    if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
       const p = new Promise<boolean>((resolve, reject) => {
         // Use subscribe constant string
         this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {
