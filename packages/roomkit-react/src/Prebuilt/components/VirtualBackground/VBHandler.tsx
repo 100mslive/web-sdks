@@ -1,15 +1,24 @@
-import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+// Open issue with eslint-plugin-import https://github.com/import-js/eslint-plugin-import/issues/1810
+// eslint-disable-next-line
+import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
-  private effectsPlugin?: HMSEffectsPlugin | undefined;
+  private effectsPlugin?: any;
 
-  initialisePlugin = (effectsSDKKey?: string, onInit?: () => void) => {
+  initialisePlugin = async (effectsSDKKey?: string, onInit?: () => void) => {
     if (this.getVBObject()) {
       return;
     }
     if (effectsSDKKey) {
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      try {
+        // eslint-disable-next-line
+        const { HMSEffectsPlugin } = await import('@100mslive/hms-virtual-background/hmseffectsplugin');
+        this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey, onInit);
+      } catch (error) {
+        console.error('Failed to initialise HMSEffectsPlugin:', error, 'Using HMSVBPlugin');
+        this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+      }
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }

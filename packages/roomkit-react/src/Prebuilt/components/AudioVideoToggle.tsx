@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
 import {
   DeviceType,
@@ -14,6 +14,7 @@ import {
   useDevices,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import {
   AudioLevelIcon,
@@ -44,7 +45,7 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { useIsNoiseCancellationEnabled, useSetNoiseCancellation } from './AppData/useUISettings';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
-import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
+import { isAndroid, isIOS, isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 const krispPlugin = new HMSKrispPlugin();
 // const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
@@ -105,22 +106,26 @@ const useNoiseCancellationWithPlugin = () => {
   const actions = useHMSActions();
   const [inProgress, setInProgress] = useState(false);
   const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
-  const setNoiseCancellationWithPlugin = async (enabled: boolean) => {
-    if (inProgress) {
-      return;
-    }
-    if (!krispPlugin.checkSupport().isSupported) {
-      throw Error('Krisp plugin is not supported');
-    }
-    setInProgress(true);
-    if (enabled) {
-      await actions.addPluginToAudioTrack(krispPlugin);
-    } else {
-      await actions.removePluginFromAudioTrack(krispPlugin);
-    }
-    setNoiseCancellationEnabled(enabled);
-    setInProgress(false);
-  };
+  const isEnabledForRoom = useHMSStore(selectRoom)?.isNoiseCancellationEnabled;
+  const setNoiseCancellationWithPlugin = useCallback(
+    async (enabled: boolean) => {
+      if (!isEnabledForRoom || inProgress) {
+        return;
+      }
+      if (!krispPlugin.checkSupport().isSupported) {
+        throw Error('Krisp plugin is not supported');
+      }
+      setInProgress(true);
+      if (enabled) {
+        await actions.addPluginToAudioTrack(krispPlugin);
+      } else {
+        await actions.removePluginFromAudioTrack(krispPlugin);
+      }
+      setNoiseCancellationEnabled(enabled);
+      setInProgress(false);
+    },
+    [actions, inProgress, isEnabledForRoom, setNoiseCancellationEnabled],
+  );
   return {
     setNoiseCancellationWithPlugin,
     inProgress,
@@ -263,11 +268,18 @@ const AudioSettings = ({ onClick }: { onClick: () => void }) => {
   );
 };
 export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolean }) => {
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices(error => {
+    ToastManager.addToast({
+      title: error.message,
+      variant: 'error',
+      duration: 2000,
+    });
+  });
   const { videoInput, audioInput, audioOutput } = allDevices;
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
+  const vanillaStore = useHMSVanillaStore();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const roomState = useHMSStore(selectRoomState);
@@ -283,7 +295,14 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
 
   useEffect(() => {
     (async () => {
-      if (isNoiseCancellationEnabled && !isKrispPluginAdded && !inProgress && localPeer?.audioTrack) {
+      const isEnabledForRoom = vanillaStore.getState(selectRoom)?.isNoiseCancellationEnabled;
+      if (
+        isEnabledForRoom &&
+        isNoiseCancellationEnabled &&
+        !isKrispPluginAdded &&
+        !inProgress &&
+        localPeer?.audioTrack
+      ) {
         try {
           await setNoiseCancellationWithPlugin(true);
           ToastManager.addToast({
@@ -310,10 +329,9 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           disabled={!toggleAudio}
           hideOptions={hideOptions || !hasAudioDevices}
           onDisabledClick={toggleAudio}
+          testid="audio_toggle_btn"
           tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
-          icon={
-            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
-          }
+          icon={!isLocalAudioEnabled ? <MicOffIcon /> : <MicOnIcon />}
           active={isLocalAudioEnabled}
           onClick={toggleAudio}
           key="toggleAudio"
@@ -353,13 +371,8 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           hideOptions={hideOptions || !hasVideoDevices}
           onDisabledClick={toggleVideo}
           tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
-          icon={
-            !isLocalVideoEnabled ? (
-              <VideoOffIcon data-testid="video_off_btn" />
-            ) : (
-              <VideoOnIcon data-testid="video_on_btn" />
-            )
-          }
+          testid="video_toggle_btn"
+          icon={!isLocalVideoEnabled ? <VideoOffIcon /> : <VideoOnIcon />}
           key="toggleVideo"
           active={isLocalVideoEnabled}
           onClick={toggleVideo}
@@ -372,7 +385,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
         </IconButtonWithOptions>
       ) : null}
 
-      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview && (isIOS || isAndroid) ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {

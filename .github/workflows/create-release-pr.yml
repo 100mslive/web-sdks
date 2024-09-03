@@ -5,14 +5,18 @@ on:
       versionBump:
         description: 'which version to bump eg: prerelease, patch'
         required: true
+        type: choice
         default: 'prerelease'
+        options:
+          - prerelease
+          - patch
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
-        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/main'
+        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/dev'
         run: exit 1
 
       - uses: actions/checkout@v3
@@ -46,10 +50,10 @@ jobs:
 
       - uses: peter-evans/create-pull-request@v4
         with:
-          commit-message: 'build: update versions for release'
-          title: 'build: update versions for release'
+          commit-message: 'ci: update versions for release'
+          title: 'ci: update versions for release'
           body: |
             - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
-          branch: release
+          branch: ci/release
           branch-suffix: short-commit-hash
           delete-branch: true

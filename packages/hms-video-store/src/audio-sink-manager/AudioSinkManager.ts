@@ -5,7 +5,6 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
-import { isMobile } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -41,7 +40,6 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
-  private autoUnpauseTimer: ReturnType<typeof setInterval> | null = null;
   private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
@@ -49,8 +47,8 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
     this.startPollingForDevices();
-    this.startPollingToCheckPausedAudio();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -97,19 +95,17 @@ export class AudioSinkManager {
 
   cleanup() {
     this.audioSink?.remove();
+    this.earpieceSelected = false;
     this.audioSink = undefined;
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
-    if (this.autoUnpauseTimer) {
-      clearInterval(this.autoUnpauseTimer);
-      this.autoUnpauseTimer = null;
-    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -265,14 +261,6 @@ export class AudioSinkManager {
     }
   };
 
-  private startPollingToCheckPausedAudio = () => {
-    if (isMobile()) {
-      this.autoUnpauseTimer = setInterval(() => {
-        this.unpauseAudioTracks();
-      }, 5000);
-    }
-  };
-
   private startPollingForDevices = () => {
     // device change supported, no polling needed
     if ('ondevicechange' in navigator.mediaDevices) {
@@ -295,32 +283,18 @@ export class AudioSinkManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
-    let bluetoothDevice: InputDeviceInfo | null = null;
-    let speakerPhone: InputDeviceInfo | null = null;
-    let wired: InputDeviceInfo | null = null;
-    let earpiece: InputDeviceInfo | null = null;
-
-    for (const device of this.deviceManager.audioInput) {
-      const label = device.label.toLowerCase();
-      if (label.includes('speakerphone')) {
-        speakerPhone = device;
-      } else if (label.includes('wired')) {
-        wired = device;
-      } else if (label.includes('bluetooth')) {
-        bluetoothDevice = device;
-      } else if (label.includes('earpiece')) {
-        earpiece = device;
-      }
-    }
+    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (localAudioTrack && earpiece) {
-      const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+      const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
+      const externalDeviceID =
+        manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
       HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
       // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
+      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
-      if (!this.earpieceSelected) {
+      if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }

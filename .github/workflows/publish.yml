@@ -3,9 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       publishFlag:
-        description: 'which version to publish eg: alpha, beta, latest, experimental'
+        description: 'which version to publish eg: alpha, latest'
         required: true
         default: 'alpha'
+        type: choice
+        options:
+          - alpha
+          - latest
   repository_dispatch:
     types: [publish-command]
 
@@ -88,6 +92,13 @@ jobs:
           channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
           status: Failed
           color: danger
+
+  run_api_reference:
+    needs: publish_packages
+    if: github.event.inputs.publishFlag == 'latest'
+    uses: ./.github/workflows/generate-docs.yml
+    secrets:
+      DOCKER_GIT_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN}}
 
   notify_100ms_links:
    runs-on: ubuntu-latest

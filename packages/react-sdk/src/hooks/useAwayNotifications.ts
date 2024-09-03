@@ -1,13 +1,26 @@
 // write a hook to use the MDN notifications API to show a notification when the user is away from the page
 import { useCallback } from 'react';
+import { selectLocalPeerRoleName } from '@100mslive/hms-video-store';
+import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 
+// Do not prompt if preview is not available. Skips for beam
 export const useAwayNotifications = () => {
+  const vanillaStore = useHMSVanillaStore();
   const requestPermission = useCallback(async () => {
-    if (!Notification || Notification?.permission === 'granted') {
+    // Headless check for beam
+    if (navigator.webdriver) {
       return;
     }
-    await Notification.requestPermission();
-  }, []);
+    if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+      return;
+    }
+    const unsubscribe = vanillaStore.subscribe(async role => {
+      if (role && role !== '__internal_recorder') {
+        await Notification.requestPermission();
+        unsubscribe?.();
+      }
+    }, selectLocalPeerRoleName);
+  }, [vanillaStore]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
     if (

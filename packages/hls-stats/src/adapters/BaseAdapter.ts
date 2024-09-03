@@ -3,10 +3,11 @@ import { HlsPlayerStats } from '../interfaces';
 export abstract class BaseAdapter {
   hlsInstance: Hls;
   videoEl: HTMLVideoElement;
-  hlsStatsState: HlsPlayerStats = {};
+  hlsStatsState: HlsPlayerStats;
   constructor(hlsInstance: Hls, videoEl: HTMLVideoElement) {
     this.hlsInstance = hlsInstance;
     this.videoEl = videoEl;
+    this.hlsStatsState = {};
   }
   abstract startGatheringStats(): void;
   abstract finishGatheringStats(): void;
