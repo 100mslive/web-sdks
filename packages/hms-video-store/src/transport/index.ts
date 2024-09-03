@@ -548,7 +548,7 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate({ track, enabled }: { track: HMSLocalTrack; enabled: boolean }) {
+  trackUpdate = ({ track, enabled }: { track: HMSLocalTrack; enabled: boolean }) => {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
@@ -571,7 +571,7 @@ export default class HMSTransport {
         this.listener?.onTrackUpdate(enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED, track, peer);
       }
     }
-  }
+  };
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();
