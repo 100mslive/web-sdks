@@ -250,7 +250,6 @@ export { default as TrophyFilledIcon } from './TrophyFilledIcon';
 export { default as TwitterXIcon } from './TwitterXIcon';
 export { default as UnpinIcon } from './UnpinIcon';
 export { default as UploadIcon } from './UploadIcon';
-export { default as UserMusicIcon } from './UserMusicIcon';
 export { default as VerifiedIcon } from './VerifiedIcon';
 export { default as VerticalMenuIcon } from './VerticalMenuIcon';
 export { default as VideoConferencingIcon } from './VideoConferencingIcon';
