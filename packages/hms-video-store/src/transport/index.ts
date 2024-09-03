@@ -83,6 +83,7 @@ export default class HMSTransport {
   private sfuNodeId?: string;
   joinRetryCount = 0;
   private publishDisconnectTimer = 0;
+  private subscribeConnectionTimer = 0;
   private listener?: HMSUpdateListener;
   private onScreenshareStop = () => {};
   private screenStream = new Set<MediaStream>();
@@ -842,6 +843,7 @@ export default class HMSTransport {
               }
             }, ICE_DISCONNECTION_TIMEOUT);
           } else if (newState === 'connected') {
+            clearTimeout(this.subscribeConnectionTimer);
             this.subscribeConnection?.handleSelectedIceCandidatePairs();
             const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
             this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
@@ -875,6 +877,16 @@ export default class HMSTransport {
           this.isFlagEnabled.bind(this),
           subscribeConnectionObserver,
         );
+
+        this.subscribeConnectionTimer = window.setTimeout(() => {
+          if (this.initConfig && !this.subscribeConnection?.selectedCandidatePair) {
+            this.subscribeConnection?.setConfiguration({
+              ...this.initConfig.rtcConfiguration,
+              iceTransportPolicy: 'relay',
+            });
+          }
+          clearTimeout(this.subscribeConnectionTimer);
+        }, SUBSCRIBE_TIMEOUT);
       }
     }
 
