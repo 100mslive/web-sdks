@@ -54,15 +54,16 @@ async function main() {
         metafile: true,
       });
     } else {
+      console.log('here');
       await esbuild.build({
         ...commonOptions,
-        outdir: 'dist',
+        outdir: 'dist/cjs',
         format: 'cjs',
       });
 
       esmResult = await esbuild.build({
         ...commonOptions,
-        outdir: 'dist',
+        outdir: 'dist/esm',
         format: 'esm',
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
