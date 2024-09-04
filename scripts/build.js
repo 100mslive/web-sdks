@@ -35,7 +35,6 @@ async function main() {
     tsconfig: 'tsconfig.json',
     minify: true,
     sourcemap: true,
-    treeShaking: true,
   };
   try {
     let esmResult;
@@ -54,7 +53,6 @@ async function main() {
         metafile: true,
       });
     } else {
-      console.log('here');
       await esbuild.build({
         ...commonOptions,
         outdir: 'dist/cjs',
@@ -65,7 +63,6 @@ async function main() {
         ...commonOptions,
         outdir: 'dist/esm',
         format: 'esm',
-        splitting: true,
         metafile: true,
       });
     }
