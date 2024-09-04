@@ -66,7 +66,6 @@ async function main() {
         outdir: 'dist/esm',
         format: 'esm',
         splitting: true,
-        chunkNames: 'chunks/[name]-[hash]',
         metafile: true,
       });
     }
