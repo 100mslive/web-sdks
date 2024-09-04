@@ -5,7 +5,7 @@
   "author": "100ms",
   "module": "dist/esm/index.js",
   "main": "dist/cjs/index.js",
-  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
   "typesVersions": {
     "*": {
       "hmsvbplugin": [
@@ -20,15 +20,18 @@
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js",
       "types": "./dist/index.d.ts"
     },
     "./hmsvbplugin": {
       "import": "./dist/esm/HMSVBPlugin.js",
       "require": "./dist/cjs/HMSVBPlugin.js",
+      "default": "./dist/esm/HMSVBPlugin.js",
       "types": "./dist/HMSVBPlugin.d.ts"
     },
     "./hmseffectsplugin": {
       "import": "./dist/esm/HMSEffectsPlugin.js",
+      "default": "./dist/esm/HMSEffectsPlugin.js",
       "require": "./dist/cjs/HMSEffectsPlugin.js",
       "types": "./dist/HMSEffectsPlugin.d.ts"
     }
