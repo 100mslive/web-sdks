@@ -53,6 +53,7 @@ async function main() {
         metafile: true,
       });
     } else {
+      console.log('here');
       await esbuild.build({
         ...commonOptions,
         outdir: 'dist/cjs',
