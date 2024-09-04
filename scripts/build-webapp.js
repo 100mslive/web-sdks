@@ -18,7 +18,7 @@ async function main() {
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
-  const target = ['safari11', 'es6'];
+  const target = 'es6';
   const plugins = [
     PostCssPlugin.default({
       plugins: [autoprefixer],
