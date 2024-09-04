@@ -64,6 +64,17 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
   useEffect(() => {
+    const addHMSVBPlugin = async () => {
+      setLoadingEffects(false);
+      if (!role) {
+        return;
+      }
+      await VBHandler.initialisePlugin();
+      await hmsActions.addPluginToVideoTrack(
+        VBHandler.getVBObject() as HMSVBPlugin,
+        Math.floor(role.publishParams.video.frameRate / 2),
+      );
+    };
     const initializeVirtualBackground = async () => {
       if (!track?.id || pluginLoadingRef.current || isPluginAdded) {
         return;
@@ -79,17 +90,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           await VBHandler.initialisePlugin(effectsKey, () => {
             setLoadingEffects(false);
           });
-          hmsActions.addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin]);
-        } else {
-          setLoadingEffects(false);
-          if (!role) {
-            return;
+          const vbInstance = VBHandler.getVBObject();
+          if (vbInstance.getName() === 'HMSEffects') {
+            hmsActions.addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin]);
+          } else {
+            await addHMSVBPlugin();
           }
-          await VBHandler.initialisePlugin();
-          await hmsActions.addPluginToVideoTrack(
-            VBHandler.getVBObject() as HMSVBPlugin,
-            Math.floor(role.publishParams.video.frameRate / 2),
-          );
+        } else {
+          await addHMSVBPlugin();
         }
 
         const handleDefaultBackground = async () => {
