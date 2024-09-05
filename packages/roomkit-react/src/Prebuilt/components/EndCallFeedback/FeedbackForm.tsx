@@ -78,9 +78,9 @@ export const FeedbackContent = ({
   const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
   const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
-  const handleCheckedChange = (index: number) => {
+  const handleCheckedChange = (checked: boolean | string, index: number) => {
     const newSelected = new Set(selectedReasons);
-    if (!selectedReasons.has(index)) {
+    if (checked) {
       newSelected.add(index);
     } else {
       newSelected.delete(index);
@@ -253,7 +253,7 @@ export const FeedbackForm = ({
   comment: string;
   setComment: (value: string) => void;
   selectedReasons: Set<number>;
-  handleCheckedChange: (index: number) => void;
+  handleCheckedChange: (checked: string | boolean, index: number) => void;
 }) => {
   const { feedback } = useRoomLayoutLeaveScreen();
   return (
@@ -302,11 +302,11 @@ export const FeedbackForm = ({
                     r: '$1',
                     p: '$6',
                   }}
-                  onClick={() => handleCheckedChange(index)}
                 >
                   <Checkbox.Root
                     id={`${option}-${index}`}
                     checked={selectedReasons.has(index)}
+                    onCheckedChange={checked => handleCheckedChange(checked, index)}
                     css={{
                       cursor: 'pointer',
                       flexShrink: 0,
@@ -319,6 +319,7 @@ export const FeedbackForm = ({
                     </Checkbox.Indicator>
                   </Checkbox.Root>
                   <Label
+                    htmlFor={`${option}-${index}`}
                     css={{
                       color: '$on_surface_high',
                       fontSize: '$sm',
