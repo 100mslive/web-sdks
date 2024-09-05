@@ -190,7 +190,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                 await VBHandler?.setBlur(blurAmount);
                 hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.BLUR);
               },
-              supported: isEffectsSupported && isEffectsEnabled,
+              supported: isEffectsSupported && VBHandler.getName() === 'HMSEffects',
             },
           ]}
           activeBackground={background}
