@@ -93,7 +93,6 @@ export const FeedbackContent = ({
     }
     try {
       const reasons = [...selectedReasons].map((value: number) => ratings[indexSelected]?.reasons?.[value] || '');
-      console.log('reasons ', reasons);
       await hmsActions.submitSessionFeedback(
         {
           question: ratings[indexSelected].question,
