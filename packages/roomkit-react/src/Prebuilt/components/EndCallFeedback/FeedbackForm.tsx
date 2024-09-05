@@ -78,9 +78,9 @@ export const FeedbackContent = ({
   const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
   const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
-  const handleCheckedChange = (checked: boolean | string, index: number) => {
+  const handleCheckedChange = (index: number) => {
     const newSelected = new Set(selectedReasons);
-    if (checked) {
+    if (!selectedReasons.has(index)) {
       newSelected.add(index);
     } else {
       newSelected.delete(index);
@@ -93,6 +93,7 @@ export const FeedbackContent = ({
     }
     try {
       const reasons = [...selectedReasons].map((value: number) => ratings[indexSelected]?.reasons?.[value] || '');
+      console.log('reasons ', reasons);
       await hmsActions.submitSessionFeedback(
         {
           question: ratings[indexSelected].question,
@@ -253,7 +254,7 @@ export const FeedbackForm = ({
   comment: string;
   setComment: (value: string) => void;
   selectedReasons: Set<number>;
-  handleCheckedChange: (checked: string | boolean, index: number) => void;
+  handleCheckedChange: (index: number) => void;
 }) => {
   const { feedback } = useRoomLayoutLeaveScreen();
   return (
@@ -302,11 +303,11 @@ export const FeedbackForm = ({
                     r: '$1',
                     p: '$6',
                   }}
+                  onClick={() => handleCheckedChange(index)}
                 >
                   <Checkbox.Root
                     id={`${option}-${index}`}
                     checked={selectedReasons.has(index)}
-                    onCheckedChange={checked => handleCheckedChange(checked, index)}
                     css={{
                       cursor: 'pointer',
                       flexShrink: 0,
