@@ -50,7 +50,10 @@ export const PIPChat = () => {
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
-  const canSendChatMessages = !!elements?.chat?.public_chat_enabled || !!elements?.chat?.roles_whitelist?.length;
+  const canSendChatMessages =
+    !!elements?.chat?.public_chat_enabled ||
+    !!elements?.chat?.roles_whitelist?.length ||
+    !!elements?.chat?.private_chat_enabled;
 
   const getChatStatus = useCallback(() => {
     if (isLocalPeerBlacklisted) return "You've been blocked from sending messages";
