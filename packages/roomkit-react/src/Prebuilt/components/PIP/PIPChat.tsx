@@ -115,7 +115,7 @@ export const PIPChat = () => {
               {canSendChatMessages ? 'Start a conversation' : 'No messages yet'}
             </Text>
             <Text variant="sm" style={{ maxWidth: '80%', textAlign: 'center', marginTop: '4px' }}>
-              There are no messages here yet. Start a conversation by sending a message.
+              There are no messages here yet.{canSendChatMessages ? ` Start a conversation by sending a message.` : ''}
             </Text>
           </div>
         ) : (
