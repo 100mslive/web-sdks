@@ -175,7 +175,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     // Replace silent empty track with an actual audio track, if enabled.
-    if (value && isEmptyTrack(this.nativeTrack)) {
+    if (value && (isEmptyTrack(this.nativeTrack) || this.nativeTrack.muted)) {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
