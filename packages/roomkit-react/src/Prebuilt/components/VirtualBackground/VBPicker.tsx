@@ -64,6 +64,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
   useEffect(() => {
+    const isEffectsSupported = doesBrowserSupportEffectsSDK();
+    setIsBlurSupported(isEffectsSupported);
+
     const addHMSVBPlugin = async () => {
       setLoadingEffects(false);
       if (!role) {
@@ -79,9 +82,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       if (!track?.id || pluginLoadingRef.current || isPluginAdded) {
         return;
       }
-
-      const isEffectsSupported = doesBrowserSupportEffectsSDK();
-      setIsBlurSupported(isEffectsSupported);
 
       try {
         pluginLoadingRef.current = true;
