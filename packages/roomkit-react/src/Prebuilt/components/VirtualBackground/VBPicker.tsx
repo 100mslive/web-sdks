@@ -25,7 +25,6 @@ import {
 import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
-import { doesBrowserSupportEffectsSDK } from './util';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
 // @ts-ignore
@@ -49,7 +48,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const [blurAmount, setBlurAmount] = useState(VBHandler.getBlurAmount() || 0.5);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const [isBlurSupported, setIsBlurSupported] = useState(false);
+  const isEffectsSupported = VBHandler.isEffectsSupported();
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
   const isMobile = useMedia(cssConfig.media.md);
@@ -79,9 +78,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       if (!track?.id || pluginLoadingRef.current || isPluginAdded) {
         return;
       }
-
-      const isEffectsSupported = doesBrowserSupportEffectsSDK();
-      setIsBlurSupported(isEffectsSupported);
 
       try {
         pluginLoadingRef.current = true;
@@ -125,6 +121,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     role,
     isPluginAdded,
     isEffectsEnabled,
+    isEffectsSupported,
     effectsKey,
     track?.id,
     background,
@@ -193,7 +190,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                 await VBHandler?.setBlur(blurAmount);
                 hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.BLUR);
               },
-              supported: isBlurSupported,
+              supported: isEffectsSupported && isEffectsEnabled,
             },
           ]}
           activeBackground={background}

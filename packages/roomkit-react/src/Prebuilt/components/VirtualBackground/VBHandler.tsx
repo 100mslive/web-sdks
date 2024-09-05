@@ -1,7 +1,8 @@
 // Open issue with eslint-plugin-import https://github.com/import-js/eslint-plugin-import/issues/1810
 // eslint-disable-next-line
 import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
-
+import { parsedUserAgent } from '@100mslive/react-sdk';
+import { isSafari } from '../../common/constants';
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: any;
@@ -100,6 +101,17 @@ export class VBPlugin {
   reset = () => {
     this.effectsPlugin = undefined;
     this.hmsPlugin = undefined;
+  };
+
+  isEffectsSupported = () => {
+    if (!isSafari) {
+      return true;
+    }
+    const browserVersion = parsedUserAgent?.getBrowser()?.version || '16';
+    if (browserVersion && parseInt(browserVersion.split('.')[0]) < 17) {
+      return false;
+    }
+    return true;
   };
 }
 
