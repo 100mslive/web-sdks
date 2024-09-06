@@ -120,7 +120,7 @@ Tthe following command will build the roomkit-react package and generate a .tgz 
 ```
 yarn && yarn build;
 cd packages/roomkit-react;
-npm pack
+yarn pack
 ```
 
 Push your changes and the .tgz file to the forked repository and in the package.json of the app you are building, use the following link for the roomkit-react package:
