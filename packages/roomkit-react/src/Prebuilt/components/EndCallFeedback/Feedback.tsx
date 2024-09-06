@@ -42,7 +42,7 @@ export const Feedback = () => {
       justify="center"
       css={{
         pt: '$16',
-        w: '528px',
+        w: isMobile ? '100%' : '528px',
       }}
     >
       {index === FEEBACK_INDEX.INIT ? (
