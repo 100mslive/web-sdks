@@ -39,7 +39,7 @@ export const FeedbackModal = ({
     return (
       <Sheet.Root open={index !== FEEBACK_INDEX.INIT} onOpenChange={onOpenChange}>
         <Sheet.Content
-          css={{ bg: '$surface_dim', p: '$10', overflowY: 'scroll' }}
+          css={{ bg: '$surface_dim', p: '$10', overflow: 'auto' }}
           onPointerDownOutside={avoidDefaultDomBehavior}
           onInteractOutside={avoidDefaultDomBehavior}
         >
