@@ -48,7 +48,7 @@ export const Feedback = () => {
       {index === FEEBACK_INDEX.INIT ? (
         <Flex
           css={{
-            p: '$12',
+            p: isMobile ? '$10' : '$12',
             border: '1px solid $border_default',
             bg: '$surface_dim',
             borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
@@ -56,6 +56,7 @@ export const Feedback = () => {
             '@md': {
               position: 'absolute',
               bottom: '0',
+              w: '100%',
             },
           }}
           direction="column"
