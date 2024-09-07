@@ -41,6 +41,7 @@ export class AudioSinkManager {
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setInterval> | null = null;
   private earpieceSelected = false;
+  private leaveStarted = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -48,6 +49,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
+    this.eventBus.leave.subscribe(this.onLeave);
     this.startPollingForDevices();
   }
 
@@ -97,15 +99,16 @@ export class AudioSinkManager {
     this.audioSink?.remove();
     this.earpieceSelected = false;
     this.audioSink = undefined;
+    this.leaveStarted = false;
     if (this.timer) {
       clearInterval(this.timer);
-      this.timer = null;
     }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
+    this.eventBus.leave.unsubscribe(this.onLeave);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -268,6 +271,9 @@ export class AudioSinkManager {
     }
     this.timer = setInterval(() => {
       (async () => {
+        if (this.leaveStarted) {
+          return;
+        }
         await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
         this.unpauseAudioTracks();
@@ -275,12 +281,20 @@ export class AudioSinkManager {
     }, 5000);
   };
 
+  onLeave = () => {
+    this.leaveStarted = true;
+    console.log('on leave');
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  };
+
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices) {
+    if ('ondevicechange' in navigator.mediaDevices || this.leaveStarted) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
@@ -294,6 +308,8 @@ export class AudioSinkManager {
       if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
         return;
       }
+      console.log('set settings on local audio');
+
       if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;

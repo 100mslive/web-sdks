@@ -194,6 +194,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
+    console.trace('set settings called', settings);
 
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
@@ -292,6 +293,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private replaceSenderTrack = async () => {
+    console.trace('replaceSenderTrack');
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
       HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
       return;
@@ -325,6 +327,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
+      console.log('device change called');
       this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       HMSLogger.d(
         this.TAG,
