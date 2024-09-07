@@ -144,6 +144,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    console.trace('replaceTrackWith');
     try {
       const newTrack = await getAudioTrack(settings);
       newTrack.enabled = this.enabled;

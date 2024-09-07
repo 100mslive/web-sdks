@@ -309,6 +309,8 @@ export class AudioSinkManager {
         return;
       }
       console.log('set settings on local audio');
+      // eslint-disable-next-line no-debugger
+      debugger;
 
       if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);

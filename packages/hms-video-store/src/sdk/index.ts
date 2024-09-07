@@ -703,6 +703,7 @@ export class HMSSdk implements HMSInterface {
       // setSessionJoin
       this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
       this.networkTestManager?.stop();
+      console.log('leave publish called');
       this.eventBus.leave.publish(error);
       const peerId = this.localPeer?.peerId;
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}, peerId=${peerId}`);
