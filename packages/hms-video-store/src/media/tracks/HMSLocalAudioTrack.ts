@@ -155,13 +155,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
-      // @ts-ignore
-      if (!window.audioTracks) {
-        // @ts-ignore
-        window.audioTracks = [];
-      }
-      // @ts-ignore
-      window.audioTracks.push(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
