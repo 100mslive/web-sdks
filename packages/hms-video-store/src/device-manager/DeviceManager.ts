@@ -208,7 +208,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (!audioDeviceId && localPeer?.audioTrack) {
       const getInitialDeviceId = () => {
         const nonIPhoneDevice = this.audioInput.find(device => !device.label.toLowerCase().includes('iphone'));
-        return isIOS() && nonIPhoneDevice ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
+        return isIOS() ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
       };
       const deviceIdToUpdate = getInitialDeviceId();
       if (deviceIdToUpdate) {
