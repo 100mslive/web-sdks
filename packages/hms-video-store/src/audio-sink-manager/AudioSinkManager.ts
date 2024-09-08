@@ -39,8 +39,6 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private timer: ReturnType<typeof setTimeout> | null = null;
-  private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -48,8 +46,6 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
-    this.eventBus.leave.subscribe(this.onLeave);
-    console.log('audio sink init called');
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -96,17 +92,12 @@ export class AudioSinkManager {
 
   cleanup() {
     this.audioSink?.remove();
-    this.earpieceSelected = false;
     this.audioSink = undefined;
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
-    this.eventBus.leave.unsubscribe(this.onLeave);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -186,12 +177,6 @@ export class AudioSinkManager {
   };
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
-    // this means the initial load
-    if (!event.selection) {
-      HMSLogger.d(this.TAG, 'device change called');
-      this.autoSelectAudioOutput();
-      this.startPollingForDevices();
-    }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
@@ -260,72 +245,6 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
-    }
-  };
-
-  private startPollingForDevices = () => {
-    // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    this.timer = setTimeout(() => {
-      (async () => {
-        await this.deviceManager.init(true, false);
-        await this.autoSelectAudioOutput();
-        await this.unpauseAudioTracks();
-        this.startPollingForDevices();
-      })();
-    }, 5000);
-  };
-
-  onLeave = () => {
-    console.log('on leave');
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-  };
-
-  /**
-   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
-   */
-  // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
-    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-    if (localAudioTrack && earpiece) {
-      const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
-      const externalDeviceID =
-        manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
-      // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
-        return;
-      }
-      console.log('set settings on local audio', {
-        earpiece: this.earpieceSelected,
-        bluetoothDevice,
-        externalDeviceID,
-      });
-
-      if (!this.earpieceSelected) {
-        if (bluetoothDevice?.deviceId === externalDeviceID) {
-          console.log('returning from bluetooth device');
-          this.earpieceSelected = true;
-          return;
-        }
-        console.log('setting earpiece', earpiece?.deviceId);
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        this.earpieceSelected = true;
-      }
-      await localAudioTrack.setSettings(
-        {
-          deviceId: externalDeviceID,
-        },
-        true,
-      );
     }
   };
 }
