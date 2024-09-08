@@ -26,6 +26,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private manuallySelectedDeviceId?: string;
+  /**
+   * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
+   * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
+   * for you stop, which leaves the mic as enabled even after leave is called.
+   */
+  private tracksCreated = new Set<MediaStreamTrack>();
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
@@ -39,8 +45,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * will be false for preview tracks
    */
   isPublished = false;
-
-  private replaceInProgress = false;
 
   constructor(
     stream: HMSLocalStream,
@@ -129,6 +133,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * @param track
    */
   private async updateTrack(track: MediaStreamTrack) {
+    track.enabled = this.enabled;
     const localStream = this.stream as HMSLocalStream;
     await localStream.replaceStreamTrack(this.nativeTrack, track);
     // change nativeTrack so plugin can start its work
@@ -136,13 +141,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.replaceSenderTrack();
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     isLevelMonitored && this.initAudioLevelMonitor();
-    this.replaceInProgress = false;
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
-    if (this.replaceInProgress) {
-      return;
-    }
     const prevTrack = this.nativeTrack;
     /*
      * Note: Do not change the order of this.
@@ -150,10 +151,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
-    console.trace('replaceTrackWith', { prevTrack });
+    this.tracksCreated.forEach(track => track.stop());
+    this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
-      newTrack.enabled = this.enabled;
       // @ts-ignore
       if (!window.audioTracks) {
         // @ts-ignore
@@ -286,6 +287,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.closeContext();
     this.transceiver = undefined;
     this.processedTrack?.stop();
+    this.tracksCreated.forEach(track => track.stop());
+    this.tracksCreated.clear();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
