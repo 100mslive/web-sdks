@@ -312,6 +312,7 @@ export class AudioSinkManager {
       if (!this.earpieceSelected) {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
           console.log('returning from bluetooth device');
+          this.earpieceSelected = true;
           return;
         }
         console.log('setting earpiece', earpiece?.deviceId);
