@@ -40,6 +40,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   isPublished = false;
 
+  private replaceInProgress = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -137,6 +139,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
+    if (this.replaceInProgress) {
+      console.log('replace already in progress, wait to complete');
+      return;
+    }
     const prevTrack = this.nativeTrack;
     /*
      * Note: Do not change the order of this.
