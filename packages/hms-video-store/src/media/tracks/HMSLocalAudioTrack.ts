@@ -301,7 +301,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private replaceSenderTrack = async () => {
-    console.trace('replaceSenderTrack');
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
       HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
       return;
