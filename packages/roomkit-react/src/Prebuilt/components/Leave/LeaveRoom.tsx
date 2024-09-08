@@ -63,7 +63,6 @@ export const LeaveRoom = ({
     if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
       await stopStream();
     }
-    console.log('leave room');
     await hmsActions.leave();
   };
 

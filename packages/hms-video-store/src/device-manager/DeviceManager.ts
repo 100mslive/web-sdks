@@ -491,19 +491,11 @@ export class DeviceManager implements HMSDeviceManager {
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
     }
-    console.log('set settings on local audio', {
-      earpiece: this.earpieceSelected,
-      bluetoothDevice,
-      externalDeviceID,
-    });
-
     if (!this.earpieceSelected) {
       if (bluetoothDevice?.deviceId === externalDeviceID) {
-        console.log('returning from bluetooth device');
         this.earpieceSelected = true;
         return;
       }
-      console.log('setting earpiece', earpiece?.deviceId);
       await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
       this.earpieceSelected = true;
     }

@@ -136,11 +136,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.replaceSenderTrack();
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     isLevelMonitored && this.initAudioLevelMonitor();
+    this.replaceInProgress = false;
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     if (this.replaceInProgress) {
-      console.log('replace already in progress, wait to complete');
       return;
     }
     const prevTrack = this.nativeTrack;
@@ -340,7 +340,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
-      console.log('device change called');
       this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       HMSLogger.d(
         this.TAG,
