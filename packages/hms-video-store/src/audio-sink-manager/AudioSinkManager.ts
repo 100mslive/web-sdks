@@ -41,7 +41,6 @@ export class AudioSinkManager {
   private listener?: HMSUpdateListener;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private earpieceSelected = false;
-  private leaveStarted = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -99,7 +98,6 @@ export class AudioSinkManager {
     this.audioSink?.remove();
     this.earpieceSelected = false;
     this.audioSink = undefined;
-    this.leaveStarted = false;
     if (this.timer) {
       clearTimeout(this.timer);
     }
@@ -271,9 +269,6 @@ export class AudioSinkManager {
     }
     this.timer = setTimeout(() => {
       (async () => {
-        if (this.leaveStarted) {
-          return;
-        }
         await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
         await this.unpauseAudioTracks();
@@ -283,7 +278,6 @@ export class AudioSinkManager {
   };
 
   onLeave = () => {
-    this.leaveStarted = true;
     console.log('on leave');
     if (this.timer) {
       clearTimeout(this.timer);
@@ -295,7 +289,7 @@ export class AudioSinkManager {
    */
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices || this.leaveStarted) {
+    if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
@@ -315,7 +309,11 @@ export class AudioSinkManager {
         externalDeviceID,
       });
 
-      if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
+      if (!this.earpieceSelected) {
+        if (bluetoothDevice?.deviceId === externalDeviceID) {
+          console.log('returning from bluetooth device');
+          return;
+        }
         console.log('setting earpiece', earpiece?.deviceId);
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
