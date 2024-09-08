@@ -269,7 +269,7 @@ export class AudioSinkManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
-    this.timer = setInterval(() => {
+    /*   this.timer = setInterval(() => {
       (async () => {
         if (this.leaveStarted) {
           return;
@@ -278,7 +278,7 @@ export class AudioSinkManager {
         await this.autoSelectAudioOutput();
         this.unpauseAudioTracks();
       })();
-    }, 5000);
+    }, 5000); */
   };
 
   onLeave = () => {
