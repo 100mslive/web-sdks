@@ -155,11 +155,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
+      this.tracksCreated.add(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
+      this.tracksCreated.add(newTrack);
       await this.updateTrack(newTrack);
       if (this.isPublished) {
         this.eventBus.analytics.publish(
