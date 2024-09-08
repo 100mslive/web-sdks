@@ -316,6 +316,7 @@ export class AudioSinkManager {
       });
 
       if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
+        console.log('setting earpiece', earpiece?.deviceId);
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }
