@@ -29,7 +29,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   /**
    * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
    * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
-   * for you stop, which leaves the mic as enabled even after leave is called.
+   * for you to stop, which leads to the microphone not released even after leave is called.
    */
   private tracksCreated = new Set<MediaStreamTrack>();
 
