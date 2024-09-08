@@ -100,10 +100,10 @@ export class DeviceManager implements HMSDeviceManager {
     }
     this.logDevices('Init');
     await this.setOutputDevice();
+    this.eventBus.deviceChange.publish({
+      devices: this.getDevices(),
+    } as HMSDeviceChangeEvent);
     if (logAnalytics) {
-      this.eventBus.deviceChange.publish({
-        devices: this.getDevices(),
-      } as HMSDeviceChangeEvent);
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: this.getCurrentSelection(),

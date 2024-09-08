@@ -49,7 +49,6 @@ export class AudioSinkManager {
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
     this.eventBus.leave.subscribe(this.onLeave);
-    this.startPollingForDevices();
     console.log('audio sink init called');
   }
 
@@ -191,6 +190,7 @@ export class AudioSinkManager {
     if (!event.selection) {
       HMSLogger.d(this.TAG, 'device change called');
       this.autoSelectAudioOutput();
+      this.startPollingForDevices();
     }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
