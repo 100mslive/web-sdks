@@ -39,7 +39,7 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private timer: ReturnType<typeof setInterval> | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
   private earpieceSelected = false;
   private leaveStarted = false;
 
@@ -101,7 +101,7 @@ export class AudioSinkManager {
     this.audioSink = undefined;
     this.leaveStarted = false;
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
     }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
@@ -269,23 +269,24 @@ export class AudioSinkManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
-    /*   this.timer = setInterval(() => {
+    this.timer = setTimeout(() => {
       (async () => {
         if (this.leaveStarted) {
           return;
         }
         await this.deviceManager.init(true, false);
         await this.autoSelectAudioOutput();
-        this.unpauseAudioTracks();
+        await this.unpauseAudioTracks();
+        this.startPollingForDevices();
       })();
-    }, 5000); */
+    }, 5000);
   };
 
   onLeave = () => {
     this.leaveStarted = true;
     console.log('on leave');
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
     }
   };
 
