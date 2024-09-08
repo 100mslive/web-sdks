@@ -425,6 +425,8 @@ export class HMSSdk implements HMSInterface {
       );
     }
 
+    console.log('preview called');
+
     if ([TransportState.Joined, TransportState.Reconnecting].includes(this.transportState)) {
       return this.midCallPreview(config.asRole, config.settings);
     }

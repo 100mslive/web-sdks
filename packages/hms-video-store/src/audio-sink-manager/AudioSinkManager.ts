@@ -50,6 +50,7 @@ export class AudioSinkManager {
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
     this.eventBus.leave.subscribe(this.onLeave);
     this.startPollingForDevices();
+    console.log('audio sink init called');
   }
 
   setListener(listener?: HMSUpdateListener) {
