@@ -131,6 +131,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.earpieceSelected = false;
     if (this.timer) {
       clearTimeout(this.timer);
+      this.timer = null;
     }
     this.audioInput = [];
     this.audioOutput = [];
