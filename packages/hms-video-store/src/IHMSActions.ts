@@ -1,6 +1,7 @@
 import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
 import { TranscriptionConfig } from './interfaces/transcription-config';
 import { FindPeerByNameRequestParams } from './signal/interfaces';
+import { HMSSessionFeedback } from './end-call-feedback';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -339,6 +340,12 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * If lock is passed as true, the room cannot be used further.
    */
   endRoom: (lock: boolean, reason: string) => Promise<void>;
+
+  /**
+   * After leave send feedback to backend for call quality purpose.
+   * @param feedback
+   */
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 
   /**
    * If you have **removeOthers** permission, you can remove a peer from the room.

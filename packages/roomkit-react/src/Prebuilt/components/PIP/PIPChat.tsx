@@ -50,7 +50,10 @@ export const PIPChat = () => {
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
-  const canSendChatMessages = !!elements?.chat?.public_chat_enabled || !!elements?.chat?.roles_whitelist?.length;
+  const canSendChatMessages =
+    !!elements?.chat?.public_chat_enabled ||
+    !!elements?.chat?.roles_whitelist?.length ||
+    !!elements?.chat?.private_chat_enabled;
 
   const getChatStatus = useCallback(() => {
     if (isLocalPeerBlacklisted) return "You've been blocked from sending messages";
@@ -102,9 +105,25 @@ export const PIPChat = () => {
         )}
         {filteredMessages.length === 0 ? (
           <div
-            style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <Text>No messages here yet</Text>
+            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+              {canSendChatMessages ? 'Start a conversation' : 'No messages yet'}
+            </Text>
+            {canSendChatMessages ? (
+              <Text variant="sm" style={{ maxWidth: '80%', textAlign: 'center', marginTop: '4px' }}>
+                There are no messages here yet. Start a conversation by sending a message.
+              </Text>
+            ) : (
+              ''
+            )}
           </div>
         ) : (
           filteredMessages.map(message => (

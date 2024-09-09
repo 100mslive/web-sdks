@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExitIcon } from '@100mslive/react-icons';
+import { Feedback } from './EndCallFeedback/Feedback';
 // @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
@@ -63,6 +64,7 @@ export const LeaveScreen = () => {
             <Text css={{ ml: '$3', fontWeight: '$semiBold', color: 'inherit' }}>Rejoin</Text>
           </Button>
         </Flex>
+        <Feedback />
       </Flex>
     </Flex>
   );

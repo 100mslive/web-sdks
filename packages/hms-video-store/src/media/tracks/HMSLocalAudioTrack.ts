@@ -26,6 +26,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private manuallySelectedDeviceId?: string;
+  /**
+   * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
+   * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
+   * for you to stop, which leads to the microphone not released even after leave is called.
+   */
+  private tracksCreated = new Set<MediaStreamTrack>();
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
@@ -107,6 +113,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
+          reason: 'visibility-change',
         }),
       );
     } else {
@@ -115,6 +122,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
+          reason: 'visibility-change',
         }),
       );
     }
@@ -125,6 +133,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * @param track
    */
   private async updateTrack(track: MediaStreamTrack) {
+    track.enabled = this.enabled;
     const localStream = this.stream as HMSLocalStream;
     await localStream.replaceStreamTrack(this.nativeTrack, track);
     // change nativeTrack so plugin can start its work
@@ -142,14 +151,17 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    this.tracksCreated.forEach(track => track.stop());
+    this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
-      newTrack.enabled = this.enabled;
+      this.tracksCreated.add(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
+      this.tracksCreated.add(newTrack);
       await this.updateTrack(newTrack);
       if (this.isPublished) {
         this.eventBus.analytics.publish(
@@ -269,6 +281,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.closeContext();
     this.transceiver = undefined;
     this.processedTrack?.stop();
+    this.tracksCreated.forEach(track => track.stop());
+    this.tracksCreated.clear();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);

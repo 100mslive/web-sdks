@@ -5,8 +5,11 @@ on:
       versionBump:
         description: 'which version to bump eg: prerelease, patch'
         required: true
+        type: choice
         default: 'prerelease'
-      
+        options:
+          - prerelease
+          - patch
 
 jobs:
   create_pr:
