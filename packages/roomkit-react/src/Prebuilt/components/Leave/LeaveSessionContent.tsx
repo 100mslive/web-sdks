@@ -47,7 +47,9 @@ export const LeaveSessionContent = ({
         <Button
           variant="danger"
           css={{ w: '100%' }}
-          onClick={async () => await leaveRoom()}
+          onClick={async () => {
+            await leaveRoom();
+          }}
           id="leaveRoom"
           data-testid="leave_room"
         >
