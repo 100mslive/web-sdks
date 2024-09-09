@@ -70,7 +70,10 @@ export const useAppStateManager = () => {
         () => {
           setActiveState(prevState => {
             return match({ isLeaveScreenEnabled, isPreviewScreenEnabled, prevState })
-              .with({ isLeaveScreenEnabled: true, prevState: PrebuiltStates.MEETING }, () => PrebuiltStates.LEAVE)
+              .when(
+                ({ isLeaveScreenEnabled, prevState }) => isLeaveScreenEnabled && prevState !== PrebuiltStates.LEAVE,
+                () => PrebuiltStates.LEAVE,
+              )
               .with({ isPreviewScreenEnabled: true }, () => PrebuiltStates.PREVIEW)
               .otherwise(() => PrebuiltStates.MEETING);
           });
