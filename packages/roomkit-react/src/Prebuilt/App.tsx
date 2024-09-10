@@ -206,7 +206,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                   if (typography?.font_family) {
                     fontFamily = [`${typography?.font_family}`, ...fontFamily];
                   }
-
+                  if (theme.palette?.background_default) {
+                    document.body.style.background = theme.palette.background_default;
+                  }
                   return (
                     <HMSThemeProvider
                       // issue is with stichtes caching the theme using the theme name / class
