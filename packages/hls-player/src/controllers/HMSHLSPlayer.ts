@@ -236,7 +236,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     });
   };
   private volumeEventHandler = () => {
-    this._volume = this._videoEl.volume;
+    this._volume = this._videoEl.volume * 100;
   };
 
   private reConnectToStream = () => {

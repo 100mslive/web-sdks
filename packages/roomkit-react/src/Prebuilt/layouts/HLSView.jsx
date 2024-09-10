@@ -728,6 +728,7 @@ const HLSView = () => {
                           selection={currentSelectedQuality}
                           onQualityChange={handleQuality}
                           isAuto={isUserSelectedAuto}
+                          containerRef={hlsViewRef.current}
                         />
                       ) : null}
                       {isFullScreenSupported ? (
