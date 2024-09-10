@@ -206,7 +206,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                   if (typography?.font_family) {
                     fontFamily = [`${typography?.font_family}`, ...fontFamily];
                   }
-                  if (theme.palette?.background_default) {
+                  if (theme.palette?.background_default && document) {
                     document.body.style.background = theme.palette.background_default;
                   }
                   return (
