@@ -485,11 +485,6 @@ const HLSView = () => {
       css={{
         flex: isLandscape ? '2 1 0' : '1 1 0',
         transition: 'all 0.3s ease-in-out',
-        '&:fullscreen': {
-          '& video': {
-            height: 'unset !important',
-          },
-        },
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (

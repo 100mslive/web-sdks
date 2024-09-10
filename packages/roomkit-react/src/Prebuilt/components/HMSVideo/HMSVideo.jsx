@@ -1,11 +1,8 @@
 import React, { forwardRef, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
-import { config } from '../../../Theme';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
   const [width, setWidth] = useState('auto');
-  const isMobile = useMedia(config.media.md);
   const updatingVideoWidth = () => {
     if (videoRef.current.videoWidth > videoRef.current.videoHeight && width !== '100%') {
       setWidth('100%');
@@ -57,7 +54,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           margin: '0 auto',
           objectFit: 'contain',
           width: width,
-          height: isMobile && width === 'auto' ? '' : 'inherit !important',
+          height: '100%',
           maxWidth: '100%',
         }}
         ref={videoRef}
