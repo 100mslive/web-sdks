@@ -294,6 +294,17 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      window.location.reload();
+    }, 5000);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, []);
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
