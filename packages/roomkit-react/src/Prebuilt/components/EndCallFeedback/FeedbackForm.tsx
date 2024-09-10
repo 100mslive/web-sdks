@@ -39,7 +39,7 @@ export const FeedbackModal = ({
     return (
       <Sheet.Root open={index !== FEEBACK_INDEX.INIT} onOpenChange={onOpenChange}>
         <Sheet.Content
-          css={{ bg: '$surface_dim', p: '$12' }}
+          css={{ bg: '$surface_dim', p: '$10', overflowY: 'auto' }}
           onPointerDownOutside={avoidDefaultDomBehavior}
           onInteractOutside={avoidDefaultDomBehavior}
         >
@@ -75,6 +75,7 @@ export const FeedbackContent = ({
 }) => {
   const { feedback } = useRoomLayoutLeaveScreen();
   const { endpoints } = useHMSPrebuiltContext();
+  const isMobile = useMedia(cssConfig.media.md);
   const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
   const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
@@ -95,7 +96,7 @@ export const FeedbackContent = ({
       const reasons = [...selectedReasons].map((value: number) => ratings[indexSelected]?.reasons?.[value] || '');
       await hmsActions.submitSessionFeedback(
         {
-          question: ratings[indexSelected].question,
+          question: `${feedback?.title} | ${ratings[indexSelected].question || ''}`,
           rating: ratings[indexSelected].value || 1,
           min_rating: 1,
           max_rating: ratings.length,
@@ -139,7 +140,7 @@ export const FeedbackContent = ({
         type="submit"
         icon
         css={{
-          alignSelf: 'end',
+          alignSelf: isMobile ? '' : 'end',
         }}
         onClick={submitFeedback}
       >
@@ -157,6 +158,7 @@ export const FeedbackHeader = ({
   ratings: Rating[];
   indexSelected?: number;
 }) => {
+  const isMobile = useMedia(cssConfig.media.md);
   const { feedback } = useRoomLayoutLeaveScreen();
   return (
     <>
@@ -168,7 +170,7 @@ export const FeedbackHeader = ({
           }}
         >
           <Text
-            variant="h5"
+            variant={isMobile ? 'h6' : 'h5'}
             css={{
               c: '$on_surface_high',
               fontStyle: 'normal',
@@ -177,7 +179,7 @@ export const FeedbackHeader = ({
             {feedback?.title || 'How was your experience?'}
           </Text>
           <Text
-            variant="body1"
+            variant={isMobile ? 'body2' : 'body1'}
             css={{
               c: '$on_surface_medium',
               opacity: 0.9,
@@ -192,9 +194,13 @@ export const FeedbackHeader = ({
         ) : null}
       </Flex>
       <Flex
+        justify="between"
         css={{
           gap: '$17',
           c: '$on_surface_high',
+          '@md': {
+            gap: '0',
+          },
         }}
       >
         {ratings.map((element, index) => {
@@ -219,12 +225,15 @@ export const FeedbackHeader = ({
                   pb: '$1',
                   cursor: 'pointer',
                   opacity: indexSelected === index || indexSelected === FEEBACK_INDEX.INIT ? 1 : 0.2,
+                  '@md': {
+                    fontSize: '$h5',
+                  },
                 }}
               >
                 {element.emoji}
               </Text>
               <Text
-                variant="body1"
+                variant={isMobile ? 'body2' : 'body1'}
                 css={{
                   c:
                     indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
@@ -319,6 +328,7 @@ export const FeedbackForm = ({
                     </Checkbox.Indicator>
                   </Checkbox.Root>
                   <Label
+                    htmlFor={`${option}-${index}`}
                     css={{
                       color: '$on_surface_high',
                       fontSize: '$sm',

@@ -27,7 +27,7 @@ export const ThankyouView = () => {
     >
       <UserMusicIcon width="64px" height="64px" />
       <Flex direction="column" align={isMobile ? 'center' : 'start'}>
-        <Text variant="h5">Thank you for your feedback!</Text>
+        <Text variant="h5">Thank you for your feedback</Text>
         <Text
           variant="body1"
           css={{

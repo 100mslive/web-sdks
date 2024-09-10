@@ -39,8 +39,6 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private timer: ReturnType<typeof setInterval> | null = null;
-  private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -48,7 +46,6 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
-    this.startPollingForDevices();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -95,12 +92,7 @@ export class AudioSinkManager {
 
   cleanup() {
     this.audioSink?.remove();
-    this.earpieceSelected = false;
     this.audioSink = undefined;
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -185,11 +177,6 @@ export class AudioSinkManager {
   };
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
-    // this means the initial load
-    if (!event.selection) {
-      HMSLogger.d(this.TAG, 'device change called');
-      this.autoSelectAudioOutput();
-    }
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
@@ -258,52 +245,6 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
-    }
-  };
-
-  private startPollingForDevices = () => {
-    // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    this.timer = setInterval(() => {
-      (async () => {
-        await this.deviceManager.init(true, false);
-        await this.autoSelectAudioOutput();
-        this.unpauseAudioTracks();
-      })();
-    }, 5000);
-  };
-
-  /**
-   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
-   */
-  // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.deviceManager.categorizeAudioInputDevices();
-    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-    if (localAudioTrack && earpiece) {
-      const manualSelection = this.deviceManager.getManuallySelectedAudioDevice();
-      const externalDeviceID =
-        manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
-      // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
-        return;
-      }
-      if (!this.earpieceSelected && bluetoothDevice?.deviceId !== externalDeviceID) {
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        this.earpieceSelected = true;
-      }
-      await localAudioTrack.setSettings(
-        {
-          deviceId: externalDeviceID,
-        },
-        true,
-      );
     }
   };
 }

@@ -34,6 +34,8 @@ export class DeviceManager implements HMSDeviceManager {
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
+  private earpieceSelected = false;
+  private timer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
@@ -97,6 +99,8 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
+      await this.autoSelectAudioOutput();
+      this.startPollingForDevices();
     }
     this.logDevices('Init');
     await this.setOutputDevice();
@@ -124,6 +128,11 @@ export class DeviceManager implements HMSDeviceManager {
 
   cleanup() {
     this.initialized = false;
+    this.earpieceSelected = false;
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
     this.audioInput = [];
     this.audioOutput = [];
     this.videoInput = [];
@@ -210,7 +219,10 @@ export class DeviceManager implements HMSDeviceManager {
         const nonIPhoneDevice = this.audioInput.find(device => !device.label.toLowerCase().includes('iphone'));
         return isIOS() && nonIPhoneDevice ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
       };
-      await localPeer.audioTrack.setSettings({ deviceId: getInitialDeviceId() }, true);
+      const deviceIdToUpdate = getInitialDeviceId();
+      if (deviceIdToUpdate) {
+        await localPeer.audioTrack.setSettings({ deviceId: getInitialDeviceId() }, true);
+      }
     }
   };
 
@@ -445,6 +457,57 @@ export class DeviceManager implements HMSDeviceManager {
 
     return { bluetoothDevice, speakerPhone, wired, earpiece };
   }
+
+  private startPollingForDevices = () => {
+    // device change supported, no polling needed
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    this.timer = setTimeout(() => {
+      (async () => {
+        await this.enumerateDevices();
+        await this.autoSelectAudioOutput();
+        this.startPollingForDevices();
+      })();
+    }, 5000);
+  };
+
+  /**
+   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
+   */
+  // eslint-disable-next-line complexity
+  private autoSelectAudioOutput = async () => {
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
+    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+    if (!localAudioTrack || !earpiece) {
+      return;
+    }
+    const manualSelection = this.getManuallySelectedAudioDevice();
+    const externalDeviceID =
+      manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+    HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+    // already selected appropriate device
+    if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
+      return;
+    }
+    if (!this.earpieceSelected) {
+      if (bluetoothDevice?.deviceId === externalDeviceID) {
+        this.earpieceSelected = true;
+        return;
+      }
+      await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+      this.earpieceSelected = true;
+    }
+    await localAudioTrack.setSettings(
+      {
+        deviceId: externalDeviceID,
+      },
+      true,
+    );
+  };
 
   // eslint-disable-next-line complexity
   private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {

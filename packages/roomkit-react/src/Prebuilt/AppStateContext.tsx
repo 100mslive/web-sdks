@@ -68,12 +68,15 @@ export const useAppStateManager = () => {
         [HMSRoomState.Disconnected, HMSRoomState.Connecting],
         [HMSRoomState.Disconnected, HMSRoomState.Reconnecting],
         () => {
-          setActiveState(
-            match({ isLeaveScreenEnabled, isPreviewScreenEnabled })
-              .with({ isLeaveScreenEnabled: true }, () => PrebuiltStates.LEAVE)
+          setActiveState(prevState => {
+            return match({ isLeaveScreenEnabled, isPreviewScreenEnabled, prevState })
+              .when(
+                ({ isLeaveScreenEnabled, prevState }) => isLeaveScreenEnabled && prevState !== PrebuiltStates.LEAVE,
+                () => PrebuiltStates.LEAVE,
+              )
               .with({ isPreviewScreenEnabled: true }, () => PrebuiltStates.PREVIEW)
-              .otherwise(() => PrebuiltStates.MEETING),
-          );
+              .otherwise(() => PrebuiltStates.MEETING);
+          });
           VBHandler.reset();
           redirectToLeave(1000); // to clear toasts after 1 second
         },
