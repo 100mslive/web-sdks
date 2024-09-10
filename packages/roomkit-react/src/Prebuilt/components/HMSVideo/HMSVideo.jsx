@@ -9,9 +9,9 @@ export const HMSVideo = forwardRef(({ fullscreen, children, ...props }, videoRef
     }
   };
   useEffect(() => {
-    videoRef.current.addEventListener('loadedmetadata', updatingVideoWidth);
+    videoRef.current?.addEventListener('loadedmetadata', updatingVideoWidth);
     return () => {
-      videoRef.current.removeEventListener('loadedmetadata', updatingVideoWidth);
+      videoRef.current?.removeEventListener('loadedmetadata', updatingVideoWidth);
     };
   }, []);
   return (
