@@ -174,7 +174,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
 
-    // Replace silent empty track with an actual audio track, if enabled.
+    // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled.
     if (value && (isEmptyTrack(this.nativeTrack) || this.nativeTrack.muted)) {
       await this.replaceTrackWith(this.settings);
     }
