@@ -536,6 +536,7 @@ const HLSView = () => {
             onMouseMove={onHoverHandler}
             onMouseLeave={onHoverHandler}
             onClick={onClickHandler}
+            fullscreen={isFullScreen}
             onDoubleClick={e => {
               onDoubleClickHandler(e);
             }}

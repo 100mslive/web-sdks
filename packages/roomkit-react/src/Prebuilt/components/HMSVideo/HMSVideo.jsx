@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
-export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+export const HMSVideo = forwardRef(({ fullscreen, children, ...props }, videoRef) => {
   const [width, setWidth] = useState('auto');
   const updatingVideoWidth = () => {
     if (videoRef.current.videoWidth > videoRef.current.videoHeight && width !== '100%') {
@@ -23,9 +23,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         justifyContent: 'center',
         transition: 'all 0.3s ease-in-out',
         '@md': {
-          height: 'auto',
           '& video': {
-            height: '$60 !important',
+            height: fullscreen ? '' : '$60 !important',
           },
         },
         '& video::cue': {
