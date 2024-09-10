@@ -1,7 +1,19 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+  const [width, setWidth] = useState('auto');
+  const updatingVideoWidth = () => {
+    if (videoRef.current.videoWidth > videoRef.current.videoHeight && width !== '100%') {
+      setWidth('100%');
+    }
+  };
+  useEffect(() => {
+    videoRef.current.addEventListener('loadedmetadata', updatingVideoWidth);
+    return () => {
+      videoRef.current.removeEventListener('loadedmetadata', updatingVideoWidth);
+    };
+  }, []);
   return (
     <Flex
       data-testid="hms-video"
@@ -41,8 +53,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         style={{
           margin: '0 auto',
           objectFit: 'contain',
-          width: 'auto',
-          height: '100%',
+          width: width,
+          height: 'inherit !important',
           maxWidth: '100%',
         }}
         ref={videoRef}
