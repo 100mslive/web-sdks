@@ -26,8 +26,10 @@ export const ChangeNameContent = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isMobile && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 200);
+    if (isMobile) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 200);
     }
   }, [isMobile]);
 
