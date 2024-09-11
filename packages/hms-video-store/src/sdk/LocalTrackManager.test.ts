@@ -30,6 +30,7 @@ const testObserver: ITransportObserver = {
 
 let testStore = new Store();
 let testEventBus = new EventBus();
+let analyticsTimer = new AnalyticsTimer();
 
 const policyParams: PolicyParams = {
   name: 'host',
@@ -235,6 +236,7 @@ describe('LocalTrackManager', () => {
       type: HMSPeerType.REGULAR,
     });
     testStore.addPeer(localPeer);
+    analyticsTimer = new AnalyticsTimer();
   });
 
   it('instantiates without any issues', () => {
@@ -243,7 +245,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
-      new AnalyticsTimer(),
+      analyticsTimer,
     );
     expect(manager).toBeDefined();
   });
@@ -254,7 +256,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
-      new AnalyticsTimer(),
+      analyticsTimer,
     );
     testStore.setKnownRoles(policyParams);
     await manager.getTracksToPublish({});
@@ -276,7 +278,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setKnownRoles(policyParams);
@@ -423,7 +425,8 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
+          addEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
       );
@@ -436,7 +439,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
@@ -455,7 +458,8 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
+          addEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
       );
@@ -465,7 +469,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});

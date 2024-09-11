@@ -144,7 +144,10 @@ class Queue {
 }
 
 class CaptionMaintainerQueue {
-  captionData: Queue = new Queue();
+  captionData: Queue;
+  constructor() {
+    this.captionData = new Queue();
+  }
   push(data: HMSTranscript[] = []) {
     data.forEach((value: HMSTranscript) => {
       this.captionData.enqueue(value);

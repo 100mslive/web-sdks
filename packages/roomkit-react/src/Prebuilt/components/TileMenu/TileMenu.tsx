@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import {
+  HMSAudioTrack,
   HMSVideoTrack,
   selectLocalPeerID,
   selectPeerByID,
@@ -17,6 +18,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig, useTheme } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
+import { getVideoTileLabel } from '../peerTileUtils';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
@@ -52,7 +54,8 @@ const TileMenu = ({
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
   const showPinAction = !!(audioTrackID || (videoTrackID && isPrimaryVideoTrack));
 
-  const track = useHMSStore(selectTrackByID(videoTrackID)) as HMSVideoTrack;
+  const track = useHMSStore(selectTrackByID(videoTrackID)) as HMSVideoTrack | null;
+  const audioTrack = useHMSStore(selectTrackByID(audioTrackID)) as HMSAudioTrack | null;
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   const isMobile = useMedia(cssConfig.media.md);
   const peer = useHMSStore(selectPeerByID(peerID));
@@ -61,20 +64,19 @@ const TileMenu = ({
   useDropdownList({ open, name: 'TileMenu' });
   const dragClassName = getDragClassName();
 
-  if (!(removeOthers || toggleAudio || toggleVideo || setVolume || showPinAction) && hideSimulcastLayers) {
+  if (!peer || (!(removeOthers || toggleAudio || toggleVideo || setVolume || showPinAction) && hideSimulcastLayers)) {
     return null;
   }
 
   const openNameChangeModal = () => setShowNameChangeModal(true);
   const openRoleChangeModal = () => setShowRoleChangeModal(true);
 
-  const props = {
+  const props: React.ComponentPropsWithoutRef<typeof TileMenuContent> = {
     isLocal,
     isScreenshare,
     audioTrackID,
     videoTrackID,
     peerID,
-    isPrimaryVideoTrack,
     showSpotlight,
     showPinAction,
     canMinimise,
@@ -111,8 +113,7 @@ const TileMenu = ({
               >
                 <Box>
                   <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                    {peer?.name}
-                    {isLocal ? ` (You)` : null}
+                    {getVideoTileLabel({ peerName: peer?.name, isLocal, audioTrack, videoTrack: track })}
                   </Text>
                   {peer?.roleName ? (
                     <Text variant="xs" css={{ color: '$on_surface_low', mt: '$2' }}>

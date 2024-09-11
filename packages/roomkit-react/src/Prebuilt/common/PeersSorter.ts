@@ -7,13 +7,14 @@ class PeersSorter {
   lruPeers: Set<HMSPeerID>;
   tilesPerPage!: number;
   speaker?: HMSPeer;
-  listeners: Set<(peers: HMSPeer[]) => void> = new Set();
+  listeners: Set<(peers: HMSPeer[]) => void>;
 
   constructor(store: IStoreReadOnly<any>) {
     this.store = store;
     this.peers = new Map();
     this.lruPeers = new Set();
     this.speaker = undefined;
+    this.listeners = new Set();
   }
 
   setPeersAndTilesPerPage = ({ peers, tilesPerPage }: { peers: HMSPeer[]; tilesPerPage: number }) => {

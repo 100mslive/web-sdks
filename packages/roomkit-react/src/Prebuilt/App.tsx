@@ -21,6 +21,7 @@ import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
+import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
@@ -143,10 +144,12 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           init: string;
           tokenByRoomCode: string;
           roomLayout: string;
+          event: string;
         }
       | undefined;
     const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
     const initEndpoint: string = endpointsObj?.init || '';
+    const eventEndpoint: string = endpointsObj?.event || '';
     const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
 
     const overrideLayout: Partial<Layout> = {
@@ -185,6 +188,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
+              event: eventEndpoint,
             },
           }}
         >
@@ -222,24 +226,26 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <Init />
-                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
-                        <Box
-                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
-                          css={{
-                            bg: '$background_dim',
-                            size: '100%',
-                            lineHeight: '1.5',
-                            '-webkit-text-size-adjust': '100%',
-                            position: 'relative',
-                          }}
-                        >
-                          <AppRoutes
-                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                            defaultAuthToken={authToken}
-                          />
-                        </Box>
-                      </DialogContainerProvider>
+                      <PIPProvider>
+                        <Init />
+                        <DialogContainerProvider dialogContainerSelector={containerSelector}>
+                          <Box
+                            className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
+                            css={{
+                              bg: '$background_dim',
+                              size: '100%',
+                              lineHeight: '1.5',
+                              '-webkit-text-size-adjust': '100%',
+                              position: 'relative',
+                            }}
+                          >
+                            <AppRoutes
+                              authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                              defaultAuthToken={authToken}
+                            />
+                          </Box>
+                        </DialogContainerProvider>
+                      </PIPProvider>
                     </HMSThemeProvider>
                   );
                 }}
@@ -304,7 +310,11 @@ function AppRoutes({
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        <AuthToken
+          authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+          defaultAuthToken={defaultAuthToken}
+          activeState={activeState}
+        />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
     </AppStateContext.Provider>

@@ -16,6 +16,7 @@ import { TranscriptionConfig } from './transcription-config';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
+import { HMSSessionFeedback } from '../end-call-feedback';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSPeerListIterator } from '../sdk/HMSPeerListIterator';
@@ -104,4 +105,5 @@ export interface HMSInterface {
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 
   updatePlaylistSettings(options: HMSPlaylistSettings): void;
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 }

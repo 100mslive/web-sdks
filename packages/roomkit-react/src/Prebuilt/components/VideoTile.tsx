@@ -20,7 +20,6 @@ import { VideoTileStats } from '../../Stats';
 import { CSS } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
-// @ts-ignore: No implicit Any
 import { getVideoTileLabel } from './peerTileUtils';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
@@ -101,8 +100,9 @@ const Tile = ({
   });
   const label = getVideoTileLabel({
     peerName,
-    track,
     isLocal,
+    videoTrack: track,
+    audioTrack,
   });
   const onHoverHandler = useCallback((event: React.MouseEvent) => {
     setIsMouseHovered(event.type === 'mouseenter');

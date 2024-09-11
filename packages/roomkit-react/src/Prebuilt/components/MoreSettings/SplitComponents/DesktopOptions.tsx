@@ -48,12 +48,14 @@ import { CaptionModal } from '../CaptionModal';
 import { FullScreenItem } from '../FullScreenItem';
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../../AppData/useSidepane';
+// @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 // @ts-ignore: No implicit any
 import { usePIPChat } from '../../PIP/usePIPChat';
 // @ts-ignore: No implicit any
-import { APP_DATA, isMacOS } from '../../../common/constants';
+import { APP_DATA, isMacOS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -85,7 +87,10 @@ export const DesktopOptions = ({
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
   const { isSupported, pipWindow, requestPipWindow } = usePIPChat();
-  const showPipChatOption = !!elements?.chat && isSupported;
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  // Hide if pip chat is already open
+  const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -180,7 +185,13 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
-          <PIPChatOption showPIPChat={showPipChatOption} openChat={async () => await requestPipWindow(350, 500)} />
+          <PIPChatOption
+            showPIPChat={showPipChatOption}
+            openChat={async () => {
+              isChatOpen && toggleChat();
+              await requestPipWindow(350, 500);
+            }}
+          />
           <FullScreenItem />
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
