@@ -57,7 +57,7 @@ export const ChangeNameContent = ({
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
           // Prevents popup from showing up on chrome mweb
-          type={isMobile && isAndroid ? 'search' : 'text'}
+          type={isAndroid ? 'search' : 'text'}
           onChange={e => {
             setCurrentName(e.target.value);
           }}

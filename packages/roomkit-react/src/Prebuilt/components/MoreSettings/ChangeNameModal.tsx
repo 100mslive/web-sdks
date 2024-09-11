@@ -69,7 +69,10 @@ export const ChangeNameModal = ({
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
+        <Dialog.Content
+          css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}
+          onOpenAutoFocus={e => e.preventDefault()}
+        >
           <ChangeNameContent {...props} />
         </Dialog.Content>
       </Dialog.Portal>
