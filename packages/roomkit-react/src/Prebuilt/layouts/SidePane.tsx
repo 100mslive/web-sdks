@@ -2,7 +2,6 @@ import React, { Suspense, useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
-import FullPageProgress from '../components/FullPageProgress';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 import VideoTile from '../components/VideoTile';
@@ -240,7 +239,7 @@ const SidePane = ({
           {...tileLayout}
         />
       )}
-      <Suspense fallback={<FullPageProgress />}>{SidepaneComponent}</Suspense>
+      <Suspense fallback={<></>}>{SidepaneComponent}</Suspense>
     </Flex>
   );
 };

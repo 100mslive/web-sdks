@@ -78,18 +78,18 @@ export const VideoStreamingSection = ({
   }
 
   return (
-    <Suspense fallback={<FullPageProgress />}>
-      <Flex
-        css={{
-          size: '100%',
-          position: 'relative',
-          gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
-        }}
-        direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
-          .with({ isLandscapeHLSStream: true }, () => 'row')
-          .with({ isMobileHLSStream: true }, () => 'column')
-          .otherwise(() => 'row')}
-      >
+    <Flex
+      css={{
+        size: '100%',
+        position: 'relative',
+        gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
+      }}
+      direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
+        .with({ isLandscapeHLSStream: true }, () => 'row')
+        .with({ isMobileHLSStream: true }, () => 'column')
+        .otherwise(() => 'row')}
+    >
+      <Suspense fallback={<FullPageProgress />}>
         {match({
           screenType,
           isNotAllowedToPublish,
@@ -141,27 +141,29 @@ export const VideoStreamingSection = ({
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
         <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
-        <Box
-          css={{
-            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
-              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
-              .with({ isMobileHLSStream: true }, () => '2 1 0')
-              .otherwise(() => undefined),
-            position: 'relative',
-            height: !isMobileHLSStream ? '100%' : undefined,
-            maxHeight: '100%',
-            '&:empty': { display: 'none' },
-            overflowY: 'clip',
-          }}
-        >
+      </Suspense>
+      <Box
+        css={{
+          flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+            .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+            .with({ isMobileHLSStream: true }, () => '2 1 0')
+            .otherwise(() => undefined),
+          position: 'relative',
+          height: !isMobileHLSStream ? '100%' : undefined,
+          maxHeight: '100%',
+          '&:empty': { display: 'none' },
+          overflowY: 'clip',
+        }}
+      >
+        <Suspense fallback={<></>}>
           <SidePane
             screenType={screenType}
             // @ts-ignore
             tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
             hideControls={hideControls}
           />
-        </Box>
-      </Flex>
-    </Suspense>
+        </Suspense>
+      </Box>
+    </Flex>
   );
 };
