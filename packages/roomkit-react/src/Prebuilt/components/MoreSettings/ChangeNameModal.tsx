@@ -58,7 +58,7 @@ export const ChangeNameModal = ({
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$8 0' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$8 0' }} onOpenAutoFocus={e => e.preventDefault()}>
           <ChangeNameContent {...props} />
         </Sheet.Content>
       </Sheet.Root>
@@ -69,10 +69,7 @@ export const ChangeNameModal = ({
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content
-          css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}
-          onOpenAutoFocus={e => e.preventDefault()}
-        >
+        <Dialog.Content css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
           <ChangeNameContent {...props} />
         </Dialog.Content>
       </Dialog.Portal>
