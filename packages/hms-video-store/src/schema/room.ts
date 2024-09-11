@@ -40,6 +40,7 @@ export interface HMSRoom {
   peerCount?: number;
   isLargeRoom?: boolean;
   isEffectsEnabled?: boolean;
+  disableNoneLayerRequest?: boolean;
   isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;

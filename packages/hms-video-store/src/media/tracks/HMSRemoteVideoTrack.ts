@@ -18,9 +18,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
   private bizTrackId!: string;
+  private disableNoneLayerRequest = false;
 
-  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
+  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string, disableNoneLayerRequest?: boolean) {
     super(stream, track, source);
+    this.disableNoneLayerRequest = !!disableNoneLayerRequest;
     this.setVideoHandler(new VideoElementManager(this));
   }
 
@@ -170,7 +172,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.enabled || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
+    const newLayer =
+      (this.degraded || !this.enabled || !this.hasSinks()) && !this.disableNoneLayerRequest
+        ? HMSSimulcastLayer.NONE
+        : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
