@@ -129,6 +129,12 @@ Push your changes and the .tgz file to the forked repository and in the package.
 "@100mslive/roomkit-react":"https://github.com/<user_name>/web-sdks/raw/main/packages/roomkit-react/<tgz_file_name>.tgz",
 ```
 
+Re-install the dependencies after updating the package.json and build using the following command:
+
+```
+yarn && yarn build
+```
+
 You can now import the HMSPrebuilt component in the same way as before:
 
 ```
