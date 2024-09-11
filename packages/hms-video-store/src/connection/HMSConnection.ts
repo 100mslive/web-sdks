@@ -79,8 +79,11 @@ export default abstract class HMSConnection {
   }
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription signalling state closed`);
+      return;
+    }
     try {
-      console.log(TAG, 'setlocaldescription', this.nativeConnection.signalingState, this.action);
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
@@ -90,8 +93,21 @@ export default abstract class HMSConnection {
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(
+        TAG,
+        `[role=${this.role}] setRemoteDescription signalling state ${this.nativeConnection.signalingState}`,
+      );
+      return;
+    }
+    if (this.role === HMSConnectionRole.Publish && this.nativeConnection.signalingState === 'stable') {
+      HMSLogger.d(
+        TAG,
+        `[role=${this.role}] setRemoteDescription signalling state ${this.nativeConnection.signalingState}`,
+      );
+      return;
+    }
     try {
-      console.log(TAG, 'setRemoteDescription', this.nativeConnection.signalingState, this.action);
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {

@@ -59,6 +59,11 @@ interface NegotiateJoinParams {
   autoSubscribeVideo: boolean;
 }
 
+const enum PublishEvents {
+  published = 'published',
+  unpublished = 'unpublished',
+}
+
 export default class HMSTransport {
   private state: TransportState = TransportState.Disconnected;
   private trackStates: Map<string, TrackState> = new Map();
@@ -139,6 +144,7 @@ export default class HMSTransport {
           HMSLogger.d(TAG, 'ignoring old offer');
           return;
         }
+        console.log('subscribe', this.subscribeConnection.nativeConnection.signalingState);
         await this.subscribeConnection.setRemoteDescription(jsep);
         HMSLogger.d(
           TAG,
@@ -149,6 +155,7 @@ export default class HMSTransport {
           await this.subscribeConnection.addIceCandidate(candidate);
         }
         this.subscribeConnection.candidates.length = 0;
+        console.log('subscribe after remote description', this.subscribeConnection.nativeConnection.signalingState);
         const answer = await this.subscribeConnection.createAnswer();
         await this.subscribeConnection.setLocalDescription(answer);
         this.signal.answer(answer);
@@ -1052,9 +1059,9 @@ export default class HMSTransport {
   private sendPublishEvents = () => {
     this.publishConnection?.getTransceivers().forEach(transceiver => {
       if (transceiver.direction === 'inactive') {
-        this.eventEmitter.emit('unpublished', transceiver.mid);
+        this.eventEmitter.emit(PublishEvents.unpublished, transceiver.mid);
       } else if (transceiver.direction === 'sendonly' && transceiver.mid !== null) {
-        this.eventEmitter.emit('published', transceiver);
+        this.eventEmitter.emit(PublishEvents.published, transceiver);
       }
     });
   };
@@ -1070,11 +1077,15 @@ export default class HMSTransport {
       const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
       await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
-      console.log(TAG, this.publishConnection.nativeConnection.signalingState);
       const answer = await this.signal.offer(offer, this.trackStates);
-      HMSLogger.timeEnd(`renegotiation-offer-exchange`);
-      console.log(TAG, this.publishConnection.nativeConnection.signalingState);
+      console.log(
+        'after offer to server:',
+        this.publishConnection.nativeConnection.pendingLocalDescription,
+        this.publishConnection.nativeConnection.currentRemoteDescription,
+        this.publishConnection.nativeConnection.signalingState,
+      );
       await this.publishConnection.setRemoteDescription(answer);
+      HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       this.sendPublishEvents();
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
       return true;
