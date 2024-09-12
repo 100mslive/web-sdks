@@ -65,6 +65,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   isPublished = false;
 
+  enableInProgress = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -133,9 +135,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   async setEnabled(value: boolean): Promise<void> {
-    if (value === this.enabled) {
+    if (value === this.enabled || this.enableInProgress) {
       return;
     }
+    this.enableInProgress = true;
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
       if (value) {
@@ -155,6 +158,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
+    this.enableInProgress = false;
   }
 
   private async processPlugins() {
