@@ -39,6 +39,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
+  private tracksCreated = new Set<MediaStreamTrack>();
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -266,6 +267,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    this.tracksCreated.forEach(track => track.stop());
+    this.tracksCreated.clear();
     if (isBrowser && isMobile()) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -377,8 +380,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      */
     this.removeTrackEventListeners(prevTrack);
     prevTrack?.stop();
+    this.tracksCreated.forEach(track => track.stop());
     try {
       const newTrack = await getVideoTrack(settings);
+      this.tracksCreated.add(newTrack);
       this.addTrackEventListeners(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
@@ -389,6 +394,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
+      this.tracksCreated.add(track);
       this.addTrackEventListeners(track);
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
