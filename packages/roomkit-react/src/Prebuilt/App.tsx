@@ -298,7 +298,7 @@ function AppRoutes({
   useEffect(() => {
     const interval = setInterval(() => {
       window.location.reload();
-    }, 5000);
+    }, 30000);
     return () => {
       if (interval) {
         clearInterval(interval);
