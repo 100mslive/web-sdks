@@ -143,10 +143,10 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           event: string;
         }
       | undefined;
-    const tokenByRoomCodeEndpoint: string | undefined = endpointsObj?.tokenByRoomCode;
-    const initEndpoint: string | undefined = endpointsObj?.init;
-    const eventEndpoint: string | undefined = endpointsObj?.event;
-    const roomLayoutEndpoint: string | undefined = endpointsObj?.roomLayout;
+    const tokenByRoomCodeEndpoint = endpointsObj?.tokenByRoomCode;
+    const initEndpoint = endpointsObj?.init;
+    const eventEndpoint = endpointsObj?.event;
+    const roomLayoutEndpoint = endpointsObj?.roomLayout;
 
     const overrideLayout: Partial<Layout> = {
       logo,
