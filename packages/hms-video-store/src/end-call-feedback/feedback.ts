@@ -18,7 +18,7 @@ export class FeedbackService {
 
   static async sendFeedback({
     token,
-    eventEndpoint,
+    eventEndpoint = 'https://event.100ms.live',
     info,
     feedback,
   }: {
@@ -27,9 +27,6 @@ export class FeedbackService {
     info: HMSSessionInfo;
     feedback?: HMSSessionFeedback;
   }): Promise<void> {
-    if (!eventEndpoint) {
-      eventEndpoint = 'https://event.100ms.live';
-    }
     HMSLogger.d(
       this.TAG,
       `sendFeedback: feedbackEndpoint=${eventEndpoint} peerId=${info.peer.peer_id} session=${info.peer.session_id} `,
