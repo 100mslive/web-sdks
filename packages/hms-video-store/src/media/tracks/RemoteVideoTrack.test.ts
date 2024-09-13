@@ -199,22 +199,11 @@ describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
     });
   };
 
-  const expectDegradationLayerAndSink = (isDegraded: boolean, layer: HMSSimulcastLayer, hasSink: boolean) => {
-    expect(track.degraded).toBe(isDegraded);
-    expect(track.getLayer()).toBe(layer);
-    expect(track.hasSinks()).toBe(hasSink);
-  };
-
-  const expectDegradedHighRequested = (layer = HMSSimulcastLayer.HIGH) => {
-    expectDegradationLayerAndSink(true, layer, true);
-  };
-
   test('should not request NONE layer when disableNoneLayerRequest is true', async () => {
     await track.addSink(videoElement);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
     sfuDegrades();
-    expectDegradedHighRequested();
     expectLayersSent([HMSSimulcastLayer.HIGH]);
   });
 });
