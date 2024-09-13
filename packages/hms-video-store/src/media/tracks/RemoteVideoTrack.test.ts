@@ -208,6 +208,7 @@ describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
   });
 
   test('disableNoneLayerRequest - mute and removeSink', async () => {
+    await track.addSink(videoElement);
     track.setEnabled(false);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
