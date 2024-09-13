@@ -566,7 +566,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       if (this.enabled) {
-        this.setEnabled(false);
+        await this.setEnabled(false);
       }
       // started interruption event
       this.eventBus.analytics.publish(
