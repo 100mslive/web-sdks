@@ -598,13 +598,13 @@ export default class HMSTransport {
     await new Promise<void>((resolve, reject) => {
       const listener = (transceiver: RTCRtpTransceiver) => {
         if (transceiver === track.transceiver) {
-          this.eventEmitter.off('publish', listener);
+          this.eventEmitter.off(PublishEvents.published, listener);
           this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
           resolve();
         }
       };
-      this.eventEmitter.on('published', listener);
-      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+      this.eventEmitter.on(PublishEvents.published, listener);
+      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
         console.log('publish error', ex);
         reject(ex);
       });
@@ -656,13 +656,13 @@ export default class HMSTransport {
     await new Promise<void>((resolve, reject) => {
       const listener = (mid: string) => {
         if (track.transceiver?.mid === mid) {
-          this.eventEmitter.off('unpublished', listener);
+          this.eventEmitter.off(PublishEvents.unpublished, listener);
           this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
           resolve();
         }
       };
-      this.eventEmitter.on('unpublished', listener);
-      this.eventEmitter.once(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+      this.eventEmitter.on(PublishEvents.unpublished, listener);
+      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
         console.log('unpublish error', ex);
         reject(ex);
       });
