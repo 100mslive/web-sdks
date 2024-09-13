@@ -261,6 +261,7 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
 
+  console.log('AppStates> states ', isPreviewScreenEnabled, isLeaveScreenEnabled, activeState);
   return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
     .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
     .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)

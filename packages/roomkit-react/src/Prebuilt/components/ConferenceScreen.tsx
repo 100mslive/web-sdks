@@ -60,6 +60,7 @@ export const ConferenceScreen = () => {
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
 
+  console.log('ConferenceScreen> isMwebHLSStream ', isMwebHLSStream);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
       setHideControls(value => !value);

@@ -58,6 +58,7 @@ export const VideoStreamingSection = ({
   useCloseScreenshareWhiteboard();
 
   const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();
+  console.log('VideoStreamingSection> screenType ', screenType, isMobileHLSStream, isLandscapeHLSStream);
 
   useEffect(() => {
     if (!isConnected) {

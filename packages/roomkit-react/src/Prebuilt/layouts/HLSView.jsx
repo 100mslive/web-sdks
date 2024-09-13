@@ -108,6 +108,8 @@ const HLSView = () => {
   const isMobile = useMedia(config.media.md);
   const isLandscape = useIsLandscape();
 
+  console.log('HLSView> hlsURL, lastHLSURL, hlsStatsState, hlsState ', hlsUrl, lastHlsUrl, hlsStatsState, hlsState);
+
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
