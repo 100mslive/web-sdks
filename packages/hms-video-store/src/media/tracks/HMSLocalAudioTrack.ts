@@ -109,14 +109,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
       return;
     }
-    if (document.visibilityState === 'hidden') {
+    if (document.visibilityState === 'hidden' && this.enabled) {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
           reason: 'visibility-change',
         }),
       );
-    } else {
+    } else if (this.enabled && document.visibilityState !== 'hidden') {
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
