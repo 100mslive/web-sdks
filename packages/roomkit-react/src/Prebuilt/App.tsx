@@ -288,7 +288,7 @@ function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
 }: {
-  authTokenByRoomCodeEndpoint: string | undefined;
+  authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
