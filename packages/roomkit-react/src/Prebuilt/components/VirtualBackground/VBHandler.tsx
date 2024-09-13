@@ -104,13 +104,15 @@ export class VBPlugin {
   };
 
   isBlurSupported = () => {
-    if (this.effectsPlugin) {
-      return true;
-    }
     if ((isSafari || isIOS) && this.hmsPlugin) {
       return false;
     }
-    return true;
+
+    if (this.effectsPlugin) {
+      return true;
+    }
+
+    return false;
   };
 
   isEffectsSupported = () => {
