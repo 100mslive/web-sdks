@@ -4,7 +4,6 @@ import { Button } from '../../../Button';
 import { Input } from '../../../Input';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { isAndroid } from '../../common/constants';
 
 export const ChangeNameContent = ({
   changeName,
@@ -67,8 +66,7 @@ export const ChangeNameContent = ({
           ref={inputRef}
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
-          // Prevents popup from showing up on chrome mweb
-          type={isAndroid ? 'search' : 'text'}
+          type="text"
           onChange={e => {
             setCurrentName(e.target.value);
           }}
