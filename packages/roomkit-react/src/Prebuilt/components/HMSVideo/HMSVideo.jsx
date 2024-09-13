@@ -1,17 +1,26 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
-export const HMSVideo = forwardRef(({ fullscreen, children, ...props }, videoRef) => {
+export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
   const [width, setWidth] = useState('auto');
-  const updatingVideoWidth = () => {
-    if (videoRef.current.videoWidth > videoRef.current.videoHeight && width !== '100%') {
-      setWidth('100%');
-    }
-  };
+
   useEffect(() => {
-    videoRef.current?.addEventListener('loadedmetadata', updatingVideoWidth);
+    const updatingVideoWidth = () => {
+      const videoEl = videoRef.current;
+      if (!videoEl) {
+        return;
+      }
+      if (videoEl.videoWidth > videoEl.videoHeight && width !== '100%') {
+        setWidth('100%');
+      }
+    };
+    const videoEl = videoRef.current;
+    if (!videoEl) {
+      return;
+    }
+    videoEl.addEventListener('loadedmetadata', updatingVideoWidth);
     return () => {
-      videoRef.current?.removeEventListener('loadedmetadata', updatingVideoWidth);
+      videoEl.removeEventListener('loadedmetadata', updatingVideoWidth);
     };
   }, []);
   return (
@@ -24,7 +33,7 @@ export const HMSVideo = forwardRef(({ fullscreen, children, ...props }, videoRef
         transition: 'all 0.3s ease-in-out',
         '@md': {
           '& video': {
-            height: fullscreen ? '' : '$60 !important',
+            height: props.fullscreen ? '' : '$60 !important',
           },
         },
         '& video::cue': {
