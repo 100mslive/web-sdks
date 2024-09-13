@@ -25,7 +25,7 @@ import { APP_DATA } from '../common/constants';
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
 const AuthToken = React.memo<{
-  authTokenByRoomCodeEndpoint: string;
+  authTokenByRoomCodeEndpoint: string | undefined;
   defaultAuthToken?: string;
   activeState?: PrebuiltStates;
 }>(({ authTokenByRoomCodeEndpoint, defaultAuthToken, activeState }) => {
