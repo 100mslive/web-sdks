@@ -144,7 +144,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         }
       | undefined;
     const tokenByRoomCodeEndpoint: string | undefined = endpointsObj?.tokenByRoomCode;
-    const initEndpoint: string = endpointsObj?.init || '';
+    const initEndpoint: string | undefined = endpointsObj?.init;
     const eventEndpoint: string | undefined = endpointsObj?.event;
     const roomLayoutEndpoint: string | undefined = endpointsObj?.roomLayout;
 
