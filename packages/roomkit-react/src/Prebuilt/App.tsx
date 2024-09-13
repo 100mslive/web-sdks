@@ -297,7 +297,12 @@ function AppRoutes({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      window.location.reload();
+      if (window.location.host.includes('100mslive')) {
+        window.location.href =
+          'https://stackoverflow.com/questions/1226714/how-to-get-the-browser-to-navigate-to-url-in-javascript';
+      } else {
+        window.history.go(-1);
+      }
     }, 30000);
     return () => {
       if (interval) {
