@@ -19,7 +19,7 @@ describe('remoteVideoTrack', () => {
     const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
     nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
-    track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular');
+    track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular', false);
     window.MediaStream = jest.fn().mockImplementation(() => ({
       addTrack: jest.fn(),
       // Add any method you want to mock
@@ -154,5 +154,67 @@ describe('remoteVideoTrack', () => {
     await track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
+  });
+});
+
+describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
+  let stream: HMSRemoteStream;
+  let sendOverApiDataChannelWithResponse: jest.Mock;
+  let track: HMSRemoteVideoTrack;
+  let nativeTrack: MediaStreamTrack;
+  let videoElement: HTMLVideoElement;
+  const trackId = 'test-track-id';
+
+  beforeEach(() => {
+    videoElement = document.createElement('video');
+    sendOverApiDataChannelWithResponse = jest.fn();
+    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    const nativeStream = new MediaStream();
+    stream = new HMSRemoteStream(nativeStream, connection);
+    nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
+    track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular', true); // disableNoneLayerRequest flag is set
+    track.setTrackId(trackId);
+
+    window.MediaStream = jest.fn().mockImplementation(() => ({
+      addTrack: jest.fn(),
+    }));
+  });
+
+  const expectLayersSent = (layers: HMSSimulcastLayer[]) => {
+    const allCalls = sendOverApiDataChannelWithResponse.mock.calls;
+    expect(allCalls.length).toBe(layers.length);
+    for (let i = 0; i < allCalls.length; i++) {
+      const data = allCalls[i][0];
+      expect(data.params.max_spatial_layer).toBe(layers[i]);
+    }
+  };
+
+  const sfuDegrades = () => {
+    track.setLayerFromServer({
+      subscriber_degraded: true,
+      expected_layer: HMSSimulcastLayer.HIGH,
+      current_layer: HMSSimulcastLayer.NONE,
+      publisher_degraded: false,
+      track_id: trackId,
+    });
+  };
+
+  const expectDegradationLayerAndSink = (isDegraded: boolean, layer: HMSSimulcastLayer, hasSink: boolean) => {
+    expect(track.degraded).toBe(isDegraded);
+    expect(track.getLayer()).toBe(layer);
+    expect(track.hasSinks()).toBe(hasSink);
+  };
+
+  const expectDegradedHighRequested = (layer = HMSSimulcastLayer.HIGH) => {
+    expectDegradationLayerAndSink(true, layer, true);
+  };
+
+  test('should not request NONE layer when disableNoneLayerRequest is true', async () => {
+    await track.addSink(videoElement);
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
+
+    sfuDegrades();
+    expectDegradedHighRequested();
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
   });
 });
