@@ -33,7 +33,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         transition: 'all 0.3s ease-in-out',
         '@md': {
           '& video': {
-            height: props.fullscreen ? '' : '$60 !important',
+            height: props.isFullScreen ? '' : '$60 !important',
           },
         },
         '& video::cue': {
