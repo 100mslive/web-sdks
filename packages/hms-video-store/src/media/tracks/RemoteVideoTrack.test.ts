@@ -199,11 +199,19 @@ describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
     });
   };
 
-  test('should not request NONE layer when disableNoneLayerRequest is true', async () => {
+  test('disableNoneLayerRequest - degradation', async () => {
     await track.addSink(videoElement);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
     sfuDegrades();
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
+  });
+
+  test('disableNoneLayerRequest - mute and removeSink', async () => {
+    track.setEnabled(false);
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
+
+    await track.removeSink(videoElement);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
   });
 });
