@@ -57,6 +57,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '');
   const pluginLoadingRef = useRef(false);
+  const isBlurSupported = VBHandler?.isBlurSupported();
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
@@ -190,7 +191,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                 await VBHandler?.setBlur(blurAmount);
                 hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.BLUR);
               },
-              supported: isEffectsSupported && isEffectsEnabled,
+              supported: isBlurSupported,
             },
           ]}
           activeBackground={background}
@@ -198,7 +199,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
 
         {/* Slider */}
         <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
-          {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+          {background === HMSVirtualBackgroundTypes.BLUR && isBlurSupported ? (
             <Box>
               <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
                 Blur intensity
