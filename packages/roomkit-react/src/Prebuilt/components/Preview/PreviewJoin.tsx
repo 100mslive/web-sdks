@@ -139,7 +139,6 @@ const PreviewJoin = ({
       <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
         <Text>effectsKey: {effectsKey}</Text>
         <Text>effectsEnabled: {effectsEnabled.toString()}</Text>
-        <Text>userAgent: {navigator.userAgent}</Text>
 
         <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '$8' }}>
           <Logo />
