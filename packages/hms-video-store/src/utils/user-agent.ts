@@ -52,8 +52,8 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     const deviceVendor = replaceSpaces(`${parsedDevice.vendor}_${parsedDevice.type}`);
     device_model = `${deviceVendor}/${browser}`;
   }
-  alert(device_model);
-  return convertObjectToString({
+
+  const userAgentString = convertObjectToString({
     os,
     os_version,
     sdk,
@@ -66,6 +66,8 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     framework_version: frameworkInfo?.version,
     framework_sdk_version: frameworkInfo?.sdkVersion,
   });
+  alert(`${device_model}^${userAgentString}`);
+  return userAgentString;
 }
 
 function replaceSpaces(s: string) {
