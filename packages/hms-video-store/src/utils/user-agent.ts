@@ -52,7 +52,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     const deviceVendor = replaceSpaces(`${parsedDevice.vendor}_${parsedDevice.type}`);
     device_model = `${deviceVendor}/${browser}`;
   }
-
+  alert(device_model);
   return convertObjectToString({
     os,
     os_version,
