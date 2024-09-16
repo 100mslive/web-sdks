@@ -9,7 +9,6 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { isMobile } from '../utils/support';
 import { sleep } from '../utils/timer-utils';
 
 /**
@@ -50,6 +49,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -101,29 +101,17 @@ export class AudioSinkManager {
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
 
   private handleAudioPaused = async (event: any) => {
-    const audioEl = event.target as HTMLAudioElement;
-    //@ts-ignore
-    const track = audioEl.srcObject?.getAudioTracks()[0];
-    if (!track?.enabled) {
-      // No need to play if already disabled
-      return;
-    }
-    // this means the audio paused because of external factors(headset removal)
+    // this means the audio paused because of external factors(headset removal, incoming phone call)
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
-      if (isMobile()) {
-        // Play after a delay since mobile devices don't call onDevice change event
-        await sleep(500);
-        this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
-      } else {
-        this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
-      }
+      this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
     }
   };
 
@@ -161,7 +149,6 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    await this.autoSelectAudioOutput();
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -262,41 +249,6 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
-    }
-  };
-
-  /**
-   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
-   */
-  // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
-    if (this.audioSink?.children.length === 0) {
-      let bluetoothDevice: InputDeviceInfo | null = null;
-      let speakerPhone: InputDeviceInfo | null = null;
-      let wired: InputDeviceInfo | null = null;
-      let earpiece: InputDeviceInfo | null = null;
-
-      for (const device of this.deviceManager.audioInput) {
-        if (device.label.toLowerCase().includes('speakerphone')) {
-          speakerPhone = device;
-        }
-        if (device.label.toLowerCase().includes('wired')) {
-          wired = device;
-        }
-        if (device.label.toLowerCase().includes('bluetooth')) {
-          bluetoothDevice = device;
-        }
-        if (device.label.toLowerCase().includes('earpiece')) {
-          earpiece = device;
-        }
-      }
-      const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-      if (localAudioTrack && earpiece) {
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
-        await localAudioTrack.setSettings({
-          deviceId: bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId,
-        });
-      }
     }
   };
 }

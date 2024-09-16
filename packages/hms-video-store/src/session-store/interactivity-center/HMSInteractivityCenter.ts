@@ -10,6 +10,7 @@ import {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
+  HMSPollQuestionResponse,
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
   HMSPollStates,
@@ -132,9 +133,10 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       throw new Error('Invalid poll ID - Poll not found');
     }
 
-    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
+    const localPeerPermissions = this.store.getLocalPeer()?.role?.permissions;
+    const canViewSummary = !!(localPeerPermissions?.pollRead || localPeerPermissions?.pollWrite);
 
-    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
+    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canViewSummary) {
       return { entries: [], hasNext: false };
     }
     const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
@@ -165,6 +167,39 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
   }
 
+  async getPollResponses(poll: HMSPoll, self: boolean) {
+    const serverResponseParams = await this.transport.signal.getPollResponses({
+      poll_id: poll.id,
+      index: 0,
+      count: 50,
+      self,
+    });
+    const pollCopy = JSON.parse(JSON.stringify(poll));
+    serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+      const question = poll?.questions?.find(question => question.index === response.question);
+      if (question) {
+        const pollResponse: HMSPollQuestionResponse = {
+          id: response.response_id,
+          questionIndex: response.question,
+          option: response.option,
+          options: response.options,
+          text: response.text,
+          responseFinal: final,
+          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+          skipped: response.skipped,
+          type: response.type,
+          update: response.update,
+        };
+        const existingResponses = question.responses && !self ? [...question.responses] : [];
+
+        if (pollCopy.questions?.[response.question - 1]) {
+          pollCopy.questions[response.question - 1].responses = [...existingResponses, pollResponse];
+        }
+      }
+    });
+    this.store.setPoll(pollCopy);
+    this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, [pollCopy]);
+  }
   async getPolls(): Promise<HMSPoll[]> {
     const launchedPollsList = await this.transport.signal.getPollsList({ count: 50, state: 'started' });
     const polls: HMSPoll[] = [];
@@ -199,10 +234,23 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return polls;
   }
 
+  // eslint-disable-next-line complexity
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {
+    // early return if the question has been saved before in a draft
+    if (questionParams.index) {
+      const optionsWithIndex = questionParams.options?.map((option, index) => {
+        return { ...option, index: index + 1 };
+      });
+      return {
+        question: { ...questionParams, index: index + 1 },
+        options: optionsWithIndex,
+        answer: questionParams.answer,
+      };
+    }
     const question: PollQuestionParams['question'] = { ...questionParams, index: index + 1 };
     let options: HMSPollQuestionOption[] | undefined;
     const answer: HMSPollQuestionAnswer = questionParams.answer || { hidden: false };
+
     if (
       Array.isArray(questionParams.options) &&
       [HMSPollQuestionType.SINGLE_CHOICE, HMSPollQuestionType.MULTIPLE_CHOICE].includes(questionParams.type)
@@ -213,7 +261,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         weight: option.weight,
       }));
 
-      delete answer?.text;
       if (questionParams.type === HMSPollQuestionType.SINGLE_CHOICE) {
         answer.option = questionParams.options.findIndex(option => option.isCorrectAnswer) + 1 || undefined;
       } else {

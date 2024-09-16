@@ -13,9 +13,12 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
+import { HMSDiagnosticsConnectivityListener } from '../diagnostics/interfaces';
+import { FeedbackService, HMSSessionFeedback, HMSSessionInfo } from '../end-call-feedback';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -28,6 +31,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSPeerType,
   HMSPlaylistSettings,
   HMSPlaylistType,
   HMSPreviewConfig,
@@ -47,7 +51,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import { PlaylistManager } from '../internal';
+import { PlaylistManager, TranscriptionConfig } from '../internal';
 import { joinMachine } from '../machines/joinMachine';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
@@ -59,21 +63,29 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, PeerLeaveRequestNotification, SendMessage } from '../notification-manager';
+import {
+  HMSNotificationMethod,
+  PeerLeaveRequestNotification,
+  PeerNotificationInfo,
+  SendMessage,
+} from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  FindPeerByNameRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
   StartRTMPOrRecordingRequestParams,
+  StartTranscriptionRequestParams,
 } from '../signal/interfaces';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { getAnalyticsDeviceId } from '../utils/analytics-deviceId';
 import {
   DEFAULT_PLAYLIST_AUDIO_BITRATE,
   DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -100,19 +112,21 @@ const INITIAL_STATE = {
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport;
   private readonly TAG = '[HMSSdk]:';
-  private listener?: HMSUpdateListener;
+  public listener?: HMSUpdateListener;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
   public store!: Store;
   private notificationManager?: NotificationManager;
-  private deviceManager!: DeviceManager;
+  /** @internal */
+  public deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private playlistManager!: PlaylistManager;
   private audioOutput!: AudioOutputManager;
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
-  private localTrackManager!: LocalTrackManager;
+  /** @internal */
+  public localTrackManager!: LocalTrackManager;
   private analyticsEventsService!: AnalyticsEventsService;
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
@@ -120,8 +134,18 @@ export class HMSSdk implements HMSInterface {
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private interactivityCenter!: InteractivityCenter;
+  private pluginUsageTracker!: PluginUsageTracker;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private isDiagnostics = false;
+  /**
+   * will be set post join
+   * this will not be reset on leave but after feedback success
+   * we will just clean token after successful submit feedback
+   * will be replaced when a newer join happens.
+   */
+  private sessionPeerInfo?: HMSSessionInfo;
+
   private playlistSettings: HMSPlaylistSettings = {
     video: {
       bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
@@ -131,6 +155,33 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
+  private setSessionPeerInfo(websocketURL: string, peer?: HMSLocalPeer) {
+    const room = this.store.getRoom();
+    if (!peer || !room) {
+      HMSLogger.e(this.TAG, 'setSessionPeerInfo> Local peer or room is undefined');
+      return;
+    }
+    this.sessionPeerInfo = {
+      peer: {
+        peer_id: peer.peerId,
+        role: peer.role?.name,
+        joined_at: peer.joinedAt?.valueOf() || 0,
+        room_name: room.name,
+        session_started_at: room.startedAt?.valueOf() || 0,
+        user_data: peer.customerUserId,
+        user_name: peer.name,
+        template_id: room.templateId,
+        session_id: room.sessionId,
+        token: this.store.getConfig()?.authToken,
+      },
+      agent: this.store.getUserAgent(),
+      device_id: getAnalyticsDeviceId(),
+      cluster: {
+        websocket_url: websocketURL,
+      },
+      timestamp: Date.now(),
+    };
+  }
   private initNotificationManager() {
     if (!this.notificationManager) {
       this.notificationManager = new NotificationManager(
@@ -143,7 +194,13 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private initStoreAndManagers() {
+  /** @internal */
+  initStoreAndManagers(listener: HMSPreviewListener | HMSUpdateListener | HMSDiagnosticsConnectivityListener) {
+    this.listener = listener as unknown as HMSUpdateListener;
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.store?.setErrorListener(this.errorListener);
+
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
@@ -151,12 +208,15 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       this.interactivityCenter.setListener(this.listener);
+      this.transport.setListener(this.listener);
       return;
     }
 
     this.sdkState.isInitialised = true;
     this.store = new Store();
+    this.store.setErrorListener(this.errorListener);
     this.eventBus = new EventBus();
+    this.pluginUsageTracker = new PluginUsageTracker(this.eventBus);
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
@@ -180,16 +240,21 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+      this.pluginUsageTracker,
     );
+    // add diagnostics callbacks if present
+    if ('onInitSuccess' in listener) {
+      this.transport.setConnectivityListener(listener);
+    }
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
-
     /**
      * Note: Subscribe to events here right after creating stores and managers
      * to not miss events that are published before the handlers are subscribed.
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
@@ -231,6 +296,10 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getTranscriptionState() {
+    return this.store.getRoom()?.transcriptions;
   }
 
   getTemplateAppData() {
@@ -400,16 +469,9 @@ export class HMSSdk implements HMSInterface {
         resolve();
       };
 
-      const errorHandler = (ex?: HMSException) => {
-        this.analyticsTimer.end(TimedEvent.PREVIEW);
-        ex && this.errorListener?.onError(ex);
-        this.sendPreviewAnalyticsEvent(ex);
-        this.sdkState.isPreviewInProgress = false;
-        reject(ex as HMSException);
-      };
-
       this.eventBus.policyChange.subscribeOnce(policyHandler);
-      this.eventBus.leave.subscribeOnce(errorHandler);
+      this.eventBus.leave.subscribeOnce(this.handlePreviewError);
+      this.eventBus.leave.subscribeOnce(ex => reject(ex as HMSException));
 
       this.transport
         .preview(
@@ -418,6 +480,7 @@ export class HMSSdk implements HMSInterface {
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
+          config.iceServers,
         )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
@@ -428,9 +491,19 @@ export class HMSSdk implements HMSInterface {
             });
           }
         })
-        .catch(errorHandler);
+        .catch(ex => {
+          this.handlePreviewError(ex);
+          reject(ex);
+        });
     });
   }
+
+  private handlePreviewError = (ex?: HMSException) => {
+    this.analyticsTimer.end(TimedEvent.PREVIEW);
+    ex && this.errorListener?.onError(ex);
+    this.sendPreviewAnalyticsEvent(ex);
+    this.sdkState.isPreviewInProgress = false;
+  };
 
   private async midCallPreview(asRole?: string, settings?: InitialSettings): Promise<void> {
     if (!this.localPeer || this.transportState !== TransportState.Joined) {
@@ -500,6 +573,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -508,13 +582,14 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
+    // remove terminal error handling from preview(do not send preview.failed after join on disconnect)
+    this.eventBus?.leave?.unsubscribe(this.handlePreviewError);
     this.analyticsTimer.start(TimedEvent.JOIN);
     this.sdkState.isJoinInProgress = true;
 
     const { roomId, userId, role } = decodeJWT(config.authToken);
     const previewRole = this.localPeer?.asRole?.name || this.localPeer?.role?.name;
     this.networkTestManager?.stop();
-    this.listener = listener;
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
@@ -607,6 +682,7 @@ export class HMSSdk implements HMSInterface {
   private cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
@@ -646,16 +722,19 @@ export class HMSSdk implements HMSInterface {
         await workerSleep(100);
       }
       const roomId = room.id;
+      // setSessionJoin
+      this.setSessionPeerInfo(this.transport.getWebsocketEndpoint() || '', this.localPeer);
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);
-      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
+      const peerId = this.localPeer?.peerId;
+      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}, peerId=${peerId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave(notifyServer);
       this.cleanup();
-      HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
+      HMSLogger.d(this.TAG, `✅ Left room ${roomId}, peerId=${peerId}`);
     }
   }
 
@@ -729,17 +808,79 @@ export class HMSSdk implements HMSInterface {
     let recipientPeer = this.store.getPeerById(peerId);
     if (!recipientPeer) {
       if (isLargeRoom) {
-        const { peers } = await this.transport.signal.findPeers({ peers: [peerId], limit: 1 });
-        if (peers.length === 0) {
+        const peer = await this.transport.signal.getPeer({ peer_id: peerId });
+        if (!peer) {
           throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
         }
-        recipientPeer = createRemotePeer(peers[0], this.store);
+        recipientPeer = createRemotePeer(peer, this.store);
       } else {
         throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
       }
     }
 
     return await this.sendMessageInternal({ message, recipientPeer, type });
+  }
+  async submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string) {
+    if (!this.sessionPeerInfo) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> session is undefined');
+      throw new Error('session is undefined');
+    }
+    const token = this.sessionPeerInfo.peer.token;
+    if (!token) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> token is undefined');
+      throw new Error('Internal error, token is not present');
+    }
+    try {
+      await FeedbackService.sendFeedback({
+        token: token,
+        info: this.sessionPeerInfo,
+        feedback,
+        eventEndpoint,
+      });
+      HMSLogger.i(this.TAG, 'submitSessionFeedback> submitted feedback');
+      this.sessionPeerInfo = undefined;
+    } catch (e) {
+      HMSLogger.e(this.TAG, 'submitSessionFeedback> error occured ', e);
+      throw new Error('Unable to submit feedback');
+    }
+  }
+  async getPeer(peerId: string) {
+    const response = await this.transport.signal.getPeer({ peer_id: peerId });
+    if (response) {
+      return createRemotePeer(response, this.store);
+    }
+    return undefined;
+  }
+
+  async findPeerByName({ query, limit = 10, offset }: FindPeerByNameRequestParams) {
+    const {
+      peers,
+      offset: responseOffset,
+      eof,
+    } = await this.transport.signal.findPeerByName({ query: query?.toLowerCase(), limit, offset });
+    if (peers.length > 0) {
+      return {
+        offset: responseOffset,
+        eof,
+        peers: peers.map(peerInfo => {
+          return createRemotePeer(
+            {
+              peer_id: peerInfo.peer_id,
+              role: peerInfo.role,
+              groups: [],
+              info: {
+                name: peerInfo.name,
+                data: '',
+                user_id: '',
+                type: peerInfo.type,
+              },
+            } as PeerNotificationInfo,
+            this.store,
+          );
+        }),
+      };
+    }
+    return { offset: responseOffset, peers: [] };
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
@@ -789,6 +930,9 @@ export class HMSSdk implements HMSInterface {
       });
       return;
     }
+    this.transport.setOnScreenshareStop(() => {
+      this.stopEndedScreenshare(onStop);
+    });
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
@@ -882,6 +1026,11 @@ export class HMSSdk implements HMSInterface {
 
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {
     this.notificationManager?.setConnectionQualityListener(qualityListener);
+  }
+
+  /** @internal */
+  setIsDiagnostics(isDiagnostics: boolean) {
+    this.isDiagnostics = isDiagnostics;
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
@@ -1014,6 +1163,35 @@ export class HMSSdk implements HMSInterface {
       await this.transport?.signal.stopHLSStreaming(hlsParams);
     }
     await this.transport?.signal.stopHLSStreaming();
+  }
+
+  async startTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start transcriptions',
+      );
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.startTranscription(transcriptionParams);
+  }
+
+  async stopTranscription(params: TranscriptionConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop transcriptions',
+      );
+    }
+    if (!params) {
+      throw ErrorFactory.GenericErrors.Signalling(HMSAction.VALIDATION, 'No mode is passed to stop the transcription');
+    }
+    const transcriptionParams: StartTranscriptionRequestParams = {
+      mode: params.mode,
+    };
+    await this.transport?.signal.stopTranscription(transcriptionParams);
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
@@ -1166,6 +1344,7 @@ export class HMSSdk implements HMSInterface {
   private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
     await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+    await this.interactivityCenter.whiteboard.handleLocalRoleUpdate();
   };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -1211,7 +1390,8 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.cleanup();
   }
 
-  private initPreviewTrackAudioLevelMonitor() {
+  /** @internal */
+  initPreviewTrackAudioLevelMonitor() {
     const localAudioTrack = this.localPeer?.audioTrack;
     localAudioTrack?.initAudioLevelMonitor();
     this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {
@@ -1263,7 +1443,6 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
-    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
@@ -1319,6 +1498,7 @@ export class HMSSdk implements HMSInterface {
       role: policy,
       // default value is the original role if user didn't pass asRole in config
       asRole: asRolePolicy || policy,
+      type: HMSPeerType.REGULAR,
     });
 
     this.store.addPeer(localPeer);
@@ -1335,10 +1515,8 @@ export class HMSSdk implements HMSInterface {
     if (!config.initEndpoint) {
       config.initEndpoint = 'https://prod-init.100ms.live';
     }
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-    this.store.setErrorListener(this.errorListener);
+
+    this.initStoreAndManagers(listener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId));
     }
@@ -1365,7 +1543,8 @@ export class HMSSdk implements HMSInterface {
    * @returns
    */
   private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
-    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
+    const isOptimizedScreenShare = this.transport.isFlagEnabled(InitFlags.FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS);
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config, isOptimizedScreenShare);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);
@@ -1394,13 +1573,19 @@ export class HMSSdk implements HMSInterface {
     return tracks;
   }
 
+  private unpauseRemoteVideoTracks = () => {
+    this.store.getRemoteVideoTracks().forEach(track => track.handleTrackUnmute());
+  };
+
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
     HMSLogger.w(this.TAG, 'Audio Presence Failure', this.transportState, error);
     // this.sendAnalyticsEvent(
     //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
     // );
-    // this.listener?.onError(error);
+    if (this.isDiagnostics) {
+      this.listener?.onError(error);
+    }
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {
@@ -1426,6 +1611,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
+    // don't send analytics for diagnostics
+    if (this.isDiagnostics) {
+      return;
+    }
     this.analyticsEventsService.queue(event).flush();
   };
 

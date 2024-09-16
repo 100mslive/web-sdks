@@ -7,7 +7,7 @@ import { HMSConnectionRole } from '../model';
 
 export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
-  private readonly observer: IPublishConnectionObserver;
+  protected readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
   readonly channel: RTCDataChannel;
 
@@ -23,6 +23,7 @@ export default class HMSPublishConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
+        this.observer.onIceCandidate(candidate);
         signal.trickle(this.role, candidate);
       }
     };
@@ -31,7 +32,6 @@ export default class HMSPublishConnection extends HMSConnection {
       this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
 
-    // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     this.nativeConnection.onconnectionstatechange = () => {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
 
@@ -48,6 +48,11 @@ export default class HMSPublishConnection extends HMSConnection {
         };
       }
     };
+  }
+
+  close() {
+    super.close();
+    this.channel.close();
   }
 
   initAfterJoin() {

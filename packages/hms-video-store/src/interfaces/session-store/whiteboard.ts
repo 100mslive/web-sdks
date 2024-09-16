@@ -15,9 +15,21 @@ export interface HMSWhiteboard {
   open?: boolean; // whether whiteboard is open or not
   title?: string;
   owner?: string; // user id for whiteboard owner
-  addr?: string; // address to be used to connect to whiteboard service
-  token?: string; // security token to be used for whiteboard API
   permissions?: Array<HMSPermissionType>;
   presence?: boolean;
   attributes?: Array<{ name: string; value: unknown }>;
+  /**
+   * the URL that needs to be used as the iframe src
+   */
+  url?: string;
+  /**
+   * address to be used to connect to whiteboard grpc communication service
+   * @internal
+   */
+  addr?: string;
+  /**
+   *  security token to be used for whiteboard API
+   * @internal
+   */
+  token?: string;
 }

@@ -5,7 +5,7 @@ const StyledFieldset = styled('fieldset', {
   alignItems: 'center',
   justifyContent: 'space-between',
   border: 'none',
-  backgroundColor: '$transparent',
+  backgroundColor: 'transparent',
 });
 
 export const Fieldset = StyledFieldset;

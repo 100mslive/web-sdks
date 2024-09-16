@@ -1,4 +1,4 @@
-import { HMSPeerWithMuteStatus } from '@100mslive/hms-video-store';
+import { HMSPeerType, HMSPeerWithMuteStatus } from '@100mslive/react-sdk';
 
 let counter = 1;
 export const makeFakeParticipant = (name: string, role = 'Student'): HMSPeerWithMuteStatus => {
@@ -11,6 +11,7 @@ export const makeFakeParticipant = (name: string, role = 'Student'): HMSPeerWith
       isLocal: counter === 1,
       groups: [],
       isHandRaised: false,
+      type: HMSPeerType.REGULAR,
     },
     isAudioEnabled: false,
   };

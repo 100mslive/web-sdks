@@ -17,15 +17,34 @@ import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Pop
 import { Sheet } from '../../../Sheet';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore
-import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
-import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useRecordingHandler } from '../../common/hooks';
 // @ts-ignore
 import { formatTime } from '../../common/utils';
-// @ts-ignore
-import { APP_DATA } from '../../common/constants';
+
+export const getRecordingText = (
+  {
+    isBrowserRecordingOn,
+    isServerRecordingOn,
+    isHLSRecordingOn,
+  }: { isBrowserRecordingOn: boolean; isServerRecordingOn: boolean; isHLSRecordingOn: boolean },
+  delimiter = ', ',
+) => {
+  if (!isBrowserRecordingOn && !isServerRecordingOn && !isHLSRecordingOn) {
+    return '';
+  }
+  const title: string[] = [];
+  if (isBrowserRecordingOn) {
+    title.push('Browser');
+  }
+  if (isServerRecordingOn) {
+    title.push('Server');
+  }
+  if (isHLSRecordingOn) {
+    title.push('HLS');
+  }
+  return title.join(delimiter);
+};
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -42,7 +61,7 @@ export const LiveStatus = () => {
         setLiveTime(Date.now() - timeStamp.getTime());
       }
     }, 1000);
-  }, [hlsState?.running, hlsState?.variants]);
+  }, [hlsState?.running, hlsState?.variants, screenType]);
 
   useEffect(() => {
     if (hlsState?.running) {
@@ -147,7 +166,7 @@ export const RecordingPauseStatus = () => {
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
   const [open, setOpen] = useState(false);
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const { startRecording, recordingStarted } = useRecordingHandler();
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording || isHLSRunning) {
@@ -201,26 +220,7 @@ const StartRecording = () => {
       icon
       disabled={recordingStarted || isStreamingOn}
       onClick={async () => {
-        try {
-          setRecordingState(true);
-          await hmsActions.startRTMPOrRecording({
-            record: true,
-          });
-        } catch (error) {
-          const err = error as Error;
-          if (err.message.includes('stream already running')) {
-            ToastManager.addToast({
-              title: 'Recording already running',
-              variant: 'error',
-            });
-          } else {
-            ToastManager.addToast({
-              title: err.message,
-              variant: 'error',
-            });
-          }
-          setRecordingState(false);
-        }
+        await startRecording();
       }}
     >
       {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}
@@ -241,7 +241,6 @@ export const StreamActions = () => {
 
   return (
     <Flex align="center" css={{ gap: '$4' }}>
-      <AdditionalRoomState />
       {!isMobile && (
         <Flex align="center" css={{ gap: '$4' }}>
           <RecordingPauseStatus />

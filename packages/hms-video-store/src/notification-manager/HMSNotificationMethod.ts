@@ -28,11 +28,13 @@ export enum HMSNotificationMethod {
   RTMP_UPDATE = 'on-rtmp-update',
   RECORDING_UPDATE = 'on-record-update',
   HLS_UPDATE = 'on-hls-update',
+  TRANSCRIPTION_UPDATE = 'on-transcription-update',
   METADATA_CHANGE = 'on-metadata-change',
   POLL_START = 'on-poll-start',
   POLL_STOP = 'on-poll-stop',
   POLL_STATS = 'on-poll-stats',
   ROOM_INFO = 'room-info',
   SESSION_INFO = 'session-info',
+  NODE_INFO = 'node-info',
   WHITEBOARD_UPDATE = 'on-whiteboard-update',
 }

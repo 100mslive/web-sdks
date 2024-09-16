@@ -20,6 +20,7 @@ export interface HMSInteractivityCenter {
   stopPoll(pollID: string): Promise<void>;
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
   fetchLeaderboard(pollID: string, offset: number, count: number): Promise<HMSQuizLeaderboardResponse>;
+  getPollResponses(poll: HMSPoll, self: boolean): Promise<void>;
   getPolls(): Promise<HMSPoll[]>;
   /** @alpha */
   whiteboard: HMSWhiteboardInteractivityCenter;

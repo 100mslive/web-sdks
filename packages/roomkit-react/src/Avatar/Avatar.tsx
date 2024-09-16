@@ -47,14 +47,14 @@ type Props = VariantProps<typeof StyledAvatar> &
   };
 
 export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
-  const { initials } = getAvatarBg(name);
-  let { color } = getAvatarBg(name);
+  const info = getAvatarBg(name);
+  let { color } = info;
   if (!name) {
     color = '#7E47EB';
   }
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
-      {initials || <PersonIcon height={40} width={40} />}
+      {info.initials || <PersonIcon height={40} width={40} />}
     </StyledAvatar>
   );
 };

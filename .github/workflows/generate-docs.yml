@@ -1,6 +1,10 @@
 name: Update API Reference
 on:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      DOCKER_GIT_TOKEN: 
+        required: true
 
 jobs:
   generate_api_reference:

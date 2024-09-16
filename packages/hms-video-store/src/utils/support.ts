@@ -29,4 +29,7 @@ export const isPageHidden = () => typeof document !== 'undefined' && document.hi
 
 export const isIOS = () => parsedUserAgent.getOS().name?.toLowerCase() === 'ios';
 
+// safari for mac and mobile safari for iOS
+export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('safari');
+
 export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'firefox';

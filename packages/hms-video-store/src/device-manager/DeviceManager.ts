@@ -4,6 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
+import { isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -33,6 +34,8 @@ export class DeviceManager implements HMSDeviceManager {
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
+  private earpieceSelected = false;
+  private timer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private store: Store,
@@ -89,25 +92,33 @@ export class DeviceManager implements HMSDeviceManager {
     return newDevice;
   };
 
-  async init(force = false) {
+  async init(force = false, logAnalytics = true) {
     if (this.initialized && !force) {
       return;
     }
     !this.initialized && navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     this.initialized = true;
     await this.enumerateDevices();
+    // do it only on initial load.
+    if (!force) {
+      await this.updateToActualDefaultDevice();
+      await this.autoSelectAudioOutput();
+      this.startPollingForDevices();
+    }
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.deviceChange({
-        selection: this.getCurrentSelection(),
-        type: 'list',
-        devices: this.getDevices(),
-      }),
-    );
+    if (logAnalytics) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: this.getCurrentSelection(),
+          type: 'list',
+          devices: this.getDevices(),
+        }),
+      );
+    }
   }
 
   getDevices(): DeviceMap {
@@ -120,6 +131,11 @@ export class DeviceManager implements HMSDeviceManager {
 
   cleanup() {
     this.initialized = false;
+    this.earpieceSelected = false;
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
     this.audioInput = [];
     this.audioOutput = [];
     this.videoInput = [];
@@ -189,15 +205,36 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
+  /**
+   * For example, if a different device, say OBS is selected as default from chrome settings, when you do getUserMedia with default, that is not the device
+   * you get. So update to the browser settings default device
+   * Update only when initial deviceId is not passed
+   */
+  private updateToActualDefaultDevice = async () => {
+    const localPeer = this.store.getLocalPeer();
+    const videoDeviceId = this.store.getConfig()?.settings?.videoDeviceId;
+    if (!videoDeviceId && localPeer?.videoTrack) {
+      await localPeer.videoTrack.setSettings({ deviceId: this.videoInput[0]?.deviceId }, true);
+    }
+    const audioDeviceId = this.store.getConfig()?.settings?.audioInputDeviceId;
+    if (!audioDeviceId && localPeer?.audioTrack) {
+      const getInitialDeviceId = () => {
+        const nonIPhoneDevice = this.audioInput.find(device => !device.label.toLowerCase().includes('iphone'));
+        return isIOS() && nonIPhoneDevice ? nonIPhoneDevice?.deviceId : this.getNewAudioInputDevice()?.deviceId;
+      };
+      const deviceIdToUpdate = getInitialDeviceId();
+      if (deviceIdToUpdate) {
+        await localPeer.audioTrack.setSettings({ deviceId: getInitialDeviceId() }, true);
+      }
+    }
+  };
+
   private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
-    if (audioTrack) {
-      await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    }
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
@@ -215,16 +252,12 @@ export class DeviceManager implements HMSDeviceManager {
    * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
-    const localPeer = this.store.getLocalPeer();
-    const audioTrack = localPeer?.audioTrack;
-    const manualSelection = this.audioInput.find(
-      device => device.deviceId === audioTrack?.getManuallySelectedDeviceId(),
-    );
+    const manualSelection = this.getManuallySelectedAudioDevice();
     if (manualSelection) {
       return manualSelection;
     }
     // if manually selected device is not available, reset on the track
-    audioTrack?.resetManuallySelectedDeviceId();
+    this.store.getLocalPeer()?.audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
@@ -309,6 +342,7 @@ export class DeviceManager implements HMSDeviceManager {
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
       .deviceId(newSelection.deviceId)
+      .audioMode(settings.audioMode)
       .build();
     try {
       await audioTrack.setSettings(newAudioTrackSettings, true);
@@ -370,7 +404,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
-      await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
+      await videoTrack.setSettings(newVideoTrackSettings, true);
       // On replace track, enabled will be true. Need to be set to previous state
       // videoTrack.setEnabled(enabled); // TODO: remove this once verified on qa.
       this.eventBus.deviceChange.publish({
@@ -396,6 +430,86 @@ export class DeviceManager implements HMSDeviceManager {
         devices: this.getDevices(),
       } as HMSDeviceChangeEvent);
     }
+  };
+
+  getManuallySelectedAudioDevice() {
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    return this.audioInput.find(device => device.deviceId === audioTrack?.getManuallySelectedDeviceId());
+  }
+
+  // specifically used for mweb
+  categorizeAudioInputDevices() {
+    let bluetoothDevice: InputDeviceInfo | null = null;
+    let speakerPhone: InputDeviceInfo | null = null;
+    let wired: InputDeviceInfo | null = null;
+    let earpiece: InputDeviceInfo | null = null;
+
+    for (const device of this.audioInput) {
+      const label = device.label.toLowerCase();
+      if (label.includes('speakerphone')) {
+        speakerPhone = device;
+      } else if (label.includes('wired')) {
+        wired = device;
+      } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
+        bluetoothDevice = device;
+      } else if (label.includes('earpiece')) {
+        earpiece = device;
+      }
+    }
+
+    return { bluetoothDevice, speakerPhone, wired, earpiece };
+  }
+
+  private startPollingForDevices = () => {
+    // device change supported, no polling needed
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    this.timer = setTimeout(() => {
+      (async () => {
+        await this.enumerateDevices();
+        await this.autoSelectAudioOutput();
+        this.startPollingForDevices();
+      })();
+    }, 5000);
+  };
+
+  /**
+   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
+   */
+  // eslint-disable-next-line complexity
+  private autoSelectAudioOutput = async () => {
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
+    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+    if (!localAudioTrack || !earpiece) {
+      return;
+    }
+    const manualSelection = this.getManuallySelectedAudioDevice();
+    const externalDeviceID =
+      manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+    HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+    // already selected appropriate device
+    if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
+      return;
+    }
+    if (!this.earpieceSelected) {
+      if (bluetoothDevice?.deviceId === externalDeviceID) {
+        this.earpieceSelected = true;
+        return;
+      }
+      await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+      this.earpieceSelected = true;
+    }
+    await localAudioTrack.setSettings(
+      {
+        deviceId: externalDeviceID,
+      },
+      true,
+    );
   };
 
   // eslint-disable-next-line complexity

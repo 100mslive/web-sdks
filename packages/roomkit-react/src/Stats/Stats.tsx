@@ -13,6 +13,7 @@ import {
 import { Tooltip } from '../Tooltip';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
+import { useQoE } from './useQoE';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
@@ -33,6 +34,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
   const videoTrackStats = isLocal ? localVideoTrackStats?.[0] : remoteVideoTrackStats;
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   const availableOutgoingBitrate = useHMSStatsStore(selectHMSStats.availablePublishBitrate);
+  const qoe = useQoE({ videoTrackID, audioTrackID, isLocal });
 
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
@@ -56,7 +58,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 }
                 const layer = stat.rid ? simulcastMapping[stat.rid as RID] : '';
                 return (
-                  <Fragment>
+                  <Fragment key={`${stat.id}${stat.rid}`}>
                     {layer && <StatsRow label={layer.toUpperCase()} value="" />}
                     <StatsRow
                       show={isNotNullishAndNot0(stat.frameWidth)}
@@ -87,6 +89,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             </Fragment>
           ) : (
             <Fragment>
+              <StatsRow show={isNotNullish(qoe)} label="QoE" value={qoe} />
               <StatsRow
                 show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
                 label="Width"
@@ -107,6 +110,16 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 }`}
               />
               <StatsRow
+                show={isNotNullish(videoTrackStats?.totalPausesDuration)}
+                label="Pauses Duration"
+                value={videoTrackStats?.totalPausesDuration}
+              />
+              <StatsRow
+                show={isNotNullish(videoTrackStats?.totalFreezesDuration)}
+                label="Freezes Duration"
+                value={videoTrackStats?.totalFreezesDuration}
+              />
+              <StatsRow
                 show={isNotNullish(videoTrackStats?.bitrate)}
                 label="Bitrate(V)"
                 value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
@@ -120,7 +133,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 
-          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={downlinkScore} />
+          <StatsRow show={isNotNullish(downlinkScore)} label="CQS" value={downlinkScore} />
 
           <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
 
@@ -185,7 +198,7 @@ const RawStatsRow = ({
   show?: boolean;
   tooltip?: string;
 }) => {
-  const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
+  const statsLabel = <Stats.Label>{label}</Stats.Label>;
 
   return (
     <>

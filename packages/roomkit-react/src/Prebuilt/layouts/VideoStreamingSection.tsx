@@ -1,21 +1,24 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
+import { ControlPosition } from 'react-draggable';
+import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
+  selectIsLocalScreenShared,
   selectLocalPeerRoleName,
-  selectPeerScreenSharing,
-  selectWhiteboard,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
+import { PeopleAddIcon, ShareScreenIcon } from '@100mslive/react-icons';
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
+import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -23,17 +26,12 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
-import { WhiteboardView } from './WhiteboardView';
-import {
-  usePDFConfig,
-  useUrlToEmbed,
-  useWaitingViewerRole,
-  // @ts-ignore: No implicit Any
-} from '../components/AppData/useUISettings';
-import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
+import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
+import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
+import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
+import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
-
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
@@ -46,16 +44,20 @@ export const VideoStreamingSection = ({
   elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
   hideControls: boolean;
 }) => {
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const isWhiteboardOpen = useHMSStore(selectWhiteboard)?.open;
+  const isSharingScreen = useHMSStore(selectIsLocalScreenShared);
 
   const hmsActions = useHMSActions();
-  const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobile = useMedia(config.media.md);
+  const [captionPosition, setCaptionPosition] = useState<ControlPosition>({ x: isMobile ? 0 : -200, y: 0 });
   useCloseScreenshareWhiteboard();
+
+  const { isNotAllowedToPublish, isScreenOnlyPublishParams, hasSubscribedRolePublishing } = useWaitingRoomInfo();
 
   useEffect(() => {
     if (!isConnected) {
@@ -71,29 +73,9 @@ export const VideoStreamingSection = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
 
-  if (!localPeerRole) {
+  if (!localPeerRoleName) {
     // we don't know the role yet to decide how to render UI
     return null;
-  }
-
-  let ViewComponent;
-  if (screenType === 'hls_live_streaming') {
-    ViewComponent = <HLSView />;
-  } else if (localPeerRole === waitingViewerRole) {
-    ViewComponent = <WaitingView />;
-  } else if (pdfAnnotatorActive) {
-    ViewComponent = <PDFView />;
-  } else if (urlToIframe) {
-    ViewComponent = <EmbedView />;
-  } else if (peerSharing) {
-    // screen share should take preference over whiteboard
-    //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
-  } else if (isWhiteboardOpen) {
-    ViewComponent = <WhiteboardView />;
-  } else {
-    //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
   }
 
   return (
@@ -102,11 +84,77 @@ export const VideoStreamingSection = ({
         css={{
           size: '100%',
           position: 'relative',
-          gap: '$4',
+          gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
         }}
+        direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
+          .with({ isLandscapeHLSStream: true }, () => 'row')
+          .with({ isMobileHLSStream: true }, () => 'column')
+          .otherwise(() => 'row')}
       >
-        {ViewComponent}
-        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip', '&:empty': { display: 'none' } }}>
+        {match({
+          screenType,
+          isNotAllowedToPublish,
+          isScreenOnlyPublishParams,
+          hasSubscribedRolePublishing,
+          isSharingScreen,
+          pdfAnnotatorActive,
+          urlToIframe,
+        })
+          .with(
+            {
+              screenType: 'hls_live_streaming',
+            },
+            () => <HLSView />,
+          )
+          .when(
+            ({ isNotAllowedToPublish, hasSubscribedRolePublishing }) =>
+              isNotAllowedToPublish && !hasSubscribedRolePublishing,
+            () => (
+              <WaitingView
+                title="Waiting for Host to join"
+                subtitle="Sit back and relax"
+                icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
+              />
+            ),
+          )
+          .when(
+            ({ isScreenOnlyPublishParams, isSharingScreen, hasSubscribedRolePublishing }) =>
+              isScreenOnlyPublishParams && !isSharingScreen && !hasSubscribedRolePublishing,
+            () => (
+              <WaitingView
+                title="Ready to present"
+                subtitle="Select the Screenshare button to start presenting"
+                icon={<ShareScreenIcon width="56px" height="56px" style={{ color: 'white' }} />}
+              />
+            ),
+          )
+          .when(
+            ({ pdfAnnotatorActive }) => !!pdfAnnotatorActive,
+            () => <PDFView />,
+          )
+          .when(
+            ({ urlToIframe }) => !!urlToIframe,
+            () => <EmbedView />,
+          )
+
+          .otherwise(() => {
+            // @ts-ignore
+            return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
+          })}
+        <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
+        <Box
+          css={{
+            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+              .with({ isMobileHLSStream: true }, () => '2 1 0')
+              .otherwise(() => undefined),
+            position: 'relative',
+            height: !isMobileHLSStream ? '100%' : undefined,
+            maxHeight: '100%',
+            '&:empty': { display: 'none' },
+            overflowY: 'clip',
+          }}
+        >
           <SidePane
             screenType={screenType}
             // @ts-ignore

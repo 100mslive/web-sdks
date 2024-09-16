@@ -17,6 +17,7 @@ export enum HMSRoomUpdate {
   SERVER_RECORDING_STATE_UPDATED = 'SERVER_RECORDING_STATE_UPDATED',
   RTMP_STREAMING_STATE_UPDATED = 'RTMP_STREAMING_STATE_UPDATED',
   HLS_STREAMING_STATE_UPDATED = 'HLS_STREAMING_STATE_UPDATED',
+  TRANSCRIPTION_STATE_UPDATED = 'TRANSCRIPTION_STATE_UPDATED',
   ROOM_PEER_COUNT_UPDATED = 'ROOM_PEER_COUNT_UPDATED',
 }
 
@@ -54,7 +55,6 @@ export enum HMSPollsUpdate {
   POLL_STOPPED,
   POLLS_LIST,
   POLL_STATS_UPDATED,
-  // POLL_LEADERBOARD_SHARED,
 }
 
 export interface HMSAudioListener {
@@ -83,6 +83,7 @@ export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreLis
   onError(error: HMSException): void;
   onReconnecting(error: HMSException): void;
   onReconnected(): void;
+  onSFUMigration?: () => void;
   onRoleChangeRequest(request: HMSRoleChangeRequest): void;
   onRoleUpdate(newRole: string): void;
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;

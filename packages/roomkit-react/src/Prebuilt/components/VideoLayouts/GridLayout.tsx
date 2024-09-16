@@ -5,12 +5,15 @@ import {
   selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
+  selectWhiteboard,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
+import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
@@ -40,6 +43,7 @@ export const GridLayout = ({
   hide_metadata_on_tile = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
+  const whiteboard = useHMSStore(selectWhiteboard);
   const pinnedTrack = usePinnedTrack();
   const peers = useHMSStore(selectPeers);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
@@ -53,9 +57,9 @@ export const GridLayout = ({
       )) ||
     pinnedTrack;
   const updatedPeers = useMemo(() => {
-    // remove screenshare peer from active speaker sorting
-    if (activeScreensharePeerId) {
-      return peers.filter(peer => peer.id !== activeScreensharePeerId);
+    // remove screenshare/whiteboard peer from active speaker sorting
+    if (activeScreensharePeerId || whiteboard?.open) {
+      return peers.filter(peer => peer.id !== activeScreensharePeerId || peer.customerUserId !== whiteboard?.owner);
     }
     if (isInsetEnabled) {
       const isLocalPeerPinned = localPeerID === pinnedTrack?.peerId;
@@ -67,7 +71,16 @@ export const GridLayout = ({
       }
     }
     return peers;
-  }, [isInsetEnabled, activeScreensharePeerId, localPeerRole, localPeerID, prominentRoles, peers, pinnedTrack]);
+  }, [
+    isInsetEnabled,
+    whiteboard,
+    activeScreensharePeerId,
+    localPeerRole,
+    localPeerID,
+    prominentRoles,
+    peers,
+    pinnedTrack,
+  ]);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(updatedPeers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
@@ -97,6 +110,17 @@ export const GridLayout = ({
     return (
       <VideoTileContext.Provider value={tileLayout}>
         <ScreenshareLayout
+          peers={sortedPeers}
+          onPageSize={setPageSize}
+          onPageChange={setMainPage}
+          edgeToEdge={edge_to_edge}
+        />
+      </VideoTileContext.Provider>
+    );
+  } else if (whiteboard?.open) {
+    return (
+      <VideoTileContext.Provider value={tileLayout}>
+        <WhiteboardLayout
           peers={sortedPeers}
           onPageSize={setPageSize}
           onPageChange={setMainPage}

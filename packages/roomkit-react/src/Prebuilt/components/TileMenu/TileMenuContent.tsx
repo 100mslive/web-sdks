@@ -5,6 +5,7 @@ import {
   HMSSimulcastLayerDefinition,
   HMSTrackID,
   HMSVideoTrack,
+  selectAvailableRoleNames,
   selectPermissions,
   selectSessionStore,
   selectTrackByID,
@@ -17,6 +18,7 @@ import {
   MicOffIcon,
   MicOnIcon,
   PencilIcon,
+  PersonSettingsIcon,
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
@@ -39,7 +41,7 @@ import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { getDragClassName } from './utils';
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, isIOS, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
 export const isSameTile = ({
   trackId,
@@ -224,6 +226,9 @@ export const TileMenuContent = ({
   openNameChangeModal = () => {
     return;
   },
+  openRoleChangeModal = () => {
+    return;
+  },
 }: {
   videoTrackID: string;
   audioTrackID: string;
@@ -235,11 +240,15 @@ export const TileMenuContent = ({
   canMinimise?: boolean;
   closeSheetOnClick?: () => void;
   openNameChangeModal?: () => void;
+  openRoleChangeModal?: () => void;
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
-  const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
+  const permissions = useHMSStore(selectPermissions);
+  const canChangeRole = !!permissions?.changeRole;
+  const removeOthers = !!permissions?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
+  const roles = useHMSStore(selectAvailableRoleNames);
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
@@ -289,7 +298,7 @@ export const TileMenuContent = ({
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
           {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
-          <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
+          <span>{isVideoEnabled ? 'Mute Video' : 'Request to Unmute Video'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 
@@ -304,11 +313,26 @@ export const TileMenuContent = ({
           data-testid={isAudioEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
           {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
-          <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
+          <span>{isAudioEnabled ? 'Mute Audio' : 'Request to Unmute Audio'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 
-      {audioTrackID ? (
+      {!isScreenshare && canChangeRole && roles.length > 1 ? (
+        <StyledMenuTile.ItemButton
+          className={dragClassName}
+          css={spacingCSS}
+          onClick={() => {
+            openRoleChangeModal();
+            closeSheetOnClick();
+          }}
+          data-testid="change_role_btn"
+        >
+          <PersonSettingsIcon height={20} width={20} />
+          <span>Switch Role</span>
+        </StyledMenuTile.ItemButton>
+      ) : null}
+
+      {!isIOS && audioTrackID ? (
         <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
           <Flex align="center" gap={1}>
             <SpeakerIcon height={20} width={20} />

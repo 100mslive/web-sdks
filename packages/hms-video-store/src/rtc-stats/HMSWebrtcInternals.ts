@@ -17,20 +17,18 @@ export class HMSWebrtcInternals {
   constructor(
     private readonly store: Store,
     private readonly eventBus: EventBus,
-    private publishConnection?: RTCPeerConnection,
-    private subscribeConnection?: RTCPeerConnection,
   ) {}
-
-  getPublishPeerConnection() {
-    return this.publishConnection;
-  }
-
-  getSubscribePeerConnection() {
-    return this.subscribeConnection;
-  }
 
   getCurrentStats() {
     return this.hmsStats;
+  }
+
+  getPublishPeerConnection() {
+    return this.hmsStats?.getPublishPeerConnection();
+  }
+
+  getSubscribePeerConnection() {
+    return this.hmsStats?.getSubscribePeerConnection();
   }
 
   onStatsChange(statsChangeCb: (stats: HMSWebrtcStats) => void) {
@@ -42,7 +40,9 @@ export class HMSWebrtcInternals {
 
   private handleStatsUpdate = async () => {
     await this.hmsStats?.updateStats();
-    this.eventBus.statsUpdate.publish(this.hmsStats);
+    if (this.hmsStats) {
+      this.eventBus.statsUpdate.publish(this.hmsStats);
+    }
   };
 
   /**
@@ -50,17 +50,11 @@ export class HMSWebrtcInternals {
    * @internal
    */
   setPeerConnections({ publish, subscribe }: { publish?: RTCPeerConnection; subscribe?: RTCPeerConnection }) {
-    this.publishConnection = publish;
-    this.subscribeConnection = subscribe;
-
-    this.hmsStats = new HMSWebrtcStats(
-      {
-        publish: this.publishConnection?.getStats.bind(this.publishConnection),
-        subscribe: this.subscribeConnection?.getStats.bind(this.subscribeConnection),
-      },
-      this.store,
-      this.eventBus,
-    );
+    if (this.hmsStats) {
+      this.hmsStats.setPeerConnections({ publish, subscribe });
+    } else {
+      this.hmsStats = new HMSWebrtcStats(this.store, this.eventBus, publish, subscribe);
+    }
   }
 
   /**

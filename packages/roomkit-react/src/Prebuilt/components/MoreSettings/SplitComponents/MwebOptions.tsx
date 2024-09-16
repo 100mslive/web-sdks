@@ -1,32 +1,41 @@
 import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
+  HMSTranscriptionMode,
   selectIsConnectedToRoom,
+  selectIsLocalVideoEnabled,
+  selectIsTranscriptionAllowedByMode,
+  selectIsTranscriptionEnabled,
   selectPeerCount,
   selectPermissions,
-  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import {
   BrbIcon,
+  ClosedCaptionIcon,
   CrossIcon,
   EmojiIcon,
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
+  InfoIcon,
+  OpenCaptionIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
   RecordIcon,
   SettingsIcon,
+  VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
+import { NoiseCancellation } from '../../AudioVideoToggle';
 // @ts-ignore: No implicit any
 import { EmojiReaction } from '../../EmojiReaction';
 // @ts-ignore: No implicit any
@@ -37,23 +46,26 @@ import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
+import { CaptionModal } from '../CaptionModal';
 // @ts-ignore: No implicit any
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
+import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { useShowPolls } from '../../AppData/useUISettings';
+import { useSetIsCaptionEnabled, useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
-// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
+import { useLandscapeHLSStream, useMobileHLSStream, useRecordingHandler } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
-import { SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -65,6 +77,7 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+  CAPTION: 'caption',
 };
 
 export const MwebOptions = ({
@@ -83,18 +96,24 @@ export const MwebOptions = ({
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const { showPolls } = useShowPolls();
   const togglePollView = usePollViewToggle();
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
-  const { toggleAudio, toggleVideo } = useAVToggle();
-  const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
-  // const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const { title, description } = useRoomLayoutHeader();
+  const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
+  const { startRecording, isRecordingLoading } = useRecordingHandler();
+  const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
+  const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
+  const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName: string, value: boolean) => {
@@ -116,7 +135,7 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton>
+            <IconButton css={{ bg: isMobileHLSStream || isLandscapeHLSStream ? '$surface_default' : '' }}>
               <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
@@ -167,7 +186,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
-            {!noAVPermissions ? (
+            {elements.hand_raise ? (
               <ActionTile.Root
                 active={isHandRaised}
                 onClick={() => {
@@ -179,8 +198,19 @@ export const MwebOptions = ({
                 <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-
-            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
+            <NoiseCancellation setOpenOptionsSheet={setOpenOptionsSheet} actionTile />
+            {isTranscriptionAllowed ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setOpenOptionsSheet(false);
+                  updateState(MODALS.CAPTION, true);
+                }}
+              >
+                {isTranscriptionEnabled && isCaptionEnabled ? <ClosedCaptionIcon /> : <OpenCaptionIcon />}
+                <ActionTile.Title>Closed Caption</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+            {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
                   toggleVB();
@@ -190,9 +220,9 @@ export const MwebOptions = ({
                 <VirtualBackgroundIcon />
                 <ActionTile.Title>Virtual Background</ActionTile.Title>
               </ActionTile.Root>
-            ) : null} */}
+            ) : null}
 
-            {elements?.emoji_reactions && (
+            {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);
@@ -252,29 +282,8 @@ export const MwebOptions = ({
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setIsRecordingLoading(true);
-                    try {
-                      await hmsActions.startRTMPOrRecording({
-                        record: true,
-                      });
-                      setOpenOptionsSheet(false);
-                      setIsRecordingLoading(false);
-                    } catch (error) {
-                      // @ts-ignore
-                      if (error.message.includes('stream already running')) {
-                        ToastManager.addToast({
-                          title: 'Recording already running',
-                          variant: 'error',
-                        });
-                      } else {
-                        ToastManager.addToast({
-                          // @ts-ignore
-                          title: error.message,
-                          variant: 'error',
-                        });
-                      }
-                      setIsRecordingLoading(false);
-                    }
+                    await startRecording();
+                    setOpenOptionsSheet(false);
                   }
                   if (isHLSRunning) {
                     setOpenOptionsSheet(false);
@@ -283,12 +292,24 @@ export const MwebOptions = ({
               >
                 {isRecordingLoading ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {isBrowserRecordingOn
-                    ? 'Recording On'
-                    : isRecordingLoading
-                      ? 'Starting Recording'
-                      : 'Start Recording'}
+                  {match({ isBrowserRecordingOn, isRecordingLoading })
+                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
+                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')
+                    .otherwise(() => null)}
                 </ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+
+            {title || description ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setOpenOptionsSheet(false);
+                  toggleDetailsSheet();
+                }}
+              >
+                <InfoIcon />
+                <ActionTile.Title>About Session</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
           </Box>
@@ -304,7 +325,9 @@ export const MwebOptions = ({
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
-
+      {openModals.has(MODALS.CAPTION) && (
+        <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
+      )}
       {showEmojiCard && (
         <Box
           ref={emojiCardRef}
@@ -323,7 +346,7 @@ export const MwebOptions = ({
             mx: '$4',
           }}
         >
-          <EmojiReaction />
+          <EmojiReaction showCard />
         </Box>
       )}
       {showRecordingOn && (

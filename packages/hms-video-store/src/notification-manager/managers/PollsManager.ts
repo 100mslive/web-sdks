@@ -92,8 +92,6 @@ export class PollsManager {
       }
 
       this.updatePollResult(savedPoll, updatedPoll);
-      await this.updatePollResponses(savedPoll, false);
-
       updatedPolls.push(savedPoll);
     }
 

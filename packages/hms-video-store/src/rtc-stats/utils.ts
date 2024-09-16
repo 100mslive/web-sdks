@@ -117,16 +117,16 @@ export const getTrackStats = async (
   }
 
   return (
-    trackStats &&
-    Object.assign(trackStats, {
+    trackStats && {
+      ...trackStats,
       bitrate,
       packetsLostRate,
-      peerId: track.peerId,
+      peerID: track.peerId,
       enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
       trackIdentifier: track.trackId,
-    })
+    }
   );
 };
 

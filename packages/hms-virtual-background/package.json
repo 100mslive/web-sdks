@@ -1,11 +1,41 @@
 {
-  "version": "1.12.6",
+  "version": "1.13.19",
   "license": "MIT",
   "name": "@100mslive/hms-virtual-background",
   "author": "100ms",
-  "module": "dist/index.js",
-  "main": "dist/index.cjs.js",
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
   "typings": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "hmsvbplugin": [
+        "./dist/HMSVBPlugin.d.ts"
+      ],
+      "hmseffectsplugin": [
+        "./dist/HMSEffectsPlugin.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./hmsvbplugin": {
+      "import": "./dist/esm/HMSVBPlugin.js",
+      "require": "./dist/cjs/HMSVBPlugin.js",
+      "default": "./dist/esm/HMSVBPlugin.js",
+      "types": "./dist/HMSVBPlugin.d.ts"
+    },
+    "./hmseffectsplugin": {
+      "import": "./dist/esm/HMSEffectsPlugin.js",
+      "default": "./dist/esm/HMSEffectsPlugin.js",
+      "require": "./dist/cjs/HMSEffectsPlugin.js",
+      "types": "./dist/HMSEffectsPlugin.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/100mslive/web-sdks.git",
@@ -32,10 +62,10 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video-store": "0.11.6"
+    "@100mslive/hms-video-store": "0.12.19"
   },
   "devDependencies": {
-    "@100mslive/hms-video-store": "0.11.6"
+    "@100mslive/hms-video-store": "0.12.19"
   },
   "dependencies": {
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
@@ -45,7 +75,7 @@
     "@tensorflow/tfjs-core": "^3.19.0",
     "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
     "@webassemblyjs/wasm-gen": "1.11.1",
-    "effects-sdk": "2.6.8",
+    "effects-sdk": "3.2.3",
     "gifuct-js": "^2.1.2",
     "wasm-check": "^2.0.2"
   },

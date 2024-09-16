@@ -6,18 +6,21 @@ import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100m
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
-// @ts-ignore
+import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { RaiseHand } from '../RaiseHand';
+// @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useChatDraftMessage } from '../AppData/useChatState';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection } from '../../common/hooks';
+import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
+import { CHAT_MESSAGE_LIMIT } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -72,12 +75,12 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children?: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const { elements } = useRoomLayoutConferencingScreen();
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
@@ -87,14 +90,36 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+  const isMwebHLSStream = useMobileHLSStream();
+  const [messageLengthExceeded, setMessageLengthExceeded] = useState(false);
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      inputRef.current?.focus();
+      // @ts-ignore
+      if (!(isMobile || isLandscapeHLSStream) && !elements?.chat?.disable_autofocus) {
+        inputRef.current?.focus();
+      }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream, elements?.chat]);
+
+  const resetInputHeight = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = `${Math.max(
+        32,
+        inputRef.current.value ? Math.min(inputRef.current.scrollHeight, 24 * 4) : 0,
+      )}px`;
+    }
+  }, []);
+
+  const updateInputHeight = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = `${Math.max(32, Math.min(inputRef.current.scrollHeight, 24 * 4))}px`;
+    }
+  }, []);
+
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -109,6 +134,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = '';
+      resetInputHeight();
       setTimeout(() => {
         onSend(1);
       }, 0);
@@ -124,6 +150,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     const messageElement = inputRef.current;
     if (messageElement) {
       messageElement.value = draftMessage;
+      updateInputHeight();
+      setMessageLengthExceeded(draftMessage.length > CHAT_MESSAGE_LIMIT);
     }
   }, [draftMessage]);
 
@@ -139,11 +167,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box>
+    <Box css={{ position: 'relative' }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }}>
+          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={e => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
@@ -188,27 +216,27 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         ) : null}
       </Flex>
       {selection && (
-        <Flex align="center" css={{ gap: '$4', w: '100%' }}>
+        <Flex align={inputRef.current?.scrollHeight === 32 ? 'center' : 'end'} css={{ gap: '$4', w: '100%' }}>
           <Flex
-            align="center"
+            align="end"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
               minHeight: '$16',
-              maxHeight: '$24',
               position: 'relative',
-              py: '$6',
+              py: isOverlayChat && isMobile ? '$2' : '$6',
               pl: '$8',
               flexGrow: 1,
               r: '$1',
               '@md': {
-                minHeight: 'unset',
-                h: '$14',
+                minHeight: '$14',
                 boxSizing: 'border-box',
               },
+              ...(isLandscapeHLSStream ? { minHeight: '$14', py: 0 } : {}),
             }}
           >
             {children}
             <TextArea
+              maxLength={CHAT_MESSAGE_LIMIT + 10}
               css={{
                 c: '$on_surface_high',
                 '&:valid ~ .send-msg': { color: '$on_surface_high' },
@@ -219,10 +247,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={!isMobile}
+              autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
-                  if (!event.shiftKey) {
+                  if (!event.shiftKey && !messageLengthExceeded) {
                     event.preventDefault();
                     await sendMessage();
                   }
@@ -230,11 +258,16 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               }}
               autoComplete="off"
               aria-autocomplete="none"
+              onChange={e => {
+                updateInputHeight();
+                setMessageLengthExceeded(e.target.value.length > CHAT_MESSAGE_LIMIT);
+              }}
+              onBlur={resetInputHeight}
               onPaste={e => e.stopPropagation()}
               onCut={e => e.stopPropagation()}
               onCopy={e => e.stopPropagation()}
             />
-            {!isMobile ? (
+            {!isMobile && !isLandscapeHLSStream ? (
               <EmojiPicker
                 onSelect={emoji => {
                   if (inputRef.current) {
@@ -246,6 +279,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             <BaseIconButton
               className="send-msg"
               onClick={sendMessage}
+              disabled={messageLengthExceeded}
               css={{
                 ml: 'auto',
                 height: 'max-content',
@@ -257,7 +291,25 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               <SendIcon />
             </BaseIconButton>
           </Flex>
+          {(isMwebHLSStream || isLandscapeHLSStream) && (
+            <>
+              <Flex
+                css={{
+                  alignItems: 'center',
+                }}
+                gap="2"
+              >
+                <RaiseHand css={{ bg: '$surface_default' }} />
+                <MoreSettings elements={elements} screenType={screenType} />
+              </Flex>
+            </>
+          )}
         </Flex>
+      )}
+      {messageLengthExceeded && (
+        <Text variant="xs" css={{ color: '$alert_error_default', fontWeight: '$semiBold', mt: '$1', ml: '$7' }}>
+          Message cannot exceed 2000 characters
+        </Text>
       )}
     </Box>
   );

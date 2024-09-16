@@ -1,9 +1,9 @@
 import React, { Fragment, useState } from 'react';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
-import { ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { CrossIcon, ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { IconButton } from '../../../IconButton';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Tooltip } from '../../../Tooltip';
@@ -11,19 +11,22 @@ import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
 import { LeaveSessionContent } from './LeaveSessionContent';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
-  screenType,
   endRoom,
+  container,
 }: {
   leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
-  screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
+  container?: HTMLElement;
 }) => {
   const [open, setOpen] = useState(false);
+  const { screenType } = useRoomLayoutConferencingScreen();
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -43,22 +46,13 @@ export const MwebLeaveRoom = ({
       {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
-            <LeaveIconButton
-              key="LeaveRoom"
-              data-testid="leave_room_btn"
-              css={{
-                borderTopRightRadius: '$1',
-                borderBottomRightRadius: '$1',
+            <LeaveButton
+              onClick={() => {
+                setOpen(open => !open);
               }}
-            >
-              <Tooltip title="Leave Room">
-                <Box>
-                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-                </Box>
-              </Tooltip>
-            </LeaveIconButton>
+            />
           </Sheet.Trigger>
-          <Sheet.Content>
+          <Sheet.Content container={container}>
             <LeaveCard
               title={showStream ? 'Leave Stream' : 'Leave Session'}
               subtitle={`Others will continue after you leave. You can join the ${
@@ -88,16 +82,10 @@ export const MwebLeaveRoom = ({
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => setShowLeaveRoomAlert(true)}>
-          <Tooltip title="Leave Room">
-            <Box>
-              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-            </Box>
-          </Tooltip>
-        </LeaveIconButton>
+        <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
             leaveRoom={isStreamingOn ? leaveRoom : endRoom}
@@ -107,10 +95,41 @@ export const MwebLeaveRoom = ({
       </Sheet.Root>
 
       <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
         </Sheet.Content>
       </Sheet.Root>
     </Fragment>
+  );
+};
+
+const LeaveButton = ({ onClick }: { onClick: () => void }) => {
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+
+  return isMobileHLSStream || isLandscapeHLSStream ? (
+    <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={onClick}>
+      <Tooltip title="Leave Room">
+        <Box>
+          <CrossIcon />
+        </Box>
+      </Tooltip>
+    </IconButton>
+  ) : (
+    <LeaveIconButton
+      key="LeaveRoom"
+      data-testid="leave_room_btn"
+      css={{
+        borderTopRightRadius: '$1',
+        borderBottomRightRadius: '$1',
+      }}
+      onClick={onClick}
+    >
+      <Tooltip title="Leave Room">
+        <Box>
+          <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+        </Box>
+      </Tooltip>
+    </LeaveIconButton>
   );
 };

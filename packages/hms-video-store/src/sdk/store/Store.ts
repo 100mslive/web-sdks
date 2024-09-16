@@ -3,7 +3,15 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPermissionType, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
+import {
+  HMSConfig,
+  HMSFrameworkInfo,
+  HMSPermissionType,
+  HMSPoll,
+  HMSSpeaker,
+  HMSTranscriptionMode,
+  HMSWhiteboard,
+} from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -23,13 +31,21 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { PolicyParams } from '../../notification-manager';
+import {
+  NoiseCancellationPlugin,
+  Plugins,
+  PolicyParams,
+  TranscriptionPluginPermissions,
+  WhiteBoardPluginPermissions,
+} from '../../notification-manager';
+import HMSLogger from '../../utils/logger';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store {
+  private TAG = '[Store]:';
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -57,6 +73,15 @@ class Store {
 
   setSimulcastEnabled(enabled: boolean) {
     this.simulcastEnabled = enabled;
+  }
+
+  removeRemoteTracks() {
+    this.tracks.forEach(track => {
+      if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
+        this.removeTrack(track);
+        delete this.peerTrackStates[track.trackId];
+      }
+    });
   }
 
   getEnv() {
@@ -264,6 +289,10 @@ class Store {
     this.peerTrackStates[trackStateEntry.trackInfo.track_id] = trackStateEntry;
   }
 
+  removeTrackState(trackId: string) {
+    delete this.peerTrackStates[trackId];
+  }
+
   removePeer(peerId: string) {
     if (this.localPeerId === peerId) {
       this.localPeerId = undefined;
@@ -373,6 +402,10 @@ class Store {
     this.whiteboards.set(whiteboard.id, whiteboard);
   }
 
+  getWhiteboards() {
+    return this.whiteboards;
+  }
+
   getWhiteboard(id?: string): HMSWhiteboard | undefined {
     return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
   }
@@ -410,30 +443,72 @@ class Store {
       return;
     }
 
-    const addPermissionToRole = (
-      role: string,
-      pluginName: keyof PolicyParams['plugins'],
-      permission: HMSPermissionType,
-    ) => {
-      const rolePermissions = this.knownRoles[role].permissions;
+    Object.keys(plugins).forEach(plugin => {
+      const pluginName = plugin as keyof PolicyParams['plugins'];
+      switch (pluginName) {
+        case Plugins.WHITEBOARD: {
+          this.addWhiteboardPluginToRole(plugins[pluginName]);
+          break;
+        }
+        case Plugins.TRANSCRIPTIONS: {
+          this.addTranscriptionsPluginToRole(plugins[pluginName]);
+          break;
+        }
+        case Plugins.NOISE_CANCELLATION: {
+          this.handleNoiseCancellationPlugin(plugins[pluginName]);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    });
+  }
+  private addPermissionToRole = (
+    role: string,
+    pluginName: keyof PolicyParams['plugins'],
+    permission: HMSPermissionType,
+    mode?: HMSTranscriptionMode,
+  ) => {
+    if (!this.knownRoles[role]) {
+      HMSLogger.d(this.TAG, `role ${role} is not present in given roles`, this.knownRoles);
+      return;
+    }
+    const rolePermissions = this.knownRoles[role].permissions;
+    if (pluginName === Plugins.TRANSCRIPTIONS && mode) {
+      // currently only admin is allowed, so no issue
+      rolePermissions[pluginName] = {
+        ...rolePermissions[pluginName],
+        [mode]: [permission],
+      };
+    } else if (pluginName === Plugins.WHITEBOARD) {
       if (!rolePermissions[pluginName]) {
         rolePermissions[pluginName] = [];
       }
       rolePermissions[pluginName]?.push(permission);
-    };
+    }
+  };
+  private addWhiteboardPluginToRole = (plugin?: WhiteBoardPluginPermissions) => {
+    const permissions = plugin?.permissions;
+    permissions?.admin?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'admin'));
+    permissions?.reader?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'read'));
+    permissions?.writer?.forEach(role => this.addPermissionToRole(role, Plugins.WHITEBOARD, 'write'));
+  };
+  private addTranscriptionsPluginToRole = (plugin: TranscriptionPluginPermissions[] = []) => {
+    for (const transcription of plugin) {
+      transcription.permissions?.admin?.forEach(role =>
+        this.addPermissionToRole(role, Plugins.TRANSCRIPTIONS, 'admin', transcription.mode),
+      );
+    }
+  };
+  private handleNoiseCancellationPlugin = (plugin?: NoiseCancellationPlugin) => {
+    if (!this.room) {
+      return;
+    }
+    // it will be called again after internalConnect room initialization, even after network disconnection
+    this.room.isNoiseCancellationEnabled = !!plugin?.enabled && !!this.room.isNoiseCancellationEnabled;
+  };
 
-    Object.keys(plugins).forEach(plugin => {
-      const pluginName = plugin as keyof PolicyParams['plugins'];
-      if (!plugins[pluginName]) {
-        return;
-      }
-
-      const permissions = plugins[pluginName].permissions;
-      permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
-      permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
-      permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
-    });
-  }
   private setEnv() {
     const endPoint = this.config?.initEndpoint!;
     const url = endPoint.split('https://')[1];

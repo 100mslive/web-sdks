@@ -34,10 +34,13 @@ export const PUBLISH_STATS_PUSH_INTERVAL = 300;
 export const SUBSCRIBE_STATS_SAMPLE_WINDOW = 10;
 export const SUBSCRIBE_STATS_PUSH_INTERVAL = 60;
 
+export const MAX_SAFE_INTEGER = Math.pow(2, 31) - 1;
+
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
   LOCAL_VIDEO_ENABLED: 'local-video-enabled',
+  LOCAL_VIDEO_UNMUTED_NATIVELY: 'local-video-unmuted-natively',
   STATS_UPDATE: 'stats-update', // emitted by HMSWebrtcInternals
   RTC_STATS_UPDATE: 'rtc-stats-update', // emitted by RTCStatsMonitor
   TRACK_DEGRADED: 'track-degraded',
@@ -57,10 +60,14 @@ export const HMSEvents = {
 
 export const PROTOCOL_VERSION = '2.5';
 
-export const PROTOCOL_SPEC = '20231201';
+export const PROTOCOL_SPEC = '20240720';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
 
 export const DEFAULT_PLAYLIST_VIDEO_BITRATE = 1000;
 
 export const DEFAULT_PLAYLIST_AUDIO_BITRATE = 64;
+
+export const WHITEBOARD_ORIGIN = 'https://whiteboard.100ms.live';
+
+export const WHITEBOARD_QA_ORIGIN = 'https://whiteboard-qa.100ms.live';

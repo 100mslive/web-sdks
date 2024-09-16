@@ -98,6 +98,7 @@ export class PeerListManager {
           name: peer.name,
           data: peer.metadata || '',
           user_id: peer.customerUserId || '',
+          type: peer.type,
         },
         tracks: {},
         groups: [],

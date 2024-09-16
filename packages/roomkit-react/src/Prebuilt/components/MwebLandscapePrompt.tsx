@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
+import { match, P } from 'ts-pattern';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import { useLandscapeHLSStream } from '../common/hooks';
 // @ts-ignore
 import { isMobileUserAgent } from '../common/utils';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isLandscape = useMedia(cssConfig.media.ls);
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!isMobileUserAgent) {
@@ -20,22 +23,30 @@ export const MwebLandscapePrompt = () => {
     }
 
     if (!window.screen?.orientation) {
-      setShowMwebLandscapePrompt(isLandscape);
+      setShowMwebLandscapePrompt(isLandscape && !isLandscapeHLSStream);
       return;
     }
     const handleRotation = () => {
       const angle = window.screen.orientation.angle;
       const type = window.screen.orientation.type || '';
       // Angle check needed to diff bw mobile and desktop
-      setShowMwebLandscapePrompt(angle ? angle >= 90 && type.includes('landscape') : isLandscape);
+      setShowMwebLandscapePrompt(
+        match({ angle, isLandscapeHLSStream, isLandscape, type })
+          .with({ isLandscapeHLSStream: true }, () => false)
+          .with({ angle: P.when(angle => angle && angle >= 90) }, ({ type }) => type.includes('landscape'))
+          .otherwise(() => isLandscape),
+      );
     };
     handleRotation();
     window.screen.orientation.addEventListener('change', handleRotation);
     return () => {
       window.screen.orientation.removeEventListener('change', handleRotation);
     };
-  }, [isLandscape]);
+  }, [isLandscape, isLandscapeHLSStream]);
 
+  if (isLandscapeHLSStream) {
+    return null;
+  }
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
       <Dialog.Portal>

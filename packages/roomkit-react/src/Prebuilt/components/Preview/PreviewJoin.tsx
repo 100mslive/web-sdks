@@ -2,11 +2,14 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
+  selectAppData,
   selectIsLocalVideoEnabled,
+  selectIsVBEnabled,
   selectLocalPeer,
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
+  useAwayNotifications,
   useHMSStore,
   useParticipants,
   usePreviewJoin,
@@ -16,33 +19,29 @@ import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
-// @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 import SidePane from '../../layouts/SidePane';
-// @ts-ignore: No implicit Any
-import { AudioVideoToggle } from '../AudioVideoToggle';
-// @ts-ignore: No implicit Any
+import { AudioVideoToggle, NoiseCancellation } from '../AudioVideoToggle';
 import Chip from '../Chip';
-// @ts-ignore: No implicit Any
 import TileConnection from '../Connection/TileConnection';
-// @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
 // @ts-ignore: No implicit Any
 import { Logo } from '../Header/HeaderComponents';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
-// @ts-ignore: No implicit Any
 import { VBToggle } from '../VirtualBackground/VBToggle';
-// @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore: No implicit Any
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+import {
+  useAuthToken,
+  useUISettings,
+  // @ts-ignore: No implicit Any
+} from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
-import { UI_SETTINGS } from '../../common/constants';
+import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
@@ -85,6 +84,7 @@ const PreviewJoin = ({
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
+  const loadingEffects = useHMSStore(selectAppData(APP_DATA.loadingEffects));
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -102,6 +102,7 @@ const PreviewJoin = ({
     },
     asRole,
   });
+  const { requestPermission } = useAwayNotifications();
   const roomState = useHMSStore(selectRoomState);
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -117,7 +118,7 @@ const PreviewJoin = ({
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
-        preview();
+        preview().then(() => requestPermission());
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,23 +132,20 @@ const PreviewJoin = ({
 
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
-      <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
+      <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
         {toggleVideo ? null : <Box />}
-        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
+        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '$8' }}>
           <Logo />
-          <Text
-            variant="h4"
-            css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
-          >
+          <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
             {previewHeader.title}
           </Text>
           <Text
-            css={{ c: '$on_surface_medium', my: '0', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
+            css={{ c: '$on_surface_medium', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
             variant="sm"
           >
             {previewHeader.sub_title}
           </Text>
-          <Flex justify="center" css={{ mt: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
+          <Flex justify="center" css={{ gap: '$4' }}>
             {isStreamingOn ? (
               <Chip
                 content="LIVE"
@@ -160,13 +158,13 @@ const PreviewJoin = ({
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
+        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 340}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
             disabled={!!initialName}
             onChange={setName}
-            enableJoin={enableJoin}
+            enableJoin={enableJoin && !loadingEffects}
             onJoin={savePreferenceAndJoin}
             cannotPublishVideo={!toggleVideo}
             cannotPublishAudio={!toggleAudio}
@@ -210,11 +208,11 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       css={{
         bg: '$surface_default',
         aspectRatio,
-        height: 'min(360px, 70vh)',
+        height: 'min(340px, 70vh)',
         width: 'auto',
-        maxWidth: '640px',
+        maxWidth: '600px',
         overflow: 'clip',
-        mt: '$14',
+        mt: '$10',
         '@md': {
           mt: 0,
           width: 'min(220px, 70vw)',
@@ -225,7 +223,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     >
       {localPeer ? (
         <>
-          <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
+          <TileConnection name="" peerId={localPeer.id} hideLabel={false} />
           <Video
             mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
@@ -256,20 +254,23 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
-
+  const isVBEnabledForUser = useHMSStore(selectIsVBEnabled);
   return (
     <Flex
       justify={hideSettings && isMobile ? 'center' : 'between'}
       css={{
         width: '100%',
-        mt: '$8',
+        mt: '$6',
       }}
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {vbEnabled && !isMobile ? <VBToggle /> : null}
+        {vbEnabled && isVBEnabledForUser ? <VBToggle /> : null}
       </Flex>
-      {!hideSettings ? <PreviewSettings /> : null}
+      <Flex align="center" gap="1">
+        {isMobile && <NoiseCancellation iconOnly />}
+        {!hideSettings ? <PreviewSettings /> : null}
+      </Flex>
     </Flex>
   );
 };

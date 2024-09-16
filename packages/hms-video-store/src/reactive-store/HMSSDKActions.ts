@@ -16,9 +16,12 @@ import { HMSSessionStore } from './HMSSessionStore';
 import { NamedSetState } from './internalTypes';
 import { HMSLogger } from '../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../controller/beam/BeamSpeakerLabelsLogger';
+import { Diagnostics } from '../diagnostics';
+import { HMSSessionFeedback } from '../end-call-feedback';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
+  HMSAudioMode,
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
@@ -88,8 +91,7 @@ import {
   selectTracksMap,
   selectVideoTrackByID,
 } from '../selectors';
-
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
+import { FindPeerByNameRequestParams } from '../signal/interfaces';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -132,6 +134,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.actionBatcher = new ActionBatcher(store);
+  }
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void> {
+    return this.sdk.submitSessionFeedback(feedback, eventEndpoint);
   }
 
   getLocalTrack(trackID: string) {
@@ -360,6 +365,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
+
     if (trackID) {
       await this.setSDKLocalAudioTrackSettings(trackID, settings);
       this.syncRoomState('setAudioSettings');
@@ -415,6 +421,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    const ignoreMessage = !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type);
+    if (ignoreMessage) {
+      return;
+    }
     const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
@@ -427,9 +437,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       senderName: localPeer?.name,
       sender: localPeer?.peerId,
       senderRole: localPeer?.role?.name,
-      ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
+      ignored: false,
     };
-    this.putMessageInStore(hmsMessage);
+    // update directly to store without batch
+    this.setState(store => {
+      store.messages.byID[hmsMessage.id] = hmsMessage;
+      store.messages.allIDs.push(hmsMessage.id);
+    }, 'newMessage');
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
@@ -594,6 +608,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
+  async getPeer(peerId: string) {
+    const peer = await this.sdk.getPeer(peerId);
+    if (peer) {
+      return SDKToHMS.convertPeer(peer) as HMSPeer;
+    }
+    return undefined;
+  }
+
+  async findPeerByName(options: FindPeerByNameRequestParams) {
+    const { offset, peers, eof } = await this.sdk.findPeerByName(options);
+    return { offset, eof, peers: peers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer) };
+  }
+
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     const iterator = this.sdk.getPeerListIterator(options);
     return {
@@ -687,6 +714,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.stopHLSStreaming(params);
   }
 
+  async startTranscription(params: sdkTypes.TranscriptionConfig) {
+    await this.sdk.startTranscription(params);
+  }
+
+  async stopTranscription(params: sdkTypes.TranscriptionConfig): Promise<void> {
+    await this.sdk.stopTranscription(params);
+  }
+
   async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
     await this.sdk.sendHLSTimedMetadata(metadataList);
   }
@@ -771,6 +806,36 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       await this.beamSpeakerLabelsLogger.start();
     }
   }
+  initDiagnostics() {
+    const diagnostics = new Diagnostics(this.sdk, {
+      onJoin: this.onJoin.bind(this),
+      onPreview: this.onPreview.bind(this),
+      onRoomUpdate: this.onRoomUpdate.bind(this),
+      onPeerUpdate: this.onPeerUpdate.bind(this),
+      onTrackUpdate: this.onTrackUpdate.bind(this),
+      onMessageReceived: this.onMessageReceived.bind(this),
+      onError: this.onError.bind(this),
+      onReconnected: this.onReconnected.bind(this),
+      onReconnecting: this.onReconnecting.bind(this),
+      onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
+      onRoleUpdate: this.onRoleUpdate.bind(this),
+      onDeviceChange: this.onDeviceChange.bind(this),
+      onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
+      onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
+      onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
+      onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
+      onPollsUpdate: this.onPollsUpdate.bind(this),
+      onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
+    });
+    this.sdk.addAudioListener({
+      onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
+    });
+    return diagnostics;
+  }
 
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
@@ -801,6 +866,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
       onPollsUpdate: this.onPollsUpdate.bind(this),
       onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
+      onSFUMigration: this.onSFUMigration.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -810,6 +876,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     });
   }
 
+  private onSFUMigration() {
+    this.syncRoomState('SFUMigration');
+  }
   private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
     const requestedBy = this.store.getState(selectPeerByID(request.requestedBy?.peerId));
     this.hmsNotifications.sendLeaveRoom({
@@ -997,6 +1066,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
     const hls = this.sdk.getHLSState();
+    const transcriptions = this.sdk.getTranscriptionState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -1009,7 +1079,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
-      Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      if (draftStore.room.isConnected) {
+        Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      }
 
       /**
        * if preview is already present merge,
@@ -1022,7 +1094,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls, transcriptions));
       Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
@@ -1074,6 +1146,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
+    if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED) {
+      this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
+    }
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
@@ -1139,6 +1214,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    if (hmsMessage.type === 'hms_transcript') {
+      hmsMessage.ignored = true;
+    }
     this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
@@ -1353,6 +1431,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
+      audioMode: audioTrack?.settings.audioMode || HMSAudioMode.VOICE,
     };
   }
 

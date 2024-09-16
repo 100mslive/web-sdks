@@ -72,7 +72,12 @@ export class OnDemandTrackManager extends TrackManager {
     const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.getSubscribeConnection()!);
     const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
     emptyTrack.enabled = !trackInfo.mute;
-    const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
+    const track = new HMSRemoteVideoTrack(
+      remoteStream,
+      emptyTrack,
+      trackInfo.source,
+      this.store.getRoom()?.disableNoneLayerRequest,
+    );
     track.setTrackId(trackInfo.track_id);
     track.peerId = hmsPeer.peerId;
     track.logIdentifier = hmsPeer.name;
