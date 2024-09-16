@@ -105,18 +105,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private handleVisibilityChange = async () => {
     // track state is fine do nothing
-    if (!this.isTrackNotPublishing()) {
+    console.log(this.isTrackNotPublishing(), this.enabled, this.nativeTrack.readyState, this.nativeTrack.muted);
+    if (!this.isTrackNotPublishing() && this.enabled) {
       HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
       return;
     }
-    if (document.visibilityState === 'hidden' && this.enabled) {
+    if (document.visibilityState === 'hidden') {
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: true,
           reason: 'visibility-change',
         }),
       );
-    } else if (this.enabled && document.visibilityState !== 'hidden') {
+    } else {
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
