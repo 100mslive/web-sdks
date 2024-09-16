@@ -1,7 +1,7 @@
 import { Dependencies as TFCDependencies, TransportFailureCategory as TFC } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import { HMSException } from '../error/HMSException';
-import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
+import { MAX_TRANSPORT_RETRY_TIME } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
 
@@ -23,7 +23,7 @@ interface ScheduleTaskParams {
   error: HMSException;
   task: RetryTask;
   originalState: TransportState;
-  maxFailedRetries?: number;
+  maxRetryTime?: number;
   changeState?: boolean;
 }
 
@@ -42,10 +42,10 @@ export class RetryScheduler {
     error,
     task,
     originalState,
-    maxFailedRetries = MAX_TRANSPORT_RETRIES,
+    maxRetryTime = MAX_TRANSPORT_RETRY_TIME,
     changeState = true,
   }: ScheduleTaskParams) {
-    await this.scheduleTask({ category, error, changeState, task, originalState, maxFailedRetries });
+    await this.scheduleTask({ category, error, changeState, task, originalState, maxRetryTime, failedAt: Date.now() });
   }
 
   reset() {
@@ -65,9 +65,10 @@ export class RetryScheduler {
     changeState,
     task,
     originalState,
-    maxFailedRetries = MAX_TRANSPORT_RETRIES,
+    failedAt,
+    maxRetryTime = MAX_TRANSPORT_RETRY_TIME,
     failedRetryCount = 0,
-  }: ScheduleTaskParams & { failedRetryCount?: number }): Promise<void> {
+  }: ScheduleTaskParams & { failedAt: number; failedRetryCount?: number }): Promise<void> {
     HMSLogger.d(this.TAG, 'schedule: ', { category: TFC[category], error });
 
     // First schedule call
@@ -113,8 +114,9 @@ export class RetryScheduler {
       }
     }
 
-    if (failedRetryCount >= maxFailedRetries || hasFailedDependency) {
-      error.description += `. [${TFC[category]}] Could not recover after ${failedRetryCount} tries`;
+    const timeElapsedSinceError = Date.now() - failedAt;
+    if (timeElapsedSinceError >= maxRetryTime || hasFailedDependency) {
+      error.description += `. [${TFC[category]}] Could not recover after ${timeElapsedSinceError} milliseconds`;
 
       if (hasFailedDependency) {
         error.description += ` Could not recover all of it's required dependencies - [${(dependencies as Array<TFC>)
@@ -144,7 +146,7 @@ export class RetryScheduler {
       this.onStateChange(TransportState.Reconnecting, error);
     }
 
-    const delay = this.getDelayForRetryCount(category, failedRetryCount);
+    const delay = this.getDelayForRetryCount(category);
 
     HMSLogger.d(
       this.TAG,
@@ -171,7 +173,10 @@ export class RetryScheduler {
       if (changeState && this.inProgress.size === 0) {
         this.onStateChange(originalState);
       }
-      HMSLogger.d(this.TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
+      HMSLogger.d(
+        this.TAG,
+        `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️ after ${timeElapsedSinceError}ms`,
+      );
     } else {
       await this.scheduleTask({
         category,
@@ -179,25 +184,26 @@ export class RetryScheduler {
         changeState,
         task,
         originalState,
-        maxFailedRetries,
+        maxRetryTime,
+        failedAt,
         failedRetryCount: failedRetryCount + 1,
       });
     }
   }
 
-  private getBaseDelayForTask(category: TFC, n: number) {
+  private getDelayForRetryCount(category: TFC) {
+    const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
+    let delaySeconds = 0;
     if (category === TFC.JoinWSMessageFailed) {
       // linear backoff(2 + jitter for every retry)
-      return 2;
+      delaySeconds = 2 + jitter;
+    } else if (category === TFC.SignalDisconnect) {
+      delaySeconds = 1;
+    } else {
+      delaySeconds = 0;
     }
-    // exponential backoff
-    return Math.pow(2, n);
-  }
 
-  private getDelayForRetryCount(category: TFC, n: number) {
-    const delay = this.getBaseDelayForTask(category, n);
-    const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
-    return Math.round(Math.min(delay + jitter, MAX_TRANSPORT_RETRY_DELAY) * 1000);
+    return delaySeconds * 1000;
   }
 
   private async setTimeoutPromise<T>(task: () => Promise<T>, delay: number): Promise<T> {
