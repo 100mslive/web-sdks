@@ -73,7 +73,7 @@ import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig, InitFlags } from '../signal/init/models';
+import { InitFlags } from '../signal/init/models';
 import {
   FindPeerByNameRequestParams,
   HLSRequestParams,
@@ -473,16 +473,20 @@ export class HMSSdk implements HMSInterface {
       this.eventBus.leave.subscribeOnce(this.handlePreviewError);
       this.eventBus.leave.subscribeOnce(ex => reject(ex as HMSException));
 
-      this.transport
-        .preview(
-          config.authToken,
-          config.initEndpoint!,
-          this.localPeer!.peerId,
-          { name: config.userName, metaData: config.metaData || '' },
-          config.autoVideoSubscribe,
-          config.iceServers,
-        )
-        .then((initConfig: InitConfig | void) => {
+      const actor = createActor(joinMachine(this.transport, true));
+      actor.start();
+      actor.send({
+        type: 'init',
+        payload: {
+          authToken: config.authToken,
+          peerId: this.localPeer!.peerId,
+          customData: { name: config.userName, metaData: config.metaData! },
+          initEndpoint: config.initEndpoint!,
+          autoSubscribeVideo: config.autoVideoSubscribe,
+        },
+      });
+      toPromise(actor)
+        .then(({ initConfig }) => {
           initSuccessful = true;
           clearTimeout(timerId);
           if (initConfig && config.captureNetworkQualityInPreview) {
@@ -491,10 +495,32 @@ export class HMSSdk implements HMSInterface {
             });
           }
         })
-        .catch(ex => {
-          this.handlePreviewError(ex);
-          reject(ex);
+        .catch(({ error }) => {
+          this.handlePreviewError(error);
+          reject(error);
         });
+      // this.transport
+      //   .preview(
+      //     config.authToken,
+      //     config.initEndpoint!,
+      //     this.localPeer!.peerId,
+      //     { name: config.userName, metaData: config.metaData || '' },
+      //     config.autoVideoSubscribe,
+      //     config.iceServers,
+      //   )
+      //   .then((initConfig: InitConfig | void) => {
+      //     initSuccessful = true;
+      //     clearTimeout(timerId);
+      //     if (initConfig && config.captureNetworkQualityInPreview) {
+      //       this.networkTestManager.start(initConfig.config?.networkHealth).then(() => {
+      //         networkTestFinished = true;
+      //       });
+      //     }
+      //   })
+      //   .catch(ex => {
+      //     this.handlePreviewError(ex);
+      //     reject(ex);
+      //   });
     });
   }
 

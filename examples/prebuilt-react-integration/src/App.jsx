@@ -10,6 +10,6 @@ export default function App() {
   }
 
   return (
-      <HMSPrebuilt roomCode={roomCode} screens={{ preview: null }}/>
+      <HMSPrebuilt roomCode={roomCode} />
   )
 }

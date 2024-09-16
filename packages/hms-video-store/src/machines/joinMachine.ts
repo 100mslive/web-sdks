@@ -1,6 +1,7 @@
 import { assign, createMachine, fromPromise } from 'xstate';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSException } from '../internal';
+import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 
 interface joinParams {
@@ -26,14 +27,15 @@ function shouldRetryError(error: any) {
 }
 
 type JoinEvents = { type: 'init'; payload: joinParams } | { type: 'retry' } | any;
-export const joinMachine = (transport: HMSTransport) =>
+
+export const joinMachine = (transport: HMSTransport, isPreview = false) =>
   createMachine({
     id: 'joinMachine',
     initial: 'idle',
     types: {} as {
-      context: { retryCount: number; error: HMSException | null } & joinParams;
+      context: { retryCount: number; error: HMSException | null; initConfig?: InitConfig } & joinParams;
       events: JoinEvents;
-      output: { data: HMSException };
+      output: { data?: HMSException; initConfig?: InitConfig };
     },
     context: {
       authToken: '',
@@ -62,12 +64,12 @@ export const joinMachine = (transport: HMSTransport) =>
         invoke: {
           id: 'initService',
           src: fromPromise(({ input }) => {
-            console.log({ joinCall: 'joinCalled' });
-            return transport.join(input);
+            return isPreview ? transport.preview(input) : transport.join(input);
           }),
           input: ({ context }) => context,
           onDone: {
             target: 'ws',
+            actions: assign({ initConfig: ({ event }) => event.output }),
           },
           onError: [
             {
@@ -99,7 +101,7 @@ export const joinMachine = (transport: HMSTransport) =>
           }),
           input: ({ context }) => ({ authToken: context.authToken, peerId: context.peerId }),
           onDone: {
-            target: 'iceConnection',
+            target: isPreview ? 'success' : 'iceConnection',
           },
           onError: [
             {
@@ -144,6 +146,9 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       success: {
         type: 'final',
+        output: ({ context }) => {
+          return { initConfig: context.initConfig, error: context.error };
+        },
       },
       failed: {
         type: 'final',

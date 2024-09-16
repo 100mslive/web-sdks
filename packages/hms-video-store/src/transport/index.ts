@@ -255,15 +255,22 @@ export default class HMSTransport {
     this.connectivityListener = listener;
   }
 
-  async preview(
-    token: string,
-    endpoint: string,
-    peerId: string,
-    customData: { name: string; metaData: string },
+  async preview({
+    authToken,
+    peerId,
+    customData,
+    initEndpoint,
     autoSubscribeVideo = false,
-    iceServers?: HMSICEServer[],
-  ): Promise<InitConfig | void> {
-    const initConfig = await this.connect(token, endpoint, peerId, customData, autoSubscribeVideo, iceServers);
+    iceServers,
+  }: {
+    authToken: string;
+    peerId: string;
+    customData: { name: string; metaData: string };
+    initEndpoint: string;
+    autoSubscribeVideo?: boolean;
+    iceServers?: HMSICEServer[];
+  }): Promise<InitConfig | void> {
+    const initConfig = await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo, iceServers);
     this.state = TransportState.Preview;
     this.observer.onStateChange(this.state);
     return initConfig;
@@ -290,7 +297,7 @@ export default class HMSTransport {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo, iceServers);
       }
 
-      this.validateNotDisconnected('connect');
+      // this.validateNotDisconnected('connect');
 
       if (this.initConfig) {
         await this.waitForLocalRoleAvailability();
@@ -1140,7 +1147,7 @@ export default class HMSTransport {
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
-      this.validateNotDisconnected('post init');
+      // this.validateNotDisconnected('post init');
       // await this.openSignal(token, peerId);
       this.observer.onConnected();
       this.connectivityListener?.onSignallingSuccess();
