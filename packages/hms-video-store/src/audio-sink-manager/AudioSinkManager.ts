@@ -239,10 +239,12 @@ export class AudioSinkManager {
   };
 
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
-    HMSLogger.d(this.TAG, 'removing audio element', `${track}`);
-    audioEl.removeEventListener('pause', this.handleAudioPaused);
-    audioEl.srcObject = null;
-    audioEl.remove();
-    track.setAudioElement(null);
+    if (audioEl) {
+      HMSLogger.d(this.TAG, 'removing audio element', `${track}`);
+      audioEl.removeEventListener('pause', this.handleAudioPaused);
+      audioEl.srcObject = null;
+      audioEl.remove();
+      track.setAudioElement(null);
+    }
   };
 }
