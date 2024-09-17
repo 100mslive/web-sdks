@@ -199,10 +199,7 @@ export class RetryScheduler {
       delaySeconds = 2 + jitter;
     } else if (category === TFC.SignalDisconnect) {
       delaySeconds = 1;
-    } else {
-      delaySeconds = 0;
     }
-
     return delaySeconds * 1000;
   }
 
