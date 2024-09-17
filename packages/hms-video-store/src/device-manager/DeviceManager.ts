@@ -493,14 +493,14 @@ export class DeviceManager implements HMSDeviceManager {
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
     }
-    if (!this.earpieceSelected) {
-      if (bluetoothDevice?.deviceId === externalDeviceID) {
-        this.earpieceSelected = true;
-        return;
-      }
-      await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-      this.earpieceSelected = true;
-    }
+    await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+    // if (!this.earpieceSelected) {
+    //   if (bluetoothDevice?.deviceId === externalDeviceID) {
+    //     this.earpieceSelected = true;
+    //     return;
+    //   }
+    //   this.earpieceSelected = true;
+    // }
     await localAudioTrack.setSettings(
       {
         deviceId: externalDeviceID,
