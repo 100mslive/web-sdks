@@ -1,5 +1,7 @@
 import HMSLogger from './logger';
 import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
+import { Store } from '../sdk/store';
 
 const TAG = `[VALIDATIONS]`;
 
@@ -30,5 +32,15 @@ export const validateMediaDevicesExistence = () => {
     const error = ErrorFactory.GenericErrors.MissingMediaDevices();
     HMSLogger.e(TAG, error);
     throw error;
+  }
+};
+
+export const validatePublishParams = (store: Store) => {
+  const publishParams = store.getPublishParams();
+  if (!publishParams) {
+    throw ErrorFactory.GenericErrors.NotConnected(
+      HMSAction.VALIDATION,
+      'call addTrack after preview or join is successful',
+    );
   }
 };
