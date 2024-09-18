@@ -4,10 +4,10 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import "./App.css";
-import JoinForm from "./Components/JoinForm";
+import JoinForm from ".JoinForm";
 import { useEffect } from "react";
-import Conference from "./Components/Conference";
-import Footer from "./Components/Footer";
+import Conference from ".Conference";
+import Footer from "./Footer";
 
 function App() {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
