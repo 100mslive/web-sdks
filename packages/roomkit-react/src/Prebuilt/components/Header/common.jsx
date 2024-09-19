@@ -79,7 +79,7 @@ export const AudioActions = () => {
     return null;
   }
   let AudioIcon = <SpeakerIcon />;
-  if (currentSelection && currentSelection.label.toLowerCase().includes('bluetooth')) {
+  if (/airpods|buds|wireless|bluetooth/gi.test(currentSelection.label)) {
     AudioIcon = <BluetoothIcon />;
   } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
     AudioIcon = <HeadphonesIcon />;
