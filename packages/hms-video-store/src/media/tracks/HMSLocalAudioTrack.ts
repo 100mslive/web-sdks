@@ -248,11 +248,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   async setProcessedTrack(processedTrack?: MediaStreamTrack) {
     // if all plugins are removed reset everything back to native track
-    if (!processedTrack) {
-      this.processedTrack = undefined;
-    } else if (processedTrack !== this.processedTrack) {
-      this.processedTrack = processedTrack;
-    }
+    // if (!processedTrack) {
+    //   this.processedTrack = undefined;
+    // } else if (processedTrack !== this.processedTrack) {
+    //   this.processedTrack = processedTrack;
+    // }
+    console.log('process track ', processedTrack);
     await this.replaceSenderTrack();
   }
 

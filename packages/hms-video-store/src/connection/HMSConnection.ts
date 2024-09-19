@@ -185,12 +185,10 @@ export default abstract class HMSConnection {
       if (params.encodings.length === 1) {
         if (maxBitrate) {
           params.encodings[0].maxBitrate = maxBitrate * 1000;
-          params.encodings[0].rid = 'call';
         }
         if (maxFramerate) {
           // @ts-ignore
           params.encodings[0].maxFramerate = maxFramerate;
-          params.encodings[0].rid = 'call';
         }
       }
       await sender.setParameters(params);
