@@ -76,7 +76,6 @@ export class DeviceManager implements HMSDeviceManager {
     if (newDevice) {
       this.outputDevice = newDevice;
       await this.store.updateAudioOutputDevice(newDevice);
-      this.earpieceSelected = false;
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           isUserSelection,
