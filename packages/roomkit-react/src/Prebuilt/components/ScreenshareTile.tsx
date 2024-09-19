@@ -16,7 +16,6 @@ import { config as cssConfig, useTheme } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { LayoutModeSelector } from './LayoutModeSelector';
-// @ts-ignore: No implicit Any
 import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
 // @ts-ignore: No implicit Any
@@ -62,7 +61,8 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   const label = getVideoTileLabel({
     peerName: peer?.name,
     isLocal: false,
-    track,
+    videoTrack: track,
+    audioTrack,
   });
 
   return (

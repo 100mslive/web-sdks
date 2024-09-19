@@ -34,6 +34,7 @@ export interface HMSRoom {
   max_size?: number;
   large_room_optimization?: boolean;
   isEffectsEnabled?: boolean;
+  disableNoneLayerRequest?: boolean;
   isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;

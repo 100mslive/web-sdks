@@ -140,7 +140,6 @@ const MobileSettingModal = ({
           <Flex
             direction="column"
             css={{
-              px: '$8',
               pb: '$8',
               overflowY: 'auto',
             }}
@@ -159,7 +158,7 @@ const MobileSettingModal = ({
                     css={{
                       all: 'unset',
                       fontFamily: '$sans',
-                      py: '$10',
+                      p: '$10 $8',
                       display: 'flex',
                       alignItems: 'center',
                       fontSize: '$sm',
