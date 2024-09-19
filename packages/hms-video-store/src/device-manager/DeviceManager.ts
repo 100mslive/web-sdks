@@ -76,6 +76,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (newDevice) {
       this.outputDevice = newDevice;
       await this.store.updateAudioOutputDevice(newDevice);
+      this.earpieceSelected = false;
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           isUserSelection,
@@ -493,15 +494,14 @@ export class DeviceManager implements HMSDeviceManager {
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
     }
-    await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-    // if (!this.earpieceSelected) {
-    //   if (bluetoothDevice?.deviceId === externalDeviceID) {
-    //     this.earpieceSelected = true;
-    //     return;
-    //   }
-    //   await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-    //   this.earpieceSelected = true;
-    // }
+    if (!this.earpieceSelected) {
+      if (bluetoothDevice?.deviceId === externalDeviceID) {
+        this.earpieceSelected = true;
+        return;
+      }
+      await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+      this.earpieceSelected = true;
+    }
     await localAudioTrack.setSettings(
       {
         deviceId: externalDeviceID,
