@@ -58,7 +58,7 @@ The `Prebuilt` folder contains the full Prebuilt implementation.
 
 | Component | Description |
 |--|--|
-| [RoomLayoutProvider](src/Prebuilt/provider/roomLayoutProvider/index.tsx) | This is a context that contains the configuration from the dashboard [customiser](dashboard.100ms.live). Whatever changes are made in the dashboard customiser are available the next time you join.|
+| [RoomLayoutProvider](src/Prebuilt/provider/roomLayoutProvider/index.tsx) | This is a context that contains the configuration from the dashboard [customiser](https://dashboard.100ms.live/). Whatever changes are made in the dashboard customiser are available the next time you join.|
 |[AppStateContext](src/Prebuilt/AppStateContext.tsx)  | Contains the logic to switch between different screens, for example, Preview to Meeting, Meeting to Leave. These transitions are based on the roomState that is available from the reactive store (`useHMSStore(selectHMSRoomState)`). |
 | [PreviewScreen](src/Prebuilt/components/Preview/PreviewScreen.tsx) | Contains the Preview implementation. Contains the Video tile, video, audio toggles and Virtual background and settings along with the name input.|
 | [ConferenceScreen](src/Prebuilt/components/ConferenceScreen.tsx) | This contains the screen once you finish Preview and enter the meeting. This contains the header and footer and the main content.|
