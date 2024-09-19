@@ -70,7 +70,7 @@ The `Prebuilt` folder contains the full Prebuilt implementation.
 
 [Base Config](./src/Theme/base.config.ts) has all the variables that you can use. Any changes you want for the theme can be made here. Most likely no additional changes will be required unless you want to introduce new variables.
 
-When [`HMSThemeProvider`](src/Theme/ThemeProvider.tsx) is used at the top level, all the variables will be available for all the children under this component tree.
+When [`HMSThemeProvider`](./src/Theme/ThemeProvider.tsx) is used at the top level, all the variables will be available for all the children under this component tree.
 
 For components created using the base components like `Box`, `Flex`, `Button` etc, css Prop is available to modify the styles. Within the css prop, you can access the variables from the [base config](./src/Theme/base.config.ts).
 
