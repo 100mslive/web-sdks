@@ -4,7 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
-import { isIOS } from '../internal';
+import { getAudioDeviceCategory, isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -443,14 +443,14 @@ export class DeviceManager implements HMSDeviceManager {
     let earpiece: InputDeviceInfo | null = null;
 
     for (const device of this.audioInput) {
-      const label = device.label.toLowerCase();
-      if (label.includes('speakerphone')) {
+      const deviceCategory = getAudioDeviceCategory(device.label);
+      if (deviceCategory === 'speakerphone') {
         speakerPhone = device;
-      } else if (label.includes('wired')) {
+      } else if (deviceCategory === 'wired') {
         wired = device;
-      } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
+      } else if (deviceCategory === 'bluetooth') {
         bluetoothDevice = device;
-      } else if (label.includes('earpiece')) {
+      } else if (deviceCategory === 'speakerhone') {
         earpiece = device;
       }
     }
