@@ -43,10 +43,10 @@ export default App() {
 
 For additional props, refer the [docs](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart#props-for-hmsprebuilt)
 
-## Cutomization
+## Customisation
 While we offer [a no-code way to customize Prebuilt](https://www.100ms.live/docs/get-started/v2/get-started/prebuilt/overview#customize-prebuilt), you can fork your copy of the Prebuilt component and make changes to the code to allow for more fine-tuning.
 
-Prebuilt customisations are available on [100ms dashboard](https://dashboard.100ms.live)
+Prebuilt customisations are available on [100ms Dashboard](https://dashboard.100ms.live).
 
 ### Understanding the Structure
 
@@ -58,7 +58,7 @@ The `Prebuilt` folder contains the full Prebuilt implementation.
 
 | Component | Description |
 |--|--|
-| [RoomLayoutProvider](src/Prebuilt/provider/roomLayoutProvider/index.tsx) | This is a context that contains the configuration from the dashboard [customiser](dashboard.100ms.live). Whatever changes are made in the dashboard customiser are available the next time you join.|
+| [RoomLayoutProvider](src/Prebuilt/provider/roomLayoutProvider/index.tsx) | This is a context that contains the configuration from the dashboard [customiser](https://dashboard.100ms.live/). Whatever changes are made in the dashboard customiser are available the next time you join.|
 |[AppStateContext](src/Prebuilt/AppStateContext.tsx)  | Contains the logic to switch between different screens, for example, Preview to Meeting, Meeting to Leave. These transitions are based on the roomState that is available from the reactive store (`useHMSStore(selectHMSRoomState)`). |
 | [PreviewScreen](src/Prebuilt/components/Preview/PreviewScreen.tsx) | Contains the Preview implementation. Contains the Video tile, video, audio toggles and Virtual background and settings along with the name input.|
 | [ConferenceScreen](src/Prebuilt/components/ConferenceScreen.tsx) | This contains the screen once you finish Preview and enter the meeting. This contains the header and footer and the main content.|
@@ -68,11 +68,11 @@ The `Prebuilt` folder contains the full Prebuilt implementation.
 
 ### Customising the Styles
 
-[Base Config](/src/Theme/base.config.ts) has all the variables that you can use. Any changes you want for the theme can be made here. Most likely no additional changes will be required unless you want to introduce new variables.
+[Base Config](./src/Theme/base.config.ts) has all the variables that you can use. Any changes you want for the theme can be made here. Most likely no additional changes will be required unless you want to introduce new variables.
 
-When [`HMSThemeProvider`](src/Theme/ThemeProvider.tsx) is used at the top level, all the variables will be available for all the children under this component tree.
+When [`HMSThemeProvider`](./src/Theme/ThemeProvider.tsx) is used at the top level, all the variables will be available for all the children under this component tree.
 
-For components created using the base components like `Box`, `Flex`, `Button` etc, css Prop is available to modify the styles. Within the css prop, you can access the variables from the [base config](/src/Theme/base.config.ts).
+For components created using the base components like `Box`, `Flex`, `Button` etc, css Prop is available to modify the styles. Within the css prop, you can access the variables from the [base config](./src/Theme/base.config.ts).
 
 
 ## Contributing

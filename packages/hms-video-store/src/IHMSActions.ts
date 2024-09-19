@@ -232,16 +232,16 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * Add  video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the video track is available.
-   * @param plugin HMSMediaStreamPlugin
    * @see HMSMediaStreamPlugin
+   * @param plugins
    */
   addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
   /**
    * Remove video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the video track is available.
-   * @param plugin HMSMediaStreamPlugin
    * @see HMSMediaStreamPlugin
+   * @param plugins
    */
   removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
@@ -344,6 +344,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * After leave send feedback to backend for call quality purpose.
    * @param feedback
+   * @param eventEndpoint
    */
   submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 
