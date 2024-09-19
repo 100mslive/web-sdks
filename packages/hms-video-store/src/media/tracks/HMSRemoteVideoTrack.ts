@@ -163,17 +163,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       isDegraded=${this._degraded}`,
     );
     const stream = this.stream as HMSRemoteStream;
-    // There are cases where none is requested just after this
-    if (
-      stream.getVideoLayer() === HMSSimulcastLayer.NONE &&
-      this.hasSinks() &&
-      currentLayer !== HMSSimulcastLayer.NONE
-    ) {
-      this.updateLayer('setLayerFromServer');
-    }
     // No need to send preferLayer update, as server has done it already
     stream.setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
-
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
     return this._degraded;
   }
