@@ -46,7 +46,7 @@ For additional props, refer the [docs](https://www.100ms.live/docs/javascript/v2
 ## Customisation
 While we offer [a no-code way to customize Prebuilt](https://www.100ms.live/docs/get-started/v2/get-started/prebuilt/overview#customize-prebuilt), you can fork your copy of the Prebuilt component and make changes to the code to allow for more fine-tuning.
 
-Prebuilt customisations are available on [100ms dashboard](https://dashboard.100ms.live)
+Prebuilt customisations are available on [100ms Dashboard](https://dashboard.100ms.live).
 
 ### Understanding the Structure
 
