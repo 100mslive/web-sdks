@@ -62,6 +62,7 @@ export default abstract class HMSConnection {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
+      offer.sdp = offer.sdp?.replace(/(m=audio .*\r\n)/g, '$1a=content:main\r\na=content:call\r\n');
       return enableOpusDtx(fixMsid(offer, tracks));
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.CreateOfferFailed(this.action, (error as Error).message);
