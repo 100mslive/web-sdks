@@ -148,10 +148,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
-    this._degraded =
-      this.enabled &&
-      (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
-      layerUpdate.current_layer === HMSSimulcastLayer.NONE;
+    this._degraded = this.getDegradationValue(layerUpdate);
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
@@ -165,10 +162,28 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       pub_degraded=${layerUpdate.publisher_degraded}
       isDegraded=${this._degraded}`,
     );
+    const stream = this.stream as HMSRemoteStream;
+    // There are cases where none is requested just after this
+    if (
+      stream.getVideoLayer() === HMSSimulcastLayer.NONE &&
+      this.hasSinks() &&
+      currentLayer !== HMSSimulcastLayer.NONE
+    ) {
+      this.updateLayer('setLayerFromServer');
+    }
     // No need to send preferLayer update, as server has done it already
-    (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
+    stream.setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
+
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
     return this._degraded;
+  }
+
+  private getDegradationValue(layerUpdate: VideoTrackLayerUpdate) {
+    return (
+      this.enabled &&
+      (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
+      layerUpdate.current_layer === HMSSimulcastLayer.NONE
+    );
   }
 
   private async updateLayer(source: string) {
