@@ -180,6 +180,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               onClick: async () => {
                 await VBHandler.removeEffects();
                 hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
+                if (navigator.maxTouchPoints > 0) {
+                  toggleVB();
+                }
               },
               supported: true,
             },
@@ -235,6 +238,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             onClick: async () => {
               await VBHandler?.setBackground(mediaURL);
               hmsActions.setAppData(APP_DATA.background, mediaURL);
+              if (navigator.maxTouchPoints > 0) {
+                toggleVB();
+              }
             },
             supported: true,
           }))}
