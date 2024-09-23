@@ -25,8 +25,8 @@ const Root = ({
       bg: '$surface_bright',
       border: `4px solid ${isActive ? '$primary_default' : '$surface_dim'}`,
       cursor: 'pointer',
-      '&:hover': {
-        border: `4px solid ${navigator.maxTouchPoints > 0 || isActive ? '$primary_default' : '$primary_dim'}`,
+      '@media (hover:hover)': {
+        '&:hover': { border: '4px solid $primary_dim' },
       },
       ...(mediaURL ? { height: '$20', backgroundImage: `url("${mediaURL}")`, backgroundSize: 'cover' } : {}),
     }}
