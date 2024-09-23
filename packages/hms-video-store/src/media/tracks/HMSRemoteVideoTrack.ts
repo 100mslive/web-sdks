@@ -178,10 +178,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer =
-      (!this.enabled || !this.hasSinks()) && !this.disableNoneLayerRequest
-        ? HMSSimulcastLayer.NONE
-        : this.preferredLayer;
+    let newLayer: HMSSimulcastLayer = this.preferredLayer;
+    if (this.enabled || this.hasSinks()) {
+      newLayer = this.preferredLayer;
+      // send none only when the flag is not set
+    } else if (!this.disableNoneLayerRequest) {
+      newLayer = HMSSimulcastLayer.NONE;
+    }
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
