@@ -65,6 +65,6 @@ export class HMSMediaStreamPluginsManager {
   }
 
   async cleanup() {
-    this.plugins.forEach(plugin => plugin.stop());
+    this.removePlugins(Array.from(this.plugins));
   }
 }

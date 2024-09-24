@@ -261,10 +261,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async cleanup() {
     this.removeTrackEventListeners(this.nativeTrack);
+    await this.mediaStreamPluginsManager.cleanup();
+    await this.pluginsManager.cleanup();
     super.cleanup();
     this.transceiver = undefined;
-    await this.pluginsManager.cleanup();
-    await this.mediaStreamPluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
     if (isBrowser && isMobile()) {
