@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { PeopleAddIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
@@ -18,7 +17,6 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-  const peerCount = useHMSStore(selectPeerCount);
   const pageList = usePagesWithTiles({
     peers,
     maxTileCount,
@@ -53,8 +51,8 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
       )}
       {pageList.length === 0 ? (
         <WaitingView
-          title={peerCount <= 1 ? "You're the only one here" : 'Glad to have you here'}
-          subtitle={peerCount <= 1 ? 'Sit back and relax till others join' : ''}
+          title="You're the only one here"
+          subtitle="Sit back and relax till others join"
           icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
         />
       ) : null}
