@@ -91,6 +91,7 @@ export const VideoStreamingSection = ({
           .with({ isMobileHLSStream: true }, () => 'column')
           .otherwise(() => 'row')}
       >
+        console.log('screenType: ', screenType);
         {match({
           screenType,
           isNotAllowedToPublish,
