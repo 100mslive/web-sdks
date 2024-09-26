@@ -45,6 +45,7 @@ export const useFetchRoomLayout = ({
       return;
     }
     const [layout] = (layoutResp.current?.data || []).filter(layout => layout.role === role);
+    console.log('layout ', layout);
     if (layout) {
       setLayout(layout);
     }
