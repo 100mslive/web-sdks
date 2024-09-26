@@ -36,7 +36,6 @@ import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
-  MAX_TRANSPORT_RETRIES,
   PROTOCOL_SPEC,
   PROTOCOL_VERSION,
   PUBLISH_STATS_PUSH_INTERVAL,
@@ -352,7 +351,6 @@ export default class HMSTransport {
           error,
           task,
           originalState: this.state,
-          maxFailedRetries: MAX_TRANSPORT_RETRIES,
           changeState: false,
         });
       } else {
@@ -923,7 +921,6 @@ export default class HMSTransport {
           error: hmsError,
           task,
           originalState: TransportState.Joined,
-          maxFailedRetries: 3,
           changeState: false,
         });
       } else {
@@ -1087,7 +1084,6 @@ export default class HMSTransport {
         error,
         task: this.retrySubscribeIceFailedTask,
         originalState: TransportState.Joined,
-        maxFailedRetries: 1,
       });
     }
   }

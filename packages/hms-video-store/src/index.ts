@@ -20,6 +20,7 @@ export {
   simulcastMapping,
   DeviceType,
   HMSPeerType,
+  getAudioDeviceCategory,
 } from './internal';
 
 export type {
