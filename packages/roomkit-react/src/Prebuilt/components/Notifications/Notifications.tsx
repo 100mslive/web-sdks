@@ -16,7 +16,7 @@ import {
 } from '@100mslive/react-sdk';
 import { GroupIcon } from '@100mslive/react-icons';
 import { Box, Button } from '../../..';
-import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -45,7 +45,6 @@ export function Notifications() {
   const notification = useHMSNotifications();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
-  const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
   const screenProps = useRoomLayoutConferencingScreen();
   const vanillaStore = useHMSVanillaStore();
@@ -111,12 +110,10 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
-        console.log('has role updated ', notification.data);
         if (notification.data?.isLocal && notification.data?.roleName) {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
-          updateRoomLayoutForRole?.(notification.data.roleName);
         }
         break;
       }

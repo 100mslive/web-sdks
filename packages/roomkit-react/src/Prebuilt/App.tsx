@@ -1,5 +1,10 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import {
+  HMSNotificationTypes,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
+} from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -8,6 +13,7 @@ import {
   HMSRoomProvider,
   selectIsConnectedToRoom,
   useHMSActions,
+  useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { AppData } from './components/AppData/AppData';
@@ -29,7 +35,12 @@ import { PreviewScreen } from './components/Preview/PreviewScreen';
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { Sheet } from './layouts/Sheet';
-import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
+import {
+  RoomLayoutContext,
+  RoomLayoutProvider,
+  useRoomLayout,
+  useUpdateRoomLayout,
+} from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
@@ -259,8 +270,13 @@ HMSPrebuilt.displayName = 'HMSPrebuilt';
 const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const notification = useHMSNotifications(HMSNotificationTypes.ROLE_UPDATED);
+  const updateRoomLayoutForRole = useUpdateRoomLayout();
   useAutoStartStreaming();
 
+  if (notification && notification.data?.isLocal && notification.data?.roleName) {
+    updateRoomLayoutForRole?.(notification.data.roleName);
+  }
   return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
     .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
     .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)
