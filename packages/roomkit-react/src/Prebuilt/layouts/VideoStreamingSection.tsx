@@ -78,8 +78,6 @@ export const VideoStreamingSection = ({
     return null;
   }
 
-  console.log('screenType: ', screenType);
-
   return (
     <Suspense fallback={<FullPageProgress />}>
       <Flex
