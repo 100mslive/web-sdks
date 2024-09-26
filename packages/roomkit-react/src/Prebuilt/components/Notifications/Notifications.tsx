@@ -111,6 +111,7 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
+        console.log('has role updated ', notification.data);
         if (notification.data?.isLocal && notification.data?.roleName) {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
