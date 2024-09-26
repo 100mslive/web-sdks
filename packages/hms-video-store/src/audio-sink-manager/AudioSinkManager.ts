@@ -136,7 +136,7 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
-        // try to wait for main execution to complete.
+        // try to wait for main execution to complete first
         await sleep(500);
         this.removeAudioElement(audioEl, track);
         await this.handleTrackAdd({ track, peer, callListener: false });

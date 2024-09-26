@@ -4,7 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
-import { getAudioDeviceCategory, isIOS } from '../internal';
+import { isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -443,14 +443,14 @@ export class DeviceManager implements HMSDeviceManager {
     let earpiece: InputDeviceInfo | null = null;
 
     for (const device of this.audioInput) {
-      const deviceCategory = getAudioDeviceCategory(device.label);
-      if (deviceCategory === 'speakerphone') {
+      const label = device.label.toLowerCase();
+      if (label.includes('speakerphone')) {
         speakerPhone = device;
-      } else if (deviceCategory === 'wired') {
+      } else if (label.includes('wired')) {
         wired = device;
-      } else if (deviceCategory === 'bluetooth') {
+      } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
         bluetoothDevice = device;
-      } else if (deviceCategory === 'speakerhone') {
+      } else if (label.includes('earpiece')) {
         earpiece = device;
       }
     }
@@ -498,7 +498,7 @@ export class DeviceManager implements HMSDeviceManager {
         this.earpieceSelected = true;
         return;
       }
-      await localAudioTrack.setSettings({ deviceId: 'default' }, true);
+      await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
       this.earpieceSelected = true;
     }
     await localAudioTrack.setSettings(
