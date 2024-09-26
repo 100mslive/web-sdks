@@ -78,6 +78,8 @@ export const VideoStreamingSection = ({
     return null;
   }
 
+  console.log('screenType: ', screenType);
+
   return (
     <Suspense fallback={<FullPageProgress />}>
       <Flex
@@ -91,7 +93,6 @@ export const VideoStreamingSection = ({
           .with({ isMobileHLSStream: true }, () => 'column')
           .otherwise(() => 'row')}
       >
-        console.log('screenType: ', screenType);
         {match({
           screenType,
           isNotAllowedToPublish,
