@@ -137,20 +137,29 @@ export class AudioSinkManager {
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         // try to wait for main execution to complete first
+        console.log('internal line ');
         await sleep(500);
         this.removeAudioElement(audioEl, track);
         await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
+    console.log('line 1');
     track.setAudioElement(audioEl);
+    console.log('line 2');
     await track.setVolume(this.volume);
+    console.log('line 3');
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);
+    console.log('line 4');
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
+    console.log('line 5');
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
+    console.log('line 6');
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    console.log('line 7');
     await this.handleAutoplayError(track);
+    console.log('line 8');
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
