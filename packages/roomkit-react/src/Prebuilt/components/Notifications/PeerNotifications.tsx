@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -7,9 +7,8 @@ import { useSetSubscribedChatSelector, useSubscribedNotifications } from '../App
 // @ts-ignore: No implicit Any
 import { CHAT_SELECTOR, SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
-const notificationTypes = [HMSNotificationTypes.PEER_JOINED, HMSNotificationTypes.PEER_LEFT];
-
-export const PeerNotifications = () => {
+export const PeerNotifications = React.memo(() => {
+  const notificationTypes = [HMSNotificationTypes.PEER_JOINED, HMSNotificationTypes.PEER_LEFT];
   const notification = useHMSNotifications(notificationTypes);
   const isPeerJoinSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_JOINED);
   const isPeerLeftSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_LEFT);
@@ -42,4 +41,4 @@ export const PeerNotifications = () => {
   }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, selectedPeer.id, setPeerSelector]);
 
   return null;
-};
+});
