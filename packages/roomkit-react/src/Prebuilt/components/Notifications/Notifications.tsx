@@ -26,6 +26,7 @@ import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorNotificationModal } from './PermissionErrorModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
+import { RoleChangeNotification } from './RoleChangeNotification';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
@@ -109,14 +110,6 @@ export function Notifications() {
           title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
         });
         break;
-      case HMSNotificationTypes.ROLE_UPDATED: {
-        if (notification.data?.isLocal && notification.data?.roleName) {
-          ToastManager.addToast({
-            title: `You are now a ${notification.data.roleName}`,
-          });
-        }
-        break;
-      }
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
         const track = notification.data?.track;
         if (!notification.data.enabled) {
@@ -197,6 +190,7 @@ export function Notifications() {
       {roomState === HMSRoomState.Connected ? <PeerNotifications /> : null}
       <ReconnectNotifications />
       <AutoplayBlockedModal />
+      <RoleChangeNotification />
       <PermissionErrorNotificationModal />
       <InitErrorModal />
       <ChatNotifications />
