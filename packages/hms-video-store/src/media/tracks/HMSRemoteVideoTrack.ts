@@ -18,9 +18,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
   private bizTrackId!: string;
+  private disableNoneLayerRequest = false;
 
-  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
+  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string, disableNoneLayerRequest?: boolean) {
     super(stream, track, source);
+    this.disableNoneLayerRequest = !!disableNoneLayerRequest;
     this.setVideoHandler(new VideoElementManager(this));
   }
 
@@ -146,10 +148,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
-    this._degraded =
-      this.enabled &&
-      (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
-      layerUpdate.current_layer === HMSSimulcastLayer.NONE;
+    this._degraded = this.getDegradationValue(layerUpdate);
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
@@ -169,8 +168,22 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this._degraded;
   }
 
+  private getDegradationValue(layerUpdate: VideoTrackLayerUpdate) {
+    return (
+      this.enabled &&
+      (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
+      layerUpdate.current_layer === HMSSimulcastLayer.NONE
+    );
+  }
+
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.enabled || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
+    let newLayer: HMSSimulcastLayer = this.preferredLayer;
+    if (this.enabled && this.hasSinks()) {
+      newLayer = this.preferredLayer;
+      // send none only when the flag is not set
+    } else if (!this.disableNoneLayerRequest) {
+      newLayer = HMSSimulcastLayer.NONE;
+    }
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }

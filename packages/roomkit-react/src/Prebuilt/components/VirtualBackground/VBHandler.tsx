@@ -2,7 +2,7 @@
 // eslint-disable-next-line
 import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { parsedUserAgent } from '@100mslive/react-sdk';
-import { isSafari } from '../../common/constants';
+import { isIOS, isSafari } from '../../common/constants';
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: any;
@@ -101,6 +101,18 @@ export class VBPlugin {
   reset = () => {
     this.effectsPlugin = undefined;
     this.hmsPlugin = undefined;
+  };
+
+  isBlurSupported = () => {
+    if ((isSafari || isIOS) && this.hmsPlugin) {
+      return false;
+    }
+
+    if (this.effectsPlugin) {
+      return true;
+    }
+
+    return false;
   };
 
   isEffectsSupported = () => {

@@ -62,4 +62,5 @@ export enum InitFlags {
   FLAG_HIPAA_ENABLED = 'hipaa',
   FLAG_NOISE_CANCELLATION = 'noiseCancellation',
   FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS = 'scaleScreenshareBasedOnPixels',
+  FLAG_DISABLE_NONE_LAYER_REQUEST = 'disableNoneLayerRequest',
 }

@@ -34,10 +34,10 @@ you want to do -
       passed in selector such that whenever the portion changes, the passed in callback is notified.
 2. Actions - The actions interface for dispatching actions which in turn may reach
    out to server and update the store. Check the interface with detailed doc
-   [here](src/core/IHMSActions.ts).
+   [here](./src/IHMSActions.ts).
 
 We also provide optimized and efficient selectors for most common use cases. These are
-available in [this folder](src/core/selectors).
+available in [this folder](./src/selectors).
 
 Important Note: The data received from either getState or Subscribe is immutable, the
 object received is frozen, and it is not allowed to mutate it. You'll get an error

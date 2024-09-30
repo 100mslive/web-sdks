@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   DeviceType,
+  getAudioDeviceCategory,
   selectIsLocalVideoEnabled,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
@@ -78,12 +79,13 @@ export const AudioActions = () => {
   if (!audioFiltered) {
     return null;
   }
+  const deviceCategory = getAudioDeviceCategory(currentSelection.label);
   let AudioIcon = <SpeakerIcon />;
-  if (currentSelection && currentSelection.label.toLowerCase().includes('bluetooth')) {
+  if (deviceCategory === 'bluetooth') {
     AudioIcon = <BluetoothIcon />;
-  } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
+  } else if (deviceCategory === 'wired') {
     AudioIcon = <HeadphonesIcon />;
-  } else if (currentSelection && currentSelection.label.toLowerCase().includes('earpiece')) {
+  } else if (deviceCategory === 'earpiece') {
     AudioIcon = <TelePhoneIcon />;
   }
   return (
