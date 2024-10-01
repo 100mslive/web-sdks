@@ -140,7 +140,9 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
 
   // reverse the height and width if mobile as mobile web browsers override the height and width basis orientation
   private improviseConstraintsAspect(): Partial<IHMSVideoTrackSettings> {
+    console.log('herer 1 improveise Constraint ');
     if (isMobile() && this.height && this.width && this.height > this.width) {
+      console.log('herer 2 improveise Constraint ');
       return {
         width: this.height,
         height: this.width,
