@@ -8,7 +8,6 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interface
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
-import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
@@ -57,6 +56,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
+    this.addTrackEventListeners(track);
 
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId
@@ -66,7 +66,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
-    this.eventBus.localVideoUnmutedNatively.subscribe(this.handleVisibilityChange);
     if (source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -115,7 +114,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
-      alert('replacing audio track');
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
@@ -150,17 +148,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    this.removeTrackEventListeners(prevTrack);
     this.tracksCreated.forEach(track => track.stop());
     this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
+      this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
-      alert(stringifyMediaStreamTrack(newTrack));
     } catch (e) {
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
+      this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
       await this.updateTrack(newTrack);
       if (this.isPublished) {
@@ -302,6 +302,38 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   getTrackBeingSent() {
     return this.processedTrack || this.nativeTrack;
   }
+
+  private addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('mute', this.handleTrackMute);
+    track.addEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('mute', this.handleTrackMute);
+    track.removeEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private handleTrackMute = () => {
+    HMSLogger.d(this.TAG, 'muted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: true,
+        reason: 'incoming-call',
+      }),
+    );
+  };
+
+  /** @internal */
+  handleTrackUnmute = () => {
+    HMSLogger.d(this.TAG, 'unmuted natively');
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: false,
+        reason: 'incoming-call',
+      }),
+    );
+    this.setEnabled(this.enabled);
+  };
 
   private replaceSenderTrack = async () => {
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {

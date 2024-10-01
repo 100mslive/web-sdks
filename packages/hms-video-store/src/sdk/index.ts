@@ -457,7 +457,6 @@ export class HMSSdk implements HMSInterface {
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
-        alert(JSON.stringify(tracks.join('\n')));
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
