@@ -85,6 +85,11 @@ export abstract class HMSTrack {
   protected setFirstTrackId(trackId: string) {
     this.firstTrackId = trackId;
   }
+
+  isTrackNotPublishing = () => {
+    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
+  };
+
   /**
    * @internal
    * It will send event to analytics when interruption start/stop

@@ -65,6 +65,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, room);
     this.setFirstTrackId(track.id);
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.handleVisibilityChange);
     if (source === 'regular') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -98,10 +99,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   resetManuallySelectedDeviceId() {
     this.manuallySelectedDeviceId = undefined;
   }
-
-  private isTrackNotPublishing = () => {
-    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
-  };
 
   private handleVisibilityChange = async () => {
     // track state is fine do nothing
@@ -185,7 +182,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled.
-    if (value && (isEmptyTrack(this.nativeTrack) || this.nativeTrack.muted)) {
+    if (value && (isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing())) {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
