@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
@@ -21,6 +21,7 @@ import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutPro
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
+import { DeviceInUseModal } from './DeviceInUseModal';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
@@ -54,6 +55,7 @@ export function Notifications() {
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const logoURL = useRoomLayout()?.logo?.url;
   const { pipWindow } = usePIPWindow();
+  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(false);
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -97,6 +99,21 @@ export function Notifications() {
             });
           }
           return;
+        }
+        if (notification.data?.code === 3003) {
+          ToastManager.addToast({
+            title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
+            action: (
+              <Button
+                outlined
+                variant="standard"
+                css={{ w: 'max-content' }}
+                onClick={() => setShowDeviceInUseModal(true)}
+              >
+                Help
+              </Button>
+            ),
+          });
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
         if (notification.data?.code === 3008 || notification.data?.code === 3001 || notification.data?.code === 3011) {
@@ -204,6 +221,7 @@ export function Notifications() {
       <ChatNotifications />
       <HandRaisedNotifications />
       <TranscriptionNotifications />
+      <DeviceInUseModal showDeviceInUseModal={showDeviceInUseModal} setShowDeviceInUseModal={setShowDeviceInUseModal} />
     </>
   );
 }
