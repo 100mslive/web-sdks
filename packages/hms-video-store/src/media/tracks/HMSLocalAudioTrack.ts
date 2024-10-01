@@ -8,6 +8,7 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interface
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
+import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
@@ -114,6 +115,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
+      alert('replacing audio track');
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       await this.replaceTrackWith(this.settings);
       this.eventBus.analytics.publish(
@@ -155,6 +157,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.tracksCreated.add(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
+      alert(stringifyMediaStreamTrack(newTrack));
     } catch (e) {
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
