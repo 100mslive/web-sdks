@@ -435,13 +435,6 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
-    // Request permissions and populate devices before waiting for policy
-    if (config.alwaysRequestPermissions) {
-      this.localTrackManager.requestPermissions().then(async () => {
-        await this.initDeviceManagers();
-      });
-    }
-
     let initSuccessful = false;
     let networkTestFinished = false;
     const timerId = setTimeout(() => {
