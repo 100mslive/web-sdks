@@ -134,10 +134,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   // eslint-disable-next-line complexity
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) {
-      if (value && !this.isTrackNotPublishing()) {
-        HMSLogger.d(this.TAG, 'track is in valid state and enable state is same');
-        return;
-      }
+      return;
     }
     if (this.source === 'regular') {
       let track: MediaStreamTrack;

@@ -102,7 +102,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private handleVisibilityChange = async () => {
     // track state is fine do nothing
-    if (!this.isTrackNotPublishing()) {
+    if (!this.shouldReacquireTrack()) {
       HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
       return;
     }
@@ -184,8 +184,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
 
-    // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled.
-    if (value && (isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing())) {
+    // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
+    if (value && this.shouldReacquireTrack()) {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
@@ -341,6 +341,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
     await this.transceiver.sender.replaceTrack(this.processedTrack || this.nativeTrack);
+  };
+
+  private shouldReacquireTrack = () => {
+    return (
+      isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing() || this.audioLevelMonitor?.isSilentThisInstant()
+    );
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
