@@ -6,6 +6,7 @@ import {
   RID,
   selectConnectionQualityByPeerID,
   selectHMSStats,
+  selectRoom,
   simulcastMapping,
   useHMSStatsStore,
   useHMSStore,
@@ -35,6 +36,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   const availableOutgoingBitrate = useHMSStatsStore(selectHMSStats.availablePublishBitrate);
   const qoe = useQoE({ videoTrackID, audioTrackID, isLocal });
+  const { websocketUrl = '', initEndpoint = '', enabledFlags = [] } = useHMSStore(selectRoom);
 
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
@@ -52,6 +54,16 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 tooltip="Available Outgoing Bitrate"
                 value={formatBytes(availableOutgoingBitrate, 'b/s')}
               />
+
+              <Stats.Gap />
+              <StatsRow show={!!websocketUrl} label="Websocket" tooltip="WebsocketURL" value={websocketUrl} />
+              <StatsRow show={!!initEndpoint} label="InitEndpoint" tooltip="InitEndpoint" value={initEndpoint} />
+              <StatsRow show={enabledFlags.length > 0} label="Enabled Flags" value={' '} />
+              {enabledFlags.map(flag => (
+                <StatsRow key={flag} show label={flag} />
+              ))}
+
+              <Stats.Gap />
               {localVideoTrackStats?.map(stat => {
                 if (!stat) {
                   return null;

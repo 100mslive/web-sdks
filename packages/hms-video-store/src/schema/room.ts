@@ -45,4 +45,7 @@ export interface HMSRoom {
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
+  enabledFlags?: string[];
+  websocketUrl?: string;
+  initEndpoint?: string;
 }

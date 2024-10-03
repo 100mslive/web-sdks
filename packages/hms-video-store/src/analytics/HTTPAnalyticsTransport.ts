@@ -38,7 +38,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   isConnected = true;
   private env: null | ENV = null;
-  private websocketURL = '';
+  public websocketURL = '';
 
   setEnv(env: ENV) {
     this.env = env;

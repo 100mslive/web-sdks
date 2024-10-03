@@ -163,6 +163,9 @@ export class SDKToHMS {
       isVBEnabled: sdkRoom.isVBEnabled,
       effectsKey: sdkRoom.effectsKey,
       isHipaaEnabled: sdkRoom.isHipaaEnabled,
+      enabledFlags: sdkRoom.enabledFlags,
+      websocketUrl: sdkRoom.websocketUrl,
+      initEndpoint: sdkRoom.initEndpoint,
       isNoiseCancellationEnabled: sdkRoom.isNoiseCancellationEnabled,
     };
   }

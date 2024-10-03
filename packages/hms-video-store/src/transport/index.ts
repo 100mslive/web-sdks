@@ -1088,6 +1088,7 @@ export default class HMSTransport {
     }
   }
 
+  // eslint-disable-next-line complexity
   private async internalConnect(token: string, initEndpoint: string, peerId: string, iceServers?: HMSICEServer[]) {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
@@ -1109,9 +1110,16 @@ export default class HMSTransport {
         room.isVBEnabled = this.isFlagEnabled(InitFlags.FLAG_VB_ENABLED);
         room.isHipaaEnabled = this.isFlagEnabled(InitFlags.FLAG_HIPAA_ENABLED);
         room.isNoiseCancellationEnabled = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
+        room.enabledFlags = [];
+        const allFlags = Object.values(InitFlags);
+        room.enabledFlags = allFlags.filter(flag => this.isFlagEnabled(flag));
+        room.initEndpoint = initEndpoint;
       }
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
+      if (room) {
+        room.websocketUrl = HTTPAnalyticsTransport.websocketURL;
+      }
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);

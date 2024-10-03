@@ -459,7 +459,9 @@ export const selectIsLargeRoom = createSelector(selectRoom, room => !!room.isLar
 export const selectIsEffectsEnabled = createSelector(selectRoom, room => !!room.isEffectsEnabled);
 export const selectIsVBEnabled = createSelector(selectRoom, room => !!room.isVBEnabled);
 export const selectEffectsKey = createSelector(selectRoom, room => room.effectsKey);
-
+export const selectWebsocketURL = createSelector(selectRoom, room => room.websocketUrl);
+export const selectInitEndpoint = createSelector(selectRoom, room => room.initEndpoint);
+export const selectEnabledFlags = createSelector(selectRoom, room => room.enabledFlags);
 export const selectTemplateAppData = (store: HMSStore) => store.templateAppData;
 /** @deprecated - use `selectSessionStore` instead */
 export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;

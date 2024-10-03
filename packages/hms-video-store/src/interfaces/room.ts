@@ -40,6 +40,9 @@ export interface HMSRoom {
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
   transcriptions?: HMSTranscriptionInfo[];
+  enabledFlags?: string[];
+  websocketUrl?: string;
+  initEndpoint?: string;
 }
 
 export interface HMSRecording {
