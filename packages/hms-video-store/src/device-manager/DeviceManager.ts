@@ -450,7 +450,7 @@ export class DeviceManager implements HMSDeviceManager {
         wired = device;
       } else if (deviceCategory === 'bluetooth') {
         bluetoothDevice = device;
-      } else if (deviceCategory === 'speakerhone') {
+      } else if (deviceCategory === 'earpiece') {
         earpiece = device;
       }
     }
