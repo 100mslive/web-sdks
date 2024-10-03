@@ -67,7 +67,7 @@ export const HMSAudioContextHandler: HMSAudioContext = {
 export const getAudioDeviceCategory = (deviceLabel: string) => {
   const label = deviceLabel.toLowerCase();
   if (label.includes('speakerphone')) {
-    return 'speakerhone';
+    return 'speakerphone';
   } else if (label.includes('wired')) {
     return 'wired';
   } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
