@@ -1325,6 +1325,16 @@ export class HMSSdk implements HMSInterface {
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
     for (const track of tracks) {
       await this.transport.publish([track]);
+      if (track.isTrackNotPublishing()) {
+        this.sendAnalyticsEvent(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error: ErrorFactory.TracksErrors.NoDataInTrack(
+              `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+            ),
+          }),
+        );
+      }
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
@@ -1555,12 +1565,10 @@ export class HMSSdk implements HMSInterface {
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
     HMSLogger.w(this.TAG, 'Audio Presence Failure', this.transportState, error);
-    // this.sendAnalyticsEvent(
-    //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
-    // );
-    if (this.isDiagnostics) {
-      this.listener?.onError(error);
-    }
+    this.sendAnalyticsEvent(
+      AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
+    );
+    this.listener?.onError(error);
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {

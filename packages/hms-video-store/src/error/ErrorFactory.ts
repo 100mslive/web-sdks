@@ -251,6 +251,16 @@ export const ErrorFactory = {
         false,
       );
     },
+
+    NoDataInTrack(description: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.NO_DATA,
+        'Track is not publishing any data',
+        HMSAction.TRACK,
+        description,
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {
