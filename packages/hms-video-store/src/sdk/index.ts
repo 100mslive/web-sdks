@@ -1326,14 +1326,16 @@ export class HMSSdk implements HMSInterface {
     for (const track of tracks) {
       await this.transport.publish([track]);
       if (track.isTrackNotPublishing()) {
+        const error = ErrorFactory.TracksErrors.NoDataInTrack(
+          `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+        );
         this.sendAnalyticsEvent(
           AnalyticsEventFactory.publish({
             devices: this.deviceManager.getDevices(),
-            error: ErrorFactory.TracksErrors.NoDataInTrack(
-              `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
-            ),
+            error: error,
           }),
         );
+        this.listener?.onError(error);
       }
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
