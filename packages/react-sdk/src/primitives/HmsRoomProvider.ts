@@ -208,7 +208,6 @@ export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
     }
 
     const unsubscribe = HMSContextConsumer.notifications.onNotification<T>(notification => {
-      console.log('notification-useEffect', notification);
       setNotification(notification);
     }, type);
     return unsubscribe;
