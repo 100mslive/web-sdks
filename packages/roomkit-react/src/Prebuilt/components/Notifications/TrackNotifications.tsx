@@ -12,6 +12,8 @@ export const TrackNotifications = () => {
   useEffect(() => {
     if (notification) {
       console.debug(`[${notification.type}]`, notification);
+    } else {
+      return;
     }
   }, [notification]);
 
