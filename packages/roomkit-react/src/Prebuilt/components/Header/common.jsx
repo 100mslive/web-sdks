@@ -77,15 +77,9 @@ export const AudioActions = () => {
   const currentSelection = availableAudioDevices?.find(item => item.deviceId === selectedAudio);
 
   if (!audioFiltered) {
-    console.log('No audio devices found, exiting AudioActions');
     return null;
   }
-  let deviceCategory = 'speakerphone';
-  if (currentSelection) {
-    deviceCategory = getAudioDeviceCategory(currentSelection.label);
-  } else {
-    console.log('Current Selection of audio devices not found');
-  }
+  let deviceCategory = getAudioDeviceCategory(currentSelection?.label);
   let AudioIcon = <SpeakerIcon />;
   if (deviceCategory === 'bluetooth') {
     AudioIcon = <BluetoothIcon />;
