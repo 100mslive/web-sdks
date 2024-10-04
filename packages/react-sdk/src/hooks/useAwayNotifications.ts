@@ -17,6 +17,7 @@ export const useAwayNotifications = () => {
       if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
         return;
       }
+      console.log('Requesting Notification Permission', Notification);
       const unsubscribe = vanillaStore.subscribe(async role => {
         if (role && role !== '__internal_recorder') {
           await Notification.requestPermission();
