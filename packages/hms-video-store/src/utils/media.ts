@@ -64,7 +64,11 @@ export const HMSAudioContextHandler: HMSAudioContext = {
   },
 };
 
-export const getAudioDeviceCategory = (deviceLabel: string) => {
+export const getAudioDeviceCategory = (deviceLabel?: string) => {
+  if (!deviceLabel) {
+    HMSLogger.e('[DeviceManager]:', 'No device label provided');
+    return 'speakerphone';
+  }
   const label = deviceLabel.toLowerCase();
   if (label.includes('speakerphone')) {
     return 'speakerphone';
