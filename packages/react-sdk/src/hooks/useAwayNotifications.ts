@@ -14,6 +14,7 @@ export const useAwayNotifications = () => {
       if (navigator.webdriver) {
         return;
       }
+      console.log('###### Notifications not supported');
       if (!('Notification' in window)) {
         // Notifications not supported
         return;
