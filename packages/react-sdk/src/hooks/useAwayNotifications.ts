@@ -6,11 +6,16 @@ import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 // Do not prompt if preview is not available. Skips for beam
 export const useAwayNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
+  // eslint-disable-next-line complexity
   const requestPermission = useCallback(async () => {
     // Headless check for beam
 
     try {
       if (navigator.webdriver) {
+        return;
+      }
+      if (!('Notification' in window)) {
+        // Notifications not supported
         return;
       }
 
