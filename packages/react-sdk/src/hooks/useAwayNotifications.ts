@@ -14,18 +14,21 @@ export const useAwayNotifications = () => {
         return;
       }
 
-      console.log('Requesting Notification Permission !Notification');
+      console.log('###### Requesting Notification Permission !Notification');
       if (!Notification) {
+        console.log('###### Requesting Notification exiting early');
         return;
       }
 
-      console.log('Requesting Notification Permission !permission');
+      console.log('###### will Request for Notification');
       if (Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+        console.log('###### Requesting Notification?.permission exiting early');
         return;
       }
-      console.log('Requesting Notification Permission unsuscribe', Notification);
+      console.log('###### Requesting Notification Permission unsubscribe', Notification);
       const unsubscribe = vanillaStore.subscribe(async role => {
         if (role && role !== '__internal_recorder') {
+          console.log('###### Requesting Notification now', Notification);
           await Notification?.requestPermission();
           unsubscribe?.();
         }
