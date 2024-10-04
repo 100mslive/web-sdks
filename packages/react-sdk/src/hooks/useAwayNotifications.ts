@@ -8,18 +8,24 @@ export const useAwayNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const requestPermission = useCallback(async () => {
     // Headless check for beam
-    if (navigator.webdriver) {
-      return;
-    }
-    if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
-      return;
-    }
-    const unsubscribe = vanillaStore.subscribe(async role => {
-      if (role && role !== '__internal_recorder') {
-        await Notification.requestPermission();
-        unsubscribe?.();
+
+    try {
+      if (navigator.webdriver) {
+        return;
       }
-    }, selectLocalPeerRoleName);
+
+      if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+        return;
+      }
+      const unsubscribe = vanillaStore.subscribe(async role => {
+        if (role && role !== '__internal_recorder') {
+          await Notification.requestPermission();
+          unsubscribe?.();
+        }
+      }, selectLocalPeerRoleName);
+    } catch (e) {
+      console.log(e);
+    }
   }, [vanillaStore]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
