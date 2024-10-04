@@ -14,16 +14,23 @@ export const useAwayNotifications = () => {
         return;
       }
 
-      if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+      console.log('Requesting Notification Permission !Notification');
+      if (!Notification) {
         return;
       }
-      console.log('Requesting Notification Permission', Notification);
+
+      console.log('Requesting Notification Permission !permission');
+      if (Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+        return;
+      }
+      console.log('Requesting Notification Permission unsuscribe', Notification);
       const unsubscribe = vanillaStore.subscribe(async role => {
         if (role && role !== '__internal_recorder') {
           await Notification?.requestPermission();
           unsubscribe?.();
         }
       }, selectLocalPeerRoleName);
+      console.log('Requesting Notification Permission success', Notification);
     } catch (e) {
       console.log(e);
     }
