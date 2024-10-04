@@ -20,7 +20,7 @@ export const useAwayNotifications = () => {
       console.log('Requesting Notification Permission', Notification);
       const unsubscribe = vanillaStore.subscribe(async role => {
         if (role && role !== '__internal_recorder') {
-          await Notification.requestPermission();
+          await Notification?.requestPermission();
           unsubscribe?.();
         }
       }, selectLocalPeerRoleName);
