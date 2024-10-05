@@ -79,7 +79,7 @@ export const AudioActions = () => {
   if (!audioFiltered) {
     return null;
   }
-  let deviceCategory = getAudioDeviceCategory(currentSelection?.label);
+  const deviceCategory = getAudioDeviceCategory(currentSelection?.label);
   let AudioIcon = <SpeakerIcon />;
   if (deviceCategory === 'bluetooth') {
     AudioIcon = <BluetoothIcon />;
