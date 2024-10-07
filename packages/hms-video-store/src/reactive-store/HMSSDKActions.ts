@@ -845,6 +845,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, reason);
   }
 
+  getCallDetails() {
+    return this.sdk.getCallDetails();
+  }
+
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),

@@ -5,6 +5,7 @@ import {
   selectLocalPeerID,
   selectPeersMap,
   selectTracksMap,
+  useHMSActions,
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -27,6 +28,9 @@ export const StatsForNerds = ({ onOpenChange }) => {
     () => [{ id: 'local-peer', label: 'Local Peer Stats' }, ...tracksWithLabels],
     [tracksWithLabels],
   );
+  const hmsActions = useHMSActions();
+  const details = hmsActions.getCallDetails();
+  console.log({ details });
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
   const [open, setOpen] = useState(false);
@@ -228,6 +232,16 @@ const TrackStats = ({ trackID, layer, local }) => {
     </Flex>
   );
 };
+
+// const CallDetails = ({ details }) => {
+//   return (
+//     <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
+//       <StatsRow label="Websocket URL" value={details.callDuration} />
+//       <StatsRow label="Init Endpoint" value={details.totalParticipants} />
+//       <StatsRow label="Enabled flags" value={details.totalStreams} />
+//     </Flex>
+//   );
+// };
 
 const StatsRow = React.memo(({ label, value }) => (
   <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3' }}>

@@ -6,3 +6,9 @@ export interface HMSMediaSettings {
   audioOutputDeviceId?: string;
   audioMode?: HMSAudioMode;
 }
+
+export interface CallDetails {
+  websocketUrl?: string;
+  enabledFlags?: string[];
+  initEndpoint?: string;
+}

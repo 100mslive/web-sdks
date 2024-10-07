@@ -72,6 +72,7 @@ import {
 } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
+import { CallDetails } from '../schema';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
@@ -277,6 +278,17 @@ export class HMSSdk implements HMSInterface {
 
   getWebrtcInternals() {
     return this.transport?.getWebrtcInternals();
+  }
+
+  getCallDetails(): CallDetails {
+    const websocketUrl = this.transport.getWebsocketEndpoint();
+    const enabledFlags = Object.values(InitFlags).filter(flag => this.transport.isFlagEnabled(flag));
+    const initEndpoint = this.store.getConfig()?.initEndpoint;
+    return {
+      websocketUrl,
+      enabledFlags,
+      initEndpoint,
+    };
   }
 
   getSessionStore() {
