@@ -285,7 +285,7 @@ export class HMSSdk implements HMSInterface {
     const enabledFlags = Object.values(InitFlags).filter(flag => this.transport.isFlagEnabled(flag));
     const initEndpoint = this.store.getConfig()?.initEndpoint;
     return {
-      websocketUrl,
+      websocketURL: websocketUrl,
       enabledFlags,
       initEndpoint,
     };

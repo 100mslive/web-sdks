@@ -8,7 +8,7 @@ export interface HMSMediaSettings {
 }
 
 export interface CallDetails {
-  websocketUrl?: string;
+  websocketURL?: string;
   enabledFlags?: string[];
   initEndpoint?: string;
 }

@@ -9,6 +9,7 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Accordion } from '../../Accordion';
 import { HorizontalDivider } from '../../Divider';
 import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
@@ -30,7 +31,6 @@ export const StatsForNerds = ({ onOpenChange }) => {
   );
   const hmsActions = useHMSActions();
   const details = hmsActions.getCallDetails();
-  console.log({ details });
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
   const [open, setOpen] = useState(false);
@@ -50,7 +50,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
         <Dialog.Content
           css={{
             width: 'min(500px, 95%)',
-            maxHeight: '100%',
+            height: 'min(656px, 90%)',
             overflowY: 'auto',
           }}
         >
@@ -74,6 +74,9 @@ export const StatsForNerds = ({ onOpenChange }) => {
             </Text>
           </Flex>
           {/* Select */}
+          <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
+            <CallDetails details={details} />
+          </Flex>
           <Flex
             direction="column"
             css={{
@@ -233,18 +236,29 @@ const TrackStats = ({ trackID, layer, local }) => {
   );
 };
 
-// const CallDetails = ({ details }) => {
-//   return (
-//     <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
-//       <StatsRow label="Websocket URL" value={details.callDuration} />
-//       <StatsRow label="Init Endpoint" value={details.totalParticipants} />
-//       <StatsRow label="Enabled flags" value={details.totalStreams} />
-//     </Flex>
-//   );
-// };
+const CallDetails = ({ details }) => {
+  return (
+    <Accordion.Root type="single" collapsible css={{ w: '100%' }}>
+      <Accordion.Item value="Call Details">
+        <Accordion.Header>
+          <Label variant="body2" css={{ c: '$on_surface_high' }}>
+            Call Details
+          </Label>
+        </Accordion.Header>
+        <Accordion.Content>
+          <Flex css={{ flexWrap: 'wrap', mt: '$10', gap: '$10' }}>
+            <StatsRow css={{ w: 'calc(100% - $6)' }} label="Websocket URL" value={details?.websocketURL} />
+            <StatsRow css={{ w: 'calc(100% - $6)' }} label="Init Endpoint" value={details?.initEndpoint} />
+            <StatsRow css={{ w: 'calc(100% - $6)' }} label="Enabled flags" value={details?.enabledFlags?.join(', ')} />
+          </Flex>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion.Root>
+  );
+};
 
-const StatsRow = React.memo(({ label, value }) => (
-  <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3' }}>
+const StatsRow = React.memo(({ label, value, css }) => (
+  <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3', ...css }}>
     <Text
       variant="overline"
       css={{
