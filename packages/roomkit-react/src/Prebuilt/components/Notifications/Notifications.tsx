@@ -71,8 +71,7 @@ export function Notifications() {
     'Notifications.tsx: Notifications(): ',
     !notification,
     isNotificationDisabled,
-    notification?.type,
-    notification?.data,
+    notification,
     roleNotification,
   );
 
@@ -81,8 +80,7 @@ export function Notifications() {
       console.warn(
         'Notifications.tsx: Notifications(): return: --------',
         !notification || isNotificationDisabled,
-        notification?.type,
-        notification?.data,
+        notification,
         roleNotification,
       );
       return;
