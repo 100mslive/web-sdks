@@ -1,7 +1,10 @@
-import React from 'react';
-import { Dialog, Text } from '../../..';
+import React, { useEffect, useState } from 'react';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { Button, Dialog, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
 
 const Instruction = ({ number, description }: { number: string; description: string }) => (
   <DialogRow css={{ alignItems: 'baseline', justifyContent: 'normal', gap: '$4' }}>
@@ -10,13 +13,23 @@ const Instruction = ({ number, description }: { number: string; description: str
   </DialogRow>
 );
 
-export function DeviceInUseModal({
-  showDeviceInUseModal,
-  setShowDeviceInUseModal,
-}: {
-  showDeviceInUseModal: boolean;
-  setShowDeviceInUseModal: (show: boolean) => void;
-}) {
+export function DeviceInUseError() {
+  const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
+  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(false);
+
+  useEffect(() => {
+    if (notification?.data?.code === 3003) {
+      ToastManager.addToast({
+        title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
+        action: (
+          <Button outlined variant="standard" css={{ w: 'max-content' }} onClick={() => setShowDeviceInUseModal(true)}>
+            Help
+          </Button>
+        ),
+      });
+    }
+  }, [notification]);
+
   return (
     <Dialog.Root
       open={showDeviceInUseModal}
