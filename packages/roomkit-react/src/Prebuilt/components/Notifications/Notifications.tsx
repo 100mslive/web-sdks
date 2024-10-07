@@ -64,7 +64,7 @@ export function Notifications() {
 
   useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
 
-  console.log(
+  console.warn(
     'Notifications.tsx: Notifications(): ',
     !notification,
     isNotificationDisabled,
@@ -74,6 +74,12 @@ export function Notifications() {
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {
+      console.warn(
+        'Notifications.tsx: Notifications(): return: --------',
+        !notification || isNotificationDisabled,
+        notification?.type,
+        notification?.data,
+      );
       return;
     }
     switch (notification.type) {
