@@ -205,7 +205,12 @@ export function Notifications() {
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED]);
+  }, [
+    notification,
+    subscribedNotifications.ERROR,
+    subscribedNotifications.METADATA_UPDATED,
+    subscribedNotifications.ROLE_UPDATED,
+  ]);
 
   if (isNotificationDisabled) {
     return null;
