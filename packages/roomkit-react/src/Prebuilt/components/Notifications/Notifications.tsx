@@ -204,15 +204,11 @@ export function Notifications() {
         }
         break;
       default:
+        console.warn('Notifications.tsx: default: ', notification);
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    notification,
-    subscribedNotifications.ERROR,
-    subscribedNotifications.METADATA_UPDATED,
-    subscribedNotifications.ROLE_UPDATED,
-  ]);
+  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED]);
 
   if (isNotificationDisabled) {
     return null;
