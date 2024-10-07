@@ -131,10 +131,13 @@ export function Notifications() {
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
         if (notification.data?.isLocal && notification.data?.roleName) {
+          console.warn('Notifications.tsx: HMSNotificationTypes.ROLE_UPDATED: ', notification.data);
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
           updateRoomLayoutForRole?.(notification.data.roleName);
+        } else {
+          console.warn('Notifications.tsx: Skipping HMSNotificationTypes.ROLE_UPDATED: ', notification.data);
         }
         break;
       }
