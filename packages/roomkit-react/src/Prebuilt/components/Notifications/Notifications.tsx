@@ -55,7 +55,10 @@ export function Notifications() {
   const logoURL = useRoomLayout()?.logo?.url;
   const { pipWindow } = usePIPWindow();
 
+  const roleNotification = useHMSNotifications(HMSNotificationTypes.ROLE_UPDATED);
+
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
+    console.warn('Notifications.tsx: handleRoleChangeDenied(): ', request);
     ToastManager.addToast({
       title: `${request.peerName} denied your request to join the ${request.role.name} role`,
       variant: 'error',
@@ -70,6 +73,7 @@ export function Notifications() {
     isNotificationDisabled,
     notification?.type,
     notification?.data,
+    roleNotification,
   );
 
   useEffect(() => {
@@ -79,6 +83,7 @@ export function Notifications() {
         !notification || isNotificationDisabled,
         notification?.type,
         notification?.data,
+        roleNotification,
       );
       return;
     }
