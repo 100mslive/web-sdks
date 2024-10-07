@@ -40,9 +40,22 @@ import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
 
+const notificationTypes = [
+  HMSNotificationTypes.NAME_UPDATED,
+  HMSNotificationTypes.ERROR,
+  HMSNotificationTypes.ROLE_UPDATED,
+  HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+  HMSNotificationTypes.REMOVED_FROM_ROOM,
+  HMSNotificationTypes.ROOM_ENDED,
+  HMSNotificationTypes.DEVICE_CHANGE_UPDATE,
+  HMSNotificationTypes.POLL_STARTED,
+  HMSNotificationTypes.POLL_STOPPED,
+  HMSNotificationTypes.NEW_MESSAGE,
+];
+
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
-  const notification = useHMSNotifications();
+  const notification = useHMSNotifications(notificationTypes);
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
