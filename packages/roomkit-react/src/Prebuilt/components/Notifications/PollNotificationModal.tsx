@@ -8,8 +8,10 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
+// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 
 const notificationTypes = [HMSNotificationTypes.POLL_STARTED, HMSNotificationTypes.POLL_STOPPED];
