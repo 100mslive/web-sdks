@@ -202,8 +202,11 @@ export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
     throw new Error(hooksErrorMessage);
   }
 
+  console.warn('useHMSNotifications: rendered ', HMSContextConsumer.notifications);
   useEffect(() => {
+    console.warn('useHMSNotifications: ', HMSContextConsumer.notifications);
     if (!HMSContextConsumer.notifications) {
+      console.warn('useHMSNotifications: return');
       return;
     }
     const unsubscribe = HMSContextConsumer.notifications.onNotification<T>(notification => {
