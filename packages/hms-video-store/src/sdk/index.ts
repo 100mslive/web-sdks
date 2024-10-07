@@ -281,11 +281,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   getDebugInfo(): DebugInfo {
-    const websocketUrl = this.transport.getWebsocketEndpoint();
+    const websocketURL = this.transport.getWebsocketEndpoint();
     const enabledFlags = Object.values(InitFlags).filter(flag => this.transport.isFlagEnabled(flag));
     const initEndpoint = this.store.getConfig()?.initEndpoint;
     return {
-      websocketURL: websocketUrl,
+      websocketURL,
       enabledFlags,
       initEndpoint,
     };
