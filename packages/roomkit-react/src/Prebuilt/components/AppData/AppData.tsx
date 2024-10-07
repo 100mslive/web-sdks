@@ -46,6 +46,7 @@ const initialAppData = {
     NEW_MESSAGE: true,
     ERROR: true,
     METADATA_UPDATED: true,
+    ROLE_UPDATED: true,
   },
   [APP_DATA.chatOpen]: false,
   [APP_DATA.chatSelector]: {

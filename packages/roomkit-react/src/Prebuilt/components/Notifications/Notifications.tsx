@@ -73,6 +73,7 @@ export function Notifications() {
     isNotificationDisabled,
     notification,
     roleNotification,
+    subscribedNotifications,
   );
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export function Notifications() {
         !notification || isNotificationDisabled,
         notification,
         roleNotification,
+        subscribedNotifications,
       );
       return;
     }
