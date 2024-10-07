@@ -25,7 +25,7 @@ import {
   TokenRequestOptions,
 } from './internal';
 import {
-  CallDetails,
+  DebugInfo,
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
@@ -583,5 +583,5 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   initDiagnostics(): HMSDiagnosticsInterface;
 
-  getCallDetails(): CallDetails;
+  getDebugInfo(): DebugInfo;
 }

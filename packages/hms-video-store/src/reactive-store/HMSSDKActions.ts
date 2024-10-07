@@ -845,8 +845,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, reason);
   }
 
-  getCallDetails() {
-    return this.sdk.getCallDetails();
+  getDebugInfo() {
+    return this.sdk.getDebugInfo();
   }
 
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {

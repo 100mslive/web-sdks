@@ -30,7 +30,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
     [tracksWithLabels],
   );
   const hmsActions = useHMSActions();
-  const details = hmsActions.getCallDetails();
+  const details = hmsActions.getDebugInfo();
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
   const [open, setOpen] = useState(false);
@@ -74,9 +74,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
             </Text>
           </Flex>
           {/* Select */}
-          <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
-            <CallDetails details={details} />
-          </Flex>
+
           <Flex
             direction="column"
             css={{
@@ -126,6 +124,9 @@ export const StatsForNerds = ({ onOpenChange }) => {
           ) : (
             <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
           )}
+          <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
+            <DebugInfo details={details} />
+          </Flex>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -236,7 +237,7 @@ const TrackStats = ({ trackID, layer, local }) => {
   );
 };
 
-const CallDetails = ({ details }) => {
+const DebugInfo = ({ details }) => {
   return (
     <Accordion.Root type="single" collapsible css={{ w: '100%' }}>
       <Accordion.Item value="Call Details">
