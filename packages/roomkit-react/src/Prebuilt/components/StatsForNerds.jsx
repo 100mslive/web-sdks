@@ -240,10 +240,10 @@ const TrackStats = ({ trackID, layer, local }) => {
 const DebugInfo = ({ details }) => {
   return (
     <Accordion.Root type="single" collapsible css={{ w: '100%' }}>
-      <Accordion.Item value="Call Details">
+      <Accordion.Item value="Debug Info">
         <Accordion.Header>
           <Label variant="body2" css={{ c: '$on_surface_high' }}>
-            Call Details
+            Debug Info
           </Label>
         </Accordion.Header>
         <Accordion.Content>
