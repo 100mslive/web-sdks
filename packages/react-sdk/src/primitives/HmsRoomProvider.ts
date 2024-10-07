@@ -204,7 +204,7 @@ export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
 
   console.warn('useHMSNotifications: rendered ', HMSContextConsumer.notifications);
   useEffect(() => {
-    console.warn('useHMSNotifications: ', HMSContextConsumer.notifications);
+    console.warn('useHMSNotifications: useEffect ', HMSContextConsumer.notifications);
     if (!HMSContextConsumer.notifications) {
       console.warn('useHMSNotifications: return');
       return;
