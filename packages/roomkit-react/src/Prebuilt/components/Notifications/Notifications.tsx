@@ -44,6 +44,7 @@ const notificationTypes = [
   HMSNotificationTypes.NAME_UPDATED,
   HMSNotificationTypes.ERROR,
   HMSNotificationTypes.ROLE_UPDATED,
+  HMSNotificationTypes.METADATA_UPDATED,
   HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
   HMSNotificationTypes.REMOVED_FROM_ROOM,
   HMSNotificationTypes.ROOM_ENDED,
