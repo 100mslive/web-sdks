@@ -7,8 +7,8 @@ import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 export const useAwayNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const requestPermission = useCallback(async () => {
-    // Headless check for beam
-    if (navigator.webdriver) {
+    if (!('Notification' in window) || navigator.webdriver) {
+      // Notifications not supported
       return;
     }
     if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
