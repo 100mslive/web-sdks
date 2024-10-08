@@ -60,14 +60,7 @@ export const PeerNotifications = () => {
         return;
     }
     ToastBatcher.showToast({ notification });
-  }, [
-    notification,
-    isPeerJoinSubscribed,
-    isPeerLeftSubscribed,
-    selectedPeer.id,
-    setPeerSelector,
-    updateRoomLayoutForRole,
-  ]);
+  }, [notification]);
 
   return null;
 };
