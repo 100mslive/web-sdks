@@ -450,7 +450,21 @@ export class HMSSdk implements HMSInterface {
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
-        tracks.forEach(track => this.setLocalPeerTrack(track));
+        tracks.forEach(track => {
+          this.setLocalPeerTrack(track);
+          if (track.isTrackNotPublishing()) {
+            const error = ErrorFactory.TracksErrors.NoDataInTrack(
+              `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+            );
+            this.sendAnalyticsEvent(
+              AnalyticsEventFactory.publish({
+                devices: this.deviceManager.getDevices(),
+                error: error,
+              }),
+            );
+            this.listener?.onError(error);
+          }
+        });
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
