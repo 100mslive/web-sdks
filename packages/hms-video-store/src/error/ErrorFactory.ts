@@ -251,6 +251,16 @@ export const ErrorFactory = {
         false,
       );
     },
+
+    NoDataInTrack(description: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.NO_DATA,
+        'Track does not have any data',
+        HMSAction.TRACK,
+        description,
+        'This could possibily due to another application taking priority over the access to camera or microphone or due to an incoming call',
+      );
+    },
   },
 
   WebrtcErrors: {
