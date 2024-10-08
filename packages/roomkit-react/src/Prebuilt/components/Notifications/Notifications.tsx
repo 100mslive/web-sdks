@@ -5,8 +5,8 @@ import { HMSRoleChangeRequest, HMSRoomState, selectRoomState, useCustomEvent, us
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
-import { DeviceInUseError } from './DeviceInUseError';
 import { DeviceChangeNotifications } from './DeviceChangeNotifications';
+import { DeviceInUseError } from './DeviceInUseError';
 import { ErrorNotifications } from './ErrorNotifications';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
