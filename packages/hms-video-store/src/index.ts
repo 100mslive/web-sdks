@@ -12,6 +12,7 @@ export * from './selectors';
 export * from './webrtc-stats';
 export {
   HMSAudioMode,
+  HMSAudioDeviceCategory,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
