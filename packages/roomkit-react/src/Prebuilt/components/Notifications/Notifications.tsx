@@ -6,6 +6,7 @@ import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
 import { DeviceChangeNotifications } from './DeviceChangeNotifications';
+import { DeviceInUseError } from './DeviceInUseError';
 import { ErrorNotifications } from './ErrorNotifications';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
@@ -56,6 +57,7 @@ export function Notifications() {
       <ChatNotifications />
       <HandRaisedNotifications />
       <TranscriptionNotifications />
+      <DeviceInUseError />
     </>
   );
 }
