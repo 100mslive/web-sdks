@@ -24,6 +24,7 @@ import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
+  HMSAudioCodec,
   HMSChangeMultiTrackStateParams,
   HMSConfig,
   HMSConnectionQualityListener,
@@ -37,6 +38,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  HMSVideoCodec,
   TokenRequest,
   TokenRequestOptions,
 } from '../interfaces';
@@ -51,6 +53,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { PlaylistManager, TranscriptionConfig } from '../internal';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -95,7 +98,7 @@ import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 import { isNode } from '../utils/support';
 import { workerSleep } from '../utils/timer-utils';
-import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
+import { validateMediaDevicesExistence, validatePublishParams, validateRTCPeerConnection } from '../utils/validations';
 
 const INITIAL_STATE = {
   published: false,
@@ -954,7 +957,8 @@ export class HMSSdk implements HMSInterface {
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
     const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
-    this.setPlaylistSettings({
+    await this.applySettings(hmsTrack);
+    await this.setPlaylistSettings({
       track,
       hmsTrack,
       source,
@@ -1601,6 +1605,44 @@ export class HMSSdk implements HMSInterface {
       this.playlistManager.stop(HMSPlaylistType.audio);
     } else if (track.source === 'videoplaylist') {
       this.playlistManager.stop(HMSPlaylistType.video);
+    }
+  }
+
+  // eslint-disable-next-line complexity
+  private async applySettings(track: HMSLocalTrack) {
+    validatePublishParams(this.store);
+    const publishParams = this.store.getPublishParams();
+    // this is not needed but added for avoiding ? later
+    if (!publishParams) {
+      return;
+    }
+    if (track instanceof HMSLocalVideoTrack) {
+      const publishKey = track.source === 'regular' ? 'video' : track.source === 'screen' ? 'screen' : '';
+      if (!publishKey || !publishParams.allowed.includes(publishKey)) {
+        return;
+      }
+      const video = publishParams[publishKey];
+      if (!video) {
+        return;
+      }
+      const settings = new HMSVideoTrackSettingsBuilder()
+        .codec(video.codec as HMSVideoCodec)
+        .maxBitrate(video.bitRate)
+        .maxFramerate(video.frameRate)
+        .setWidth(video.width)
+        .setHeight(video.height)
+        .build();
+
+      await track.setSettings(settings);
+    } else if (track instanceof HMSLocalAudioTrack) {
+      if (!publishParams.allowed.includes('audio')) {
+        return;
+      }
+      const settings = new HMSAudioTrackSettingsBuilder()
+        .codec(publishParams.audio.codec as HMSAudioCodec)
+        .maxBitrate(publishParams.audio.bitRate)
+        .build();
+      await track.setSettings(settings);
     }
   }
 }

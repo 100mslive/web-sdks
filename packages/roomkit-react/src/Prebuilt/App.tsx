@@ -147,10 +147,10 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           event: string;
         }
       | undefined;
-    const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
-    const initEndpoint: string = endpointsObj?.init || '';
-    const eventEndpoint: string = endpointsObj?.event || '';
-    const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
+    const tokenByRoomCodeEndpoint = endpointsObj?.tokenByRoomCode;
+    const initEndpoint = endpointsObj?.init;
+    const eventEndpoint = endpointsObj?.event;
+    const roomLayoutEndpoint = endpointsObj?.roomLayout;
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -292,7 +292,7 @@ function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
 }: {
-  authTokenByRoomCodeEndpoint: string;
+  authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();

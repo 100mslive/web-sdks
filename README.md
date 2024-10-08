@@ -113,6 +113,34 @@ Once the app has been deployed, you can append the room code at the end of the d
 
 <br>
 
+### Maintaining A Forked Version
+
+Tthe following command will build the roomkit-react package and generate a .tgz file:
+
+```
+yarn && yarn build;
+cd packages/roomkit-react;
+yarn pack
+```
+
+Push your changes and the .tgz file to the forked repository and in the package.json of the app you are building, use the following link for the roomkit-react package:
+
+```
+"@100mslive/roomkit-react":"https://github.com/<user_name>/web-sdks/raw/main/packages/roomkit-react/<tgz_file_name>.tgz",
+```
+
+Re-install the dependencies after updating the package.json and build using the following command:
+
+```
+yarn && yarn build
+```
+
+You can now import the HMSPrebuilt component in the same way as before:
+
+```
+import { HMSPrebuilt } from '@100mslive/roomkit-react';
+```
+
 ## Contributing
 We welcome external contributors or anyone excited to help improve 100ms SDKs. If you'd like to get involved, check out our [contribution guide](./DEVELOPER.MD), and get started exploring the codebase.
 

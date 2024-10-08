@@ -522,11 +522,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private handleTrackMute = () => {
-    HMSLogger.d(this.TAG, 'muted natively');
+    HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: true,
-        reason: 'incoming-call',
+        reason: reason,
       }),
     );
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
@@ -534,11 +535,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   /** @internal */
   handleTrackUnmute = () => {
-    HMSLogger.d(this.TAG, 'unmuted natively');
+    HMSLogger.d(this.TAG, 'unmuted natively', document.visibilityState);
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
-        reason: 'incoming-call',
+        reason: reason,
       }),
     );
     super.handleTrackUnmute();
@@ -566,12 +568,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (document.visibilityState === 'hidden') {
       this.enabledStateBeforeBackground = this.enabled;
       if (this.enabled) {
-        const track = await this.replaceTrackWithBlank();
-        await this.replaceSender(track, this.enabled);
-        this.nativeTrack?.stop();
-        this.nativeTrack = track;
-      } else {
-        await this.replaceSender(this.nativeTrack, false);
+        await this.setEnabled(false);
       }
       // started interruption event
       this.eventBus.analytics.publish(
@@ -581,12 +578,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
-      HMSLogger.d(this.TAG, 'visibility visibile, restoring track state', this.enabledStateBeforeBackground);
+      HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
         await this.setEnabled(true);
-      } else {
-        this.nativeTrack.enabled = this.enabledStateBeforeBackground;
-        await this.replaceSender(this.nativeTrack, this.enabledStateBeforeBackground);
       }
       // ended interruption event
       this.eventBus.analytics.publish(
@@ -596,6 +590,5 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     }
-    this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
 }
