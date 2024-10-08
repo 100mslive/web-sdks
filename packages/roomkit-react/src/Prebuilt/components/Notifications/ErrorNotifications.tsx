@@ -12,43 +12,44 @@ export const ErrorNotifications = () => {
   const subscribedNotifications = useSubscribedNotifications() || {};
 
   useEffect(() => {
-    if (notification) {
-      if (notification.data?.isTerminal && notification.data?.action !== 'INIT') {
-        if ([500, 6008].includes(notification.data?.code)) {
-          ToastManager.addToast({
-            title: `Error: ${notification.data?.message}`,
-          });
-        } else if (notification.data?.message === 'role limit reached') {
-          ToastManager.addToast({
-            title: 'The room is currently full, try joining later',
-            close: true,
-            icon: (
-              <Box css={{ color: '$alert_error_default' }}>
-                <GroupIcon />
-              </Box>
-            ),
-          });
-        } else {
-          ToastManager.addToast({
-            title:
-              notification.data?.message || 'We couldn’t reconnect you. When you’re back online, try joining the room.',
-            close: false,
-          });
-        }
-        return;
+    if (!notification) return;
+
+    const { isTerminal, action, code, message, description } = notification.data;
+
+    if (isTerminal && action !== 'INIT') {
+      if ([500, 6008].includes(code)) {
+        ToastManager.addToast({
+          title: `Error: ${message}`,
+        });
+      } else if (message === 'role limit reached') {
+        ToastManager.addToast({
+          title: 'The room is currently full, try joining later',
+          close: true,
+          icon: (
+            <Box css={{ color: '$alert_error_default' }}>
+              <GroupIcon />
+            </Box>
+          ),
+        });
+      } else {
+        ToastManager.addToast({
+          title: message || 'We couldn’t reconnect you. When you’re back online, try joining the room.',
+          close: false,
+        });
       }
-      // Autoplay error or user denied screen share (cancelled browser pop-up)
-      if (notification.data?.code === 3008 || notification.data?.code === 3001 || notification.data?.code === 3011) {
-        return;
-      }
-      if (notification.data?.action === 'INIT') {
-        return;
-      }
-      if (!subscribedNotifications.ERROR) return;
-      ToastManager.addToast({
-        title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
-      });
+      return;
     }
+    // Autoplay error or user denied screen share (cancelled browser pop-up)
+    if (code === 3008 || code === 3001 || code === 3011) {
+      return;
+    }
+    if (action === 'INIT') {
+      return;
+    }
+    if (!subscribedNotifications.ERROR) return;
+    ToastManager.addToast({
+      title: `Error: ${message} - ${description}`,
+    });
   }, [notification, subscribedNotifications.ERROR]);
 
   return null;
