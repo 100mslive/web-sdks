@@ -27,6 +27,7 @@ export type {
   HMSConfig,
   HMSPreviewConfig,
   HMSConfigInitialSettings,
+  HMSAudioDeviceCategory,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   RTMPRecordingConfig,

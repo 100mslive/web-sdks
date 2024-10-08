@@ -1,4 +1,5 @@
 import React from 'react';
+import { HMSAudioDeviceCategory } from '@100mslive/hms-video-store';
 import {
   DeviceType,
   getAudioDeviceCategory,
@@ -25,7 +26,6 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
-import { AudioDeviceCategory } from '@100mslive/hms-video-store/src/utils/media';
 
 export const CamaraFlipActions = () => {
   const actions = useHMSActions();
@@ -82,11 +82,11 @@ export const AudioActions = () => {
   }
   const deviceCategory = getAudioDeviceCategory(currentSelection?.label);
   let AudioIcon = <SpeakerIcon />;
-  if (deviceCategory === AudioDeviceCategory.BLUETOOTH) {
+  if (deviceCategory === HMSAudioDeviceCategory.BLUETOOTH) {
     AudioIcon = <BluetoothIcon />;
-  } else if (deviceCategory === AudioDeviceCategory.WIRED) {
+  } else if (deviceCategory === HMSAudioDeviceCategory.WIRED) {
     AudioIcon = <HeadphonesIcon />;
-  } else if (deviceCategory === AudioDeviceCategory.EARPIECE) {
+  } else if (deviceCategory === HMSAudioDeviceCategory.EARPIECE) {
     AudioIcon = <TelePhoneIcon />;
   }
   return (

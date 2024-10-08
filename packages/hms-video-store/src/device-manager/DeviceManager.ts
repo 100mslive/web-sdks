@@ -4,7 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
-import { AudioDeviceCategory, getAudioDeviceCategory, isIOS } from '../internal';
+import { getAudioDeviceCategory, HMSAudioDeviceCategory, isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { Store } from '../sdk/store';
@@ -444,13 +444,13 @@ export class DeviceManager implements HMSDeviceManager {
 
     for (const device of this.audioInput) {
       const deviceCategory = getAudioDeviceCategory(device.label);
-      if (deviceCategory === AudioDeviceCategory.SPEAKERPHONE) {
+      if (deviceCategory === HMSAudioDeviceCategory.SPEAKERPHONE) {
         speakerPhone = device;
-      } else if (AudioDeviceCategory.WIRED) {
+      } else if (HMSAudioDeviceCategory.WIRED) {
         wired = device;
-      } else if (AudioDeviceCategory.BLUETOOTH) {
+      } else if (HMSAudioDeviceCategory.BLUETOOTH) {
         bluetoothDevice = device;
-      } else if (AudioDeviceCategory.EARPIECE) {
+      } else if (HMSAudioDeviceCategory.EARPIECE) {
         earpiece = device;
       }
     }
