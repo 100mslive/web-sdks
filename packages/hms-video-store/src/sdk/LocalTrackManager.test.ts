@@ -109,6 +109,7 @@ const mockMediaStream = {
       kind: 'video',
       getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })),
       addEventListener: jest.fn(() => {}),
+      removeEventListener: jest.fn(() => {}),
     },
   ]),
   getAudioTracks: jest.fn(() => [
@@ -117,6 +118,7 @@ const mockMediaStream = {
       kind: 'audio',
       getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })),
       addEventListener: jest.fn(() => {}),
+      removeEventListener: jest.fn(() => {}),
     },
   ]),
   addTrack: jest.fn(() => {}),
@@ -206,7 +208,13 @@ const mockAudioContext = {
     return {
       stream: {
         getAudioTracks: jest.fn(() => [
-          { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-mock-device-id' })) },
+          {
+            id: 'audio-id',
+            kind: 'audio',
+            getSettings: jest.fn(() => ({ deviceId: 'audio-mock-device-id' })),
+            addEventListener: jest.fn(() => {}),
+            removeEventListener: jest.fn(() => {}),
+          },
         ]),
       },
     };
@@ -426,6 +434,7 @@ describe('LocalTrackManager', () => {
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
           addEventListener: jest.fn(() => {}),
+          removeEventListener: jest.fn(() => {}),
         } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
@@ -459,6 +468,7 @@ describe('LocalTrackManager', () => {
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
           addEventListener: jest.fn(() => {}),
+          removeEventListener: jest.fn(() => {}),
         } as unknown as MediaStreamTrack,
         HMSPeerType.REGULAR,
         testEventBus,
