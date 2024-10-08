@@ -12,7 +12,7 @@ export const ErrorNotifications = () => {
   const subscribedNotifications = useSubscribedNotifications() || {};
 
   useEffect(() => {
-    if (!notification) return;
+    if (!notification || !notification.data) return;
 
     const { isTerminal, action, code, message, description } = notification.data;
 
@@ -40,7 +40,7 @@ export const ErrorNotifications = () => {
       return;
     }
     // Autoplay error or user denied screen share (cancelled browser pop-up)
-    if (code === 3008 || code === 3001 || code === 3011) {
+    if ([3008, 3001, 3011].includes(code)) {
       return;
     }
     if (action === 'INIT') {
