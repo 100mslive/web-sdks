@@ -248,9 +248,9 @@ const DebugInfo = ({ details }) => {
         </Accordion.Header>
         <Accordion.Content>
           <Flex css={{ flexWrap: 'wrap', mt: '$10', gap: '$10' }}>
-            <StatsRow css={{ w: 'calc(100%)' }} label="Websocket URL" value={details?.websocketURL} />
-            <StatsRow css={{ w: 'calc(100%)' }} label="Init Endpoint" value={details?.initEndpoint} />
-            <StatsRow css={{ w: 'calc(100%)' }} label="Enabled flags" value={details?.enabledFlags?.join(', ')} />
+            <StatsRow css={{ w: '100%' }} label="Websocket URL" value={details?.websocketURL} />
+            <StatsRow css={{ w: '100%' }} label="Init Endpoint" value={details?.initEndpoint} />
+            <StatsRow css={{ w: '100%' }} label="Enabled flags" value={details?.enabledFlags?.join(', ')} />
           </Flex>
         </Accordion.Content>
       </Accordion.Item>
