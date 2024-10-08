@@ -1567,10 +1567,12 @@ export class HMSSdk implements HMSInterface {
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
     HMSLogger.w(this.TAG, 'Audio Presence Failure', this.transportState, error);
-    this.sendAnalyticsEvent(
-      AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
-    );
-    this.listener?.onError(error);
+    // this.sendAnalyticsEvent(
+    //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
+    // );
+    if (this.isDiagnostics) {
+      this.listener?.onError(error);
+    }
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {
