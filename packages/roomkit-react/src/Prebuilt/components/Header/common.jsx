@@ -25,6 +25,7 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
+import { AudioDeviceCategory } from '@100mslive/hms-video-store/src/utils/media';
 
 export const CamaraFlipActions = () => {
   const actions = useHMSActions();
@@ -81,11 +82,11 @@ export const AudioActions = () => {
   }
   const deviceCategory = getAudioDeviceCategory(currentSelection?.label);
   let AudioIcon = <SpeakerIcon />;
-  if (deviceCategory === 'bluetooth') {
+  if (deviceCategory === AudioDeviceCategory.BLUETOOTH) {
     AudioIcon = <BluetoothIcon />;
-  } else if (deviceCategory === 'wired') {
+  } else if (deviceCategory === AudioDeviceCategory.WIRED) {
     AudioIcon = <HeadphonesIcon />;
-  } else if (deviceCategory === 'earpiece') {
+  } else if (deviceCategory === AudioDeviceCategory.EARPIECE) {
     AudioIcon = <TelePhoneIcon />;
   }
   return (
