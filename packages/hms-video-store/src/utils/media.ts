@@ -64,16 +64,27 @@ export const HMSAudioContextHandler: HMSAudioContext = {
   },
 };
 
-export const getAudioDeviceCategory = (deviceLabel: string) => {
+export enum HMSAudioDeviceCategory {
+  SPEAKERPHONE = 'SPEAKERPHONE',
+  WIRED = 'WIRED',
+  BLUETOOTH = 'BLUETOOTH',
+  EARPIECE = 'EARPIECE',
+}
+
+export const getAudioDeviceCategory = (deviceLabel?: string) => {
+  if (!deviceLabel) {
+    HMSLogger.e('[DeviceManager]:', 'No device label provided');
+    return HMSAudioDeviceCategory.SPEAKERPHONE;
+  }
   const label = deviceLabel.toLowerCase();
   if (label.includes('speakerphone')) {
-    return 'speakerhone';
+    return HMSAudioDeviceCategory.SPEAKERPHONE;
   } else if (label.includes('wired')) {
-    return 'wired';
+    return HMSAudioDeviceCategory.WIRED;
   } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
-    return 'bluetooth';
+    return HMSAudioDeviceCategory.BLUETOOTH;
   } else if (label.includes('earpiece')) {
-    return 'earpiece';
+    return HMSAudioDeviceCategory.EARPIECE;
   }
-  return 'speakerphone';
+  return HMSAudioDeviceCategory.SPEAKERPHONE;
 };
