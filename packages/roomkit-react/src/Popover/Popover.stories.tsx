@@ -32,7 +32,7 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
         <Button
           variant="standard"
           css={{
-            aspectRatio: 1,
+            aspectRatio: '1',
             r: '$round',
             p: '$2 $2',
             bg: '$background_default',
