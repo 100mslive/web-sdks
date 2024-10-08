@@ -315,10 +315,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: true,
-        reason: 'incoming-call',
+        reason,
       }),
     );
   };
@@ -326,10 +327,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   /** @internal */
   handleTrackUnmute = () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
-        reason: 'incoming-call',
+        reason,
       }),
     );
     this.setEnabled(this.enabled);
