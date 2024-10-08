@@ -11,7 +11,7 @@ import { RequestDialog } from '../../primitives/DialogContent';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 
-const types = [
+const notificationTypes = [
   HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
   HMSNotificationTypes.ROOM_ENDED,
   HMSNotificationTypes.REMOVED_FROM_ROOM,
@@ -19,7 +19,7 @@ const types = [
 
 export const TrackUnmuteModal = () => {
   const hmsActions = useHMSActions();
-  const notification = useHMSNotifications(types);
+  const notification = useHMSNotifications(notificationTypes);
   const [muteNotification, setMuteNotification] = useState<HMSChangeTrackStateRequest | null>(null);
 
   useEffect(() => {

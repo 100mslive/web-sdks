@@ -4,13 +4,10 @@ import { GroupIcon } from '@100mslive/react-icons';
 import { Box } from '../../../Layout';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
-import { AutoplayBlockedModal } from './AutoplayBlockedModal';
-import { InitErrorModal } from './InitErrorModal';
-import { PermissionErrorNotificationModal } from './PermissionErrorModal';
 // @ts-ignore: No implicit Any
 import { useSubscribedNotifications } from '../AppData/useUISettings';
 
-export const ErrorNotificationModal = () => {
+export const ErrorNotifications = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const subscribedNotifications = useSubscribedNotifications() || {};
 
@@ -54,11 +51,5 @@ export const ErrorNotificationModal = () => {
     }
   }, [notification, subscribedNotifications.ERROR]);
 
-  return (
-    <>
-      <AutoplayBlockedModal />
-      <PermissionErrorNotificationModal />
-      <InitErrorModal />
-    </>
-  );
+  return null;
 };
