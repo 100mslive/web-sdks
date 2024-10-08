@@ -6,16 +6,17 @@ import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 
-const Instruction = ({ number, description }: { number: string; description: string }) => (
-  <DialogRow css={{ alignItems: 'baseline', justifyContent: 'normal', gap: '$4' }}>
-    <Text variant="body2">{number}. </Text>
-    <Text variant="body2">{description}</Text>
-  </DialogRow>
+const Instruction = ({ description }: { description: string }) => (
+  <li>
+    <DialogRow css={{ ml: '$4' }}>
+      <Text variant="body2">{description}</Text>
+    </DialogRow>
+  </li>
 );
 
 export function DeviceInUseError() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(false);
+  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(true);
   const [deviceType, setDeviceType] = useState('');
 
   useEffect(() => {
@@ -62,19 +63,16 @@ export function DeviceInUseError() {
             configured properly. Please follow the following instructions to resolve this issue.
           </Text>
         </DialogRow>
-        <Instruction
-          number="1"
-          description={`Please check if the ${deviceType} device(s) are in use by another browser or application and close it.`}
-        />
-        <Instruction
-          number="2"
-          description={`Go to Browser Settings > Privacy and security > Site settings > ${deviceType} and check if your preferred device is selected as default.`}
-        />
-        <Instruction number="3" description="Try restarting the browser." />
-        <Instruction
-          number="4"
-          description="Try disconnecting and reconnecting the external device if your intention is to use one."
-        />
+        <ol>
+          <Instruction
+            description={`Please check if the ${deviceType} device(s) are in use by another browser or application and close it.`}
+          />
+          <Instruction
+            description={`Go to Browser Settings > Privacy and security > Site settings > ${deviceType} and check if your preferred device is selected as default.`}
+          />
+          <Instruction description="Try restarting the browser." />
+          <Instruction description="Try disconnecting and reconnecting the external device if your intention is to use one." />
+        </ol>
       </DialogContent>
     </Dialog.Root>
   );
