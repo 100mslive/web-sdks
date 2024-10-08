@@ -25,6 +25,7 @@ import {
   TokenRequestOptions,
 } from './internal';
 import {
+  DebugInfo,
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
@@ -581,4 +582,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
 
   initDiagnostics(): HMSDiagnosticsInterface;
+
+  getDebugInfo(): DebugInfo;
 }

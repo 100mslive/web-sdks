@@ -93,8 +93,8 @@ export class HMSVideoTrack extends HMSTrack {
 
   private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
-      videoElement.play().catch(() => {
-        HMSLogger.w('[HMSVideoTrack]', 'failed to play');
+      videoElement.play().catch((e: Error) => {
+        HMSLogger.w('[HMSVideoTrack]', 'failed to play', e.message);
       });
     }, 0);
   };

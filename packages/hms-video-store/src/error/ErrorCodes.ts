@@ -76,6 +76,9 @@ export const ErrorCodes = {
 
     // Selected device not detected on change
     SELECTED_DEVICE_MISSING: 3014,
+
+    // Track is publishing with no data, can happen when a whatsapp call is ongoing before 100ms call in mweb
+    NO_DATA: 3015,
   },
 
   WebrtcErrors: {

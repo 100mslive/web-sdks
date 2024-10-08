@@ -133,7 +133,7 @@ export class TrackAudioLevelMonitor {
     return percent;
   }
 
-  private isSilentThisInstant() {
+  isSilentThisInstant() {
     if (!this.analyserNode || !this.dataArray) {
       HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;

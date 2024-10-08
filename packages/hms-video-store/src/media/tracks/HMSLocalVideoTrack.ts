@@ -131,6 +131,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * use this function to set the enabled state of a track. If true the track will be unmuted and muted otherwise.
    * @param value
    */
+  // eslint-disable-next-line complexity
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) {
       return;
@@ -546,6 +547,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
+    this.setEnabled(this.enabled);
   };
 
   /**
