@@ -258,7 +258,7 @@ export const ErrorFactory = {
         'Track is not publishing any data',
         HMSAction.TRACK,
         description,
-        description,
+        'This could possibily due to another application taking priority over the access to camera or microphone or due to an incoming call',
       );
     },
   },
