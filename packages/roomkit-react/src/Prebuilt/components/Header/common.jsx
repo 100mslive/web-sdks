@@ -1,8 +1,8 @@
 import React from 'react';
-import { HMSAudioDeviceCategory } from '@100mslive/hms-video-store';
 import {
   DeviceType,
   getAudioDeviceCategory,
+  HMSAudioDeviceCategory,
   selectIsLocalVideoEnabled,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
