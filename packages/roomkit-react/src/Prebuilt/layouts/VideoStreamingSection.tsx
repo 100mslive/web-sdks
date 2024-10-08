@@ -19,13 +19,7 @@ import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
 import { config } from '../../Theme';
-// @ts-ignore: No implicit Any
-import { EmbedView } from './EmbedView';
-// @ts-ignore: No implicit Any
-import { PDFView } from './PDFView';
 import SidePane from './SidePane';
-// @ts-ignore: No implicit Any
-import { WaitingView } from './WaitingView';
 import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
 import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
@@ -34,6 +28,11 @@ import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '.
 import { SESSION_STORE_KEY } from '../common/constants';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
+// @ts-ignore: No implicit Any
+const EmbedView = React.lazy(() => import('./EmbedView').then(module => ({ default: module.EmbedView })));
+// @ts-ignore: No implicit Any
+const PDFView = React.lazy(() => import('./PDFView').then(module => ({ default: module.PDFView })));
+const WaitingView = React.lazy(() => import('./WaitingView').then(module => ({ default: module.WaitingView })));
 
 export const VideoStreamingSection = ({
   screenType,
@@ -79,18 +78,18 @@ export const VideoStreamingSection = ({
   }
 
   return (
-    <Suspense fallback={<FullPageProgress />}>
-      <Flex
-        css={{
-          size: '100%',
-          position: 'relative',
-          gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
-        }}
-        direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
-          .with({ isLandscapeHLSStream: true }, () => 'row')
-          .with({ isMobileHLSStream: true }, () => 'column')
-          .otherwise(() => 'row')}
-      >
+    <Flex
+      css={{
+        size: '100%',
+        position: 'relative',
+        gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
+      }}
+      direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
+        .with({ isLandscapeHLSStream: true }, () => 'row')
+        .with({ isMobileHLSStream: true }, () => 'column')
+        .otherwise(() => 'row')}
+    >
+      <Suspense fallback={<FullPageProgress />}>
         {match({
           screenType,
           isNotAllowedToPublish,
@@ -142,27 +141,29 @@ export const VideoStreamingSection = ({
             return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
           })}
         <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
-        <Box
-          css={{
-            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
-              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
-              .with({ isMobileHLSStream: true }, () => '2 1 0')
-              .otherwise(() => undefined),
-            position: 'relative',
-            height: !isMobileHLSStream ? '100%' : undefined,
-            maxHeight: '100%',
-            '&:empty': { display: 'none' },
-            overflowY: 'clip',
-          }}
-        >
+      </Suspense>
+      <Box
+        css={{
+          flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+            .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+            .with({ isMobileHLSStream: true }, () => '2 1 0')
+            .otherwise(() => undefined),
+          position: 'relative',
+          height: !isMobileHLSStream ? '100%' : undefined,
+          maxHeight: '100%',
+          '&:empty': { display: 'none' },
+          overflowY: 'clip',
+        }}
+      >
+        <Suspense fallback={<></>}>
           <SidePane
             screenType={screenType}
             // @ts-ignore
             tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
             hideControls={hideControls}
           />
-        </Box>
-      </Flex>
-    </Suspense>
+        </Suspense>
+      </Box>
+    </Flex>
   );
 };

@@ -1,14 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
-import { Polls } from '../components/Polls/Polls';
-import { RoomDetailsPane } from '../components/RoomDetails/RoomDetailsPane';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
-import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 import VideoTile from '../components/VideoTile';
-import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Flex } from '../../Layout';
 import { config as cssConfig, styled } from '../../Theme';
 // @ts-ignore: No implicit Any
@@ -22,6 +18,16 @@ import {
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
+const SidePaneTabs = React.lazy(() =>
+  import('../components/SidePaneTabs').then(module => ({ default: module.SidePaneTabs })),
+);
+const Polls = React.lazy(() => import('../components/Polls/Polls').then(module => ({ default: module.Polls })));
+const RoomDetailsPane = React.lazy(() =>
+  import('../components/RoomDetails/RoomDetailsPane').then(module => ({ default: module.RoomDetailsPane })),
+);
+const VBPicker = React.lazy(() =>
+  import('../components/VirtualBackground/VBPicker').then(module => ({ default: module.VBPicker })),
+);
 
 const Wrapper = styled('div', {
   w: '$100',
@@ -233,7 +239,7 @@ const SidePane = ({
           {...tileLayout}
         />
       )}
-      {SidepaneComponent}
+      <Suspense fallback={<></>}>{SidepaneComponent}</Suspense>
     </Flex>
   );
 };
