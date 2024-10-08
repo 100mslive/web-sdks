@@ -5,11 +5,7 @@ import { ToastConfig } from '../Toast/ToastConfig';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 
-const notificationTypes = [
-  HMSNotificationTypes.RECONNECTED,
-  HMSNotificationTypes.RECONNECTING,
-  HMSNotificationTypes.ERROR,
-];
+const notificationTypes = [HMSNotificationTypes.RECONNECTED, HMSNotificationTypes.RECONNECTING];
 let notificationId: string | null = null;
 
 export const ReconnectNotifications = () => {
