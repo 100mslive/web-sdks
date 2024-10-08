@@ -65,10 +65,10 @@ export const HMSAudioContextHandler: HMSAudioContext = {
 };
 
 export enum HMSAudioDeviceCategory {
-  SPEAKERPHONE,
-  WIRED,
-  BLUETOOTH,
-  EARPIECE,
+  SPEAKERPHONE = 'SPEAKERPHONE',
+  WIRED = 'WIRED',
+  BLUETOOTH = 'BLUETOOTH',
+  EARPIECE = 'EARPIECE',
 }
 
 export const getAudioDeviceCategory = (deviceLabel?: string) => {
