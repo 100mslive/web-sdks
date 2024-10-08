@@ -13,7 +13,7 @@ export const useAwayNotifications = () => {
       // Notifications not supported
       return;
     }
-    if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+    if (Notification?.permission === 'granted' || Notification?.permission === 'denied') {
       return;
     }
     const unsubscribe = vanillaStore.subscribe(async role => {
@@ -31,7 +31,6 @@ export const useAwayNotifications = () => {
       return;
     }
     if (
-      !Notification ||
       Notification?.permission === 'denied' ||
       /**
        * document.visibilityState is still 'visible' when the tab is active but window is not open
