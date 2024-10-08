@@ -15,6 +15,7 @@ import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorNotificationModal } from './PermissionErrorModal';
 import { PollNotificationModal } from './PollNotificationModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
+import { RoleChangeNotification } from './RoleChangeNotification';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
@@ -46,6 +47,7 @@ export function Notifications() {
       <TrackBulkUnmuteModal />
       <TrackNotifications />
       {roomState === HMSRoomState.Connected ? <PeerNotifications /> : null}
+      <RoleChangeNotification />
       <PollNotificationModal />
       <MessageNotifications />
       <DeviceChangeNotifications />
