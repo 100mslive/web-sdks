@@ -16,7 +16,7 @@ const Instruction = ({ description }: { description: string }) => (
 
 export function DeviceInUseError() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(true);
+  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(false);
   const [deviceType, setDeviceType] = useState('');
 
   useEffect(() => {
