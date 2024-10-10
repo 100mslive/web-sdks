@@ -516,12 +516,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private addTrackEventListeners(track: MediaStreamTrack) {
     track.addEventListener('mute', this.handleTrackMute);
-    track.addEventListener('unmute', this.handleTrackUnmute);
+    track.addEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private removeTrackEventListeners(track: MediaStreamTrack) {
     track.removeEventListener('mute', this.handleTrackMute);
-    track.removeEventListener('unmute', this.handleTrackUnmute);
+    track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private handleTrackMute = () => {
@@ -536,7 +536,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   /** @internal */
-  handleTrackUnmute = async () => {
+  handleTrackUnmuteNatively = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
