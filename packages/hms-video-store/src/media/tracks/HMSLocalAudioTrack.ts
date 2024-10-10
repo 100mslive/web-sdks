@@ -325,7 +325,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   /** @internal */
-  handleTrackUnmute = () => {
+  handleTrackUnmute = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
     const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
@@ -334,7 +334,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         reason,
       }),
     );
-    this.setEnabled(this.enabled);
+    await this.setEnabled(this.enabled);
+    // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
+    this.eventBus.localAudioUnmutedNatively.publish();
   };
 
   private replaceSenderTrack = async () => {
