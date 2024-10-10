@@ -40,6 +40,7 @@ export const HMSEvents = {
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
   LOCAL_VIDEO_ENABLED: 'local-video-enabled',
   LOCAL_VIDEO_UNMUTED_NATIVELY: 'local-video-unmuted-natively',
+  LOCAL_AUDIO_UNMUTED_NATIVELY: 'local-audio-unmuted-natively',
   STATS_UPDATE: 'stats-update', // emitted by HMSWebrtcInternals
   RTC_STATS_UPDATE: 'rtc-stats-update', // emitted by RTCStatsMonitor
   TRACK_DEGRADED: 'track-degraded',
