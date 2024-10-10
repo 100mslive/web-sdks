@@ -135,6 +135,16 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static audioRecovered(message: string) {
+    return new AnalyticsEvent({
+      name: 'audioRecovered',
+      level: AnalyticsEventLevel.VERBOSE,
+      properties: {
+        message,
+      },
+    });
+  }
+
   static deviceChange({
     isUserSelection,
     selection,

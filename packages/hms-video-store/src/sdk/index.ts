@@ -435,13 +435,6 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
-    // Request permissions and populate devices before waiting for policy
-    if (config.alwaysRequestPermissions) {
-      this.localTrackManager.requestPermissions().then(async () => {
-        await this.initDeviceManagers();
-      });
-    }
-
     let initSuccessful = false;
     let networkTestFinished = false;
     const timerId = setTimeout(() => {
@@ -457,7 +450,21 @@ export class HMSSdk implements HMSInterface {
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
-        tracks.forEach(track => this.setLocalPeerTrack(track));
+        tracks.forEach(track => {
+          this.setLocalPeerTrack(track);
+          if (track.isTrackNotPublishing()) {
+            const error = ErrorFactory.TracksErrors.NoDataInTrack(
+              `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+            );
+            this.sendAnalyticsEvent(
+              AnalyticsEventFactory.publish({
+                devices: this.deviceManager.getDevices(),
+                error: error,
+              }),
+            );
+            this.listener?.onError(error);
+          }
+        });
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
@@ -1332,6 +1339,18 @@ export class HMSSdk implements HMSInterface {
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
     for (const track of tracks) {
       await this.transport.publish([track]);
+      if (track.isTrackNotPublishing()) {
+        const error = ErrorFactory.TracksErrors.NoDataInTrack(
+          `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+        );
+        this.sendAnalyticsEvent(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error: error,
+          }),
+        );
+        this.listener?.onError(error);
+      }
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }

@@ -136,13 +136,19 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
+        // try to wait for main execution to complete first
         this.removeAudioElement(audioEl, track);
         await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
+        if (!this.state.autoplayFailed) {
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+          );
+        }
       }
     };
     track.setAudioElement(audioEl);
-    track.setVolume(this.volume);
+    await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);

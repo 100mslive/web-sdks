@@ -21,6 +21,7 @@ import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutPro
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
+import { DeviceInUseError } from './DeviceInUseError';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
@@ -204,6 +205,7 @@ export function Notifications() {
       <ChatNotifications />
       <HandRaisedNotifications />
       <TranscriptionNotifications />
+      <DeviceInUseError />
     </>
   );
 }
