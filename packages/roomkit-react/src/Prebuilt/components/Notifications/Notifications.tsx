@@ -120,6 +120,7 @@ export function Notifications() {
         if (!subscribedNotifications.ERROR) return;
         ToastManager.addToast({
           title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
+          duration: 8000,
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {

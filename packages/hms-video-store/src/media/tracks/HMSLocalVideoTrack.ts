@@ -544,7 +544,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         reason: 'incoming-call',
       }),
     );
-    super.handleTrackUnmute();
+    this.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
     await this.setEnabled(this.enabled);
