@@ -2,8 +2,6 @@ import IConnectionObserver, { RTCIceCandidatePair } from './IConnectionObserver'
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import JsonRpcSignal from '../signal/jsonrpc';
 import HMSLogger from '../utils/logger';
@@ -64,6 +62,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
       return enableOpusDtx(fixMsid(offer, tracks));
     } catch (error) {
+      HMSLogger.d(TAG, `error creating offer - ${error}`);
       throw ErrorFactory.WebrtcErrors.CreateOfferFailed(this.action, (error as Error).message);
     }
   }
@@ -74,24 +73,45 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
       return answer;
     } catch (error) {
+      HMSLogger.d(TAG, `error creating answer - ${error}`);
       throw ErrorFactory.WebrtcErrors.CreateAnswerFailed(this.action, (error as Error).message);
     }
   }
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription signalling state closed`);
+      return;
+    }
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
+      HMSLogger.e(TAG, 'local description error', error);
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
     }
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(
+        TAG,
+        `[role=${this.role}] setRemoteDescription signalling state ${this.nativeConnection.signalingState}`,
+      );
+      return;
+    }
+    if (this.role === HMSConnectionRole.Publish && this.nativeConnection.signalingState === 'stable') {
+      HMSLogger.d(
+        TAG,
+        `[role=${this.role}] setRemoteDescription signalling state ${this.nativeConnection.signalingState}`,
+      );
+      return;
+    }
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
+      HMSLogger.e(TAG, 'remote description error', error);
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
     }
   }
@@ -111,6 +131,10 @@ export default abstract class HMSConnection {
 
   getSenders(): Array<RTCRtpSender> {
     return this.nativeConnection.getSenders();
+  }
+
+  getTransceivers(): Array<RTCRtpTransceiver> {
+    return this.nativeConnection.getTransceivers();
   }
 
   handleSelectedIceCandidatePairs() {
@@ -160,42 +184,6 @@ export default abstract class HMSConnection {
         TAG,
         `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
         error,
-      );
-    }
-  }
-
-  removeTrack(sender: RTCRtpSender) {
-    if (this.nativeConnection.signalingState !== 'closed') {
-      this.nativeConnection.removeTrack(sender);
-    }
-  }
-
-  // eslint-disable-next-line
-  async setMaxBitrateAndFramerate(
-    track: HMSLocalTrack,
-    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
-  ) {
-    const maxBitrate = updatedSettings?.maxBitrate || track.settings.maxBitrate;
-    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
-    const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
-
-    if (sender) {
-      const params = sender.getParameters();
-      // modify only for non-simulcast encodings
-      if (params.encodings.length === 1) {
-        if (maxBitrate) {
-          params.encodings[0].maxBitrate = maxBitrate * 1000;
-        }
-        if (maxFramerate) {
-          // @ts-ignore
-          params.encodings[0].maxFramerate = maxFramerate;
-        }
-      }
-      await sender.setParameters(params);
-    } else {
-      HMSLogger.w(
-        TAG,
-        `no sender found to setMaxBitrate for track - ${track.trackId}, sentTrackId - ${track.getTrackIDBeingSent()}`,
       );
     }
   }

@@ -1,3 +1,4 @@
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { JoinParameters } from './models/JoinParameters';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
@@ -48,21 +49,18 @@ import {
 } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
-import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
-
-// @DISCUSS: action and extra are not used at all.
-interface CallbackTriple {
-  promise: PromiseCallbacks<boolean>;
-  action: HMSAction;
-  extra: any;
-}
 
 interface NegotiateJoinParams {
   name: string;
   data: string;
   autoSubscribeVideo: boolean;
+}
+
+const enum PublishEvents {
+  published = 'published',
+  unpublished = 'unpublished',
 }
 
 export default class HMSTransport {
@@ -79,6 +77,7 @@ export default class HMSTransport {
   private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   private connectivityListener?: HMSDiagnosticsConnectivityListener;
+  private eventEmitter = new EventEmitter();
   private sfuNodeId?: string;
   joinRetryCount = 0;
   private publishDisconnectTimer = 0;
@@ -110,16 +109,9 @@ export default class HMSTransport {
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
 
-    this.eventBus.localAudioEnabled.subscribe(({ track, enabled }) => this.trackUpdate(track, enabled));
-    this.eventBus.localVideoEnabled.subscribe(({ track, enabled }) => this.trackUpdate(track, enabled));
+    this.eventBus.localAudioEnabled.subscribe(this.trackUpdate);
+    this.eventBus.localVideoEnabled.subscribe(this.trackUpdate);
   }
-
-  /**
-   * Map of callbacks used to wait for an event to fire.
-   * Used here for:
-   *  1. publish/unpublish waits for [IPublishConnectionObserver.onRenegotiationNeeded] to complete
-   */
-  private readonly callbacks = new Map<string, CallbackTriple>();
 
   setListener = (listener: HMSUpdateListener) => {
     this.listener = listener;
@@ -151,6 +143,7 @@ export default class HMSTransport {
           HMSLogger.d(TAG, 'ignoring old offer');
           return;
         }
+        console.log('subscribe', this.subscribeConnection.nativeConnection.signalingState);
         await this.subscribeConnection.setRemoteDescription(jsep);
         HMSLogger.d(
           TAG,
@@ -161,6 +154,7 @@ export default class HMSTransport {
           await this.subscribeConnection.addIceCandidate(candidate);
         }
         this.subscribeConnection.candidates.length = 0;
+        console.log('subscribe after remote description', this.subscribeConnection.nativeConnection.signalingState);
         const answer = await this.subscribeConnection.createAnswer();
         await this.subscribeConnection.setLocalDescription(answer);
         this.signal.answer(answer);
@@ -182,11 +176,13 @@ export default class HMSTransport {
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
         trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
-      if (!connection?.remoteDescription) {
-        // ICE candidates can't be added without any remote session description
-        connection?.candidates.push(trickle.candidate);
-      } else {
-        await connection.addIceCandidate(trickle.candidate);
+      if (connection) {
+        if (!connection.remoteDescription) {
+          // ICE candidates can't be added without any remote session description
+          connection?.candidates.push(trickle.candidate);
+        } else {
+          await connection.addIceCandidate(trickle.candidate);
+        }
       }
     },
 
@@ -384,6 +380,9 @@ export default class HMSTransport {
       this.analyticsEventsService.flushFailedClientEvents();
       this.analyticsEventsService.reset();
       await this.signal.close();
+      this.eventBus.localAudioEnabled.unsubscribe(this.trackUpdate);
+      this.eventBus.localVideoEnabled.unsubscribe(this.trackUpdate);
+      this.eventBus.statsUpdate.removeAllListeners();
     } catch (err) {
       this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err as Error));
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
@@ -419,13 +418,40 @@ export default class HMSTransport {
             error: error as Error,
           }),
         );
+        console.log('retrying in publish', error);
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.PublishFailed,
+          error: error as HMSException,
+          task: () =>
+            this.publishTrack(track)
+              .then(() => true)
+              .catch(() => false),
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
       }
     }
   }
 
   async unpublish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
-      await this.unpublishTrack(track);
+      try {
+        await this.unpublishTrack(track);
+      } catch (error) {
+        console.log('retrying in unpublish', error);
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.UnpublishFailed,
+          error: error as HMSException,
+          task: () =>
+            this.unpublishTrack(track)
+              .then(() => true)
+              .catch(() => false),
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
+      }
     }
   }
 
@@ -529,7 +555,7 @@ export default class HMSTransport {
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
    */
-  trackUpdate(track: HMSLocalTrack, enabled: boolean) {
+  trackUpdate = ({ track, enabled }: { track: HMSLocalTrack; enabled: boolean }) => {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       trackState => track.type === trackState.type && track.source === trackState.source,
@@ -552,7 +578,7 @@ export default class HMSTransport {
         this.listener?.onTrackUpdate(enabled ? HMSTrackUpdate.TRACK_UNMUTED : HMSTrackUpdate.TRACK_MUTED, track, peer);
       }
     }
-  }
+  };
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();
@@ -562,25 +588,32 @@ export default class HMSTransport {
       `${track}`,
     );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.PUBLISH,
-        extra: {},
-      });
-    });
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    await p;
+    await new Promise<void>((resolve, reject) => {
+      const listener = (transceiver: RTCRtpTransceiver) => {
+        if (transceiver === track.transceiver) {
+          this.eventEmitter.off(PublishEvents.published, listener);
+          this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
+          resolve();
+        }
+      };
+      this.eventEmitter.on(PublishEvents.published, listener);
+      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+        console.log('publish error', ex);
+        reject(ex);
+      });
+    });
+    // await this.getPromiseForRenegotiation();
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
     // add track to store after publish
     this.store.addTrack(track);
 
-    await stream
-      .setMaxBitrateAndFramerate(track)
+    await this.publishConnection
+      ?.setMaxBitrateAndFramerate(track)
       .then(() => {
         HMSLogger.d(
           TAG,
@@ -593,10 +626,14 @@ export default class HMSTransport {
 
     track.isPublished = true;
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`);
   }
 
+  // eslint-disable-next-line complexity
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
+    if (!track.transceiver) {
+      return;
+    }
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
@@ -612,16 +649,22 @@ export default class HMSTransport {
         this.trackStates.delete(originalTrackState.track_id);
       }
     }
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.UNPUBLISH,
-        extra: {},
+    this.publishConnection?.removeTrack(track.transceiver?.sender);
+    // await this.getPromiseForRenegotiation();
+    await new Promise<void>((resolve, reject) => {
+      const listener = (mid: string) => {
+        if (track.transceiver?.mid === mid) {
+          this.eventEmitter.off(PublishEvents.unpublished, listener);
+          this.eventEmitter.off(RENEGOTIATION_CALLBACK_ID, reject);
+          resolve();
+        }
+      };
+      this.eventEmitter.on(PublishEvents.unpublished, listener);
+      this.eventEmitter.on(RENEGOTIATION_CALLBACK_ID, (ex: HMSException) => {
+        console.log('unpublish error', ex);
+        reject(ex);
       });
     });
-    const stream = track.stream as HMSLocalStream;
-    stream.removeSender(track);
-    await p;
     await track.cleanup();
     if (track.source === 'screen' && this.screenStream) {
       // stop older screenshare tracks to remove the screenshare banner
@@ -634,7 +677,7 @@ export default class HMSTransport {
     }
     // remove track from store on unpublish
     this.store.removeTrack(track);
-    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`);
   }
 
   private async clearPeerConnections() {
@@ -806,13 +849,8 @@ export default class HMSTransport {
           logConnectionState(HMSConnectionRole.Subscribe, newState, true);
 
           if (newState === 'connected') {
-            const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-            this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-
+            this.eventEmitter.emit(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, true);
             this.connectivityListener?.onICESuccess(false);
-            if (callback) {
-              callback.promise.resolve(true);
-            }
           }
         },
 
@@ -841,12 +879,7 @@ export default class HMSTransport {
             }, ICE_DISCONNECTION_TIMEOUT);
           } else if (newState === 'connected') {
             this.subscribeConnection?.handleSelectedIceCandidatePairs();
-            const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-            this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-
-            if (callback) {
-              callback.promise.resolve(true);
-            }
+            this.eventEmitter.emit(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, true);
           }
         },
 
@@ -962,8 +995,10 @@ export default class HMSTransport {
       onDemandTracks,
       offer,
     );
+    console.log(TAG, this.publishConnection.nativeConnection.signalingState);
     this.setSFUNodeId(answer?.sfu_node_id);
     await this.publishConnection.setRemoteDescription(answer);
+    console.log(TAG, this.publishConnection.nativeConnection.signalingState);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
     }
@@ -1018,17 +1053,21 @@ export default class HMSTransport {
     }
   }
 
+  private sendPublishEvents = () => {
+    this.publishConnection?.getTransceivers().forEach(transceiver => {
+      if (transceiver.direction === 'inactive') {
+        this.eventEmitter.emit(PublishEvents.unpublished, transceiver.mid);
+      } else if (transceiver.direction === 'sendonly' && transceiver.mid !== null) {
+        this.eventEmitter.emit(PublishEvents.published, transceiver);
+      }
+    });
+  };
+
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
-    const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
-    if (!callback) {
-      HMSLogger.w(TAG, 'no callback found for renegotiation');
-      return;
-    }
-
     if (!this.publishConnection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot renegotiate');
-      return;
+      return false;
     }
 
     try {
@@ -1036,11 +1075,17 @@ export default class HMSTransport {
       await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
-      this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
-      HMSLogger.timeEnd(`renegotiation-offer-exchange`);
+      console.log(
+        'after offer to server:',
+        this.publishConnection.nativeConnection.pendingLocalDescription,
+        this.publishConnection.nativeConnection.currentRemoteDescription,
+        this.publishConnection.nativeConnection.signalingState,
+      );
       await this.publishConnection.setRemoteDescription(answer);
-      callback.promise.resolve(true);
+      HMSLogger.timeEnd(`renegotiation-offer-exchange`);
+      this.sendPublishEvents();
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
+      return true;
     } catch (err) {
       let ex: HMSException;
       if (err instanceof HMSException) {
@@ -1051,11 +1096,13 @@ export default class HMSTransport {
 
       // resolve for now as this might happen during migration
       if (ex.code === 421) {
-        callback.promise.resolve(true);
+        this.sendPublishEvents();
+        return true;
       } else {
-        callback.promise.reject(ex);
+        HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
+        this.eventEmitter.emit(RENEGOTIATION_CALLBACK_ID, ex);
+        return false;
       }
-      HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
     }
   }
 
@@ -1235,15 +1282,9 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
-      const p = new Promise<boolean>((resolve, reject) => {
-        this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-          promise: { resolve, reject },
-          action: HMSAction.RESTART_ICE,
-          extra: {},
-        });
+      return await this.performPublishRenegotiation({
+        iceRestart: this.publishConnection.connectionState !== 'connected',
       });
-      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
-      await p;
     }
 
     return true;
@@ -1251,12 +1292,9 @@ export default class HMSTransport {
 
   private retrySubscribeIceFailedTask = async () => {
     if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
-      const p = new Promise<boolean>((resolve, reject) => {
-        // Use subscribe constant string
-        this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {
-          promise: { resolve, reject },
-          action: HMSAction.RESTART_ICE,
-          extra: {},
+      const p = new Promise<boolean>(resolve => {
+        this.eventEmitter.once(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, value => {
+          resolve(value);
         });
       });
 
@@ -1311,9 +1349,10 @@ export default class HMSTransport {
     }
   }
 
+  // eslint-disable-next-line complexity
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
     const additionalProps = this.getAdditionalAnalyticsProperties();
-    let event: AnalyticsEvent;
+    let event: AnalyticsEvent | undefined = undefined;
     switch (category) {
       case TransportFailureCategory.ConnectFailed:
         event = AnalyticsEventFactory.connect(error, additionalProps);
@@ -1334,13 +1373,16 @@ export default class HMSTransport {
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
+      case TransportFailureCategory.PublishFailed:
         event = AnalyticsEventFactory.publish({ error });
         break;
       case TransportFailureCategory.SubscribeIceConnectionFailed:
         event = AnalyticsEventFactory.subscribeFail(error);
         break;
     }
-    this.eventBus.analytics.publish(event!);
+    if (event) {
+      this.eventBus.analytics.publish(event);
+    }
   }
 
   getSubscribeConnection() {
