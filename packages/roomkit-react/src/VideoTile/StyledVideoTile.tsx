@@ -1,14 +1,14 @@
+import { motion } from 'framer-motion';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
 import { flexCenter } from '../utils';
 
 export const Root = styled('div', {
   padding: '0.75rem',
-  // show videotile context menu on hover
-  // [`&:hover .tile-menu`]: {
-  //   display: 'inline-block',
-  // },
 });
+
+const MotionRoot = motion(Root);
+MotionRoot.defaultProps = { layout: true };
 
 const Container = styled('div', {
   width: '100%',
@@ -128,7 +128,7 @@ const AvatarContainer = styled(Box, {
 });
 
 interface VideoTileType {
-  Root: typeof Root;
+  Root: typeof MotionRoot;
   Container: typeof Container;
   Overlay: typeof Overlay;
   Info: typeof Info;
@@ -139,7 +139,7 @@ interface VideoTileType {
 }
 
 export const StyledVideoTile: VideoTileType = {
-  Root,
+  Root: MotionRoot,
   Container,
   Overlay,
   Info,

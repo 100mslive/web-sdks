@@ -102,6 +102,7 @@
     "@stitches/react": "^1.2.8",
     "emoji-mart": "^5.2.2",
     "eventemitter2": "^6.4.9",
+    "framer-motion":"^11.11.0",
     "lodash.merge": "^4.6.2",
     "qrcode.react": "^3.1.0",
     "react-dom": "^18.2.0",
