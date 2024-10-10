@@ -456,6 +456,7 @@ export class HMSSdk implements HMSInterface {
             const error = ErrorFactory.TracksErrors.NoDataInTrack(
               `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
             );
+            HMSLogger.e(this.TAG, error);
             this.sendAnalyticsEvent(
               AnalyticsEventFactory.publish({
                 devices: this.deviceManager.getDevices(),
@@ -1343,6 +1344,7 @@ export class HMSSdk implements HMSInterface {
         const error = ErrorFactory.TracksErrors.NoDataInTrack(
           `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
         );
+        HMSLogger.e(this.TAG, error);
         this.sendAnalyticsEvent(
           AnalyticsEventFactory.publish({
             devices: this.deviceManager.getDevices(),
