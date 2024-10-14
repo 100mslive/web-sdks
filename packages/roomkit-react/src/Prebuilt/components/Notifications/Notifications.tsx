@@ -21,6 +21,7 @@ import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutPro
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
+import { DeviceInUseError } from './DeviceInUseError';
 import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
@@ -42,7 +43,18 @@ const pollToastKey: Record<string, string> = {};
 
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
-  const notification = useHMSNotifications();
+  const notification = useHMSNotifications([
+    HMSNotificationTypes.NAME_UPDATED,
+    HMSNotificationTypes.ERROR,
+    HMSNotificationTypes.ROLE_UPDATED,
+    HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+    HMSNotificationTypes.REMOVED_FROM_ROOM,
+    HMSNotificationTypes.ROOM_ENDED,
+    HMSNotificationTypes.DEVICE_CHANGE_UPDATE,
+    HMSNotificationTypes.POLL_STARTED,
+    HMSNotificationTypes.POLL_STOPPED,
+    HMSNotificationTypes.NEW_MESSAGE,
+  ]);
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
@@ -108,6 +120,7 @@ export function Notifications() {
         if (!subscribedNotifications.ERROR) return;
         ToastManager.addToast({
           title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
+          duration: 8000,
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
@@ -204,6 +217,7 @@ export function Notifications() {
       <ChatNotifications />
       <HandRaisedNotifications />
       <TranscriptionNotifications />
+      <DeviceInUseError />
     </>
   );
 }

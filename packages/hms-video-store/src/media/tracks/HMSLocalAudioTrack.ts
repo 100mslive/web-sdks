@@ -56,6 +56,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
+    this.addTrackEventListeners(track);
 
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId
@@ -99,13 +100,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.manuallySelectedDeviceId = undefined;
   }
 
-  private isTrackNotPublishing = () => {
-    return this.nativeTrack.readyState === 'ended' || this.nativeTrack.muted;
-  };
-
   private handleVisibilityChange = async () => {
     // track state is fine do nothing
-    if (!this.isTrackNotPublishing()) {
+    if (!this.shouldReacquireTrack()) {
       HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
       return;
     }
@@ -151,16 +148,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    this.removeTrackEventListeners(prevTrack);
     this.tracksCreated.forEach(track => track.stop());
     this.tracksCreated.clear();
     try {
       const newTrack = await getAudioTrack(settings);
+      this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
+      this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
       await this.updateTrack(newTrack);
       if (this.isPublished) {
@@ -184,8 +184,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
 
-    // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled.
-    if (value && (isEmptyTrack(this.nativeTrack) || this.nativeTrack.muted)) {
+    // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
+    if (value && this.shouldReacquireTrack()) {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
@@ -303,12 +303,54 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     return this.processedTrack || this.nativeTrack;
   }
 
+  private addTrackEventListeners(track: MediaStreamTrack) {
+    track.addEventListener('mute', this.handleTrackMute);
+    track.addEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private removeTrackEventListeners(track: MediaStreamTrack) {
+    track.removeEventListener('mute', this.handleTrackMute);
+    track.removeEventListener('unmute', this.handleTrackUnmute);
+  }
+
+  private handleTrackMute = () => {
+    HMSLogger.d(this.TAG, 'muted natively');
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: true,
+        reason,
+      }),
+    );
+  };
+
+  /** @internal */
+  handleTrackUnmute = async () => {
+    HMSLogger.d(this.TAG, 'unmuted natively');
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
+    this.eventBus.analytics.publish(
+      this.sendInterruptionEvent({
+        started: false,
+        reason,
+      }),
+    );
+    await this.setEnabled(this.enabled);
+    // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
+    this.eventBus.localAudioUnmutedNatively.publish();
+  };
+
   private replaceSenderTrack = async () => {
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
       HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
       return;
     }
     await this.transceiver.sender.replaceTrack(this.processedTrack || this.nativeTrack);
+  };
+
+  private shouldReacquireTrack = () => {
+    return (
+      isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing() || this.audioLevelMonitor?.isSilentThisInstant()
+    );
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {

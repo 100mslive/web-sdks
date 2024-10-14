@@ -85,6 +85,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.handleTrackUnmute);
     if (isBrowser && source === 'regular' && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -131,6 +132,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * use this function to set the enabled state of a track. If true the track will be unmuted and muted otherwise.
    * @param value
    */
+  // eslint-disable-next-line complexity
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) {
       return;
@@ -260,6 +262,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @internal
    */
   async cleanup() {
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.handleTrackUnmute);
     this.removeTrackEventListeners(this.nativeTrack);
     super.cleanup();
     this.transceiver = undefined;
@@ -513,12 +516,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private addTrackEventListeners(track: MediaStreamTrack) {
     track.addEventListener('mute', this.handleTrackMute);
-    track.addEventListener('unmute', this.handleTrackUnmute);
+    track.addEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private removeTrackEventListeners(track: MediaStreamTrack) {
     track.removeEventListener('mute', this.handleTrackMute);
-    track.removeEventListener('unmute', this.handleTrackUnmute);
+    track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private handleTrackMute = () => {
@@ -533,7 +536,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   /** @internal */
-  handleTrackUnmute = () => {
+  handleTrackUnmuteNatively = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
@@ -541,9 +544,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         reason: 'incoming-call',
       }),
     );
-    super.handleTrackUnmute();
+    this.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
+    await this.setEnabled(this.enabled);
   };
 
   /**
