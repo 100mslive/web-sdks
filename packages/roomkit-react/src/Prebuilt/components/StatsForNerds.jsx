@@ -44,7 +44,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
       setSelectedStat('local-peer');
     }
   }, [tracksWithLabels, selectedStat]);
-  console.log({ isMobile });
+
   return isMobile ? (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
