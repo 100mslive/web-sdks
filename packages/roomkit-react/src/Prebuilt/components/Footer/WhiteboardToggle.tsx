@@ -12,7 +12,6 @@ export const WhiteboardToggle = () => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const disabled = !!peerSharing || (open && !isOwner);
 
-  console.log('loading ', isLoading);
   if (!toggle) {
     return null;
   }
