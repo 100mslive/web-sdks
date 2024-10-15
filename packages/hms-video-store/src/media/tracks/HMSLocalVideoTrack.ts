@@ -85,6 +85,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.handleTrackUnmute);
     if (isBrowser && source === 'regular' && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -261,6 +262,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @internal
    */
   async cleanup() {
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.handleTrackUnmute);
     this.removeTrackEventListeners(this.nativeTrack);
     // Stopping the plugin before cleaning the track is more predictable when dealing with 3rd party plugins
     await this.mediaStreamPluginsManager.cleanup();
@@ -516,12 +518,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private addTrackEventListeners(track: MediaStreamTrack) {
     track.addEventListener('mute', this.handleTrackMute);
-    track.addEventListener('unmute', this.handleTrackUnmute);
+    track.addEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private removeTrackEventListeners(track: MediaStreamTrack) {
     track.removeEventListener('mute', this.handleTrackMute);
-    track.removeEventListener('unmute', this.handleTrackUnmute);
+    track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
   private handleTrackMute = () => {
@@ -537,19 +539,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   /** @internal */
-  handleTrackUnmute = () => {
-    HMSLogger.d(this.TAG, 'unmuted natively', document.visibilityState);
+  handleTrackUnmuteNatively = async () => {
+    HMSLogger.d(this.TAG, 'unmuted natively');
     const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
+
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
         reason: reason,
       }),
     );
-    super.handleTrackUnmute();
+    this.handleTrackUnmute();
     this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     this.eventBus.localVideoUnmutedNatively.publish();
-    this.setEnabled(this.enabled);
+    await this.setEnabled(this.enabled);
   };
 
   /**

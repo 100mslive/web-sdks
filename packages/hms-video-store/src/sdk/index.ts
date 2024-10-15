@@ -257,6 +257,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
@@ -468,6 +469,7 @@ export class HMSSdk implements HMSInterface {
             const error = ErrorFactory.TracksErrors.NoDataInTrack(
               `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
             );
+            HMSLogger.e(this.TAG, error);
             this.sendAnalyticsEvent(
               AnalyticsEventFactory.publish({
                 devices: this.deviceManager.getDevices(),
@@ -683,6 +685,7 @@ export class HMSSdk implements HMSInterface {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
@@ -1355,6 +1358,7 @@ export class HMSSdk implements HMSInterface {
         const error = ErrorFactory.TracksErrors.NoDataInTrack(
           `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
         );
+        HMSLogger.e(this.TAG, error);
         this.sendAnalyticsEvent(
           AnalyticsEventFactory.publish({
             devices: this.deviceManager.getDevices(),

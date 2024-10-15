@@ -46,6 +46,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseAudioTracks);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -98,6 +99,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
