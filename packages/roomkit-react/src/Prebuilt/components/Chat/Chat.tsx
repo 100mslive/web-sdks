@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useCallback, useRef } from 'react';
+import React, { MutableRefObject, Suspense, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
@@ -8,10 +8,6 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-// @ts-ignore: No implicit any
-import { EmojiReaction } from '../EmojiReaction';
-import { MoreSettings } from '../MoreSettings/MoreSettings';
-import { RaiseHand } from '../RaiseHand';
 import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
@@ -21,6 +17,12 @@ import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLay
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
+const MoreSettings = React.lazy(() =>
+  import('../MoreSettings/MoreSettings').then(module => ({ default: module.MoreSettings })),
+);
+const RaiseHand = React.lazy(() => import('../RaiseHand').then(module => ({ default: module.RaiseHand })));
+// @ts-ignore: No implicit any
+const EmojiReaction = React.lazy(() => import('../EmojiReaction').then(module => ({ default: module.EmojiReaction })));
 
 export const Chat = () => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
@@ -65,10 +67,10 @@ export const Chat = () => {
         <ChatPaused />
         <ChatBlocked />
         {streaming && (!isChatEnabled || isLocalPeerBlacklisted) && (
-          <>
+          <Suspense fallback={<></>}>
             <RaiseHand css={{ bg: '$surface_default' }} />
             <MoreSettings elements={elements} screenType={screenType} />
-          </>
+          </Suspense>
         )}
       </Flex>
       {isMobile && elements?.chat?.is_overlay && !streaming ? <PinnedMessage /> : null}
@@ -129,7 +131,9 @@ export const Chat = () => {
               .otherwise(() => ({})),
           }}
         >
-          <EmojiReaction />
+          <Suspense fallback={<></>}>
+            <EmojiReaction />
+          </Suspense>
         </Box>
       )}
     </Flex>

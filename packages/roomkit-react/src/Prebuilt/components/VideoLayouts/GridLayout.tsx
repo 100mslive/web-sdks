@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
 import {
   selectLocalPeerID,
@@ -9,16 +9,22 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
+import FullPageProgress from '../FullPageProgress';
 import { EqualProminence } from './EqualProminence';
-import { RoleProminence } from './RoleProminence';
-import { ScreenshareLayout } from './ScreenshareLayout';
-import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
+const RoleProminence = React.lazy(() =>
+  import('./RoleProminence').then(module => ({ default: module.RoleProminence })),
+);
+const ScreenshareLayout = React.lazy(() =>
+  import('./ScreenshareLayout').then(module => ({ default: module.ScreenshareLayout })),
+);
+const WhiteboardLayout = React.lazy(() =>
+  import('./WhiteboardLayout').then(module => ({ default: module.WhiteboardLayout })),
+);
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
@@ -108,38 +114,44 @@ export const GridLayout = ({
 
   if (peerSharing) {
     return (
-      <VideoTileContext.Provider value={tileLayout}>
-        <ScreenshareLayout
-          peers={sortedPeers}
-          onPageSize={setPageSize}
-          onPageChange={setMainPage}
-          edgeToEdge={edge_to_edge}
-        />
-      </VideoTileContext.Provider>
+      <Suspense fallback={<FullPageProgress />}>
+        <VideoTileContext.Provider value={tileLayout}>
+          <ScreenshareLayout
+            peers={sortedPeers}
+            onPageSize={setPageSize}
+            onPageChange={setMainPage}
+            edgeToEdge={edge_to_edge}
+          />
+        </VideoTileContext.Provider>
+      </Suspense>
     );
   } else if (whiteboard?.open) {
     return (
-      <VideoTileContext.Provider value={tileLayout}>
-        <WhiteboardLayout
-          peers={sortedPeers}
-          onPageSize={setPageSize}
-          onPageChange={setMainPage}
-          edgeToEdge={edge_to_edge}
-        />
-      </VideoTileContext.Provider>
+      <Suspense fallback={<FullPageProgress />}>
+        <VideoTileContext.Provider value={tileLayout}>
+          <WhiteboardLayout
+            peers={sortedPeers}
+            onPageSize={setPageSize}
+            onPageChange={setMainPage}
+            edgeToEdge={edge_to_edge}
+          />
+        </VideoTileContext.Provider>
+      </Suspense>
     );
   } else if (isRoleProminence) {
     return (
-      <VideoTileContext.Provider value={tileLayout}>
-        <RoleProminence
-          peers={sortedPeers}
-          onPageSize={setPageSize}
-          onPageChange={setMainPage}
-          prominentRoles={prominentRoles}
-          isInsetEnabled={isInsetEnabled}
-          edgeToEdge={edge_to_edge}
-        />
-      </VideoTileContext.Provider>
+      <Suspense fallback={<FullPageProgress />}>
+        <VideoTileContext.Provider value={tileLayout}>
+          <RoleProminence
+            peers={sortedPeers}
+            onPageSize={setPageSize}
+            onPageChange={setMainPage}
+            prominentRoles={prominentRoles}
+            isInsetEnabled={isInsetEnabled}
+            edgeToEdge={edge_to_edge}
+          />
+        </VideoTileContext.Provider>
+      </Suspense>
     );
   }
   return (

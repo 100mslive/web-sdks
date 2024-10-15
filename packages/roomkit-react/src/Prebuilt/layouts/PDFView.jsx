@@ -19,6 +19,7 @@ export const PDFView = () => {
     return () => {
       resetConfig();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     (async () => {
