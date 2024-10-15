@@ -446,11 +446,11 @@ export class DeviceManager implements HMSDeviceManager {
       const deviceCategory = getAudioDeviceCategory(device.label);
       if (deviceCategory === HMSAudioDeviceCategory.SPEAKERPHONE) {
         speakerPhone = device;
-      } else if (HMSAudioDeviceCategory.WIRED) {
+      } else if (deviceCategory === HMSAudioDeviceCategory.WIRED) {
         wired = device;
-      } else if (HMSAudioDeviceCategory.BLUETOOTH) {
+      } else if (deviceCategory === HMSAudioDeviceCategory.BLUETOOTH) {
         bluetoothDevice = device;
-      } else if (HMSAudioDeviceCategory.EARPIECE) {
+      } else if (deviceCategory === HMSAudioDeviceCategory.EARPIECE) {
         earpiece = device;
       }
     }
