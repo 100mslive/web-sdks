@@ -8,10 +8,11 @@ import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 
 export const WhiteboardToggle = () => {
-  const { toggle, open, isOwner } = useWhiteboard();
+  const { toggle, open, isOwner, isLoading } = useWhiteboard();
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const disabled = !!peerSharing || (open && !isOwner);
 
+  console.log('loading ', isLoading);
   if (!toggle) {
     return null;
   }
@@ -25,7 +26,7 @@ export const WhiteboardToggle = () => {
     >
       <IconButton
         onClick={async () => {
-          if (disabled) {
+          if (disabled || isLoading) {
             return;
           }
           try {
@@ -35,7 +36,7 @@ export const WhiteboardToggle = () => {
           }
         }}
         active={!open}
-        disabled={disabled}
+        disabled={disabled || isLoading}
         data-testid="whiteboard_btn"
       >
         <PencilDrawIcon />

@@ -10,6 +10,7 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
 export const useWhiteboard = (isMobile = false) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const [isLoading, setLoading] = useState(false);
   const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
   const whiteboard = useHMSStore(selectWhiteboard);
   const isHeadless = useHMSStore(selectAppData('disableNotifications'));
@@ -34,7 +35,9 @@ export const useWhiteboard = (isMobile = false) => {
     if (open) {
       isOwner && (await actions.interactivityCenter.whiteboard.close());
     } else {
+      setLoading(true);
       await actions.interactivityCenter.whiteboard.open();
+      setTimeout(() => setLoading(false), 500);
     }
   }, [actions, isOwner, isAdmin, open, isConnected]);
 
@@ -45,6 +48,7 @@ export const useWhiteboard = (isMobile = false) => {
     isOwner,
     isAdmin,
     zoomToContent: isHeadless || isMobile,
+    isLoading,
     toggle: isEnabled && isAdmin ? toggle : undefined,
   };
 };
