@@ -142,7 +142,7 @@ export class RetryScheduler {
           .toString()}]`;
       }
       error.isTerminal = true;
-      handleTerminalError(error);
+      return handleTerminalError(error);
     }
 
     if (changeState) {
@@ -161,18 +161,15 @@ export class RetryScheduler {
       taskSucceeded = await this.setTimeoutPromise(task, delay);
     } catch (ex) {
       taskSucceeded = false;
+      const error = ex as HMSException;
 
-      if ((ex as HMSException).isTerminal) {
-        HMSLogger.e(
-          this.TAG,
-          `[${TFC[category]}] Un-caught terminal exception ${(ex as HMSException).name} in retry-task`,
-          ex,
-        );
-        handleTerminalError(ex as HMSException);
+      if (error.isTerminal) {
+        HMSLogger.e(this.TAG, `[${TFC[category]}] Un-caught terminal exception ${error.name} in retry-task`, ex);
+        return handleTerminalError(error);
       } else {
         HMSLogger.w(
           this.TAG,
-          `[${TFC[category]}] Un-caught exception ${(ex as HMSException).name} in retry-task, initiating retry`,
+          `[${TFC[category]}] Un-caught exception ${error.name} in retry-task, initiating retry`,
           ex,
         );
       }
