@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import {
   selectHMSStats,
@@ -15,15 +16,20 @@ import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
+import { Sheet } from '../../Sheet';
 import { formatBytes } from '../../Stats';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
+import { config as cssConfig } from '../../Theme';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { UI_SETTINGS } from '../common/constants';
 
-export const StatsForNerds = ({ onOpenChange }) => {
+export const StatsForNerds = ({ open, onOpenChange }) => {
+  const mediaQueryLg = cssConfig.media.md;
+  const isMobile = useMedia(mediaQueryLg);
+
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(
     () => [{ id: 'local-peer', label: 'Local Peer Stats' }, ...tracksWithLabels],
@@ -33,7 +39,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
   const details = hmsActions.getDebugInfo();
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
-  const [open, setOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
   const ref = useRef();
   const selectionBg = useDropdownSelection();
 
@@ -43,8 +49,86 @@ export const StatsForNerds = ({ onOpenChange }) => {
     }
   }, [tracksWithLabels, selectedStat]);
 
-  return (
-    <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
+  return isMobile ? (
+    <Sheet.Root open={open} onOpenChange={onOpenChange}>
+      <Sheet.Content
+        css={{
+          bg: '$surface_dim',
+          overflowY: 'auto',
+          px: '$4',
+        }}
+      >
+        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+          <Flex justify="between">
+            <Flex align="center" css={{ mb: '$1' }}>
+              <Text variant="h6" inline>
+                Stats For Nerds
+              </Text>
+            </Flex>
+            <Dialog.DefaultClose data-testid="stats_dialog_close_icon" />
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
+          <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
+          <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
+            Show Stats on Tiles
+          </Text>
+        </Flex>
+        {/* Select */}
+        <Flex
+          direction="column"
+          css={{
+            mb: '$12',
+            position: 'relative',
+            minWidth: 0,
+          }}
+        >
+          <Label variant="body2" css={{ c: '$on_surface_high' }}>
+            Stats For
+          </Label>
+          <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
+            <DialogDropdownTrigger
+              title={selectedStat.label || 'Select Stats'}
+              css={{ mt: '$4' }}
+              titleCSS={{ mx: 0 }}
+              open={openDropdown}
+              ref={ref}
+            />
+            <Dropdown.Portal>
+              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+                {statsOptions.map(option => {
+                  const isSelected = option.id === selectedStat.id && option.layer === selectedStat.layer;
+                  return (
+                    <Dropdown.Item
+                      key={`${option.id}-${option.layer || ''}`}
+                      onClick={() => {
+                        setSelectedStat(option);
+                      }}
+                      css={{
+                        px: '$9',
+                        bg: isSelected ? selectionBg : undefined,
+                        c: isSelected ? '$on_primary_high' : '$on_primary_high',
+                      }}
+                    >
+                      {option.label}
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Content>
+            </Dropdown.Portal>
+          </Dropdown.Root>
+        </Flex>
+        {/* Stats */}
+        {selectedStat.id === 'local-peer' ? (
+          <LocalPeerStats />
+        ) : (
+          <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
+        )}
+      </Sheet.Content>
+    </Sheet.Root>
+  ) : (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
@@ -86,12 +170,12 @@ export const StatsForNerds = ({ onOpenChange }) => {
             <Label variant="body2" css={{ c: '$on_surface_high' }}>
               Stats For
             </Label>
-            <Dropdown.Root data-testid="dialog_select_Stats For" open={open} onOpenChange={setOpen}>
+            <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
               <DialogDropdownTrigger
                 title={selectedStat.label || 'Select Stats'}
                 css={{ mt: '$4' }}
                 titleCSS={{ mx: 0 }}
-                open={open}
+                open={openDropdown}
                 ref={ref}
               />
               <Dropdown.Portal>
