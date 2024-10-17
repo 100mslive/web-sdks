@@ -70,9 +70,9 @@ const SecondarySection = ({
             rootCSS={{
               padding: 0,
               maxWidth: 240,
-              aspectRatio: 16 / 9,
+              aspectRatio: '16 / 9',
               ...(hasSidebar ? { w: '100%' } : { h: '100%' }),
-              '@md': { aspectRatio: 1 },
+              '@md': { aspectRatio: '1' },
             }}
             objectFit="contain"
             {...tileLayoutProps}

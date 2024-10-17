@@ -286,6 +286,7 @@ const HLSView = () => {
         hlsPlayer.reset();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hlsUrl, vanillaStore, hmsActions]);
 
   /**
