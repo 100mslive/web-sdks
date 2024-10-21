@@ -61,13 +61,12 @@ export const Tooltip: React.FC<
   align = 'center',
   disabled = false,
   delayDuration = 200,
-  ...props
 }) => {
   const [open, setOpen] = useState(false);
 
   return (
     <BaseTooltip.Provider>
-      <TooltipRoot delayDuration={delayDuration} open={open && !disabled} onOpenChange={setOpen} {...props}>
+      <TooltipRoot delayDuration={delayDuration} open={open && !disabled} onOpenChange={setOpen}>
         <TooltipTrigger css={{ ...triggerCss }} asChild>
           {children}
         </TooltipTrigger>
