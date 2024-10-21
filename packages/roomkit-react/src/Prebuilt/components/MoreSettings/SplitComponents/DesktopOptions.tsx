@@ -1,4 +1,4 @@
-import React, { FocusEvent, Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   ConferencingScreen,
@@ -120,12 +120,7 @@ export const DesktopOptions = ({
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
         modal={false}
       >
-        <Tooltip
-          title="More options"
-          onFocus={(event: FocusEvent<Element>) => {
-            event.preventDefault();
-          }}
-        >
+        <Tooltip title="More options">
           <Dropdown.Trigger asChild data-testid="more_settings_btn">
             <IconButton>
               <HamburgerMenuIcon />
@@ -135,6 +130,9 @@ export const DesktopOptions = ({
 
         <Dropdown.Content
           sideOffset={5}
+          onCloseAutoFocus={e => {
+            e.preventDefault();
+          }}
           align="end"
           css={{
             py: '$0',

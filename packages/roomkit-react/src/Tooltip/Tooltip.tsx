@@ -50,7 +50,6 @@ export const Tooltip: React.FC<
     triggerCss?: CSS;
     boxCss?: CSS;
     delayDuration?: number;
-    onFocus?: (event: React.FocusEvent) => void;
   }>
 > = ({
   children,
@@ -69,7 +68,7 @@ export const Tooltip: React.FC<
   return (
     <BaseTooltip.Provider>
       <TooltipRoot delayDuration={delayDuration} open={open && !disabled} onOpenChange={setOpen} {...props}>
-        <TooltipTrigger css={{ ...triggerCss }} onFocus={props?.onFocus} asChild>
+        <TooltipTrigger css={{ ...triggerCss }} asChild>
           {children}
         </TooltipTrigger>
         <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined} css={{ ...boxCss }}>
