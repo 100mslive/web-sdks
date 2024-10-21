@@ -54,11 +54,11 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
       <Sheet.Content
         css={{
           bg: '$surface_dim',
-          px: '$8',
+          px: '$4',
           pb: '$4',
         }}
       >
-        <Sheet.Title css={{ py: '$10', px: '$4', alignItems: 'center' }}>
+        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
           <Flex justify="between">
             <Flex align="center" css={{ mb: '$1' }}>
               <Text variant="h6" inline>
@@ -74,6 +74,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           css={{
             overflowY: 'auto',
             maxHeight: '65vh',
+            px: '$4',
           }}
         >
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
