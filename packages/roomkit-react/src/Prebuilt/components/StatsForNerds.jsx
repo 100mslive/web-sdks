@@ -56,6 +56,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           bg: '$surface_dim',
           overflowY: 'auto',
           px: '$4',
+          pb: '$4',
         }}
       >
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
@@ -125,6 +126,9 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         ) : (
           <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
         )}
+        <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
+          <DebugInfo details={details} />
+        </Flex>
       </Sheet.Content>
     </Sheet.Root>
   ) : (
