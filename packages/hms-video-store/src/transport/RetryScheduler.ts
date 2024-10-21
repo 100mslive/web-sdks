@@ -114,17 +114,7 @@ export class RetryScheduler {
       }
     }
 
-    const timeElapsedSinceError = Date.now() - failedAt;
-    if (timeElapsedSinceError >= maxRetryTime || hasFailedDependency) {
-      error.description += `. [${TFC[category]}] Could not recover after ${timeElapsedSinceError} milliseconds`;
-
-      if (hasFailedDependency) {
-        error.description += ` Could not recover all of it's required dependencies - [${(dependencies as Array<TFC>)
-          .map(dep => TFC[dep])
-          .toString()}]`;
-      }
-      error.isTerminal = true;
-
+    const handleTerminalError = (error: HMSException) => {
       // @NOTE: Don't reject to throw error for dependencies, use onStateChange
       // const taskPromise = this.inProgress.get(category);
       this.inProgress.delete(category);
@@ -140,6 +130,19 @@ export class RetryScheduler {
       }
 
       return;
+    };
+
+    const timeElapsedSinceError = Date.now() - failedAt;
+    if (timeElapsedSinceError >= maxRetryTime || hasFailedDependency) {
+      error.description += `. [${TFC[category]}] Could not recover after ${timeElapsedSinceError} milliseconds`;
+
+      if (hasFailedDependency) {
+        error.description += ` Could not recover all of it's required dependencies - [${(dependencies as Array<TFC>)
+          .map(dep => TFC[dep])
+          .toString()}]`;
+      }
+      error.isTerminal = true;
+      return handleTerminalError(error);
     }
 
     if (changeState) {
@@ -158,11 +161,18 @@ export class RetryScheduler {
       taskSucceeded = await this.setTimeoutPromise(task, delay);
     } catch (ex) {
       taskSucceeded = false;
-      HMSLogger.w(
-        this.TAG,
-        `[${TFC[category]}] Un-caught exception ${(ex as HMSException).name} in retry-task, initiating retry`,
-        ex,
-      );
+      const error = ex as HMSException;
+
+      if (error.isTerminal) {
+        HMSLogger.e(this.TAG, `[${TFC[category]}] Un-caught terminal exception ${error.name} in retry-task`, ex);
+        return handleTerminalError(error);
+      } else {
+        HMSLogger.w(
+          this.TAG,
+          `[${TFC[category]}] Un-caught exception ${error.name} in retry-task, initiating retry`,
+          ex,
+        );
+      }
     }
 
     if (taskSucceeded) {

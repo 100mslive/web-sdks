@@ -6,9 +6,11 @@ import {
   selectLocalPeerID,
   selectPeersMap,
   selectTracksMap,
+  useHMSActions,
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Accordion } from '../../Accordion';
 import { HorizontalDivider } from '../../Divider';
 import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
@@ -33,6 +35,8 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
     () => [{ id: 'local-peer', label: 'Local Peer Stats' }, ...tracksWithLabels],
     [tracksWithLabels],
   );
+  const hmsActions = useHMSActions();
+  const details = hmsActions.getDebugInfo();
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -130,7 +134,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         <Dialog.Content
           css={{
             width: 'min(500px, 95%)',
-            maxHeight: '100%',
+            height: 'min(656px, 90%)',
             overflowY: 'auto',
           }}
         >
@@ -154,6 +158,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
             </Text>
           </Flex>
           {/* Select */}
+
           <Flex
             direction="column"
             css={{
@@ -203,6 +208,9 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           ) : (
             <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
           )}
+          <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
+            <DebugInfo details={details} />
+          </Flex>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -313,8 +321,29 @@ const TrackStats = ({ trackID, layer, local }) => {
   );
 };
 
-const StatsRow = React.memo(({ label, value }) => (
-  <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3' }}>
+const DebugInfo = ({ details }) => {
+  return (
+    <Accordion.Root type="single" collapsible css={{ w: '100%' }}>
+      <Accordion.Item value="Debug Info">
+        <Accordion.Header>
+          <Label variant="body2" css={{ c: '$on_surface_high' }}>
+            Debug Info
+          </Label>
+        </Accordion.Header>
+        <Accordion.Content>
+          <Flex css={{ flexWrap: 'wrap', mt: '$10', gap: '$10' }}>
+            <StatsRow css={{ w: '100%' }} label="Websocket URL" value={details?.websocketURL} />
+            <StatsRow css={{ w: '100%' }} label="Init Endpoint" value={details?.initEndpoint} />
+            <StatsRow css={{ w: '100%' }} label="Enabled flags" value={details?.enabledFlags?.join(', ')} />
+          </Flex>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion.Root>
+  );
+};
+
+const StatsRow = React.memo(({ label, value, css }) => (
+  <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3', ...css }}>
     <Text
       variant="overline"
       css={{

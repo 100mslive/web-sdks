@@ -264,9 +264,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async cleanup() {
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.handleTrackUnmute);
     this.removeTrackEventListeners(this.nativeTrack);
+    // Stopping the plugin before cleaning the track is more predictable when dealing with 3rd party plugins
+    await this.mediaStreamPluginsManager.cleanup();
+    await this.pluginsManager.cleanup();
     super.cleanup();
     this.transceiver = undefined;
-    await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
     if (isBrowser && isMobile()) {
@@ -525,11 +527,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private handleTrackMute = () => {
-    HMSLogger.d(this.TAG, 'muted natively');
+    HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: true,
-        reason: 'incoming-call',
+        reason: reason,
       }),
     );
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
@@ -538,10 +541,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /** @internal */
   handleTrackUnmuteNatively = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
+    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
+
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
-        reason: 'incoming-call',
+        reason: reason,
       }),
     );
     this.handleTrackUnmute();
