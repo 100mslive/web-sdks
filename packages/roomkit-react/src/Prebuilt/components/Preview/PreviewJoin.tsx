@@ -61,7 +61,7 @@ const useLocalTileAspectRatio = () => {
   } else {
     aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   }
-  return aspectRatio;
+  return aspectRatio.toString();
 };
 
 const PreviewJoin = ({
@@ -113,6 +113,7 @@ const PreviewJoin = ({
   const { elements = {} } = useRoomLayoutPreviewScreen();
   const { preview_header: previewHeader = {}, virtual_background } = elements || {};
   const aspectRatio = useLocalTileAspectRatio();
+
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -158,7 +159,7 @@ const PreviewJoin = ({
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 340}px` }}>
+        <Box css={{ w: '100%', maxWidth: `${Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
