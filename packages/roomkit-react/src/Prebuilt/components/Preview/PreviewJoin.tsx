@@ -159,7 +159,7 @@ const PreviewJoin = ({
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 340}px` }}>
+        <Box css={{ w: '100%', maxWidth: `${Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
