@@ -13,12 +13,14 @@ import {
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
+import { ConferenceScreen } from './components/ConferenceScreen';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
 // @ts-ignore: No implicit Any
 import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
+import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
 import { PIPProvider } from './components/PIP/PIPProvider';
@@ -48,12 +50,6 @@ import {
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
 import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
-const LeaveScreen = React.lazy(() =>
-  import('./components/LeaveScreen').then(module => ({ default: module.LeaveScreen })),
-);
-const ConferenceScreen = React.lazy(() =>
-  import('./components/ConferenceScreen').then(module => ({ default: module.ConferenceScreen })),
-);
 
 export type HMSPrebuiltOptions = {
   userName?: string;
