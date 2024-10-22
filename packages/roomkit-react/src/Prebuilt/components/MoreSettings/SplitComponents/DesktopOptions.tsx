@@ -130,6 +130,9 @@ export const DesktopOptions = ({
 
         <Dropdown.Content
           sideOffset={5}
+          onCloseAutoFocus={e => {
+            e.preventDefault();
+          }}
           align="end"
           css={{
             py: '$0',
