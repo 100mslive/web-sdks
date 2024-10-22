@@ -1,4 +1,4 @@
-import React, { MutableRefObject, Suspense, useCallback, useRef } from 'react';
+import React, { MutableRefObject, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
@@ -129,9 +129,7 @@ export const Chat = () => {
               .otherwise(() => ({})),
           }}
         >
-          <Suspense fallback={<></>}>
-            <EmojiReaction />
-          </Suspense>
+          <EmojiReaction />
         </Box>
       )}
     </Flex>

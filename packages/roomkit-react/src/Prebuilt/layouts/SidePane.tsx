@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
@@ -233,7 +233,7 @@ const SidePane = ({
           {...tileLayout}
         />
       )}
-      <Suspense fallback={<></>}>{SidepaneComponent}</Suspense>
+      {SidepaneComponent}
     </Flex>
   );
 };
