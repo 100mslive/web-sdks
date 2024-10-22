@@ -11,20 +11,14 @@ import {
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../FullPageProgress';
 import { EqualProminence } from './EqualProminence';
+import { RoleProminence } from './RoleProminence';
+import { ScreenshareLayout } from './ScreenshareLayout';
+import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
-const RoleProminence = React.lazy(() =>
-  import('./RoleProminence').then(module => ({ default: module.RoleProminence })),
-);
-const ScreenshareLayout = React.lazy(() =>
-  import('./ScreenshareLayout').then(module => ({ default: module.ScreenshareLayout })),
-);
-const WhiteboardLayout = React.lazy(() =>
-  import('./WhiteboardLayout').then(module => ({ default: module.WhiteboardLayout })),
-);
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
