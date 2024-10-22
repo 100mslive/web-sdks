@@ -17,6 +17,7 @@ const terminalActions: (HMSSignalMethod | HMSAction)[] = [
   HMSSignalMethod.TRICKLE,
   HMSSignalMethod.SERVER_ERROR,
   HMSAction.JOIN,
+  HMSAction.PUBLISH,
 ];
 
 export const ErrorFactory = {
