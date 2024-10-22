@@ -61,7 +61,7 @@ const useLocalTileAspectRatio = () => {
   } else {
     aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   }
-  return aspectRatio;
+  return aspectRatio.toString();
 };
 
 const PreviewJoin = ({
@@ -113,6 +113,7 @@ const PreviewJoin = ({
   const { elements = {} } = useRoomLayoutPreviewScreen();
   const { preview_header: previewHeader = {}, virtual_background } = elements || {};
   const aspectRatio = useLocalTileAspectRatio();
+
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -201,6 +202,8 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     () => calculateAvatarAndAttribBoxSize(calculatedWidth, calculatedHeight),
     [calculatedWidth, calculatedHeight],
   );
+
+  console.log({ aspectRatio });
 
   return (
     <StyledVideoTile.Container
