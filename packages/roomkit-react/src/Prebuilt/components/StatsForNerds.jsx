@@ -55,6 +55,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         css={{
           bg: '$surface_dim',
           px: '$4',
+          mr: '-$2',
           pb: '$4',
         }}
       >
