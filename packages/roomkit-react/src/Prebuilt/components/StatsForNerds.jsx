@@ -55,7 +55,6 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         css={{
           bg: '$surface_dim',
           px: '$4',
-          mr: '-$2',
           pb: '$4',
         }}
       >
@@ -73,9 +72,11 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         <Flex
           direction="column"
           css={{
+            mr: '-$2',
             overflowY: 'auto',
             maxHeight: '65vh',
-            px: '$4',
+            pr: '$6',
+            pl: '$4',
           }}
         >
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
