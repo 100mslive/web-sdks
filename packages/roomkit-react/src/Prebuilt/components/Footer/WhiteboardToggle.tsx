@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { selectPeerScreenSharing, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { PencilDrawIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
@@ -11,6 +11,7 @@ export const WhiteboardToggle = () => {
   const { toggle, open, isOwner } = useWhiteboard();
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const disabled = !!peerSharing || (open && !isOwner);
+  const [isLoading, setLoading] = useState(false);
 
   if (!toggle) {
     return null;
@@ -25,17 +26,23 @@ export const WhiteboardToggle = () => {
     >
       <IconButton
         onClick={async () => {
-          if (disabled) {
+          if (disabled || isLoading) {
             return;
           }
           try {
-            await toggle();
+            if (!open) {
+              setLoading(true);
+              await toggle();
+              setTimeout(() => setLoading(false), 500);
+            } else {
+              await toggle();
+            }
           } catch (error) {
             ToastManager.addToast({ title: (error as Error).message, variant: 'error' });
           }
         }}
         active={!open}
-        disabled={disabled}
+        disabled={disabled || isLoading}
         data-testid="whiteboard_btn"
       >
         <PencilDrawIcon />
