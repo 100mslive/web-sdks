@@ -203,8 +203,6 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     [calculatedWidth, calculatedHeight],
   );
 
-  console.log({ aspectRatio });
-
   return (
     <StyledVideoTile.Container
       ref={ref}
