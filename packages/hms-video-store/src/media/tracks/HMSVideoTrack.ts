@@ -87,9 +87,9 @@ export class HMSVideoTrack extends HMSTrack {
     this.sinkCount++;
   }
 
-  handleTrackUnmute() {
+  handleTrackUnmute = () => {
     this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
-  }
+  };
 
   private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
