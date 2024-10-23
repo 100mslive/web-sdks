@@ -4,3 +4,8 @@
 -
 
 ### Implementation note, gotchas, related work and Future TODOs (optional)
+
+
+### Merging:
+- Squash merge to dev
+- Merge commit to publish-alpha and main
