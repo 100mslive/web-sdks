@@ -15,7 +15,7 @@ MotionRoot.defaultProps = {
     stiffness: 300,
     damping: 30,
     mass: 1,
-    duration: 0.3,
+    duration: 0.15,
   },
 };
 
