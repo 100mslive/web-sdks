@@ -221,6 +221,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           sans: fontFamily,
                         },
                       }}
+                      container={containerSelector}
                     >
                       <PIPProvider>
                         <Init />
