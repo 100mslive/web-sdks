@@ -10,11 +10,13 @@ export const Root = styled('div', {
 const MotionRoot = motion(Root);
 MotionRoot.defaultProps = {
   layout: true,
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.8 },
-  transition: { duration: 0.3 },
-  style: { originX: 0, originY: 0 },
+  transition: {
+    type: 'spring',
+    stiffness: 300,
+    damping: 30,
+    mass: 1,
+    duration: 0.3,
+  },
 };
 
 const Container = styled('div', {
