@@ -73,7 +73,7 @@ export enum HMSAudioDeviceCategory {
 
 export const getAudioDeviceCategory = (deviceLabel?: string) => {
   if (!deviceLabel) {
-    HMSLogger.e('[DeviceManager]:', 'No device label provided');
+    HMSLogger.w('[DeviceManager]:', 'No device label provided');
     return HMSAudioDeviceCategory.SPEAKERPHONE;
   }
   const label = deviceLabel.toLowerCase();
