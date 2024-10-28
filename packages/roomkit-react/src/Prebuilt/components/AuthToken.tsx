@@ -107,8 +107,8 @@ const AuthToken = React.memo<{
 const convertError = (error: HMSException) => {
   console.error('[error]', { error });
   console.warn(
-    'If you think this is a mistake on our side, please reach out to us over Discord:',
-    'https://discord.com/invite/kGdmszyzq2',
+    'If you think this is a mistake on our side, please reach out to us on Dashboard:',
+    'https://dashboard.100ms.live/dashboard',
   );
   return match([error.action, error.code])
     .with(['GET_TOKEN', 403], () => ({
