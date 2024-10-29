@@ -463,6 +463,10 @@ export class DeviceManager implements HMSDeviceManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
+    if (!this.hasMicrophonePermission) {
+      HMSLogger.d(this.TAG, `No permissions given for microphone, not polling`);
+      return;
+    }
     this.timer = setTimeout(() => {
       (async () => {
         await this.enumerateDevices();
@@ -478,6 +482,10 @@ export class DeviceManager implements HMSDeviceManager {
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
     if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    if (!this.hasMicrophonePermission) {
+      HMSLogger.w(this.TAG, `No permissions given, can't select audio output`);
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
