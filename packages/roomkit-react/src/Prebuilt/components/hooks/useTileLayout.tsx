@@ -115,9 +115,10 @@ export const useTileLayout = ({
             }
           }
         }
+        // Beam layout breaks at 480p resolution without this adjustment
         for (let i = 0; i < row.length; i++) {
-          row[i].width = tileWidth;
-          row[i].height = tileHeight;
+          row[i].width = tileWidth - 5;
+          row[i].height = tileHeight - 5;
         }
       }
     }
