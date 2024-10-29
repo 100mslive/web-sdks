@@ -13,6 +13,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
     public message: string,
     public description: string,
     public isTerminal: boolean = false,
+    public deviceType: string = '',
   ) {
     super(message);
 
@@ -29,6 +30,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
       error_description: this.description,
       action: this.action,
       is_terminal: this.isTerminal,
+      device_type: this.deviceType,
     };
   }
 
@@ -36,7 +38,25 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
     this.nativeError = error;
   }
 
+  //add method to set HMSGetMediaActions as deviceType
+  addDeviceType(deviceType: string) {
+    this.deviceType = deviceType;
+  }
+
   toString() {
+    //add deviceType to the string representation of the error
+    if (this.deviceType) {
+      return `{
+        code: ${this.code};
+        name: ${this.name};
+        action: ${this.action};
+        message: ${this.message};
+        description: ${this.description};
+        isTerminal: ${this.isTerminal};
+        nativeError: ${this.nativeError?.message};
+        deviceType: ${this.deviceType};
+      }`;
+    }
     return `{
       code: ${this.code};
       name: ${this.name};

@@ -73,5 +73,6 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSExcept
 export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
   const exception = convertMediaErrorToHMSException(err, deviceInfo);
   exception.addNativeError(err);
+  exception.addDeviceType(deviceInfo);
   return exception;
 }
