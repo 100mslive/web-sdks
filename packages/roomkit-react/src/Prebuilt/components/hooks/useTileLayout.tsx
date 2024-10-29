@@ -115,10 +115,10 @@ export const useTileLayout = ({
             }
           }
         }
-        // Beam layout breaks at 480p resolution without this adjustment
+        // Beam layout breaks at 480p resolution because the gap of $4 between tiles is not accounted for
         for (let i = 0; i < row.length; i++) {
-          row[i].width = tileWidth - 5;
-          row[i].height = tileHeight - 5;
+          row[i].width = tileWidth - 8 / maxCols;
+          row[i].height = tileHeight - 8 / maxRows;
         }
       }
     }
