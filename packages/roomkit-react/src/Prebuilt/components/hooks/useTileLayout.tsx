@@ -116,6 +116,7 @@ export const useTileLayout = ({
           }
         }
         // Beam layout breaks at 480p resolution because the gap of $4 between tiles is not accounted for
+        // There could be more such cases, this is a generic fix
         for (let i = 0; i < row.length; i++) {
           row[i].width = tileWidth - (8 / maxCols) * (maxCols - 1);
           row[i].height = tileHeight - (8 / maxRows) * (maxRows - 1);
