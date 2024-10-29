@@ -13,13 +13,18 @@ export enum HMSGetMediaActions {
 
 function getDefaultError(error: string, deviceInfo: string) {
   const message = error.toLowerCase();
+  let exception = ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error);
+
   if (message.includes('device not found')) {
-    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, error);
+    exception = ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, error);
   } else if (message.includes('permission denied')) {
-    return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
-  } else {
-    return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error);
+    exception = ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
   }
+  if (deviceInfo) {
+    exception.addDeviceType(deviceInfo);
+  }
+
+  return exception;
 }
 
 /**

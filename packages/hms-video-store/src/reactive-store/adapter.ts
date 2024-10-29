@@ -204,6 +204,19 @@ export class SDKToHMS {
   }
 
   static convertException(sdkException: sdkTypes.HMSException): HMSException {
+    if (sdkException.deviceType) {
+      return {
+        code: sdkException.code,
+        action: sdkException.action,
+        name: sdkException.name,
+        message: sdkException.message,
+        description: sdkException.description,
+        isTerminal: sdkException.isTerminal,
+        nativeError: sdkException.nativeError,
+        deviceType: sdkException.deviceType,
+        timestamp: new Date(),
+      };
+    }
     return {
       code: sdkException.code,
       action: sdkException.action,
