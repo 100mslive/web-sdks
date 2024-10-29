@@ -53,7 +53,7 @@ export const useTileLayout = ({
     if (width === 0 || height === 0) {
       return;
     }
-    // calculate dimesions for each page
+    // calculate dimensions for each page
     for (const page of pageList) {
       const noOfTilesInPage = page.length;
       let maxCols =
@@ -123,5 +123,6 @@ export const useTileLayout = ({
     }
     setPagesWithTiles([...pageList]);
   }, [width, height, maxTileCount, pageList, vanillaStore, isMobile, edgeToEdge]);
+  console.log('debug>', { width, height, maxTileCount, pageList, edgeToEdge });
   return { pagesWithTiles, ref };
 };

@@ -7,6 +7,7 @@ import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
 export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>(
   ({ tiles, edgeToEdge }, ref) => {
+    console.log('debug>', { tiles });
     const videoTileProps = useVideoTileContext();
     return (
       <Box
