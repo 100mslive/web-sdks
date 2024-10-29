@@ -44,9 +44,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
   }
 
   toString() {
-    //add deviceType to the string representation of the error
-    if (this.deviceType) {
-      return `{
+    return `{
         code: ${this.code};
         name: ${this.name};
         action: ${this.action};
@@ -56,15 +54,5 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
         nativeError: ${this.nativeError?.message};
         deviceType: ${this.deviceType};
       }`;
-    }
-    return `{
-      code: ${this.code};
-      name: ${this.name};
-      action: ${this.action};
-      message: ${this.message};
-      description: ${this.description};
-      isTerminal: ${this.isTerminal};
-      nativeError: ${this.nativeError?.message};
-    }`;
   }
 }
