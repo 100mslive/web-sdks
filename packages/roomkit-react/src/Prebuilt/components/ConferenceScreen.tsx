@@ -95,6 +95,7 @@ export const ConferenceScreen = () => {
           userName: userName || uuid(),
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
+          rememberDeviceSelection: true,
           settings: {
             isAudioMuted: !isPreviewScreenEnabled,
             isVideoMuted: !isPreviewScreenEnabled,
