@@ -77,7 +77,7 @@ export const useTileLayout = ({
         return rowElements;
       });
 
-      const gap = edgeToEdge ? 0 : 8; // gap between flex items
+      const gap = edgeToEdge && isMobile ? 0 : 8; // gap between flex items
       const maxHeight = height - (maxRows - 1) * gap;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios =
@@ -115,11 +115,10 @@ export const useTileLayout = ({
             }
           }
         }
-        // Beam layout breaks at 480p resolution because the gap of $4 between tiles is not accounted for
-        // There could be more such cases, this is a generic fix
+
         for (let i = 0; i < row.length; i++) {
-          row[i].width = tileWidth - (gap / maxCols) * (maxCols - 1);
-          row[i].height = tileHeight - (gap / maxRows) * (maxRows - 1);
+          row[i].width = tileWidth;
+          row[i].height = tileHeight;
         }
       }
     }
