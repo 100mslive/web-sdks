@@ -204,20 +204,7 @@ export class SDKToHMS {
   }
 
   static convertException(sdkException: sdkTypes.HMSException): HMSException {
-    if (sdkException.deviceType) {
-      return {
-        code: sdkException.code,
-        action: sdkException.action,
-        name: sdkException.name,
-        message: sdkException.message,
-        description: sdkException.description,
-        isTerminal: sdkException.isTerminal,
-        nativeError: sdkException.nativeError,
-        deviceType: sdkException.deviceType,
-        timestamp: new Date(),
-      };
-    }
-    return {
+    const exp = {
       code: sdkException.code,
       action: sdkException.action,
       name: sdkException.name,
@@ -226,7 +213,11 @@ export class SDKToHMS {
       isTerminal: sdkException.isTerminal,
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
-    };
+    } as HMSException;
+    if (sdkException.deviceType) {
+      exp.deviceType = sdkException.deviceType;
+    }
+    return exp;
   }
 
   static convertDeviceChangeUpdate(sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent): HMSDeviceChangeEvent {

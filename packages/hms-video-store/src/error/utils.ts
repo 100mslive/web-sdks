@@ -20,9 +20,6 @@ function getDefaultError(error: string, deviceInfo: string) {
   } else if (message.includes('permission denied')) {
     exception = ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
   }
-  if (deviceInfo) {
-    exception.addDeviceType(deviceInfo);
-  }
 
   return exception;
 }
