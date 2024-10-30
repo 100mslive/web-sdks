@@ -2,7 +2,7 @@ import { createRemotePeer } from './utils';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
 import { HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
-import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackKind } from '../../media/tracks';
 import { HMSPeer } from '../../sdk/models/peer';
 import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
@@ -72,7 +72,7 @@ export class TrackManager {
       }
 
       // emit this event here as peer will already be removed(if left the room) by the time this event is received
-      track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+      track.type === HMSTrackKind.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
       this.store.removeTrack(track);
       const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
       if (!hmsPeer) {
@@ -112,7 +112,7 @@ export class TrackManager {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
 
       // emit this event here as peer will already be removed(if left the room) by the time this event is received
-      track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+      track.type === HMSTrackKind.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     }
   }
 
@@ -201,7 +201,7 @@ export class TrackManager {
        * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
        * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
        **/
-      track.type === HMSTrackType.AUDIO
+      track.type === HMSTrackKind.AUDIO
         ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
         : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(track.trackId);
@@ -227,10 +227,10 @@ export class TrackManager {
       hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
       HMSLogger.d(this.TAG, 'auxiliary track removed', `${track}`);
     } else {
-      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack === track) {
+      if (track.type === HMSTrackKind.AUDIO && hmsPeer.audioTrack === track) {
         hmsPeer.audioTrack = undefined;
         HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
-      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
+      } else if (track.type === HMSTrackKind.VIDEO && hmsPeer.videoTrack === track) {
         hmsPeer.videoTrack = undefined;
         HMSLogger.d(this.TAG, 'video track removed', `${track}`);
       }
@@ -238,7 +238,7 @@ export class TrackManager {
   }
 
   private addAudioTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    if (track.type !== HMSTrackType.AUDIO) {
+    if (track.type !== HMSTrackKind.AUDIO) {
       return;
     }
     if (track.source === 'regular' && (!hmsPeer.audioTrack || hmsPeer.audioTrack?.trackId === track.trackId)) {
@@ -251,7 +251,7 @@ export class TrackManager {
   }
 
   addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    if (track.type !== HMSTrackType.VIDEO) {
+    if (track.type !== HMSTrackKind.VIDEO) {
       return;
     }
     const remoteTrack = track as HMSRemoteVideoTrack;
@@ -285,7 +285,7 @@ export class TrackManager {
     let eventType;
     if (currentTrackState.mute !== trackState.mute) {
       eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
-      track.type === HMSTrackType.AUDIO &&
+      track.type === HMSTrackKind.AUDIO &&
         this.eventBus.audioTrackUpdate.publish({ track: track as HMSRemoteAudioTrack, enabled: !trackState.mute });
     } else if (currentTrackState.description !== trackState.description) {
       eventType = HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED;

@@ -24,6 +24,7 @@ import {
   HMSRoom,
   HMSScreenVideoTrack,
   HMSTrack,
+  HMSTrackException,
   HMSTrackFacingMode,
   HMSVideoTrack,
 } from '../schema';
@@ -214,8 +215,9 @@ export class SDKToHMS {
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
     } as HMSException;
-    if (sdkException.deviceType) {
-      exp.deviceType = sdkException.deviceType;
+    if (sdkException instanceof sdkTypes.HMSTrackException) {
+      (exp as HMSTrackException).trackType = sdkException.trackType;
+      return exp as HMSTrackException;
     }
     return exp;
   }

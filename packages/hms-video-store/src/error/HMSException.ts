@@ -1,5 +1,6 @@
 import { HMSAction } from './HMSAction';
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
+import { HMSTrackType } from '../media/tracks/HMSTrackType';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
@@ -13,7 +14,6 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
     public message: string,
     public description: string,
     public isTerminal: boolean = false,
-    public deviceType: string = '',
   ) {
     super(message);
 
@@ -30,17 +30,11 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
       error_description: this.description,
       action: this.action,
       is_terminal: this.isTerminal,
-      device_type: this.deviceType,
     };
   }
 
   addNativeError(error: Error) {
     this.nativeError = error;
-  }
-
-  //add method to set HMSGetMediaActions as deviceType
-  addDeviceType(deviceType: string) {
-    this.deviceType = deviceType;
   }
 
   toString() {
@@ -52,7 +46,39 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
         description: ${this.description};
         isTerminal: ${this.isTerminal};
         nativeError: ${this.nativeError?.message};
-        deviceType: ${this.deviceType};
+      }`;
+  }
+}
+
+export class HMSTrackException extends HMSException {
+  constructor(
+    code: number,
+    name: string,
+    action: HMSAction | HMSSignalMethod,
+    message: string,
+    description: string,
+    public trackType: HMSTrackType,
+  ) {
+    super(code, name, action, message, description, false);
+  }
+
+  toAnalyticsProperties() {
+    return {
+      ...super.toAnalyticsProperties(),
+      track_type: this.trackType,
+    };
+  }
+
+  toString() {
+    return `{
+        code: ${this.code};
+        name: ${this.name};
+        action: ${this.action};
+        message: ${this.message};
+        description: ${this.description};
+        isTerminal: ${this.isTerminal};
+        nativeError: ${this.nativeError?.message};
+        trackType: ${this.trackType};
       }`;
   }
 }

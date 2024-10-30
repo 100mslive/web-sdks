@@ -1,7 +1,7 @@
 import adapter from 'webrtc-adapter';
 import { ErrorFactory } from './ErrorFactory';
 import { HMSAction } from './HMSAction';
-import { HMSException } from './HMSException';
+import { HMSTrackException } from './HMSException';
 
 export enum HMSGetMediaActions {
   UNKNOWN = 'unknown(video or audio)',
@@ -33,7 +33,7 @@ function getDefaultError(error: string, deviceInfo: string) {
  * System blocked - NotAllowedError - Permission denied by system
  */
 // eslint-disable-next-line complexity
-function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSException {
+function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSTrackException {
   /**
    * Note: Adapter detects all chromium browsers as 'chrome'
    */
@@ -72,9 +72,8 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSExcept
   }
 }
 
-export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
+export function BuildGetMediaError(err: Error, deviceInfo: string): HMSTrackException {
   const exception = convertMediaErrorToHMSException(err, deviceInfo);
   exception.addNativeError(err);
-  exception.addDeviceType(deviceInfo);
   return exception;
 }

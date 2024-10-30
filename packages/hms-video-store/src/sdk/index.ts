@@ -60,8 +60,8 @@ import {
   HMSLocalTrack,
   HMSLocalVideoTrack,
   HMSRemoteTrack,
+  HMSTrackKind,
   HMSTrackSource,
-  HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
 import {
@@ -1241,7 +1241,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean) {
-    if (forRemoteTrack.type === HMSTrackType.VIDEO && forRemoteTrack.source !== 'regular') {
+    if (forRemoteTrack.type === HMSTrackKind.VIDEO && forRemoteTrack.source !== 'regular') {
       HMSLogger.w(this.TAG, `Muting non-regular video tracks is currently not supported`);
       return;
     }
@@ -1376,11 +1376,11 @@ export class HMSSdk implements HMSInterface {
   private setLocalPeerTrack(track: HMSLocalTrack) {
     track.peerId = this.localPeer?.peerId;
     switch (track.type) {
-      case HMSTrackType.AUDIO:
+      case HMSTrackKind.AUDIO:
         this.localPeer!.audioTrack = track as HMSLocalAudioTrack;
         break;
 
-      case HMSTrackType.VIDEO:
+      case HMSTrackKind.VIDEO:
         this.localPeer!.videoTrack = track as HMSLocalVideoTrack;
         break;
     }

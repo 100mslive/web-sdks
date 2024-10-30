@@ -8,7 +8,7 @@ import {
   HMSException,
   HMSRoom,
   HMSTrack,
-  HMSTrackType,
+  HMSTrackKind,
   HMSTrackUpdate,
   HMSUpdateListener,
 } from '../internal';
@@ -108,10 +108,10 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
 
   onMediaPublished(track: HMSTrack): void {
     switch (track.type) {
-      case HMSTrackType.AUDIO:
+      case HMSTrackKind.AUDIO:
         this.isAudioTrackPublished = true;
         break;
-      case HMSTrackType.VIDEO:
+      case HMSTrackKind.VIDEO:
         this.isVideoTrackPublished = true;
         break;
       default:
@@ -156,10 +156,10 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     this.sdkListener.onTrackUpdate(type, track, peer);
     if (peer.isLocal && type === HMSTrackUpdate.TRACK_ADDED) {
       switch (track.type) {
-        case HMSTrackType.AUDIO:
+        case HMSTrackKind.AUDIO:
           this.isAudioTrackCaptured = true;
           break;
-        case HMSTrackType.VIDEO:
+        case HMSTrackKind.VIDEO:
           this.isVideoTrackCaptured = true;
           break;
         default:

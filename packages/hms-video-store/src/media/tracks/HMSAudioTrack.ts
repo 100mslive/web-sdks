@@ -1,11 +1,11 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
-import { HMSTrackType } from './HMSTrackType';
+import { HMSTrackKind } from './HMSTrackKind';
 import HMSLogger from '../../utils/logger';
 import { isFirefox } from '../../utils/support';
 import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export class HMSAudioTrack extends HMSTrack {
-  readonly type: HMSTrackType = HMSTrackType.AUDIO;
+  readonly type: HMSTrackKind = HMSTrackKind.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
 

@@ -27,8 +27,8 @@ import {
   HMSRemoteAudioTrack,
   HMSRemoteVideoTrack,
   HMSTrack,
+  HMSTrackKind,
   HMSTrackSource,
-  HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
 import {
@@ -145,7 +145,7 @@ class Store {
   }
 
   getVideoTracks() {
-    return this.getTracks().filter(track => track.type === HMSTrackType.VIDEO) as HMSVideoTrack[];
+    return this.getTracks().filter(track => track.type === HMSTrackKind.VIDEO) as HMSVideoTrack[];
   }
 
   getRemoteVideoTracks() {
@@ -153,7 +153,7 @@ class Store {
   }
 
   getAudioTracks() {
-    return this.getTracks().filter(track => track.type === HMSTrackType.AUDIO) as HMSAudioTrack[];
+    return this.getTracks().filter(track => track.type === HMSTrackKind.AUDIO) as HMSAudioTrack[];
   }
 
   getPeerTracks(peerId?: string) {
