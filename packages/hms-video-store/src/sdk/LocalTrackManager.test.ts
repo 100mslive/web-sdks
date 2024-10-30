@@ -5,7 +5,7 @@ import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSLocalVideoTrack, HMSPeerType, HMSTrackType } from '../internal';
+import { HMSLocalVideoTrack, HMSPeerType, HMSTrackKind } from '../internal';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
 import { PolicyParams } from '../notification-manager';
@@ -457,7 +457,7 @@ describe('LocalTrackManager', () => {
       const constraints = mockGetUserMedia.mock.calls[0][0];
       expect(constraints).toHaveProperty('video', false);
       expect(tracksToPublish).toHaveLength(1);
-      expect(tracksToPublish[0]).toHaveProperty('type', HMSTrackType.AUDIO);
+      expect(tracksToPublish[0]).toHaveProperty('type', HMSTrackKind.AUDIO);
     });
 
     it("doesn't fetch tracks if already present", async () => {
