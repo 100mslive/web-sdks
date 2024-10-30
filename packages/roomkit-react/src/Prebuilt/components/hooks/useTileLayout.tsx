@@ -47,7 +47,6 @@ export const useTileLayout = ({
   const vanillaStore = useHMSVanillaStore();
   const [ref, { width, height }] = useMeasure<HTMLDivElement>();
   const isMobile = useMedia(cssConfig.media.lg);
-  const isUnderMd = useMedia(cssConfig.media.md);
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimensions[][]>([]);
 
   useEffect(() => {
@@ -78,7 +77,7 @@ export const useTileLayout = ({
         return rowElements;
       });
 
-      const gap = edgeToEdge && isUnderMd ? 0 : 8; // gap between flex items
+      const gap = edgeToEdge && isMobile ? 0 : 8; // gap between flex items
       const maxHeight = height - (maxRows - 1) * gap;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios =
