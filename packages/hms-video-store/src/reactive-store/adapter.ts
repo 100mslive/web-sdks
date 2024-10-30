@@ -214,8 +214,8 @@ export class SDKToHMS {
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
     } as HMSException;
-    if (sdkException.deviceType) {
-      exp.deviceType = sdkException.deviceType;
+    if (sdkException.metadata) {
+      exp.metadata = sdkException.metadata;
     }
     return exp;
   }
