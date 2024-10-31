@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSNotificationTypes,
+  HMSTrackException,
+  HMSTrackExceptionTrackType,
+  useHMSNotifications,
+} from '@100mslive/react-sdk';
 import { Button, Dialog, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
@@ -24,6 +29,11 @@ export function DeviceInUseError() {
     if (!error || error.code !== 3003) {
       return;
     }
+    const errorTrackExceptionType = (error as HMSTrackException)?.trackType;
+    const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
+    const hasVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.VIDEO;
+    const hasAudioVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO_VIDEO;
+    const hasScreen = errorTrackExceptionType === HMSTrackExceptionTrackType.SCREEN;
 
     const errorMessage = error?.message;
     ToastManager.addToast({
@@ -35,10 +45,7 @@ export function DeviceInUseError() {
       ),
     });
 
-    const hasAudio = errorMessage.includes('audio');
-    const hasVideo = errorMessage.includes('video');
-    const hasScreen = errorMessage.includes('screen');
-    if (hasAudio && hasVideo) {
+    if (hasAudioVideo) {
       setDeviceType('camera and microphone');
     } else if (hasAudio) {
       setDeviceType('microphone');

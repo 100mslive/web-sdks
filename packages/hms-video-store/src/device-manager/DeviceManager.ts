@@ -7,6 +7,7 @@ import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces'
 import { getAudioDeviceCategory, HMSAudioDeviceCategory, isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { debounce } from '../utils/timer-utils';
@@ -325,7 +326,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
-          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('audio'),
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.AUDIO),
           devices: this.getDevices(),
           type: 'audioInput',
         }),
@@ -383,7 +384,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
-          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('video'),
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.VIDEO),
           devices: this.getDevices(),
           type: 'video',
         }),

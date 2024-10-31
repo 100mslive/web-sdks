@@ -8,6 +8,8 @@
 import { ErrorCodes } from './ErrorCodes';
 import { HMSAction } from './HMSAction';
 import { HMSException } from './HMSException';
+import { HMSTrackException } from './HMSTrackException';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 const terminalActions: (HMSSignalMethod | HMSAction)[] = [
@@ -98,52 +100,56 @@ export const ErrorFactory = {
 
   TracksErrors: {
     GenericTrack(action: HMSAction, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.GENERIC_TRACK,
         'GenericTrack',
         action,
         `[TRACK]: ${description}`,
         `[TRACK]: ${description}`,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
-
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
         'CantAccessCaptureDevice',
         action,
         `User denied permission to access capture device - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
     DeviceNotAvailable(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,
         'DeviceNotAvailable',
         action,
         `[TRACK]: Capture device is no longer available - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
     DeviceInUse(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.DEVICE_IN_USE,
         'DeviceInUse',
         action,
         `[TRACK]: Capture device is in use by another application - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
     DeviceLostMidway(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.DEVICE_LOST_MIDWAY,
         'DeviceLostMidway',
         action,
         `Lost access to capture device midway - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -152,113 +158,123 @@ export const ErrorFactory = {
       description = '',
       message = `There is no media to return. Please select either video or audio or both.`,
     ) {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
         message,
         description,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
 
     InvalidVideoSettings(action: HMSAction, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.INVALID_VIDEO_SETTINGS,
         'InvalidVideoSettings',
         action,
         `Cannot enable simulcast when no video settings are provided`,
         description,
+        HMSTrackExceptionTrackType.VIDEO,
       );
     },
 
     AutoplayBlocked(action: HMSAction, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.AUTOPLAY_ERROR,
         'AutoplayBlocked',
         action,
         "Autoplay blocked because the user didn't interact with the document first",
         description,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
     CodecChangeNotPermitted(action: HMSAction, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.CODEC_CHANGE_NOT_PERMITTED,
         'CodecChangeNotPermitted',
         action,
         `Codec can't be changed mid call.`,
         description,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
 
     OverConstrained(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.OVER_CONSTRAINED,
         'OverConstrained',
         action,
         `[TRACK]: Requested constraints cannot be satisfied with the device hardware - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
     NoAudioDetected(action: HMSAction, description = 'Please check the mic or use another audio input') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.NO_AUDIO_DETECTED,
         'NoAudioDetected',
         action,
         'No audio input detected from microphone',
         description,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
     SystemDeniedPermission(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
         'SystemDeniedPermission',
         action,
         `Operating System denied permission to access capture device - ${deviceInfo}`,
         description,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
     CurrentTabNotShared() {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.CURRENT_TAB_NOT_SHARED,
         'CurrentTabNotShared',
         HMSAction.TRACK,
         'The app requires you to share the current tab',
         'You must screen share the current tab in order to proceed',
+        HMSTrackExceptionTrackType.SCREEN,
       );
     },
 
     AudioPlaybackError(description: string) {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.AUDIO_PLAYBACK_ERROR,
         'Audio playback error',
         HMSAction.TRACK,
         description,
         description,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
     SelectedDeviceMissing(deviceType: string) {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.SELECTED_DEVICE_MISSING,
         'SelectedDeviceMissing',
         HMSAction.TRACK,
         `Could not detect selected ${deviceType} device`,
         `Please check connection to the ${deviceType} device`,
-        false,
+        deviceType as HMSTrackExceptionTrackType,
       );
     },
 
     NoDataInTrack(description: string) {
-      return new HMSException(
+      return new HMSTrackException(
         ErrorCodes.TracksErrors.NO_DATA,
         'Track does not have any data',
         HMSAction.TRACK,
         description,
         'This could possibily due to another application taking priority over the access to camera or microphone or due to an incoming call',
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
   },
