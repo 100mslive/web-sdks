@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSException, HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { HMSNotificationTypes, HMSTrackException, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import androidPermissionAlert from '../../images/android-perm-1.png';
@@ -11,10 +11,10 @@ import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorNotificationModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  return <PermissionErrorModal error={notification?.data} />;
+  return <PermissionErrorModal error={notification?.data as HMSTrackException} />;
 }
 
-export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
+export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) => {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);

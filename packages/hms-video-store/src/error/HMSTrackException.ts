@@ -5,11 +5,11 @@ import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export class HMSTrackException extends HMSException {
   constructor(
-    code: number,
-    name: string,
+    public readonly code: number,
+    public name: string,
     action: HMSAction | HMSSignalMethod,
-    message: string,
-    description: string,
+    public message: string,
+    public description: string,
     public trackType: HMSTrackExceptionTrackType,
   ) {
     super(code, name, action, message, description, false);

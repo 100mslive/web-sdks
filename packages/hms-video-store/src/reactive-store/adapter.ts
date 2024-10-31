@@ -204,7 +204,8 @@ export class SDKToHMS {
     };
   }
 
-  static convertException(sdkException: sdkTypes.HMSException): HMSException {
+  static convertException(sdkException: sdkTypes.HMSException): HMSException | HMSTrackException {
+    const isTrackException = 'trackType' in sdkException;
     const exp = {
       code: sdkException.code,
       action: sdkException.action,
@@ -215,8 +216,8 @@ export class SDKToHMS {
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
     } as HMSException;
-    if (sdkException instanceof sdkTypes.HMSTrackException) {
-      (exp as HMSTrackException).trackType = sdkException.trackType;
+    if (isTrackException) {
+      (exp as HMSTrackException).trackType = (sdkException as sdkTypes.HMSTrackException)?.trackType;
       return exp as HMSTrackException;
     }
     return exp;

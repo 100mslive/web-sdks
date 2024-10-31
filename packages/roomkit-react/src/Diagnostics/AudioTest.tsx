@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  HMSException,
+  HMSTrackException,
   selectDevices,
   selectLocalAudioTrackID,
   selectLocalMediaSettings,
@@ -182,7 +182,7 @@ export const AudioTest = () => {
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your audio sound good?" />
-      <PermissionErrorModal error={error as HMSException} />
+      <PermissionErrorModal error={error as HMSTrackException} />
     </>
   );
 };
