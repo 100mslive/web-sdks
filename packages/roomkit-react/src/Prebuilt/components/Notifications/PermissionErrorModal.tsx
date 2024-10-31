@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
+  HMSException,
   HMSNotificationTypes,
   HMSTrackException,
   HMSTrackExceptionTrackType,
@@ -16,10 +17,10 @@ import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorNotificationModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  return <PermissionErrorModal error={notification?.data as HMSTrackException} />;
+  return <PermissionErrorModal error={notification?.data} />;
 }
 
-export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) => {
+export const PermissionErrorModal = ({ error }: { error?: HMSTrackException | HMSException }) => {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
@@ -31,7 +32,8 @@ export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) =
     ) {
       return;
     }
-    const errorTrackExceptionType = error?.trackType;
+
+    const errorTrackExceptionType = (error as HMSTrackException)?.trackType;
     const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
     const hasVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.VIDEO;
     const hasAudioVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO_VIDEO;
