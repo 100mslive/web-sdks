@@ -32,7 +32,6 @@ export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) =
       return;
     }
     const errorTrackExceptionType = error?.trackType;
-    console.log(error);
     const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
     const hasVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.VIDEO;
     const hasAudioVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO_VIDEO;
