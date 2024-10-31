@@ -1,7 +1,7 @@
 import adapter from 'webrtc-adapter';
 import { ErrorFactory } from './ErrorFactory';
 import { HMSAction } from './HMSAction';
-import { HMSTrackException } from './HMSException';
+import { HMSTrackException } from './HMSTrackException';
 
 export enum HMSGetMediaActions {
   UNKNOWN = 'unknown(video or audio)',

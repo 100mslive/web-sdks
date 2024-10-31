@@ -7,7 +7,8 @@
 
 import { ErrorCodes } from './ErrorCodes';
 import { HMSAction } from './HMSAction';
-import { HMSException, HMSTrackException } from './HMSException';
+import { HMSException } from './HMSException';
+import { HMSTrackException } from './HMSTrackException';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
