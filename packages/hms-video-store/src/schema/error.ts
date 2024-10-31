@@ -14,14 +14,6 @@ export interface HMSException {
   nativeError?: Error;
 }
 
-export interface HMSTrackException {
-  code: number;
-  action: string;
-  name: string;
-  message: string;
-  description: string;
-  isTerminal: boolean;
-  timestamp: Date;
-  nativeError?: Error;
+export interface HMSTrackException extends HMSException {
   trackType: HMSTrackExceptionTrackType;
 }

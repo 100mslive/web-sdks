@@ -1,5 +1,5 @@
 import { HMSDeviceChangeEvent } from './device-change';
-import { HMSException, HMSTrackException } from './error';
+import { HMSException } from './error';
 import { HMSMessage } from './message';
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSPlaylistItem } from './playlist';
@@ -44,7 +44,7 @@ export interface HMSMessageNotification extends BaseNotification {
 }
 export interface HMSExceptionNotification extends BaseNotification {
   type: HMSNotificationTypes.ERROR;
-  data: HMSException | HMSTrackException;
+  data: HMSException;
 }
 export interface HMSChangeTrackStateRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST;

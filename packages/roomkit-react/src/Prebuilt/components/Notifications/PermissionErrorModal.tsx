@@ -20,7 +20,7 @@ export function PermissionErrorNotificationModal() {
   return <PermissionErrorModal error={notification?.data} />;
 }
 
-export const PermissionErrorModal = ({ error }: { error?: HMSTrackException | HMSException }) => {
+export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
