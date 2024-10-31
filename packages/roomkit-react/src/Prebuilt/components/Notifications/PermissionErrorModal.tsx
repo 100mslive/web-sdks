@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
+import { HMSTrackExceptionTrackType } from '@100mslive/hms-video-store';
 import { HMSNotificationTypes, HMSTrackException, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 // @ts-ignore: No implicit Any
@@ -27,10 +28,12 @@ export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) =
       return;
     }
     const errorMessage = error?.message;
-    const hasAudio = errorMessage.includes('audio');
-    const hasVideo = errorMessage.includes('video');
-    const hasScreen = errorMessage.includes('screen');
-    if (hasAudio && hasVideo) {
+    const errorTrackExceptionType = error?.trackType;
+    const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
+    const hasVideo = errorMessage === HMSTrackExceptionTrackType.VIDEO;
+    const hasAudioVideo = errorMessage === HMSTrackExceptionTrackType.AV;
+    const hasScreen = errorMessage === HMSTrackExceptionTrackType.AV;
+    if (hasAudioVideo) {
       setDeviceType('camera and microphone');
     } else if (hasAudio) {
       setDeviceType('microphone');
