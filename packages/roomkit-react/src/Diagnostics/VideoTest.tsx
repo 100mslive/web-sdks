@@ -66,7 +66,7 @@ export const VideoTest = () => {
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your video look good?" />
-      <PermissionErrorModal error={error as HMSException} />
+      <PermissionErrorModal error={error} />
     </>
   );
 };
