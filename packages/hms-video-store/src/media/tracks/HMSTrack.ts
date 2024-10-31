@@ -1,4 +1,4 @@
-import { HMSTrackKind } from './HMSTrackKind';
+import { HMSTrackType } from './HMSTrackType';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
@@ -44,7 +44,7 @@ export abstract class HMSTrack {
    */
   private firstTrackId?: string;
 
-  abstract readonly type: HMSTrackKind;
+  abstract readonly type: HMSTrackType;
 
   public get enabled(): boolean {
     return this.nativeTrack.enabled;

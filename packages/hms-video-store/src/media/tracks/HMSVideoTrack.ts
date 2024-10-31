@@ -1,12 +1,12 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
-import { HMSTrackKind } from './HMSTrackKind';
+import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
 import HMSLogger from '../../utils/logger';
 import { isSafari } from '../../utils/support';
 import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
-  readonly type: HMSTrackKind = HMSTrackKind.VIDEO;
+  readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
   videoHandler!: VideoElementManager;
 

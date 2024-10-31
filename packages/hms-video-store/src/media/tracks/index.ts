@@ -13,4 +13,4 @@ export * from './HMSRemoteAudioTrack';
 export * from './HMSVideoTrack';
 export * from './HMSLocalVideoTrack';
 export * from './HMSRemoteVideoTrack';
-export * from './HMSTrackKind';
+export * from './HMSTrackType';

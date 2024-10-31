@@ -1,13 +1,13 @@
 import HMSLogger from './logger';
 import { BuildGetMediaError } from '../error/utils';
-import { HMSTrackType } from '../media/tracks/HMSTrackType';
+import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackType.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionType.AV);
   }
 }
 
@@ -17,7 +17,7 @@ export async function getLocalScreen(constraints: MediaStreamConstraints['video'
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: constraints, audio: false });
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackType.SCREEN);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionType.SCREEN);
   }
 }
 
@@ -38,7 +38,7 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     devices.forEach(device => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackType.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionType.AV);
   }
 }
 

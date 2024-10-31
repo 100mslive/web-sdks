@@ -1,6 +1,6 @@
 import { HMSAction } from './HMSAction';
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
-import { HMSTrackType } from '../media/tracks/HMSTrackType';
+import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
@@ -57,7 +57,7 @@ export class HMSTrackException extends HMSException {
     action: HMSAction | HMSSignalMethod,
     message: string,
     description: string,
-    public trackType: HMSTrackType,
+    public trackType: HMSTrackExceptionType,
   ) {
     super(code, name, action, message, description, false);
   }

@@ -17,7 +17,7 @@ import {
   ScreenCaptureHandleConfig,
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackKind } from '../internal';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -27,7 +27,7 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSTrackType } from '../media/tracks/HMSTrackType';
+import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -237,7 +237,7 @@ export class LocalTrackManager {
       }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
-      const error = BuildGetMediaError(err as Error, HMSTrackType.SCREEN);
+      const error = BuildGetMediaError(err as Error, HMSTrackExceptionType.SCREEN);
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.publish({
           error: error as Error,
@@ -479,17 +479,17 @@ export class LocalTrackManager {
     }
   }
 
-  getErrorType(videoError: boolean, audioError: boolean): HMSTrackType {
+  getErrorType(videoError: boolean, audioError: boolean): HMSTrackExceptionType {
     if (videoError && audioError) {
-      return HMSTrackType.AV;
+      return HMSTrackExceptionType.AV;
     }
     if (videoError) {
-      return HMSTrackType.VIDEO;
+      return HMSTrackExceptionType.VIDEO;
     }
     if (audioError) {
-      return HMSTrackType.AUDIO;
+      return HMSTrackExceptionType.AUDIO;
     }
-    return HMSTrackType.AV;
+    return HMSTrackExceptionType.AV;
   }
 
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
@@ -506,14 +506,14 @@ export class LocalTrackManager {
 
   private async updateCurrentLocalTrackSettings(trackSettings: HMSTrackSettings | null) {
     const localTracks = this.store.getLocalPeerTracks();
-    const videoTrack = localTracks.find(t => t.type === HMSTrackKind.VIDEO && t.source === 'regular') as
+    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
       | HMSLocalVideoTrack
       | undefined;
-    const audioTrack = localTracks.find(t => t.type === HMSTrackKind.AUDIO && t.source === 'regular') as
+    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
       | HMSLocalAudioTrack
       | undefined;
 
-    const screenVideoTrack = localTracks.find(t => t.type === HMSTrackKind.VIDEO && t.source === 'screen') as
+    const screenVideoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
       | HMSLocalVideoTrack
       | undefined;
 
