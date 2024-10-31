@@ -7,7 +7,7 @@ import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { BuildGetMediaError } from '../error/utils';
 import { EventBus } from '../events/EventBus';
 import {
   HMSAudioCodec,
@@ -27,6 +27,7 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -236,7 +237,7 @@ export class LocalTrackManager {
       }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
-      const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      const error = BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.SCREEN);
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.publish({
           error: error as Error,
@@ -478,17 +479,17 @@ export class LocalTrackManager {
     }
   }
 
-  getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+  getErrorType(videoError: boolean, audioError: boolean): HMSTrackExceptionTrackType {
     if (videoError && audioError) {
-      return HMSGetMediaActions.AV;
+      return HMSTrackExceptionTrackType.AUDIO_VIDEO;
     }
     if (videoError) {
-      return HMSGetMediaActions.VIDEO;
+      return HMSTrackExceptionTrackType.VIDEO;
     }
     if (audioError) {
-      return HMSGetMediaActions.AUDIO;
+      return HMSTrackExceptionTrackType.AUDIO;
     }
-    return HMSGetMediaActions.UNKNOWN;
+    return HMSTrackExceptionTrackType.AUDIO_VIDEO;
   }
 
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
