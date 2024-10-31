@@ -49,8 +49,8 @@ export class ErrorBoundary extends Component {
                 <Text>Message: ${this.state.error}</Text>
                 <br />
                 Please reload to see if it works. If you think this is a mistake on our side, please reach out to us on
-                <a href="https://discord.com/invite/kGdmszyzq2" target="_blank" rel="noreferrer">
-                  Discord
+                <a href="https://dashboard.100ms.live/dashboard" target="_blank" rel="noreferrer">
+                  Dashboard
                 </a>
               </div>
               <Flex>
