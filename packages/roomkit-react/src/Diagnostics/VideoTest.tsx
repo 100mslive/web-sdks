@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   HMSException,
-  HMSTrackException,
   selectDevices,
   selectLocalMediaSettings,
   selectLocalVideoTrackID,
@@ -67,7 +66,7 @@ export const VideoTest = () => {
         </Flex>
       </TestContainer>
       <TestFooter error={error} ctaText="Does your video look good?" />
-      <PermissionErrorModal error={error as HMSTrackException} />
+      <PermissionErrorModal error={error as HMSException} />
     </>
   );
 };
