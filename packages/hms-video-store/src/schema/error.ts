@@ -1,4 +1,4 @@
-import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
 /**
  * any mid call error notification will be in this format
@@ -23,5 +23,5 @@ export interface HMSTrackException {
   isTerminal: boolean;
   timestamp: Date;
   nativeError?: Error;
-  trackType: HMSTrackExceptionType;
+  trackType: HMSTrackExceptionTrackType;
 }

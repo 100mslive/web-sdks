@@ -1,4 +1,4 @@
-export enum HMSTrackExceptionType {
+export enum HMSTrackExceptionTrackType {
   AUDIO = 'audio',
   VIDEO = 'video',
   AV = 'audio, video',

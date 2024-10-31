@@ -8,7 +8,7 @@
 import { ErrorCodes } from './ErrorCodes';
 import { HMSAction } from './HMSAction';
 import { HMSException, HMSTrackException } from './HMSException';
-import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 const terminalActions: (HMSSignalMethod | HMSAction)[] = [
@@ -105,7 +105,7 @@ export const ErrorFactory = {
         action,
         `[TRACK]: ${description}`,
         `[TRACK]: ${description}`,
-        HMSTrackExceptionType.AV,
+        HMSTrackExceptionTrackType.AV,
       );
     },
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
@@ -115,7 +115,7 @@ export const ErrorFactory = {
         action,
         `User denied permission to access capture device - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -126,7 +126,7 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Capture device is no longer available - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -137,7 +137,7 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Capture device is in use by another application - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -148,7 +148,7 @@ export const ErrorFactory = {
         action,
         `Lost access to capture device midway - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -163,7 +163,7 @@ export const ErrorFactory = {
         action,
         message,
         description,
-        HMSTrackExceptionType.AV,
+        HMSTrackExceptionTrackType.AV,
       );
     },
 
@@ -174,7 +174,7 @@ export const ErrorFactory = {
         action,
         `Cannot enable simulcast when no video settings are provided`,
         description,
-        HMSTrackExceptionType.VIDEO,
+        HMSTrackExceptionTrackType.VIDEO,
       );
     },
 
@@ -185,7 +185,7 @@ export const ErrorFactory = {
         action,
         "Autoplay blocked because the user didn't interact with the document first",
         description,
-        HMSTrackExceptionType.AUDIO,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
@@ -196,7 +196,7 @@ export const ErrorFactory = {
         action,
         `Codec can't be changed mid call.`,
         description,
-        HMSTrackExceptionType.AV,
+        HMSTrackExceptionTrackType.AV,
       );
     },
 
@@ -207,7 +207,7 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Requested constraints cannot be satisfied with the device hardware - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -218,7 +218,7 @@ export const ErrorFactory = {
         action,
         'No audio input detected from microphone',
         description,
-        HMSTrackExceptionType.AUDIO,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
@@ -229,7 +229,7 @@ export const ErrorFactory = {
         action,
         `Operating System denied permission to access capture device - ${deviceInfo}`,
         description,
-        deviceInfo as HMSTrackExceptionType,
+        deviceInfo as HMSTrackExceptionTrackType,
       );
     },
 
@@ -240,7 +240,7 @@ export const ErrorFactory = {
         HMSAction.TRACK,
         'The app requires you to share the current tab',
         'You must screen share the current tab in order to proceed',
-        HMSTrackExceptionType.SCREEN,
+        HMSTrackExceptionTrackType.SCREEN,
       );
     },
 
@@ -251,7 +251,7 @@ export const ErrorFactory = {
         HMSAction.TRACK,
         description,
         description,
-        HMSTrackExceptionType.AUDIO,
+        HMSTrackExceptionTrackType.AUDIO,
       );
     },
 
@@ -262,7 +262,7 @@ export const ErrorFactory = {
         HMSAction.TRACK,
         `Could not detect selected ${deviceType} device`,
         `Please check connection to the ${deviceType} device`,
-        deviceType as HMSTrackExceptionType,
+        deviceType as HMSTrackExceptionTrackType,
       );
     },
 
@@ -273,7 +273,7 @@ export const ErrorFactory = {
         HMSAction.TRACK,
         description,
         'This could possibily due to another application taking priority over the access to camera or microphone or due to an incoming call',
-        HMSTrackExceptionType.AV,
+        HMSTrackExceptionTrackType.AV,
       );
     },
   },

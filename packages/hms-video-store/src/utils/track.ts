@@ -1,6 +1,6 @@
 import { BuildGetMediaError } from '../error/utils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
-import { HMSTrackExceptionType } from '../media/tracks/HMSTrackExceptionType';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
 export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {
@@ -9,7 +9,7 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
     });
     return stream.getAudioTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackExceptionType.AUDIO);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AUDIO);
   }
 }
 
@@ -20,7 +20,7 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<Me
     });
     return stream.getVideoTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackExceptionType.VIDEO);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.VIDEO);
   }
 }
 
