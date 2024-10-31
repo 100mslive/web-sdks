@@ -106,7 +106,7 @@ export const ErrorFactory = {
         action,
         `[TRACK]: ${description}`,
         `[TRACK]: ${description}`,
-        HMSTrackExceptionTrackType.AV,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
@@ -164,7 +164,7 @@ export const ErrorFactory = {
         action,
         message,
         description,
-        HMSTrackExceptionTrackType.AV,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
 
@@ -197,7 +197,7 @@ export const ErrorFactory = {
         action,
         `Codec can't be changed mid call.`,
         description,
-        HMSTrackExceptionTrackType.AV,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
 
@@ -274,7 +274,7 @@ export const ErrorFactory = {
         HMSAction.TRACK,
         description,
         'This could possibily due to another application taking priority over the access to camera or microphone or due to an incoming call',
-        HMSTrackExceptionTrackType.AV,
+        HMSTrackExceptionTrackType.AUDIO_VIDEO,
       );
     },
   },

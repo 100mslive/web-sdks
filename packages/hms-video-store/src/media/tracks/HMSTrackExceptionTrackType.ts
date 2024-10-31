@@ -1,6 +1,6 @@
 export enum HMSTrackExceptionTrackType {
   AUDIO = 'audio',
   VIDEO = 'video',
-  AV = 'audio, video',
+  AUDIO_VIDEO = 'audio, video',
   SCREEN = 'screen',
 }

@@ -7,7 +7,7 @@ export async function getLocalStream(constraints: MediaStreamConstraints): Promi
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AUDIO_VIDEO);
   }
 }
 
@@ -38,7 +38,7 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     devices.forEach(device => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AUDIO_VIDEO);
   }
 }
 

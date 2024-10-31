@@ -31,12 +31,12 @@ export const PermissionErrorModal = ({ error }: { error?: HMSTrackException }) =
     ) {
       return;
     }
-    const errorMessage = error?.message;
     const errorTrackExceptionType = error?.trackType;
+    console.log(error);
     const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
-    const hasVideo = errorMessage === HMSTrackExceptionTrackType.VIDEO;
-    const hasAudioVideo = errorMessage === HMSTrackExceptionTrackType.AV;
-    const hasScreen = errorMessage === HMSTrackExceptionTrackType.AV;
+    const hasVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.VIDEO;
+    const hasAudioVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO_VIDEO;
+    const hasScreen = errorTrackExceptionType === HMSTrackExceptionTrackType.SCREEN;
     if (hasAudioVideo) {
       setDeviceType('camera and microphone');
     } else if (hasAudio) {

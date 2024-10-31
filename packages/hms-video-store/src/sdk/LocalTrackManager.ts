@@ -481,7 +481,7 @@ export class LocalTrackManager {
 
   getErrorType(videoError: boolean, audioError: boolean): HMSTrackExceptionTrackType {
     if (videoError && audioError) {
-      return HMSTrackExceptionTrackType.AV;
+      return HMSTrackExceptionTrackType.AUDIO_VIDEO;
     }
     if (videoError) {
       return HMSTrackExceptionTrackType.VIDEO;
@@ -489,7 +489,7 @@ export class LocalTrackManager {
     if (audioError) {
       return HMSTrackExceptionTrackType.AUDIO;
     }
-    return HMSTrackExceptionTrackType.AV;
+    return HMSTrackExceptionTrackType.AUDIO_VIDEO;
   }
 
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
