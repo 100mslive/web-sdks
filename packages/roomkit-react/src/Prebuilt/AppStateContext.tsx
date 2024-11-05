@@ -67,6 +67,7 @@ export const useAppStateManager = () => {
         [HMSRoomState.Disconnected, HMSRoomState.Connected],
         [HMSRoomState.Disconnected, HMSRoomState.Connecting],
         [HMSRoomState.Disconnected, HMSRoomState.Reconnecting],
+        [HMSRoomState.Disconnected, HMSRoomState.Preview],
         () => {
           setActiveState(prevState => {
             return match({ isLeaveScreenEnabled, isPreviewScreenEnabled, prevState })

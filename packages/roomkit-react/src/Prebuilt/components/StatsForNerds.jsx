@@ -54,8 +54,8 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
       <Sheet.Content
         css={{
           bg: '$surface_dim',
-          overflowY: 'auto',
           px: '$4',
+          pb: '$4',
         }}
       >
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
@@ -69,62 +69,76 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           </Flex>
         </Sheet.Title>
         <HorizontalDivider />
-        <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
-          <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
-          <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
-            Show Stats on Tiles
-          </Text>
-        </Flex>
-        {/* Select */}
         <Flex
           direction="column"
           css={{
-            mb: '$12',
-            position: 'relative',
-            minWidth: 0,
+            mr: '-$2',
+            overflowY: 'auto',
+            maxHeight: '65vh',
+            pr: '$6',
+            pl: '$4',
           }}
         >
-          <Label variant="body2" css={{ c: '$on_surface_high' }}>
-            Stats For
-          </Label>
-          <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
-            <DialogDropdownTrigger
-              title={selectedStat.label || 'Select Stats'}
-              css={{ mt: '$4' }}
-              titleCSS={{ mx: 0 }}
-              open={openDropdown}
-              ref={ref}
-            />
-            <Dropdown.Portal>
-              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
-                {statsOptions.map(option => {
-                  const isSelected = option.id === selectedStat.id && option.layer === selectedStat.layer;
-                  return (
-                    <Dropdown.Item
-                      key={`${option.id}-${option.layer || ''}`}
-                      onClick={() => {
-                        setSelectedStat(option);
-                      }}
-                      css={{
-                        px: '$9',
-                        bg: isSelected ? selectionBg : undefined,
-                        c: isSelected ? '$on_primary_high' : '$on_primary_high',
-                      }}
-                    >
-                      {option.label}
-                    </Dropdown.Item>
-                  );
-                })}
-              </Dropdown.Content>
-            </Dropdown.Portal>
-          </Dropdown.Root>
+          <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
+            <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
+            <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
+              Show Stats on Tiles
+            </Text>
+          </Flex>
+          {/* Select */}
+          <Flex
+            direction="column"
+            css={{
+              mb: '$12',
+              position: 'relative',
+              minWidth: 0,
+            }}
+          >
+            <Label variant="body2" css={{ c: '$on_surface_high' }}>
+              Stats For
+            </Label>
+            <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
+              <DialogDropdownTrigger
+                title={selectedStat.label || 'Select Stats'}
+                css={{ mt: '$4' }}
+                titleCSS={{ mx: 0 }}
+                open={openDropdown}
+                ref={ref}
+              />
+              <Dropdown.Portal>
+                <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+                  {statsOptions.map(option => {
+                    const isSelected = option.id === selectedStat.id && option.layer === selectedStat.layer;
+                    return (
+                      <Dropdown.Item
+                        key={`${option.id}-${option.layer || ''}`}
+                        onClick={() => {
+                          setSelectedStat(option);
+                        }}
+                        css={{
+                          px: '$9',
+                          bg: isSelected ? selectionBg : undefined,
+                          c: isSelected ? '$on_primary_high' : '$on_primary_high',
+                        }}
+                      >
+                        {option.label}
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Content>
+              </Dropdown.Portal>
+            </Dropdown.Root>
+          </Flex>
+          {/* Stats */}
+          {selectedStat.id === 'local-peer' ? (
+            <LocalPeerStats />
+          ) : (
+            <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
+          )}
+          <Flex justify="start" gap={4} css={{ m: '$10 0', w: '100%' }}>
+            <DebugInfo details={details} />
+          </Flex>
         </Flex>
-        {/* Stats */}
-        {selectedStat.id === 'local-peer' ? (
-          <LocalPeerStats />
-        ) : (
-          <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
-        )}
       </Sheet.Content>
     </Sheet.Root>
   ) : (

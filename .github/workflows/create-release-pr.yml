@@ -1,4 +1,4 @@
-name: Create release PR
+name: Create Release PR
 on:
   workflow_dispatch:
     inputs:
@@ -19,7 +19,7 @@ jobs:
         if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/dev'
         run: exit 1
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -48,7 +48,7 @@ jobs:
           echo $STORE_VERSION
           echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
-      - uses: peter-evans/create-pull-request@v4
+      - uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'ci: update versions for release'
           title: 'ci: update versions for release'

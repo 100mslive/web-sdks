@@ -3,7 +3,7 @@ import { useValue } from '@tldraw/state';
 import { Editor, hardResetEditor } from '@tldraw/tldraw';
 import classNames from 'classnames';
 
-const DISCORD_URL = 'https://discord.gg/pTge2BwDBq';
+const DASHBOARD_URL = 'https://dashboard.100ms.live/dashboard';
 
 export type TLErrorFallbackComponent = ComponentType<{
   error: unknown;
@@ -141,7 +141,7 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
             <h2>Something&apos;s gone wrong.</h2>
             <p>
               Sorry, we encountered an error. Please refresh the page to continue. If you keep seeing this error, you
-              can <a href={DISCORD_URL}>ask for help on Discord</a>.
+              can <a href={DASHBOARD_URL}>ask for help on Dashboard</a>.
             </p>
             {shouldShowError && (
               <div className="tl-error-boundary__content__error">
