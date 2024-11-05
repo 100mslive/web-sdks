@@ -66,7 +66,12 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     if (!isBrowser) {
       return updatedTheme;
     }
-    let element = document.querySelector(container);
+    let element;
+    try {
+      element = document.querySelector(container);
+    } catch (e) {
+      console.debug('container class not assigned');
+    }
     if (!element) {
       element = document.documentElement;
     }
