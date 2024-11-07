@@ -1,6 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -28,7 +27,6 @@ import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
@@ -50,7 +48,7 @@ import {
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
-import { APP_DATA, DEFAULT_PORTAL_CONTAINER } from './common/constants';
+import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -131,8 +129,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(() => {
       // leave room when component unmounts
       return () => {
-        VBHandler.reset();
-        reactiveStore?.current?.hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
