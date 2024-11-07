@@ -124,6 +124,10 @@ export const ConferenceScreen = () => {
     };
   }, [onJoinFunc]);
 
+  useEffect(() => {
+    setTimeout(() => window.location.reload(), 20000);
+  }, []);
+
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
