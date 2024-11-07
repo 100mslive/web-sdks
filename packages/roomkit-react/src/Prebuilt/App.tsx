@@ -1,5 +1,6 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -49,7 +50,7 @@ import {
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
-import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
+import { APP_DATA, DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -131,6 +132,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       // leave room when component unmounts
       return () => {
         VBHandler.reset();
+        reactiveStore?.current?.hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);

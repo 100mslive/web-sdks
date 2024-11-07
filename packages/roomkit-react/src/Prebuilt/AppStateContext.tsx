@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { match, P } from 'ts-pattern';
 import { HMSRoomState, selectRoomState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
@@ -79,6 +80,7 @@ export const useAppStateManager = () => {
               .otherwise(() => PrebuiltStates.MEETING);
           });
           VBHandler.reset();
+          hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
           redirectToLeave(1000); // to clear toasts after 1 second
         },
       )
