@@ -27,7 +27,6 @@ import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
@@ -130,7 +129,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(() => {
       // leave room when component unmounts
       return () => {
-        VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
