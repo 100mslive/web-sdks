@@ -283,7 +283,7 @@ export class HMSSdk implements HMSInterface {
 
   getDebugInfo(): DebugInfo | undefined {
     if (!this.transport) {
-      HMSLogger.e(this.TAG, `Transport is not defined`);
+      HMSLogger.w(this.TAG, `Transport is not defined`);
       return undefined;
     }
     const websocketURL = this.transport.getWebsocketEndpoint();
