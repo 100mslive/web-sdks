@@ -583,7 +583,8 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   initDiagnostics(): HMSDiagnosticsInterface;
   /**
-   * Method to get enabled flags and endpoints. Should be called after transport is defined.
+   * @internal
+   * Method to get enabled flags and endpoints. Should only be called after joining.
    */
   getDebugInfo(): DebugInfo | undefined;
 }
