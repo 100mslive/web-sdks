@@ -582,6 +582,8 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
 
   initDiagnostics(): HMSDiagnosticsInterface;
-
-  getDebugInfo(): DebugInfo;
+  /**
+   * Method to get enabled flags and endpoints. Should be called after transport is defined.
+   */
+  getDebugInfo(): DebugInfo | undefined;
 }
