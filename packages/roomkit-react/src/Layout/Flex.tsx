@@ -48,7 +48,7 @@ export const Flex = styled('div', {
       baseline: {
         alignItems: 'baseline',
       },
-      strech: {
+      stretch: {
         alignItems: 'stretch',
       },
     },
