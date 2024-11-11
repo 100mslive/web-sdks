@@ -23,7 +23,7 @@ export const useAwayNotifications = () => {
           unsubscribe?.();
         }
       } catch (e) {
-        console.log('Error in requestPermission', e);
+        console.log('Error in requestPermission : ', e);
       }
     }, selectLocalPeerRoleName);
   }, [vanillaStore]);
