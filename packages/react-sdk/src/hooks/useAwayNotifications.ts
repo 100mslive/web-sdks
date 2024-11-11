@@ -17,9 +17,13 @@ export const useAwayNotifications = () => {
       return;
     }
     const unsubscribe = vanillaStore.subscribe(async role => {
-      if (role && role !== '__internal_recorder') {
-        await Notification.requestPermission();
-        unsubscribe?.();
+      try {
+        if (role && role !== '__internal_recorder') {
+          await Notification.requestPermission();
+          unsubscribe?.();
+        }
+      } catch (e) {
+        console.log('Error in requestPermission', e);
       }
     }, selectLocalPeerRoleName);
   }, [vanillaStore]);
