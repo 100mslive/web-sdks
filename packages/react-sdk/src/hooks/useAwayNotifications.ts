@@ -9,7 +9,7 @@ export const useAwayNotifications = () => {
   const requestPermission = useCallback(async () => {
     // Headless check for beam
     if (!('Notification' in window) || navigator.webdriver) {
-      console.debug('Request Permsissions : Notifications not supported or headless browser');
+      console.debug('Request Permissions : Notifications not supported or headless browser');
       // Notifications not supported
       return;
     }
@@ -31,7 +31,7 @@ export const useAwayNotifications = () => {
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
     // Notifications not supported
     if (!('Notification' in window)) {
-      console.debug('Show Notifications: Notifications not supported or headless browser');
+      console.debug('Show Notifications : Notifications not supported or headless browser');
       return;
     }
     if (
