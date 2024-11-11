@@ -105,7 +105,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
           r: '$2',
           ...(!minimised
             ? {
-                aspectRatio: aspectRatio,
+                aspectRatio: `${aspectRatio}`,
                 h: height,
               }
             : {}),

@@ -281,7 +281,11 @@ export class HMSSdk implements HMSInterface {
     return this.transport?.getWebrtcInternals();
   }
 
-  getDebugInfo(): DebugInfo {
+  getDebugInfo(): DebugInfo | undefined {
+    if (!this.transport) {
+      HMSLogger.e(this.TAG, `Transport is not defined`);
+      throw new Error('getDebugInfo can only be called after join');
+    }
     const websocketURL = this.transport.getWebsocketEndpoint();
     const enabledFlags = Object.values(InitFlags).filter(flag => this.transport.isFlagEnabled(flag));
     const initEndpoint = this.store.getConfig()?.initEndpoint;
