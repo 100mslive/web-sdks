@@ -328,7 +328,7 @@ export const MwebOptions = ({
       </Sheet.Root>
       <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} screenType={screenType} />
 
-      <StatsForNerds open={openStatsForNerdsSheet} onOpenChange={setOpenStatsForNerdsSheet} />
+      {openSettingsSheet && <StatsForNerds open={openStatsForNerdsSheet} onOpenChange={setOpenStatsForNerdsSheet} />}
 
       {openModals.has(MODALS.MUTE_ALL) && (
         <MuteAllModal onOpenChange={(value: boolean) => updateState(MODALS.MUTE_ALL, value)} isMobile />
