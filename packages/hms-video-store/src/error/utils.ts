@@ -1,7 +1,7 @@
 import adapter from 'webrtc-adapter';
 import { ErrorFactory } from './ErrorFactory';
 import { HMSAction } from './HMSAction';
-import { HMSException } from './HMSException';
+import { HMSTrackException } from './HMSTrackException';
 
 export enum HMSGetMediaActions {
   UNKNOWN = 'unknown(video or audio)',
@@ -13,13 +13,15 @@ export enum HMSGetMediaActions {
 
 function getDefaultError(error: string, deviceInfo: string) {
   const message = error.toLowerCase();
+  let exception = ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error);
+
   if (message.includes('device not found')) {
-    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, error);
+    exception = ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, error);
   } else if (message.includes('permission denied')) {
-    return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
-  } else {
-    return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error);
+    exception = ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
   }
+
+  return exception;
 }
 
 /**
@@ -31,7 +33,7 @@ function getDefaultError(error: string, deviceInfo: string) {
  * System blocked - NotAllowedError - Permission denied by system
  */
 // eslint-disable-next-line complexity
-function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSException {
+function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSTrackException {
   /**
    * Note: Adapter detects all chromium browsers as 'chrome'
    */
@@ -70,7 +72,7 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo = ''): HMSExcept
   }
 }
 
-export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
+export function BuildGetMediaError(err: Error, deviceInfo: string): HMSTrackException {
   const exception = convertMediaErrorToHMSException(err, deviceInfo);
   exception.addNativeError(err);
   return exception;

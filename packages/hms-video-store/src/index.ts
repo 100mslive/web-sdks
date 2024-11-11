@@ -78,3 +78,5 @@ export type {
 } from './internal';
 export * from './diagnostics';
 export { DomainCategory } from './analytics/AnalyticsEventDomains';
+
+export { HMSTrackExceptionTrackType } from './media/tracks/HMSTrackExceptionTrackType';

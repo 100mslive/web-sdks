@@ -845,6 +845,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, reason);
   }
 
+  getDebugInfo() {
+    return this.sdk.getDebugInfo();
+  }
+
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
@@ -928,6 +932,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
+      onTrackUpdate: this.onTrackUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),

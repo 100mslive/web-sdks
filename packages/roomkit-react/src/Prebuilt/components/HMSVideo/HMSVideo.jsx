@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
-export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoRef) => {
   const [width, setWidth] = useState('auto');
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
     return () => {
       videoEl.removeEventListener('loadedmetadata', updatingVideoWidth);
     };
-  }, []);
+  }, [videoRef, width]);
   return (
     <Flex
       data-testid="hms-video"
@@ -33,7 +33,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         transition: 'all 0.3s ease-in-out',
         '@md': {
           '& video': {
-            height: props.isFullScreen ? '' : '$60 !important',
+            height: isFullScreen ? '' : '$60 !important',
           },
         },
         '& video::cue': {

@@ -8,10 +8,12 @@ export const useAwayNotifications = () => {
   const vanillaStore = useHMSVanillaStore();
   const requestPermission = useCallback(async () => {
     // Headless check for beam
-    if (navigator.webdriver) {
+    if (!('Notification' in window) || navigator.webdriver) {
+      console.debug('Request Permsissions : Notifications not supported or headless browser');
+      // Notifications not supported
       return;
     }
-    if (!Notification || Notification?.permission === 'granted' || Notification?.permission === 'denied') {
+    if (Notification?.permission === 'granted' || Notification?.permission === 'denied') {
       return;
     }
     const unsubscribe = vanillaStore.subscribe(async role => {
@@ -23,8 +25,12 @@ export const useAwayNotifications = () => {
   }, [vanillaStore]);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
+    // Notifications not supported
+    if (!('Notification' in window)) {
+      console.debug('Show Notifications: Notifications not supported or headless browser');
+      return;
+    }
     if (
-      !Notification ||
       Notification?.permission === 'denied' ||
       /**
        * document.visibilityState is still 'visible' when the tab is active but window is not open
