@@ -327,6 +327,7 @@ export const MwebOptions = ({
         </Sheet.Content>
       </Sheet.Root>
       <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} screenType={screenType} />
+
       <StatsForNerds open={openStatsForNerdsSheet} onOpenChange={setOpenStatsForNerdsSheet} />
 
       {openModals.has(MODALS.MUTE_ALL) && (
