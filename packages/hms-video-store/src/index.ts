@@ -80,3 +80,4 @@ export * from './diagnostics';
 export { DomainCategory } from './analytics/AnalyticsEventDomains';
 
 export { HMSTrackExceptionTrackType } from './media/tracks/HMSTrackExceptionTrackType';
+export { HMSAudioContextHandler } from './utils/media';

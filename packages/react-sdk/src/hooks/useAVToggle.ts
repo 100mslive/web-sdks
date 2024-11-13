@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  HMSAudioContextHandler,
   selectIsAllowedToPreviewMedia,
   selectIsAllowedToPublish,
   selectIsInPreview,
@@ -43,7 +44,11 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
 
   const toggleAudio = useCallback(async () => {
     try {
-      await actions.setLocalAudioEnabled(!isLocalAudioEnabled);
+      const enabled = !isLocalAudioEnabled;
+      await actions.setLocalAudioEnabled(enabled);
+      if (enabled) {
+        await HMSAudioContextHandler.resumeContext();
+      }
     } catch (err) {
       handleError(err as Error, 'toggleAudio');
     }
