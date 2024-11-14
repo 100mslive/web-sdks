@@ -43,10 +43,6 @@ export interface HMSConfig {
   autoVideoSubscribe?: boolean;
   initEndpoint?: string;
   /**
-   * Request Camera/Mic permissions irrespective of role to avoid delay in getting device list
-   */
-  alwaysRequestPermissions?: boolean;
-  /**
    * Enable to get a network quality score while in preview. The score ranges from -1 to 5.
    * -1 when we are not able to connect to 100ms servers within an expected time limit
    * 0 when there is a timeout/failure when measuring the quality

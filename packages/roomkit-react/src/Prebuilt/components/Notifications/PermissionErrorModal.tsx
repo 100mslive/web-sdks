@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSException, HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSException,
+  HMSNotificationTypes,
+  HMSTrackException,
+  HMSTrackExceptionTrackType,
+  useHMSNotifications,
+} from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import androidPermissionAlert from '../../images/android-perm-1.png';
@@ -26,11 +32,13 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
     ) {
       return;
     }
-    const errorMessage = error?.message;
-    const hasAudio = errorMessage.includes('audio');
-    const hasVideo = errorMessage.includes('video');
-    const hasScreen = errorMessage.includes('screen');
-    if (hasAudio && hasVideo) {
+
+    const errorTrackExceptionType = (error as HMSTrackException)?.trackType;
+    const hasAudio = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO;
+    const hasVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.VIDEO;
+    const hasAudioVideo = errorTrackExceptionType === HMSTrackExceptionTrackType.AUDIO_VIDEO;
+    const hasScreen = errorTrackExceptionType === HMSTrackExceptionTrackType.SCREEN;
+    if (hasAudioVideo) {
       setDeviceType('camera and microphone');
     } else if (hasAudio) {
       setDeviceType('microphone');

@@ -14,4 +14,3 @@ body:
       description: Describe the feature, who it would help, and link to any examples from other apps.
     validations:
       required: true
-  

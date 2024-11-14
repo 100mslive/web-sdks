@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { match, P } from 'ts-pattern';
 import { HMSRoomState, selectRoomState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
@@ -67,6 +68,7 @@ export const useAppStateManager = () => {
         [HMSRoomState.Disconnected, HMSRoomState.Connected],
         [HMSRoomState.Disconnected, HMSRoomState.Connecting],
         [HMSRoomState.Disconnected, HMSRoomState.Reconnecting],
+        [HMSRoomState.Disconnected, HMSRoomState.Preview],
         () => {
           setActiveState(prevState => {
             return match({ isLeaveScreenEnabled, isPreviewScreenEnabled, prevState })
@@ -78,6 +80,7 @@ export const useAppStateManager = () => {
               .otherwise(() => PrebuiltStates.MEETING);
           });
           VBHandler.reset();
+          hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
           redirectToLeave(1000); // to clear toasts after 1 second
         },
       )
@@ -87,6 +90,6 @@ export const useAppStateManager = () => {
       .otherwise(() => {
         // do nothing
       });
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave, hmsActions]);
   return { activeState, rejoin };
 };

@@ -87,14 +87,14 @@ export class HMSVideoTrack extends HMSTrack {
     this.sinkCount++;
   }
 
-  handleTrackUnmute() {
+  handleTrackUnmute = () => {
     this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
-  }
+  };
 
   private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
-      videoElement.play().catch(() => {
-        HMSLogger.w('[HMSVideoTrack]', 'failed to play');
+      videoElement.play().catch((e: Error) => {
+        HMSLogger.w('[HMSVideoTrack]', 'failed to play', e.message);
       });
     }, 0);
   };

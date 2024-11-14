@@ -8,7 +8,7 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-// @ts-ignore: No implicit any
+// @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';

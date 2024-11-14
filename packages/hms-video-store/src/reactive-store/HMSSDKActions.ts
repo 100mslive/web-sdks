@@ -92,6 +92,7 @@ import {
   selectVideoTrackByID,
 } from '../selectors';
 import { FindPeerByNameRequestParams } from '../signal/interfaces';
+import { HMSStats } from '../webrtc-stats';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -845,6 +846,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, reason);
   }
 
+  getDebugInfo() {
+    return this.sdk.getDebugInfo();
+  }
+
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
@@ -928,6 +933,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
+      onTrackUpdate: this.onTrackUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -1666,4 +1672,24 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private setState: NamedSetState<HMSStore<T>> = (fn, name) => {
     return this.store.namedSetState(fn, name);
   };
+
+  /**
+   * @internal
+   * This will be used by beam to check if the recording should continue, it will pass __hms.stats
+   * It will poll at a fixed interval and start an exit timer if the method fails twice consecutively
+   * The exit timer is stopped if the method returns true before that
+   * @param hmsStats
+   */
+  hasActiveElements(hmsStats: HMSStats): boolean {
+    const isWhiteboardPresent = Object.keys(this.store.getState().whiteboards).length > 0;
+    const isQuizOrPollPresent = Object.keys(this.store.getState().polls).length > 0;
+    const peerCount = Object.keys(this.store.getState().peers).length > 0;
+    const remoteTracks = hmsStats.getState().remoteTrackStats;
+    return (
+      peerCount &&
+      (isWhiteboardPresent ||
+        isQuizOrPollPresent ||
+        Object.values(remoteTracks).some(track => track && typeof track.bitrate === 'number' && track.bitrate > 0))
+    );
+  }
 }

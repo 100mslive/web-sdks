@@ -46,6 +46,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseAudioTracks);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -98,6 +99,7 @@ export class AudioSinkManager {
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -136,13 +138,19 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
+        // try to wait for main execution to complete first
         this.removeAudioElement(audioEl, track);
         await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
+        if (!this.state.autoplayFailed) {
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+          );
+        }
       }
     };
     track.setAudioElement(audioEl);
-    track.setVolume(this.volume);
+    await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);

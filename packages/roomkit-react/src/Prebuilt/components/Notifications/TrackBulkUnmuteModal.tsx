@@ -9,14 +9,16 @@ import { MicOnIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { RequestDialog } from '../../primitives/DialogContent';
 
+const notificationTypes = [
+  HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST,
+  HMSNotificationTypes.ROOM_ENDED,
+  HMSNotificationTypes.REMOVED_FROM_ROOM,
+];
+
 export const TrackBulkUnmuteModal = () => {
   const hmsActions = useHMSActions();
   const [muteNotification, setMuteNotification] = useState<HMSChangeMultiTrackStateRequest | null>(null);
-  const notification = useHMSNotifications([
-    HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST,
-    HMSNotificationTypes.ROOM_ENDED,
-    HMSNotificationTypes.REMOVED_FROM_ROOM,
-  ]);
+  const notification = useHMSNotifications(notificationTypes);
 
   useEffect(() => {
     switch (notification?.type) {

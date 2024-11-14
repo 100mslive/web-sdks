@@ -72,6 +72,7 @@ import {
 } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
+import { DebugInfo } from '../schema';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig, InitFlags } from '../signal/init/models';
@@ -256,6 +257,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
@@ -277,6 +279,21 @@ export class HMSSdk implements HMSInterface {
 
   getWebrtcInternals() {
     return this.transport?.getWebrtcInternals();
+  }
+
+  getDebugInfo(): DebugInfo | undefined {
+    if (!this.transport) {
+      HMSLogger.e(this.TAG, `Transport is not defined`);
+      throw new Error('getDebugInfo can only be called after join');
+    }
+    const websocketURL = this.transport.getWebsocketEndpoint();
+    const enabledFlags = Object.values(InitFlags).filter(flag => this.transport.isFlagEnabled(flag));
+    const initEndpoint = this.store.getConfig()?.initEndpoint;
+    return {
+      websocketURL,
+      enabledFlags,
+      initEndpoint,
+    };
   }
 
   getSessionStore() {
@@ -435,13 +452,6 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
-    // Request permissions and populate devices before waiting for policy
-    if (config.alwaysRequestPermissions) {
-      this.localTrackManager.requestPermissions().then(async () => {
-        await this.initDeviceManagers();
-      });
-    }
-
     let initSuccessful = false;
     let networkTestFinished = false;
     const timerId = setTimeout(() => {
@@ -457,7 +467,22 @@ export class HMSSdk implements HMSInterface {
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
-        tracks.forEach(track => this.setLocalPeerTrack(track));
+        tracks.forEach(track => {
+          this.setLocalPeerTrack(track);
+          if (track.isTrackNotPublishing()) {
+            const error = ErrorFactory.TracksErrors.NoDataInTrack(
+              `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+            );
+            HMSLogger.e(this.TAG, error);
+            this.sendAnalyticsEvent(
+              AnalyticsEventFactory.publish({
+                devices: this.deviceManager.getDevices(),
+                error: error,
+              }),
+            );
+            this.listener?.onError(error);
+          }
+        });
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
@@ -664,6 +689,7 @@ export class HMSSdk implements HMSInterface {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
@@ -1332,6 +1358,19 @@ export class HMSSdk implements HMSInterface {
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
     for (const track of tracks) {
       await this.transport.publish([track]);
+      if (track.isTrackNotPublishing()) {
+        const error = ErrorFactory.TracksErrors.NoDataInTrack(
+          `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
+        );
+        HMSLogger.e(this.TAG, error);
+        this.sendAnalyticsEvent(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error: error,
+          }),
+        );
+        this.listener?.onError(error);
+      }
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }

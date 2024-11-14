@@ -12,6 +12,7 @@ export * from './selectors';
 export * from './webrtc-stats';
 export {
   HMSAudioMode,
+  HMSAudioDeviceCategory,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
@@ -77,3 +78,5 @@ export type {
 } from './internal';
 export * from './diagnostics';
 export { DomainCategory } from './analytics/AnalyticsEventDomains';
+
+export { HMSTrackExceptionTrackType } from './media/tracks/HMSTrackExceptionTrackType';

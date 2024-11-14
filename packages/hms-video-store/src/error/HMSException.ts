@@ -38,13 +38,13 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
 
   toString() {
     return `{
-      code: ${this.code};
-      name: ${this.name};
-      action: ${this.action};
-      message: ${this.message};
-      description: ${this.description};
-      isTerminal: ${this.isTerminal};
-      nativeError: ${this.nativeError?.message};
-    }`;
+        code: ${this.code};
+        name: ${this.name};
+        action: ${this.action};
+        message: ${this.message};
+        description: ${this.description};
+        isTerminal: ${this.isTerminal};
+        nativeError: ${this.nativeError?.message};
+      }`;
   }
 }

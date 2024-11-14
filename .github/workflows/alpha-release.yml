@@ -9,7 +9,7 @@ jobs:
   bump_versions:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -41,10 +41,8 @@ jobs:
     needs: bump_versions
     steps:
       - name: Trigger Publish Packages workflow
-        uses: aurelien-baudet/workflow-dispatch@v2.1.1
+        uses: aurelien-baudet/workflow-dispatch@v4.0.0
         with:
           workflow: publish.yml
           token: ${{ secrets.GITHUB_TOKEN }}
           inputs: '{ "publishFlag": "alpha" }'
-
-          

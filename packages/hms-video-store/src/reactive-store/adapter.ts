@@ -24,6 +24,7 @@ import {
   HMSRoom,
   HMSScreenVideoTrack,
   HMSTrack,
+  HMSTrackException,
   HMSTrackFacingMode,
   HMSVideoTrack,
 } from '../schema';
@@ -203,8 +204,9 @@ export class SDKToHMS {
     };
   }
 
-  static convertException(sdkException: sdkTypes.HMSException): HMSException {
-    return {
+  static convertException(sdkException: sdkTypes.HMSException): HMSException | HMSTrackException {
+    const isTrackException = 'trackType' in sdkException;
+    const exp = {
       code: sdkException.code,
       action: sdkException.action,
       name: sdkException.name,
@@ -213,7 +215,12 @@ export class SDKToHMS {
       isTerminal: sdkException.isTerminal,
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
-    };
+    } as HMSException;
+    if (isTrackException) {
+      (exp as HMSTrackException).trackType = (sdkException as sdkTypes.HMSTrackException)?.trackType;
+      return exp as HMSTrackException;
+    }
+    return exp;
   }
 
   static convertDeviceChangeUpdate(sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent): HMSDeviceChangeEvent {

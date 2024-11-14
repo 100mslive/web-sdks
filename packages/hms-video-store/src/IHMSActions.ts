@@ -25,6 +25,7 @@ import {
   TokenRequestOptions,
 } from './internal';
 import {
+  DebugInfo,
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
@@ -39,6 +40,7 @@ import {
   IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
+import { HMSStats } from './webrtc-stats';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -581,4 +583,15 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
 
   initDiagnostics(): HMSDiagnosticsInterface;
+  /**
+   * @internal
+   * Method to get enabled flags and endpoints. Should only be called after joining.
+   */
+  getDebugInfo(): DebugInfo | undefined;
+
+  /**
+   * @internal
+   * Method to check if received bitrate is 0 for all remote peers or whether the room has whiteboard/quiz running. To be used by beam.
+   */
+  hasActiveElements(hmsStats: HMSStats): boolean;
 }

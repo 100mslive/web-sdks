@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMedia } from 'react-use';
-import { UserMusicIcon } from '@100mslive/react-icons';
+import { CrossIcon, UserMusicIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 
 export const ThankyouView = () => {
+  const [isVisible, setIsVisible] = useState(true);
   const isMobile = useMedia(cssConfig.media.md);
+
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <Flex
       direction={isMobile ? 'column' : 'row'}
@@ -25,6 +31,20 @@ export const ThankyouView = () => {
         },
       }}
     >
+      {isMobile && (
+        <CrossIcon
+          width="24px"
+          height="24px"
+          color="white"
+          onClick={() => setIsVisible(false)}
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '16px',
+            cursor: 'pointer',
+          }}
+        />
+      )}
       <UserMusicIcon width="64px" height="64px" />
       <Flex direction="column" align={isMobile ? 'center' : 'start'}>
         <Text variant="h5">Thank you for your feedback</Text>
