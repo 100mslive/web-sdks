@@ -1,5 +1,11 @@
 # Web SDKs
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Activity](https://img.shields.io/github/commit-activity/m/100mslive/web-sdks.svg)](https://www.100ms.live/docs/javascript/v2/release-notes/release-notes)
+[![License](https://img.shields.io/npm/l/@100mslive/hms-video-store)](https://www.100ms.live/)
+[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://www.100ms.live/docs/javascript/v2/quickstart/javascript-quickstart)
+[![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://dashboard.100ms.live/register)
+
 This monorepo contains all the packages required to integrate 100ms on the web.
 
 ## What is included?

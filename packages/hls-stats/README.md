@@ -1,5 +1,11 @@
 # @100mslive/hms-stats
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hls-stats)](https://bundlephobia.com/result?p=@100mslive/hls-stats)
+[![License](https://img.shields.io/npm/l/@100mslive/hls-stats)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hls-stats)
+
+
 A simple library for HLS stats for Hls.js.
 
 ## Installation

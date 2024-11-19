@@ -1,5 +1,10 @@
 # 100ms HLS Player
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hls-player)](https://bundlephobia.com/result?p=@100mslive/hls-player)
+[![License](https://img.shields.io/npm/l/@100mslive/hls-player)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hls-player)
+
 The `HMSHLSPlayer` is an HLS player offered by 100ms that can be used to play HLS streams. The player takes a URL and video element to play the stream.
 
 ## How to integrate HLS Player SDK
