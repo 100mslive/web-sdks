@@ -167,11 +167,11 @@ export default class RoleChangeManager {
   private getAudioDeviceSettings(): { audioInputDeviceId: string; audioOutputDeviceId: string } {
     const initialSettings = this.store.getConfig()?.settings;
     const audioInputDeviceId =
-      this.deviceManager.prevSelection[DeviceType.audioInput]?.deviceId ||
+      this.deviceManager.currentSelection[DeviceType.audioInput]?.deviceId ||
       initialSettings?.audioInputDeviceId ||
       'default';
     const audioOutputDeviceId =
-      this.deviceManager.prevSelection[DeviceType.audioOutput]?.deviceId ||
+      this.deviceManager.currentSelection[DeviceType.audioOutput]?.deviceId ||
       initialSettings?.audioOutputDeviceId ||
       'default';
 
@@ -184,7 +184,9 @@ export default class RoleChangeManager {
   private getVideoInputDeviceId(): string {
     const initialSettings = this.store.getConfig()?.settings;
     return (
-      this.deviceManager.prevSelection[DeviceType.videoInput]?.deviceId || initialSettings?.videoDeviceId || 'default'
+      this.deviceManager.currentSelection[DeviceType.videoInput]?.deviceId ||
+      initialSettings?.videoDeviceId ||
+      'default'
     );
   }
 }

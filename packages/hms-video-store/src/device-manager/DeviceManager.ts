@@ -31,7 +31,7 @@ export class DeviceManager implements HMSDeviceManager {
   hasWebcamPermission = false;
   hasMicrophonePermission = false;
 
-  prevSelection: SelectedDevices = {
+  currentSelection: SelectedDevices = {
     audioInput: undefined,
     videoInput: undefined,
     audioOutput: undefined,
