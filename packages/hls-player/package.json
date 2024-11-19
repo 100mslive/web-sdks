@@ -39,5 +39,13 @@
     "@100mslive/hls-stats": "0.4.24",
     "eventemitter2": "^6.4.9",
     "hls.js": "1.4.12"
-  }
+  },
+  "keywords": [
+    "hls",
+    "video",
+    "player",
+    "webrtc",
+    "conferencing",
+    "100ms"
+  ]
 }
