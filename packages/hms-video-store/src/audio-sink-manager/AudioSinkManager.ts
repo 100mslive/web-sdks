@@ -73,8 +73,8 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      HMSAudioContextHandler.resumeContext();
-      this.unpauseAudioTracks();
+      await HMSAudioContextHandler.resumeContext();
+      await this.unpauseAudioTracks();
     }
   }
 
