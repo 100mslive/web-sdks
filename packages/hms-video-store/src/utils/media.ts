@@ -1,11 +1,7 @@
 import HMSLogger from './logger';
+import { isFirefox } from './support';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
-
-//Handling sample rate error in case of firefox
-const checkBrowserSupport = () => {
-  return navigator.userAgent.indexOf('Firefox') !== -1;
-};
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
@@ -61,12 +57,12 @@ export const HMSAudioContextHandler: {
   audioContext: null,
   getAudioContext(options?: AudioContextOptions) {
     if (!this.audioContext) {
-      if (checkBrowserSupport()) {
+      if (isFirefox) {
         /**
-        Not setting default sample rate for firefox since connecting
-        audio nodes from context with different sample rate is not
-        supported in firefox
- */
+         * Not setting default sample rate for firefox since connecting
+         * audio nodes from context with different sample rate is not
+         * supported in firefox
+         */
         this.audioContext = new AudioContext();
       } else {
         this.audioContext = new AudioContext(options);
