@@ -45,15 +45,11 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
 
 export interface HMSAudioContext {
   audioContext: AudioContext | null;
-  getAudioContext: () => AudioContext;
+  getAudioContext: (options?: AudioContextOptions) => AudioContext;
   resumeContext: () => Promise<void>;
 }
 
-export const HMSAudioContextHandler: {
-  audioContext: AudioContext | null;
-  getAudioContext(options?: AudioContextOptions): AudioContext;
-  resumeContext(): Promise<void>;
-} = {
+export const HMSAudioContextHandler: HMSAudioContext = {
   audioContext: null,
   getAudioContext(options?: AudioContextOptions) {
     const newAudioContextNeeded =

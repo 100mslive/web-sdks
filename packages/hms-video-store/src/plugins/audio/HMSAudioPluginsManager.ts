@@ -210,7 +210,7 @@ export class HMSAudioPluginsManager {
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
-    this.updateProcessedTrack();
+    await this.updateProcessedTrack();
   }
 
   private async initAudioNodes() {
