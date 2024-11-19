@@ -1555,7 +1555,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
           this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
         }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   /**
