@@ -2,6 +2,11 @@ import HMSLogger from './logger';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
+//Handling sample rate error in case of firefox
+const checkBrowserSupport = () => {
+  return navigator.userAgent.indexOf('Firefox') !== -1;
+};
+
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -48,11 +53,19 @@ export interface HMSAudioContext {
   resumeContext: () => Promise<void>;
 }
 
-export const HMSAudioContextHandler: HMSAudioContext = {
+export const HMSAudioContextHandler: {
+  audioContext: AudioContext | null;
+  getAudioContext(options?: AudioContextOptions): AudioContext;
+  resumeContext(): Promise<void>;
+} = {
   audioContext: null,
-  getAudioContext() {
+  getAudioContext(options?: AudioContextOptions) {
     if (!this.audioContext) {
-      this.audioContext = new AudioContext();
+      if (checkBrowserSupport()) {
+        this.audioContext = new AudioContext();
+      } else {
+        this.audioContext = new AudioContext(options);
+      }
     }
     return this.audioContext;
   },
