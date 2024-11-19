@@ -62,6 +62,11 @@ export const HMSAudioContextHandler: {
   getAudioContext(options?: AudioContextOptions) {
     if (!this.audioContext) {
       if (checkBrowserSupport()) {
+        /**
+        Not setting default sample rate for firefox since connecting
+        audio nodes from context with different sample rate is not
+        supported in firefox
+ */
         this.audioContext = new AudioContext();
       } else {
         this.audioContext = new AudioContext(options);
