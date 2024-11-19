@@ -4,6 +4,7 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
+import { HMSAudioContextHandler } from '../../internal';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
@@ -48,7 +49,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.createAudioContext();
+    this.audioContext = HMSAudioContextHandler.getAudioContext();
     this.room = room;
   }
 
