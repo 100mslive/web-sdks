@@ -1,5 +1,10 @@
 # Virtual Background with Effects SDK
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-virtual-background)](https://bundlephobia.com/result?p=@100mslive/hms-virtual-background)
+[![License](https://img.shields.io/npm/l/@100mslive/hms-virtual-background)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-virtual-background)
+
 Virtual background plugin helps in customising one’s background. The customising options are blurring the background or replacing it with a static image. This guide provides an overview of usage of the virtual background plugin of 100ms.
 
 ## Pre-requisites

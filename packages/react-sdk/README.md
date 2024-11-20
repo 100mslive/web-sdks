@@ -1,4 +1,10 @@
-### About
+# 100ms React SDK
+
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/react-sdk)](https://bundlephobia.com/result?p=@100mslive/react-sdk)
+[![License](https://img.shields.io/npm/l/@100mslive/react-sdk)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/react-sdk)
+
 
 This package is a react wrapper over the core SDK(`@100mslive/hms-video-store`). 
 An easy way to use the store, actions and notifications are provided via

@@ -1,5 +1,10 @@
 # 100ms Whiteboard
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-whiteboard)](https://bundlephobia.com/result?p=@100mslive/hms-whiteboard)
+[![License](https://img.shields.io/npm/l/@100mslive/hms-whiteboard)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-whiteboard)
+
 The 100ms SDK provides robust APIs for integrating whiteboard collaboration into your conferencing sessions. Participants can engage in real-time by drawing, writing, and collaborating on a shared digital whiteboard. This documentation outlines how to implement the start and stop functionality for a whiteboard and display it within an iframe or embed it as a React component.
 
 ## Requirements
