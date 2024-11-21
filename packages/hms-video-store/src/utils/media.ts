@@ -1,4 +1,5 @@
 import HMSLogger from './logger';
+import { isFirefox } from './support';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
@@ -44,17 +45,26 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
 
 export interface HMSAudioContext {
   audioContext: AudioContext | null;
-  getAudioContext: () => AudioContext;
+  getAudioContext: (options?: AudioContextOptions) => AudioContext;
   resumeContext: () => Promise<void>;
 }
 
 export const HMSAudioContextHandler: HMSAudioContext = {
   audioContext: null,
-  getAudioContext() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
+  getAudioContext(options?: AudioContextOptions) {
+    const newAudioContextNeeded =
+      !this.audioContext || (options?.sampleRate && this.audioContext.sampleRate !== options.sampleRate);
+
+    if (newAudioContextNeeded) {
+      /**
+       * Not setting default sample rate for firefox since connecting
+       * audio nodes from context with different sample rate is not
+       * supported in firefox
+       */
+      this.audioContext = isFirefox ? new AudioContext() : new AudioContext(options);
     }
-    return this.audioContext;
+
+    return this.audioContext!;
   },
   async resumeContext() {
     try {

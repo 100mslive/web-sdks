@@ -72,7 +72,7 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      this.unpauseAudioTracks();
+      await this.unpauseAudioTracks();
     }
   }
 

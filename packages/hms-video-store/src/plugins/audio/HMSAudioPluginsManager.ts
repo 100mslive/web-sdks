@@ -4,16 +4,12 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
+import { HMSAudioContextHandler } from '../../internal';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
 const DEFAULT_SAMPLE_RATE = 48000;
-
-//Handling sample rate error in case of firefox
-const checkBrowserSupport = () => {
-  return navigator.userAgent.indexOf('Firefox') !== -1;
-};
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -48,7 +44,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.createAudioContext();
+    this.audioContext = HMSAudioContextHandler.getAudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
     this.room = room;
   }
 
@@ -214,7 +210,7 @@ export class HMSAudioPluginsManager {
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
-    this.updateProcessedTrack();
+    await this.updateProcessedTrack();
   }
 
   private async initAudioNodes() {
@@ -281,20 +277,5 @@ export class HMSAudioPluginsManager {
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
-  }
-
-  private createAudioContext() {
-    if (!this.audioContext) {
-      if (checkBrowserSupport()) {
-        /**
-        Not setting default sample rate for firefox since connecting
-        audio nodes from context with different sample rate is not
-        supported in firefox
- */
-        this.audioContext = new AudioContext();
-      } else {
-        this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
-      }
-    }
   }
 }
