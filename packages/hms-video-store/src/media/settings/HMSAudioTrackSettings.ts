@@ -59,24 +59,6 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
-  updateConstraints(overrides: Partial<Array<MediaTrackConstraintSet>>) {
-    const constraintsMap = new Map<string, MediaTrackConstraintSet>();
-    this._advanced.forEach(constraint => {
-      const key = Object.keys(constraint)[0];
-      constraintsMap.set(key, constraint);
-    });
-
-    Object.entries(overrides).forEach(([key, value]) => {
-      if (value !== undefined) {
-        // @ts-ignore
-        constraintsMap.set(key, { [key]: { exact: value['exact'] } });
-      }
-    });
-
-    this._advanced = Array.from(constraintsMap.values());
-    return this;
-  }
-
   advanced(advanced: Array<MediaTrackConstraintSet>) {
     this._advanced = advanced;
     return this;

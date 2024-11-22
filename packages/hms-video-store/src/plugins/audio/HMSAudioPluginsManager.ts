@@ -91,7 +91,20 @@ export class HMSAudioPluginsManager {
           .codec(settings.codec)
           .maxBitrate(settings.maxBitrate)
           .deviceId(settings.deviceId!)
-          .updateConstraints([{ autoGainControl: { exact: false } }, { noiseSuppression: { exact: false } }])
+          .advanced([
+            // @ts-ignore
+            { googEchoCancellation: { exact: true } },
+            // @ts-ignore
+            { googExperimentalEchoCancellation: { exact: true } },
+            // @ts-ignore
+            { autoGainControl: { exact: false } },
+            // @ts-ignore
+            { noiseSuppression: { exact: false } },
+            // @ts-ignore
+            { googHighpassFilter: { exact: true } },
+            // @ts-ignore
+            { googAudioMirroring: { exact: true } },
+          ])
           .audioMode(settings.audioMode)
           .build();
         await this.hmsTrack.setSettings(newAudioTrackSettings);
@@ -180,7 +193,20 @@ export class HMSAudioPluginsManager {
           .codec(settings.codec)
           .maxBitrate(settings.maxBitrate)
           .deviceId(settings.deviceId!)
-          .updateConstraints([{ autoGainControl: { exact: true } }, { noiseSuppression: { exact: true } }])
+          .advanced([
+            // @ts-ignore
+            { googEchoCancellation: { exact: true } },
+            // @ts-ignore
+            { googExperimentalEchoCancellation: { exact: true } },
+            // @ts-ignore
+            { autoGainControl: { exact: true } },
+            // @ts-ignore
+            { noiseSuppression: { exact: true } },
+            // @ts-ignore
+            { googHighpassFilter: { exact: true } },
+            // @ts-ignore
+            { googAudioMirroring: { exact: true } },
+          ])
           .audioMode(settings.audioMode)
           .build();
         await this.hmsTrack.setSettings(newAudioTrackSettings);
