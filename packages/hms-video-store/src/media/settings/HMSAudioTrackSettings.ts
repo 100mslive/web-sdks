@@ -1,3 +1,4 @@
+import { standardMediaConstraints } from './constants';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSAudioCodec, HMSAudioMode, HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 
@@ -8,20 +9,11 @@ export class HMSAudioTrackSettingsBuilder {
   private _deviceId = 'default';
   private _audioMode: HMSAudioMode = HMSAudioMode.VOICE;
   private _advanced: Array<MediaTrackConstraintSet> = [
-    // @ts-ignore
-    { googEchoCancellation: { exact: true } },
-    // @ts-ignore
-    { googExperimentalEchoCancellation: { exact: true } },
-    // @ts-ignore
+    ...standardMediaConstraints,
     { autoGainControl: { exact: true } },
     // @ts-ignore
     { noiseSuppression: { exact: true } },
-    // @ts-ignore
-    { googHighpassFilter: { exact: true } },
-    // @ts-ignore
-    { googAudioMirroring: { exact: true } },
   ];
-
   volume(volume: number) {
     if (!(0.0 <= volume && volume <= 1.0)) {
       throw Error('volume can only be in range [0.0, 1.0]');
