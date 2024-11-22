@@ -5,6 +5,7 @@ import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettingsBuilder } from '../../media/settings';
+import { standardMediaConstraints } from '../../media/settings/constants';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
@@ -92,18 +93,11 @@ export class HMSAudioPluginsManager {
           .maxBitrate(settings.maxBitrate)
           .deviceId(settings.deviceId!)
           .advanced([
-            // @ts-ignore
-            { googEchoCancellation: { exact: true } },
-            // @ts-ignore
-            { googExperimentalEchoCancellation: { exact: true } },
+            ...standardMediaConstraints,
             // @ts-ignore
             { autoGainControl: { exact: false } },
             // @ts-ignore
             { noiseSuppression: { exact: false } },
-            // @ts-ignore
-            { googHighpassFilter: { exact: true } },
-            // @ts-ignore
-            { googAudioMirroring: { exact: true } },
           ])
           .audioMode(settings.audioMode)
           .build();
@@ -194,18 +188,11 @@ export class HMSAudioPluginsManager {
           .maxBitrate(settings.maxBitrate)
           .deviceId(settings.deviceId!)
           .advanced([
-            // @ts-ignore
-            { googEchoCancellation: { exact: true } },
-            // @ts-ignore
-            { googExperimentalEchoCancellation: { exact: true } },
+            ...standardMediaConstraints,
             // @ts-ignore
             { autoGainControl: { exact: true } },
             // @ts-ignore
             { noiseSuppression: { exact: true } },
-            // @ts-ignore
-            { googHighpassFilter: { exact: true } },
-            // @ts-ignore
-            { googAudioMirroring: { exact: true } },
           ])
           .audioMode(settings.audioMode)
           .build();
