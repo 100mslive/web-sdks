@@ -67,7 +67,9 @@ export class DiagnosticsStatsCollector {
     const ridAveragedVideoBitrateList = this.localVideoTrackStatsList.map(trackStatsMap =>
       trackStatsMap ? calculateAverage(Object.values(trackStatsMap), curr => curr.bitrate) : 0,
     );
-
+    const audioJitter = getLastElement(this.remoteAudioTrackStatsList)?.jitter || 0;
+    const videoJitter = getLastElement(this.remoteVideoTrackStatsList)?.jitter || 0;
+    const jitter = Math.max(audioJitter, videoJitter);
     const lastLocalAudioTrackStats = getLastElement(this.localAudioTrackStatsList);
     const lastLocalVideoTrackStats = getLastElement(this.localVideoTrackStatsList);
 
@@ -80,6 +82,7 @@ export class DiagnosticsStatsCollector {
         bytesReceived: lastSubscribeStats?.bytesReceived || 0,
         bitrateSent: calculateAverage(this.peerStatsList, curr => curr.publish?.bitrate),
         bitrateReceived: calculateAverage(this.peerStatsList, curr => curr.subscribe?.bitrate),
+        jitter: jitter,
       },
       audio: {
         roundTripTime,
@@ -91,6 +94,7 @@ export class DiagnosticsStatsCollector {
         bytesSent: lastLocalAudioTrackStats
           ? Object.values(lastLocalAudioTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
           : 0,
+        jitter: audioJitter,
       },
       video: {
         roundTripTime,
@@ -102,6 +106,7 @@ export class DiagnosticsStatsCollector {
         bytesSent: lastLocalVideoTrackStats
           ? Object.values(lastLocalVideoTrackStats).reduce((acc, curr) => acc + (curr.bytesSent || 0), 0)
           : 0,
+        jitter: videoJitter,
       },
     };
   }

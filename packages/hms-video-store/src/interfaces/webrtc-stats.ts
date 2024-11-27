@@ -29,6 +29,7 @@ interface MissingCommonStats {
 interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonStats {
   bytesSent?: number;
   packetsSent?: number;
+  jitter?: number;
   qualityLimitationReason?: string;
   qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
   totalPacketSendDelay?: number;

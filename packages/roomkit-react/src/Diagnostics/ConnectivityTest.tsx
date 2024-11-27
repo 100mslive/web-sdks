@@ -164,6 +164,7 @@ const AudioStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
           <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
           <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
           <DetailedInfo title="Round Trip Time" value={`${stats.roundTripTime} ms`} />
+          <DetailedInfo title="Jitter" value={`${stats.jitter}`} />
         </Flex>
       )}
     </ConnectivityTestStepResult>
@@ -182,6 +183,7 @@ const VideoStats = ({ stats }: { stats: DiagnosticsRTCStats | undefined }) => {
           <DetailedInfo title="Bitrate Sent" value={formatBytes(stats.bitrateSent, 'b/s')} />
           <DetailedInfo title="Bitrate Received" value={formatBytes(stats.bitrateReceived, 'b/s')} />
           <DetailedInfo title="Round Trip Time" value={`${stats.roundTripTime} ms`} />
+          <DetailedInfo title="Jitter" value={`${stats.jitter}`} />
         </Flex>
       )}
     </ConnectivityTestStepResult>
