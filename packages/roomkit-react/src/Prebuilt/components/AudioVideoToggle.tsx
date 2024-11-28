@@ -109,7 +109,7 @@ const useNoiseCancellationWithPlugin = () => {
   const isEnabledForRoom = useHMSStore(selectRoom)?.isNoiseCancellationEnabled;
   const setNoiseCancellationWithPlugin = useCallback(
     async (enabled: boolean) => {
-      if (!isEnabledForRoom || inProgress || isIOS) {
+      if (!isEnabledForRoom || inProgress) {
         return;
       }
       if (!krispPlugin.checkSupport().isSupported) {
