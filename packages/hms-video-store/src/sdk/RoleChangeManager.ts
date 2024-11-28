@@ -1,6 +1,6 @@
 import { Store } from './store';
 import { DeviceManager } from '../device-manager';
-import { HMSRole } from '../interfaces';
+import { DeviceType, HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
@@ -144,14 +144,49 @@ export default class RoleChangeManager {
   }
 
   private getSettings(): InitialSettings {
-    const initialSettings = this.store.getConfig()?.settings;
+    const { isAudioMuted, isVideoMuted } = this.getMutedStatus();
+    const { audioInputDeviceId, audioOutputDeviceId } = this.getAudioDeviceSettings();
+    const videoDeviceId = this.getVideoInputDeviceId();
+    return {
+      isAudioMuted: isAudioMuted,
+      isVideoMuted: isVideoMuted,
+      audioInputDeviceId: audioInputDeviceId,
+      audioOutputDeviceId: audioOutputDeviceId,
+      videoDeviceId: videoDeviceId,
+    };
+  }
 
+  private getMutedStatus(): { isAudioMuted: boolean; isVideoMuted: boolean } {
+    const initialSettings = this.store.getConfig()?.settings;
     return {
       isAudioMuted: initialSettings?.isAudioMuted ?? true,
       isVideoMuted: initialSettings?.isVideoMuted ?? true,
-      audioInputDeviceId: initialSettings?.audioInputDeviceId || 'default',
-      audioOutputDeviceId: initialSettings?.audioOutputDeviceId || 'default',
-      videoDeviceId: initialSettings?.videoDeviceId || 'default',
     };
+  }
+
+  private getAudioDeviceSettings(): { audioInputDeviceId: string; audioOutputDeviceId: string } {
+    const initialSettings = this.store.getConfig()?.settings;
+    const audioInputDeviceId =
+      this.deviceManager.currentSelection[DeviceType.audioInput]?.deviceId ||
+      initialSettings?.audioInputDeviceId ||
+      'default';
+    const audioOutputDeviceId =
+      this.deviceManager.currentSelection[DeviceType.audioOutput]?.deviceId ||
+      initialSettings?.audioOutputDeviceId ||
+      'default';
+
+    return {
+      audioInputDeviceId,
+      audioOutputDeviceId,
+    };
+  }
+
+  private getVideoInputDeviceId(): string {
+    const initialSettings = this.store.getConfig()?.settings;
+    return (
+      this.deviceManager.currentSelection[DeviceType.videoInput]?.deviceId ||
+      initialSettings?.videoDeviceId ||
+      'default'
+    );
   }
 }

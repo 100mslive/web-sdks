@@ -1,10 +1,15 @@
-# `@100mslive/roomkit-web`
+# 100ms Web RoomKit
+
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/roomkit-web)](https://bundlephobia.com/result?p=@100mslive/roomkit-web)
+[![License](https://img.shields.io/npm/l/@100mslive/roomkit-web)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/roomkit-web)
 
 A web component implementation of the HMSPrebuilt component from [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
 
 ## Usage
 
-```
+```js
 import '@100mslive/roomkit-web'
 
 Vue
