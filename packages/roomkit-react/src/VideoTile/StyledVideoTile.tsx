@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
 import { flexCenter } from '../utils';
@@ -6,18 +5,6 @@ import { flexCenter } from '../utils';
 export const Root = styled('div', {
   padding: '0.75rem',
 });
-
-const MotionRoot = motion(Root);
-MotionRoot.defaultProps = {
-  layout: true,
-  transition: {
-    type: 'spring',
-    stiffness: 300,
-    damping: 30,
-    mass: 1,
-    duration: 0.15,
-  },
-};
 
 const Container = styled('div', {
   width: '100%',
@@ -137,7 +124,7 @@ const AvatarContainer = styled(Box, {
 });
 
 interface VideoTileType {
-  Root: typeof MotionRoot;
+  Root: typeof Root;
   Container: typeof Container;
   Overlay: typeof Overlay;
   Info: typeof Info;
@@ -148,7 +135,7 @@ interface VideoTileType {
 }
 
 export const StyledVideoTile: VideoTileType = {
-  Root: MotionRoot,
+  Root,
   Container,
   Overlay,
   Info,
