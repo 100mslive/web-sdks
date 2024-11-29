@@ -47,9 +47,9 @@ import { HMSStats } from './webrtc-stats';
  * It talks to our 100ms backend and handles error reconnections, state managements
  * and lots of other things so you don't have to. You can use this gateway with any
  * sort of UI to make connecting to our backend easier.
- * In case you use react, we also provide a HMSProvider class with very powerful hooks
- * and out of box components which you can use to setup your website in minutes. Our
- * components have in built integration with this interface and you won't have to worry
+ * In case you use React, we also provide a HMSProvider class with very powerful hooks
+ * and out of box components which you can use to set up your website in minutes. Our
+ * components have in built integration with this interface, and you won't have to worry
  * about passing props if you use them.
  *
  * @remarks
@@ -69,16 +69,20 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * is ignored
    *
    * @param config join config with room id, required for joining the room
+   * @returns Promise<void> - resolves when the room is joined
    */
   join(config: HMSConfig): Promise<void>;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
+   * This function also cleans up the store and removes all the tracks and participants.
+   * @returns Promise<void> - resolves when the room is left
    */
   leave(): Promise<void>;
 
   /**
    * stop tracks fetched during midcall preview and general cleanup
+   * @returns Promise<void> - resolves when the tracks are stopped
    */
   cancelMidCallPreview(): Promise<void>;
 
@@ -86,8 +90,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * If you want to enable screenshare for the local peer this class can be called.
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
-   * @param enabled boolean
+   * @param enabled boolean - true to enable screenshare, false to disable
    * @param config check the config object for details about the fields
+   * @returns Promise<void> - resolves when the screenshare is enabled
    */
   setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
@@ -217,7 +222,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   /**
    * set the quality of the selected videoTrack for simulcast.
-   * @alpha
+   * @param trackId HMSTrackID - trackId of the video track
+   * @param layer HMSSimulcastLayer - layer to be set
+   * @returns Promise<void> - resolves when the layer is set
    */
   setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
@@ -399,21 +406,21 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   stopTranscription(params: TranscriptionConfig): Promise<void>;
 
   /**
-   * @alpha
    * Used to define date range metadata in a media playlist.
    * This api adds EXT-X-DATERANGE tags to the media playlist.
    * It is useful for defining timed metadata for interstitial regions such as advertisements,
    * but can be used to define any timed metadata needed by your stream.
-   * usage (e.g)
+   * ```js
    * const metadataList = `[{
-   *  payload: "some string 1",
-   *  duration: 2
-   * },
-   * {
-   *  payload: "some string 2",
-   *  duration: 3
+   *    payload: "some string 1",
+   *    duration: 2
+   *   },
+   *   {
+   *    payload: "some string 2",
+   *    duration: 3
    * }]`
    * sendHLSTimedMetadata(metadataList);
+   * ```
    */
   sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
@@ -549,13 +556,23 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
 
+  /**
+   * Get the track object by trackId
+   * @param trackId string - ID of the track
+   * @returns HMSTrack | undefined - track object
+   */
   getTrackById(trackId: string): HMSTrack | undefined;
 
+  /**
+   * Get the auth token for the room code. This is useful when you want to join a room using a room code.
+   * @param tokenRequest - token request object
+   * @param tokenRequestOptions - token request options
+   */
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   /**
    * enable sending audio speaker data to beam
-   * @alpha
+   * @returns Promise<void> - resolves when the speaker data is enabled
    */
   enableBeamSpeakerLabelsLogging(): Promise<void>;
 
@@ -567,6 +584,10 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 
+  /**
+   * interactivityCenter contains all actions that can be performed on the interactivity center
+   * This will be available after joining the room
+   */
   interactivityCenter: IHMSInteractivityCenter;
 
   raiseLocalPeerHand(): Promise<void>;
