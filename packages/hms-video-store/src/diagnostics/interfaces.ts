@@ -88,4 +88,5 @@ export interface DiagnosticsRTCStats {
   bitrateSent: number;
   bitrateReceived: number;
   roundTripTime: number;
+  jitter: number;
 }
