@@ -39,7 +39,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
     };
   }
 
-  protected sendEvent() {
+  sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
     super.sendEvent();
   }

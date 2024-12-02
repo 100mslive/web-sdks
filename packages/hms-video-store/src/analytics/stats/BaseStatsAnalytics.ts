@@ -57,13 +57,13 @@ export abstract class BaseStatsAnalytics {
     }
   }
 
-  protected sendEvent(): void {
+  sendEvent(): void {
     this.trackAnalytics.forEach(trackAnalytic => {
       trackAnalytic.clearSamples();
     });
   }
 
-  protected cleanTrackAnalyticsAndCreateSample(shouldCreateSample: boolean) {
+  cleanTrackAnalyticsAndCreateSample(shouldCreateSample: boolean) {
     // delete track analytics if track is not present in store and no samples are present
     this.trackAnalytics.forEach(trackAnalytic => {
       if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
