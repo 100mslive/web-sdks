@@ -1,7 +1,14 @@
 // @ts-check
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
-import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSRoomState,
+  selectLocalPeer,
+  selectLocalPeerRoleName,
+  selectRoomState,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
@@ -27,7 +34,7 @@ export const QuestionCard = ({
 }) => {
   const actions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
-
+  const roomState = useHMSStore(selectRoomState);
   const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const roleCanViewResponse =
@@ -183,13 +190,19 @@ export const QuestionCard = ({
         ) : null}
       </Box>
       {isLive && (
-        <QuestionActions isValidVote={isValidVote} onVote={handleVote} response={localPeerChoice} isQuiz={isQuiz} />
+        <QuestionActions
+          disableVote={roomState !== HMSRoomState.Connected}
+          isValidVote={isValidVote}
+          onVote={handleVote}
+          response={localPeerChoice}
+          isQuiz={isQuiz}
+        />
       )}
     </Box>
   );
 };
 
-const QuestionActions = ({ isValidVote, response, isQuiz, onVote }) => {
+const QuestionActions = ({ isValidVote, response, isQuiz, onVote, disableVote }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
       {response ? (
@@ -199,7 +212,7 @@ const QuestionActions = ({ isValidVote, response, isQuiz, onVote }) => {
           {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
-        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
+        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote || disableVote} onClick={onVote}>
           {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}
