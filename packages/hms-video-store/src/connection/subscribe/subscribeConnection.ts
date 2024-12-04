@@ -18,7 +18,7 @@ import { HMSConnectionRole } from '../model';
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
-  private readonly observer: ISubscribeConnectionObserver;
+  protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
   readonly nativeConnection: RTCPeerConnection;
@@ -60,6 +60,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = e => {
       if (e.candidate !== null) {
+        this.observer.onIceCandidate(e.candidate);
         this.signal.trickle(this.role, e.candidate);
       }
     };
@@ -97,8 +98,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       });
 
       const remote = this.remoteStreams.get(streamId)!;
-      const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
-      const track = new TrackCls(remote, e.track);
+      const isAudioTrack = e.track.kind === 'audio';
+      const TrackCls = isAudioTrack ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
+      const track = isAudioTrack
+        ? new TrackCls(remote, e.track)
+        : new TrackCls(remote, e.track, undefined, this.isFlagEnabled(InitFlags.FLAG_DISABLE_NONE_LAYER_REQUEST));
       // reset the simulcast layer to none when new video tracks are added, UI will subscribe when required
       if (e.track.kind === 'video') {
         remote.setVideoLayerLocally(HMSSimulcastLayer.NONE, 'addTrack', 'subscribeConnection');
@@ -153,8 +157,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
     return this.sendMessage(request, id);
   }
 
-  async close() {
-    await super.close();
+  close() {
+    super.close();
     this.apiChannel?.close();
   }
 

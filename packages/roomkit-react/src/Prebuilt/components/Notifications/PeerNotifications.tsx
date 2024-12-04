@@ -8,9 +8,9 @@ import { useSetSubscribedChatSelector, useSubscribedNotifications } from '../App
 import { CHAT_SELECTOR, SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
 const notificationTypes = [
-  HMSNotificationTypes.PEER_LIST,
   HMSNotificationTypes.PEER_JOINED,
   HMSNotificationTypes.PEER_LEFT,
+  HMSNotificationTypes.NAME_UPDATED,
 ];
 
 export const PeerNotifications = () => {
@@ -26,11 +26,6 @@ export const PeerNotifications = () => {
 
     console.debug(`[${notification.type}]`, notification);
     switch (notification.type) {
-      case HMSNotificationTypes.PEER_LIST:
-        if (!isPeerJoinSubscribed || notification.data.length === 0) {
-          return;
-        }
-        break;
       case HMSNotificationTypes.PEER_JOINED:
         if (!isPeerJoinSubscribed) {
           return;
@@ -44,12 +39,14 @@ export const PeerNotifications = () => {
           return;
         }
         break;
+      case HMSNotificationTypes.NAME_UPDATED:
+        console.log(notification.data.id + ' changed their name to ' + notification.data.name);
+        return;
       default:
         return;
     }
-
     ToastBatcher.showToast({ notification });
-  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
+  }, [notification]);
 
   return null;
 };

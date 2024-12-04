@@ -28,17 +28,8 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { usePinnedBy } from '../hooks/usePinnedBy';
+import { formatTime } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-
-const formatTime = (date: Date) => {
-  if (!(date instanceof Date)) {
-    return '';
-  }
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const suffix = hours > 11 ? 'PM' : 'AM';
-  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}`;
-};
 
 const rowHeights: Record<number, { size: number; id: string }> = {};
 let listInstance: VariableSizeList | null = null; //eslint-disable-line
@@ -75,34 +66,41 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
         ml: '$2',
         mr: '$4',
         gap: '$space$2',
+        flexWrap: 'nowrap',
       }}
     >
       {left && (
-        <SenderName
+        <Text
           variant="xs"
           as="span"
-          css={{ color: '$on_surface_medium', textTransform: 'capitalize', fontWeight: '$regular' }}
+          css={{
+            color: '$on_surface_medium',
+            textTransform: 'capitalize',
+            fontWeight: '$regular',
+            whiteSpace: 'nowrap',
+          }}
         >
           {left}
-        </SenderName>
+        </Text>
       )}
       {right && (
-        <SenderName
+        <Text
           as="span"
           variant="overline"
           css={{
             color: '$on_surface_medium',
             fontWeight: '$regular',
+            whiteSpace: 'nowrap',
           }}
         >
           {right}
-        </SenderName>
+        </Text>
       )}
     </Flex>
   );
 };
 
-const MessageType = ({
+export const MessageType = ({
   roles,
   hasCurrentUserSent,
   receiver,
@@ -165,11 +163,12 @@ const getMessageType = ({ roles, receiver }: { roles?: HMSRoleName[]; receiver?:
   }
   return receiver ? 'private' : '';
 };
-const SenderName = styled(Text, {
+
+export const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '14ch',
+  width: '100%',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
@@ -251,7 +250,15 @@ const ChatMessage = React.memo(
             }}
             as="div"
           >
-            <Flex align="baseline">
+            <Flex
+              align="baseline"
+              css={{
+                flexWrap: 'nowrap',
+                maxWidth: 'calc(100% - 10ch)',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               {message.senderName === 'You' || !message.senderName ? (
                 <SenderName
                   as="span"
@@ -261,7 +268,7 @@ const ChatMessage = React.memo(
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
-                <Tooltip title={message.senderName} side="top" align="start">
+                <Tooltip title={message.senderName} side="top" align="start" boxCss={{ zIndex: 50 }}>
                   <SenderName
                     as="span"
                     variant="sub2"
@@ -410,6 +417,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     }, [blacklistedMessageIDs, messages]);
 
     const vanillaStore = useHMSVanillaStore();
+    const rerenderOnFirstMount = useRef(false);
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -419,12 +427,24 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
         }
         // @ts-ignore
         const outerElement = listRef.current._outerRef;
-        if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
+        if (
+          outerElement &&
+          outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight
+        ) {
           requestAnimationFrame(() => scrollToBottom(1));
         }
       }, selectUnreadHMSMessagesCount);
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
+
+    useEffect(() => {
+      // @ts-ignore
+      if (filteredMessages.length > 0 && listRef?.current && !rerenderOnFirstMount.current) {
+        rerenderOnFirstMount.current = true;
+        // @ts-ignore
+        listRef.current.resetAfterIndex(0);
+      }
+    }, [listRef, filteredMessages]);
 
     return filteredMessages.length === 0 ? (
       <EmptyChat />

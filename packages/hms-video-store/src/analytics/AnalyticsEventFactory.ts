@@ -135,6 +135,16 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static audioRecovered(message: string) {
+    return new AnalyticsEvent({
+      name: 'audioRecovered',
+      level: AnalyticsEventLevel.VERBOSE,
+      properties: {
+        message,
+      },
+    });
+  }
+
   static deviceChange({
     isUserSelection,
     selection,
@@ -232,6 +242,50 @@ export default class AnalyticsEventFactory {
       name: 'subscriber.stats',
       level: AnalyticsEventLevel.INFO,
       properties,
+    });
+  }
+
+  static getKrispUsage(duration: number) {
+    return new AnalyticsEvent({
+      name: 'krisp.usage',
+      level: AnalyticsEventLevel.INFO,
+      properties: { duration },
+    });
+  }
+
+  static krispStart() {
+    return new AnalyticsEvent({
+      name: 'krisp.start',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static krispStop() {
+    return new AnalyticsEvent({
+      name: 'krisp.stop',
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
+  static interruption({
+    started,
+    type,
+    reason,
+    deviceInfo,
+  }: {
+    started: boolean;
+    type: string;
+    reason: string;
+    deviceInfo: Partial<MediaDeviceInfo>;
+  }) {
+    return new AnalyticsEvent({
+      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        reason,
+        type,
+        ...deviceInfo,
+      },
     });
   }
 

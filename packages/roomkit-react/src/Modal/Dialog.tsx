@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
 import {
@@ -14,6 +14,17 @@ import {
 import { useDialogContainerSelector } from '../hooks/useDialogContainerSelector';
 
 const StyledDialog = styled(Root, {});
+
+// Handles race conditions when multiple elements with dismissable layer are present
+// https://github.com/radix-ui/primitives/issues/2122
+const DialogRoot = <T extends React.ComponentProps<typeof StyledDialog>>(props: T) => {
+  useEffect(() => {
+    return () => {
+      if (document) setTimeout(() => (document.body.style.pointerEvents = 'auto'), 0);
+    };
+  }, []);
+  return <StyledDialog {...(props as object)} />;
+};
 
 const CustomDialogPortal = ({ children, container }: { children: ReactNode; container?: HTMLElement | null }) => {
   const dialogContainerSelector = useDialogContainerSelector();
@@ -34,7 +45,7 @@ const CustomDialogPortal = ({ children, container }: { children: ReactNode; cont
 };
 
 export const Dialog = {
-  Root: StyledDialog,
+  Root: DialogRoot,
   Trigger: StyledDialogTrigger,
   Overlay: CustomDialogOverlay,
   Content: CustomDialogContent,

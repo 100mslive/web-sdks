@@ -4,10 +4,6 @@ import { flexCenter } from '../utils';
 
 export const Root = styled('div', {
   padding: '0.75rem',
-  // show videotile context menu on hover
-  // [`&:hover .tile-menu`]: {
-  //   display: 'inline-block',
-  // },
 });
 
 const Container = styled('div', {

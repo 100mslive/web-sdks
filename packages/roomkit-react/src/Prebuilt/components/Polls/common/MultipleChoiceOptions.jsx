@@ -33,7 +33,7 @@ export const MultipleChoiceOptions = ({
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map(option => {
         return (
-          <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$9' }}>
+          <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$4' }}>
             {!isStopped || !isQuiz ? (
               <Checkbox.Root
                 id={`${questionIndex}-${option.index}`}
@@ -42,6 +42,7 @@ export const MultipleChoiceOptions = ({
                 onCheckedChange={checked => handleCheckedChange(checked, option.index)}
                 css={{
                   cursor: canRespond ? 'pointer' : 'not-allowed',
+                  flexShrink: 0,
                 }}
               >
                 <Checkbox.Indicator>
@@ -51,7 +52,7 @@ export const MultipleChoiceOptions = ({
             ) : null}
 
             {isStopped && correctOptionIndexes?.includes(option.index) ? (
-              <Flex css={{ color: '$on_surface_high' }}>
+              <Flex align="center" css={{ color: '$on_surface_high' }}>
                 <CheckCircleIcon height={20} width={20} />
               </Flex>
             ) : null}

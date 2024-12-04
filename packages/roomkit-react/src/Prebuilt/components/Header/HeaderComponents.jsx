@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { selectDominantSpeaker, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import { Flex, styled, Text, textEllipsis, VerticalDivider } from '../../../';
+import { Flex, styled, Text, textEllipsis } from '../../../';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 export const SpeakerTag = () => {
@@ -14,9 +14,8 @@ export const SpeakerTag = () => {
         justify="center"
         css={{ flex: '1 1 0', color: '$on_surface_high', '@md': { display: 'none' } }}
       >
-        <VerticalDivider css={{ ml: '$8' }} />
         <VolumeOneIcon />
-        <Text variant="md" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
+        <Text variant="sm" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
           {dominantSpeaker.name}
         </Text>
       </Flex>

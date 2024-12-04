@@ -3,6 +3,7 @@ import { HMSNotificationMethod } from './HMSNotificationMethod';
 import { NotificationManager } from './NotificationManager';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { PluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
@@ -10,6 +11,7 @@ import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSTransport from '../transport';
+import ITransportObserver from '../transport/ITransportObserver';
 
 let joinHandler: jest.Mock<any, any>;
 let previewHandler: jest.Mock<any, any>;
@@ -36,6 +38,9 @@ const store: Store = new Store();
 let notificationManager: NotificationManager;
 let eventBus: EventBus;
 let transport: HMSTransport;
+let deviceManager: DeviceManager;
+let analyticsTimer: AnalyticsTimer;
+let observer: ITransportObserver;
 
 beforeEach(() => {
   joinHandler = jest.fn();
@@ -57,6 +62,16 @@ beforeEach(() => {
   pollsUpdateHandler = jest.fn();
   whiteboardUpdateHandler = jest.fn();
   eventBus = new EventBus();
+  deviceManager = new DeviceManager(store, eventBus);
+  analyticsTimer = new AnalyticsTimer();
+  observer = {
+    onNotification: jest.fn(),
+    onTrackAdd: jest.fn(),
+    onTrackRemove: jest.fn(),
+    onFailure: jest.fn(),
+    onStateChange: jest.fn(),
+    onConnected: jest.fn(),
+  };
   const mockMediaStream = {
     id: 'native-stream-id',
     getVideoTracks: jest.fn(() => [
@@ -82,19 +97,13 @@ beforeEach(() => {
   global.HTMLCanvasElement.prototype.captureStream = jest.fn().mockImplementation(() => mockMediaStream);
 
   transport = new HMSTransport(
-    {
-      onNotification: jest.fn(),
-      onTrackAdd: jest.fn(),
-      onTrackRemove: jest.fn(),
-      onFailure: jest.fn(),
-      onStateChange: jest.fn(),
-      onConnected: jest.fn(),
-    },
-    new DeviceManager(store, eventBus),
+    observer,
+    deviceManager,
     store,
     eventBus,
     new AnalyticsEventsService(store),
-    new AnalyticsTimer(),
+    analyticsTimer,
+    new PluginUsageTracker(eventBus),
   );
   store.setRoom(new HMSRoom('1234'));
 
@@ -117,6 +126,8 @@ beforeEach(() => {
     onPollsUpdate: pollsUpdateHandler,
     onWhiteboardUpdate: whiteboardUpdateHandler,
   };
+
+  transport.setListener(listener);
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
 

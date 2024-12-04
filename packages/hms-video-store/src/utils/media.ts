@@ -1,12 +1,13 @@
 import HMSLogger from './logger';
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { BuildGetMediaError } from '../error/utils';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AUDIO_VIDEO);
   }
 }
 
@@ -16,7 +17,7 @@ export async function getLocalScreen(constraints: MediaStreamConstraints['video'
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: constraints, audio: false });
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.SCREEN);
   }
 }
 
@@ -37,7 +38,7 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     devices.forEach(device => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
-    throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
+    throw BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.AUDIO_VIDEO);
   }
 }
 
@@ -62,4 +63,29 @@ export const HMSAudioContextHandler: HMSAudioContext = {
       HMSLogger.e('AudioContext', error);
     }
   },
+};
+
+export enum HMSAudioDeviceCategory {
+  SPEAKERPHONE = 'SPEAKERPHONE',
+  WIRED = 'WIRED',
+  BLUETOOTH = 'BLUETOOTH',
+  EARPIECE = 'EARPIECE',
+}
+
+export const getAudioDeviceCategory = (deviceLabel?: string) => {
+  if (!deviceLabel) {
+    HMSLogger.w('[DeviceManager]:', 'No device label provided');
+    return HMSAudioDeviceCategory.SPEAKERPHONE;
+  }
+  const label = deviceLabel.toLowerCase();
+  if (label.includes('speakerphone')) {
+    return HMSAudioDeviceCategory.SPEAKERPHONE;
+  } else if (label.includes('wired')) {
+    return HMSAudioDeviceCategory.WIRED;
+  } else if (/airpods|buds|wireless|bluetooth/gi.test(label)) {
+    return HMSAudioDeviceCategory.BLUETOOTH;
+  } else if (label.includes('earpiece')) {
+    return HMSAudioDeviceCategory.EARPIECE;
+  }
+  return HMSAudioDeviceCategory.SPEAKERPHONE;
 };

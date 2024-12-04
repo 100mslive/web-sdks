@@ -27,11 +27,13 @@ export const StyledDialogPortal = styled(DialogPrimitive.Portal, {});
 
 export const CustomDialogContent = styled(DialogPrimitive.Content, {
   color: '$on_surface_medium',
-  backgroundColor: '$surface_default',
+  backgroundColor: '$surface_dim',
   borderRadius: '8px',
   position: 'absolute',
   top: '50%',
   left: '50%',
+  maxHeight: '95%',
+  overflowY: 'auto',
   border: '$space$px solid $border_bright',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   transform: 'translate(-50%, -50%)',

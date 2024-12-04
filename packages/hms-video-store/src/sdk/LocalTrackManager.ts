@@ -7,9 +7,15 @@ import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { BuildGetMediaError } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
+import {
+  HMSAudioCodec,
+  HMSAudioMode,
+  HMSScreenShareConfig,
+  HMSVideoCodec,
+  ScreenCaptureHandleConfig,
+} from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
@@ -21,6 +27,7 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
+import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -31,6 +38,7 @@ const defaultSettings = {
   audioInputDeviceId: 'default',
   audioOutputDeviceId: 'default',
   videoDeviceId: 'default',
+  audioMode: HMSAudioMode.VOICE,
 };
 type IFetchTrackOptions = boolean | 'empty';
 interface IFetchAVTrackOptions {
@@ -158,8 +166,39 @@ export class LocalTrackManager {
     nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
-
-  async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
+  private async optimizeScreenShareConstraint(stream: MediaStream, constraints: MediaStreamConstraints) {
+    if (typeof constraints.video === 'boolean' || !constraints.video?.width || !constraints.video?.height) {
+      return;
+    }
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed?.includes('screen')) {
+      return;
+    }
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = stream;
+    videoElement.addEventListener('loadedmetadata', async () => {
+      const { videoWidth, videoHeight } = videoElement;
+      const screen = publishParams.screen;
+      const pixels = screen.width * screen.height;
+      const actualAspectRatio = videoWidth / videoHeight;
+      const currentAspectRatio = screen.width / screen.height;
+      if (actualAspectRatio > currentAspectRatio) {
+        const videoConstraint = constraints.video as MediaTrackConstraints;
+        const ratio = actualAspectRatio / currentAspectRatio;
+        const sqrt_ratio = Math.sqrt(ratio);
+        if (videoWidth * videoHeight > pixels) {
+          videoConstraint.width = videoWidth / sqrt_ratio;
+          videoConstraint.height = videoHeight / sqrt_ratio;
+        } else {
+          videoConstraint.height = videoHeight * sqrt_ratio;
+          videoConstraint.width = videoWidth * sqrt_ratio;
+        }
+        await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
+      }
+    });
+  }
+  // eslint-disable-next-line complexity
+  async getLocalScreen(partialConfig?: HMSScreenShareConfig, optimise = false) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
@@ -181,15 +220,24 @@ export class LocalTrackManager {
         googAutoGainControl: false,
         echoCancellation: false,
       };
+    } else if (partialConfig?.forceCurrentTab && partialConfig.preferCurrentTab && partialConfig.cropElement) {
+      // only need if crop element with prefer and force current tab
+      constraints.audio = {
+        echoCancellation: true,
+        noiseSuppression: true,
+      };
     }
     let stream;
     try {
       HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+      if (optimise) {
+        await this.optimizeScreenShareConstraint(stream, constraints);
+      }
     } catch (err) {
       HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
-      const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      const error = BuildGetMediaError(err as Error, HMSTrackExceptionTrackType.SCREEN);
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.publish({
           error: error as Error,
@@ -203,7 +251,14 @@ export class LocalTrackManager {
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, screenSettings?.video);
+    const videoTrack = new HMSLocalVideoTrack(
+      local,
+      nativeVideoTrack,
+      'screen',
+      this.eventBus,
+      screenSettings?.video,
+      this.store.getRoom(),
+    );
     videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'screen'));
 
     try {
@@ -224,6 +279,7 @@ export class LocalTrackManager {
         'screen',
         this.eventBus,
         screenSettings?.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -423,17 +479,17 @@ export class LocalTrackManager {
     }
   }
 
-  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+  getErrorType(videoError: boolean, audioError: boolean): HMSTrackExceptionTrackType {
     if (videoError && audioError) {
-      return HMSGetMediaActions.AV;
+      return HMSTrackExceptionTrackType.AUDIO_VIDEO;
     }
     if (videoError) {
-      return HMSGetMediaActions.VIDEO;
+      return HMSTrackExceptionTrackType.VIDEO;
     }
     if (audioError) {
-      return HMSGetMediaActions.AUDIO;
+      return HMSTrackExceptionTrackType.AUDIO;
     }
-    return HMSGetMediaActions.UNKNOWN;
+    return HMSTrackExceptionTrackType.AUDIO_VIDEO;
   }
 
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
@@ -590,6 +646,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.audio,
+        this.store.getRoom(),
       );
       tracks.push(audioTrack);
     }
@@ -601,6 +658,7 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.video,
+        this.store.getRoom(),
       );
       videoTrack.setSimulcastDefinitons(
         this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'regular'),

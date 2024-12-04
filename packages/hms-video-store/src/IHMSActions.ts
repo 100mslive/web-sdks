@@ -1,3 +1,7 @@
+import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
+import { TranscriptionConfig } from './interfaces/transcription-config';
+import { FindPeerByNameRequestParams } from './signal/interfaces';
+import { HMSSessionFeedback } from './end-call-feedback';
 import {
   HLSConfig,
   HLSTimedMetadata,
@@ -21,9 +25,11 @@ import {
   TokenRequestOptions,
 } from './internal';
 import {
+  DebugInfo,
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
+  HMSPeer,
   HMSPeerID,
   HMSPeerListIterator,
   HMSPeerListIteratorOptions,
@@ -34,6 +40,7 @@ import {
   IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
+import { HMSStats } from './webrtc-stats';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -164,12 +171,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
+
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+
   /**
    * Toggle the camera between front and back if the both the camera's exist
    */
@@ -225,16 +234,16 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * Add  video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the video track is available.
-   * @param plugin HMSMediaStreamPlugin
    * @see HMSMediaStreamPlugin
+   * @param plugins
    */
   addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
   /**
    * Remove video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the video track is available.
-   * @param plugin HMSMediaStreamPlugin
    * @see HMSMediaStreamPlugin
+   * @param plugins
    */
   removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
@@ -335,6 +344,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   endRoom: (lock: boolean, reason: string) => Promise<void>;
 
   /**
+   * After leave send feedback to backend for call quality purpose.
+   * @param feedback
+   * @param eventEndpoint
+   */
+  submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
+
+  /**
    * If you have **removeOthers** permission, you can remove a peer from the room.
    * @param peerID peerID of the peer to be removed from the room
    * @param reason a string explaining why the peer is removed from the room.
@@ -369,6 +385,18 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+
+  /**
+   * If you want to start transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription. Currently we have Caption mode only
+   */
+  startTranscription(params: TranscriptionConfig): Promise<void>;
+
+  /**
+   * If you want to stop transcriptions(Closed Caption).
+   * @param params.mode This is the mode which represent the type of transcription you want to stop. Currently we have Caption mode only
+   */
+  stopTranscription(params: TranscriptionConfig): Promise<void>;
 
   /**
    * @alpha
@@ -546,9 +574,24 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
+  getPeer(peerId: string): Promise<HMSPeer | undefined>;
+  findPeerByName(options: FindPeerByNameRequestParams): Promise<{ offset: number; eof?: boolean; peers: HMSPeer[] }>;
   /**
    * Method to override the default settings for playlist tracks
    * @param {HMSPlaylistSettings} settings
    */
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
+
+  initDiagnostics(): HMSDiagnosticsInterface;
+  /**
+   * @internal
+   * Method to get enabled flags and endpoints. Should only be called after joining.
+   */
+  getDebugInfo(): DebugInfo | undefined;
+
+  /**
+   * @internal
+   * Method to check if received bitrate is 0 for all remote peers or whether the room has whiteboard/quiz running. To be used by beam.
+   */
+  hasActiveElements(hmsStats: HMSStats): boolean;
 }

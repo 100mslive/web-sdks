@@ -5,7 +5,7 @@ import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSLocalVideoTrack, HMSTrackType } from '../internal';
+import { HMSLocalVideoTrack, HMSPeerType, HMSTrackType } from '../internal';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
 import { PolicyParams } from '../notification-manager';
@@ -30,6 +30,7 @@ const testObserver: ITransportObserver = {
 
 let testStore = new Store();
 let testEventBus = new EventBus();
+let analyticsTimer = new AnalyticsTimer();
 
 const policyParams: PolicyParams = {
   name: 'host',
@@ -96,6 +97,7 @@ const publishParams = hostRole.publishParams;
 let localPeer = new HMSLocalPeer({
   name: 'test',
   role: hostRole,
+  type: HMSPeerType.REGULAR,
 });
 testStore.addPeer(localPeer);
 
@@ -107,6 +109,7 @@ const mockMediaStream = {
       kind: 'video',
       getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })),
       addEventListener: jest.fn(() => {}),
+      removeEventListener: jest.fn(() => {}),
     },
   ]),
   getAudioTracks: jest.fn(() => [
@@ -115,6 +118,7 @@ const mockMediaStream = {
       kind: 'audio',
       getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })),
       addEventListener: jest.fn(() => {}),
+      removeEventListener: jest.fn(() => {}),
     },
   ]),
   addTrack: jest.fn(() => {}),
@@ -204,7 +208,13 @@ const mockAudioContext = {
     return {
       stream: {
         getAudioTracks: jest.fn(() => [
-          { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-mock-device-id' })) },
+          {
+            id: 'audio-id',
+            kind: 'audio',
+            getSettings: jest.fn(() => ({ deviceId: 'audio-mock-device-id' })),
+            addEventListener: jest.fn(() => {}),
+            removeEventListener: jest.fn(() => {}),
+          },
         ]),
       },
     };
@@ -231,8 +241,10 @@ describe('LocalTrackManager', () => {
     localPeer = new HMSLocalPeer({
       name: 'test',
       role: hostRole,
+      type: HMSPeerType.REGULAR,
     });
     testStore.addPeer(localPeer);
+    analyticsTimer = new AnalyticsTimer();
   });
 
   it('instantiates without any issues', () => {
@@ -241,7 +253,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
-      new AnalyticsTimer(),
+      analyticsTimer,
     );
     expect(manager).toBeDefined();
   });
@@ -252,7 +264,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
-      new AnalyticsTimer(),
+      analyticsTimer,
     );
     testStore.setKnownRoles(policyParams);
     await manager.getTracksToPublish({});
@@ -274,7 +286,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setKnownRoles(policyParams);
@@ -408,6 +420,7 @@ describe('LocalTrackManager', () => {
       localPeer = new HMSLocalPeer({
         name: 'test',
         role: hostRole,
+        type: HMSPeerType.REGULAR,
       });
       testStore.addPeer(localPeer);
       mockGetUserMedia.mockClear();
@@ -420,8 +433,10 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
-        'regular',
+          addEventListener: jest.fn(() => {}),
+          removeEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
+        HMSPeerType.REGULAR,
         testEventBus,
       );
       localPeer.videoTrack = mockVideoTrack;
@@ -433,7 +448,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
@@ -452,8 +467,10 @@ describe('LocalTrackManager', () => {
           id: 'video-track-id',
           kind: 'video',
           getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
-        } as MediaStreamTrack,
-        'regular',
+          addEventListener: jest.fn(() => {}),
+          removeEventListener: jest.fn(() => {}),
+        } as unknown as MediaStreamTrack,
+        HMSPeerType.REGULAR,
         testEventBus,
       );
 
@@ -462,7 +479,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
-        new AnalyticsTimer(),
+        analyticsTimer,
       );
       testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});

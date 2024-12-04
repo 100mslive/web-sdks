@@ -3,14 +3,11 @@ import { useSearchParam } from 'react-use';
 import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
-// @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
-// @ts-ignore: No implicit Any
 import PreviewJoin from './PreviewJoin';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useAuthToken } from '../AppData/useUISettings';
-// @ts-ignore: No implicit Any
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 export const PreviewScreen = () => {

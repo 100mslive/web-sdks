@@ -1,6 +1,8 @@
+import IConnectionObserver, { RTCIceCandidatePair } from './IConnectionObserver';
 import { HMSConnectionRole } from './model';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import JsonRpcSignal from '../signal/jsonrpc';
@@ -8,15 +10,12 @@ import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
 const TAG = '[HMSConnection]';
-interface RTCIceCandidatePair {
-  local: RTCIceCandidate;
-  remote: RTCIceCandidate;
-}
 
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: JsonRpcSignal;
 
+  protected abstract readonly observer: IConnectionObserver;
   abstract readonly nativeConnection: RTCPeerConnection;
   /**
    * We keep a list of pending IceCandidates received
@@ -29,6 +28,8 @@ export default abstract class HMSConnection {
    *  - [HMSSubscribeConnection] clears this list as soon as we call [addIceCandidate]
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
+  // @ts-ignore
+  sfuNodeId?: string;
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
@@ -47,6 +48,10 @@ export default abstract class HMSConnection {
 
   private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
+  }
+
+  setSfuNodeId(nodeId?: string) {
+    this.sfuNodeId = nodeId;
   }
 
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
@@ -108,7 +113,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.getSenders();
   }
 
-  logSelectedIceCandidatePairs() {
+  handleSelectedIceCandidatePairs() {
     /**
      * for the very first peer in the room we don't have any subscribe ice candidates
      * because the peer hasn't subscribed to anything.
@@ -125,26 +130,29 @@ export default abstract class HMSConnection {
         if (transmitter.transport) {
           const iceTransport = transmitter.transport.iceTransport;
 
-          const logSelectedCandidate = () => {
+          const handleSelectedCandidate = () => {
             // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
               // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
-              HMSLogger.d(
-                TAG,
-                `${HMSConnectionRole[this.role]} connection`,
-                `selected ${kindOfTrack || 'unknown'} candidate pair`,
-                JSON.stringify(this.selectedCandidatePair, null, 2),
-              );
+              if (this.selectedCandidatePair) {
+                this.observer.onSelectedCandidatePairChange(this.selectedCandidatePair);
+                HMSLogger.d(
+                  TAG,
+                  `${HMSConnectionRole[this.role]} connection`,
+                  `selected ${kindOfTrack || 'unknown'} candidate pair`,
+                  JSON.stringify(this.selectedCandidatePair, null, 2),
+                );
+              }
             }
           };
 
           // @ts-expect-error
           if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
             // @ts-expect-error
-            iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
+            iceTransport.onselectedcandidatepairchange = handleSelectedCandidate;
           }
-          logSelectedCandidate();
+          handleSelectedCandidate();
         }
       });
     } catch (error) {
@@ -162,8 +170,12 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
-    const maxBitrate = track.settings.maxBitrate;
+  // eslint-disable-next-line
+  async setMaxBitrateAndFramerate(
+    track: HMSLocalTrack,
+    updatedSettings?: HMSAudioTrackSettings | HMSVideoTrackSettings,
+  ) {
+    const maxBitrate = updatedSettings?.maxBitrate || track.settings.maxBitrate;
     const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
@@ -192,7 +204,7 @@ export default abstract class HMSConnection {
     return await this.nativeConnection.getStats();
   }
 
-  async close() {
+  close() {
     this.nativeConnection.close();
   }
 

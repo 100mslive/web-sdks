@@ -1,10 +1,17 @@
 import InitialSettings from './settings';
 
+export type HMSICEServer = {
+  urls: string[];
+  userName?: string;
+  password?: string;
+};
+
 /**
  * the config object tells the SDK options you want to join with
  * @link https://docs.100ms.live/javascript/v2/features/preview
  * @link https://docs.100ms.live/javascript/v2/features/join
  */
+
 export interface HMSConfig {
   /**
    * the name of the peer, can be later accessed via peer.name and can also be changed mid call.
@@ -36,10 +43,6 @@ export interface HMSConfig {
   autoVideoSubscribe?: boolean;
   initEndpoint?: string;
   /**
-   * Request Camera/Mic permissions irrespective of role to avoid delay in getting device list
-   */
-  alwaysRequestPermissions?: boolean;
-  /**
    * Enable to get a network quality score while in preview. The score ranges from -1 to 5.
    * -1 when we are not able to connect to 100ms servers within an expected time limit
    * 0 when there is a timeout/failure when measuring the quality
@@ -53,10 +56,14 @@ export interface HMSConfig {
    */
   autoManageVideo?: boolean;
   /**
-   * if this flag is enabled, wake lock will be acquired automatically(if supported) when joining the room, so the device
+   * if this flag is enabled, wake lock will be acquired automatically (if supported) when joining the room, so the device
    * will be kept awake.
    */
   autoManageWakeLock?: boolean;
+  /**
+   * use custom STUN/TURN servers for media connection (advanced)
+   */
+  iceServers?: HMSICEServer[];
 }
 
 export interface HMSMidCallPreviewConfig {

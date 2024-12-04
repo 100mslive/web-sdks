@@ -25,7 +25,7 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
           showPassword={showPassword}
           onChange={e => setText(e.target.value)}
         />
-        <PasswordInput.Icons ref={ref} css={{ bg: '$transparent' }}>
+        <PasswordInput.Icons ref={ref} css={{ bg: 'transparent' }}>
           <PasswordInput.ShowIcon
             showPassword={showPassword}
             onClick={() => {

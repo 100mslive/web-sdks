@@ -11,10 +11,16 @@ import { usePDFConfig, useResetPDFConfig } from '../components/AppData/useUISett
 export const PDFView = () => {
   const pdfConfig = usePDFConfig();
   const resetConfig = useResetPDFConfig();
-
   // need to send resetConfig to clear configuration, if stop screenshare occurs.
   const { iframeRef, startPDFShare, isPDFShareInProgress } = usePDFShare(resetConfig);
 
+  useEffect(() => {
+    // no working in other useEffect, as return is called multiple time on state change
+    return () => {
+      resetConfig();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     (async () => {
       try {

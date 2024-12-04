@@ -19,6 +19,7 @@ export class WakeLockManager {
         HMSLogger.w(this.TAG, 'Error while releasing wake lock', `name=${error.name}, message=${error.message}`);
       }
     }
+    document?.removeEventListener('visibilitychange', this.visibilityHandler);
     this.wakeLock = null;
   };
 

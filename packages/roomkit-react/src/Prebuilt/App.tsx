@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
@@ -22,10 +23,11 @@ import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
+import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { VBHandler } from './components/VirtualBackground/VBHandler';
+import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -63,6 +65,7 @@ export type HMSPrebuiltProps = {
   options?: HMSPrebuiltOptions;
   screens?: Screens;
   authToken?: string;
+  leaveOnUnload?: boolean;
   onLeave?: () => void;
   onJoin?: () => void;
   /**
@@ -90,6 +93,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       themes,
       options: { userName = '', userId = '', endpoints } = {},
       screens,
+      leaveOnUnload = true,
       onLeave,
       onJoin,
     },
@@ -125,7 +129,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(() => {
       // leave room when component unmounts
       return () => {
-        VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
@@ -135,11 +138,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           init: string;
           tokenByRoomCode: string;
           roomLayout: string;
+          event: string;
         }
       | undefined;
-    const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
-    const initEndpoint: string = endpointsObj?.init || '';
-    const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
+    const tokenByRoomCodeEndpoint = endpointsObj?.tokenByRoomCode;
+    const initEndpoint = endpointsObj?.init;
+    const eventEndpoint = endpointsObj?.event;
+    const roomLayoutEndpoint = endpointsObj?.roomLayout;
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -177,6 +182,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
+              event: eventEndpoint,
             },
           }}
         >
@@ -186,6 +192,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             store={reactiveStore.current?.hmsStore}
             notifications={reactiveStore.current?.hmsNotifications}
             stats={reactiveStore.current?.hmsStats}
+            leaveOnUnload={leaveOnUnload}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
@@ -213,24 +220,26 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <Init />
-                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
-                        <Box
-                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
-                          css={{
-                            bg: '$background_dim',
-                            size: '100%',
-                            lineHeight: '1.5',
-                            '-webkit-text-size-adjust': '100%',
-                            position: 'relative',
-                          }}
-                        >
-                          <AppRoutes
-                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                            defaultAuthToken={authToken}
-                          />
-                        </Box>
-                      </DialogContainerProvider>
+                      <PIPProvider>
+                        <Init />
+                        <DialogContainerProvider dialogContainerSelector={containerSelector}>
+                          <Box
+                            className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
+                            css={{
+                              bg: '$background_dim',
+                              size: '100%',
+                              lineHeight: '1.5',
+                              '-webkit-text-size-adjust': '100%',
+                              position: 'relative',
+                            }}
+                          >
+                            <AppRoutes
+                              authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                              defaultAuthToken={authToken}
+                            />
+                          </Box>
+                        </DialogContainerProvider>
+                      </PIPProvider>
                     </HMSThemeProvider>
                   );
                 }}
@@ -250,12 +259,10 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
 
-  if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
-    return <PreviewScreen />;
-  } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
-    return <LeaveScreen />;
-  }
-  return <ConferenceScreen />;
+  return match({ activeState, isPreviewScreenEnabled, isLeaveScreenEnabled })
+    .with({ activeState: PrebuiltStates.PREVIEW, isPreviewScreenEnabled: true }, () => <PreviewScreen />)
+    .with({ activeState: PrebuiltStates.LEAVE, isLeaveScreenEnabled: true }, () => <LeaveScreen />)
+    .otherwise(() => <ConferenceScreen />);
 };
 
 const BackSwipe = () => {
@@ -279,13 +286,12 @@ function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
 }: {
-  authTokenByRoomCodeEndpoint: string;
+  authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const { activeState, rejoin } = useAppStateManager();
-
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
@@ -293,11 +299,16 @@ function AppRoutes({
         <ToastContainer />
         <Notifications />
         <MwebLandscapePrompt />
+        <Sheet />
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        <AuthToken
+          authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+          defaultAuthToken={defaultAuthToken}
+          activeState={activeState}
+        />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
     </AppStateContext.Provider>

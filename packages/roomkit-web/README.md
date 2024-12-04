@@ -1,10 +1,15 @@
-# `@100mslive/roomkit-web`
+# 100ms Web RoomKit
+
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/roomkit-web)](https://bundlephobia.com/result?p=@100mslive/roomkit-web)
+[![License](https://img.shields.io/npm/l/@100mslive/roomkit-web)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/roomkit-web)
 
 A web component implementation of the HMSPrebuilt component from [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
 
 ## Usage
 
-```
+```js
 import '@100mslive/roomkit-web'
 
 Vue
@@ -30,7 +35,7 @@ import '@100mslive/roomkit-web';
 - An image URL as a string which is displayed in the preview screen and header.
 
 `auth-token` (optional)
-- This token is room and role specific. It can be copied from the join room modal on the [dashboard](https://dashboard.100ms.live). Read more about it [here](/get-started/v2/get-started/security-and-tokens#auth-token-for-client-sdks).
+- This token is room and role specific. It can be copied from the join room modal on the [dashboard](https://dashboard.100ms.live). Read more about it [here](https://www.100ms.live/docs/get-started/v2/get-started/security-and-tokens#auth-token-for-client-sdks).
 
 `room-id` (optional unless room-code is not being used)
 - The room ID of the room you want to join. You can get the room ID from the [dashboard](https://dashboard.100ms.live). It should be specified with the role prop if the room-code is not being provided.

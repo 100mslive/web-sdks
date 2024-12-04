@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  selectLocalPeer,
   selectPeerNameByID,
   selectPermissions,
   selectPollByID,
@@ -14,6 +15,8 @@ import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 // @ts-ignore
 import { usePollViewState } from '../../AppData/useUISettings';
+// @ts-ignore
+import { getPeerResponses } from '../../../common/utils';
 import { StatusIndicator } from '../common/StatusIndicator';
 import { POLL_VIEWS } from '../../../common/constants';
 
@@ -26,6 +29,43 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
+  const fetchedInitialResponses = useRef(false);
+  const [savedResponses, setSavedResponses] = useState<Record<any, any>>({});
+  const localPeer = useHMSStore(selectLocalPeer);
+  const localPeerId = localPeer?.id;
+  const customerUserId = localPeer?.customerUserId;
+
+  // To reset whenever a different poll is opened
+  useEffect(() => {
+    fetchedInitialResponses.current = false;
+    setSavedResponses({});
+  }, [id, setSavedResponses]);
+
+  useEffect(() => {
+    const getResponses = async () => {
+      if (poll && actions.interactivityCenter && !fetchedInitialResponses.current) {
+        await actions.interactivityCenter.getPollResponses(poll, true);
+        fetchedInitialResponses.current = true;
+      }
+    };
+    getResponses();
+  }, [poll, actions.interactivityCenter]);
+
+  useEffect(() => {
+    if (poll?.questions) {
+      const localPeerResponses = getPeerResponses(poll.questions, localPeerId, customerUserId);
+      // @ts-ignore
+      localPeerResponses?.forEach(response => {
+        if (response) {
+          setSavedResponses(prev => {
+            const prevCopy = { ...prev };
+            prevCopy[response[0]?.questionIndex] = { option: response[0]?.option, options: response[0]?.options };
+            return prevCopy;
+          });
+        }
+      });
+    }
+  }, [localPeerId, poll?.questions, id, customerUserId]);
 
   if (!poll) {
     return null;
@@ -38,9 +78,9 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       <Flex
         align="center"
         css={{
-          gap: '$6',
+          gap: '$4',
           py: '$6',
-          px: '$10',
+          px: '$8',
           my: '$4',
           w: '100%',
           color: '$on_surface_high',
@@ -60,6 +100,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
             marginLeft: 'auto',
             cursor: 'pointer',
             '&:hover': { opacity: '0.8' },
+            height: 'fit-content',
           }}
         >
           <CrossIcon onClick={toggleVoting} />
@@ -73,7 +114,11 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           </Text>
         ) : null}
 
-        {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
+        {showSingleView ? (
+          <TimedView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
+        ) : (
+          <StandardView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
+        )}
       </Flex>
       <Flex
         css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}

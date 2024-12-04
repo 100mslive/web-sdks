@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
+import { selectIsAllowedToPublish, useAwayNotifications, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
+import { ToastManager } from './Toast/ToastManager';
 import { Box, Flex } from '../../Layout';
 import { Tooltip } from '../../Tooltip';
 import { ScreenShareButton } from './ShareMenuIcon';
@@ -13,7 +14,18 @@ export const ScreenshareToggle = ({ css = {} }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
 
-  const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
+  const {
+    amIScreenSharing,
+    screenShareVideoTrackId: video,
+    toggleScreenShare,
+  } = useScreenShare(error => {
+    ToastManager.addToast({
+      title: error.message,
+      variant: 'error',
+      duration: 2000,
+    });
+  });
+  const { requestPermission } = useAwayNotifications();
   const isVideoScreenshare = amIScreenSharing && !!video;
   if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
     return null;
@@ -21,15 +33,16 @@ export const ScreenshareToggle = ({ css = {} }) => {
 
   return (
     <Fragment>
-      <Flex direction="row" css={{ '@md': { display: 'none' } }}>
+      <Flex direction="row">
         <ScreenShareButton
           variant="standard"
           key="ShareScreen"
           active={!isVideoScreenshare}
           css={css}
           disabled={isAudioOnly}
-          onClick={() => {
-            toggleScreenShare();
+          onClick={async () => {
+            await toggleScreenShare();
+            await requestPermission();
           }}
         >
           <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>

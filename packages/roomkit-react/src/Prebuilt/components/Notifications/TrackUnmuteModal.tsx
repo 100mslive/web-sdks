@@ -8,20 +8,28 @@ import {
 import { MicOnIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { RequestDialog } from '../../primitives/DialogContent';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
+
+const notificationTypes = [
+  HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+  HMSNotificationTypes.ROOM_ENDED,
+  HMSNotificationTypes.REMOVED_FROM_ROOM,
+];
 
 export const TrackUnmuteModal = () => {
   const hmsActions = useHMSActions();
-  const notification = useHMSNotifications([
-    HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
-    HMSNotificationTypes.ROOM_ENDED,
-    HMSNotificationTypes.REMOVED_FROM_ROOM,
-  ]);
+  const notification = useHMSNotifications(notificationTypes);
   const [muteNotification, setMuteNotification] = useState<HMSChangeTrackStateRequest | null>(null);
 
   useEffect(() => {
     switch (notification?.type) {
       case HMSNotificationTypes.REMOVED_FROM_ROOM:
       case HMSNotificationTypes.ROOM_ENDED:
+        ToastManager.addToast({
+          title: `${notification.message}. 
+              ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
+        });
         setMuteNotification(null);
         break;
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
@@ -42,9 +50,9 @@ export const TrackUnmuteModal = () => {
 
   return (
     <RequestDialog
-      title="Track Unmute Request"
+      title={`Unmute your ${track.type}?`}
       onOpenChange={(value: boolean) => !value && setMuteNotification(null)}
-      body={`${peer?.name} has requested you to unmute your ${track?.source} ${track?.type}.`}
+      body={`${peer?.name} is requesting you to unmute your ${track?.type}.`}
       onAction={() => {
         hmsActions.setEnabledTrack(track.id, enabled);
         setMuteNotification(null);

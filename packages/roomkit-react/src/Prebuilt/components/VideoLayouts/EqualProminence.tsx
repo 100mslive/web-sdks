@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
+import { PeopleAddIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
+import { WaitingView } from '../../layouts/WaitingView';
 import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
@@ -13,26 +14,14 @@ import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 import { UI_SETTINGS } from '../../common/constants';
 
 export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) {
-  const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-  let pageList = usePagesWithTiles({
+  const pageList = usePagesWithTiles({
     peers,
     maxTileCount,
   });
-  // useMemo is needed to prevent recursion as new array is created for localPeer
-  const inputPeers = useMemo(() => {
-    if (pageList.length === 0) {
-      return localPeer ? [localPeer] : [];
-    }
-    return peers;
-  }, [pageList.length, peers, localPeer]);
-  // Pass local peer to main grid if no other peer has tiles
-  pageList = usePagesWithTiles({
-    peers: inputPeers,
-    maxTileCount,
-  });
+
   const { ref, pagesWithTiles } = useTileLayout({
     pageList,
     maxTileCount,
@@ -60,7 +49,14 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
           numPages={pagesWithTiles.length}
         />
       )}
-      {isInsetEnabled && pageList.length > 0 && pageList[0][0].peer.id !== localPeer?.id && <InsetTile />}
+      {pageList.length === 0 ? (
+        <WaitingView
+          title="You're the only one here"
+          subtitle="Sit back and relax till others join"
+          icon={<PeopleAddIcon width="56px" height="56px" style={{ color: 'white' }} />}
+        />
+      ) : null}
+      {isInsetEnabled && <InsetTile />}
     </Flex>
   );
 }

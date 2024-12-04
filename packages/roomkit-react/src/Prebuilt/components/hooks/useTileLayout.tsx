@@ -115,6 +115,7 @@ export const useTileLayout = ({
             }
           }
         }
+
         for (let i = 0; i < row.length; i++) {
           row[i].width = tileWidth;
           row[i].height = tileHeight;

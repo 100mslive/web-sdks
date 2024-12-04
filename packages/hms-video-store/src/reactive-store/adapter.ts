@@ -24,6 +24,7 @@ import {
   HMSRoom,
   HMSScreenVideoTrack,
   HMSTrack,
+  HMSTrackException,
   HMSTrackFacingMode,
   HMSVideoTrack,
 } from '../schema';
@@ -51,6 +52,7 @@ export class SDKToHMS {
       joinedAt: sdkPeer.joinedAt,
       groups: sdkPeer.groups,
       isHandRaised: sdkPeer.isHandRaised,
+      type: sdkPeer.type,
     };
   }
 
@@ -138,10 +140,11 @@ export class SDKToHMS {
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom, sdkLocalPeerId?: string): Partial<HMSRoom> {
-    const { recording, rtmp, hls } = SDKToHMS.convertRecordingStreamingState(
-      sdkRoom?.recording,
-      sdkRoom?.rtmp,
-      sdkRoom?.hls,
+    const { recording, rtmp, hls, transcriptions } = SDKToHMS.convertRecordingStreamingState(
+      sdkRoom.recording,
+      sdkRoom.rtmp,
+      sdkRoom.hls,
+      sdkRoom.transcriptions,
     );
     return {
       id: sdkRoom.id,
@@ -150,13 +153,18 @@ export class SDKToHMS {
       recording,
       rtmp,
       hls,
+      transcriptions,
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt,
       joinedAt: sdkRoom.joinedAt,
       peerCount: sdkRoom.peerCount,
       isLargeRoom: sdkRoom.large_room_optimization,
       isEffectsEnabled: sdkRoom.isEffectsEnabled,
+      disableNoneLayerRequest: sdkRoom.disableNoneLayerRequest,
+      isVBEnabled: sdkRoom.isVBEnabled,
       effectsKey: sdkRoom.effectsKey,
+      isHipaaEnabled: sdkRoom.isHipaaEnabled,
+      isNoiseCancellationEnabled: sdkRoom.isNoiseCancellationEnabled,
     };
   }
 
@@ -196,8 +204,9 @@ export class SDKToHMS {
     };
   }
 
-  static convertException(sdkException: sdkTypes.HMSException): HMSException {
-    return {
+  static convertException(sdkException: sdkTypes.HMSException): HMSException | HMSTrackException {
+    const isTrackException = 'trackType' in sdkException;
+    const exp = {
       code: sdkException.code,
       action: sdkException.action,
       name: sdkException.name,
@@ -206,7 +215,12 @@ export class SDKToHMS {
       isTerminal: sdkException.isTerminal,
       nativeError: sdkException.nativeError,
       timestamp: new Date(),
-    };
+    } as HMSException;
+    if (isTrackException) {
+      (exp as HMSTrackException).trackType = (sdkException as sdkTypes.HMSTrackException)?.trackType;
+      return exp as HMSTrackException;
+    }
+    return exp;
   }
 
   static convertDeviceChangeUpdate(sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent): HMSDeviceChangeEvent {
@@ -273,7 +287,13 @@ export class SDKToHMS {
     recording?: sdkTypes.HMSRecording,
     rtmp?: sdkTypes.HMSRTMP,
     hls?: sdkTypes.HMSHLS,
-  ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
+    transcriptions?: sdkTypes.HMSTranscriptionInfo[],
+  ): {
+    recording: sdkTypes.HMSRecording;
+    rtmp: sdkTypes.HMSRTMP;
+    hls: sdkTypes.HMSHLS;
+    transcriptions: sdkTypes.HMSTranscriptionInfo[];
+  } {
     return {
       recording: {
         browser: {
@@ -292,6 +312,7 @@ export class SDKToHMS {
         running: !!hls?.running,
         error: hls?.error,
       },
+      transcriptions: transcriptions || [],
     };
   }
 }

@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { match, P } from 'ts-pattern';
 import { selectAppData, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { usePollViewState } from './useUISettings';
 import { APP_DATA, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../../common/constants';
@@ -45,13 +46,39 @@ export const usePollViewToggle = () => {
 
   const togglePollView = useCallback(
     id => {
-      id = typeof id === 'string' ? id : undefined;
-      const newView = id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ;
-      setPollState({
-        [POLL_STATE.pollInView]: id,
-        [POLL_STATE.view]: newView,
-      });
-      hmsActions.setAppData(APP_DATA.sidePane, newView ? SIDE_PANE_OPTIONS.POLLS : '');
+      match({ id, isOpen, view })
+        .with(
+          {
+            id: P.string,
+          },
+          () => {
+            setPollState({
+              [POLL_STATE.pollInView]: id,
+              [POLL_STATE.view]: POLL_VIEWS.VOTE,
+            });
+            hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.POLLS);
+          },
+        )
+        .with(
+          {
+            isOpen: true,
+            view: P.when(view => !!view),
+          },
+          () => {
+            setPollState({
+              [POLL_STATE.pollInView]: undefined,
+              [POLL_STATE.view]: null,
+            });
+            hmsActions.setAppData(APP_DATA.sidePane, '');
+          },
+        )
+        .otherwise(() => {
+          setPollState({
+            [POLL_STATE.pollInView]: undefined,
+            [POLL_STATE.view]: POLL_VIEWS.CREATE_POLL_QUIZ,
+          });
+          hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.POLLS);
+        });
     },
     [hmsActions, view, setPollState, isOpen],
   );

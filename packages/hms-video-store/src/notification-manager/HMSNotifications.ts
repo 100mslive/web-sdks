@@ -1,4 +1,5 @@
 import { VideoTrackLayerUpdate } from '../connection/channel-messages';
+import { HMSPeerType } from '../interfaces/peer/hms-peer';
 import { HMSRole } from '../interfaces/role';
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
@@ -39,6 +40,14 @@ export interface Info {
   name: string;
   data: string;
   user_id: string;
+  type: HMSPeerType;
+}
+
+export interface FindPeerByNameInfo {
+  name: string;
+  peer_id: string;
+  role: string;
+  type: HMSPeerType;
 }
 
 export enum HMSRecordingState {
@@ -59,7 +68,16 @@ export enum HMSStreamingState {
   FAILED = 'failed',
 }
 
-interface PluginPermissions {
+export enum HMSTranscriptionState {
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+export enum HMSTranscriptionMode {
+  CAPTION = 'caption',
+}
+export interface WhiteBoardPluginPermissions {
   permissions?: {
     // list of roles
     admin?: Array<string>;
@@ -68,13 +86,32 @@ interface PluginPermissions {
   };
 }
 
+export interface TranscriptionPluginPermissions {
+  permissions?: {
+    // list of roles
+    admin?: Array<string>;
+  };
+  mode: HMSTranscriptionMode;
+}
+
+export interface NoiseCancellationPlugin {
+  enabled?: boolean;
+}
+export enum Plugins {
+  WHITEBOARD = 'whiteboard',
+  TRANSCRIPTIONS = 'transcriptions',
+  NOISE_CANCELLATION = 'noiseCancellation',
+}
+
 export interface PolicyParams {
   name: string;
   known_roles: {
     [role: string]: HMSRole;
   };
   plugins: {
-    [plugin in 'whiteboard']?: PluginPermissions;
+    [Plugins.WHITEBOARD]?: WhiteBoardPluginPermissions;
+    [Plugins.TRANSCRIPTIONS]?: TranscriptionPluginPermissions[];
+    [Plugins.NOISE_CANCELLATION]?: NoiseCancellationPlugin;
   };
   template_id: string;
   app_data?: Record<string, string>;
@@ -120,6 +157,17 @@ export interface PeerNotification {
   is_from_room_state?: boolean;
 }
 
+export interface TranscriptionNotification {
+  state?: HMSTranscriptionState;
+  mode?: HMSTranscriptionMode;
+  initialised_at?: number;
+  started_at?: number;
+  updated_at?: number;
+  stopped_at?: number;
+  peer?: PeerNotificationInfo;
+  error?: ServerError;
+}
+
 export interface RoomState {
   name: string;
   session_id?: string;
@@ -151,6 +199,7 @@ export interface RoomState {
     rtmp: { enabled: boolean; started_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
+  transcriptions?: TranscriptionNotification[];
 }
 
 export interface PeerListNotification {
@@ -279,13 +328,24 @@ export interface HLSNotification {
   hls_recording?: HLSRecording;
 }
 
+export enum HLSPlaylistType {
+  DVR = 'dvr',
+  NO_DVR = 'no-dvr',
+}
+export enum HLSStreamType {
+  REGULAR = 'regular',
+  SCREEN = 'screen',
+  COMPOSITE = 'composite',
+}
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
+  playlist_type?: HLSPlaylistType;
   metadata?: string;
   started_at?: number;
   initialised_at?: number;
   state?: HMSStreamingState;
+  stream_type?: HLSStreamType;
 }
 
 export interface MetadataChangeNotification {
@@ -332,4 +392,8 @@ export interface WhiteboardInfo {
   owner?: string;
   state?: string;
   attributes?: Array<{ name: string; value: unknown }>;
+}
+
+export interface NodeInfo {
+  sfu_node_id: string;
 }

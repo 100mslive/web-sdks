@@ -2,17 +2,16 @@ import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
-import { useAVToggle } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+import { CaptionIcon } from '../CaptionIcon';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 // @ts-ignore: No implicit Any
 import { LeaveRoom } from '../Leave/LeaveRoom';
 // @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-// @ts-ignore: No implicit Any
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
@@ -42,8 +41,6 @@ export const Footer = ({
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
 
-  const { toggleAudio, toggleVideo } = useAVToggle();
-  const noAVPermissions = !(toggleAudio || toggleVideo);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const { showPolls } = useShowPolls();
@@ -91,7 +88,8 @@ export const Footer = ({
       >
         {isMobile ? (
           <>
-            {noAVPermissions ? <RaiseHand /> : null}
+            <ScreenshareToggle />
+            <RaiseHand />
             {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
@@ -99,6 +97,7 @@ export const Footer = ({
           <>
             <ScreenshareToggle />
             <RaiseHand />
+            {screenType !== 'hls_live_streaming' && <CaptionIcon />}
             {elements?.emoji_reactions && <EmojiReaction />}
             <LeaveRoom screenType={screenType} />
           </>

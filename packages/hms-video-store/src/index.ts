@@ -11,6 +11,8 @@ export type { IHMSNotifications as HMSNotifications } from './schema/notificatio
 export * from './selectors';
 export * from './webrtc-stats';
 export {
+  HMSAudioMode,
+  HMSAudioDeviceCategory,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
@@ -18,6 +20,8 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
+  HMSPeerType,
+  getAudioDeviceCategory,
 } from './internal';
 
 export type {
@@ -51,10 +55,20 @@ export type {
   HMSPollQuestionOption,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
+  HMSTranscriptionInfo,
+  HMSICEServer,
 } from './internal';
 
+export { EventBus } from './events/EventBus';
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
-export { HMSPluginUnsupportedTypes, HMSRecordingState } from './internal';
+export {
+  HMSPluginUnsupportedTypes,
+  HMSRecordingState,
+  HLSPlaylistType,
+  HLSStreamType,
+  HMSTranscriptionMode,
+  HMSTranscriptionState,
+} from './internal';
 export type {
   HMSVideoPlugin,
   HMSAudioPlugin,
@@ -62,3 +76,7 @@ export type {
   HMSPluginSupportResult,
   HMSFrameworkInfo,
 } from './internal';
+export * from './diagnostics';
+export { DomainCategory } from './analytics/AnalyticsEventDomains';
+
+export { HMSTrackExceptionTrackType } from './media/tracks/HMSTrackExceptionTrackType';

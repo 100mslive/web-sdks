@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Input } from '../../../Input';
@@ -22,6 +22,16 @@ export const ChangeNameContent = ({
   onExit: () => void;
   onBackClick: () => void;
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isMobile) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 200);
+    }
+  }, [isMobile]);
+
   return (
     <form
       onSubmit={async e => {
@@ -53,10 +63,10 @@ export const ChangeNameContent = ({
       </Text>
       <Flex justify="center" align="center" css={{ my: '$8', w: '100%', '@md': { px: '$8' } }}>
         <Input
+          ref={inputRef}
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
-          // Prevents popup from showing up on chrome mweb
-          type={isMobile ? 'search' : 'text'}
+          type="text"
           onChange={e => {
             setCurrentName(e.target.value);
           }}

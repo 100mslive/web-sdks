@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
+import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { SecondaryTiles } from '../SecondaryTiles';
-import { LayoutMode } from '../Settings/LayoutSettings';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
@@ -23,8 +24,9 @@ export function RoleProminence({
 }: LayoutProps) {
   const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
-  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
-  const maxTileCount = 4;
+  const isMobile = useMedia(cssConfig.media.md);
+  let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
+  maxTileCount = isMobile ? 4 : maxTileCount;
   const pageList = usePagesWithTiles({
     peers: prominentPeers,
     maxTileCount,
@@ -43,7 +45,7 @@ export function RoleProminence({
   }, [pageSize, onPageSize]);
 
   return (
-    <ProminenceLayout.Root hasSidebar={layoutMode === LayoutMode.SIDEBAR}>
+    <ProminenceLayout.Root>
       <ProminenceLayout.ProminentSection>
         <Grid ref={ref} tiles={pagesWithTiles[page]} />
       </ProminenceLayout.ProminentSection>
@@ -57,13 +59,8 @@ export function RoleProminence({
           numPages={pagesWithTiles.length}
         />
       )}
-      <SecondaryTiles
-        peers={layoutMode === LayoutMode.SPOTLIGHT ? [] : secondaryPeers}
-        isInsetEnabled={isInsetEnabled}
-        edgeToEdge={edgeToEdge}
-        hasSidebar={layoutMode === LayoutMode.SIDEBAR}
-      />
-      {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
+      <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} edgeToEdge={edgeToEdge} />
+      {isInsetEnabled && localPeer && prominentPeers.length > 0 && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );
 }

@@ -48,9 +48,6 @@ export const useSetUiSettings = uiSettingKey => {
   return [value, setValue];
 };
 
-export const useWaitingViewerRole = () => {
-  return useHMSStore(selectAppData(APP_DATA.waitingViewerRole));
-};
 export const useIsHLSStartedFromUI = () => {
   return useHMSStore(selectAppData(APP_DATA.hlsStarted));
 };
@@ -104,6 +101,16 @@ export const useSetSubscribedNotifications = notificationKey => {
     key1: APP_DATA.subscribedNotifications,
     key2: notificationKey,
   });
+  return [value, setValue];
+};
+
+export const useIsCaptionEnabled = () => {
+  const isCaptionEnabled = useHMSStore(selectAppDataByPath(APP_DATA.caption));
+  return isCaptionEnabled;
+};
+
+export const useSetIsCaptionEnabled = () => {
+  const [value, setValue] = useSetAppDataByKey(APP_DATA.caption);
   return [value, setValue];
 };
 
@@ -193,4 +200,13 @@ export const usePollViewState = () => {
     pollInView: pollState?.pollInView,
     view: pollState?.view,
   };
+};
+
+export const useIsNoiseCancellationEnabled = () => {
+  const isNoiseCancellationEnabled = useHMSStore(selectAppDataByPath(APP_DATA.noiseCancellation));
+  return isNoiseCancellationEnabled;
+};
+export const useSetNoiseCancellation = () => {
+  const [isNoiseCancellationEnabled, setNoiseCancellationEnabled] = useSetAppDataByKey(APP_DATA.noiseCancellation);
+  return [isNoiseCancellationEnabled, setNoiseCancellationEnabled];
 };

@@ -16,8 +16,9 @@ async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/roomkit-web' ? './src/index.js' : './src/index.ts';
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
-  const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
+  const loader = { '.js': 'jsx', '.svg': 'copy', '.png': 'copy' };
   const define = { 'process.env': JSON.stringify(process.env) };
+  const target = 'es6';
   const plugins = [
     PostCssPlugin.default({
       plugins: [autoprefixer],
@@ -29,7 +30,7 @@ async function main() {
       assetNames: '[name]',
       minify: false,
       bundle: true,
-      target: 'es6',
+      target,
       external,
       treeShaking: true,
       sourcemap: true,
