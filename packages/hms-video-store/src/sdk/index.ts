@@ -1465,7 +1465,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    * @returns {Promise<void>} - resolves when store is initialised
    */
-  private async setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
+  private async setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void> {
     this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
