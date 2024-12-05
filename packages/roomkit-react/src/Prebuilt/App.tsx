@@ -1,11 +1,13 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
