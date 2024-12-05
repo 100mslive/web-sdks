@@ -5,10 +5,12 @@ import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSRoomState,
   HMSStatsStoreWrapper,
   HMSStoreWrapper,
   IHMSNotifications,
   selectIsConnectedToRoom,
+  selectRoomState,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -294,13 +296,16 @@ const sleep = (delay: number) => {
 
 const rejoinInLoop = () => {
   // @ts-ignore
-  __hms.store.subscribe(async () => {
-    await sleep(10000);
-    console.log('timeout');
-    (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
-    await sleep(2000);
-    (document.querySelector('button[data-testid="join_again_btn"]') as HTMLButtonElement)?.click();
-  }, selectIsConnectedToRoom);
+  __hms.store.subscribe(async (roomState: HMSRoomState) => {
+    if (roomState === HMSRoomState.Connected) {
+      await sleep(10000);
+      console.log('timeout');
+      (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
+    } else if (roomState === HMSRoomState.Disconnected) {
+      await sleep(2000);
+      (document.querySelector('button[data-testid="join_again_btn"]') as HTMLButtonElement)?.click();
+    }
+  }, selectRoomState);
 };
 
 function AppRoutes({
