@@ -1,11 +1,13 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
@@ -117,6 +119,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStore,
         hmsNotifications,
       };
+      console.log('effect triggered');
+      rejoinInLoop();
     }, []);
 
     useEffect(() => {
@@ -280,6 +284,23 @@ const BackSwipe = () => {
     };
   }, [hmsActions, isConnectedToRoom]);
   return null;
+};
+
+const sleep = (delay: number) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, delay);
+  });
+};
+
+const rejoinInLoop = () => {
+  // @ts-ignore
+  __hms.store.subscribe(async () => {
+    await sleep(5000);
+    console.log('timeout');
+    (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
+    await sleep(1000);
+    (document.querySelector('button[data-testid="join_again_btn"]') as HTMLButtonElement)?.click();
+  }, selectIsConnectedToRoom);
 };
 
 function AppRoutes({
