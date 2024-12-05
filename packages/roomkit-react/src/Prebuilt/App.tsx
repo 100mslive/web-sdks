@@ -3,6 +3,7 @@ import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebu
 import { match } from 'ts-pattern';
 import {
   HMSActions,
+  HMSNotificationTypes,
   HMSReactiveStore,
   HMSRoomProvider,
   HMSRoomState,
@@ -295,12 +296,22 @@ const sleep = (delay: number) => {
 };
 
 const rejoinInLoop = () => {
+  let audioPlayBackError = false;
+  // @ts-ignore
+  __hms.notifications.onNotification(error => {
+    if (error.code === 3013) {
+      alert('audioplayback error');
+      audioPlayBackError = true;
+    }
+  }, HMSNotificationTypes.ERROR);
   // @ts-ignore
   __hms.store.subscribe(async (roomState: HMSRoomState) => {
     if (roomState === HMSRoomState.Connected) {
       await sleep(10000);
-      console.log('timeout');
-      (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
+      if (!audioPlayBackError) {
+        console.log('timeout');
+        (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
+      }
     } else if (roomState === HMSRoomState.Disconnected) {
       await sleep(2000);
       (document.querySelector('button[data-testid="join_again_btn"]') as HTMLButtonElement)?.click();
