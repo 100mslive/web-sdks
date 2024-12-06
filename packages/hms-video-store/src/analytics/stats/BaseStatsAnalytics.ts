@@ -57,7 +57,8 @@ export abstract class BaseStatsAnalytics {
     }
   }
 
-  sendEvent(): void {
+  protected sendEvent(): void {
+    console.log('BaseSend', `${new Date()}`, { trackAnalytics: JSON.stringify(this.trackAnalytics) });
     this.trackAnalytics.forEach(trackAnalytic => {
       trackAnalytic.clearSamples();
     });
@@ -67,12 +68,14 @@ export abstract class BaseStatsAnalytics {
     // delete track analytics if track is not present in store and no samples are present
     this.trackAnalytics.forEach(trackAnalytic => {
       if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
+        console.log('delete track analytics', { samples: JSON.stringify(trackAnalytic.samples) });
         this.trackAnalytics.delete(trackAnalytic.track_id);
       }
     });
 
     if (shouldCreateSample) {
       this.trackAnalytics.forEach(trackAnalytic => {
+        console.log('createSample analytics', { samples: JSON.stringify(trackAnalytic.samples) });
         trackAnalytic.createSample();
       });
     }

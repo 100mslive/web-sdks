@@ -39,14 +39,26 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
     };
   }
 
-  sendEvent() {
-    this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
+  protected sendEvent() {
+    const track = Object.assign({}, this.trackAnalytics);
+    this.cleanTrackAnalyticsAndCreateSample(true);
+    console.log(
+      'publishSend',
+      `${new Date()}`,
+      this.toAnalytics(),
+      {
+        trackAnalytics: JSON.stringify(this.trackAnalytics),
+        track: JSON.stringify(track),
+      },
+      { ...this.toAnalytics() },
+    );
+    this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats({ ...this.toAnalytics() }));
     super.sendEvent();
   }
 
   protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     let shouldCreateSample = false;
-
+    console.log(new Date());
     const localTracksStats = hmsStats.getLocalTrackStats();
     Object.keys(localTracksStats).forEach(trackIDBeingSent => {
       const trackStats = localTracksStats[trackIDBeingSent];
@@ -57,12 +69,18 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
           return;
         }
         const identifier = this.getTrackIdentifier(track.trackId, layerStats);
+
         const newTempStats = {
           ...layerStats,
           availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
         };
         if (identifier && this.trackAnalytics.has(identifier)) {
           this.trackAnalytics.get(identifier)?.pushTempStat(newTempStats);
+          console.log('inside if', new Date(), {
+            newTempStats,
+            LasttrackAnalytics: this.trackAnalytics.get(identifier)?.getLatestStat(),
+            trackAnalytics: this.trackAnalytics.get(identifier),
+          });
         } else {
           if (track) {
             const trackAnalytics = new RunningLocalTrackAnalytics({
@@ -73,6 +91,11 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
               kind: layerStats.kind,
             });
             trackAnalytics.pushTempStat(newTempStats);
+            console.log('inside else', new Date(), {
+              newTempStats,
+              LasttrackAnalytics: this.trackAnalytics.get(identifier)?.getLatestStat(),
+              trackAnalytics: this.trackAnalytics.get(identifier),
+            });
             this.trackAnalytics.set(this.getTrackIdentifier(track.trackId, layerStats), trackAnalytics);
           }
         }
@@ -80,11 +103,18 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
         const trackAnalytics = this.trackAnalytics.get(identifier);
         if (trackAnalytics?.shouldCreateSample()) {
           shouldCreateSample = true;
+          console.log('shouldCreateSample', new Date(), {
+            LasttrackAnalytics: trackAnalytics?.getLatestStat(),
+            trackAnalytics: trackAnalytics,
+
+            samples: JSON.stringify(trackAnalytics.samples),
+          });
         }
       });
     });
 
     this.cleanTrackAnalyticsAndCreateSample(shouldCreateSample);
+    console.log('cleanTrackAnalyticsAndCreateSample', new Date(), { shouldCreateSample });
   }
 
   private getTrackIdentifier(trackId: string, stats: HMSTrackStats) {
