@@ -132,7 +132,7 @@ export class AudioSinkManager {
     audioEl.addEventListener('pause', this.handleAudioPaused);
 
     audioEl.onerror = async () => {
-      HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
+      HMSLogger.e(this.TAG, 'error on audio element', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
         `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
       );
@@ -140,8 +140,18 @@ export class AudioSinkManager {
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         // try to wait for main execution to complete first
         this.removeAudioElement(audioEl, track);
+        console.error(audioEl);
         await sleep(500);
+        console.error('retrying for trackId', track.trackId);
         await this.handleTrackAdd({ track, peer, callListener: false });
+        console.error(
+          'after retry for trackId',
+          track.trackId,
+          'autoplayState',
+          this.state.autoplayFailed,
+          'autopausedTracks',
+          this.autoPausedTracks.values(),
+        );
         if (!this.state.autoplayFailed) {
           this.eventBus.analytics.publish(
             AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
