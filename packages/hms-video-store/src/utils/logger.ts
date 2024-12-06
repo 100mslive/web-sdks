@@ -23,7 +23,7 @@ export default class HMSLogger {
   }
 
   static d(tag: string, ...data: any[]) {
-    this.log(HMSLogLevel.DEBUG, tag, ...data);
+    this.log(HMSLogLevel.ERROR, tag, ...data);
   }
 
   static i(tag: string, ...data: any[]) {
