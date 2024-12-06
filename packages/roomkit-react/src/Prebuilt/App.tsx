@@ -1,12 +1,17 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
   HMSActions,
+  HMSNotificationTypes,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSRoomState,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
   selectIsConnectedToRoom,
+  selectRoomState,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -118,6 +123,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStore,
         hmsNotifications,
       };
+      rejoinInLoop();
     }, []);
 
     useEffect(() => {
@@ -279,6 +285,36 @@ const BackSwipe = () => {
     };
   }, [hmsActions, isConnectedToRoom]);
   return null;
+};
+
+const sleep = (delay: number) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, delay);
+  });
+};
+
+const rejoinInLoop = () => {
+  let audioPlayBackError = false;
+  // @ts-ignore
+  __hms.notifications.onNotification(error => {
+    if (error.code === 3013) {
+      alert('audioplayback error');
+      audioPlayBackError = true;
+    }
+  }, HMSNotificationTypes.ERROR);
+  // @ts-ignore
+  __hms.store.subscribe(async (roomState: HMSRoomState) => {
+    if (roomState === HMSRoomState.Connected) {
+      await sleep(10000);
+      if (!audioPlayBackError) {
+        console.log('timeout');
+        (document.querySelector('button[data-testid="leave_room_btn"]') as HTMLButtonElement)?.click();
+      }
+    } else if (roomState === HMSRoomState.Disconnected) {
+      await sleep(2000);
+      (document.querySelector('button[data-testid="join_again_btn"]') as HTMLButtonElement)?.click();
+    }
+  }, selectRoomState);
 };
 
 function AppRoutes({

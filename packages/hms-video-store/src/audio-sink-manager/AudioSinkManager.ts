@@ -148,6 +148,7 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
+        this.listener?.onError(ex);
         this.removeAudioElement(audioEl, track);
         await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
