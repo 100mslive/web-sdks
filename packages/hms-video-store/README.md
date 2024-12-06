@@ -1,8 +1,9 @@
 # 100ms Reactive Store
 
 [![NPM](https://badgen.net/npm/v/@100mslive/hms-video-store?color=green)](https://www.npmjs.com/package/@100mslive/hms-video-store)
-![Test](https://github.com/100mslive/hms-video-store/actions/workflows/main.yaml/badge.svg)
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
 [![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-video-store)](https://bundlephobia.com/result?p=@100mslive/hms-video-store)
+[![License](https://img.shields.io/npm/l/@100mslive/hms-video-store)](https://www.100ms.live/)
 ![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-video-store)
 
 ![Architecture](images/architecture.png)

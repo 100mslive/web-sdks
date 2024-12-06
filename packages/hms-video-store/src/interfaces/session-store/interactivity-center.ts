@@ -22,6 +22,5 @@ export interface HMSInteractivityCenter {
   fetchLeaderboard(pollID: string, offset: number, count: number): Promise<HMSQuizLeaderboardResponse>;
   getPollResponses(poll: HMSPoll, self: boolean): Promise<void>;
   getPolls(): Promise<HMSPoll[]>;
-  /** @alpha */
   whiteboard: HMSWhiteboardInteractivityCenter;
 }

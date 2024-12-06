@@ -72,13 +72,13 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
   }
 
   /**
-   * By default store.subscribe does not call the handler with the current state at time of subscription,
+   * By default, store.subscribe does not call the handler with the current state at time of subscription,
    * this behaviour can be modified by calling this function. What it means is that instead of calling the
    * handler only for changes which happen post subscription we'll also call it exactly once at the time
    * of subscription with the current state. This behaviour is similar to that of BehaviourSubject in RxJS.
    * This will be an irreversible change
    *
-   * Note: you don't need this if you're using our react hooks, it takes care of this requirement.
+   * Note: you don't need this if you're using our React hooks, it takes care of this requirement.
    */
   triggerOnSubscribe(): void {
     if (this.initialTriggerOnSubscribe) {
@@ -125,9 +125,6 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
     return { onNotification: this.notifications.onNotification };
   }
 
-  /**
-   * @alpha
-   */
   getStats = (): IHMSStatsStoreReadOnly => {
     if (!this.stats) {
       this.stats = new HMSStats(this.store as unknown as IHMSStore, this.sdk);

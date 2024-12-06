@@ -40,15 +40,16 @@ import {
   IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
+import { HMSStats } from './webrtc-stats';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
  * It talks to our 100ms backend and handles error reconnections, state managements
  * and lots of other things so you don't have to. You can use this gateway with any
  * sort of UI to make connecting to our backend easier.
- * In case you use react, we also provide a HMSProvider class with very powerful hooks
- * and out of box components which you can use to setup your website in minutes. Our
- * components have in built integration with this interface and you won't have to worry
+ * In case you use React, we also provide a HMSProvider class with very powerful hooks
+ * and out of box components which you can use to set up your website in minutes. Our
+ * components have in built integration with this interface, and you won't have to worry
  * about passing props if you use them.
  *
  * @remarks
@@ -58,7 +59,14 @@ import { HMSRoleChangeRequest } from './selectors';
  * @category Core
  */
 export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
+  /**
+   * Preview function can be used to preview the camera and microphone before joining the room.
+   * This function is useful when you want to check and/or modify the camera and microphone settings before joining the Room.
+   * @param config preview config with camera and microphone devices
+   * @returns Promise<void> - resolves when the preview is successful
+   */
   preview(config: HMSMidCallPreviewConfig | HMSPreviewConfig): Promise<void>;
+
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -68,16 +76,20 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * is ignored
    *
    * @param config join config with room id, required for joining the room
+   * @returns Promise<void> - resolves when the room is joined
    */
   join(config: HMSConfig): Promise<void>;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
+   * This function also cleans up the store and removes all the tracks and participants.
+   * @returns Promise<void> - resolves when the room is left
    */
   leave(): Promise<void>;
 
   /**
    * stop tracks fetched during midcall preview and general cleanup
+   * @returns Promise<void> - resolves when the tracks are stopped
    */
   cancelMidCallPreview(): Promise<void>;
 
@@ -85,8 +97,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * If you want to enable screenshare for the local peer this class can be called.
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
-   * @param enabled boolean
+   * @param enabled boolean - true to enable screenshare, false to disable
    * @param config check the config object for details about the fields
+   * @returns Promise<void> - resolves when the screenshare is enabled
    */
   setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
@@ -95,6 +108,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * This method adds the track to the local peer's list of auxiliary tracks and publishes it to make it available to remote peers.
    * @param track MediaStreamTrack - Track to be added
    * @param type HMSTrackSource - 'regular' | 'screen' | 'plugin' - Source of track - default: 'regular'
+   * @returns Promise<void> - resolves when the track is added
    */
   addTrack(track: MediaStreamTrack, type: HMSTrackSource): Promise<void>;
 
@@ -102,6 +116,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * You can use the removeTrack method to remove an auxiliary track.
    * This method removes the track from the local peer's list of auxiliary tracks and unpublishes it.
    * @param trackId string - ID of the track to be removed
+   * @returns Promise<void> - resolves when the track is removed
    */
   removeTrack(trackId: HMSTrackID): Promise<void>;
 
@@ -117,6 +132,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Send a plain text message to all the other participants in the room.
    * @param message - string message to broadcast
    * @param type - type of message. For example: image, video etc. - optional defaults to chat
+   * @returns Promise<void> - resolves when the message is sent
    */
   sendBroadcastMessage(message: string, type?: string): Promise<void>;
   /**
@@ -124,6 +140,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param message - string message to send
    * @param roles - roles to which to send the message
    * @param type - type of message. For example: image, video etc. - optional defaults to chat
+   * @returns Promise<void> - resolves when the message is sent
    */
   sendGroupMessage(message: string, roles: HMSRoleName[], type?: string): Promise<void>;
   /**
@@ -131,6 +148,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param message
    * @param peerID - id of the peer to which message has to be sent
    * @param type - type of message. For example: image, video etc. - optional defaults to chat
+   * @returns Promise<void> - resolves when the message is sent
    */
   sendDirectMessage(message: string, peerID: HMSPeerID, type?: string): Promise<void>;
 
@@ -149,18 +167,21 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * This function can be used to enable/disable(unmute/mute) local audio track
    * @param enabled boolean - true to unmute, false to mute
+   * @returns Promise<void> - resolves when the audio is enabled
    */
   setLocalAudioEnabled(enabled: boolean): Promise<void>;
 
   /**
    * This function can be used to enable/disable(unmute/mute) local video track
    * @param enabled boolean - true to unmute, false to mute
+   * @returns Promise<void> - resolves when the video is enabled
    */
   setLocalVideoEnabled(enabled: boolean): Promise<void>;
 
   /**
    * @param trackId string - ID of the track whose mute status needs to be set
    * @param enabled boolean - true when we want to unmute the track and false when we want to unmute it
+   * @returns Promise<void> - resolves when the track is enabled
    */
   setEnabledTrack(trackId: HMSTrackID, enabled: boolean): Promise<void>;
 
@@ -180,6 +201,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   /**
    * Toggle the camera between front and back if the both the camera's exist
+   * @returns Promise<void> - resolves when the camera is toggled
    */
   switchCamera(): Promise<void>;
 
@@ -190,6 +212,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * the stream coming from server saving significant bandwidth for the user.
    * @param localTrackID trackID as stored in the store for the peer
    * @param videoElement HTML native element where the video has to be shown
+   * @returns Promise<void> - resolves when the video is attached
    */
   attachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
 
@@ -202,13 +225,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Set the output volume of audio tracks(overall/particular audio track)
    * @param value number between 0-100
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
-   *
+   * @returns Promise<void> - resolves when the volume is set
    */
   setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
+   * @returns Promise<void> - resolves when the audio output device is set
    */
   setAudioOutputDevice(deviceId: string): Promise<void>;
 
@@ -216,7 +240,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   /**
    * set the quality of the selected videoTrack for simulcast.
-   * @alpha
+   * @param trackId HMSTrackID - trackId of the video track
+   * @param layer HMSSimulcastLayer - layer to be set
+   * @returns Promise<void> - resolves when the layer is set
    */
   setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
@@ -292,6 +318,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param forPeerId The remote peer id whose role needs to be changed
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
+   * @returns Promise<void> - resolves when the role is changed
    */
   changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
 
@@ -299,12 +326,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Request for a role change of a remote peer. Can be forced.
    * @param roles List of roles whose role needs to be changed
    * @param toRole The name of the new role.
+   * @returns Promise<void> - resolves when the role is changed
    */
   changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received
    * @param {HMSRoleChangeRequest} request The original request that was received
+   * @returns Promise<void> - resolves when the role is accepted
    */
   acceptChangeRole(request: HMSRoleChangeRequest): Promise<void>;
 
@@ -319,12 +348,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * This can be used to mute/unmute a remote peer's track
    * @param forRemoteTrackID The track ID or array of track IDs for which you want to change the state
    * @param enabled `true` if you wish to enable(unmute permission is required) the track, `false` if you wish to disable(mute permission is required) the track
+   * @returns Promise<void> - resolves when the track state is changed
    */
   setRemoteTrackEnabled(forRemoteTrackID: HMSTrackID | HMSTrackID[], enabled: boolean): Promise<void>;
 
   /**
    * Use this to mute/unmute multiple tracks by source, role or type
    * @param {HMSChangeMultiTrackStateParams} params
+   * @returns Promise<void> - resolves when the track state is changed
    */
   setRemoteTracksEnabled(params: HMSChangeMultiTrackStateParams): Promise<void>;
 
@@ -333,19 +364,24 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Most browsers have limitations where an audio can not be played if there was no user interaction.
    * SDK throws an autoplay error in this case, this method can be called after an UI interaction
    * to resolve the autoplay error
+   * @returns Promise<void> - resolves when the autoplay error is resolved
    */
   unblockAudio: () => Promise<void>;
 
   /**
    * If you have the **endRoom** permission, you can end the room. That means everyone will be kicked out.
    * If lock is passed as true, the room cannot be used further.
+   * @param lock boolean - true to lock the room
+   * @param reason string - reason for ending the room
+   * @returns Promise<void> - resolves when the room is ended
    */
   endRoom: (lock: boolean, reason: string) => Promise<void>;
 
   /**
    * After leave send feedback to backend for call quality purpose.
-   * @param feedback
-   * @param eventEndpoint
+   * @param feedback HMSSessionFeedback - feedback object
+   * @param eventEndpoint string - endpoint to send feedback
+   * @returns Promise<void> - resolves when the feedback is submitted
    */
   submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
 
@@ -355,6 +391,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param reason a string explaining why the peer is removed from the room.
    * This string could be used to notify the user before they're removed from the room
    * using the `REMOVED_FROM_ROOM` type of notification
+   * @returns Promise<void> - resolves when the peer is removed
    */
   removePeer(peerID: HMSPeerID, reason: string): Promise<void>;
 
@@ -365,11 +402,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param params.RTMPURLs The list of ingest URLs where the call as visible in the meeting url should be streamed.
    * Optional, when not specified the method is used to just start the recording.
    * @param params.record If you want to start the recording or not.
+   * @returns Promise<void> - resolves when the RTMP streaming and recording is started
    */
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
 
   /**
    * If you want to stop both RTMP streaming and recording.
+   * @returns Promise<void> - resolves when the RTMP streaming and recording is stopped
    */
   stopRTMPAndRecording(): Promise<void>;
 
@@ -378,10 +417,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * otherwise @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
+   * @param params HLSConfig - HLSConfig object with the required fields
+   * @returns Promise<void> - resolves when the HLS streaming is started
    */
   startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
+   * @param params HLSConfig - HLSConfig object with the required fields
+   * @returns Promise<void> - resolves when the HLS streaming is stopped
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
@@ -398,21 +441,21 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   stopTranscription(params: TranscriptionConfig): Promise<void>;
 
   /**
-   * @alpha
    * Used to define date range metadata in a media playlist.
    * This api adds EXT-X-DATERANGE tags to the media playlist.
    * It is useful for defining timed metadata for interstitial regions such as advertisements,
    * but can be used to define any timed metadata needed by your stream.
-   * usage (e.g)
+   * ```js
    * const metadataList = `[{
-   *  payload: "some string 1",
-   *  duration: 2
-   * },
-   * {
-   *  payload: "some string 2",
-   *  duration: 3
+   *    payload: "some string 1",
+   *    duration: 2
+   *   },
+   *   {
+   *    payload: "some string 2",
+   *    duration: 3
    * }]`
    * sendHLSTimedMetadata(metadataList);
+   * ```
    */
   sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
@@ -548,13 +591,23 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
 
+  /**
+   * Get the track object by trackId
+   * @param trackId string - ID of the track
+   * @returns HMSTrack | undefined - track object
+   */
   getTrackById(trackId: string): HMSTrack | undefined;
 
+  /**
+   * Get the auth token for the room code. This is useful when you want to join a room using a room code.
+   * @param tokenRequest - token request object
+   * @param tokenRequestOptions - token request options
+   */
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   /**
    * enable sending audio speaker data to beam
-   * @alpha
+   * @returns Promise<void> - resolves when the speaker data is enabled
    */
   enableBeamSpeakerLabelsLogging(): Promise<void>;
 
@@ -566,13 +619,51 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 
+  /**
+   * interactivityCenter contains all actions that can be performed on the interactivity center
+   * This will be available after joining the room
+   */
   interactivityCenter: IHMSInteractivityCenter;
 
+  /**
+   * raise hand for local peer
+   * @returns Promise<void> - resolves when the hand is raised
+   */
   raiseLocalPeerHand(): Promise<void>;
+
+  /**
+   * lower hand for local peer
+   * @returns Promise<void> - resolves when the hand is lowered
+   */
   lowerLocalPeerHand(): Promise<void>;
+
+  /**
+   * raise hand for remote peer
+   * @param peerId string - ID of the peer
+   * @returns Promise<void> - resolves when the hand is raised
+   */
   raiseRemotePeerHand(peerId: string): Promise<void>;
+
+  /**
+   * lower hand for remote peer
+   * @param peerId string - ID of the peer
+   * @returns Promise<void> - resolves when the hand is lowered
+   */
   lowerRemotePeerHand(peerId: string): Promise<void>;
+
+  /**
+   * get the list of peers in the room
+   * @see https://www.100ms.live/docs/react-native/v2/how-to-guides/interact-with-room/peer/large-room
+   * @param options HMSPeerListIteratorOptions - options for the peer list iterator
+   * @returns HMSPeerListIterator - iterator for the peer list
+   */
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
+
+  /**
+   * get the peer object by peerId
+   * @param peerId string - ID of the peer
+   * @returns Promise<HMSPeer | undefined> - resolves with the peer object
+   */
   getPeer(peerId: string): Promise<HMSPeer | undefined>;
   findPeerByName(options: FindPeerByNameRequestParams): Promise<{ offset: number; eof?: boolean; peers: HMSPeer[] }>;
   /**
@@ -581,10 +672,20 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   setPlaylistSettings(settings: HMSPlaylistSettings): void;
 
+  /**
+   * Method to initialize diagnostics. Should only be called after joining.
+   */
   initDiagnostics(): HMSDiagnosticsInterface;
+
   /**
    * @internal
    * Method to get enabled flags and endpoints. Should only be called after joining.
    */
   getDebugInfo(): DebugInfo | undefined;
+
+  /**
+   * @internal
+   * Method to check if received bitrate is 0 for all remote peers or whether the room has whiteboard/quiz running. To be used by beam.
+   */
+  hasActiveElements(hmsStats: HMSStats): boolean;
 }

@@ -1,12 +1,17 @@
 ![Banner](https://github.com/100mslive/web-sdks/blob/06c65259912db6ccd8617f2ecb6fef51429251ec/prebuilt-banner.png)
 
+[![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/roomkit-react)](https://bundlephobia.com/result?p=@100mslive/roomkit-react)
+[![License](https://img.shields.io/npm/l/@100mslive/roomkit-react)](https://www.100ms.live/)
+![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/roomkit-react)
+
 # Room Kit React Library
 
 100ms Room Kit provides simple & easy to use UI components to build Live Streaming & Video Conferencing experiences in your apps.
 
 ## Installation
 
-```
+```bash
 // npm
 npm install @100mslive/roomkit-react@latest --save
 
@@ -16,7 +21,7 @@ yarn add @100mslive/roomkit-react@latest
 
 ## Usage
 
-#### Using room code
+### Using room code
 
 ```jsx
 import { HMSPrebuilt } from '@100mslive/roomkit-react'
@@ -28,7 +33,7 @@ export default App() {
 }
 ```
 
-#### Using authToken
+### Using authToken
 
 ```jsx
 import { HMSPrebuilt } from '@100mslive/roomkit-react'
