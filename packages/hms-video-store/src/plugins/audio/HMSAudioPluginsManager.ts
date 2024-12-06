@@ -136,7 +136,7 @@ export class HMSAudioPluginsManager {
         this.prevAudioNode.disconnect();
       }
       this.analytics.added(name, this.audioContext!.sampleRate);
-      await this.analytics.initWithTime(name, async () => plugin.init());
+      await this.analytics.initWithTime(name, async () => await plugin.init());
       this.pluginsMap.set(name, plugin);
       await this.processPlugin(plugin);
       await this.connectToDestination();

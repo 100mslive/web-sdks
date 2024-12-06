@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-noise-cancellation@0.0.2-alpha.9":
-  version "0.0.2-alpha.9"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.2-alpha.9.tgz#e1aac1c91f1b73da4d2f6d9c121c5ec51d67ebae"
-  integrity sha512-4iucs7nD+RfyUxk0onU9TvuTFDvfN6SWIy6Hk9g1cGDxlwXvrlVCpqqd11ZSnUdCqMVp9pE4uAogj5PrXwmLrg==
+"@100mslive/hms-noise-cancellation@0.0.2-alpha.10":
+  version "0.0.2-alpha.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.2-alpha.10.tgz#96ae93b3bcba4a5703e66488729c715dbb298bad"
+  integrity sha512-nmTU/RsEZQUFIHvPAbgbDTMPjuDr982Nueh3w8rTNOv63uJ1aalSNol2M4ZkNxkndrkK1+SkxxB7cnS2eYwSHw==
 
 "@100mslive/types-prebuilt@0.12.12":
   version "0.12.12"
