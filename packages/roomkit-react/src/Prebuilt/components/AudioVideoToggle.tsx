@@ -155,7 +155,7 @@ export const NoiseCancellation = ({
     return (
       <ActionTile.Root
         active={isNoiseCancellationEnabled && isKrispPluginAdded}
-        disable={inProgress}
+        disabled={inProgress}
         onClick={async () => {
           await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
           setOpenOptionsSheet?.(false);
