@@ -138,6 +138,7 @@ export class AudioSinkManager {
       HMSLogger.e(this.TAG, 'error on audio element for track - ', track.trackId, 'error code', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
         `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
+        audioEl?.error?.code,
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
