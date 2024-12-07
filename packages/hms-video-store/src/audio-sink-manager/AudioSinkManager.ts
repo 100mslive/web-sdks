@@ -141,9 +141,7 @@ export class AudioSinkManager {
         audioEl?.error?.code,
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
-      if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
-        this.listener?.onError(ex);
-      }
+      this.listener?.onError(ex);
     });
   };
 
