@@ -116,15 +116,7 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'Track updated', `${track}`);
   };
 
-  private handleTrackAdd = async ({
-    track,
-    peer,
-    callListener = true,
-  }: {
-    track: HMSRemoteAudioTrack;
-    peer: HMSRemotePeer;
-    callListener?: boolean;
-  }) => {
+  private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
@@ -137,7 +129,7 @@ export class AudioSinkManager {
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
-    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
   };
 
