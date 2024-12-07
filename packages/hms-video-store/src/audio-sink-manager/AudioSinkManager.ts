@@ -5,6 +5,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSAudioContextHandler } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -72,7 +73,8 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      this.unpauseAudioTracks();
+      await this.unpauseAudioTracks();
+      await HMSAudioContextHandler.resumeContext();
     }
   }
 
@@ -152,12 +154,12 @@ export class AudioSinkManager {
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         // try to wait for main execution to complete first
         this.removeAudioElement(audioEl, track);
-        console.error(audioEl);
         await sleep(500);
-        console.error('retrying for trackId', track.trackId);
+        HMSLogger.d(this.TAG, 'retrying for trackId', track.trackId, HMSAudioContextHandler.getAudioContext().state);
+        await HMSAudioContextHandler.resumeContext();
         await this.handleTrackAdd({ track, peer, callListener: false });
-        alert('Audio playback error');
-        console.error(
+        HMSLogger.d(
+          this.TAG,
           'after retry for trackId',
           track.trackId,
           'autoplayState',
@@ -165,8 +167,8 @@ export class AudioSinkManager {
           'autopausedTracks',
           this.autoPausedTracks.values(),
         );
-        if (!this.state.autoplayFailed) {
-          console.error('audioRecoveredEvent sent', track.trackId);
+        if (!this.state.autoplayFailed && this.state.autoplayCheckPromise) {
+          HMSLogger.d(this.TAG, 'audioRecoveredEvent sent', track.trackId);
           this.eventBus.analytics.publish(
             AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
           );
