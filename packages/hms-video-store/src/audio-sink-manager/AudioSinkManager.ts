@@ -5,12 +5,10 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
-import { HMSAudioContextHandler } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { sleep } from '../utils/timer-utils';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -74,7 +72,6 @@ export class AudioSinkManager {
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
       await this.unpauseAudioTracks();
-      await HMSAudioContextHandler.resumeContext();
     }
   }
 
@@ -132,7 +129,7 @@ export class AudioSinkManager {
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
-    this.handleAudioElementError(audioEl, track, peer);
+    this.handleAudioElementError(audioEl, track);
     track.setAudioElement(audioEl);
     await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
@@ -144,7 +141,7 @@ export class AudioSinkManager {
     await this.handleAutoplayError(track);
   };
 
-  private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack, peer: HMSRemotePeer) => {
+  private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     audioEl.addEventListener('error', async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
@@ -152,27 +149,7 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
-        // try to wait for main execution to complete first
-        this.removeAudioElement(audioEl, track);
-        await sleep(500);
-        HMSLogger.d(this.TAG, 'retrying for trackId', track.trackId, HMSAudioContextHandler.getAudioContext().state);
-        await HMSAudioContextHandler.resumeContext();
-        await this.handleTrackAdd({ track, peer, callListener: false });
-        HMSLogger.d(
-          this.TAG,
-          'after retry for trackId',
-          track.trackId,
-          'autoplayState',
-          this.state.autoplayFailed,
-          'autopausedTracks',
-          this.autoPausedTracks.values(),
-        );
-        if (!this.state.autoplayFailed && this.state.autoplayCheckPromise) {
-          HMSLogger.d(this.TAG, 'audioRecoveredEvent sent', track.trackId);
-          this.eventBus.analytics.publish(
-            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
-          );
-        }
+        this.listener?.onError(ex);
       }
     });
   };

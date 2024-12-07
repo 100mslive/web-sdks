@@ -11,8 +11,9 @@ export class HMSTrackException extends HMSException {
     public message: string,
     public description: string,
     public trackType: HMSTrackExceptionTrackType,
+    public isTerminal = false,
   ) {
-    super(code, name, action, message, description, false);
+    super(code, name, action, message, description, isTerminal);
   }
 
   toAnalyticsProperties() {

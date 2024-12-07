@@ -253,6 +253,7 @@ export const ErrorFactory = {
         description,
         description,
         HMSTrackExceptionTrackType.AUDIO,
+        true,
       );
     },
 
