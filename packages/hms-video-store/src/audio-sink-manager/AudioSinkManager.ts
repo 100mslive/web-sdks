@@ -143,7 +143,7 @@ export class AudioSinkManager {
 
   private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     audioEl.addEventListener('error', async () => {
-      HMSLogger.e(this.TAG, 'error on audio element', audioEl?.error?.code);
+      HMSLogger.e(this.TAG, 'error on audio element for track - ', track.trackId, 'error code', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
         `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
       );
