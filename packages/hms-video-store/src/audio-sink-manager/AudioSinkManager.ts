@@ -130,8 +130,20 @@ export class AudioSinkManager {
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
+    this.handleAudioElementError(audioEl, track, peer);
+    track.setAudioElement(audioEl);
+    await track.setVolume(this.volume);
+    HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
+    this.init(); // call to create sink element if not already created
+    this.audioSink?.append(audioEl);
+    this.outputDevice && (await track.setOutputDevice(this.outputDevice));
+    audioEl.srcObject = new MediaStream([track.nativeTrack]);
+    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    await this.handleAutoplayError(track);
+  };
 
-    audioEl.onerror = async () => {
+  private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack, peer: HMSRemotePeer) => {
+    audioEl.addEventListener('error', async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
         `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
@@ -144,6 +156,7 @@ export class AudioSinkManager {
         await sleep(500);
         console.error('retrying for trackId', track.trackId);
         await this.handleTrackAdd({ track, peer, callListener: false });
+        alert('Audio playback error');
         console.error(
           'after retry for trackId',
           track.trackId,
@@ -153,21 +166,13 @@ export class AudioSinkManager {
           this.autoPausedTracks.values(),
         );
         if (!this.state.autoplayFailed) {
+          console.error('audioRecoveredEvent sent', track.trackId);
           this.eventBus.analytics.publish(
             AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
           );
         }
       }
-    };
-    track.setAudioElement(audioEl);
-    await track.setVolume(this.volume);
-    HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
-    this.init(); // call to create sink element if not already created
-    this.audioSink?.append(audioEl);
-    this.outputDevice && (await track.setOutputDevice(this.outputDevice));
-    audioEl.srcObject = new MediaStream([track.nativeTrack]);
-    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
-    await this.handleAutoplayError(track);
+    });
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
