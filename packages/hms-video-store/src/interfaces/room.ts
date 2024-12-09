@@ -80,9 +80,6 @@ export interface HMSHLSRecording {
 
 export interface HMSRTMP {
   running: boolean;
-  /**
-   * @alpha
-   **/
   startedAt?: Date;
   state?: HMSStreamingState;
   error?: HMSException;
