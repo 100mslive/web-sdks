@@ -123,12 +123,12 @@ export class AudioSinkManager {
     audioEl.addEventListener('pause', this.handleAudioPaused);
     this.handleAudioElementError(audioEl, track);
     track.setAudioElement(audioEl);
-    await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
+    await track.setVolume(this.volume);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
   };
