@@ -116,12 +116,20 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'Track updated', `${track}`);
   };
 
-  private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
+  private handleTrackAdd = async ({
+    track,
+    peer,
+    callListener = true,
+  }: {
+    track: HMSRemoteAudioTrack;
+    peer: HMSRemotePeer;
+    callListener?: boolean;
+  }) => {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
-    this.handleAudioElementError(audioEl, track);
+    this.handleAudioElementError(audioEl, peer, track);
     track.setAudioElement(audioEl);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
@@ -129,19 +137,27 @@ export class AudioSinkManager {
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     await track.setVolume(this.volume);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
   };
 
-  private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
+  private handleAudioElementError = (audioEl: HTMLAudioElement, peer: HMSRemotePeer, track: HMSRemoteAudioTrack) => {
     audioEl.addEventListener('error', async () => {
       HMSLogger.e(this.TAG, 'error on audio element for track - ', track.trackId, 'error code', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
         `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
-        audioEl?.error?.code,
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
-      this.listener?.onError(ex);
+      if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
+        // try to wait for main execution to complete first
+        this.removeAudioElement(audioEl, track);
+        await this.handleTrackAdd({ track, peer, callListener: false });
+        if (!this.state.autoplayFailed) {
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+          );
+        }
+      }
     });
   };
 

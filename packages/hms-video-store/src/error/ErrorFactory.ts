@@ -245,7 +245,7 @@ export const ErrorFactory = {
       );
     },
 
-    AudioPlaybackError(description: string, errorCode?: number) {
+    AudioPlaybackError(description: string) {
       return new HMSTrackException(
         ErrorCodes.TracksErrors.AUDIO_PLAYBACK_ERROR,
         'Audio playback error',
@@ -253,7 +253,6 @@ export const ErrorFactory = {
         description,
         description,
         HMSTrackExceptionTrackType.AUDIO,
-        errorCode === MediaError.MEDIA_ERR_DECODE,
       );
     },
 
