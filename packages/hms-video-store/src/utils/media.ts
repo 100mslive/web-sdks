@@ -52,15 +52,16 @@ export const HMSAudioContextHandler: HMSAudioContext = {
   audioContext: null,
   getAudioContext() {
     if (!this.audioContext) {
+      HMSLogger.d('AudioContext: ', 'audio context created');
       this.audioContext = new AudioContext();
     }
     return this.audioContext;
   },
   async resumeContext() {
     try {
-      return await this.getAudioContext().resume();
+      return this.getAudioContext().resume();
     } catch (error) {
-      HMSLogger.e('AudioContext', error);
+      HMSLogger.e('AudioContext: ', 'Error while resuming audio context', error);
     }
   },
 };

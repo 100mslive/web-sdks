@@ -608,6 +608,9 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
+    HMSAudioContextHandler.getAudioContext();
+    await HMSAudioContextHandler.resumeContext();
+
     // remove terminal error handling from preview(do not send preview.failed after join on disconnect)
     this.eventBus?.leave?.unsubscribe(this.handlePreviewError);
     this.analyticsTimer.start(TimedEvent.JOIN);
@@ -621,9 +624,8 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
-    HMSAudioContextHandler.resumeContext();
-    // acquire screen lock to stay awake while in call
     const storeConfig = this.store.getConfig();
+    // acquire screen lock to stay awake while in call
     if (storeConfig?.autoManageWakeLock) {
       this.wakeLockManager.acquireLock();
     }
