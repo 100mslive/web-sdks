@@ -505,9 +505,11 @@ export class DeviceManager implements HMSDeviceManager {
         this.earpieceSelected = true;
         return;
       }
+      HMSLogger.d(this.TAG, 'selecting earpiece as audio input');
       await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
       this.earpieceSelected = true;
     }
+    HMSLogger.d(this.TAG, 'selecting externalDevice as audio input');
     await localAudioTrack.setSettings(
       {
         deviceId: externalDeviceID,
