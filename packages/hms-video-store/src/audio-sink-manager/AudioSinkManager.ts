@@ -129,7 +129,7 @@ export class AudioSinkManager {
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
-    this.handleAudioElementError(audioEl, peer, track);
+    this.handleAudioElementError(audioEl, track);
     track.setAudioElement(audioEl);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
@@ -141,7 +141,7 @@ export class AudioSinkManager {
     await this.handleAutoplayError(track);
   };
 
-  private handleAudioElementError = (audioEl: HTMLAudioElement, peer: HMSRemotePeer, track: HMSRemoteAudioTrack) => {
+  private handleAudioElementError = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     audioEl.addEventListener('error', async () => {
       HMSLogger.e(this.TAG, 'error on audio element for track - ', track.trackId, 'error code', audioEl?.error?.code);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
