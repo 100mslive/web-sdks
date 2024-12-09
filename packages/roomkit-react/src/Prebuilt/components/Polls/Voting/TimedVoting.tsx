@@ -9,10 +9,12 @@ export const TimedView = ({
   poll,
   localPeerResponses,
   updateSavedResponses,
+  updateUnsavedResponses,
 }: {
   poll: HMSPoll;
   localPeerResponses?: Record<number, number | number[] | undefined>;
   updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
+  updateUnsavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
 }) => {
   const [currentIndex, setCurrentIndex] = useState(getIndexToShow(localPeerResponses));
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
@@ -32,6 +34,7 @@ export const TimedView = ({
       {poll.questions.map(question => {
         return attemptedAll || activeQuestion?.index === question.index ? (
           <QuestionCard
+            updateUnsavedResponses={updateUnsavedResponses}
             key={question.index}
             pollID={poll.id}
             isQuiz={poll.type === 'quiz'}

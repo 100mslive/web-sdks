@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  HMSRoomState,
   selectLocalPeer,
   selectPeerNameByID,
   selectPermissions,
   selectPollByID,
+  selectRoomState,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -31,15 +33,29 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
   const fetchedInitialResponses = useRef(false);
   const [savedResponses, setSavedResponses] = useState<Record<any, any>>({});
+  const [unsavedResponses, setUnsavedResponses] = useState<Record<any, any>>({});
   const localPeer = useHMSStore(selectLocalPeer);
   const localPeerId = localPeer?.id;
   const customerUserId = localPeer?.customerUserId;
-
+  const roomState = useHMSStore(selectRoomState);
   // To reset whenever a different poll is opened
   useEffect(() => {
     fetchedInitialResponses.current = false;
     setSavedResponses({});
   }, [id, setSavedResponses]);
+
+  // To send whenever room is connected back
+  useEffect(() => {
+    const handleDisconnectedVote = async () => {
+      if (unsavedResponses && Object.keys(unsavedResponses).length > 0 && roomState === HMSRoomState.Connected) {
+        for (const key in unsavedResponses) {
+          await actions.interactivityCenter.addResponsesToPoll(unsavedResponses[key].pollID, [unsavedResponses[key]]);
+        }
+        setUnsavedResponses({});
+      }
+    };
+    handleDisconnectedVote();
+  }, [actions.interactivityCenter, roomState, setUnsavedResponses, unsavedResponses]);
 
   useEffect(() => {
     const getResponses = async () => {
@@ -115,9 +131,19 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         ) : null}
 
         {showSingleView ? (
-          <TimedView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
+          <TimedView
+            updateUnsavedResponses={setUnsavedResponses}
+            poll={poll}
+            localPeerResponses={savedResponses}
+            updateSavedResponses={setSavedResponses}
+          />
         ) : (
-          <StandardView poll={poll} localPeerResponses={savedResponses} updateSavedResponses={setSavedResponses} />
+          <StandardView
+            updateUnsavedResponses={setUnsavedResponses}
+            poll={poll}
+            localPeerResponses={savedResponses}
+            updateSavedResponses={setSavedResponses}
+          />
         )}
       </Flex>
       <Flex

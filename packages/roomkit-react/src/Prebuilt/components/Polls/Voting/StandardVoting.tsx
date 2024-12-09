@@ -8,10 +8,12 @@ export const StandardView = ({
   poll,
   localPeerResponses,
   updateSavedResponses,
+  updateUnsavedResponses,
 }: {
   poll: HMSPoll;
   localPeerResponses: Record<number, number | number[] | undefined>;
   updateSavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
+  updateUnsavedResponses: Dispatch<SetStateAction<Record<any, any>>>;
 }) => {
   if (!poll?.questions) {
     return null;
@@ -25,6 +27,7 @@ export const StandardView = ({
       {isQuiz && isStopped ? <PeerParticipationSummary quiz={poll} /> : null}
       {poll.questions?.map((question, index) => (
         <QuestionCard
+          updateUnsavedResponses={updateUnsavedResponses}
           pollID={poll.id}
           isQuiz={isQuiz}
           startedBy={poll.startedBy}

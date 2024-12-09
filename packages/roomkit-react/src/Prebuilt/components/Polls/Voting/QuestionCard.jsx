@@ -11,6 +11,7 @@ import {
 } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
+import { isNotNullish } from '../../../../Stats/Stats';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptions } from '../common/SingleChoiceOptions';
@@ -30,6 +31,7 @@ export const QuestionCard = ({
   answer,
   localPeerResponse,
   updateSavedResponses,
+  updateUnsavedResponses,
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
@@ -55,7 +57,6 @@ export const QuestionCard = ({
   const canRespond = isLive && !localPeerChoice;
   const startTime = useRef(Date.now());
   const isCorrectAnswer = checkCorrectAnswer(answer, localPeerChoice, type);
-
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
   const [showOptions, setShowOptions] = useState(true);
@@ -80,7 +81,15 @@ export const QuestionCard = ({
       options: Array.from(multipleOptionAnswer),
       duration: Date.now() - startTime.current,
     };
-    await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
+    if (roomState === HMSRoomState.Connected) {
+      await actions.interactivityCenter.addResponsesToPoll(pollID, [submittedResponse]);
+    } else {
+      updateUnsavedResponses(prev => {
+        const prevCopy = { ...prev };
+        prevCopy[index] = { pollID: pollID, ...submittedResponse };
+        return prevCopy;
+      });
+    }
     updateSavedResponses(prev => {
       const prevCopy = { ...prev };
       prevCopy[index] = { option: singleOptionAnswer, options: Array.from(multipleOptionAnswer) };
@@ -92,9 +101,11 @@ export const QuestionCard = ({
     index,
     singleOptionAnswer,
     multipleOptionAnswer,
+    roomState,
+    updateSavedResponses,
     actions.interactivityCenter,
     pollID,
-    updateSavedResponses,
+    updateUnsavedResponses,
   ]);
 
   return (
@@ -191,7 +202,9 @@ export const QuestionCard = ({
       </Box>
       {isLive && (
         <QuestionActions
-          disableVote={roomState !== HMSRoomState.Connected}
+          disableVote={
+            isNotNullish(localPeerResponse?.[index]?.option) || localPeerResponse?.[index]?.options.length > 0
+          }
           isValidVote={isValidVote}
           onVote={handleVote}
           response={localPeerChoice}
