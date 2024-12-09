@@ -80,6 +80,15 @@ export class HMSAudioTrack extends HMSTrack {
           // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
           // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
         } else {
+          HMSLogger.d(
+            '[HMSAudioTrack]',
+            this.logIdentifier,
+            'setting output device, label -',
+            device.label,
+            'deviceId - ',
+            device.deviceId,
+          );
+
           // @ts-ignore
           await this.audioElement?.setSinkId(device.deviceId);
         }
