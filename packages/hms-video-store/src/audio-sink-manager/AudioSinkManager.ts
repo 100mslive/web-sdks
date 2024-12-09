@@ -150,13 +150,16 @@ export class AudioSinkManager {
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         // try to wait for main execution to complete first
-        this.removeAudioElement(audioEl, track);
-        await this.handleTrackAdd({ track, peer, callListener: false });
-        if (!this.state.autoplayFailed) {
-          this.eventBus.analytics.publish(
-            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
-          );
-        }
+        // this.removeAudioElement(audioEl, track);
+        this.listener?.onError(ex);
+        await track.setVolume(0);
+        await track.setVolume(this.volume);
+        // await this.handleTrackAdd({ track, peer, callListener: false });
+        // if (!this.state.autoplayFailed) {
+        //   this.eventBus.analytics.publish(
+        //     AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+        //   );
+        // }
       }
     });
   };
