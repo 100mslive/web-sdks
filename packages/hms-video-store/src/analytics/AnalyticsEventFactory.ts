@@ -138,7 +138,7 @@ export default class AnalyticsEventFactory {
   static audioRecovered(message: string) {
     return new AnalyticsEvent({
       name: 'audioRecovered',
-      level: AnalyticsEventLevel.VERBOSE,
+      level: AnalyticsEventLevel.INFO,
       properties: {
         message,
       },
