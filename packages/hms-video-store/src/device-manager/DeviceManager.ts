@@ -106,7 +106,6 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
-      await this.autoSelectAudioOutput();
       this.startPollingForDevices();
     }
     this.logDevices('Init');
@@ -134,12 +133,12 @@ export class DeviceManager implements HMSDeviceManager {
   }
 
   cleanup() {
-    this.initialized = false;
-    this.earpieceSelected = false;
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    this.initialized = false;
+    this.earpieceSelected = false;
     this.audioInput = [];
     this.audioOutput = [];
     this.videoInput = [];
@@ -483,8 +482,8 @@ export class DeviceManager implements HMSDeviceManager {
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices) {
+  public autoSelectAudioOutput = async () => {
+    if ('ondevicechange' in navigator.mediaDevices || !this.audioInputChanged) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
