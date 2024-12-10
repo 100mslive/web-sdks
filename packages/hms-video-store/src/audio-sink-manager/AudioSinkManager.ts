@@ -139,6 +139,8 @@ export class AudioSinkManager {
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         await track.setVolume(0);
         await track.setVolume(this.volume);
+        HMSLogger.d(this.TAG, 'output device', track.getOutputDevice());
+        await this.playAudioFor(track);
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
         );
