@@ -9,6 +9,7 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { sleep } from '../utils/timer-utils';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -137,11 +138,15 @@ export class AudioSinkManager {
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
-        await track.setVolume(0);
-        await track.setVolume(this.volume);
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
-        );
+        // try to wait for main execution to complete first
+        this.removeAudioElement(audioEl, track);
+        await sleep(500);
+        await this.handleTrackAdd({ track, peer, callListener: false });
+        if (!this.state.autoplayFailed) {
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+          );
+        }
       }
     };
     track.setAudioElement(audioEl);
