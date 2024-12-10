@@ -41,7 +41,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     };
   }
 
-  protected sendEvent() {
+  sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeStats(this.toAnalytics()));
     super.sendEvent();
   }
