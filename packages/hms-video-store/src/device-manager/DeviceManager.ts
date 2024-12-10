@@ -106,7 +106,6 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
-      await this.autoSelectAudioOutput();
       this.startPollingForDevices();
     }
     this.logDevices('Init');
