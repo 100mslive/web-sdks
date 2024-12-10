@@ -148,7 +148,6 @@ export class AudioSinkManager {
     };
     track.setAudioElement(audioEl);
     await track.setVolume(this.volume);
-    await this.deviceManager.autoSelectAudioOutput();
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);
