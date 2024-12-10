@@ -666,6 +666,7 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
+      await this.deviceManager.autoSelectAudioOutput();
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
