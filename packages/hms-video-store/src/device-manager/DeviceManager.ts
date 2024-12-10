@@ -133,12 +133,12 @@ export class DeviceManager implements HMSDeviceManager {
   }
 
   cleanup() {
-    this.initialized = false;
-    this.earpieceSelected = false;
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    this.initialized = false;
+    this.earpieceSelected = false;
     this.audioInput = [];
     this.audioOutput = [];
     this.videoInput = [];
