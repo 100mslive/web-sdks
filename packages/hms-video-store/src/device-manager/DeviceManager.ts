@@ -483,7 +483,7 @@ export class DeviceManager implements HMSDeviceManager {
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
+  public autoSelectAudioOutput = async () => {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
