@@ -75,16 +75,18 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      this.unpauseAudioTracks();
+      HMSLogger.e(this.TAG, 'unpausing audio tracks', this.autoPausedTracks);
+      await this.unpauseAudioTracks();
+    } else {
+      HMSLogger.e(this.TAG, 'no audio tracks to unpause', this.autoPausedTracks);
     }
   }
 
   init(elementId?: string) {
     if (this.state.initialized || this.audioSink) {
-      HMSLogger.e(this.TAG, 'audio sink already initialized', this.audioSink);
+      HMSLogger.e(this.TAG, 'audio sink already initialized', this.audioSink, this.state);
       return;
     }
-    this.state.initialized = true;
     const audioSink = document.createElement('div');
     audioSink.id = `HMS-SDK-audio-sink-${uuid()}`;
     const userElement = elementId && document.getElementById(elementId);
@@ -92,7 +94,8 @@ export class AudioSinkManager {
     audioSinkParent.append(audioSink);
 
     this.audioSink = audioSink;
-    HMSLogger.d(this.TAG, 'audio sink created', this.audioSink);
+    this.state.initialized = true;
+    HMSLogger.e(this.TAG, 'audio sink created', this.audioSink, this.state);
   }
 
   cleanup() {
@@ -181,27 +184,34 @@ export class AudioSinkManager {
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
-    if (this.state.autoplayFailed === undefined) {
+    if (!this.state || this.state.autoplayFailed === undefined) {
       if (!this.state.autoplayCheckPromise) {
         // it's the first track, try to play it, that'll tell us whether autoplay is allowed
         this.state.autoplayCheckPromise = new Promise<void>(resolve => {
           this.playAudioFor(track).then(resolve);
         });
+      } else {
+        HMSLogger.e(this.TAG, 'autoplayCheckPromise already exists', this.state.autoplayCheckPromise);
       }
       // and wait for the result to be known
       await this.state.autoplayCheckPromise;
+    } else {
+      HMSLogger.e(this.TAG, 'autoplayFailed already known', this.state.autoplayFailed);
     }
     /**
      * Don't play the track if autoplay failed, add to paused list
      */
     if (this.state.autoplayFailed) {
       this.autoPausedTracks.add(track);
+      HMSLogger.e(this.TAG, 'autoplay failed, adding to paused list', this.autoPausedTracks);
       return;
+    } else {
+      HMSLogger.e(this.TAG, 'autoplay successful, playing track', track);
     }
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
     // this means the initial load
     if (!event.selection) {
       HMSLogger.d(this.TAG, 'device change called');
@@ -211,7 +221,7 @@ export class AudioSinkManager {
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    this.unpauseAudioTracks();
+    await this.unpauseAudioTracks();
   };
 
   /**
