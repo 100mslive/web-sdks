@@ -149,8 +149,9 @@ export class AudioSinkManager {
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl, track);
-        // await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
+      } else {
+        HMSLogger.e(this.TAG, 'going into else case, the error on audio element is: ', audioEl.error);
       }
     };
     track.setAudioElement(audioEl);
@@ -162,9 +163,17 @@ export class AudioSinkManager {
     } else {
       HMSLogger.e(this.TAG, 'audio sink not initialized', this.audioSink);
     }
-    this.outputDevice && (await track.setOutputDevice(this.outputDevice));
+    if (this.outputDevice) {
+      await track.setOutputDevice(this.outputDevice);
+    } else {
+      HMSLogger.e(this.TAG, 'output device not initialized', this.outputDevice);
+    }
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
-    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    if (callListener) {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    } else {
+      HMSLogger.e(this.TAG, 'listener set to false', this.listener);
+    }
     await this.handleAutoplayError(track);
   };
 
