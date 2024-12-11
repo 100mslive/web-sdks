@@ -16,7 +16,7 @@ export default abstract class HMSConnection {
   protected readonly signal: JsonRpcSignal;
 
   protected abstract readonly observer: IConnectionObserver;
-  abstract readonly nativeConnection: RTCPeerConnection;
+  abstract nativeConnection: RTCPeerConnection;
   /**
    * We keep a list of pending IceCandidates received
    * from the signalling server. When the peer-connection

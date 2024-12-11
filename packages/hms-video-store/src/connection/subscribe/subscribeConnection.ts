@@ -21,7 +21,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
-  readonly nativeConnection: RTCPeerConnection;
+  nativeConnection: RTCPeerConnection;
 
   private pendingMessageQueue: string[] = [];
 

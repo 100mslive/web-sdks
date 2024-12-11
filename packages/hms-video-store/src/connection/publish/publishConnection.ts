@@ -8,7 +8,7 @@ import { HMSConnectionRole } from '../model';
 export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
   protected readonly observer: IPublishConnectionObserver;
-  readonly nativeConnection: RTCPeerConnection;
+  nativeConnection: RTCPeerConnection;
   readonly channel: RTCDataChannel;
 
   constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
