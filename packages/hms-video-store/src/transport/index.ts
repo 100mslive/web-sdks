@@ -1308,9 +1308,6 @@ export default class HMSTransport {
     if (this.state === TransportState.Disconnected) {
       this.state = TransportState.Connecting;
       this.observer.onStateChange(this.state);
-      if (this.initConfig) {
-        this.initStatsAnalytics();
-      }
     }
   }
 
@@ -1343,10 +1340,6 @@ export default class HMSTransport {
         event = AnalyticsEventFactory.subscribeFail(error);
         break;
     }
-    this.publishStatsAnalytics?.cleanTrackAnalyticsAndCreateSample(true);
-    this.subscribeStatsAnalytics?.cleanTrackAnalyticsAndCreateSample(true);
-    this.publishStatsAnalytics?.stop();
-    this.subscribeStatsAnalytics?.stop();
     this.eventBus.analytics.publish(event!);
   }
 

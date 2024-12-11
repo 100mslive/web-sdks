@@ -41,7 +41,6 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
 
   protected sendEvent() {
     const track = Object.assign({}, this.trackAnalytics);
-    this.cleanTrackAnalyticsAndCreateSample(true);
     console.log(
       'publishSend',
       `${new Date()}`,

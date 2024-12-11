@@ -43,7 +43,9 @@ export abstract class BaseStatsAnalytics {
   }
 
   stop = () => {
+    console.log({ t: this });
     if (this.shouldSendEvent) {
+      this.createSampleFromTrackAnalytics();
       this.sendEvent();
     }
     this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate.bind(this));
@@ -79,6 +81,23 @@ export abstract class BaseStatsAnalytics {
         trackAnalytic.createSample();
       });
     }
+  }
+
+  cleanTrackAnalytics() {
+    // delete track analytics if track is not present in store and no samples are present
+    this.trackAnalytics.forEach(trackAnalytic => {
+      if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
+        console.log('delete track analytics', { samples: JSON.stringify(trackAnalytic.samples) });
+        this.trackAnalytics.delete(trackAnalytic.track_id);
+      }
+    });
+  }
+
+  createSampleFromTrackAnalytics() {
+    this.trackAnalytics?.forEach(trackAnalytic => {
+      console.log('createSample track', { samples: JSON.stringify(trackAnalytic.samples) });
+      trackAnalytic.createSample();
+    });
   }
 
   protected abstract toAnalytics(): PublishAnalyticPayload | SubscribeAnalyticPayload;
@@ -137,7 +156,8 @@ export abstract class RunningTrackAnalytics {
     if (this.tempStats.length === 0) {
       return;
     }
-
+    console.log(JSON.parse(JSON.stringify(this)));
+    console.log(JSON.stringify({ tempStats: this.tempStats }));
     this.samples.push(this.collateSample());
     this.prevLatestStat = this.getLatestStat();
     this.tempStats.length = 0;
