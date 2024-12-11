@@ -46,7 +46,6 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   polls: Record<string, HMSPoll>;
   /** @internal */
   hideLocalPeer: boolean;
-  /** @alpha */
   whiteboards: Record<string, HMSWhiteboard>;
 }
 
