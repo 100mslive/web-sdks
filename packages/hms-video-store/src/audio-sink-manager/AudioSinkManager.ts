@@ -250,6 +250,8 @@ export class AudioSinkManager {
         ex.addNativeError(error);
         this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
         this.eventBus.autoplayError.publish(ex);
+      } else {
+        HMSLogger.e(this.TAG, 'autoplay failed, but not a NotAllowedError', error);
       }
     }
   }
