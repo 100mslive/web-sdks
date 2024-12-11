@@ -10,7 +10,6 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { sleep } from '../utils/timer-utils';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -82,6 +81,7 @@ export class AudioSinkManager {
 
   init(elementId?: string) {
     if (this.state.initialized || this.audioSink) {
+      HMSLogger.e(this.TAG, 'audio sink already initialized', this.audioSink);
       return;
     }
     this.state.initialized = true;
@@ -144,12 +144,12 @@ export class AudioSinkManager {
     audioEl.onerror = async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
-        `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
+        `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code} ${audioEl?.error} ${track}`,
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl, track);
-        await sleep(500);
+        // await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
@@ -157,7 +157,11 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    this.audioSink?.append(audioEl);
+    if (this.audioSink) {
+      this.audioSink.append(audioEl);
+    } else {
+      HMSLogger.e(this.TAG, 'audio sink not initialized', this.audioSink);
+    }
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
@@ -262,6 +266,8 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
+    } else {
+      HMSLogger.e(this.TAG, 'Audio element not found', `${track}`);
     }
   };
 
