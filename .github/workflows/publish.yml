@@ -3,9 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       publishFlag:
-        description: 'which version to publish eg: alpha, beta, latest, experimental'
+        description: 'which version to publish eg: alpha, latest'
         required: true
         default: 'alpha'
+        type: choice
+        options:
+          - alpha
+          - latest
   repository_dispatch:
     types: [publish-command]
 
@@ -13,8 +17,8 @@ jobs:
   publish_packages:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
@@ -26,7 +30,7 @@ jobs:
       - name: Notify slack starting
         if: github.event.inputs.publishFlag == 'latest' && success()
         id: slack # IMPORTANT: reference this step ID value in future Slack steps
-        env: 
+        env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
@@ -64,8 +68,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
 
-      - name: Delay for 1 minute
-        run: sleep 60
+      - name: Delay for 15s
+        run: sleep 15
 
       - name: Notify slack success
         if: github.event.inputs.publishFlag == 'latest' && success()
@@ -88,6 +92,13 @@ jobs:
           channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
           status: Failed
           color: danger
+
+  run_api_reference:
+    needs: publish_packages
+    if: github.event.inputs.publishFlag == 'latest'
+    uses: ./.github/workflows/generate-docs.yml
+    secrets:
+      DOCKER_GIT_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN}}
 
   notify_100ms_links:
    runs-on: ubuntu-latest

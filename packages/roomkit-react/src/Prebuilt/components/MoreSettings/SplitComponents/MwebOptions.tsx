@@ -43,6 +43,8 @@ import { StopRecordingInSheet } from '../../Header/StreamActions';
 // @ts-ignore: No implicit any
 import SettingsModal from '../../Settings/SettingsModal';
 // @ts-ignore: No implicit any
+import { StatsForNerds } from '../../StatsForNerds';
+// @ts-ignore: No implicit any
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
@@ -94,6 +96,7 @@ export const MwebOptions = ({
   const [openModals, setOpenModals] = useState(new Set());
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
+  const [openStatsForNerdsSheet, setOpenStatsForNerdsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
@@ -269,7 +272,15 @@ export const MwebOptions = ({
               <SettingsIcon />
               <ActionTile.Title>Settings</ActionTile.Title>
             </ActionTile.Root>
-
+            <ActionTile.Root
+              onClick={() => {
+                setOpenStatsForNerdsSheet(true);
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <InfoIcon />
+              <ActionTile.Title>Stats For Nerds</ActionTile.Title>
+            </ActionTile.Root>
             {isConnected && permissions?.browserRecording ? (
               <ActionTile.Root
                 disabled={isHLSRunning}
@@ -316,6 +327,11 @@ export const MwebOptions = ({
         </Sheet.Content>
       </Sheet.Root>
       <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} screenType={screenType} />
+
+      {openStatsForNerdsSheet && (
+        <StatsForNerds open={openStatsForNerdsSheet} onOpenChange={setOpenStatsForNerdsSheet} />
+      )}
+
       {openModals.has(MODALS.MUTE_ALL) && (
         <MuteAllModal onOpenChange={(value: boolean) => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}

@@ -1,7 +1,28 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
-export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoRef) => {
+  const [width, setWidth] = useState('auto');
+
+  useEffect(() => {
+    const updatingVideoWidth = () => {
+      const videoEl = videoRef.current;
+      if (!videoEl) {
+        return;
+      }
+      if (videoEl.videoWidth > videoEl.videoHeight && width !== '100%') {
+        setWidth('100%');
+      }
+    };
+    const videoEl = videoRef.current;
+    if (!videoEl) {
+      return;
+    }
+    videoEl.addEventListener('loadedmetadata', updatingVideoWidth);
+    return () => {
+      videoEl.removeEventListener('loadedmetadata', updatingVideoWidth);
+    };
+  }, [videoRef, width]);
   return (
     <Flex
       data-testid="hms-video"
@@ -11,9 +32,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         justifyContent: 'center',
         transition: 'all 0.3s ease-in-out',
         '@md': {
-          height: 'auto',
           '& video': {
-            height: '$60 !important',
+            height: isFullScreen ? '' : '$60 !important',
           },
         },
         '& video::cue': {
@@ -41,7 +61,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         style={{
           margin: '0 auto',
           objectFit: 'contain',
-          width: 'auto',
+          width: width,
           height: '100%',
           maxWidth: '100%',
         }}

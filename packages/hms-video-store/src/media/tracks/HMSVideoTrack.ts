@@ -1,6 +1,8 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
+import HMSLogger from '../../utils/logger';
+import { isSafari } from '../../utils/support';
 import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
@@ -69,7 +71,6 @@ export class HMSVideoTrack extends HMSTrack {
       if (existingTrack?.id === track.id) {
         if (!existingTrack.muted && existingTrack.readyState === 'live') {
           // it's already attached, attaching again would just cause flickering
-          this.reTriggerPlay({ videoElement, stream: srcObject });
           return;
         } else {
           this.reduceSinkCount();
@@ -78,21 +79,23 @@ export class HMSVideoTrack extends HMSTrack {
         this.reduceSinkCount();
       }
     }
+
+    this.addPropertiesToElement(videoElement);
     const stream = new MediaStream([track]);
     videoElement.srcObject = stream;
-    this.reTriggerPlay({ videoElement, stream });
+    this.reTriggerPlay({ videoElement });
     this.sinkCount++;
   }
 
-  private reTriggerPlay = ({ videoElement, stream }: { videoElement: HTMLVideoElement; stream: MediaStream }) => {
+  handleTrackUnmute = () => {
+    this.getSinks().forEach(videoElement => this.reTriggerPlay({ videoElement }));
+  };
+
+  private reTriggerPlay = ({ videoElement }: { videoElement: HTMLVideoElement }) => {
     setTimeout(() => {
-      if (videoElement.paused) {
-        // This is needed for safari and firefox to work properly
-        videoElement.srcObject = stream;
-        videoElement.play().catch(() => {
-          //do nothing
-        });
-      }
+      videoElement.play().catch((e: Error) => {
+        HMSLogger.w('[HMSVideoTrack]', 'failed to play', e.message);
+      });
     }, 0);
   };
 
@@ -100,5 +103,14 @@ export class HMSVideoTrack extends HMSTrack {
     if (this.sinkCount > 0) {
       this.sinkCount--;
     }
+  }
+
+  private addPropertiesToElement(element: HTMLVideoElement) {
+    if (!isSafari) {
+      element.autoplay = true;
+    }
+    element.playsInline = true;
+    element.muted = true;
+    element.controls = false;
   }
 }

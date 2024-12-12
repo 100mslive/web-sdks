@@ -135,6 +135,16 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static audioRecovered(message: string) {
+    return new AnalyticsEvent({
+      name: 'audioRecovered',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        message,
+      },
+    });
+  }
+
   static deviceChange({
     isUserSelection,
     selection,
@@ -256,6 +266,29 @@ export default class AnalyticsEventFactory {
       level: AnalyticsEventLevel.INFO,
     });
   }
+
+  static interruption({
+    started,
+    type,
+    reason,
+    deviceInfo,
+  }: {
+    started: boolean;
+    type: string;
+    reason: string;
+    deviceInfo: Partial<MediaDeviceInfo>;
+  }) {
+    return new AnalyticsEvent({
+      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        reason,
+        type,
+        ...deviceInfo,
+      },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

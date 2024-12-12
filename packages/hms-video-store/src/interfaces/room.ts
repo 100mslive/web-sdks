@@ -33,13 +33,9 @@ export interface HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
-  /**
-   * @alpha
-   */
   isEffectsEnabled?: boolean;
-  /**
-   * @alpha
-   */
+  disableNoneLayerRequest?: boolean;
+  isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
@@ -84,9 +80,6 @@ export interface HMSHLSRecording {
 
 export interface HMSRTMP {
   running: boolean;
-  /**
-   * @alpha
-   **/
   startedAt?: Date;
   state?: HMSStreamingState;
   error?: HMSException;

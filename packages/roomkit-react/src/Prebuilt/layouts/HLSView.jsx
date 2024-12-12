@@ -46,7 +46,6 @@ const toastMap = {};
 const ToggleChat = ({ isFullScreen = false }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
-  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const showChat = !!elements?.chat;
   const isMobile = useMedia(config.media.md);
   const hmsActions = useHMSActions();
@@ -57,7 +56,7 @@ const ToggleChat = ({ isFullScreen = false }) => {
         hmsActions.setAppData(APP_DATA.sidePane, '');
       })
       .with({ isMobile: true, showChat: true, sidepane: P.when(value => !value) }, () => {
-        toggleChat();
+        hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.CHAT);
       })
       .with({ showChat: false, isMobile: true, sidepane: SIDE_PANE_OPTIONS.CHAT }, () => {
         hmsActions.setAppData(APP_DATA.sidePane, '');
@@ -65,7 +64,7 @@ const ToggleChat = ({ isFullScreen = false }) => {
       .otherwise(() => {
         //do nothing
       });
-  }, [sidepane, isMobile, toggleChat, showChat, hmsActions, isFullScreen]);
+  }, [sidepane, isMobile, showChat, hmsActions, isFullScreen]);
   return null;
 };
 const HLSView = () => {
@@ -286,6 +285,7 @@ const HLSView = () => {
         hlsPlayer.reset();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hlsUrl, vanillaStore, hmsActions]);
 
   /**
@@ -485,11 +485,6 @@ const HLSView = () => {
       css={{
         flex: isLandscape ? '2 1 0' : '1 1 0',
         transition: 'all 0.3s ease-in-out',
-        '&:fullscreen': {
-          '& video': {
-            height: 'unset !important',
-          },
-        },
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (
@@ -541,6 +536,7 @@ const HLSView = () => {
             onMouseMove={onHoverHandler}
             onMouseLeave={onHoverHandler}
             onClick={onClickHandler}
+            isFullScreen={isFullScreen}
             onDoubleClick={e => {
               onDoubleClickHandler(e);
             }}
@@ -728,6 +724,7 @@ const HLSView = () => {
                           selection={currentSelectedQuality}
                           onQualityChange={handleQuality}
                           isAuto={isUserSelectedAuto}
+                          containerRef={hlsViewRef.current}
                         />
                       ) : null}
                       {isFullScreenSupported ? (

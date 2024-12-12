@@ -30,6 +30,8 @@ export class EventBus {
     HMSEvents.LOCAL_VIDEO_ENABLED,
     this.eventEmitter,
   );
+  readonly localVideoUnmutedNatively = new HMSInternalEvent(HMSEvents.LOCAL_VIDEO_UNMUTED_NATIVELY, this.eventEmitter);
+  readonly localAudioUnmutedNatively = new HMSInternalEvent(HMSEvents.LOCAL_AUDIO_UNMUTED_NATIVELY, this.eventEmitter);
 
   /**
    * Emitter which processes raw RTC stats from rtcStatsUpdate and calls client callback

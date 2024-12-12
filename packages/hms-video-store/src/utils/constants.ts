@@ -3,13 +3,12 @@ export const API_DATA_CHANNEL = 'ion-sfu';
 export const ANALYTICS_BUFFER_SIZE = 100;
 
 /**
- * Maximum number of retries that transport-layer will try
+ * Maximum time that transport-layer will try
  * before giving up on the connection and returning a failure
  *
  * Refer https://100ms.atlassian.net/browse/HMS-2369
  */
-export const MAX_TRANSPORT_RETRIES = 5;
-export const MAX_TRANSPORT_RETRY_DELAY = 60;
+export const MAX_TRANSPORT_RETRY_TIME = 60_000;
 
 export const DEFAULT_SIGNAL_PING_TIMEOUT = 12_000;
 export const DEFAULT_SIGNAL_PING_INTERVAL = 3_000;
@@ -40,6 +39,8 @@ export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
   LOCAL_VIDEO_ENABLED: 'local-video-enabled',
+  LOCAL_VIDEO_UNMUTED_NATIVELY: 'local-video-unmuted-natively',
+  LOCAL_AUDIO_UNMUTED_NATIVELY: 'local-audio-unmuted-natively',
   STATS_UPDATE: 'stats-update', // emitted by HMSWebrtcInternals
   RTC_STATS_UPDATE: 'rtc-stats-update', // emitted by RTCStatsMonitor
   TRACK_DEGRADED: 'track-degraded',
@@ -59,7 +60,7 @@ export const HMSEvents = {
 
 export const PROTOCOL_VERSION = '2.5';
 
-export const PROTOCOL_SPEC = '20240521';
+export const PROTOCOL_SPEC = '20240720';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
 

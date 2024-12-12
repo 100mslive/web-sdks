@@ -7,7 +7,7 @@ type HMSPrebuiltContextType = {
   userName?: string;
   userId?: string;
   containerSelector: string;
-  endpoints?: Record<string, string>;
+  endpoints?: Record<string, string | undefined>;
   onLeave?: () => void;
   onJoin?: () => void;
 };

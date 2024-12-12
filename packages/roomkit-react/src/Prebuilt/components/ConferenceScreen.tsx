@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { v4 as uuid } from 'uuid';
 import {
   HMSRoomState,
-  selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
   useAwayNotifications,
@@ -34,7 +33,7 @@ import {
 // @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
-import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
+import { APP_DATA } from '../common/constants';
 
 export const ConferenceScreen = () => {
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
@@ -43,13 +42,11 @@ export const ConferenceScreen = () => {
   const roomState = useHMSStore(selectRoomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const [hideControls, setHideControls] = useState(false);
-  const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
+
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef<HTMLDivElement | null>(null);
   const footerRef = useRef<HTMLDivElement | null>(null);
-  const isMobileDevice = isAndroid || isIOS || isIPadOS;
-  const dropdownListRef = useRef<string[]>();
+
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const { requestPermission } = useAwayNotifications();
 
@@ -59,28 +56,6 @@ export const ConferenceScreen = () => {
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
-
-  const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
-      setHideControls(value => !value);
-    }
-  };
-
-  useEffect(() => {
-    let timeout: undefined | ReturnType<typeof setTimeout>;
-    dropdownListRef.current = dropdownList || [];
-    if (dropdownListRef.current && dropdownListRef.current.length === 0) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (dropdownListRef.current && dropdownListRef.current.length === 0) {
-          setHideControls(isMobileDevice);
-        }
-      }, 5000);
-    }
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
     if (
@@ -95,6 +70,7 @@ export const ConferenceScreen = () => {
           userName: userName || uuid(),
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
+          rememberDeviceSelection: true,
           settings: {
             isAudioMuted: !isPreviewScreenEnabled,
             isVideoMuted: !isPreviewScreenEnabled,
@@ -127,8 +103,6 @@ export const ConferenceScreen = () => {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
-  const hideControlsForStreaming = isMwebHLSStream ? true : hideControls;
-
   return (
     <>
       {isHLSStarted ? (
@@ -143,7 +117,7 @@ export const ConferenceScreen = () => {
             css={{
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
-              marginTop: hideControlsForStreaming ? `-${headerRef.current?.clientHeight}px` : 'none',
+              marginTop: isMwebHLSStream ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
                 h: '$17',
               },
@@ -169,13 +143,12 @@ export const ConferenceScreen = () => {
           }}
           id="conferencing"
           data-testid="conferencing"
-          onClick={toggleControls}
         >
           {screenProps.elements ? (
             <VideoStreamingSection
               screenType={screenProps.screenType}
               elements={screenProps.elements}
-              hideControls={hideControlsForStreaming}
+              hideControls={isMwebHLSStream}
             />
           ) : null}
         </Box>
@@ -187,7 +160,7 @@ export const ConferenceScreen = () => {
               maxHeight: '$24',
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
-              marginBottom: hideControlsForStreaming ? `-${footerRef.current?.clientHeight}px` : undefined,
+              marginBottom: isMwebHLSStream ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',

@@ -8,7 +8,7 @@ import HMSLogger from '../../utils/logger';
 export class HMSMediaStreamPluginsManager {
   private readonly TAG = '[MediaStreamPluginsManager]';
   private analytics: VideoPluginsAnalytics;
-  private plugins: Set<HMSMediaStreamPlugin>;
+  readonly plugins: Set<HMSMediaStreamPlugin>;
   private room?: Room;
 
   constructor(eventBus: EventBus, room?: Room) {
@@ -62,5 +62,9 @@ export class HMSMediaStreamPluginsManager {
 
   getPlugins(): string[] {
     return Array.from(this.plugins).map(plugin => plugin.getName());
+  }
+
+  async cleanup() {
+    this.removePlugins(Array.from(this.plugins));
   }
 }

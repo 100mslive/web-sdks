@@ -1,16 +1,20 @@
 name: Update API Reference
 on:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      DOCKER_GIT_TOKEN:
+        required: true
 
 jobs:
   generate_api_reference:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: 'yarn'
@@ -30,7 +34,7 @@ jobs:
         run: yarn docs
 
       - name: checkout 100ms-docs
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.DOCKER_GIT_TOKEN }}
           repository: 100mslive/100ms-docs
@@ -48,9 +52,9 @@ jobs:
           rm -r v2
           mv docs v2
           mv react/docs v2/react-hooks
-      
+
       - name: Create PR
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           path: 100ms-docs
           token: ${{ secrets.DOCKER_GIT_TOKEN }}

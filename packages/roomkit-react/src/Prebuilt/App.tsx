@@ -1,11 +1,13 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
@@ -27,7 +29,6 @@ import { PIPProvider } from './components/PIP/PIPProvider';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
@@ -130,7 +131,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(() => {
       // leave room when component unmounts
       return () => {
-        VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
       };
     }, []);
@@ -140,11 +140,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           init: string;
           tokenByRoomCode: string;
           roomLayout: string;
+          event: string;
         }
       | undefined;
-    const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
-    const initEndpoint: string = endpointsObj?.init || '';
-    const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
+    const tokenByRoomCodeEndpoint = endpointsObj?.tokenByRoomCode;
+    const initEndpoint = endpointsObj?.init;
+    const eventEndpoint = endpointsObj?.event;
+    const roomLayoutEndpoint = endpointsObj?.roomLayout;
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -182,6 +184,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
+              event: eventEndpoint,
             },
           }}
         >
@@ -206,15 +209,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
                   return (
                     <HMSThemeProvider
-                      // issue is with stichtes caching the theme using the theme name / class
+                      // issue is with stitches caching the theme using the theme name / class
                       // no updates to the themes are fired if the name is same.
                       // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}
                       theme={{
-                        //@ts-ignore: Prebuilt theme to match stiches theme
+                        //@ts-ignore: Prebuilt theme to match stitches theme
                         colors: theme.palette,
                         fonts: {
-                          //@ts-ignore: font list to match token types of stiches
+                          //@ts-ignore: font list to match token types of stitches
                           sans: fontFamily,
                         },
                       }}
@@ -285,7 +288,7 @@ function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
 }: {
-  authTokenByRoomCodeEndpoint: string;
+  authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
@@ -303,7 +306,11 @@ function AppRoutes({
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        <AuthToken
+          authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+          defaultAuthToken={defaultAuthToken}
+          activeState={activeState}
+        />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
     </AppStateContext.Provider>

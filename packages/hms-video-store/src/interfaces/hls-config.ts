@@ -26,8 +26,7 @@ export interface HLSMeetingURLVariant {
    */
   meetingURL: string;
   /**
-   * additional metadata for this URL for example - landscape/portrait, the field is not currently supported
-   * @alpha
+   * additional metadata for this URL for example - landscape/portrait
    */
   metadata?: string;
 }

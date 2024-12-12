@@ -41,7 +41,7 @@ import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { getDragClassName } from './utils';
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, isIOS, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
 export const isSameTile = ({
   trackId,
@@ -317,7 +317,7 @@ export const TileMenuContent = ({
         </StyledMenuTile.ItemButton>
       ) : null}
 
-      {canChangeRole && roles.length > 1 ? (
+      {!isScreenshare && canChangeRole && roles.length > 1 ? (
         <StyledMenuTile.ItemButton
           className={dragClassName}
           css={spacingCSS}
@@ -332,7 +332,7 @@ export const TileMenuContent = ({
         </StyledMenuTile.ItemButton>
       ) : null}
 
-      {audioTrackID ? (
+      {!isIOS && audioTrackID ? (
         <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
           <Flex align="center" gap={1}>
             <SpeakerIcon height={20} width={20} />

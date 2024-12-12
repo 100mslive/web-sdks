@@ -15,13 +15,9 @@ export default class Room implements HMSRoom {
   max_size?: number;
   large_room_optimization?: boolean;
   transcriptions?: HMSTranscriptionInfo[] = [];
-  /**
-   * @alpha
-   */
   isEffectsEnabled?: boolean;
-  /**
-   * @alpha
-   */
+  disableNoneLayerRequest?: boolean;
+  isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;

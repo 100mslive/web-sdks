@@ -58,7 +58,9 @@ export enum InitFlags {
   FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE = 'disableVideoTrackAutoUnsubscribe',
   FLAG_WHITEBOARD_ENABLED = 'whiteboardEnabled',
   FLAG_EFFECTS_SDK_ENABLED = 'effectsSDKEnabled',
+  FLAG_VB_ENABLED = 'vb',
   FLAG_HIPAA_ENABLED = 'hipaa',
   FLAG_NOISE_CANCELLATION = 'noiseCancellation',
   FLAG_SCALE_SCREENSHARE_BASED_ON_PIXELS = 'scaleScreenshareBasedOnPixels',
+  FLAG_DISABLE_NONE_LAYER_REQUEST = 'disableNoneLayerRequest',
 }

@@ -5,11 +5,11 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
-import { isMobile } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { sleep } from '../utils/timer-utils';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -39,17 +39,14 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private timer: ReturnType<typeof setInterval> | null = null;
-  private autoUnpauseTimer: ReturnType<typeof setInterval> | null = null;
-  private earpieceSelected = false;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
-    this.startPollingForDevices();
-    this.startPollingToCheckPausedAudio();
+    this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseAudioTracks);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -75,18 +72,15 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      HMSLogger.e(this.TAG, 'unpausing audio tracks', this.autoPausedTracks);
-      await this.unpauseAudioTracks();
-    } else {
-      HMSLogger.e(this.TAG, 'no audio tracks to unpause', this.autoPausedTracks);
+      this.unpauseAudioTracks();
     }
   }
 
   init(elementId?: string) {
     if (this.state.initialized || this.audioSink) {
-      HMSLogger.e(this.TAG, 'audio sink already initialized', this.audioSink, this.state);
       return;
     }
+    this.state.initialized = true;
     const audioSink = document.createElement('div');
     audioSink.id = `HMS-SDK-audio-sink-${uuid()}`;
     const userElement = elementId && document.getElementById(elementId);
@@ -94,30 +88,23 @@ export class AudioSinkManager {
     audioSinkParent.append(audioSink);
 
     this.audioSink = audioSink;
-    this.state.initialized = true;
-    HMSLogger.e(this.TAG, 'audio sink created', this.audioSink, this.state);
+    HMSLogger.d(this.TAG, 'audio sink created', this.audioSink);
   }
 
   cleanup() {
     this.audioSink?.remove();
     this.audioSink = undefined;
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
-    if (this.autoUnpauseTimer) {
-      clearInterval(this.autoUnpauseTimer);
-      this.autoUnpauseTimer = null;
-    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
+    this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
+    this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
 
-  private handleAudioPaused = (event: any) => {
+  private handleAudioPaused = async (event: any) => {
     // this means the audio paused because of external factors(headset removal, incoming phone call)
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
@@ -147,36 +134,29 @@ export class AudioSinkManager {
     audioEl.onerror = async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
-        `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code} ${audioEl?.error} ${track}`,
+        `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
       );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
+        // try to wait for main execution to complete first
         this.removeAudioElement(audioEl, track);
+        await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
-      } else {
-        HMSLogger.e(this.TAG, 'going into else case, the error on audio element is: ', audioEl.error);
+        if (!this.state.autoplayFailed) {
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.audioRecovered('Audio recovered after media decode error'),
+          );
+        }
       }
     };
     track.setAudioElement(audioEl);
     await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    if (this.audioSink) {
-      this.audioSink.append(audioEl);
-    } else {
-      HMSLogger.e(this.TAG, 'audio sink not initialized', this.audioSink);
-    }
-    if (this.outputDevice) {
-      await track.setOutputDevice(this.outputDevice);
-    } else {
-      HMSLogger.e(this.TAG, 'output device not initialized', this.outputDevice);
-    }
+    this.audioSink?.append(audioEl);
+    this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
-    if (callListener) {
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
-    } else {
-      HMSLogger.e(this.TAG, 'listener set to false', this.listener);
-    }
+    callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
   };
 
@@ -184,44 +164,32 @@ export class AudioSinkManager {
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
-    if (!this.state || this.state.autoplayFailed === undefined) {
+    if (this.state.autoplayFailed === undefined) {
       if (!this.state.autoplayCheckPromise) {
         // it's the first track, try to play it, that'll tell us whether autoplay is allowed
         this.state.autoplayCheckPromise = new Promise<void>(resolve => {
           this.playAudioFor(track).then(resolve);
         });
-      } else {
-        HMSLogger.e(this.TAG, 'autoplayCheckPromise already exists', this.state.autoplayCheckPromise);
       }
       // and wait for the result to be known
       await this.state.autoplayCheckPromise;
-    } else {
-      HMSLogger.e(this.TAG, 'autoplayFailed already known', this.state.autoplayFailed);
     }
     /**
      * Don't play the track if autoplay failed, add to paused list
      */
     if (this.state.autoplayFailed) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'autoplay failed, adding to paused list', this.autoPausedTracks);
       return;
-    } else {
-      HMSLogger.e(this.TAG, 'autoplay successful, playing track', track);
     }
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
-    // this means the initial load
-    if (!event.selection) {
-      HMSLogger.d(this.TAG, 'device change called');
-      this.autoSelectAudioOutput();
-    }
+  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    await this.unpauseAudioTracks();
+    this.unpauseAudioTracks();
   };
 
   /**
@@ -250,8 +218,6 @@ export class AudioSinkManager {
         ex.addNativeError(error);
         this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
         this.eventBus.autoplayError.publish(ex);
-      } else {
-        HMSLogger.e(this.TAG, 'autoplay failed, but not a NotAllowedError', error);
       }
     }
   }
@@ -287,76 +253,6 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
-    } else {
-      HMSLogger.e(this.TAG, 'Audio element not found', `${track}`);
-    }
-  };
-
-  private startPollingToCheckPausedAudio = () => {
-    if (isMobile()) {
-      this.autoUnpauseTimer = setInterval(() => {
-        this.unpauseAudioTracks();
-      }, 5000);
-    }
-  };
-
-  private startPollingForDevices = () => {
-    // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    this.timer = setInterval(() => {
-      (async () => {
-        await this.deviceManager.init(true, false);
-        await this.autoSelectAudioOutput();
-        this.unpauseAudioTracks();
-      })();
-    }, 5000);
-  };
-
-  /**
-   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
-   */
-  // eslint-disable-next-line complexity
-  private autoSelectAudioOutput = async () => {
-    if ('ondevicechange' in navigator.mediaDevices) {
-      return;
-    }
-    let bluetoothDevice: InputDeviceInfo | null = null;
-    let speakerPhone: InputDeviceInfo | null = null;
-    let wired: InputDeviceInfo | null = null;
-    let earpiece: InputDeviceInfo | null = null;
-
-    for (const device of this.deviceManager.audioInput) {
-      const label = device.label.toLowerCase();
-      if (label.includes('speakerphone')) {
-        speakerPhone = device;
-      } else if (label.includes('wired')) {
-        wired = device;
-      } else if (label.includes('bluetooth')) {
-        bluetoothDevice = device;
-      } else if (label.includes('earpiece')) {
-        earpiece = device;
-      }
-    }
-    const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-    if (localAudioTrack && earpiece) {
-      const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-      HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
-      // already selected appropriate device
-      if (localAudioTrack.settings.deviceId === externalDeviceID) {
-        return;
-      }
-      if (!this.earpieceSelected) {
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        this.earpieceSelected = true;
-      }
-      await localAudioTrack.setSettings(
-        {
-          deviceId: externalDeviceID,
-        },
-        true,
-      );
     }
   };
 }

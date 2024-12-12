@@ -16,10 +16,12 @@ export interface ITrackAudioLevelUpdate {
   audioLevel: number;
 }
 
+// Audio level algorithm referenced from official MDN example - https://github.com/mdn/dom-examples/tree/main/media/web-dictaphone
 export class TrackAudioLevelMonitor {
   private readonly TAG = '[TrackAudioLevelMonitor]';
   private audioLevel = 0;
   private analyserNode?: AnalyserNode;
+  private dataArray?: Uint8Array;
   private isMonitored = false;
   /** Frequency of polling audio level from track */
   private interval = 100;
@@ -35,6 +37,8 @@ export class TrackAudioLevelMonitor {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
+      const bufferLength = this.analyserNode.frequencyBinCount;
+      this.dataArray = new Uint8Array(bufferLength);
     } catch (ex) {
       HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
     }
@@ -113,16 +117,15 @@ export class TrackAudioLevelMonitor {
   }
 
   private calculateAudioLevel() {
-    if (!this.analyserNode) {
+    if (!this.analyserNode || !this.dataArray) {
       HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
 
-    const data = new Uint8Array(this.analyserNode.fftSize);
-    this.analyserNode.getByteTimeDomainData(data);
+    this.analyserNode.getByteTimeDomainData(this.dataArray);
     const lowest = 0.009;
     let max = lowest;
-    for (const frequency of data) {
+    for (const frequency of this.dataArray) {
       max = Math.max(max, (frequency - 128) / 128);
     }
     const normalized = (Math.log(lowest) - Math.log(max)) / Math.log(lowest);
@@ -130,23 +133,23 @@ export class TrackAudioLevelMonitor {
     return percent;
   }
 
-  private isSilentThisInstant() {
-    if (!this.analyserNode) {
+  isSilentThisInstant() {
+    if (!this.analyserNode || !this.dataArray) {
       HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
 
-    const data = new Uint8Array(this.analyserNode.fftSize);
-    this.analyserNode.getByteTimeDomainData(data);
+    this.analyserNode.getByteTimeDomainData(this.dataArray);
 
     // For absolute silence(in case of mic/software failures), all frequencies are 128 or 0.
-    return !data.some(frequency => frequency !== 128 && frequency !== 0);
+    return this.dataArray.every(frequency => frequency === 128 || frequency === 0);
   }
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
     const audioContext = HMSAudioContextHandler.getAudioContext();
-    const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
     source.connect(analyser);
     return analyser;
   }
