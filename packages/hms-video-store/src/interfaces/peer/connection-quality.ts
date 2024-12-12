@@ -5,7 +5,6 @@
  * experience in the session.
  * Note that this is not an absolute measure, a bandwidth of 1 MBPs may be good
  * for a 1:1 call but poor for a large call.
- * @alpha
  */
 export interface HMSConnectionQuality {
   peerID: string;
