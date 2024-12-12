@@ -10,7 +10,7 @@ This monorepo contains all the packages required to integrate 100ms on the web.
 
 ## What is included?
 
-The packages folder contains all the SDK's of 100ms. Here is a brief overview of them:
+The packages folder contains all the SDK's of 100ms. Here is a brief overview:
 
 | Directory | Package | Description | Link |
 |--|--|--|--|
