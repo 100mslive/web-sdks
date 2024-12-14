@@ -469,6 +469,10 @@ export class DeviceManager implements HMSDeviceManager {
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
+    if (!this.hasMicrophonePermission) {
+      HMSLogger.d(this.TAG, `No permissions given for microphone, not polling`);
+      return;
+    }
     this.timer = setTimeout(() => {
       (async () => {
         await this.enumerateDevices();
@@ -485,6 +489,10 @@ export class DeviceManager implements HMSDeviceManager {
   public autoSelectAudioOutput = async () => {
     // do this only after join so the earpiece would be selected at the right time
     if ('ondevicechange' in navigator.mediaDevices || !this.store.getLocalPeer()?.joinedAt) {
+      return;
+    }
+    if (!this.hasMicrophonePermission) {
+      HMSLogger.w(this.TAG, `No permissions given, can't select audio output`);
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
