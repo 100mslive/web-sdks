@@ -11,12 +11,27 @@ import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
 const TAG = '[HMSConnection]';
 
+/**
+ * Abstract base class that handles WebRTC peer connections for 100ms SDK
+ * Provides common functionality for both publishing (sending) and subscribing (receiving) connections
+ */
 export default abstract class HMSConnection {
+  /**
+   * Indicates whether this connection is for publishing or subscribing media
+   */
   readonly role: HMSConnectionRole;
+
   protected readonly signal: JsonRpcSignal;
 
   protected abstract readonly observer: IConnectionObserver;
+
+  /**
+   * The native WebRTC peer connection object
+   * @abstract
+   * @type {RTCPeerConnection}
+   */
   abstract nativeConnection: RTCPeerConnection;
+
   /**
    * We keep a list of pending IceCandidates received
    * from the signalling server. When the peer-connection
@@ -131,7 +146,6 @@ export default abstract class HMSConnection {
           const iceTransport = transmitter.transport.iceTransport;
 
           const handleSelectedCandidate = () => {
-            // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
               // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
@@ -147,9 +161,7 @@ export default abstract class HMSConnection {
             }
           };
 
-          // @ts-expect-error
           if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
-            // @ts-expect-error
             iceTransport.onselectedcandidatepairchange = handleSelectedCandidate;
           }
           handleSelectedCandidate();

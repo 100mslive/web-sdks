@@ -5,10 +5,23 @@ import HMSLogger from '../../utils/logger';
 import HMSConnection from '../HMSConnection';
 import { HMSConnectionRole } from '../model';
 
+/**
+ * Represents a connection for publishing media to the signalling server.
+ * Extends the HMSConnection class to provide additional functionality for publishing media
+ * @extends {HMSConnection}
+ */
 export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
   protected readonly observer: IPublishConnectionObserver;
+  /**
+   * The native WebRTC peer connection object
+   * @type {RTCPeerConnection}
+   */
   nativeConnection: RTCPeerConnection;
+  /**
+   * The data channel used for communication with the signalling server
+   * @type {RTCDataChannel}
+   */
   readonly channel: RTCDataChannel;
 
   constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
