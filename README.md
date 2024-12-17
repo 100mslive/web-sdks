@@ -31,14 +31,14 @@ The 100ms SDK gives you everything you need to build scalable, high-quality live
 
 **There are two ways you can add 100ms to your apps:**
 
-1. ## Custom UI
+## 1. Custom UI
    - 100ms SDKs are powerful and highly extensible to build and support all custom experiences and UI.
    - **Related packages include:** `@100mslive/react-sdk`, `@100mslive/hms-video-store` and `@100mslive/react-icons`.
    - Get started with integrating the SDK using the [How to Guide](https://www.100ms.live/docs/javascript/v2/how-to-guides/install-the-sdk/integration).
 
 > Navigate to `react-sdk` for the base React Hooks and some commonly used functionalities by clicking [here](./packages/react-sdk).
 
-2.  ## 100ms Prebuilt
+## 2. 100ms Prebuilt
     - 100ms Prebuilt is a high-level abstraction with no-code customization that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
     - **Related packages include:** `roomkit-react` and `roomkit-web`.
     - Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart).
