@@ -15,7 +15,7 @@ export interface HMSSessionFeedback {
 
 export interface HMSSessionInfo {
   peer: HMSSessionPeerInfo;
-  agent: string;
+  agent?: string;
   device_id: string;
   cluster: HMSSessionCluster;
   timestamp: number;

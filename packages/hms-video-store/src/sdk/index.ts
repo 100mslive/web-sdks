@@ -450,7 +450,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
-    this.setUpPreview(config, listener);
+    await this.setUpPreview(config, listener);
 
     let initSuccessful = false;
     let networkTestFinished = false;
@@ -620,7 +620,7 @@ export class HMSSdk implements HMSInterface {
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
-    this.store.createAndSetUserAgent(this.frameworkInfo);
+    await this.store.createAndSetUserAgent(this.frameworkInfo);
     HMSAudioContextHandler.resumeContext();
     // acquire screen lock to stay awake while in call
     const storeConfig = this.store.getConfig();
@@ -1464,15 +1464,17 @@ export class HMSSdk implements HMSInterface {
    * Init store and other managers, setup listeners, create local peer, room
    * @param {HMSConfig} config
    * @param {HMSPreviewListener} listener
+   * @returns {Promise<void>} - resolves when store is initialised
    */
-  private setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
+  private async setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void> {
+    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
-    this.store.createAndSetUserAgent(this.frameworkInfo);
+    await this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
   }
 
