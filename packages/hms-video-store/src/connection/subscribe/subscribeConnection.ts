@@ -15,13 +15,22 @@ import HMSConnection from '../HMSConnection';
 import HMSDataChannel from '../HMSDataChannel';
 import { HMSConnectionRole } from '../model';
 
+/**
+ * Represents a connection for subscribing to media from the signalling server.
+ * Extends the HMSConnection class to provide additional functionality for subscribing to media
+ * @extends {HMSConnection}
+ */
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
-  readonly nativeConnection: RTCPeerConnection;
+  /**
+   * The native WebRTC peer connection object
+   * @type {RTCPeerConnection}
+   */
+  nativeConnection: RTCPeerConnection;
 
   private pendingMessageQueue: string[] = [];
 

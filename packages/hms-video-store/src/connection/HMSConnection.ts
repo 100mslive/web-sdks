@@ -11,12 +11,27 @@ import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
 const TAG = '[HMSConnection]';
 
+/**
+ * Abstract base class that handles WebRTC peer connections for 100ms SDK
+ * Provides common functionality for both publishing (sending) and subscribing (receiving) connections
+ */
 export default abstract class HMSConnection {
+  /**
+   * Indicates whether this connection is for publishing or subscribing media
+   */
   readonly role: HMSConnectionRole;
+
   protected readonly signal: JsonRpcSignal;
 
   protected abstract readonly observer: IConnectionObserver;
-  abstract readonly nativeConnection: RTCPeerConnection;
+
+  /**
+   * The native WebRTC peer connection object
+   * @abstract
+   * @type {RTCPeerConnection}
+   */
+  abstract nativeConnection: RTCPeerConnection;
+
   /**
    * We keep a list of pending IceCandidates received
    * from the signalling server. When the peer-connection
