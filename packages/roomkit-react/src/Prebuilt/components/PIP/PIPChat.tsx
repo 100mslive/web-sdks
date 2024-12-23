@@ -72,7 +72,7 @@ export const PIPChat = () => {
   ]);
 
   return (
-    <div style={{ height: '100%' }}>
+    <div style={{ height: '100vh' }}>
       <Box
         id="chat-container"
         css={{

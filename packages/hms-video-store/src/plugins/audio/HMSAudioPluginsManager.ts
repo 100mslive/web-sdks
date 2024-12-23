@@ -5,6 +5,8 @@ import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioContextHandler } from '../../internal';
+import { HMSAudioTrackSettingsBuilder } from '../../media/settings';
+import { standardMediaConstraints } from '../../media/settings/constants';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
@@ -70,7 +72,7 @@ export class HMSAudioPluginsManager {
     }
 
     switch (plugin.getName()) {
-      case 'HMSKrispPlugin':
+      case 'HMSKrispPlugin': {
         if (!this.room?.isNoiseCancellationEnabled) {
           const errorMessage = 'Krisp Noise Cancellation is not enabled for this room';
           if (this.pluginsMap.size === 0) {
@@ -81,7 +83,23 @@ export class HMSAudioPluginsManager {
           }
         }
         this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
+        const { settings } = this.hmsTrack;
+        const newAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
+          .codec(settings.codec)
+          .maxBitrate(settings.maxBitrate)
+          .deviceId(settings.deviceId!)
+          .advanced([
+            ...standardMediaConstraints,
+            // @ts-ignore
+            { autoGainControl: { exact: false } },
+            // @ts-ignore
+            { noiseSuppression: { exact: false } },
+          ])
+          .audioMode(settings.audioMode)
+          .build();
+        await this.hmsTrack.setSettings(newAudioTrackSettings);
         break;
+      }
 
       default:
     }
@@ -158,9 +176,25 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     switch (plugin.getName()) {
-      case 'HMSKrispPlugin':
+      case 'HMSKrispPlugin': {
         this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
+        const { settings } = this.hmsTrack;
+        const newAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
+          .codec(settings.codec)
+          .maxBitrate(settings.maxBitrate)
+          .deviceId(settings.deviceId!)
+          .advanced([
+            ...standardMediaConstraints,
+            // @ts-ignore
+            { autoGainControl: { exact: true } },
+            // @ts-ignore
+            { noiseSuppression: { exact: true } },
+          ])
+          .audioMode(settings.audioMode)
+          .build();
+        await this.hmsTrack.setSettings(newAudioTrackSettings);
         break;
+      }
       default:
         break;
     }
