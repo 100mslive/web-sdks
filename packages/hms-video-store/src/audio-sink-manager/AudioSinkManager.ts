@@ -186,12 +186,12 @@ export class AudioSinkManager {
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    this.unpauseAudioTracks();
+    await this.unpauseAudioTracks();
   };
 
   /**
