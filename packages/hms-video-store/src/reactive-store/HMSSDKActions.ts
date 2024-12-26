@@ -1534,24 +1534,29 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
+  //eslint-disable-next-line complexity
   private async addRemoveAudioPlugin(plugin: HMSAudioPlugin, action: 'add' | 'remove') {
-    if (!plugin) {
-      HMSLogger.w('Invalid plugin received in store');
-      return;
-    }
-    const trackID = this.store.getState(selectLocalAudioTrackID);
-    if (trackID) {
-      const sdkTrack = this.getLocalTrack(trackID);
-      if (sdkTrack) {
-        if (action === 'add') {
-          await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
-        } else if (action === 'remove') {
-          await (sdkTrack as SDKHMSLocalAudioTrack).removePlugin(plugin);
-        }
-        this.syncRoomState(`${action}AudioPlugin`);
-      } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
+    try {
+      if (!plugin) {
+        HMSLogger.w('Invalid plugin received in store');
+        return;
       }
+      const trackID = this.store.getState(selectLocalAudioTrackID);
+      if (trackID) {
+        const sdkTrack = this.getLocalTrack(trackID);
+        if (sdkTrack) {
+          if (action === 'add') {
+            await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
+          } else if (action === 'remove') {
+            await (sdkTrack as SDKHMSLocalAudioTrack).removePlugin(plugin);
+          }
+          this.syncRoomState(`${action}AudioPlugin`);
+        } else {
+          this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 

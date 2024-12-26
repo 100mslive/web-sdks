@@ -5,6 +5,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSAudioContextHandler } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -72,8 +73,9 @@ export class AudioSinkManager {
    */
   async unblockAutoplay() {
     if (this.autoPausedTracks.size > 0) {
-      this.unpauseAudioTracks();
+      await this.unpauseAudioTracks();
     }
+    await HMSAudioContextHandler.resumeContext();
   }
 
   init(elementId?: string) {
@@ -184,12 +186,12 @@ export class AudioSinkManager {
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
+  private handleAudioDeviceChange = async (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    this.unpauseAudioTracks();
+    await this.unpauseAudioTracks();
   };
 
   /**
