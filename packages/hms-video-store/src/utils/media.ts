@@ -3,6 +3,9 @@ import { isFirefox } from './support';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 
+// discussed with krisp team and this is their recommendation for the sample rate
+const DEFAULT_SAMPLE_RATE = 32000;
+
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -45,23 +48,15 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
 
 export interface HMSAudioContext {
   audioContext: AudioContext | null;
-  getAudioContext: (options?: AudioContextOptions) => AudioContext;
+  getAudioContext: () => AudioContext;
   resumeContext: () => Promise<void>;
 }
 
 export const HMSAudioContextHandler: HMSAudioContext = {
   audioContext: null,
-  getAudioContext(options?: AudioContextOptions) {
-    const newAudioContextNeeded =
-      !this.audioContext || (options?.sampleRate && this.audioContext.sampleRate !== options.sampleRate);
-
-    if (newAudioContextNeeded) {
-      /**
-       * Not setting default sample rate for firefox since connecting
-       * audio nodes from context with different sample rate is not
-       * supported in firefox
-       */
-      this.audioContext = isFirefox ? new AudioContext() : new AudioContext(options);
+  getAudioContext() {
+    if (!this.audioContext) {
+      this.audioContext = isFirefox ? new AudioContext() : new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
     }
 
     return this.audioContext!;

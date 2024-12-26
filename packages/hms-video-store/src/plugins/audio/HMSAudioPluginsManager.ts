@@ -11,8 +11,6 @@ import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 
-const DEFAULT_SAMPLE_RATE = 48000;
-
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
  * are called in the order they were added. Plugins which do not need to modify the audio are called
@@ -46,7 +44,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.audioContext = HMSAudioContextHandler.getAudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
+    this.audioContext = HMSAudioContextHandler.getAudioContext();
     this.room = room;
   }
 
@@ -230,7 +228,6 @@ export class HMSAudioPluginsManager {
 
   //Keeping it separate since we are initializing context only once
   async closeContext() {
-    this.audioContext?.close();
     this.audioContext = undefined;
   }
 
@@ -249,10 +246,8 @@ export class HMSAudioPluginsManager {
 
   private async initAudioNodes() {
     if (this.audioContext) {
-      if (!this.sourceNode) {
-        const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-        this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
-      }
+      const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
+      this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
       if (!this.destinationNode) {
         this.destinationNode = this.audioContext.createMediaStreamDestination();
         this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
