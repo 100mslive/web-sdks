@@ -246,6 +246,7 @@ export class HMSAudioPluginsManager {
 
   private async initAudioNodes() {
     if (this.audioContext) {
+      // recreate this again, irrespective of it being already there so that the latest native track is used in source node
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
       if (!this.destinationNode) {
