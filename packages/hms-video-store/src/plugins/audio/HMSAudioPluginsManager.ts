@@ -4,18 +4,12 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
+import { HMSAudioContextHandler } from '../../internal';
 import { HMSAudioTrackSettingsBuilder } from '../../media/settings';
 import { standardMediaConstraints } from '../../media/settings/constants';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-
-const DEFAULT_SAMPLE_RATE = 48000;
-
-//Handling sample rate error in case of firefox
-const checkBrowserSupport = () => {
-  return navigator.userAgent.indexOf('Firefox') !== -1;
-};
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -50,7 +44,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.createAudioContext();
+    this.audioContext = HMSAudioContextHandler.getAudioContext();
     this.room = room;
   }
 
@@ -234,7 +228,6 @@ export class HMSAudioPluginsManager {
 
   //Keeping it separate since we are initializing context only once
   async closeContext() {
-    this.audioContext?.close();
     this.audioContext = undefined;
   }
 
@@ -248,15 +241,14 @@ export class HMSAudioPluginsManager {
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
-    this.updateProcessedTrack();
+    await this.updateProcessedTrack();
   }
 
   private async initAudioNodes() {
     if (this.audioContext) {
-      if (!this.sourceNode) {
-        const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-        this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
-      }
+      // recreate this again, irrespective of it being already there so that the latest native track is used in source node
+      const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
+      this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
       if (!this.destinationNode) {
         this.destinationNode = this.audioContext.createMediaStreamDestination();
         this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
@@ -315,20 +307,5 @@ export class HMSAudioPluginsManager {
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
-  }
-
-  private createAudioContext() {
-    if (!this.audioContext) {
-      if (checkBrowserSupport()) {
-        /**
-        Not setting default sample rate for firefox since connecting
-        audio nodes from context with different sample rate is not
-        supported in firefox
- */
-        this.audioContext = new AudioContext();
-      } else {
-        this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
-      }
-    }
   }
 }

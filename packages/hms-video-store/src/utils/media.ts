@@ -1,6 +1,10 @@
 import HMSLogger from './logger';
+import { isFirefox } from './support';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
+
+// discussed with krisp team and this is their recommendation for the sample rate
+const DEFAULT_SAMPLE_RATE = 32000;
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
@@ -52,9 +56,10 @@ export const HMSAudioContextHandler: HMSAudioContext = {
   audioContext: null,
   getAudioContext() {
     if (!this.audioContext) {
-      this.audioContext = new AudioContext();
+      this.audioContext = isFirefox ? new AudioContext() : new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
     }
-    return this.audioContext;
+
+    return this.audioContext!;
   },
   async resumeContext() {
     try {

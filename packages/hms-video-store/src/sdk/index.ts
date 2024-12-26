@@ -667,6 +667,10 @@ export class HMSSdk implements HMSInterface {
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
       await this.deviceManager.autoSelectAudioOutput();
+      // Throw autoplay error even if audio context is suspended as it will be used in Audio Plugins which can lead to no audio
+      if (HMSAudioContextHandler.getAudioContext().state === 'suspended') {
+        this.listener?.onError(ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.JOIN));
+      }
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
