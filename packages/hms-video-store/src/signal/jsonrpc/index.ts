@@ -9,6 +9,7 @@ import { PeerNotificationInfo, SendMessage } from '../../notification-manager';
 import {
   DEFAULT_SIGNAL_PING_INTERVAL,
   DEFAULT_SIGNAL_PING_TIMEOUT,
+  LEAVE_REASON,
   PONG_RESPONSE_TIMES_SIZE,
 } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
@@ -307,8 +308,8 @@ export default class JsonRpcSignal {
     return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, message);
   }
 
-  leave() {
-    this.notify(HMSSignalMethod.LEAVE, {});
+  leave(reason: LEAVE_REASON) {
+    this.notify(HMSSignalMethod.LEAVE, { client_reason: reason });
   }
 
   async endRoom(lock: boolean, reason: string) {

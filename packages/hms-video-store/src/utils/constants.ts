@@ -71,3 +71,8 @@ export const DEFAULT_PLAYLIST_AUDIO_BITRATE = 64;
 export const WHITEBOARD_ORIGIN = 'https://whiteboard.100ms.live';
 
 export const WHITEBOARD_QA_ORIGIN = 'https://whiteboard-qa.100ms.live';
+
+export enum LEAVE_REASON {
+  USER_REQUEST = 'user request',
+  SDK_REQUEST = 'sdk request',
+}
