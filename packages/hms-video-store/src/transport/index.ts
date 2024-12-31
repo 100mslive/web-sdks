@@ -36,6 +36,7 @@ import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
+  LEAVE_REASON,
   PROTOCOL_SPEC,
   PROTOCOL_VERSION,
   PUBLISH_STATS_PUSH_INTERVAL,
@@ -359,7 +360,7 @@ export default class HMSTransport {
     }
   }
 
-  async leave(notifyServer: boolean): Promise<void> {
+  async leave(notifyServer: boolean, reason = LEAVE_REASON.USER_REQUEST): Promise<void> {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
@@ -375,7 +376,7 @@ export default class HMSTransport {
       this.clearPeerConnections();
       if (notifyServer) {
         try {
-          this.signal.leave();
+          this.signal.leave(reason);
           HMSLogger.d(TAG, 'signal leave done');
         } catch (err) {
           HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);

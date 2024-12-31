@@ -159,12 +159,21 @@ const PacketLostAndJitter = ({
   const isLocalPeer = audioTrackStats?.type.includes('outbound') || videoTrackStats?.type.includes('outbound');
   const audioStats = isLocalPeer ? audioTrackStats?.remote : audioTrackStats;
   const videoStats = isLocalPeer ? videoTrackStats?.remote : videoTrackStats;
+
   return (
     <>
       <TrackPacketsLostRow label="Packet Loss(V)" stats={videoStats} />
       <TrackPacketsLostRow label="Packet Loss(A)" stats={audioStats} />
-      <StatsRow show={isNotNullish(videoStats?.jitter)} label="Jitter(V)" value={videoStats?.jitter?.toFixed(4)} />
-      <StatsRow show={isNotNullish(audioStats?.jitter)} label="Jitter(A)" value={audioStats?.jitter?.toFixed(4)} />
+      <StatsRow
+        show={isNotNullish(videoStats?.jitter)}
+        label="Jitter(V)"
+        value={`${((videoStats?.jitter ?? 0) * 1000).toFixed(2)} ms`}
+      />
+      <StatsRow
+        show={isNotNullish(audioStats?.jitter)}
+        label="Jitter(A)"
+        value={`${((audioStats?.jitter ?? 0) * 1000).toFixed(2)} ms`}
+      />
     </>
   );
 };

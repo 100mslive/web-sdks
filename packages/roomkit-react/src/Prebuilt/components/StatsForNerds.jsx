@@ -275,7 +275,7 @@ const LocalPeerStats = () => {
   return (
     <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
-      <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
+      <StatsRow label="Jitter" value={`${((stats.subscribe?.jitter ?? 0) * 1000).toFixed(2)} ms`} />
       <StatsRow label="Publish Bitrate" value={formatBytes(stats.publish?.bitrate, 'b/s')} />
       <StatsRow label="Subscribe Bitrate" value={formatBytes(stats.subscribe?.bitrate, 'b/s')} />
       <StatsRow
@@ -316,7 +316,7 @@ const TrackStats = ({ trackID, layer, local }) => {
       <StatsRow label="Type" value={stats.type + ' ' + stats.kind} />
       <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, 'b/s')} />
       <StatsRow label="Packets Lost" value={stats.packetsLost} />
-      <StatsRow label="Jitter" value={stats.jitter?.toFixed(3)} />
+      <StatsRow label="Jitter" value={`${((stats.subscribe?.jitter ?? 0) * 1000).toFixed(2)} ms`} />
       <StatsRow
         label={inbound ? 'Bytes Received' : 'Bytes Sent'}
         value={formatBytes(inbound ? stats.bytesReceived : stats.bytesSent)}

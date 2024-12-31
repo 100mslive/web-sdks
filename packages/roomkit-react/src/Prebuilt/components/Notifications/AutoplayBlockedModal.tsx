@@ -9,9 +9,9 @@ export function AutoplayBlockedModal() {
   return (
     <Dialog.Root
       open={!!error}
-      onOpenChange={value => {
+      onOpenChange={async value => {
         if (!value) {
-          unblockAudio();
+          await unblockAudio();
         }
         resetError();
       }}
@@ -25,8 +25,8 @@ export function AutoplayBlockedModal() {
         <DialogRow justify="end">
           <Button
             variant="primary"
-            onClick={() => {
-              unblockAudio();
+            onClick={async () => {
+              await unblockAudio();
               resetError();
             }}
           >

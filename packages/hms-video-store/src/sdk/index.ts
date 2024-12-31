@@ -92,6 +92,7 @@ import {
   DEFAULT_PLAYLIST_AUDIO_BITRATE,
   DEFAULT_PLAYLIST_VIDEO_BITRATE,
   HAND_RAISE_GROUP_NAME,
+  LEAVE_REASON,
 } from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
@@ -666,6 +667,11 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
+      await this.deviceManager.autoSelectAudioOutput();
+      // Throw autoplay error even if audio context is suspended as it will be used in Audio Plugins which can lead to no audio
+      if (HMSAudioContextHandler.getAudioContext().state === 'suspended') {
+        this.listener?.onError(ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.JOIN));
+      }
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
@@ -719,6 +725,7 @@ export class HMSSdk implements HMSInterface {
     return this.internalLeave(notifyServer);
   }
 
+  // eslint-disable-next-line complexity
   private async internalLeave(notifyServer = true, error?: HMSException) {
     const room = this.store?.getRoom();
     if (room) {
@@ -739,7 +746,7 @@ export class HMSSdk implements HMSInterface {
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
-      await this.transport?.leave(notifyServer);
+      await this.transport?.leave(notifyServer, error ? LEAVE_REASON.SDK_REQUEST : LEAVE_REASON.USER_REQUEST);
       this.cleanup();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}, peerId=${peerId}`);
     }
