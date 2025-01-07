@@ -348,9 +348,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private shouldReacquireTrack = () => {
-    return (
-      isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing() || this.audioLevelMonitor?.isSilentThisInstant()
-    );
+    return isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing();
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
