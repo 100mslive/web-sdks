@@ -115,7 +115,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       );
     } else {
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
-      await this.replaceTrackWith(this.settings);
+      try {
+        await this.replaceTrackWith(this.settings);
+      } catch (error) {
+        this.eventBus.error.publish(error as HMSException);
+      }
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
@@ -334,9 +338,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         reason,
       }),
     );
-    await this.setEnabled(this.enabled);
-    // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
-    this.eventBus.localAudioUnmutedNatively.publish();
+    try {
+      await this.setEnabled(this.enabled);
+      // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
+      this.eventBus.localAudioUnmutedNatively.publish();
+    } catch (error) {
+      this.eventBus.error.publish(error as HMSException);
+    }
   };
 
   private replaceSenderTrack = async () => {
@@ -348,9 +356,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private shouldReacquireTrack = () => {
-    return (
-      isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing() || this.audioLevelMonitor?.isSilentThisInstant()
-    );
+    return isEmptyTrack(this.nativeTrack) || this.isTrackNotPublishing();
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
