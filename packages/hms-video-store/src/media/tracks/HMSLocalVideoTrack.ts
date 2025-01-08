@@ -5,6 +5,7 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
+import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -12,7 +13,6 @@ import {
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
 } from '../../interfaces';
-import { HMSException } from '../../internal';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
