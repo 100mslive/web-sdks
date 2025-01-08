@@ -12,6 +12,7 @@ import {
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
 } from '../../interfaces';
+import { HMSException } from '../../internal';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
@@ -587,7 +588,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
-        await this.setEnabled(true);
+        try {
+          await this.setEnabled(true);
+        } catch (error) {
+          this.eventBus.error.publish(error as HMSException);
+        }
       }
       // ended interruption event
       this.eventBus.analytics.publish(
