@@ -56,6 +56,7 @@ export const HMSEvents = {
   AUDIO_TRACK_REMOVED: 'audio-track-removed',
   AUTOPLAY_ERROR: 'autoplay-error',
   LEAVE: 'leave',
+  ERROR: 'error',
 };
 
 export const PROTOCOL_VERSION = '2.5';

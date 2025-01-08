@@ -81,4 +81,6 @@ export class EventBus {
   readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
 
   readonly leave = new HMSInternalEvent<HMSException | undefined>(HMSEvents.LEAVE, this.eventEmitter);
+
+  readonly error = new HMSInternalEvent<HMSException>(HMSEvents.ERROR, this.eventEmitter);
 }
