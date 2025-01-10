@@ -5,6 +5,7 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
+import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -587,7 +588,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
-        await this.setEnabled(true);
+        try {
+          await this.setEnabled(true);
+        } catch (error) {
+          this.eventBus.error.publish(error as HMSException);
+        }
       }
       // ended interruption event
       this.eventBus.analytics.publish(

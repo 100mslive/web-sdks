@@ -260,6 +260,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
+    this.eventBus.error.subscribe(this.handleError);
   }
 
   private validateJoined(name: string) {
@@ -600,6 +601,17 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
+  /**
+   * This is to handle errors thrown from internal handling of audio video track changes
+   * For example, handling visibility change and making a new gum can throw an error which is currently
+   * unhandled. This will notify the app of the error.
+   * @param {HMSException} error
+   */
+  private handleError = (error: HMSException) => {
+    HMSLogger.e(this.TAG, error);
+    this.errorListener?.onError(error);
+  };
+
   // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
@@ -696,6 +708,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
+    this.eventBus.error.unsubscribe(this.handleError);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
