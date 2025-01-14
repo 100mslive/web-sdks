@@ -93,14 +93,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   clone(stream: HMSLocalStream) {
-    const track = new HMSLocalVideoTrack(
-      stream,
-      this.nativeTrack.clone(),
-      this.source!,
-      this.eventBus,
-      this.settings,
-      this.room,
-    );
+    const clonedTrack = this.nativeTrack.clone();
+    /**
+     * stream only becomes active when the track is added to it. If this is not added, after sfu migration, in non-simulcast case, the video will not be
+     * published to the server
+     */
+    stream.nativeStream.addTrack(clonedTrack);
+    const track = new HMSLocalVideoTrack(stream, clonedTrack, this.source!, this.eventBus, this.settings, this.room);
     track.peerId = this.peerId;
 
     if (this.pluginsManager.pluginsMap.size > 0) {

@@ -72,14 +72,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   clone(stream: HMSLocalStream) {
-    const track = new HMSLocalAudioTrack(
-      stream,
-      this.nativeTrack.clone(),
-      this.source!,
-      this.eventBus,
-      this.settings,
-      this.room,
-    );
+    const clonedTrack = this.nativeTrack.clone();
+    /**
+     * stream only becomes active when the track is added to it.
+     */
+    stream.nativeStream.addTrack(clonedTrack);
+    const track = new HMSLocalAudioTrack(stream, clonedTrack, this.source!, this.eventBus, this.settings, this.room);
     track.peerId = this.peerId;
 
     if (this.pluginsManager.pluginsMap.size > 0) {
