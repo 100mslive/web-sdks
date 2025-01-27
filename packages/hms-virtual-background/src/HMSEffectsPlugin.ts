@@ -100,6 +100,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.removeBackground();
     this.executeAfterInit(() => {
       this.effects.setBlur(this.blurAmount);
+      this.effects.run();
     });
   }
 
@@ -138,6 +139,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.removeBlur();
     this.executeAfterInit(() => {
       this.effects.setBackground(this.background);
+      this.effects.run();
     });
   }
 
@@ -179,6 +181,5 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     } else if (this.background) {
       this.setBackground(this.background);
     }
-    this.effects.run();
   }
 }
