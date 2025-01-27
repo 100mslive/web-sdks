@@ -45,14 +45,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       if (this.effects) {
         this.initialised = true;
         this.onInit?.();
-        if (
-          this.background !== HMSVirtualBackgroundTypes.NONE &&
-          this.backgroundType !== HMSVirtualBackgroundTypes.NONE
-        ) {
-          this.effects.setBackgroundFitMode('fill');
-          this.effects.setSegmentationPreset(this.preset);
-          this.applyEffect();
-        }
+        this.effects.setBackgroundFitMode('fill');
+        this.effects.setSegmentationPreset(this.preset);
       }
     };
   }
