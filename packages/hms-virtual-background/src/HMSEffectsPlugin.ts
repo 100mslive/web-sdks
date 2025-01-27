@@ -100,8 +100,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
     this.executeAfterInit(() => {
-      this.effects.run();
       this.effects.setBlur(this.blurAmount);
+      this.effects.run();
     });
   }
 
@@ -139,8 +139,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.removeBlur();
     this.executeAfterInit(() => {
-      this.effects.run();
       this.effects.setBackground(this.background);
+      this.effects.run();
     });
   }
 
