@@ -31,4 +31,4 @@ export const isChromiumBased = chromiumBasedBrowsers.some(
   (value: string) => parsedUserAgent.getEngine()?.name?.toLowerCase() === value,
 );
 
-export const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';
+export const pdfIframeURL = 'https://pdf-annotation-qa.100ms.live/generic/web/viewer.html';
