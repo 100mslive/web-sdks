@@ -22,6 +22,7 @@ const DropdownTrigger = styled(Trigger, {
   appearance: 'none !important',
   '&[data-state="open"]': {
     backgroundColor: '$surface_bright',
+    c: '$on_surface_high',
   },
   '&:focus': {
     outline: 'none',
