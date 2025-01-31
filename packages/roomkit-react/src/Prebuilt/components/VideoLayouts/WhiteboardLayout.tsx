@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
-import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
@@ -12,12 +11,10 @@ import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';
-// eslint-disable-next-line import/no-unresolved
-import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
+  const { token } = useWhiteboard(isMobile);
 
   if (!token) {
     return null;
@@ -35,9 +32,7 @@ const WhiteboardEmbed = () => {
         },
       }}
     >
-      <Box css={{ size: '100%' }}>
-        <Whiteboard token={token} endpoint={`https://${endpoint}`} zoomToContent={zoomToContent} />
-      </Box>
+      <Box css={{ size: '100%' }} />
     </Box>
   );
 };
