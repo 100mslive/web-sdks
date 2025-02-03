@@ -319,6 +319,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private trackPermissions = () => {
     listenToPermissionChange('microphone', (state: PermissionState) => {
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
+      if (state === 'denied') {
+        this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
+      }
     });
   };
 
@@ -331,6 +334,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         reason,
       }),
     );
+    this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */

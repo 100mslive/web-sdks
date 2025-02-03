@@ -530,6 +530,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private trackPermissions = () => {
     listenToPermissionChange('camera', (state: PermissionState) => {
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
+      if (state === 'denied') {
+        this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+      }
     });
   };
 
