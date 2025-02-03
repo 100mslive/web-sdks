@@ -79,9 +79,6 @@ export const ErrorCodes = {
 
     // Track is publishing with no data, can happen when a whatsapp call is ongoing before 100ms call in mweb
     NO_DATA: 3015,
-
-    // Permissions granted initially but later revoked
-    PERMISSION_DENIED_LATER: 3016,
   },
 
   WebrtcErrors: {

@@ -145,6 +145,16 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static permissionChange(type: 'audio' | 'video', status: PermissionState) {
+    return new AnalyticsEvent({
+      name: 'permissionChanged',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        message: `Perrmission for ${type} changed to ${status}`,
+      },
+    });
+  }
+
   static deviceChange({
     isUserSelection,
     selection,

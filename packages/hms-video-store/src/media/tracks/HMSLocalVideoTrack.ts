@@ -75,6 +75,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   ) {
     super(stream, track, source);
     this.addTrackEventListeners(track);
+    this.trackPermissions();
     stream.tracks.push(this);
     this.setVideoHandler(new VideoElementManager(this));
     this.settings = settings;
@@ -525,6 +526,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
+
+  private trackPermissions = () => {
+    if (!navigator.permissions) {
+      HMSLogger.d(this.TAG, 'Permissions API not supported');
+      return;
+    }
+    // @ts-ignore
+    navigator.permissions.query({ name: 'camera' }).then(permission => {
+      permission.onchange = () => {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange('video', permission.state));
+      };
+    });
+  };
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);

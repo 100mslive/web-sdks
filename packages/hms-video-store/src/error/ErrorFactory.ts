@@ -120,17 +120,6 @@ export const ErrorFactory = {
       );
     },
 
-    PermissionDeniedLater(action: HMSAction, deviceInfo: string, description = '') {
-      return new HMSTrackException(
-        ErrorCodes.TracksErrors.PERMISSION_DENIED_LATER,
-        'CantAccessCaptureDevice - permission denied later',
-        action,
-        `User denied permission to access capture device - ${deviceInfo}`,
-        description,
-        deviceInfo as HMSTrackExceptionTrackType,
-      );
-    },
-
     DeviceNotAvailable(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSTrackException(
         ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,

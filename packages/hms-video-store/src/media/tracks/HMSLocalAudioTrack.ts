@@ -57,6 +57,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.addTrackEventListeners(track);
+    this.trackPermissions();
 
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId
@@ -314,6 +315,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmute);
   }
+
+  private trackPermissions = () => {
+    if (!navigator.permissions) {
+      HMSLogger.d(this.TAG, 'Permissions API not supported');
+      return;
+    }
+    // @ts-ignore
+    navigator.permissions.query({ name: 'microphone' }).then(permission => {
+      permission.onchange = () => {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange('audio', permission.state));
+      };
+    });
+  };
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
