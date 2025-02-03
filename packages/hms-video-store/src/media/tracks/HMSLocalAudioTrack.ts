@@ -9,7 +9,7 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { getAudioTrack, isEmptyTrack } from '../../utils/track';
+import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -317,15 +317,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private trackPermissions = () => {
-    if (!navigator.permissions) {
-      HMSLogger.d(this.TAG, 'Permissions API not supported');
-      return;
-    }
-    // @ts-ignore
-    navigator.permissions.query({ name: 'microphone' }).then(permission => {
-      permission.onchange = () => {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange('audio', permission.state));
-      };
+    listenToPermissionChange('microphone', (state: PermissionState) => {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
     });
   };
 

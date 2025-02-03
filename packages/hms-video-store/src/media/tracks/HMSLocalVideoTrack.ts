@@ -20,7 +20,7 @@ import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isMobile } from '../../utils/support';
-import { getVideoTrack, isEmptyTrack } from '../../utils/track';
+import { getVideoTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
 
@@ -528,15 +528,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private trackPermissions = () => {
-    if (!navigator.permissions) {
-      HMSLogger.d(this.TAG, 'Permissions API not supported');
-      return;
-    }
-    // @ts-ignore
-    navigator.permissions.query({ name: 'camera' }).then(permission => {
-      permission.onchange = () => {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange('video', permission.state));
-      };
+    listenToPermissionChange('camera', (state: PermissionState) => {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
     });
   };
 
