@@ -1,3 +1,4 @@
+import HMSLogger from './logger';
 import { BuildGetMediaError } from '../error/utils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
@@ -29,3 +30,19 @@ export function isEmptyTrack(track: MediaStreamTrack) {
   // Firefox gives '' as label for empty track(created from audio context)
   return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode' || track.label === '';
 }
+
+export const listenToPermissionChange = (
+  permissionName: 'camera' | 'microphone',
+  onChange: (state: PermissionState) => any,
+) => {
+  if (!navigator.permissions) {
+    HMSLogger.d('Permissions API not supported');
+    return;
+  }
+  // @ts-ignore
+  navigator.permissions.query({ name: permissionName }).then(permission => {
+    permission.onchange = () => {
+      onChange(permission.state);
+    };
+  });
+};
