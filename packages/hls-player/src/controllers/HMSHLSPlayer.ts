@@ -358,6 +358,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       maxBufferLength: 20,
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
+      fetchSetup: function (context, initParams) {
+        initParams.credentials = 'include';
+        return new Request(context.url, initParams);
+      },
       playlistLoadPolicy: {
         default: {
           maxTimeToFirstByteMs: 8000,
