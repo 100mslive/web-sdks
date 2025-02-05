@@ -118,7 +118,6 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
                         css={{
                           px: '$9',
                           bg: isSelected ? selectionBg : undefined,
-                          c: isSelected ? '$on_primary_high' : '$on_primary_high',
                         }}
                       >
                         {option.label}
@@ -205,7 +204,6 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
                         css={{
                           px: '$9',
                           bg: isSelected ? selectionBg : undefined,
-                          c: isSelected ? '$on_primary_high' : '$on_primary_high',
                         }}
                       >
                         {option.label}

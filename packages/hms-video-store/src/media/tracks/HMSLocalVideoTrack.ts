@@ -20,7 +20,7 @@ import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isMobile } from '../../utils/support';
-import { getVideoTrack, isEmptyTrack } from '../../utils/track';
+import { getVideoTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
 
@@ -75,6 +75,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   ) {
     super(stream, track, source);
     this.addTrackEventListeners(track);
+    this.trackPermissions();
     stream.tracks.push(this);
     this.setVideoHandler(new VideoElementManager(this));
     this.settings = settings;
@@ -525,6 +526,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
+
+  private trackPermissions = () => {
+    listenToPermissionChange('camera', (state: PermissionState) => {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
+      if (state === 'denied') {
+        this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+      }
+    });
+  };
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);

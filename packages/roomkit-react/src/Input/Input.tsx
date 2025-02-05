@@ -15,6 +15,9 @@ export const Input = styled('input', {
   minHeight: '30px',
   color: '$on_surface_high',
   fontSize: '$md',
+  '&:disabled': {
+    cursor: 'not-allowed',
+  },
   '&:focus': {
     boxShadow: '0 0 0 1px $colors$primary_default',
     border: '1px solid transparent',

@@ -9,7 +9,7 @@ import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { getAudioTrack, isEmptyTrack } from '../../utils/track';
+import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -57,6 +57,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.addTrackEventListeners(track);
+    this.trackPermissions();
 
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId
@@ -315,6 +316,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     track.removeEventListener('unmute', this.handleTrackUnmute);
   }
 
+  private trackPermissions = () => {
+    listenToPermissionChange('microphone', (state: PermissionState) => {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
+      if (state === 'denied') {
+        this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
+      }
+    });
+  };
+
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
     const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
@@ -324,6 +334,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         reason,
       }),
     );
+    this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
