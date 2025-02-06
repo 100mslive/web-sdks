@@ -6,6 +6,7 @@ import { HMSHLSException } from '../error/HMSHLSException';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from '../interfaces/events';
 import { HMSHLSLayer } from '../interfaces/IHMSHLSLayer';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
+import FetchLoader from '../loader/fetchLoader';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 import { mapLayer, mapLayers } from '../utilies/utils';
 
@@ -356,6 +357,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       maxBufferLength: 20,
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
+      loader: FetchLoader,
       fetchSetup: function (context, initParams) {
         initParams.credentials = 'include';
         return new Request(context.url, initParams);
