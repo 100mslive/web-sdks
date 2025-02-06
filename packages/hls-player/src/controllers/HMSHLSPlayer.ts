@@ -360,6 +360,9 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         initParams.credentials = 'include';
         return new Request(context.url, initParams);
       },
+      xhrSetup: function (xhr, url) {
+        xhr.withCredentials = true;
+      },
       playlistLoadPolicy: {
         default: {
           maxTimeToFirstByteMs: 8000,
