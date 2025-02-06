@@ -144,6 +144,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
+    console.trace('replaceTrackWith', settings);
     const prevTrack = this.nativeTrack;
     /*
      * Note: Do not change the order of this.
@@ -182,8 +183,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
-  async setEnabled(value: boolean) {
-    if (value === this.enabled) {
+  async setEnabled(value: boolean, skipcheck = false) {
+    if (value === this.enabled && !skipcheck) {
       return;
     }
 
@@ -348,8 +349,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       }),
     );
     try {
-      await this.setEnabled(false);
-      await this.setEnabled(this.enabled);
+      await this.setEnabled(this.enabled, true);
       // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
       this.eventBus.localAudioUnmutedNatively.publish();
     } catch (error) {
