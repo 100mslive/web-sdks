@@ -348,6 +348,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       }),
     );
     try {
+      await this.setEnabled(false);
       await this.setEnabled(this.enabled);
       // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
       this.eventBus.localAudioUnmutedNatively.publish();
