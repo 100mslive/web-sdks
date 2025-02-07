@@ -108,6 +108,19 @@ class FetchLoader implements Loader<LoaderContext> {
       .then((response: Response): Promise<string | ArrayBuffer> => {
         this.response = this.loader = response;
         console.log('response', response);
+        // Retrieve your custom cookie header from the response
+        //@ts-ignore
+        const cookieHeaders = Array.from(response.headers.values());
+        console.log('cookieHeaders', cookieHeaders);
+        // let edgeCookie = '';
+        // if (setCookieheaders) {
+        //   const cookieArray = setCookieheaders.split(';');
+
+        // }
+        // if (edgeCookie) {
+        //   // Manually set the cookie using document.cookie with required attributes
+        //   document.cookie = `Edge-Cache-Cookie=${edgeCookie}; Path=/; SameSite=None; Secure`;
+        // }
         const first = Math.max(window.performance.now(), stats.loading.start);
 
         window.clearTimeout(this.requestTimeout);
@@ -166,6 +179,7 @@ class FetchLoader implements Loader<LoaderContext> {
         this.callbacks?.onSuccess(loaderResponse, stats, context, response);
       })
       .catch(error => {
+        console.log('response', error);
         window.clearTimeout(this.requestTimeout);
         if (stats.aborted) {
           return;

@@ -358,13 +358,13 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
       loader: FetchLoader,
-      fetchSetup: function (context, initParams) {
-        initParams.credentials = 'include';
-        return new Request(context.url, initParams);
-      },
-      xhrSetup: function (xhr, _url) {
-        xhr.withCredentials = true;
-      },
+      // fetchSetup: function (context, initParams) {
+      //   initParams.credentials = 'include';
+      //   return new Request(context.url, initParams);
+      // },
+      // xhrSetup: function (xhr, _url) {
+      //   xhr.withCredentials = true;
+      // },
       playlistLoadPolicy: {
         default: {
           maxTimeToFirstByteMs: 8000,
