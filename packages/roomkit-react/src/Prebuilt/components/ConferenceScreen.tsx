@@ -94,10 +94,13 @@ export const ConferenceScreen = () => {
 
   useEffect(() => {
     onJoinFunc?.();
-    const notification = new Notification('Hello');
-    setTimeout(() => {
-      notification.close();
-    }, 10 * 60 * 1000);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        reg?.showNotification('Hello from Service Worker!', {
+          body: 'Click to open the app!',
+        });
+      });
+    }
 
     return () => {
       PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
