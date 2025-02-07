@@ -94,6 +94,11 @@ export const ConferenceScreen = () => {
 
   useEffect(() => {
     onJoinFunc?.();
+    const notification = new Notification('Hello');
+    setTimeout(() => {
+      notification.close();
+    }, 10 * 60 * 1000);
+
     return () => {
       PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
     };
