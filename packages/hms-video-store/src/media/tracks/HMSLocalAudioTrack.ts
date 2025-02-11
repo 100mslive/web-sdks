@@ -185,11 +185,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async setEnabled(value: boolean, skipcheck = false) {
     if (value === this.enabled && !skipcheck) {
-      console.log({ value, skipcheck }, 'returned');
       return;
     }
-    console.log({ value, skipcheck });
-
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
     if (value && this.shouldReacquireTrack()) {
       await this.replaceTrackWith(this.settings);
