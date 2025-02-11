@@ -184,7 +184,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async setEnabled(value: boolean, skipcheck = false) {
-    if (value === this.enabled) {
+    if (value === this.enabled && !skipcheck) {
       console.log({ value, skipcheck }, 'returned');
       return;
     }
