@@ -144,7 +144,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
-    console.trace('replaceTrackWith', settings);
     const prevTrack = this.nativeTrack;
     /*
      * Note: Do not change the order of this.
