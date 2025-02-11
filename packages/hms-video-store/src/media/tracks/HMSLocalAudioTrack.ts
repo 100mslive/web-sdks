@@ -182,11 +182,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
-  async setEnabled(value: boolean) {
-    if (value === this.enabled) {
+  async setEnabled(value: boolean, skipcheck = false) {
+    if (value === this.enabled && !skipcheck) {
       return;
     }
-
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
     if (value && this.shouldReacquireTrack()) {
       await this.replaceTrackWith(this.settings);
@@ -348,7 +347,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       }),
     );
     try {
-      await this.setEnabled(this.enabled);
+      await this.setEnabled(this.enabled, true);
       // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
       this.eventBus.localAudioUnmutedNatively.publish();
     } catch (error) {
