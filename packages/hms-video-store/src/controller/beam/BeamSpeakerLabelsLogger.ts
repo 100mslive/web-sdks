@@ -15,6 +15,7 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
   private readonly analysers: Record<string, AnalyserNode>;
   private readonly store: IHMSStore<T>;
   private actions: IHMSActions<T>;
+  private TAG = '[BeamSpeakerLabelsLogger]';
   constructor(store: IHMSStore<T>, actions: IHMSActions<T>) {
     this.intervalMs = 100;
     this.shouldMonitor = false;
@@ -83,6 +84,14 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
     // optimise this to selectTracks instead of selecting peers
     const allPeers = this.store.getState(selectPeers);
     const peers = allPeers.filter(peer => !!peer.audioTrack);
+    HMSLogger.d(
+      this.TAG,
+      'Peers Without audio track',
+      allPeers
+        .filter(peer => !peer.audioTrack)
+        .map(peer => peer.id)
+        .join(','),
+    );
     const peerAudioLevels = [];
     for (const peer of peers) {
       const sdkTrack = this.actions.getTrackById(peer.audioTrack || '');
@@ -92,6 +101,7 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
       }
       if (nativeStream) {
         const peerLevel = await this.getAudioLevel(peer, nativeStream);
+        HMSLogger.d(this.TAG, peer.id, peerLevel);
         if (peerLevel.level > 0) {
           peerAudioLevels.push(peerLevel);
         }
