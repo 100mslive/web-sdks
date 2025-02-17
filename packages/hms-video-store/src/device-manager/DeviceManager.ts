@@ -498,6 +498,7 @@ export class DeviceManager implements HMSDeviceManager {
     HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
+      console.error('appropriate device already selected');
       return;
     }
 
