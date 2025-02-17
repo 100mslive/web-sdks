@@ -497,7 +497,9 @@ export class DeviceManager implements HMSDeviceManager {
     const manualSelection = this.getManuallySelectedAudioDevice();
     const externalDeviceID =
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-    HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
+
+    // eslint-disable-next-line no-debugger
+    debugger;
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       console.error('appropriate device already selected');
