@@ -112,7 +112,7 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
         event: 'app-audio-level',
         data: peerAudioLevels,
       };
-      HMSLogger.d('logging audio levels', peerAudioLevels);
+      HMSLogger.d('logging audio levels', JSON.stringify(peerAudioLevels));
       window.__triggerBeamEvent__(JSON.stringify(payload));
     }
   }
