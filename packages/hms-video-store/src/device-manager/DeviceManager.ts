@@ -490,8 +490,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-    console.log(localAudioTrack, earpiece);
-
+    HMSLogger.d(this.TAG, earpiece);
     if (!localAudioTrack || !earpiece) {
       return;
     }
