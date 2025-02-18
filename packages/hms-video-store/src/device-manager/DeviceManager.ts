@@ -483,7 +483,7 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
-    if (!isAndroid() || !this.store.getLocalPeer()?.joinedAt) {
+    if (!isAndroid()) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
