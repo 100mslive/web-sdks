@@ -483,6 +483,7 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
+    console.log(this.TAG, 'localPeer', this.store.getLocalPeer()?.joinedAt);
     if ('ondevicechange' in navigator.mediaDevices) {
       return;
     }
