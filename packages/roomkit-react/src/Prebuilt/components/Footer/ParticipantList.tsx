@@ -46,9 +46,11 @@ import { SIDE_PANE_OPTIONS } from '../../common/constants';
 export const ParticipantList = ({
   offStageRoles = [],
   onActive,
+  footer,
 }: {
   offStageRoles: HMSRoleName[];
   onActive: (role: string) => void;
+  footer?: React.ReactNode;
 }) => {
   const [filter, setFilter] = useState<{ search?: string } | undefined>();
   const { participants, isConnected, peerCount } = useParticipants(filter);
@@ -121,6 +123,7 @@ export const ParticipantList = ({
             </Flex>
           ) : null}
         </VirtualizedParticipants>
+        {footer}
       </Flex>
     </Fragment>
   );

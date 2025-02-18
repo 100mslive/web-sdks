@@ -53,6 +53,7 @@ export const SidePaneTabs = React.memo<{
   const chat_title = elements?.chat?.chat_title || 'Chat';
   const showChat = !!elements?.chat;
   const showParticipants = !!elements?.participant_list;
+  const participantFooter = elements?.participant_list?.footer;
   const hideTabs = !(showChat && showParticipants) || hideTab;
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
@@ -157,7 +158,7 @@ export const SidePaneTabs = React.memo<{
               {activeTab === SIDE_PANE_OPTIONS.CHAT ? (
                 <Chat />
               ) : (
-                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
+                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} footer={participantFooter} />
               )}
             </>
           );
@@ -201,7 +202,7 @@ export const SidePaneTabs = React.memo<{
                 )}
               </Flex>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
-                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
+                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} footer={participantFooter} />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
                 <Chat />
