@@ -473,7 +473,9 @@ export class DeviceManager implements HMSDeviceManager {
     this.timer = setTimeout(() => {
       (async () => {
         await this.enumerateDevices();
-        await this.autoSelectAudioOutput();
+        if (this.audioInputChanged) {
+          await this.autoSelectAudioOutput();
+        }
         this.startPollingForDevices();
       })();
     }, 5000);
