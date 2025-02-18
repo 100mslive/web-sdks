@@ -466,7 +466,7 @@ export class DeviceManager implements HMSDeviceManager {
 
   private startPollingForDevices = () => {
     // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
+    if (!isAndroid()) {
       console.log(isAndroid());
       return;
     }
@@ -485,7 +485,7 @@ export class DeviceManager implements HMSDeviceManager {
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
     console.log(this.TAG, 'localPeer', this.store.getLocalPeer()?.joinedAt, isAndroid());
-    if (isAndroid()) {
+    if (!isAndroid()) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
