@@ -489,19 +489,12 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-    // eslint-disable-next-line no-debugger
-    debugger;
     if (!localAudioTrack || !earpiece) {
-      // eslint-disable-next-line no-debugger
-      debugger;
       return;
     }
     const manualSelection = this.getManuallySelectedAudioDevice();
     const externalDeviceID =
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-
-    // eslint-disable-next-line no-debugger
-    debugger;
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       console.error('appropriate device already selected');
