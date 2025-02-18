@@ -467,7 +467,6 @@ export class DeviceManager implements HMSDeviceManager {
   private startPollingForDevices = () => {
     // device change supported, no polling needed
     if (!isAndroid()) {
-      console.log(isAndroid());
       return;
     }
     this.timer = setTimeout(() => {
@@ -484,8 +483,7 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
-    console.log(this.TAG, 'localPeer', this.store.getLocalPeer()?.joinedAt, isAndroid());
-    if (!isAndroid()) {
+    if (!isAndroid() || !this.store.getLocalPeer()?.joinedAt) {
       return;
     }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
@@ -498,24 +496,19 @@ export class DeviceManager implements HMSDeviceManager {
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
-      console.error('appropriate device already selected');
       return;
     }
 
     try {
       if (!this.earpieceSelected) {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
-          // eslint-disable-next-line no-debugger
-          debugger;
           this.earpieceSelected = true;
           return;
         }
 
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        console.error({ earpiece }, 'setting earpiece succesful');
         this.earpieceSelected = true;
       }
-      console.log({ externalDeviceID, bluetoothDevice, speakerPhone, wired });
       await localAudioTrack.setSettings(
         {
           deviceId: externalDeviceID,
