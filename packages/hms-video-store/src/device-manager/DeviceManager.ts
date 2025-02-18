@@ -492,6 +492,8 @@ export class DeviceManager implements HMSDeviceManager {
     // eslint-disable-next-line no-debugger
     debugger;
     if (!localAudioTrack || !earpiece) {
+      // eslint-disable-next-line no-debugger
+      debugger;
       return;
     }
     const manualSelection = this.getManuallySelectedAudioDevice();
@@ -509,10 +511,12 @@ export class DeviceManager implements HMSDeviceManager {
     try {
       if (!this.earpieceSelected) {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
+          // eslint-disable-next-line no-debugger
+          debugger;
           this.earpieceSelected = true;
           return;
         }
-        console.error({ earpiece }, 'setting earpiece');
+
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         console.error({ earpiece }, 'setting earpiece succesful');
         this.earpieceSelected = true;
