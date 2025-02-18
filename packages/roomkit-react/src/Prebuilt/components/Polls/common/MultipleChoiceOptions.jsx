@@ -60,7 +60,9 @@ export const MultipleChoiceOptions = ({
             <Flex direction="column" css={{ flexGrow: '1' }}>
               <Flex css={{ w: '100%' }}>
                 <Text css={{ display: 'flex', flexGrow: '1' }}>
-                  <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
+                  <Label htmlFor={`${questionIndex}-${option.index}`} css={{ color: 'inherit' }}>
+                    {option.text}
+                  </Label>
                 </Text>
                 {showVoteCount && <VoteCount voteCount={option.voteCount} />}
               </Flex>
