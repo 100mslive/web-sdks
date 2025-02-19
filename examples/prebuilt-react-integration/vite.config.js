@@ -23,5 +23,5 @@ export default defineConfig({
   plugins: [react(), mediapipe_workaround()],
   define: {
     'process.env': {},
-  },
+  }
 });

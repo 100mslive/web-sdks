@@ -106,6 +106,7 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
+      await this.autoSelectAudioOutput();
       this.startPollingForDevices();
     }
     this.logDevices('Init');
@@ -464,15 +465,19 @@ export class DeviceManager implements HMSDeviceManager {
     return { bluetoothDevice, speakerPhone, wired, earpiece };
   }
 
-  private startPollingForDevices = () => {
+  private startPollingForDevices = async () => {
+    const { earpiece } = this.categorizeAudioInputDevices();
+
     // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
+    if (!earpiece) {
       return;
     }
     this.timer = setTimeout(() => {
       (async () => {
         await this.enumerateDevices();
-        await this.autoSelectAudioOutput();
+        if (this.audioInputChanged) {
+          await this.autoSelectAudioOutput();
+        }
         this.startPollingForDevices();
       })();
     }, 5000);
@@ -483,10 +488,6 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
-    // do this only after join so the earpiece would be selected at the right time
-    if ('ondevicechange' in navigator.mediaDevices || !this.store.getLocalPeer()?.joinedAt) {
-      return;
-    }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (!localAudioTrack || !earpiece) {
@@ -495,7 +496,6 @@ export class DeviceManager implements HMSDeviceManager {
     const manualSelection = this.getManuallySelectedAudioDevice();
     const externalDeviceID =
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-    HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
@@ -507,6 +507,7 @@ export class DeviceManager implements HMSDeviceManager {
           this.earpieceSelected = true;
           return;
         }
+
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }
