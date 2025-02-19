@@ -4,7 +4,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
-import { getAudioDeviceCategory, HMSAudioDeviceCategory, isAndroid, isIOS } from '../internal';
+import { getAudioDeviceCategory, HMSAudioDeviceCategory, isIOS } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
@@ -466,8 +466,10 @@ export class DeviceManager implements HMSDeviceManager {
   }
 
   private startPollingForDevices = async () => {
+    const { earpiece } = this.categorizeAudioInputDevices();
+
     // device change supported, no polling needed
-    if (!isAndroid()) {
+    if (!earpiece) {
       return;
     }
     this.timer = setTimeout(() => {
@@ -486,9 +488,6 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
-    if (!isAndroid()) {
-      return;
-    }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (!localAudioTrack || !earpiece) {
