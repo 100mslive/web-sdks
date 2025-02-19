@@ -33,8 +33,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl = videoEl || this.createVideoElement();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
-    } else if (!hlsUrl.endsWith('m3u8')) {
-      throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound('Invalid URL, pass m3u8 url');
     }
     this._hls.loadSource(hlsUrl);
     this._hls.attachMedia(this._videoEl);
@@ -358,6 +356,13 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       maxBufferLength: 20,
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
+      fetchSetup: function (context, initParams) {
+        initParams.credentials = 'include';
+        return new Request(context.url, initParams);
+      },
+      xhrSetup: function (xhr, _url) {
+        xhr.withCredentials = true;
+      },
       playlistLoadPolicy: {
         default: {
           maxTimeToFirstByteMs: 8000,
