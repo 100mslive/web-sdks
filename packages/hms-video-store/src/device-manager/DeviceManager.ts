@@ -466,8 +466,9 @@ export class DeviceManager implements HMSDeviceManager {
   }
 
   private startPollingForDevices = async () => {
+    const { earpiece } = this.categorizeAudioInputDevices();
     // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
+    if (!earpiece) {
       return;
     }
     this.timer = setTimeout(() => {
