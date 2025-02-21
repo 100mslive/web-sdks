@@ -1359,6 +1359,7 @@ export class HMSSdk implements HMSInterface {
 
   private async getAndPublishTracks(initialSettings?: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
+    await this.initDeviceManagers();
     await this.setAndPublishTracks(tracks);
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
     this.sdkState.published = true;
@@ -1390,7 +1391,6 @@ export class HMSSdk implements HMSInterface {
       this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
-    await this.initDeviceManagers();
   }
 
   private setLocalPeerTrack(track: HMSLocalTrack) {
