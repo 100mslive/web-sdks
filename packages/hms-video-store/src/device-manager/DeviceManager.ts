@@ -47,11 +47,17 @@ export class DeviceManager implements HMSDeviceManager {
   constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
-    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.init(true);
+    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.videoInput.length === 0) {
+        this.init(true);
+      }
     });
-    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.init(true);
+    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.audioInput.length === 0) {
+        this.init(true);
+      }
     });
 
     this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {

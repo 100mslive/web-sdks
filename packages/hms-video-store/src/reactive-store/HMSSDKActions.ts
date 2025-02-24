@@ -912,7 +912,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         store.devices.audioOutput = devices.audioOutput;
       }
       const sdkLocalPeer = this.sdk.getLocalPeer();
-      console.log('inside device change');
       if (localPeer?.id && sdkLocalPeer) {
         Object.assign(store.settings, this.getMediaSettings(sdkLocalPeer));
       }
