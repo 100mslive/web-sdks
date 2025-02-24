@@ -917,7 +917,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
-    if (event.selection) {
+    if (event.selection && !event.internal) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
       this.hmsNotifications.sendDeviceChange(notification);
     }

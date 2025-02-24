@@ -404,18 +404,18 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       );
       await this.replaceTrackWith(settings);
       const groupId = this.nativeTrack.getSettings().groupId;
-      this.eventBus.deviceChange.publish({
-        isUserSelection: !internal,
-        type: 'audioInput',
-        selection: {
-          deviceId: settings.deviceId,
-          groupId: groupId,
-        },
-      });
       if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('audioInput', {
           deviceId: settings.deviceId,
           groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'audioInput',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }
