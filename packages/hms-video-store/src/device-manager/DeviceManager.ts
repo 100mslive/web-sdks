@@ -48,16 +48,10 @@ export class DeviceManager implements HMSDeviceManager {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
     this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.videoInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
+      await this.init(true);
     });
     this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.audioInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
+      await this.init(true);
     });
 
     this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {
@@ -106,9 +100,9 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
-      await this.autoSelectAudioOutput();
       this.startPollingForDevices();
     }
+    await this.autoSelectAudioOutput();
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
