@@ -36,7 +36,7 @@ import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { APP_DATA } from '../common/constants';
 
 export const ConferenceScreen = () => {
-  const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
+  const { userName, metaData, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
@@ -68,6 +68,7 @@ export const ConferenceScreen = () => {
       hmsActions
         .join({
           userName: userName || uuid(),
+          metaData,
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
           rememberDeviceSelection: true,
@@ -89,6 +90,7 @@ export const ConferenceScreen = () => {
     isPreviewScreenEnabled,
     roomState,
     userName,
+    metaData,
     requestPermission,
   ]);
 

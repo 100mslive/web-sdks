@@ -44,9 +44,10 @@ export const StyledAvatar = styled('div', {
 type Props = VariantProps<typeof StyledAvatar> &
   React.ComponentProps<typeof StyledAvatar> & {
     name: string;
+    imageUrl?: string | null;
   };
 
-export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
+export const Avatar: React.FC<Props> = ({ imageUrl, name, css, ...props }) => {
   const info = getAvatarBg(name);
   let { color } = info;
   if (!name) {
@@ -54,7 +55,15 @@ export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   }
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
-      {info.initials || <PersonIcon height={40} width={40} />}
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={name}
+          style={{ height: 'var(--hms-ui-space-20)', borderRadius: 'var(--hms-ui-radii-round)' }}
+        />
+      ) : (
+        info.initials || <PersonIcon height={40} width={40} />
+      )}
     </StyledAvatar>
   );
 };

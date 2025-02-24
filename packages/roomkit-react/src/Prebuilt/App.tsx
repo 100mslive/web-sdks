@@ -55,6 +55,7 @@ import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 export type HMSPrebuiltOptions = {
   userName?: string;
   userId?: string;
+  metaData?: Record<string, unknown>;
   endpoints?: object;
   effectsSDKKey?: string;
 };
@@ -93,7 +94,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints } = {},
+      options: { userName = '', userId = '', endpoints, metaData } = {},
       screens,
       leaveOnUnload = true,
       onLeave,
@@ -180,6 +181,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             onJoin,
             userName,
             userId,
+            metaData: metaData ? JSON.stringify(metaData) : undefined,
             endpoints: {
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,

@@ -81,6 +81,7 @@ const Tile = ({
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
+  const { avatarImageUrl } = useHMSStore(selectPeerMetadata(peerId));
   const peerName = useHMSStore(selectPeerNameByID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -159,7 +160,12 @@ const Tile = ({
             <>
               {isVideoMuted || (!isLocal && isAudioOnly) ? (
                 <StyledVideoTile.AvatarContainer>
-                  <Avatar name={peerName || ''} data-testid="participant_avatar_icon" size={avatarSize} />
+                  <Avatar
+                    imageUrl={avatarImageUrl}
+                    name={peerName || ''}
+                    data-testid="participant_avatar_icon"
+                    size={avatarSize}
+                  />
                 </StyledVideoTile.AvatarContainer>
               ) : null}
               {!hideAudioMuteOnTile && isAudioMuted ? (

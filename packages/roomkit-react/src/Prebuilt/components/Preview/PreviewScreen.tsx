@@ -14,7 +14,7 @@ export const PreviewScreen = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
-  const { userName } = useHMSPrebuiltContext();
+  const { userName, metaData } = useHMSPrebuiltContext();
   const initialName = userName || (skipPreview ? 'Beam' : '');
   const authToken = useAuthToken();
   const roomLayout = useRoomLayout();
@@ -28,7 +28,12 @@ export const PreviewScreen = () => {
         align="center"
       >
         {authToken && Object.keys(previewHeader).length > 0 ? (
-          <PreviewJoin initialName={initialName} skipPreview={skipPreview} asRole={previewAsRole ?? undefined} />
+          <PreviewJoin
+            initialName={initialName}
+            metadata={metaData}
+            skipPreview={skipPreview}
+            asRole={previewAsRole ?? undefined}
+          />
         ) : (
           <FullPageProgress />
         )}

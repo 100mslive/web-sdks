@@ -6,6 +6,7 @@ type HMSPrebuiltContextType = {
   roomCode: string;
   userName?: string;
   userId?: string;
+  metaData?: string;
   containerSelector: string;
   endpoints?: Record<string, string | undefined>;
   onLeave?: () => void;
@@ -16,6 +17,7 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   roomCode: '',
   userName: '',
   userId: '',
+  metaData: undefined,
   containerSelector: DEFAULT_PORTAL_CONTAINER,
   endpoints: {},
   onLeave: undefined,
