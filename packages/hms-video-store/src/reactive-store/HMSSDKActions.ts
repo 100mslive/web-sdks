@@ -1430,7 +1430,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const settings = this.store.getState(selectLocalMediaSettings);
     const audioTrack = sdkPeer.audioTrack as SDKHMSLocalAudioTrack;
     const videoTrack = sdkPeer.videoTrack as SDKHMSLocalVideoTrack;
-    console.log('device id', audioTrack?.settings?.deviceId, audioTrack?.nativeTrack?.getSettings());
     return {
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
