@@ -47,16 +47,16 @@ export class DeviceManager implements HMSDeviceManager {
   constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
-    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.videoInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.videoInput.length === 0) {
+        this.init(true);
       }
     });
-    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.audioInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.audioInput.length === 0) {
+        this.init(true);
       }
     });
 
@@ -106,9 +106,9 @@ export class DeviceManager implements HMSDeviceManager {
     // do it only on initial load.
     if (!force) {
       await this.updateToActualDefaultDevice();
-      await this.autoSelectAudioOutput();
       this.startPollingForDevices();
     }
+    await this.autoSelectAudioOutput();
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
@@ -514,6 +514,17 @@ export class DeviceManager implements HMSDeviceManager {
         },
         true,
       );
+      const groupId = this.audioInput.find(input => input.deviceId === externalDeviceID)?.groupId;
+      this.eventBus.deviceChange.publish({
+        isUserSelection: false,
+        type: 'audioInput',
+        selection: {
+          deviceId: externalDeviceID,
+          groupId: groupId,
+        },
+        devices: this.getDevices(),
+        internal: true,
+      });
     } catch (error) {
       this.eventBus.error.publish(error as HMSException);
     }
