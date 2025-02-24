@@ -515,7 +515,6 @@ export class DeviceManager implements HMSDeviceManager {
         true,
       );
       const groupId = this.audioInput.find(input => input.deviceId === externalDeviceID)?.groupId;
-      console.log({ deviceId: externalDeviceID, groupId: groupId });
       this.eventBus.deviceChange.publish({
         isUserSelection: false,
         type: 'audioInput',
