@@ -912,12 +912,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         store.devices.audioOutput = devices.audioOutput;
       }
       const sdkLocalPeer = this.sdk.getLocalPeer();
+      console.log('inside device change');
       if (localPeer?.id && sdkLocalPeer) {
         Object.assign(store.settings, this.getMediaSettings(sdkLocalPeer));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
-    if (event.selection) {
+    if (event.selection && !event.internal) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
       this.hmsNotifications.sendDeviceChange(notification);
     }
@@ -1430,6 +1431,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const settings = this.store.getState(selectLocalMediaSettings);
     const audioTrack = sdkPeer.audioTrack as SDKHMSLocalAudioTrack;
     const videoTrack = sdkPeer.videoTrack as SDKHMSLocalVideoTrack;
+    console.log('device id', audioTrack?.settings?.deviceId, audioTrack.nativeTrack.getSettings());
     return {
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
