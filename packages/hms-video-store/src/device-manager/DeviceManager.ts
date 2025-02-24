@@ -511,6 +511,7 @@ export class DeviceManager implements HMSDeviceManager {
       await localAudioTrack.setSettings(
         {
           deviceId: externalDeviceID,
+          advanced: [{ echoCancellation: false }],
         },
         true,
       );
