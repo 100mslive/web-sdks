@@ -1388,16 +1388,17 @@ export class HMSSdk implements HMSInterface {
         );
         this.listener?.onError(error);
       }
-      this.setLocalPeerTrack(track);
+      await this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
   }
 
-  private setLocalPeerTrack(track: HMSLocalTrack) {
+  private async setLocalPeerTrack(track: HMSLocalTrack) {
     track.peerId = this.localPeer?.peerId;
     switch (track.type) {
       case HMSTrackType.AUDIO:
         this.localPeer!.audioTrack = track as HMSLocalAudioTrack;
+        await this.deviceManager.autoSelectAudioOutput();
         break;
 
       case HMSTrackType.VIDEO:
