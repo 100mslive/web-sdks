@@ -1380,6 +1380,7 @@ export class HMSSdk implements HMSInterface {
           `${track.type} track has no data. muted: ${track.nativeTrack.muted}, readyState: ${track.nativeTrack.readyState}`,
         );
         HMSLogger.e(this.TAG, error);
+        await track.setEnabled(false);
         this.sendAnalyticsEvent(
           AnalyticsEventFactory.publish({
             devices: this.deviceManager.getDevices(),
