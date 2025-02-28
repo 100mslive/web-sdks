@@ -53,6 +53,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     private sdkListener: HMSUpdateListener,
     private progressCallback: (state: ConnectivityState) => void,
     private completionCallback: (state: ConnectivityCheckResult) => void,
+    private connectivityDuration = CONNECTIVITY_TEST_DURATION,
   ) {
     this.statsCollector = new DiagnosticsStatsCollector(sdk);
     this.state = ConnectivityState.STARTING;
@@ -140,7 +141,7 @@ export class ConnectivityCheck implements HMSDiagnosticsConnectivityListener {
     this.sdk.getWebrtcInternals()?.start();
     this.cleanupTimer = window.setTimeout(() => {
       this.cleanupAndReport();
-    }, CONNECTIVITY_TEST_DURATION);
+    }, this.connectivityDuration);
   }
 
   onError(error: HMSException): void {
