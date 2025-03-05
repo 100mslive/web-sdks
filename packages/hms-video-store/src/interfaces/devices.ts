@@ -5,6 +5,7 @@ export interface HMSDeviceChangeEvent {
   error?: HMSException;
   devices?: DeviceMap;
   selection?: Partial<MediaDeviceInfo>;
+  internal?: boolean;
   type: 'audioOutput' | 'audioInput' | 'video';
 }
 

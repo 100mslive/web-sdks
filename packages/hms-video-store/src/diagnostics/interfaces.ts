@@ -44,6 +44,10 @@ export interface HMSDiagnosticsInterface {
     progress: (state: ConnectivityState) => void,
     completed: (result: ConnectivityCheckResult) => void,
     region?: string,
+    /**
+     * Number in milliseconds to stop the connectivity check
+     */
+    duration?: number,
   ): Promise<void>;
   stopConnectivityCheck(): Promise<void>;
 }

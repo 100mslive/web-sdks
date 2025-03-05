@@ -679,7 +679,6 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
-      await this.deviceManager.autoSelectAudioOutput();
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
@@ -1360,6 +1359,7 @@ export class HMSSdk implements HMSInterface {
 
   private async getAndPublishTracks(initialSettings?: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
+    await this.initDeviceManagers();
     await this.setAndPublishTracks(tracks);
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
     this.sdkState.published = true;
@@ -1388,17 +1388,17 @@ export class HMSSdk implements HMSInterface {
         );
         this.listener?.onError(error);
       }
-      this.setLocalPeerTrack(track);
+      await this.setLocalPeerTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
-    await this.initDeviceManagers();
   }
 
-  private setLocalPeerTrack(track: HMSLocalTrack) {
+  private async setLocalPeerTrack(track: HMSLocalTrack) {
     track.peerId = this.localPeer?.peerId;
     switch (track.type) {
       case HMSTrackType.AUDIO:
         this.localPeer!.audioTrack = track as HMSLocalAudioTrack;
+        await this.deviceManager.autoSelectAudioOutput();
         break;
 
       case HMSTrackType.VIDEO:

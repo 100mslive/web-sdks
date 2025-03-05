@@ -47,16 +47,16 @@ export class DeviceManager implements HMSDeviceManager {
   constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
-    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.videoInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.videoInput.length === 0) {
+        this.init(true);
       }
     });
-    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
-      await this.enumerateDevices();
-      if (this.audioInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(() => {
+      // Do this only if length is 0 i.e. when permissions are denied
+      if (this.audioInput.length === 0) {
+        this.init(true);
       }
     });
 
@@ -108,6 +108,7 @@ export class DeviceManager implements HMSDeviceManager {
       await this.updateToActualDefaultDevice();
       this.startPollingForDevices();
     }
+    await this.autoSelectAudioOutput();
     this.logDevices('Init');
     await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
@@ -464,9 +465,10 @@ export class DeviceManager implements HMSDeviceManager {
     return { bluetoothDevice, speakerPhone, wired, earpiece };
   }
 
-  private startPollingForDevices = () => {
+  private startPollingForDevices = async () => {
+    const { earpiece } = this.categorizeAudioInputDevices();
     // device change supported, no polling needed
-    if ('ondevicechange' in navigator.mediaDevices) {
+    if (!earpiece) {
       return;
     }
     this.timer = setTimeout(() => {
@@ -483,10 +485,6 @@ export class DeviceManager implements HMSDeviceManager {
    */
   // eslint-disable-next-line complexity
   public autoSelectAudioOutput = async () => {
-    // do this only after join so the earpiece would be selected at the right time
-    if ('ondevicechange' in navigator.mediaDevices || !this.store.getLocalPeer()?.joinedAt) {
-      return;
-    }
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (!localAudioTrack || !earpiece) {
@@ -495,7 +493,6 @@ export class DeviceManager implements HMSDeviceManager {
     const manualSelection = this.getManuallySelectedAudioDevice();
     const externalDeviceID =
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
-    HMSLogger.d(this.TAG, 'externalDeviceID', externalDeviceID);
     // already selected appropriate device
     if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
@@ -507,6 +504,7 @@ export class DeviceManager implements HMSDeviceManager {
           this.earpieceSelected = true;
           return;
         }
+
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
         this.earpieceSelected = true;
       }
@@ -516,6 +514,17 @@ export class DeviceManager implements HMSDeviceManager {
         },
         true,
       );
+      const groupId = this.audioInput.find(input => input.deviceId === externalDeviceID)?.groupId;
+      this.eventBus.deviceChange.publish({
+        isUserSelection: false,
+        type: 'audioInput',
+        selection: {
+          deviceId: externalDeviceID,
+          groupId: groupId,
+        },
+        devices: this.getDevices(),
+        internal: true,
+      });
     } catch (error) {
       this.eventBus.error.publish(error as HMSException);
     }

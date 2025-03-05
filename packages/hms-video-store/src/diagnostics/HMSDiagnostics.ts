@@ -162,12 +162,13 @@ export class Diagnostics implements HMSDiagnosticsInterface {
     progress: (state: ConnectivityState) => void,
     completed: (result: ConnectivityCheckResult) => void,
     region?: string,
+    duration?: number,
   ) {
     if (!this.sdk) {
       throw new Error('SDK not found');
     }
 
-    this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed);
+    this.connectivityCheck = new ConnectivityCheck(this.sdk, this.sdkListener, progress, completed, duration);
 
     const authToken = await this.getAuthToken(region);
     await this.sdk.leave();
