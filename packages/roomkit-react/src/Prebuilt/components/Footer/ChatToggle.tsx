@@ -43,7 +43,9 @@ export const ChatToggle = ({ onClick }: { onClick?: () => void }) => {
             background: '$primary_default',
           }}
         >
-          <Text variant="overline">{countUnreadMessages > 99 ? '99+' : countUnreadMessages}</Text>
+          <Text variant="overline" css={{ color: '$on_primary_high' }}>
+            {countUnreadMessages > 99 ? '99+' : countUnreadMessages}
+          </Text>
         </Flex>
       )}
     </Box>
