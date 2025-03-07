@@ -25,6 +25,8 @@ const CheckboxRoot = styled(CheckboxPrimitive.Root, {
 
 const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
   color: '$on_primary_high',
+  // center check svg within button box
+  lineHeight: 0,
 });
 
 export const Checkbox = {
