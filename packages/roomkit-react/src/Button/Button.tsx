@@ -18,6 +18,7 @@ const getOutlinedVariants = (
   disabled: string,
   text: string,
   textDisabled: string,
+  textHover?: string,
 ) => {
   return {
     bg: 'transparent',
@@ -30,6 +31,7 @@ const getOutlinedVariants = (
       cursor: 'not-allowed',
     },
     '&:not([disabled]):hover': {
+      c: textHover,
       border: `solid $space$px $colors${hover}`,
       bg: 'transparent',
     },
@@ -50,6 +52,7 @@ const getButtonVariants = (
   disabled: string,
   text: string,
   textDisabled: string,
+  textHover?: string,
 ) => {
   return {
     bg: base,
@@ -62,6 +65,7 @@ const getButtonVariants = (
       border: `1px solid ${disabled}`,
     },
     '&:not([disabled]):hover': {
+      c: textHover,
       bg: hover,
       border: `1px solid ${hover}`,
     },
@@ -70,7 +74,7 @@ const getButtonVariants = (
       border: `1px solid ${active}`,
     },
     '&:not([disabled]):focus-visible': {
-      boxShadow: `0 0 0 3px ${base}`,
+      boxShadow: `0 0 0 3px $colors${hover}`,
     },
   };
 };
@@ -121,6 +125,7 @@ const StyledButton = styled('button', {
         '$alert_error_brighter',
         '$on_surface_high',
         '$on_surface_low',
+        '$on_surface_high',
       ),
     },
     {
@@ -153,6 +158,7 @@ const StyledButton = styled('button', {
         '$alert_error_dim',
         '$alert_error_brighter',
         '$on_primary_low',
+        '$on_primary_high',
       ),
       primary: getButtonVariants(
         '$primary_default',
