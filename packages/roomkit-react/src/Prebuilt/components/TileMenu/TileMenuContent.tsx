@@ -65,14 +65,18 @@ const SpotlightActions = ({
   onSpotLightClick: () => void;
 }) => {
   const hmsActions = useHMSActions();
-  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
-  const isTileSpotlighted = spotlightPeerId === peerId;
+  const spotlightPeerIds = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) as string[] | undefined;
+  const isTileSpotlighted = spotlightPeerIds?.includes(peerId);
   const dragClassName = getDragClassName();
 
-  const setSpotlightPeerId = (peerIdToSpotlight?: string) =>
+  const setSpotlight = (peerIds?: string[]) =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, peerIdToSpotlight)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peerIds)
       .catch((err: HMSException) => ToastManager.addToast({ title: err.description }));
+
+  const removeFromSpotlight = () => setSpotlight(spotlightPeerIds?.filter(id => id !== peerId));
+
+  const addToSpotlight = () => setSpotlight([...(spotlightPeerIds ?? []), peerId]);
 
   return (
     <StyledMenuTile.ItemButton
@@ -80,9 +84,9 @@ const SpotlightActions = ({
       css={spacingCSS}
       onClick={() => {
         if (isTileSpotlighted) {
-          setSpotlightPeerId();
+          removeFromSpotlight();
         } else {
-          setSpotlightPeerId(peerId);
+          addToSpotlight();
         }
         onSpotLightClick();
       }}

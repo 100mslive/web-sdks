@@ -13,13 +13,14 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, ha
   const maxTileCount = isMobile ? 2 : 4;
   const [page, setPage] = useState(0);
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
-  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
+  const spotlightPeerIds = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) as string[] | undefined;
+  const hasSpotlight = !!spotlightPeerIds?.length;
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const pinnedPeer = useHMSStore(selectTrackByID(pinnedTrackId))?.peerId;
   const pageChangedAfterPinning = useRef(false);
   const pagesWithTiles = usePagesWithTiles({
     peers:
-      spotlightPeerId || pinnedPeer
+      hasSpotlight || pinnedPeer
         ? [...peers].sort((p1, p2) => {
             if (activeScreensharePeerId === p1.id) {
               return -1;
@@ -27,7 +28,7 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, ha
             if (activeScreensharePeerId === p2.id) {
               return 1;
             }
-            const peerIdList = [pinnedPeer, spotlightPeerId];
+            const peerIdList = [pinnedPeer, ...(spotlightPeerIds ?? [])];
             // put active screenshare peer, pinned peer, spotlight peer at first
             if (peerIdList.includes(p1.id)) {
               return -1;
@@ -56,13 +57,13 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, ha
   }, [pageSize, onPageSize]);
 
   useEffect(() => {
-    if ((pinnedPeer || spotlightPeerId) && page !== 0 && !pageChangedAfterPinning.current) {
+    if ((pinnedPeer || hasSpotlight) && page !== 0 && !pageChangedAfterPinning.current) {
       setPage(0);
       pageChangedAfterPinning.current = true;
-    } else if (!pinnedPeer && !spotlightPeerId) {
+    } else if (!pinnedPeer && !hasSpotlight) {
       pageChangedAfterPinning.current = false;
     }
-  }, [pinnedPeer, spotlightPeerId, page]);
+  }, [pinnedPeer, hasSpotlight, page]);
 
   return (
     <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]} edgeToEdge={edgeToEdge} hasSidebar={hasSidebar}>

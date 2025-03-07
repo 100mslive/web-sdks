@@ -24,7 +24,8 @@ const TileConnection = ({
   width?: string | number;
   pinned?: boolean;
 }) => {
-  const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
+  const spotlightPeerIds = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) as string[] | undefined;
+  const spotlighted = spotlightPeerIds?.includes(peerId);
   const isPeerScreenSharing = !!useHMSStore(selectScreenShareByPeerID(peerId));
   const peerType = useHMSStore(selectPeerTypeByID(peerId));
   return (

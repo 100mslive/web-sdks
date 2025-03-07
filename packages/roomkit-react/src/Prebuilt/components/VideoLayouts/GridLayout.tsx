@@ -14,7 +14,7 @@ import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
 import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
-import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
+import { usePinnedTrack, useSetAppDataByKey, useSpotlightPeerIds } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
@@ -44,6 +44,7 @@ export const GridLayout = ({
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const whiteboard = useHMSStore(selectWhiteboard);
   const pinnedTrack = usePinnedTrack();
+  const spotlightPeerIds = useSpotlightPeerIds() as string[] | undefined;
   const peers = useHMSStore(selectPeers);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -54,7 +55,8 @@ export const GridLayout = ({
       peers.some(
         peer => peer.roleName && prominentRoles.includes(peer.roleName) && (peer.videoTrack || peer.audioTrack),
       )) ||
-    pinnedTrack;
+    pinnedTrack ||
+    spotlightPeerIds?.length;
   const updatedPeers = useMemo(() => {
     // remove screenshare/whiteboard peer from active speaker sorting
     if (activeScreensharePeerId || whiteboard?.open) {
@@ -62,8 +64,9 @@ export const GridLayout = ({
     }
     if (isInsetEnabled) {
       const isLocalPeerPinned = localPeerID === pinnedTrack?.peerId;
+      const isLocalPeerSpotlight = !!spotlightPeerIds?.includes(localPeerID);
       // if localPeer role is prominent role, it shows up in the center or local peer is pinned, so allow it in active speaker sorting
-      if ((localPeerRole && prominentRoles.includes(localPeerRole)) || isLocalPeerPinned) {
+      if ((localPeerRole && prominentRoles.includes(localPeerRole)) || isLocalPeerPinned || isLocalPeerSpotlight) {
         return peers;
       } else {
         return peers.filter(peer => !peer.isLocal);
@@ -79,6 +82,7 @@ export const GridLayout = ({
     prominentRoles,
     peers,
     pinnedTrack,
+    spotlightPeerIds,
   ]);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(updatedPeers);
@@ -131,7 +135,8 @@ export const GridLayout = ({
     return (
       <VideoTileContext.Provider value={tileLayout}>
         <RoleProminence
-          peers={sortedPeers}
+          // handles sorting internally so prominent and secondary sections can be sorted separately
+          peers={updatedPeers}
           onPageSize={setPageSize}
           onPageChange={setMainPage}
           prominentRoles={prominentRoles}

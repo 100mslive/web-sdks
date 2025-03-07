@@ -2,12 +2,10 @@ import { useCallback, useMemo } from 'react';
 import {
   selectAppData,
   selectAppDataByPath,
-  selectAudioTrackByPeerID,
   selectPermissions,
   selectPolls,
   selectSessionStore,
   selectTrackByID,
-  selectVideoTrackByPeerID,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -77,13 +75,13 @@ export const useResetEmbedConfig = () => {
   const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
   return () => setEmbedConfig();
 };
+
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
-  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
-  const spotlightVideoTrackId = useHMSStore(selectVideoTrackByPeerID(spotlightPeerId))?.id;
-  const spotlightAudioTrackId = useHMSStore(selectAudioTrackByPeerID(spotlightPeerId))?.id;
-  return useHMSStore(selectTrackByID(pinnedTrackId || spotlightVideoTrackId || spotlightAudioTrackId));
+  return useHMSStore(selectTrackByID(pinnedTrackId));
 };
+
+export const useSpotlightPeerIds = () => useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
 
 export const useSubscribedNotifications = notificationKey => {
   const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.subscribedNotifications, notificationKey));

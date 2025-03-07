@@ -7,7 +7,7 @@ import { PictureInPicture } from './PIPManager';
 // @ts-ignore: No implicit Any
 import { MediaSession } from './SetupMediaSession';
 // @ts-ignore: No implicit Any
-import { usePinnedTrack } from '../AppData/useUISettings';
+import { usePinnedTrack, useSpotlightPeerIds } from '../AppData/useUISettings';
 
 /**
  * shows a button which when clicked shows some videos in PIP, clicking
@@ -54,6 +54,7 @@ const PIPComponent = ({ content = null }) => {
 export const ActivatedPIP = () => {
   const store = useHMSVanillaStore();
   const pinnedTrack = usePinnedTrack();
+  const spotlightPeerIds = useSpotlightPeerIds() as string[] | undefined;
 
   useEffect(() => {
     function subscribeToStore() {
@@ -61,6 +62,8 @@ export const ActivatedPIP = () => {
         let pipPeers = store.getState(selectPeers);
         if (pinnedTrack) {
           pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
+        } else if (spotlightPeerIds?.length) {
+          pipPeers = pipPeers.filter(peer => spotlightPeerIds.includes(peer.id));
         }
         PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
           console.error('error in updating pip', err);
