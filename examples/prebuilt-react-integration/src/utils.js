@@ -4,8 +4,7 @@ function isRoomCode(str) {
 }
 
 export const getRoomCodeFromUrl = () => {
-  const path = window.location.pathname;
-  const regex = /(\/streaming)?(\/(preview|meeting))?\/(?<code>[^/]+)/;
-  const roomCode = path.match(regex)?.groups?.code || null;
+  // use query param, not path, so that we don't need Vercel rewrites
+  const roomCode = new URLSearchParams(location.search).get('roomCode');
   return isRoomCode(roomCode) ? roomCode : null;
 };
