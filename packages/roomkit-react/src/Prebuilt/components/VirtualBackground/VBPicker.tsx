@@ -84,14 +84,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         pluginLoadingRef.current = true;
         if (isEffectsEnabled && isEffectsSupported && effectsKey) {
           setLoadingEffects(true);
-          await VBHandler.initialisePlugin(effectsKey, () => {
+          await VBHandler.initialisePlugin('', () => {
             setLoadingEffects(false);
           });
           const vbInstance = VBHandler.getVBObject();
           if (vbInstance.getName() === 'HMSEffects') {
             hmsActions.addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin]);
           } else {
-            await addHMSVBPlugin();
+            await addHMSVBPlugin().catch(console.error);
           }
         } else {
           await addHMSVBPlugin();
