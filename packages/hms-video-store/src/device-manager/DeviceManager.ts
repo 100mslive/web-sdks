@@ -506,7 +506,7 @@ export class DeviceManager implements HMSDeviceManager {
         }
 
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        await sleep(500);
+        await sleep(100);
         this.earpieceSelected = true;
       }
       await localAudioTrack.setSettings(
