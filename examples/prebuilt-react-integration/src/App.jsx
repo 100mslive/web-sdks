@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { HMSPrebuilt, Diagnostics, Button } from '@100mslive/roomkit-react';
+import { HMSPrebuilt, Diagnostics, Button, Flex } from '@100mslive/roomkit-react';
 import { useState } from 'react';
 import { getRoomCodeFromUrl } from './utils';
 
@@ -10,7 +10,11 @@ const Permission = function ({ next, type }) {
     next();
   };
 
-  return <Button onClick={requestPermission}>Request {type} Permission</Button>;
+  return (
+    <Flex css={{ w: '100vw', h: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+      <Button onClick={requestPermission}>Request {type} Permission</Button>
+    </Flex>
+  );
 };
 
 export default function App() {
