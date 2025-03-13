@@ -10,7 +10,7 @@ import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { debounce } from '../utils/timer-utils';
+import { debounce, sleep } from '../utils/timer-utils';
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
 
@@ -506,6 +506,7 @@ export class DeviceManager implements HMSDeviceManager {
         }
 
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+        await sleep(1000);
         this.earpieceSelected = true;
       }
       await localAudioTrack.setSettings(
