@@ -484,7 +484,7 @@ export class DeviceManager implements HMSDeviceManager {
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
-  public autoSelectAudioOutput = async () => {
+  public autoSelectAudioOutput = async (delay?: number) => {
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (!localAudioTrack || !earpiece) {
@@ -506,7 +506,9 @@ export class DeviceManager implements HMSDeviceManager {
         }
 
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        await sleep(300);
+        if (delay) {
+          await sleep(delay);
+        }
         this.earpieceSelected = true;
       }
       await localAudioTrack.setSettings(

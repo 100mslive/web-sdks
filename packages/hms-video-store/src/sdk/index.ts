@@ -1042,6 +1042,10 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.level = level;
   }
 
+  autoSelectAudioOutput(delay?: number) {
+    this.deviceManager.autoSelectAudioOutput(delay);
+  }
+
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
     this.notificationManager?.setAudioListener(audioListener);

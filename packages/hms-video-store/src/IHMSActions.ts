@@ -688,4 +688,10 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Method to check if received bitrate is 0 for all remote peers or whether the room has whiteboard/quiz running. To be used by beam.
    */
   hasActiveElements(hmsStats: HMSStats): boolean;
+
+  /**
+   * An optional delay to add between earpiece and speakerphone selection
+   * @param delay in ms
+   */
+  autoSelectAudioOutput(delay?: number): Promise<void>;
 }

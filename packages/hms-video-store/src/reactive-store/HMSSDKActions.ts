@@ -364,6 +364,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications.sendTrackUpdate(type, trackID);
   }
 
+  async autoSelectAudioOutput(delay?: number) {
+    await this.sdk.autoSelectAudioOutput(delay);
+  }
+
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
 
