@@ -73,17 +73,18 @@ export const ChatSelectorContainer = () => {
               data-testid="participant_list_filter"
               css={{
                 background: '$primary_default',
+                c: '$on_primary_high',
                 r: '$0',
                 p: '$1 $2',
                 ml: '$6',
               }}
               tabIndex={0}
             >
-              <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
+              <Flex align="center" gap="1">
                 <Text
                   variant="caption"
                   css={{
-                    c: '$on_surface_high',
+                    c: 'inherit',
                     pr: '$2',
                     display: 'flex',
                     alignItems: 'center',
