@@ -1,4 +1,3 @@
-import { standardMediaConstraints } from './constants';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSAudioCodec, HMSAudioMode, HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 
@@ -9,10 +8,14 @@ export class HMSAudioTrackSettingsBuilder {
   private _deviceId = 'default';
   private _audioMode: HMSAudioMode = HMSAudioMode.VOICE;
   private _advanced: Array<MediaTrackConstraintSet> = [
-    ...standardMediaConstraints,
+    // @ts-ignore
     { autoGainControl: { exact: true } },
     // @ts-ignore
     { noiseSuppression: { exact: true } },
+    // @ts-ignore
+    { highpassFilter: { exact: true } },
+    // @ts-ignore
+    { audioMirroring: { exact: true } },
   ];
   volume(volume: number) {
     if (!(0.0 <= volume && volume <= 1.0)) {
