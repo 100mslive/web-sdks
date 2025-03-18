@@ -163,6 +163,7 @@ const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) =>
       variant="body2"
       css={{
         fontWeight: '$normal',
+        color: 'inherit',
       }}
     >
       <b>{peerName}: </b>
@@ -240,6 +241,7 @@ export const CaptionsViewer = ({
           background: '#000000A3',
           overflow: 'clip',
           zIndex: 10,
+          color: '$on_primary_high',
           height: 'fit-content',
           r: '$1',
           p: '$6',
