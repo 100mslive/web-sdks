@@ -503,6 +503,7 @@ export class DeviceManager implements HMSDeviceManager {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
           this.earpieceSelected = true;
         } else {
+          console.log('selecting earpiece');
           await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
           if (delay) {
             await sleep(delay);
