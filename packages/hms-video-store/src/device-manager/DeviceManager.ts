@@ -499,7 +499,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
 
     try {
-      if (!this.earpieceSelected) {
+      if (!this.earpieceSelected && !delay) {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
           this.earpieceSelected = true;
           return;
