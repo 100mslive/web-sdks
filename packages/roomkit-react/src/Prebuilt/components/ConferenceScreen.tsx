@@ -72,12 +72,13 @@ export const ConferenceScreen = () => {
           initEndpoint: endpoints?.init,
           rememberDeviceSelection: true,
           settings: {
-            isAudioMuted: !isPreviewScreenEnabled,
-            isVideoMuted: !isPreviewScreenEnabled,
+            // isAudioMuted: !isPreviewScreenEnabled,
+            // isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
         .then(() => requestPermission())
+        .then(() => hmsActions.autoSelectAudioOutput(300))
         .catch(console.error);
       autoRoomJoined.current = true;
     }
