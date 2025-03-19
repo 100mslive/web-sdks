@@ -72,8 +72,8 @@ export const ConferenceScreen = () => {
           initEndpoint: endpoints?.init,
           rememberDeviceSelection: true,
           settings: {
-            // isAudioMuted: !isPreviewScreenEnabled,
-            // isVideoMuted: !isPreviewScreenEnabled,
+            isAudioMuted: !isPreviewScreenEnabled,
+            isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
