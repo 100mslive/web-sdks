@@ -78,7 +78,6 @@ export const ConferenceScreen = () => {
           },
         })
         .then(() => requestPermission())
-        .then(() => hmsActions.autoSelectAudioOutput(300))
         .catch(console.error);
       autoRoomJoined.current = true;
     }
