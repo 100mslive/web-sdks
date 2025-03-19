@@ -691,6 +691,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   /**
    * An optional delay to add between earpiece and speakerphone selection
+   * Call this after preview or join is successful
    * @param delay in ms
    */
   autoSelectAudioOutput(delay?: number): Promise<void>;

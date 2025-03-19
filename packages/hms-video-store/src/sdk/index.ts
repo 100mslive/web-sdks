@@ -1043,7 +1043,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   autoSelectAudioOutput(delay?: number) {
-    this.deviceManager.autoSelectAudioOutput(delay);
+    this.deviceManager?.autoSelectAudioOutput(delay);
   }
 
   addAudioListener(audioListener: HMSAudioListener) {
