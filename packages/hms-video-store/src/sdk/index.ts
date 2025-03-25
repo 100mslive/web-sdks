@@ -799,6 +799,12 @@ export class HMSSdk implements HMSInterface {
   }
 
   getAudioOutput() {
+    if (!this.audioOutput) {
+      throw ErrorFactory.GenericErrors.NotReady(
+        HMSAction.VALIDATION,
+        'Please call preview or join before performing this action',
+      );
+    }
     return this.audioOutput;
   }
 
