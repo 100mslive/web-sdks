@@ -31,10 +31,13 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._emitter = new HMSHLSPlayerEventEmitter();
     this._hlsUrl = hlsUrl;
     this._videoEl = videoEl || this.createVideoElement();
-    if (!hlsUrl) {
+    try {
+      const url = new URL(hlsUrl);
+      if (!url.pathname.endsWith('m3u8')) {
+        throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound('Invalid URL, pass m3u8 url');
+      }
+    } catch (e) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
-    } else if (!hlsUrl.endsWith('m3u8')) {
-      throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound('Invalid URL, pass m3u8 url');
     }
     this._hls.loadSource(hlsUrl);
     this._hls.attachMedia(this._videoEl);
