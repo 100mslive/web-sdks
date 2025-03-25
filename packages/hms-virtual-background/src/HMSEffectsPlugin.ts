@@ -40,13 +40,15 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         console.error('[HMSEffectsPlugin]', err);
       }
     });
-    this.effects.cache();
+    this.effects.cache().catch(err => console.error('[HMSEffectsPlugin]', 'error caching effects', err));
     this.effects.onReady = () => {
       if (this.effects) {
         this.initialised = true;
         this.onInit?.();
         this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset(this.preset);
+        this.effects
+          .setSegmentationPreset(this.preset)
+          .catch(err => console.error('[HMSEffectsPlugin]', 'error applying preset ', this.preset, err));
       }
     };
   }

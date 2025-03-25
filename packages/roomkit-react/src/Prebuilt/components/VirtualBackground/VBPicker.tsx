@@ -89,7 +89,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           });
           const vbInstance = VBHandler.getVBObject();
           if (vbInstance.getName() === 'HMSEffects') {
-            hmsActions.addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin]);
+            await hmsActions
+              .addPluginsToVideoStream([VBHandler.getVBObject() as HMSMediaStreamPlugin])
+              .catch(console.error);
           } else {
             await addHMSVBPlugin();
           }
@@ -116,7 +118,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       }
     };
 
-    initializeVirtualBackground();
+    initializeVirtualBackground().catch(console.error);
   }, [
     hmsActions,
     role,
