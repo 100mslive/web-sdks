@@ -33,7 +33,7 @@ import { DEFAULT_TILES_IN_VIEW } from '../MoreSettings/constants';
 const initialAppData = {
   [APP_DATA.uiSettings]: {
     [UI_SETTINGS.isAudioOnly]: false,
-    [UI_SETTINGS.maxTileCount]: 9,
+    [UI_SETTINGS.maxTileCount]: DEFAULT_TILES_IN_VIEW.DESKTOP,
     [UI_SETTINGS.showStatsOnTiles]: false,
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
@@ -125,17 +125,12 @@ export const AppData = React.memo(() => {
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
   }, [hmsActions, preferences]);
 
+  // mobile does not allow custom maxTileCount
   useEffect(() => {
-    hmsActions.setAppData(
-      APP_DATA.uiSettings,
-      {
-        [UI_SETTINGS.maxTileCount]: isMobile
-          ? DEFAULT_TILES_IN_VIEW.MWEB
-          : Number(elements?.video_tile_layout?.grid?.tiles_in_view) || DEFAULT_TILES_IN_VIEW.DESKTOP,
-      },
-      true,
-    );
-  }, [hmsActions, isMobile, elements?.video_tile_layout?.grid?.tiles_in_view]);
+    if (isMobile) {
+      hmsActions.setAppData(APP_DATA.uiSettings, { [UI_SETTINGS.maxTileCount]: DEFAULT_TILES_IN_VIEW.MWEB }, true);
+    }
+  }, [hmsActions, isMobile]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {
