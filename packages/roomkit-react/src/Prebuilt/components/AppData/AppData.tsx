@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMedia } from 'react-use';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -16,6 +17,7 @@ import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { useBackground } from '../VirtualBackground/use-background';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 // @ts-ignore
@@ -91,15 +93,8 @@ export const AppData = React.memo(() => {
     }
   }, [elements?.noise_cancellation?.enabled_by_default, setNoiseCancellationEnabled]);
 
-  const defaultMediaURL = useMemo(() => {
-    const media = elements?.virtual_background?.background_media || [];
-    for (let i = 0; i < media.length; i++) {
-      if (media[i].default && media[i].url) {
-        return media[i].url;
-      }
-    }
-    return '';
-  }, [elements?.virtual_background?.background_media]);
+  const [background] = useBackground();
+  const hasBackground = background.type !== HMSVirtualBackgroundTypes.NONE;
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -140,12 +135,11 @@ export const AppData = React.memo(() => {
   }, [preferences.subscribedNotifications, hmsActions]);
 
   useEffect(() => {
-    if (defaultMediaURL && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
-      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
+    if (hasBackground && !sidepaneOpenedRef.current && isLocalVideoEnabled) {
       sidepaneOpenedRef.current = true;
       toggleVB();
     }
-  }, [hmsActions, toggleVB, isLocalVideoEnabled, defaultMediaURL]);
+  }, [hmsActions, toggleVB, isLocalVideoEnabled, hasBackground]);
 
   return <ResetStreamingStart />;
 });
