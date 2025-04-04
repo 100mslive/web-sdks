@@ -5,7 +5,7 @@ import { styled } from '../../../Theme';
 // When changing emojis in the grid, keep in mind that the payload used in sendHLSTimedMetadata has a limit of 100 characters. Using bigger emoji Ids can cause the limit to be exceeded.
 const emojiReactionList = [
   [{ emojiId: '+1' }, { emojiId: '-1' }, { emojiId: 'wave' }, { emojiId: 'clap' }, { emojiId: 'fire' }],
-  [{ emojiId: 'tada' }, { emojiId: 'heart_eyes' }, { emojiId: 'joy' }, { emojiId: 'open_mouth' }, { emojiId: 'sob' }],
+  [{ emojiId: 'tada' }, { emojiId: 'heart' }, { emojiId: 'joy' }, { emojiId: 'open_mouth' }, { emojiId: 'sob' }],
 ];
 
 export const EmojiCard = ({ sendReaction }) => {
