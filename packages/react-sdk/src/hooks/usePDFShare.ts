@@ -35,8 +35,8 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [sharing, setSharing] = useState(false);
 
-  const handleScreenShareError = useCallback(() => {
-    throw new Error('unable to start screen share');
+  const handleScreenShareError = useCallback((e: Error) => {
+    throw e;
   }, []);
   const inProgress = useRef(false);
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);

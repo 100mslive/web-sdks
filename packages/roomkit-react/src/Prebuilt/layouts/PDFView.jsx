@@ -29,6 +29,9 @@ export const PDFView = () => {
         }
       } catch (err) {
         resetConfig();
+        if (err.name === 'CantAccessCaptureDevice') {
+          return;
+        }
         ToastManager.addToast({
           title: `Error while sharing annotator ${err.message || ''}`,
           variant: 'error',

@@ -19,6 +19,10 @@ export const ScreenshareToggle = ({ css = {} }) => {
     screenShareVideoTrackId: video,
     toggleScreenShare,
   } = useScreenShare(error => {
+    // if user hit cancel, no need to show a toast
+    if (error?.name === 'CantAccessCaptureDevice') {
+      return;
+    }
     ToastManager.addToast({
       title: error.message,
       variant: 'error',
