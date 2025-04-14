@@ -11,4 +11,4 @@ export const trackTypeOptions = [
   { label: 'video', value: 'video' },
 ];
 
-export const DEFAULT_TILES_IN_VIEW = { MWEB: 4, DESKTOP: 9 };
+export const DEFAULT_TILES_IN_VIEW = { MWEB: 4, DESKTOP: 16 };
