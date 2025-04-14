@@ -305,12 +305,6 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
       ) {
         try {
           await setNoiseCancellationWithPlugin(true);
-          ToastManager.addToast({
-            title: `Noise Reduction Enabled`,
-            variant: 'standard',
-            duration: 2000,
-            icon: <AudioLevelIcon />,
-          });
         } catch (error) {
           console.error(error);
         }
