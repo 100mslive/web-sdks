@@ -14,6 +14,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
 import { NamedSetState } from './internalTypes';
+import { AnalyticsEventLevel } from '../analytics/AnalyticsEventLevel';
 import { HMSLogger } from '../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../controller/beam/BeamSpeakerLabelsLogger';
 import { Diagnostics } from '../diagnostics';
@@ -1700,5 +1701,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         isQuizOrPollPresent ||
         Object.values(remoteTracks).some(track => track && typeof track.bitrate === 'number' && track.bitrate > 0))
     );
+  }
+
+  sendCustomAnalyticsEvent(event: { name: string; level: AnalyticsEventLevel }): void {
+    this.sdk.sendCustomAnalyticsEvent(event);
   }
 }
