@@ -8,7 +8,7 @@ import { Store } from './store';
 import { WakeLockManager } from './WakeLockManager';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { AnalyticsEventLevel, HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
@@ -1704,5 +1704,9 @@ export class HMSSdk implements HMSInterface {
         .build();
       await track.setSettings(settings);
     }
+  }
+
+  sendCustomAnalyticsEvent(event: { name: string; level: AnalyticsEventLevel }): void {
+    this.sendAnalyticsEvent(new AnalyticsEvent(event));
   }
 }
