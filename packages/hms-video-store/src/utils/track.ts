@@ -39,10 +39,15 @@ export const listenToPermissionChange = (
     HMSLogger.d('Permissions API not supported');
     return;
   }
-  // @ts-ignore
-  navigator.permissions.query({ name: permissionName }).then(permission => {
-    permission.onchange = () => {
-      onChange(permission.state);
-    };
-  });
+  navigator.permissions
+    // @ts-ignore
+    .query({ name: permissionName })
+    .then(permission => {
+      permission.onchange = () => {
+        onChange(permission.state);
+      };
+    })
+    .catch(error => {
+      HMSLogger.e(`${permissionName} not supported`, error.message);
+    });
 };
