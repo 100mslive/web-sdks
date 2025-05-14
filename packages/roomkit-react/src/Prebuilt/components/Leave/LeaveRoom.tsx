@@ -42,11 +42,11 @@ export const LeaveRoom = ({
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
-  const stopStream = async () => {
+  const stopStream = async (stop_reason = '') => {
     try {
       if (permissions?.hlsStreaming) {
         console.log('Stopping HLS stream');
-        await hmsActions.stopHLSStreaming();
+        await hmsActions.stopHLSStreaming({ stop_reason });
         ToastManager.addToast({ title: 'Stopping the stream' });
       }
     } catch (e) {

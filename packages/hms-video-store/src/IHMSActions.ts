@@ -21,6 +21,7 @@ import {
   HMSVideoPlugin,
   HMSVideoTrackSettings,
   RTMPRecordingConfig,
+  StopHLSConfig,
   TokenRequest,
   TokenRequestOptions,
 } from './internal';
@@ -426,7 +427,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param params HLSConfig - HLSConfig object with the required fields
    * @returns Promise<void> - resolves when the HLS streaming is stopped
    */
-  stopHLSStreaming(params?: HLSConfig): Promise<void>;
+  stopHLSStreaming(params?: StopHLSConfig): Promise<void>;
 
   /**
    * If you want to start transcriptions(Closed Caption).

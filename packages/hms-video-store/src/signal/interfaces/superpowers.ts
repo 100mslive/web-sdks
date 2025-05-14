@@ -72,6 +72,7 @@ export interface HLSRequestParams {
     single_file_per_layer?: boolean; // false by default on server
     hls_vod?: boolean; // false by default on server
   };
+  stop_reason?: string;
 }
 
 export interface HLSTimedMetadataParams {
