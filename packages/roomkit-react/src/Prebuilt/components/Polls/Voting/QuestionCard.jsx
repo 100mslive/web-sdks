@@ -1,14 +1,7 @@
 // @ts-check
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
-import {
-  HMSRoomState,
-  selectLocalPeer,
-  selectLocalPeerRoleName,
-  selectRoomState,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
@@ -34,7 +27,6 @@ export const QuestionCard = ({
 }) => {
   const actions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
-  const roomState = useHMSStore(selectRoomState);
   const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const roleCanViewResponse =
@@ -191,7 +183,7 @@ export const QuestionCard = ({
       </Box>
       {isLive && (
         <QuestionActions
-          disableVote={roomState !== HMSRoomState.Connected}
+          disableVote={false}
           isValidVote={isValidVote}
           onVote={handleVote}
           response={localPeerChoice}
