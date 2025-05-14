@@ -61,7 +61,7 @@ export const LeaveRoom = ({
 
   const leaveRoom = async (options: { endStream?: boolean } = { endStream: false }) => {
     if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
-      await stopStream();
+      await stopStream('last publisher left');
     }
     await hmsActions.leave();
   };
