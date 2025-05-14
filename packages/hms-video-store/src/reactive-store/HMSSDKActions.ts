@@ -715,7 +715,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.startHLSStreaming(params);
   }
 
-  async stopHLSStreaming(params?: sdkTypes.HLSConfig): Promise<void> {
+  async stopHLSStreaming(params?: sdkTypes.StopHLSConfig): Promise<void> {
     await this.sdk.stopHLSStreaming(params);
   }
 
