@@ -1,3 +1,4 @@
+import { AnalyticsEventLevel } from './analytics/AnalyticsEventLevel';
 import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
 import { TranscriptionConfig } from './interfaces/transcription-config';
 import { FindPeerByNameRequestParams } from './signal/interfaces';
@@ -695,4 +696,10 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param delay in ms
    */
   autoSelectAudioOutput(delay?: number): Promise<void>;
+
+  /**
+   * Send custom analytics event which will be forwarded by the webhooks
+   * @param event
+   */
+  sendCustomAnalyticsEvent(event: { name: string; level: AnalyticsEventLevel }): void;
 }

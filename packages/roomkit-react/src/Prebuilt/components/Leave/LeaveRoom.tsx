@@ -2,6 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import {
+  AnalyticsEventLevel,
   HMSPeer,
   HMSRole,
   selectHLSState,
@@ -56,11 +57,13 @@ export const LeaveRoom = ({
   };
 
   const endRoom = async () => {
+    hmsActions.sendCustomAnalyticsEvent({ name: 'peer.endroomcalled', level: AnalyticsEventLevel.INFO });
     await hmsActions.endRoom(false, 'End Room');
   };
 
   const leaveRoom = async (options: { endStream?: boolean } = { endStream: false }) => {
     if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
+      hmsActions.sendCustomAnalyticsEvent({ name: 'prebuilt.hlsstopcalled', level: AnalyticsEventLevel.INFO });
       await stopStream();
     }
     await hmsActions.leave();

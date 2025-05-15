@@ -14,7 +14,7 @@ import { HMSInteractivityCenter, HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
 import { TranscriptionConfig } from './transcription-config';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { AnalyticsEventLevel, HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSSessionFeedback } from '../end-call-feedback';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
@@ -106,4 +106,5 @@ export interface HMSInterface {
 
   updatePlaylistSettings(options: HMSPlaylistSettings): void;
   submitSessionFeedback(feedback: HMSSessionFeedback, eventEndpoint?: string): Promise<void>;
+  sendCustomAnalyticsEvent(event: { name: string; level: AnalyticsEventLevel }): void;
 }
