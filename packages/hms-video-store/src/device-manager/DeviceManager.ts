@@ -10,7 +10,7 @@ import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { debounce } from '../utils/timer-utils';
+import { debounce, sleep } from '../utils/timer-utils';
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
 
@@ -484,7 +484,7 @@ export class DeviceManager implements HMSDeviceManager {
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
   // eslint-disable-next-line complexity
-  public autoSelectAudioOutput = async () => {
+  public autoSelectAudioOutput = async (delay?: number) => {
     const { bluetoothDevice, earpiece, speakerPhone, wired } = this.categorizeAudioInputDevices();
     const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
     if (!localAudioTrack || !earpiece) {
@@ -494,19 +494,22 @@ export class DeviceManager implements HMSDeviceManager {
     const externalDeviceID =
       manualSelection?.deviceId || bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
     // already selected appropriate device
-    if (localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
+    if (!delay && localAudioTrack.settings.deviceId === externalDeviceID && this.earpieceSelected) {
       return;
     }
 
     try {
-      if (!this.earpieceSelected) {
+      if (!this.earpieceSelected || delay) {
         if (bluetoothDevice?.deviceId === externalDeviceID) {
           this.earpieceSelected = true;
-          return;
+        } else {
+          HMSLogger.d(this.TAG, 'selecting earpiece');
+          await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+          if (delay) {
+            await sleep(delay);
+          }
+          this.earpieceSelected = true;
         }
-
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
-        this.earpieceSelected = true;
       }
       await localAudioTrack.setSettings(
         {
