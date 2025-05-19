@@ -19,6 +19,10 @@ export interface HLSConfig {
   };
 }
 
+export interface StopHLSConfig extends HLSConfig {
+  stop_reason?: string;
+}
+
 export interface HLSMeetingURLVariant {
   /**
    * This meeting URL is opened in a headless chrome instance for generating the HLS feed.
