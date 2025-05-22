@@ -1190,8 +1190,9 @@ export class HMSSdk implements HMSInterface {
       };
 
       await this.transport?.signal.stopHLSStreaming(hlsParams);
+    } else {
+      await this.transport?.signal.stopHLSStreaming();
     }
-    await this.transport?.signal.stopHLSStreaming();
   }
 
   async startTranscription(params: TranscriptionConfig) {
