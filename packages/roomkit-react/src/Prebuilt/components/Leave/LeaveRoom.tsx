@@ -2,6 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import {
+  HLSMeetingURLVariant,
   HMSPeer,
   HMSRole,
   selectHLSState,
@@ -46,7 +47,7 @@ export const LeaveRoom = ({
     try {
       if (permissions?.hlsStreaming) {
         console.log('Stopping HLS stream');
-        await hmsActions.stopHLSStreaming({ stop_reason });
+        await hmsActions.stopHLSStreaming({ variants: hlsState.variants as HLSMeetingURLVariant[], stop_reason });
         ToastManager.addToast({ title: 'Stopping the stream' });
       }
     } catch (e) {
