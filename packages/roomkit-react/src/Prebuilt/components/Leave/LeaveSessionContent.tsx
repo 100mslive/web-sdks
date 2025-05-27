@@ -10,7 +10,7 @@ export const LeaveSessionContent = ({
   isModal = false,
 }: {
   setShowLeaveRoomAlert: (value: boolean) => void;
-  leaveRoom: (options?: { endStream?: boolean; reason?: string }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean; sendReason?: boolean }) => Promise<void>;
   isModal?: boolean;
 }) => {
   return (
@@ -48,7 +48,7 @@ export const LeaveSessionContent = ({
           variant="danger"
           css={{ w: '100%' }}
           onClick={async () => {
-            await leaveRoom({ reason: 'last publisher left' });
+            await leaveRoom({ sendReason: true });
           }}
           id="leaveRoom"
           data-testid="leave_room"

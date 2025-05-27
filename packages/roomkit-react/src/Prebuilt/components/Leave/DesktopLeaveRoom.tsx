@@ -19,7 +19,7 @@ export const DesktopLeaveRoom = ({
   endRoom,
   container,
 }: {
-  leaveRoom: (options?: { endStream?: boolean; reason?: string }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean; sendReason?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
   container?: HTMLElement;
@@ -90,7 +90,7 @@ export const DesktopLeaveRoom = ({
                     bg=""
                     titleColor="$on_surface_high"
                     icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                    onClick={async () => await leaveRoom({ reason: 'last publisher left' })}
+                    onClick={async () => await leaveRoom({ sendReason: true })}
                     css={{ p: '$8 $4' }}
                   />
                 </Dropdown.Item>
