@@ -21,7 +21,7 @@ export const MwebLeaveRoom = ({
   endRoom,
   container,
 }: {
-  leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean; reason?: string }) => Promise<void>;
   endRoom: () => Promise<void>;
   container?: HTMLElement;
 }) => {
@@ -61,7 +61,7 @@ export const MwebLeaveRoom = ({
               bg="$surface_default"
               titleColor="$on_surface_high"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-              onClick={async () => await leaveRoom()}
+              onClick={async () => await leaveRoom({ reason: 'last publisher left' })}
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
 
