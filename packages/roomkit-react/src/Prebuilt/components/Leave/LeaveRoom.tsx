@@ -59,9 +59,11 @@ export const LeaveRoom = ({
     await hmsActions.endRoom(false, 'End Room');
   };
 
-  const leaveRoom = async (options: { endStream?: boolean } = { endStream: false }) => {
+  const leaveRoom = async (
+    options: { endStream?: boolean; sendReason?: boolean } = { endStream: false, sendReason: false },
+  ) => {
     if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
-      await stopStream('last publisher left');
+      await stopStream(options.sendReason ? 'last publisher left' : '');
     }
     await hmsActions.leave();
   };
