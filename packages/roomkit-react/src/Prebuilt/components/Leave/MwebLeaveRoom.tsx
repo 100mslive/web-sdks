@@ -21,7 +21,7 @@ export const MwebLeaveRoom = ({
   endRoom,
   container,
 }: {
-  leaveRoom: (options?: { endStream?: boolean; reason?: string }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean; sendReason?: boolean }) => Promise<void>;
   endRoom: () => Promise<void>;
   container?: HTMLElement;
 }) => {
