@@ -42,11 +42,11 @@ export const LeaveRoom = ({
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
-  const stopStream = async () => {
+  const stopStream = async (stop_reason = '') => {
     try {
       if (permissions?.hlsStreaming) {
         console.log('Stopping HLS stream');
-        await hmsActions.stopHLSStreaming();
+        await hmsActions.stopHLSStreaming({ stop_reason });
         ToastManager.addToast({ title: 'Stopping the stream' });
       }
     } catch (e) {
@@ -59,9 +59,11 @@ export const LeaveRoom = ({
     await hmsActions.endRoom(false, 'End Room');
   };
 
-  const leaveRoom = async (options: { endStream?: boolean } = { endStream: false }) => {
+  const leaveRoom = async (
+    options: { endStream?: boolean; sendReason?: boolean } = { endStream: false, sendReason: false },
+  ) => {
     if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
-      await stopStream();
+      await stopStream(options.sendReason ? 'last publisher left' : '');
     }
     await hmsActions.leave();
   };

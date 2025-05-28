@@ -1,7 +1,7 @@
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
-import { HLSConfig } from './hls-config';
+import { HLSConfig, StopHLSConfig } from './hls-config';
 import { HMSLocalPeer, HMSPeer } from './peer';
 import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager, HMSPlaylistSettings } from './playlist';
@@ -62,7 +62,7 @@ export interface HMSInterface {
    * @param {HLSConfig} params
    */
   startHLSStreaming(params?: HLSConfig): Promise<void>;
-  stopHLSStreaming(params?: HLSConfig): Promise<void>;
+  stopHLSStreaming(params?: StopHLSConfig): Promise<void>;
   startTranscription(params: TranscriptionConfig): Promise<void>;
   stopTranscription(params: TranscriptionConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
