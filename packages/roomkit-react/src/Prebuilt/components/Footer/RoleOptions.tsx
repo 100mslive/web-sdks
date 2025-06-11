@@ -182,7 +182,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
               <VideoOffIcon />
               <Text variant="sm" css={optionTextCSS}>
-                Mute Video for All
+                Turn Off Video for All
               </Text>
             </Dropdown.Item>
           );
@@ -192,7 +192,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', true)}>
               <VideoOnIcon />
               <Text variant="sm" css={optionTextCSS}>
-                Request to Unmute Video for All
+                Request to Turn On Video for All
               </Text>
             </Dropdown.Item>
           );

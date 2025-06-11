@@ -129,7 +129,7 @@ const MinimiseInset = () => {
     <>
       <StyledMenuTile.ItemButton className={dragClassName} css={spacingCSS} onClick={() => setMinimised(!minimised)}>
         <ShrinkIcon height={20} width={20} />
-        <span>{minimised ? 'Show' : 'Minimise'} your video</span>
+        <span>{minimised ? 'Show' : 'Minimize'} your video</span>
       </StyledMenuTile.ItemButton>
     </>
   );
@@ -302,7 +302,7 @@ export const TileMenuContent = ({
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
           {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
-          <span>{isVideoEnabled ? 'Mute Video' : 'Request to Unmute Video'}</span>
+          <span>{isVideoEnabled ? 'Turn Off Video' : 'Request to Turn On Video'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
 

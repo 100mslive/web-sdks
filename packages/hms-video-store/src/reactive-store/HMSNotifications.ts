@@ -75,11 +75,17 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
   }
 
   sendDeviceChange(request: HMSDeviceChangeEvent) {
+    const deviceTypeMap = {
+      audioOutput: 'Audio Output',
+      audioInput: 'Audio Input',
+      video: 'Video',
+    };
+    const deviceType = deviceTypeMap[request.type];
     const notification = this.createNotification(
       HMSNotificationTypes.DEVICE_CHANGE_UPDATE,
       request,
       request.error ? HMSNotificationSeverity.ERROR : HMSNotificationSeverity.INFO,
-      `Selected ${request.type} device - ${request.selection?.label}`,
+      `Selected ${deviceType} - ${request.selection?.label}`,
     );
     this.emitEvent(notification);
   }
