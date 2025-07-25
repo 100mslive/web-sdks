@@ -74,7 +74,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     private room?: Room,
   ) {
     super(stream, track, source);
-    this.addTrackEventListeners(track);
+    // this.addTrackEventListeners(track);
     this.trackPermissions();
     stream.tracks.push(this);
     this.setVideoHandler(new VideoElementManager(this));
@@ -264,7 +264,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async cleanup() {
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.handleTrackUnmute);
-    this.removeTrackEventListeners(this.nativeTrack);
+    // this.removeTrackEventListeners(this.nativeTrack);
     // Stopping the plugin before cleaning the track is more predictable when dealing with 3rd party plugins
     await this.mediaStreamPluginsManager.cleanup();
     await this.pluginsManager.cleanup();
@@ -381,11 +381,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * you are requesting for a new device.
      * Note: Do not change the order of this.
      */
-    this.removeTrackEventListeners(prevTrack);
+    // this.removeTrackEventListeners(prevTrack);
     prevTrack?.stop();
     try {
       const newTrack = await getVideoTrack(settings);
-      this.addTrackEventListeners(newTrack);
+      // this.addTrackEventListeners(newTrack);
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
@@ -395,7 +395,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
-      this.addTrackEventListeners(track);
+      // this.addTrackEventListeners(track);
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();
@@ -419,8 +419,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
-    this.removeTrackEventListeners(prevTrack);
-    this.addTrackEventListeners(newTrack);
+    // this.removeTrackEventListeners(prevTrack);
+    // this.addTrackEventListeners(newTrack);
     prevTrack?.stop();
     HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
     return newTrack;
@@ -517,11 +517,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
   };
 
+  // @ts-ignore
   private addTrackEventListeners(track: MediaStreamTrack) {
     track.addEventListener('mute', this.handleTrackMute);
     track.addEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
+  // @ts-ignore
   private removeTrackEventListeners(track: MediaStreamTrack) {
     track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
