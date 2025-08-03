@@ -105,9 +105,7 @@ const Settings = ({ setHide }) => {
           <TestAudio id={selectedDeviceIDs.audioOutput} />
         </DeviceSelector>
       ) : null}
-      {audioOutputFiltered?.length === 0 && !shouldShowAudioOutput ? (
-        <TestAudio id={selectedDeviceIDs.audioInput} />
-      ) : null}
+      {!shouldShowAudioOutput ? <TestAudio id={selectedDeviceIDs.audioInput} /> : null}
     </Box>
   );
 };
