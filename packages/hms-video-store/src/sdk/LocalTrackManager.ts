@@ -3,6 +3,7 @@ import { Store } from './store';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
+import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
@@ -533,15 +534,20 @@ export class LocalTrackManager {
     return { videoTrack, audioTrack };
   }
 
+  // eslint-disable-next-line complexity
   private getAudioSettings(initialSettings: InitialSettings) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams || !publishParams.allowed?.includes('audio')) {
       return null;
     }
+    const config = this.store.getConfig();
     const localPeer = this.store.getLocalPeer();
+    const rememberedDeviceId = config?.rememberDeviceSelection
+      ? DeviceStorageManager.getSelection()?.audioInput?.deviceId
+      : '';
     const audioTrack = localPeer?.audioTrack;
     // Get device from the tracks already added in preview
-    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
+    const audioDeviceId = audioTrack?.settings.deviceId || rememberedDeviceId || initialSettings.audioInputDeviceId;
 
     return new HMSAudioTrackSettingsBuilder()
       .codec(publishParams.audio.codec as HMSAudioCodec)
@@ -550,15 +556,20 @@ export class LocalTrackManager {
       .build();
   }
 
+  // eslint-disable-next-line complexity
   private getVideoSettings(initialSettings: InitialSettings) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams || !publishParams.allowed?.includes('video')) {
       return null;
     }
+    const config = this.store.getConfig();
     const localPeer = this.store.getLocalPeer();
+    const rememberedDeviceId = config?.rememberDeviceSelection
+      ? DeviceStorageManager.getSelection()?.videoInput?.deviceId
+      : '';
     const videoTrack = localPeer?.videoTrack;
     // Get device from the tracks already added in preview
-    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
+    const videoDeviceId = videoTrack?.settings.deviceId || rememberedDeviceId || initialSettings.videoDeviceId;
     const video = publishParams.video;
     return new HMSVideoTrackSettingsBuilder()
       .codec(video.codec as HMSVideoCodec)
