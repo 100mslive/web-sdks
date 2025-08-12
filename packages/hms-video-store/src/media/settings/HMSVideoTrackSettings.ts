@@ -122,7 +122,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
       width: { [dimensionConstraintKey]: aspectRatio.width },
       height: { [dimensionConstraintKey]: aspectRatio.height },
       frameRate: this.maxFramerate,
-      deviceId: { exact: this.deviceId },
+      deviceId: this.deviceId === 'default' ? this.deviceId : { exact: this.deviceId },
       facingMode: this.facingMode,
     };
   }
