@@ -102,7 +102,7 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
 
   toConstraints(): MediaTrackConstraints {
     return {
-      deviceId: this.deviceId,
+      deviceId: this.deviceId === 'default' ? this.deviceId : { exact: this.deviceId },
       advanced: this.audioMode === HMSAudioMode.MUSIC ? [] : this.advanced,
     };
   }

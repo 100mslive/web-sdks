@@ -6,9 +6,6 @@ import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTra
 export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {
     const audioConstraints = settings ? settings.toConstraints() : false;
-    if (audioConstraints && typeof audioConstraints === 'object' && settings?.deviceId) {
-      audioConstraints.deviceId = { exact: settings.deviceId };
-    }
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: audioConstraints,
     });
@@ -21,9 +18,6 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
 export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<MediaStreamTrack> {
   try {
     const videoConstraints = settings ? settings.toConstraints() : false;
-    if (videoConstraints && typeof videoConstraints === 'object' && settings?.deviceId) {
-      videoConstraints.deviceId = { exact: settings.deviceId };
-    }
     const stream = await navigator.mediaDevices.getUserMedia({
       video: videoConstraints,
     });
