@@ -189,7 +189,6 @@ export const getActiveCandidatePairFromReport = (report?: RTCStatsReport): RTCIc
   report?.forEach(stat => {
     if (stat.type === 'transport') {
       // TS doesn't have correct types for RTCStatsReports
-      // @ts-expect-error
       activeCandidatePair = report?.get(stat.selectedCandidatePairId);
     }
   });
