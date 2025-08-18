@@ -201,6 +201,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
+    HMSLogger.d(this.TAG, 'replaceTrackWith called', {
+      isEmptyTrack: isEmptyTrack(prevTrack),
+      enabled: prevTrack?.enabled,
+      permissionState: this.permissionState,
+      dismissedCount: this.permissionDismissedCount,
+    });
     /*
      * Note: Do not change the order of this.
      * stop the previous before acquiring the new track otherwise this can lead to
@@ -211,6 +217,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.tracksCreated.forEach(track => track.stop());
     this.tracksCreated.clear();
     try {
+      HMSLogger.d(this.TAG, 'Calling getAudioTrack...');
       const newTrack = await getAudioTrack(settings);
       this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
@@ -220,7 +227,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const err = e as Error;
       // Check if error is due to permission denial or dismissal
       if (err.name === 'NotAllowedError') {
+        HMSLogger.d(this.TAG, 'NotAllowedError caught, handling permission error');
         await this.handlePermissionError();
+        HMSLogger.d(this.TAG, 'Permission error handled, returning without retry');
         return;
       }
 
@@ -255,6 +264,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async setEnabled(value: boolean, skipcheck = false) {
+    HMSLogger.d(this.TAG, 'setEnabled called', {
+      value,
+      currentEnabled: this.enabled,
+      skipcheck,
+      isEmptyTrack: isEmptyTrack(this.nativeTrack),
+      permissionState: this.permissionState,
+    });
     if (value === this.enabled && !skipcheck) {
       return;
     }
