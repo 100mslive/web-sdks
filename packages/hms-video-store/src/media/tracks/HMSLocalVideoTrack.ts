@@ -5,7 +5,6 @@ import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -40,6 +39,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
+  private permissionState: PermissionState = 'granted';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -393,6 +393,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (error) {
+      // Check if error is due to permission denial
+      const err = error as Error;
+      if (err.name === 'NotAllowedError') {
+        HMSLogger.d(this.TAG, 'Permission denied, using blank track');
+        this.permissionState = 'denied';
+        // Use blank track if permission is denied
+        return await this.replaceTrackWithBlank();
+      }
+
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
@@ -529,6 +538,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private trackPermissions = () => {
     listenToPermissionChange('camera', (state: PermissionState) => {
+      this.permissionState = state;
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
       if (state === 'denied') {
         this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
@@ -597,10 +607,29 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
-        try {
-          await this.setEnabled(true);
-        } catch (error) {
-          this.eventBus.error.publish(error as HMSException);
+        // Check if we have camera permission before trying to re-enable
+        if (this.permissionState === 'denied') {
+          HMSLogger.d(this.TAG, 'Camera permission denied, not re-enabling track');
+          this.enabledStateBeforeBackground = false;
+          // ended interruption event
+          this.eventBus.analytics.publish(
+            this.sendInterruptionEvent({
+              started: false,
+              reason: 'visibility-change',
+            }),
+          );
+          return;
+        }
+
+        // Only try to re-enable if not already enabled
+        if (!this.enabled) {
+          try {
+            await this.setEnabled(true);
+          } catch (error) {
+            HMSLogger.d(this.TAG, 'Failed to re-enable video track after visibility change', error);
+            this.enabledStateBeforeBackground = false;
+            // Don't propagate error to avoid showing permission popup again
+          }
         }
       }
       // ended interruption event

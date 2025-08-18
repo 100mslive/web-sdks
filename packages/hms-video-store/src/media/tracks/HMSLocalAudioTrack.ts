@@ -26,6 +26,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private manuallySelectedDeviceId?: string;
+  private permissionState: PermissionState = 'granted';
   /**
    * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
    * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
@@ -113,11 +114,25 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
-      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
+      HMSLogger.d(this.TAG, 'On visibile checking if track needs replacing');
+
+      // Check if we have microphone permission before trying to replace track
+      if (this.permissionState === 'denied') {
+        HMSLogger.d(this.TAG, 'Microphone permission denied, not replacing track');
+        this.eventBus.analytics.publish(
+          this.sendInterruptionEvent({
+            started: false,
+            reason: 'visibility-change',
+          }),
+        );
+        return;
+      }
+
       try {
         await this.replaceTrackWith(this.settings);
       } catch (error) {
-        this.eventBus.error.publish(error as HMSException);
+        HMSLogger.d(this.TAG, 'Failed to replace audio track after visibility change', error);
+        // Don't propagate error to avoid showing permission popup again
       }
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
@@ -161,6 +176,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
+      const err = e as Error;
+      // Check if error is due to permission denial
+      if (err.name === 'NotAllowedError') {
+        HMSLogger.d(this.TAG, 'Microphone permission denied, not retrying');
+        this.permissionState = 'denied';
+        // Don't retry if permission was denied, throw the error
+        throw e;
+      }
+
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
       this.addTrackEventListeners(newTrack);
@@ -317,6 +341,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private trackPermissions = () => {
     listenToPermissionChange('microphone', (state: PermissionState) => {
+      this.permissionState = state;
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
       if (state === 'denied') {
         this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
