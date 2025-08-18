@@ -7,6 +7,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
@@ -181,8 +182,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       if (err.name === 'NotAllowedError') {
         HMSLogger.d(this.TAG, 'Microphone permission denied, not retrying');
         this.permissionState = 'denied';
-        // Don't retry if permission was denied, throw the error
-        throw e;
+        // Don't retry if permission was denied, use empty track instead
+        const emptyTrack = LocalTrackManager.getEmptyAudioTrack();
+        this.addTrackEventListeners(emptyTrack);
+        this.tracksCreated.add(emptyTrack);
+        await this.updateTrack(emptyTrack);
+        // Don't throw error to avoid retry attempts
+        return;
       }
 
       // Generate a new track from previous settings so there will be audio because previous track is stopped
@@ -206,18 +212,24 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
+  private async handleTrackEnable() {
+    if (this.shouldReacquireTrack()) {
+      await this.replaceTrackWith(this.settings);
+    }
+    if (!isEmptyTrack(this.nativeTrack)) {
+      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+    }
+  }
+
   async setEnabled(value: boolean, skipcheck = false) {
     if (value === this.enabled && !skipcheck) {
       return;
     }
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
-    if (value && this.shouldReacquireTrack()) {
-      await this.replaceTrackWith(this.settings);
+    if (value) {
+      await this.handleTrackEnable();
     }
     await super.setEnabled(value);
-    if (value) {
-      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
-    }
     this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
   }
 

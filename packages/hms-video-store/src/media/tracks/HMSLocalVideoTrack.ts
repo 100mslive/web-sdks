@@ -141,7 +141,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
       if (value) {
-        track = await this.replaceTrackWith(this.settings);
+        try {
+          track = await this.replaceTrackWith(this.settings);
+        } catch (error) {
+          const err = error as Error;
+          // If permission denied, replaceTrackWith already returns a blank track
+          // But if it still throws, use blank track and don't propagate error
+          if (err.name === 'NotAllowedError') {
+            HMSLogger.d(this.TAG, 'Permission denied in setEnabled, using blank track');
+            track = await this.replaceTrackWithBlank();
+          } else {
+            throw error;
+          }
+        }
       } else {
         track = await this.replaceTrackWithBlank();
       }
@@ -149,7 +161,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.nativeTrack?.stop();
       this.nativeTrack = track;
       await super.setEnabled(value);
-      if (value) {
+      if (value && !isEmptyTrack(track)) {
         await this.pluginsManager.waitForRestart();
         await this.processPlugins();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
