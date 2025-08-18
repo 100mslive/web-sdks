@@ -20,6 +20,7 @@ import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { TranscriptionNotifications } from './TranscriptionNotifications';
+import { MutedSpeechNotification } from './MutedSpeechNotification';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from '../AppData/useUISettings';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
@@ -59,6 +60,7 @@ export function Notifications() {
       <ChatNotifications />
       <HandRaisedNotifications />
       <TranscriptionNotifications />
+      <MutedSpeechNotification />
       <DeviceInUseError />
     </>
   );
