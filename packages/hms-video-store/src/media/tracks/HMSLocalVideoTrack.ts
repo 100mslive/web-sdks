@@ -40,6 +40,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
   private permissionState: PermissionState = 'granted';
+  private permissionDismissedCount = 0;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -405,13 +406,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (error) {
-      // Check if error is due to permission denial
+      // Check if error is due to permission denial or dismissal
       const err = error as Error;
       if (err.name === 'NotAllowedError') {
-        HMSLogger.d(this.TAG, 'Permission denied, using blank track');
-        this.permissionState = 'denied';
-        // Use blank track if permission is denied
-        return await this.replaceTrackWithBlank();
+        return await this.handlePermissionError();
       }
 
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
@@ -546,6 +544,42 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private removeTrackEventListeners(track: MediaStreamTrack) {
     track.removeEventListener('mute', this.handleTrackMute);
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
+  }
+
+  private async checkPermissionAfterError(): Promise<{ wasDismissed: boolean }> {
+    let wasDismissed = false;
+
+    if (navigator.permissions) {
+      try {
+        // @ts-ignore
+        const permission = await navigator.permissions.query({ name: 'camera' });
+        if (permission.state === 'prompt') {
+          wasDismissed = true;
+          HMSLogger.d(this.TAG, 'Camera permission dismissed by user');
+        } else if (permission.state === 'denied') {
+          this.permissionState = 'denied';
+          HMSLogger.d(this.TAG, 'Camera permission denied by user');
+        }
+      } catch (permError) {
+        HMSLogger.d(this.TAG, 'Unable to check permission state', permError);
+      }
+    }
+
+    return { wasDismissed };
+  }
+
+  private async handlePermissionError(): Promise<MediaStreamTrack> {
+    const { wasDismissed } = await this.checkPermissionAfterError();
+
+    // If dismissed (not denied), track dismissal count
+    if (wasDismissed) {
+      this.permissionDismissedCount++;
+      HMSLogger.d(this.TAG, `Permission dismissed ${this.permissionDismissedCount} time(s)`);
+      // Could implement delayed retry logic here if needed
+    }
+
+    // Use blank track
+    return await this.replaceTrackWithBlank();
   }
 
   private trackPermissions = () => {
