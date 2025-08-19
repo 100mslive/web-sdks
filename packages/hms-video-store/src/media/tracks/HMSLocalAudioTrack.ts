@@ -195,8 +195,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     } catch (e) {
       const err = e as HMSException;
       // Check if error is due to permission denial or dismissal
-      if (err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE) {
-        HMSLogger.d(this.TAG, 'NotAllowedError caught, handling permission error');
+      const permissionDenied =
+        err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        err.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION;
+      if (permissionDenied) {
+        HMSLogger.d(this.TAG, 'Permission error caught, handling');
         await this.handlePermissionError();
         HMSLogger.d(this.TAG, 'Permission error handled, returning without retry');
         return;

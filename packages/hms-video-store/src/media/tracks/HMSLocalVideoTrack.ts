@@ -409,7 +409,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       // Check if error is due to permission denial or dismissal
       const err = error as HMSException;
-      if (err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE) {
+      const permissionDenied =
+        err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        err.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION;
+      if (permissionDenied) {
         return await this.handlePermissionError();
       }
 
