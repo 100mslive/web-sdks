@@ -40,7 +40,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
-  private permissionState: PermissionState = 'prompt';
+  private permissionState: PermissionState = 'granted';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only

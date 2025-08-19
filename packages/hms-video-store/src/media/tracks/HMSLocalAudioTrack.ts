@@ -32,7 +32,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * for you to stop, which leads to the microphone not released even after leave is called.
    */
   private tracksCreated = new Set<MediaStreamTrack>();
-  private permissionState: PermissionState = 'prompt';
+  private permissionState: PermissionState = 'granted';
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
