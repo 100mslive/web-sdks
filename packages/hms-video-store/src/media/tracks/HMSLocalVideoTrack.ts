@@ -376,9 +376,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @private
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
-    // Check if permission is granted before attempting to acquire media
-    if (this.permissionState !== 'granted') {
-      HMSLogger.d(this.TAG, 'Camera permission not granted, using blank track', this.permissionState);
+    // Skip media acquisition if permission is explicitly denied
+    if (this.permissionState === 'denied') {
+      HMSLogger.d(this.TAG, 'Camera permission denied, using blank track', this.permissionState);
       return await this.replaceTrackWithBlank();
     }
 

@@ -145,9 +145,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
-    // Check if permission is granted before attempting to acquire media
-    if (this.permissionState !== 'granted') {
-      HMSLogger.d(this.TAG, 'Microphone permission not granted, skipping track replacement', this.permissionState);
+    // Skip media acquisition if permission is explicitly denied
+    if (this.permissionState === 'denied') {
+      HMSLogger.d(this.TAG, 'Microphone permission denied, skipping track replacement', this.permissionState);
       return;
     }
 
