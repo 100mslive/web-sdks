@@ -3,6 +3,7 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
@@ -40,8 +41,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
-  private permissionState: PermissionState = 'granted';
-  private permissionDismissedCount = 0;
+  private permissionState: PermissionState = 'prompt';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -408,8 +408,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return newTrack;
     } catch (error) {
       // Check if error is due to permission denial or dismissal
-      const err = (error as HMSException).nativeError as Error;
-      if (err.name === 'NotAllowedError') {
+      const err = error as HMSException;
+      if (err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE) {
         return await this.handlePermissionError();
       }
 
@@ -547,40 +547,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
-  private async checkPermissionAfterError(): Promise<{ wasDismissed: boolean }> {
-    let wasDismissed = false;
-
-    if (navigator.permissions) {
-      try {
-        // @ts-ignore
-        const permission = await navigator.permissions.query({ name: 'camera' });
-        if (permission.state === 'prompt') {
-          wasDismissed = true;
-          HMSLogger.d(this.TAG, 'Camera permission dismissed by user');
-        } else if (permission.state === 'denied') {
-          this.permissionState = 'denied';
-          HMSLogger.d(this.TAG, 'Camera permission denied by user');
-        }
-      } catch (permError) {
-        HMSLogger.d(this.TAG, 'Unable to check permission state', permError);
-      }
-    }
-
-    return { wasDismissed };
-  }
-
   private async handlePermissionError(): Promise<MediaStreamTrack> {
-    const { wasDismissed } = await this.checkPermissionAfterError();
-    console.log('Permission check after error:', wasDismissed, this.permissionState);
-
-    // If dismissed (not denied), track dismissal count
-    if (wasDismissed) {
-      this.permissionDismissedCount++;
-      HMSLogger.d(this.TAG, `Permission dismissed ${this.permissionDismissedCount} time(s)`);
-      // Could implement delayed retry logic here if needed
-    }
-
-    // Use blank track
+    HMSLogger.d(this.TAG, 'Handling permission error, using blank track');
+    // The permission listener will update the permissionState automatically
     return await this.replaceTrackWithBlank();
   }
 
@@ -656,7 +625,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
         // Check if we have camera permission before trying to re-enable
-        if (this.permissionState === 'denied') {
+        if (this.permissionState !== 'granted') {
           HMSLogger.d(this.TAG, 'Camera permission denied, not re-enabling track');
           this.enabledStateBeforeBackground = false;
           // ended interruption event

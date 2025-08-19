@@ -2,6 +2,7 @@ import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
@@ -27,8 +28,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private manuallySelectedDeviceId?: string;
-  private permissionState: PermissionState = 'granted';
-  private permissionDismissedCount = 0;
+  private permissionState: PermissionState = 'prompt';
   /**
    * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
    * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
@@ -102,43 +102,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.manuallySelectedDeviceId = undefined;
   }
 
-  private async checkPermissionAfterError(): Promise<{ wasDismissed: boolean }> {
-    let wasDismissed = false;
-
-    if (navigator.permissions) {
-      try {
-        // @ts-ignore
-        const permission = await navigator.permissions.query({ name: 'microphone' });
-        if (permission.state === 'prompt') {
-          wasDismissed = true;
-          HMSLogger.d(this.TAG, 'Microphone permission dismissed by user');
-        } else if (permission.state === 'denied') {
-          this.permissionState = 'denied';
-          HMSLogger.d(this.TAG, 'Microphone permission denied by user');
-        }
-      } catch (permError) {
-        HMSLogger.d(this.TAG, 'Unable to check permission state', permError);
-      }
-    }
-
-    return { wasDismissed };
-  }
-
   private async handlePermissionError() {
-    const { wasDismissed } = await this.checkPermissionAfterError();
-
-    // Use empty track for now
+    HMSLogger.d(this.TAG, 'Handling permission error, using empty track');
+    // The permission listener will update the permissionState automatically
     const emptyTrack = LocalTrackManager.getEmptyAudioTrack();
     this.addTrackEventListeners(emptyTrack);
     this.tracksCreated.add(emptyTrack);
     await this.updateTrack(emptyTrack);
-
-    // If dismissed (not denied), track dismissal count
-    if (wasDismissed) {
-      this.permissionDismissedCount++;
-      HMSLogger.d(this.TAG, `Permission dismissed ${this.permissionDismissedCount} time(s)`);
-      // Could implement delayed retry logic here if needed
-    }
   }
 
   private handleVisibilityChange = async () => {
@@ -158,8 +128,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'On visibile checking if track needs replacing');
 
       // Check if we have microphone permission before trying to replace track
-      if (this.permissionState === 'denied') {
-        HMSLogger.d(this.TAG, 'Microphone permission denied, not replacing track');
+      if (this.permissionState !== 'granted') {
+        HMSLogger.d(this.TAG, 'Microphone permission not granted, not replacing track');
         this.eventBus.analytics.publish(
           this.sendInterruptionEvent({
             started: false,
@@ -205,7 +175,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       isEmptyTrack: isEmptyTrack(prevTrack),
       enabled: prevTrack?.enabled,
       permissionState: this.permissionState,
-      dismissedCount: this.permissionDismissedCount,
     });
     /*
      * Note: Do not change the order of this.
@@ -224,9 +193,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
-      const err = (e as HMSException).nativeError as Error;
+      const err = e as HMSException;
       // Check if error is due to permission denial or dismissal
-      if (err.name === 'NotAllowedError') {
+      if (err.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE) {
         HMSLogger.d(this.TAG, 'NotAllowedError caught, handling permission error');
         await this.handlePermissionError();
         HMSLogger.d(this.TAG, 'Permission error handled, returning without retry');
