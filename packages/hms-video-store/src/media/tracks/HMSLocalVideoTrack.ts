@@ -12,6 +12,7 @@ import {
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
 } from '../../interfaces';
+import { HMSException } from '../../internal';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
@@ -407,7 +408,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return newTrack;
     } catch (error) {
       // Check if error is due to permission denial or dismissal
-      const err = error as Error;
+      const err = (error as HMSException).nativeError as Error;
       if (err.name === 'NotAllowedError') {
         return await this.handlePermissionError();
       }
@@ -570,6 +571,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async handlePermissionError(): Promise<MediaStreamTrack> {
     const { wasDismissed } = await this.checkPermissionAfterError();
+    console.log('Permission check after error:', wasDismissed, this.permissionState);
 
     // If dismissed (not denied), track dismissal count
     if (wasDismissed) {

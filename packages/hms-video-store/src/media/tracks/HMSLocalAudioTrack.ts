@@ -224,7 +224,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
-      const err = e as Error;
+      const err = (e as HMSException).nativeError as Error;
       // Check if error is due to permission denial or dismissal
       if (err.name === 'NotAllowedError') {
         HMSLogger.d(this.TAG, 'NotAllowedError caught, handling permission error');
