@@ -2,7 +2,6 @@ import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorCodes } from '../../error/ErrorCodes';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
@@ -114,7 +113,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           reason: 'visibility-change',
         }),
       );
-    } else if (this.permissionState === 'granted') {
+    } else {
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       try {
         await this.replaceTrackWith(this.settings);
@@ -146,6 +145,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
+    // Check if permission is granted before attempting to acquire media
+    if (this.permissionState !== 'granted') {
+      HMSLogger.d(this.TAG, 'Microphone permission not granted, skipping track replacement', this.permissionState);
+      return;
+    }
+
     const prevTrack = this.nativeTrack;
     /*
      * Note: Do not change the order of this.
@@ -163,14 +168,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
-      const error = e as HMSException;
-      if (
-        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
-        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
-      ) {
-        HMSLogger.e(this.TAG, 'Error while replacing track', e);
-        return;
-      }
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
       this.addTrackEventListeners(newTrack);

@@ -3,7 +3,6 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
@@ -377,6 +376,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @private
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
+    // Check if permission is granted before attempting to acquire media
+    if (this.permissionState !== 'granted') {
+      HMSLogger.d(this.TAG, 'Camera permission not granted, using blank track', this.permissionState);
+      return await this.replaceTrackWithBlank();
+    }
+
     const prevTrack = this.nativeTrack;
     /**
      * not stopping previous track results in device in use more frequently, as many devices will not allow even if
@@ -395,14 +400,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (e) {
-      const error = e as HMSException;
-      if (
-        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
-        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
-      ) {
-        HMSLogger.e(this.TAG, 'Error while replacing track', e);
-        return await this.replaceTrackWithBlank();
-      }
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
@@ -413,11 +410,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
-            error: error as Error,
+            error: e as Error,
           }),
         );
       }
-      throw error;
+      throw e;
     }
   }
 
@@ -608,7 +605,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       );
     } else {
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
-      if (this.enabledStateBeforeBackground && this.permissionState === 'granted') {
+      if (this.enabledStateBeforeBackground) {
         try {
           await this.setEnabled(true);
         } catch (error) {
