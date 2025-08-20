@@ -161,6 +161,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           if (isBlank) {
             HMSLogger.d(this.TAG, 'Got blank track due to permissions, keeping disabled');
             actualEnabled = false;
+            // Publish error so app knows permission was denied
+            const error = ErrorFactory.TracksErrors.CantAccessCaptureDevice(
+              HMSAction.TRACK,
+              'Camera permission denied or dismissed',
+            );
+            this.eventBus.error.publish(error);
           }
         } catch (error) {
           const err = error as Error;
@@ -170,6 +176,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
             HMSLogger.d(this.TAG, 'Permission denied in setEnabled, using blank track');
             track = await this.replaceTrackWithBlank();
             actualEnabled = false;
+            // Publish error so app knows permission was denied
+            const permissionError = ErrorFactory.TracksErrors.CantAccessCaptureDevice(
+              HMSAction.TRACK,
+              'Camera permission denied',
+            );
+            this.eventBus.error.publish(permissionError);
           } else {
             throw error;
           }

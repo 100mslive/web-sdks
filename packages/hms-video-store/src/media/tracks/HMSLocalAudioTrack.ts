@@ -3,6 +3,8 @@ import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorCodes } from '../../error/ErrorCodes';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
@@ -251,32 +253,53 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
     if (value) {
-      try {
-        await this.handleTrackEnable();
-        // Check if track was actually replaced successfully
-        // If it's still empty after trying to enable, permission was likely denied
-        const isEmpty = isEmptyTrack(this.nativeTrack);
-        HMSLogger.d(this.TAG, 'Track state after enable attempt', {
-          trackId: this.nativeTrack.id,
-          label: this.nativeTrack.label,
-          kind: this.nativeTrack.kind,
-          readyState: this.nativeTrack.readyState,
-          enabled: this.nativeTrack.enabled,
-          isEmpty,
-        });
-        if (isEmpty) {
-          HMSLogger.d(this.TAG, 'Track is still empty after enable attempt, keeping disabled');
-          actualEnabled = false;
-        }
-      } catch (error) {
-        HMSLogger.d(this.TAG, 'Error enabling audio track', error);
-        actualEnabled = false;
-      }
+      actualEnabled = await this.tryEnableTrack();
     }
 
     await super.setEnabled(actualEnabled);
     // Publish the actual enabled state
     this.eventBus.localAudioEnabled.publish({ enabled: actualEnabled, track: this });
+  }
+
+  private async tryEnableTrack(): Promise<boolean> {
+    try {
+      await this.handleTrackEnable();
+      // Check if track was actually replaced successfully
+      // If it's still empty after trying to enable, permission was likely denied
+      const isEmpty = isEmptyTrack(this.nativeTrack);
+      HMSLogger.d(this.TAG, 'Track state after enable attempt', {
+        trackId: this.nativeTrack.id,
+        label: this.nativeTrack.label,
+        kind: this.nativeTrack.kind,
+        readyState: this.nativeTrack.readyState,
+        enabled: this.nativeTrack.enabled,
+        isEmpty,
+      });
+      if (isEmpty) {
+        HMSLogger.d(this.TAG, 'Track is still empty after enable attempt, keeping disabled');
+        // Publish error so app knows permission was denied
+        const error = ErrorFactory.TracksErrors.CantAccessCaptureDevice(
+          HMSAction.TRACK,
+          'Microphone permission denied or dismissed',
+        );
+        this.eventBus.error.publish(error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      HMSLogger.d(this.TAG, 'Error enabling audio track', error);
+      // Publish the error to the app
+      if (error instanceof HMSException) {
+        this.eventBus.error.publish(error);
+      } else {
+        const permissionError = ErrorFactory.TracksErrors.CantAccessCaptureDevice(
+          HMSAction.TRACK,
+          'Microphone permission error',
+        );
+        this.eventBus.error.publish(permissionError);
+      }
+      return false;
+    }
   }
 
   /**
