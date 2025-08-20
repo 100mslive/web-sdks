@@ -3,6 +3,7 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
@@ -40,7 +41,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
-  private permissionState: PermissionState = 'granted';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -376,11 +376,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @private
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
-    // Skip media acquisition if permission is explicitly denied
-    if (this.permissionState === 'denied') {
-      HMSLogger.d(this.TAG, 'Camera permission denied, using blank track', this.permissionState);
-      return await this.replaceTrackWithBlank();
-    }
+    // Don't check permissions here - let the browser handle it
+    // This allows retries after dismissals and proper permission prompts
 
     const prevTrack = this.nativeTrack;
     /**
@@ -400,6 +397,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       return newTrack;
     } catch (e) {
+      const error = e as HMSException;
+      // Handle permission errors by using blank track
+      if (
+        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
+      ) {
+        HMSLogger.e(this.TAG, 'Error while replacing track', e);
+        return await this.replaceTrackWithBlank();
+      }
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
@@ -410,11 +416,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       if (this.isPublished) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
-            error: e as Error,
+            error: error as Error,
           }),
         );
       }
-      throw e;
+      throw error;
     }
   }
 
@@ -537,7 +543,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private trackPermissions = () => {
     listenToPermissionChange('camera', (state: PermissionState) => {
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
-      this.permissionState = state;
       HMSLogger.d(this.TAG, 'camera permission changed', state);
       if (state === 'denied') {
         this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
