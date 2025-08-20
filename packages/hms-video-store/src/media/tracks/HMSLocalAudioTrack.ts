@@ -28,7 +28,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private manuallySelectedDeviceId?: string;
-  private permissionState: PermissionState = 'prompt';
+  private permissionState: PermissionState = 'granted'; // Default to granted for browsers without Permissions API
   /**
    * This is to keep track of all the tracks created so far and stop and clear them when creating new tracks to release microphone
    * This is needed because when replaceTrackWith is called before updating native track, there is no way that track is available
@@ -246,12 +246,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (value === this.enabled && !skipcheck) {
       return;
     }
+
+    let actualEnabled = value;
+
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
     if (value) {
-      await this.handleTrackEnable();
+      try {
+        await this.handleTrackEnable();
+        // Check if track was actually replaced successfully
+        // If it's still empty after trying to enable, permission was likely denied
+        if (isEmptyTrack(this.nativeTrack)) {
+          HMSLogger.d(this.TAG, 'Track is still empty after enable attempt, keeping disabled');
+          actualEnabled = false;
+        }
+      } catch (error) {
+        HMSLogger.d(this.TAG, 'Error enabling audio track', error);
+        actualEnabled = false;
+      }
     }
-    await super.setEnabled(value);
-    this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
+
+    await super.setEnabled(actualEnabled);
+    this.eventBus.localAudioEnabled.publish({ enabled: actualEnabled, track: this });
   }
 
   /**

@@ -41,7 +41,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
-  private permissionState: PermissionState = 'prompt';
+  private permissionState: PermissionState = 'granted'; // Default to granted for browsers without Permissions API
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -142,9 +142,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
+      let actualEnabled = value;
+
       if (value) {
         try {
           track = await this.replaceTrackWith(this.settings);
+          // Check if we got a blank track due to permission issues
+          const isBlank = isEmptyTrack(track);
+          if (isBlank) {
+            HMSLogger.d(this.TAG, 'Got blank track due to permissions, keeping disabled');
+            actualEnabled = false;
+          }
         } catch (error) {
           const err = error as Error;
           // If permission denied, replaceTrackWith already returns a blank track
@@ -152,6 +160,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           if (err.name === 'NotAllowedError') {
             HMSLogger.d(this.TAG, 'Permission denied in setEnabled, using blank track');
             track = await this.replaceTrackWithBlank();
+            actualEnabled = false;
           } else {
             throw error;
           }
@@ -159,16 +168,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         track = await this.replaceTrackWithBlank();
       }
-      await this.replaceSender(track, value);
+
+      await this.replaceSender(track, actualEnabled);
       this.nativeTrack?.stop();
       this.nativeTrack = track;
-      await super.setEnabled(value);
-      if (value && !isEmptyTrack(track)) {
+      await super.setEnabled(actualEnabled);
+
+      if (actualEnabled && !isEmptyTrack(track)) {
         await this.pluginsManager.waitForRestart();
         await this.processPlugins();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
       this.videoHandler.updateSinks();
+
+      // Publish the actual enabled state, not what was requested
+      this.eventBus.localVideoEnabled.publish({ enabled: actualEnabled, track: this });
+      return;
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
   }

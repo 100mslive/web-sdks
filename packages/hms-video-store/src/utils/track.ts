@@ -45,6 +45,8 @@ export const listenToPermissionChange = (
     // @ts-ignore
     .query({ name: permissionName })
     .then(permission => {
+      // Call onChange immediately with current state
+      onChange(permission.state);
       permission.onchange = () => {
         onChange(permission.state);
       };
