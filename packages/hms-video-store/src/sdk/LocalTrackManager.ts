@@ -420,20 +420,6 @@ export class LocalTrackManager {
     if (error instanceof HMSException && error.action === HMSAction.TRACK) {
       this.observer.onFailure(error);
 
-      // Don't retry if permission was denied/dismissed by user
-      const permissionDenied =
-        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
-        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION;
-      if (permissionDenied) {
-        HMSLogger.w(this.TAG, 'Permission denied, not retrying', error);
-        // Return empty tracks instead of retrying
-        const audioFailure = error.message.includes('audio');
-        const videoFailure = error.message.includes('video');
-        fetchTrackOptions.audio = audioFailure ? 'empty' : fetchTrackOptions.audio;
-        fetchTrackOptions.video = videoFailure ? 'empty' : fetchTrackOptions.video;
-        return await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
-      }
-
       const overConstrainedFailure = error.code === ErrorCodes.TracksErrors.OVER_CONSTRAINED;
       const audioFailure = error.message.includes('audio');
       const videoFailure = error.message.includes('video');

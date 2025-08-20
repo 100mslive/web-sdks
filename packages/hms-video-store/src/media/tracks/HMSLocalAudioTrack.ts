@@ -275,6 +275,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     await super.setEnabled(actualEnabled);
+    // Publish the actual enabled state
     this.eventBus.localAudioEnabled.publish({ enabled: actualEnabled, track: this });
   }
 

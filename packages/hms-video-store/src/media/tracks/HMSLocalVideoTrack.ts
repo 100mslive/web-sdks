@@ -190,7 +190,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       this.videoHandler.updateSinks();
 
-      // Publish the actual enabled state, not what was requested
+      // Publish the actual enabled state
       this.eventBus.localVideoEnabled.publish({ enabled: actualEnabled, track: this });
       return;
     }
