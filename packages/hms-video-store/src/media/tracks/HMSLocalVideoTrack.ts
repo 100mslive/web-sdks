@@ -149,6 +149,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           track = await this.replaceTrackWith(this.settings);
           // Check if we got a blank track due to permission issues
           const isBlank = isEmptyTrack(track);
+          HMSLogger.d(this.TAG, 'Track received from replaceTrackWith', {
+            trackId: track.id,
+            label: track.label,
+            kind: track.kind,
+            readyState: track.readyState,
+            enabled: track.enabled,
+            isBlank,
+            hasCanvas: 'canvas' in track,
+          });
           if (isBlank) {
             HMSLogger.d(this.TAG, 'Got blank track due to permissions, keeping disabled');
             actualEnabled = false;

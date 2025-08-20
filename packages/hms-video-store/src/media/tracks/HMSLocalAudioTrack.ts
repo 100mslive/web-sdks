@@ -255,7 +255,16 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         await this.handleTrackEnable();
         // Check if track was actually replaced successfully
         // If it's still empty after trying to enable, permission was likely denied
-        if (isEmptyTrack(this.nativeTrack)) {
+        const isEmpty = isEmptyTrack(this.nativeTrack);
+        HMSLogger.d(this.TAG, 'Track state after enable attempt', {
+          trackId: this.nativeTrack.id,
+          label: this.nativeTrack.label,
+          kind: this.nativeTrack.kind,
+          readyState: this.nativeTrack.readyState,
+          enabled: this.nativeTrack.enabled,
+          isEmpty,
+        });
+        if (isEmpty) {
           HMSLogger.d(this.TAG, 'Track is still empty after enable attempt, keeping disabled');
           actualEnabled = false;
         }
