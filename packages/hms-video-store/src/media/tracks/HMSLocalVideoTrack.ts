@@ -401,6 +401,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
         error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
       ) {
+        const track = await this.replaceTrackWithBlank();
+        this.addTrackEventListeners(track);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        this.videoHandler.updateSinks();
         throw error;
       }
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped

@@ -8,6 +8,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
@@ -173,6 +174,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
         error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
       ) {
+        const newTrack = await LocalTrackManager.getEmptyAudioTrack();
+        this.addTrackEventListeners(newTrack);
+        this.tracksCreated.add(newTrack);
+        await this.updateTrack(newTrack);
         throw error;
       }
       // Generate a new track from previous settings so there will be audio because previous track is stopped
