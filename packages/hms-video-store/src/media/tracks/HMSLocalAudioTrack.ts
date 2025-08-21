@@ -282,8 +282,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           HMSAction.TRACK,
           'Microphone permission denied or dismissed',
         );
-        this.eventBus.error.publish(error);
-        return false;
+        throw error; // This will be caught in the calling function
       }
       return true;
     } catch (error) {
