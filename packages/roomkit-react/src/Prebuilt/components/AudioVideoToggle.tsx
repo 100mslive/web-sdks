@@ -277,7 +277,16 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   });
   const { videoInput, audioInput, audioOutput } = allDevices;
   const localPeer = useHMSStore(selectLocalPeer);
-  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle(
+    (error: Error, method?: string) => {
+      const errorType = method === 'toggleAudio' ? 'audio' : 'video';
+      ToastManager.addToast({
+        title: `${errorType}: ${error.message}`,
+        variant: 'standard',
+        duration: 2000,
+      });
+    },
+  );
   const actions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
