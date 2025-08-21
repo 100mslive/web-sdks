@@ -45,7 +45,9 @@ export const listenToPermissionChange = (
     // @ts-ignore
     .query({ name: permissionName })
     .then(permission => {
+      onChange(permission.state);
       permission.onchange = () => {
+        HMSLogger.d(`${permissionName} permission changed`, permission.state);
         onChange(permission.state);
       };
     })
