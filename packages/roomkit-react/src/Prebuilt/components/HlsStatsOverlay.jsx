@@ -21,18 +21,6 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <IconButton css={{ position: 'absolute', top: '$2', right: '$2' }} onClick={onClose}>
         <CrossIcon />
       </IconButton>
-      <HlsStatsRow label="URL">
-        <Flex align="center">
-          <a
-            style={{ cursor: 'pointer', textDecoration: 'underline' }}
-            href={hlsStatsState?.url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Stream url
-          </a>
-        </Flex>
-      </HlsStatsRow>
       <HlsStatsRow label="Video size">
         {` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}
       </HlsStatsRow>
