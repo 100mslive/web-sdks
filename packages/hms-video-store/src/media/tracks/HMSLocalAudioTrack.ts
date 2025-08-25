@@ -116,6 +116,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+          reason: 'visibility-change',
+        }),
+      );
       if (this.permissionState && this.permissionState !== 'granted') {
         HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
         return;
@@ -126,12 +132,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       } catch (error) {
         this.eventBus.error.publish(error as HMSException);
       }
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
     }
   };
 

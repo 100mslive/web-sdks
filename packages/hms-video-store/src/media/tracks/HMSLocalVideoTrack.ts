@@ -610,6 +610,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
+      // ended interruption event
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+          reason: 'visibility-change',
+        }),
+      );
       if (this.permissionState && this.permissionState !== 'granted') {
         HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
         return;
@@ -622,13 +629,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           this.eventBus.error.publish(error as HMSException);
         }
       }
-      // ended interruption event
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
     }
   };
 }
