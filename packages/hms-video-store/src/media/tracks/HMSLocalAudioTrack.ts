@@ -2,11 +2,13 @@ import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
@@ -33,6 +35,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   private tracksCreated = new Set<MediaStreamTrack>();
 
+  private permissionState?: PermissionState;
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
   /**
@@ -113,18 +116,22 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         }),
       );
     } else {
-      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
-      try {
-        await this.replaceTrackWith(this.settings);
-      } catch (error) {
-        this.eventBus.error.publish(error as HMSException);
-      }
       this.eventBus.analytics.publish(
         this.sendInterruptionEvent({
           started: false,
           reason: 'visibility-change',
         }),
       );
+      if (this.permissionState && this.permissionState !== 'granted') {
+        HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+        return;
+      }
+      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
+      try {
+        await this.replaceTrackWith(this.settings);
+      } catch (error) {
+        this.eventBus.error.publish(error as HMSException);
+      }
     }
   };
 
@@ -161,6 +168,18 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
+      const error = e as HMSException;
+
+      if (
+        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
+      ) {
+        const newTrack = await LocalTrackManager.getEmptyAudioTrack();
+        this.addTrackEventListeners(newTrack);
+        this.tracksCreated.add(newTrack);
+        await this.updateTrack(newTrack);
+        throw error;
+      }
       // Generate a new track from previous settings so there will be audio because previous track is stopped
       const newTrack = await getAudioTrack(this.settings);
       this.addTrackEventListeners(newTrack);
@@ -317,6 +336,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private trackPermissions = () => {
     listenToPermissionChange('microphone', (state: PermissionState) => {
+      this.permissionState = state;
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
       if (state === 'denied') {
         this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });

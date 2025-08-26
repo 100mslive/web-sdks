@@ -3,6 +3,7 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
@@ -40,6 +41,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
+  private permissionState?: PermissionState;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -392,7 +394,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
       }
       return newTrack;
-    } catch (error) {
+    } catch (e) {
+      const error = e as HMSException;
+
+      if (
+        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
+      ) {
+        const track = await this.replaceTrackWithBlank();
+        this.addTrackEventListeners(track);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        this.videoHandler.updateSinks();
+        throw error;
+      }
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
@@ -595,6 +610,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
+      // ended interruption event
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+          reason: 'visibility-change',
+        }),
+      );
+      if (this.permissionState && this.permissionState !== 'granted') {
+        HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+        return;
+      }
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
         try {
@@ -603,13 +629,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           this.eventBus.error.publish(error as HMSException);
         }
       }
-      // ended interruption event
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
     }
   };
 }
