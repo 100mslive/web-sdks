@@ -33,7 +33,7 @@ import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
-import { globalStyles, HMSThemeProvider } from '../Theme';
+import { config as cssConfig, globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
 import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
@@ -249,8 +249,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                               '-webkit-text-size-adjust': '100%',
                               position: 'relative',
                               // Apply mobile width constraints when isMobile is set
+                              // Extract the max-width value from the md breakpoint
                               ...(isMobile && {
-                                maxWidth: '768px',
+                                maxWidth: cssConfig.media.md.match(/max-width:\s*(\d+px)/)?.[1] || '768px',
                                 margin: '0 auto',
                               }),
                             }}
