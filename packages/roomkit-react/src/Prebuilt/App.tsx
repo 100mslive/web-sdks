@@ -248,11 +248,17 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                               lineHeight: '1.5',
                               '-webkit-text-size-adjust': '100%',
                               position: 'relative',
+                              // Apply mobile width constraints when isMobile is set
+                              ...(isMobile && {
+                                maxWidth: '768px',
+                                margin: '0 auto',
+                              }),
                             }}
                           >
                             <AppRoutes
                               authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
                               defaultAuthToken={authToken}
+                              isMobile={isMobile}
                             />
                           </Box>
                         </DialogContainerProvider>
@@ -302,9 +308,11 @@ const BackSwipe = () => {
 function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
+  isMobile,
 }: {
   authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
+  isMobile?: boolean;
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
