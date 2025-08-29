@@ -47,6 +47,7 @@ import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { setGlobalMobileOverride } from './common/mediaOverride';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
@@ -75,6 +76,11 @@ export type HMSPrebuiltProps = {
    * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
    */
   containerSelector?: string;
+  /**
+   * @remarks
+   * Force mobile view regardless of actual device type
+   */
+  isMobile?: boolean;
 };
 
 export type HMSPrebuiltRefType = {
@@ -98,11 +104,20 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       leaveOnUnload = true,
       onLeave,
       onJoin,
+      isMobile,
     },
     ref,
   ) => {
     const reactiveStore = useRef<HMSPrebuiltRefType>();
     const [hydrated, setHydrated] = React.useState(false);
+
+    // Set the global mobile override
+    useEffect(() => {
+      setGlobalMobileOverride(isMobile);
+      return () => {
+        setGlobalMobileOverride(undefined);
+      };
+    }, [isMobile]);
 
     useEffect(() => {
       setHydrated(true);

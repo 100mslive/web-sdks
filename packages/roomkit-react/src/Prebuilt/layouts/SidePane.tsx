@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
@@ -11,6 +10,7 @@ import VideoTile from '../components/VideoTile';
 import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Flex } from '../../Layout';
 import { config as cssConfig, styled } from '../../Theme';
+import { useMedia } from '../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any

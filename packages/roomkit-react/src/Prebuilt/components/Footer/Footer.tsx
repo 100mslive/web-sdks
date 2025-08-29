@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
@@ -22,6 +21,7 @@ import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
 import { WhiteboardToggle } from './WhiteboardToggle';
+import { useMedia } from '../../common/useMediaOverride';
 import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
