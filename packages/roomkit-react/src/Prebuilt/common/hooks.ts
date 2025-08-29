@@ -24,12 +24,13 @@ import {
 // @ts-ignore: No implicit any
 import { ToastManager } from '../components/Toast/ToastManager';
 import { config } from '../../Theme';
+import { useHMSPrebuiltContext } from '../AppContext';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 // @ts-ignore
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit any
-import { isScreenshareSupported } from '../common/utils';
+import { isMobileUserAgent, isScreenshareSupported } from '../common/utils';
 import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -120,7 +121,9 @@ export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }
 };
 
 export const useIsLandscape = () => {
-  const isMobile = parsedUserAgent.getDevice().type === 'mobile';
+  const isMobileFromContext = useHMSPrebuiltContext().isMobile;
+  const isMobile =
+    isMobileFromContext !== undefined ? isMobileFromContext : parsedUserAgent.getDevice().type === 'mobile';
   const isLandscape = useMedia(config.media.ls);
   return isMobile && isLandscape;
 };
@@ -132,7 +135,9 @@ export const useLandscapeHLSStream = () => {
 };
 
 export const useMobileHLSStream = () => {
-  const isMobile = useMedia(config.media.md);
+  const isMobileFromContext = useHMSPrebuiltContext().isMobile;
+  const isMobileFromMedia = useMedia(config.media.md);
+  const isMobile = isMobileFromContext !== undefined ? isMobileFromContext : isMobileFromMedia;
   const { screenType } = useRoomLayoutConferencingScreen();
   return isMobile && screenType === 'hls_live_streaming';
 };
@@ -255,3 +260,36 @@ export function useWaitingRoomInfo(): WaitingRoomInfo {
     hasSubscribedRolePublishing,
   };
 }
+
+/**
+ * Hook to detect if the device is mobile
+ * Checks the isMobile prop from context first, then falls back to user agent detection
+ */
+export const useMobileDetection = (): boolean => {
+  const { isMobile } = useHMSPrebuiltContext();
+
+  // If isMobile is explicitly set, use that value
+  if (isMobile !== undefined) {
+    return isMobile;
+  }
+
+  // Otherwise fall back to user agent detection
+  return isMobileUserAgent;
+};
+
+/**
+ * Hook to detect if the device is mobile using media queries
+ * Checks the isMobile prop from context first, then falls back to media query detection
+ */
+export const useIsMobile = (): boolean => {
+  const { isMobile } = useHMSPrebuiltContext();
+  const isMobileFromMedia = useMedia(config.media.md);
+
+  // If isMobile is explicitly set, use that value
+  if (isMobile !== undefined) {
+    return isMobile;
+  }
+
+  // Otherwise fall back to media query detection
+  return isMobileFromMedia;
+};

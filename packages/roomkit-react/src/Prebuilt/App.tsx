@@ -75,6 +75,11 @@ export type HMSPrebuiltProps = {
    * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
    */
   containerSelector?: string;
+  /**
+   * @remarks
+   * Force mobile view regardless of the actual device type
+   */
+  isMobile?: boolean;
 };
 
 export type HMSPrebuiltRefType = {
@@ -98,6 +103,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       leaveOnUnload = true,
       onLeave,
       onJoin,
+      isMobile,
     },
     ref,
   ) => {
@@ -180,6 +186,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             onJoin,
             userName,
             userId,
+            isMobile,
             endpoints: {
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,

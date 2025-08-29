@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable, { ControlPosition } from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   HMSTranscript,
   selectIsTranscriptionEnabled,
@@ -10,12 +9,12 @@ import {
 } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsCaptionEnabled } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useIsMobile } from '../common/hooks';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 interface CaptionQueueData extends HMSTranscript {
   transcriptQueue: SimpleQueue;
@@ -180,7 +179,7 @@ export const CaptionsViewer = ({
   setDefaultPosition: (position: ControlPosition) => void;
 }) => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useIsMobile();
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
   const showCaptionAtTop = elements?.chat?.is_overlay && isChatOpen && isMobile;

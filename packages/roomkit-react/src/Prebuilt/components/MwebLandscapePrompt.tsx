@@ -7,17 +7,17 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
-import { useLandscapeHLSStream } from '../common/hooks';
 // @ts-ignore
-import { isMobileUserAgent } from '../common/utils';
+import { useLandscapeHLSStream, useMobileDetection } from '../common/hooks';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isLandscape = useMedia(cssConfig.media.ls);
   const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobile = useMobileDetection();
 
   useEffect(() => {
-    if (!isMobileUserAgent) {
+    if (!isMobile) {
       setShowMwebLandscapePrompt(false);
       return;
     }
@@ -42,7 +42,7 @@ export const MwebLandscapePrompt = () => {
     return () => {
       window.screen.orientation.removeEventListener('change', handleRotation);
     };
-  }, [isLandscape, isLandscapeHLSStream]);
+  }, [isLandscape, isLandscapeHLSStream, isMobile]);
 
   if (isLandscapeHLSStream) {
     return null;

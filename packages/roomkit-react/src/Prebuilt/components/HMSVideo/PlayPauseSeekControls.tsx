@@ -1,12 +1,10 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { BackwardArrowIcon, ForwardArrowIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { config } from '../../../Theme';
 import { PlayPauseButton } from './PlayPauseButton';
 import { SeekControl } from './SeekControl';
-import { useIsLandscape } from '../../common/hooks';
+import { useIsLandscape, useIsMobile } from '../../common/hooks';
 
 // desktop buttons
 export const PlayPauseSeekControls = ({
@@ -55,7 +53,7 @@ export const PlayPauseSeekOverlayControls = ({
     pausePlay: boolean;
   };
 }) => {
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useIsMobile();
   const isLandscape = useIsLandscape();
 
   if (!isMobile && !isLandscape) {
