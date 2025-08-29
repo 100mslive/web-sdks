@@ -1,9 +1,9 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { VolumeTwoIcon } from '@100mslive/react-icons';
 import { Button, config, Dialog, IconButton, Text } from '../../..';
 // @ts-ignore
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { useMedia } from '../../common/useMediaOverride';
 import { useIsLandscape } from '../../common/hooks';
 
 export function HLSAutoplayBlockedPrompt({

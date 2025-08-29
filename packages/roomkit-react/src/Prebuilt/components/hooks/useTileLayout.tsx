@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useMeasure, useMedia } from 'react-use';
+import { useMeasure } from 'react-use';
 import {
   getPeersWithTiles,
   HMSPeer,
@@ -8,6 +8,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
+import { useMedia } from '../../common/useMediaOverride';
 
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 

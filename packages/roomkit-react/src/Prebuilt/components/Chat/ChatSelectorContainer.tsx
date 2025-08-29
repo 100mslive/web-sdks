@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, GroupIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
@@ -7,6 +6,7 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { ChatSelector } from './ChatSelector';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';

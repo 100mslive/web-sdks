@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import {
   HMSPeer,
@@ -17,6 +16,7 @@ import { config as cssConfig } from '../../../Theme';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
+import { useMedia } from '../../common/useMediaOverride';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const LeaveRoom = ({

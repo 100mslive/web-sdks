@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useState } from 'react';
-import { useDebounce, useMedia } from 'react-use';
+import { useDebounce } from 'react-use';
 import {
   HMSPeer,
   HMSPeerType,
@@ -33,6 +33,7 @@ import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RemoveParticipant } from '../RemoveParticipant';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { RoleAccordion } from './RoleAccordion';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';

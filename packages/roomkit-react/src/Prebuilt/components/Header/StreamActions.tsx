@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { HMSRecordingState } from '@100mslive/hms-video-store';
 import {
   HMSRoomState,
@@ -17,6 +16,7 @@ import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Pop
 import { Sheet } from '../../../Sheet';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useRecordingHandler } from '../../common/hooks';
 // @ts-ignore

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
+import { useFullscreen, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { match, P } from 'ts-pattern';
@@ -35,6 +35,7 @@ import { Text } from '../../Text';
 import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { WaitingView } from './WaitingView';
+import { useMedia } from '../common/useMediaOverride';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable, { ControlPosition } from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   HMSTranscript,
   selectIsTranscriptionEnabled,
@@ -11,6 +10,7 @@ import {
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config } from '../../Theme';
+import { useMedia } from '../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any

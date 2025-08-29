@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectIsLargeRoom,
   selectLocalPeerID,
@@ -12,6 +11,7 @@ import {
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config as cssConfig, keyframes } from '../../Theme';
+import { useMedia } from '../common/useMediaOverride';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 let emojiCount = 1;

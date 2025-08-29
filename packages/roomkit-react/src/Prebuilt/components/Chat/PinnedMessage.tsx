@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
 import { PinIcon, UnpinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
@@ -10,6 +9,7 @@ import { ArrowNavigation } from './ArrowNavigation';
 // @ts-ignore
 import { AnnotisedMessage } from './ChatBody';
 import { StickIndicator } from './StickIndicator';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';

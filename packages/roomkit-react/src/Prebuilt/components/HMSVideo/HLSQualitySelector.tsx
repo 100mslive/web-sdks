@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { HMSHLSLayer } from '@100mslive/hls-player';
 import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { config } from '../../../Theme';
+import { useMedia } from '../../common/useMediaOverride';
 import { useIsLandscape } from '../../common/hooks';
 
 export function HLSQualitySelector({

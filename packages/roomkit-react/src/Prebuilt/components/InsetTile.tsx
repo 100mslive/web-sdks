@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   selectIsAllowedToPublish,
   selectLocalPeer,
@@ -18,6 +17,7 @@ import IconButton from '../IconButton';
 import { AudioVideoToggle } from './AudioVideoToggle';
 // @ts-ignore: No implicit Any
 import VideoTile from './VideoTile';
+import { useMedia } from '../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
 import { useVideoTileContext } from './hooks/useVideoTileLayout';

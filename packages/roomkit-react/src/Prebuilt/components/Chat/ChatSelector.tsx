@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSPeer,
   HMSPeerType,
@@ -13,6 +12,7 @@ import { CheckIcon, PeopleIcon } from '@100mslive/react-icons';
 import { Box, CSS, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
 import { config as cssConfig } from '../../../Theme';
 import { ParticipantSearch } from '../Footer/ParticipantList';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';

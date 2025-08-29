@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { BackwardArrowIcon, ForwardArrowIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config } from '../../../Theme';
 import { PlayPauseButton } from './PlayPauseButton';
 import { SeekControl } from './SeekControl';
+import { useMedia } from '../../common/useMediaOverride';
 import { useIsLandscape } from '../../common/hooks';
 
 // desktop buttons

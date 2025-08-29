@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import {
   selectHMSStats,
@@ -22,6 +21,7 @@ import { Switch } from '../../Switch';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
+import { useMedia } from '../common/useMediaOverride';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { UI_SETTINGS } from '../common/constants';

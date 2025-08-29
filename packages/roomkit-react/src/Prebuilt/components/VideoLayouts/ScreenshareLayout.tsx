@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -10,6 +9,7 @@ import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey, useSetUiSettings } from '../AppData/useUISettings';
 import { APP_DATA, UI_SETTINGS } from '../../common/constants';

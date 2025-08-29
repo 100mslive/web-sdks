@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useMeasure, useMedia } from 'react-use';
+import { useMeasure } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
@@ -31,6 +31,7 @@ import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 import PreviewForm from './PreviewForm';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import {
   useAuthToken,

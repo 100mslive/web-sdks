@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore
 import emptyChat from '../../images/empty-chat.svg';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';

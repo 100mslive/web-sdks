@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -10,6 +9,7 @@ import { DesktopOptions } from './SplitComponents/DesktopOptions';
 // @ts-ignore: No implicit Any
 import { MwebOptions } from './SplitComponents/MwebOptions';
 import { config as cssConfig } from '../../..';
+import { useMedia } from '../../common/useMediaOverride';
 import { useLandscapeHLSStream } from '../../common/hooks';
 
 export const MoreSettings = ({

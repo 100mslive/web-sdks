@@ -1,7 +1,7 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
+import { useMedia } from '../../common/useMediaOverride';
 
 export const RequestPrompt = ({
   open = true,

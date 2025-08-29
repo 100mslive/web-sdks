@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSAudioTrack,
   HMSVideoTrack,
@@ -21,6 +20,7 @@ import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { getVideoTileLabel } from '../peerTileUtils';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { TileMenuContent } from './TileMenuContent';
+import { useMedia } from '../../common/useMediaOverride';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { getDragClassName } from './utils';
 

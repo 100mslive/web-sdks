@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Flex } from '../../..';
 // @ts-ignore: No implicit any
@@ -7,6 +6,7 @@ import { Logo, SpeakerTag } from './HeaderComponents';
 // @ts-ignore: No implicit any
 import { RoomDetailsHeader } from './RoomDetailsHeader';
 import { LiveStatus, RecordingPauseStatus, RecordingStatus, StreamActions } from './StreamActions';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore: No implicit any
 import { AudioActions, CamaraFlipActions } from './common';
 

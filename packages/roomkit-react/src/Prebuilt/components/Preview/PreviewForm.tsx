@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { GoLiveIcon } from '@100mslive/react-icons';
@@ -7,6 +6,7 @@ import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { PreviewSettings } from './PreviewJoin';
+import { useMedia } from '../../common/useMediaOverride';
 
 const PreviewForm = ({
   name,

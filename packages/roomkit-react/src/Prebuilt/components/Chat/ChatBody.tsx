@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
@@ -24,6 +23,7 @@ import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { ChatActions } from './ChatActions';
 import { EmptyChat } from './EmptyChat';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';

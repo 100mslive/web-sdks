@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -8,6 +7,7 @@ import { SecondaryTiles } from '../SecondaryTiles';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { useRoleProminencePeers } from '../hooks/useRoleProminencePeers';

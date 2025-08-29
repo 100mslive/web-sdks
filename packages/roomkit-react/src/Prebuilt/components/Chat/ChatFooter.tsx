@@ -1,5 +1,4 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import Picker from '@emoji-mart/react';
 import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -11,6 +10,7 @@ import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit any
 import { useChatDraftMessage } from '../AppData/useChatState';

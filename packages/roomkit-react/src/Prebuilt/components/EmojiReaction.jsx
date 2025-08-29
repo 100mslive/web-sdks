@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
 import {
@@ -17,6 +16,7 @@ import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
+import { useMedia } from '../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';

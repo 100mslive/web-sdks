@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from 'react';
-import { useMedia } from 'react-use';
 import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
@@ -9,6 +8,7 @@ import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';

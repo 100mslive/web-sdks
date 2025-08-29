@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
@@ -10,6 +9,7 @@ import { ParticipantList } from './Footer/ParticipantList';
 import { Box, config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 import { Tooltip } from '../../Tooltip';
 import { ChatSettings } from './ChatSettings';
+import { useMedia } from '../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';

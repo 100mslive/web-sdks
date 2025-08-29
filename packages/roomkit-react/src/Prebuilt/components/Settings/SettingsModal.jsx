@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { IconButton } from '../../../IconButton';
@@ -12,6 +11,7 @@ import { config as cssConfig } from '../../../Theme';
 import DeviceSettings from './DeviceSettings';
 import { LayoutSettings } from './LayoutSettings';
 import { NotificationSettings } from './NotificationSettings';
+import { useMedia } from '../../common/useMediaOverride';
 import { settingContent } from './common';
 
 const settingsList = [

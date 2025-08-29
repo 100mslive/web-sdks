@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { Rating } from '@100mslive/types-prebuilt/elements/feedback';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { CheckIcon, CrossIcon } from '@100mslive/react-icons';
@@ -13,6 +12,7 @@ import { Text } from '../../../Text';
 import { TextArea } from '../../../TextArea';
 import { config as cssConfig } from '../../../Theme';
 import { useHMSPrebuiltContext } from '../../AppContext';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const FEEBACK_INDEX = {

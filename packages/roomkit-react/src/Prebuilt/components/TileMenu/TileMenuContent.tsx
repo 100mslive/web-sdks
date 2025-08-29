@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSException,
   HMSSimulcastLayerDefinition,
@@ -36,6 +35,7 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { useHMSPrebuiltContext } from '../../AppContext';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore

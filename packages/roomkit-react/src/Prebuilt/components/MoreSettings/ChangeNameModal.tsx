@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
@@ -7,6 +6,7 @@ import { Sheet } from '../../../Sheet';
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore: No implicit Any
 import { ChangeNameContent } from './ChangeNameContent';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 

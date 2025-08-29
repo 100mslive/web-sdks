@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useFullscreen, useMedia } from 'react-use';
+import { useFullscreen } from 'react-use';
 import screenfull from 'screenfull';
 import {
   selectLocalPeerID,
@@ -18,6 +18,7 @@ import { StyledVideoTile } from '../../VideoTile';
 import { LayoutModeSelector } from './LayoutModeSelector';
 import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
+import { useMedia } from '../common/useMediaOverride';
 // @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';

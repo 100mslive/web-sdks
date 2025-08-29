@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectAppData, selectSessionStore, selectTrackByID, useHMSStore } from '@100mslive/react-sdk';
 import { LayoutProps } from './VideoLayouts/interface';
 import { ProminenceLayout } from './VideoLayouts/ProminenceLayout';
 import { config as cssConfig } from '../../Theme';
 import { Pagination } from './Pagination';
+import { useMedia } from '../common/useMediaOverride';
 import { usePagesWithTiles } from './hooks/useTileLayout';
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 import { FEEBACK_INDEX, FeedbackHeader, FeedbackModal } from './FeedbackForm';
 import { ThankyouView } from './ThankyouView';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const Feedback = () => {

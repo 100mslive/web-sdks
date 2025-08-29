@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -13,6 +12,7 @@ import {
 } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';

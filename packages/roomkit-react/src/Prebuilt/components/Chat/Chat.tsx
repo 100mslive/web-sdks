@@ -1,5 +1,4 @@
 import React, { MutableRefObject, useCallback, useRef } from 'react';
-import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
 import { match } from 'ts-pattern';
@@ -16,6 +15,7 @@ import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
+import { useMedia } from '../../common/useMediaOverride';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';

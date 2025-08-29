@@ -1,8 +1,8 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { CaptionContent } from './CaptionContent';
+import { useMedia } from '../../common/useMediaOverride';
 
 export const CaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) => void }) => {
   const isMobile = useMedia(cssConfig.media.md);

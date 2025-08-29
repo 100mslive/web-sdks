@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { HMSPeer, selectAvailableRoleNames, selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
@@ -10,6 +9,7 @@ import { Sheet } from '../../Sheet';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+import { useMedia } from '../common/useMediaOverride';
 
 const HighlightTerm = ({ value }: { value: string | undefined }) => {
   return value ? (

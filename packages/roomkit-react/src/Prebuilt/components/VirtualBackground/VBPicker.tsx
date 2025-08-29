@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSMediaStreamPlugin,
   selectAppData,
@@ -27,6 +26,7 @@ import { Box, config as cssConfig, Flex, Loading, Slider, Video } from '../../..
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
+import { useMedia } from '../../common/useMediaOverride';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';

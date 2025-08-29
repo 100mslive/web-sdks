@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
@@ -28,6 +27,7 @@ import { useRoomLayout } from '../provider/roomLayoutProvider';
 // @ts-ignore
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useMedia } from './useMediaOverride';
 // @ts-ignore: No implicit any
 import { isScreenshareSupported } from '../common/utils';
 import { APP_DATA, CHAT_SELECTOR, RTMP_RECORD_DEFAULT_RESOLUTION } from './constants';
