@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
 import {
@@ -19,7 +18,7 @@ import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useDropdownList } from './hooks/useDropdownList';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
+import { useIsMobile, useLandscapeHLSStream, useMobileHLSStream } from '$2/common/hooks';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 init({ data });
@@ -33,7 +32,7 @@ export const EmojiReaction = ({ showCard = false }) => {
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerId = useHMSStore(selectLocalPeerID);
   // const { isStreamingOn } = useRecordingStreaming();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const isLandscape = useMedia(cssConfig.media.ls);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();

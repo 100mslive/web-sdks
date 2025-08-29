@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useFullscreen, useMedia } from 'react-use';
+import { useFullscreen } from 'react-use';
 import screenfull from 'screenfull';
 import {
   selectLocalPeerID,
@@ -12,7 +12,7 @@ import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import TileMenu from './TileMenu/TileMenu';
 import { Box } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { config as cssConfig, useTheme } from '../../Theme';
+import { useTheme } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { LayoutModeSelector } from './LayoutModeSelector';
@@ -20,6 +20,8 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
 // @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
+// @ts-ignore
+import { useIsMobile } from '../../common/hooks';
 import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {
@@ -38,7 +40,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const fullscreenRef = useRef<HTMLDivElement | null>(null);
   // fullscreen is for desired state

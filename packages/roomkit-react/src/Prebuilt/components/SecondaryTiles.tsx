@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectAppData, selectSessionStore, selectTrackByID, useHMSStore } from '@100mslive/react-sdk';
 import { LayoutProps } from './VideoLayouts/interface';
 import { ProminenceLayout } from './VideoLayouts/ProminenceLayout';
-import { config as cssConfig } from '../../Theme';
 import { Pagination } from './Pagination';
 import { usePagesWithTiles } from './hooks/useTileLayout';
+// @ts-ignore
+import { useIsMobile } from '../../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, hasSidebar }: LayoutProps) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const maxTileCount = isMobile ? 2 : 4;
   const [page, setPage] = useState(0);
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));

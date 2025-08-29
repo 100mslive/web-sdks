@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   selectIsAllowedToPublish,
   selectLocalPeer,
@@ -11,7 +10,6 @@ import {
 import { ExpandIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import IconButton from '../IconButton';
 // @ts-ignore: No implicit Any
@@ -21,6 +19,8 @@ import VideoTile from './VideoTile';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
 import { useVideoTileContext } from './hooks/useVideoTileLayout';
+// @ts-ignore
+import { useIsLandscape, useIsMobile } from '../../common/hooks';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
 
@@ -46,8 +46,8 @@ const defaultMobileAspectRatio = 9 / 16;
 const desktopAspectRatio = 1 / defaultMobileAspectRatio;
 
 export const InsetTile = ({ peerId }: { peerId?: string }) => {
-  const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.ls);
+  const isMobile = useIsMobile();
+  const isLandscape = useIsLandscape();
   const selector = peerId ? selectPeerByID(peerId) : selectLocalPeer;
   const peer = useHMSStore(selector);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);

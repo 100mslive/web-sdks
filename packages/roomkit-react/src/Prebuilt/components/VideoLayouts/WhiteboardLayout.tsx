@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
-import { useMedia } from 'react-use';
 import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
-import { config as cssConfig } from '../../../Theme';
+// @ts-ignore
 import { InsetTile } from '../InsetTile';
 import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutMode } from '../Settings/LayoutSettings';
@@ -11,12 +10,15 @@ import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
+// @ts-ignore
+import { useIsMobile } from '../../common/hooks';
 import { UI_SETTINGS } from '../../common/constants';
+// @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const { token, endpoint, zoomToContent } = useWhiteboard(isMobile);
 
   if (!token) {
@@ -46,7 +48,7 @@ export const WhiteboardLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }
   const whiteboard = useHMSStore(selectWhiteboard);
   const whiteboardOwner = useHMSStore(selectPeerByCondition(peer => peer.customerUserId === whiteboard?.owner));
   const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const hasSidebar = !isMobile && layoutMode === LayoutMode.SIDEBAR;
   const secondaryPeers = useMemo(() => {
     if (layoutMode === LayoutMode.SPOTLIGHT) {

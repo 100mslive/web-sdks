@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { HMSPeer, selectAvailableRoleNames, selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
@@ -8,8 +7,9 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Sheet } from '../../Sheet';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+// @ts-ignore
+import { useIsMobile } from '../../common/hooks';
 
 const HighlightTerm = ({ value }: { value: string | undefined }) => {
   return value ? (
@@ -159,7 +159,7 @@ export const RoleChangeModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
 
   if (!peer) {
     return null;

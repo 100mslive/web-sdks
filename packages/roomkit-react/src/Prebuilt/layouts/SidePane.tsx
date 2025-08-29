@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
@@ -10,7 +9,7 @@ import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 import VideoTile from '../components/VideoTile';
 import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Flex } from '../../Layout';
-import { config as cssConfig, styled } from '../../Theme';
+import { styled } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -19,7 +18,7 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
+import { useIsMobile, useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
 
@@ -126,7 +125,7 @@ const SidePane = ({
   tileProps?: TileCustomisationProps;
   hideControls?: boolean;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;

@@ -1,5 +1,4 @@
 import React, { MutableRefObject, useCallback, useRef } from 'react';
-import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
 import { match } from 'ts-pattern';
@@ -7,7 +6,8 @@ import { selectHMSMessagesCount, useHMSActions, useHMSStore, useHMSVanillaStore 
 import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
-import { config as cssConfig } from '../../../Theme';
+// @ts-ignore
+// @ts-ignore
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
@@ -17,10 +17,15 @@ import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+// @ts-ignore
+import { useIsMobile } from '../../common/hooks';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
+// @ts-ignore
 import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
+// @ts-ignore
 
 export const Chat = () => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
@@ -28,7 +33,7 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useIsMobile();
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
   useSidepaneResetOnLayoutUpdate('chat', SIDE_PANE_OPTIONS.CHAT);
