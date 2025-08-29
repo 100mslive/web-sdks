@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -14,6 +13,7 @@ import {
 import { config as cssConfig } from '../../../Theme';
 import { LayoutMode } from '../Settings/LayoutSettings';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -83,7 +83,7 @@ export const AppData = React.memo(() => {
   const { isLocalVideoEnabled } = useAVToggle();
   const sidepaneOpenedRef = useRef(false);
   const [, setNoiseCancellationEnabled] = useSetNoiseCancellation();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   useEffect(() => {
     if (elements?.noise_cancellation?.enabled_by_default) {

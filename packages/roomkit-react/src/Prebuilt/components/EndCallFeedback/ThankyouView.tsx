@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { CrossIcon, UserMusicIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 
 export const ThankyouView = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   if (!isVisible) {
     return null;

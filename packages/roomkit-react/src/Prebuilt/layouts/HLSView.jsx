@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
+import { useFullscreen, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { match, P } from 'ts-pattern';
@@ -36,6 +36,7 @@ import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { WaitingView } from './WaitingView';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
+import { useContainerQuery } from '../components/hooks/useContainerQuery';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
@@ -47,7 +48,7 @@ const ToggleChat = ({ isFullScreen = false }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const showChat = !!elements?.chat;
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useContainerQuery(config.media.md);
   const hmsActions = useHMSActions();
 
   useEffect(() => {
@@ -104,7 +105,7 @@ const HLSView = () => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const showChat = !!elements?.chat;
 
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useContainerQuery(config.media.md);
   const isLandscape = useIsLandscape();
 
   const isFullScreen = useFullscreen(hlsViewRef, show, {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { PeopleAddIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
@@ -10,11 +9,12 @@ import { Grid } from './Grid';
 import { LayoutProps } from './interface';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 import { UI_SETTINGS } from '../../common/constants';
 
 export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
   const pageList = usePagesWithTiles({

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSException,
   HMSNotificationTypes,
@@ -12,6 +11,7 @@ import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import androidPermissionAlert from '../../images/android-perm-1.png';
 // @ts-ignore: No implicit Any
 import iosPermissions from '../../images/ios-perm-0.png';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../../common/constants';
 
@@ -23,7 +23,7 @@ export function PermissionErrorNotificationModal() {
 export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   useEffect(() => {
     if (
       !error ||

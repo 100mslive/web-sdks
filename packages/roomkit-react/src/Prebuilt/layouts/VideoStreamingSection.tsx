@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ControlPosition } from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -30,6 +29,7 @@ import { CaptionsViewer } from '../plugins/CaptionsViewer';
 // @ts-ignore: No implicit Any
 import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
+import { useContainerQuery } from '../components/hooks/useContainerQuery';
 import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -51,7 +51,7 @@ export const VideoStreamingSection = ({
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useContainerQuery(config.media.md);
   const [captionPosition, setCaptionPosition] = useState<ControlPosition>({ x: isMobile ? 0 : -200, y: 0 });
   useCloseScreenshareWhiteboard();
 

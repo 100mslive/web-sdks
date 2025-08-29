@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { HMSHLSLayer } from '@100mslive/hls-player';
 import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { config } from '../../../Theme';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useIsLandscape } from '../../common/hooks';
 
 export function HLSQualitySelector({
@@ -24,7 +24,7 @@ export function HLSQualitySelector({
   isAuto: boolean;
   containerRef?: HTMLDivElement;
 }) {
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useContainerQuery(config.media.md);
   const isLandscape = useIsLandscape();
 
   if (layers.length === 0) {

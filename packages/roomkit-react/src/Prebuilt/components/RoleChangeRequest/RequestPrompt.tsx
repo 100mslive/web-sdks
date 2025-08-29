@@ -1,7 +1,7 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 
 export const RequestPrompt = ({
   open = true,
@@ -20,7 +20,7 @@ export const RequestPrompt = ({
   onAction: () => void;
   disableActions?: boolean;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   if (isMobile) {
     return (

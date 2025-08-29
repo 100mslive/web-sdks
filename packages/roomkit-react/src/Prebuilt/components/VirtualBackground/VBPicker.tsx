@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSMediaStreamPlugin,
   selectAppData,
@@ -32,6 +31,7 @@ import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 // @ts-ignore
 import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 
 const iconDims = { height: '40px', width: '40px' };
@@ -51,7 +51,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isEffectsSupported = VBHandler.isEffectsSupported();
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const [loadingEffects, setLoadingEffects] = useSetAppDataByKey(APP_DATA.loadingEffects);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));

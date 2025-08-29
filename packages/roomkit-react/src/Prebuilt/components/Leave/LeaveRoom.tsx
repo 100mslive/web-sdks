@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import {
   HMSPeer,
@@ -17,6 +16,7 @@ import { config as cssConfig } from '../../../Theme';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const LeaveRoom = ({
@@ -28,7 +28,7 @@ export const LeaveRoom = ({
 }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const rolesMap: Record<string, HMSRole> = useHMSStore(selectRolesMap);
   const streamingPermissionRoles = Object.keys(rolesMap).filter(roleName => {
     const roleObj = rolesMap[roleName];

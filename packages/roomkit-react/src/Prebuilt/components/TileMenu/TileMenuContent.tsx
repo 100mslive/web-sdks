@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSException,
   HMSSimulcastLayerDefinition,
@@ -38,6 +37,7 @@ import { useHMSPrebuiltContext } from '../../AppContext';
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { getDragClassName } from './utils';
@@ -259,7 +259,7 @@ export const TileMenuContent = ({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   if (isLocal) {
     return showPinAction || canMinimise || !userName || showSpotlight ? (

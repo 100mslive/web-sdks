@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -12,6 +11,7 @@ import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey, useSetUiSettings } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {
@@ -20,7 +20,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   const [page, setPage] = useState(0);
   const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
   const activeSharePeer = peersSharing[page];
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const hasSidebar = !isMobile && layoutMode === LayoutMode.SIDEBAR;
   const secondaryPeers = useMemo(() => {
     if (layoutMode === LayoutMode.SPOTLIGHT) {

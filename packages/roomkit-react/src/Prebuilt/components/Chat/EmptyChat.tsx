@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
@@ -7,12 +6,13 @@ import { config as cssConfig } from '../../../Theme';
 import emptyChat from '../../images/empty-chat.svg';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const EmptyChat = () => {
   const { elements } = useRoomLayoutConferencingScreen();
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const canSendMessages =
     elements.chat &&
     (elements.chat.public_chat_enabled ||

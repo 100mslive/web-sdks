@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { useMedia } from 'react-use';
 import {
   selectIsAllowedToPublish,
   selectLocalPeer,
@@ -20,6 +19,7 @@ import { AudioVideoToggle } from './AudioVideoToggle';
 import VideoTile from './VideoTile';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
+import { useContainerQuery } from './hooks/useContainerQuery';
 import { useVideoTileContext } from './hooks/useVideoTileLayout';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
@@ -46,8 +46,8 @@ const defaultMobileAspectRatio = 9 / 16;
 const desktopAspectRatio = 1 / defaultMobileAspectRatio;
 
 export const InsetTile = ({ peerId }: { peerId?: string }) => {
-  const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.ls);
+  const isMobile = useContainerQuery(cssConfig.media.md);
+  const isLandscape = useContainerQuery(cssConfig.media.ls);
   const selector = peerId ? selectPeerByID(peerId) : selectLocalPeer;
   const peer = useHMSStore(selector);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);

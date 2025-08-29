@@ -1,9 +1,9 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { VolumeTwoIcon } from '@100mslive/react-icons';
 import { Button, config, Dialog, IconButton, Text } from '../../..';
 // @ts-ignore
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useIsLandscape } from '../../common/hooks';
 
 export function HLSAutoplayBlockedPrompt({
@@ -14,7 +14,7 @@ export function HLSAutoplayBlockedPrompt({
   unblockAutoPlay: () => Promise<void>;
 }) {
   const isLandscape = useIsLandscape();
-  const isMobile = useMedia(config.media.md);
+  const isMobile = useContainerQuery(config.media.md);
   if ((isMobile || isLandscape) && open) {
     return (
       <IconButton

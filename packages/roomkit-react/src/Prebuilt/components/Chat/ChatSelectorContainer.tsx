@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, GroupIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
@@ -10,12 +9,13 @@ import { ChatSelector } from './ChatSelector';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
 import { CHAT_SELECTOR } from '../../common/constants';
 
 export const ChatSelectorContainer = () => {
   const [open, setOpen] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;

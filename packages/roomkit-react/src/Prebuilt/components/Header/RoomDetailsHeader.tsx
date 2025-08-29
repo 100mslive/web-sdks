@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -8,11 +7,12 @@ import { useRoomLayoutHeader } from '../../provider/roomLayoutProvider/hooks/use
 import { useSheetToggle } from '../AppData/useSheet';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const RoomDetailsHeader = () => {
   const { title, description } = useRoomLayoutHeader();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const clipLength = 30;
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);

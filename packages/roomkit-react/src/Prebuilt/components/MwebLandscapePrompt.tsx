@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
@@ -7,13 +6,14 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import { useContainerQuery } from './hooks/useContainerQuery';
 import { useLandscapeHLSStream } from '../common/hooks';
 // @ts-ignore
 import { isMobileUserAgent } from '../common/utils';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
-  const isLandscape = useMedia(cssConfig.media.ls);
+  const isLandscape = useContainerQuery(cssConfig.media.ls);
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {

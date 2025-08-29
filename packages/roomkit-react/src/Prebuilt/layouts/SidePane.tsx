@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
@@ -15,6 +14,7 @@ import { config as cssConfig, styled } from '../../Theme';
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../components/AppData/useUISettings';
+import { useContainerQuery } from '../components/hooks/useContainerQuery';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
@@ -126,7 +126,7 @@ const SidePane = ({
   tileProps?: TileCustomisationProps;
   hideControls?: boolean;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;

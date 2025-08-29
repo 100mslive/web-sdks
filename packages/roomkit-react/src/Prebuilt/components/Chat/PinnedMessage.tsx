@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
 import { PinIcon, UnpinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
@@ -11,6 +10,7 @@ import { ArrowNavigation } from './ArrowNavigation';
 import { AnnotisedMessage } from './ChatBody';
 import { StickIndicator } from './StickIndicator';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -20,7 +20,7 @@ export const PinnedMessage = () => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
   const { removePinnedMessage } = usePinnedMessages();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();
   const canUnpinMessage = !!elements?.chat?.allow_pinning_messages;

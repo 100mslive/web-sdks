@@ -1,5 +1,4 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import Picker from '@emoji-mart/react';
 import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -17,6 +16,7 @@ import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore: No implicit any
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
@@ -79,7 +79,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const { elements, screenType } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);

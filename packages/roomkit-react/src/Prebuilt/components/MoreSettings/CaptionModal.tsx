@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { CaptionContent } from './CaptionContent';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 
 export const CaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) => void }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   const props = {
     isMobile,

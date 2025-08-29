@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
@@ -13,6 +12,7 @@ import { ChatSettings } from './ChatSettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
+import { useContainerQuery } from './hooks/useContainerQuery';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../common/utils';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
@@ -54,7 +54,7 @@ export const SidePaneTabs = React.memo<{
   const showChat = !!elements?.chat;
   const showParticipants = !!elements?.participant_list;
   const hideTabs = !(showChat && showParticipants) || hideTab;
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
   const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);

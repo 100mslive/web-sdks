@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSAudioTrack,
   HMSVideoTrack,
@@ -21,6 +20,7 @@ import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { getVideoTileLabel } from '../peerTileUtils';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { TileMenuContent } from './TileMenuContent';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { getDragClassName } from './utils';
 
@@ -57,7 +57,7 @@ const TileMenu = ({
   const track = useHMSStore(selectTrackByID(videoTrackID)) as HMSVideoTrack | null;
   const audioTrack = useHMSStore(selectTrackByID(audioTrackID)) as HMSAudioTrack | null;
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const peer = useHMSStore(selectPeerByID(peerID));
   const [showNameChangeModal, setShowNameChangeModal] = useState(false);
   const [showRoleChangeModal, setShowRoleChangeModal] = useState(false);

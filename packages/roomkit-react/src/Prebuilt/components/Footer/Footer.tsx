@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
@@ -27,6 +26,7 @@ import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/ho
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useShowPolls } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -37,7 +37,7 @@ export const Footer = ({
   screenType: keyof ConferencingScreen;
   elements: ConferencingScreenElements;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
 

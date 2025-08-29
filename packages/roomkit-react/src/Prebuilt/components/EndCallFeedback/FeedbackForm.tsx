@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { Rating } from '@100mslive/types-prebuilt/elements/feedback';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { CheckIcon, CrossIcon } from '@100mslive/react-icons';
@@ -14,6 +13,7 @@ import { TextArea } from '../../../TextArea';
 import { config as cssConfig } from '../../../Theme';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 
 export const FEEBACK_INDEX = {
   THANK_YOU: -10,
@@ -28,7 +28,7 @@ export const FeedbackModal = ({
   index: number;
   setIndex: (index: number) => void;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const onOpenChange = () => {
     setIndex(FEEBACK_INDEX.INIT);
   };
@@ -75,7 +75,7 @@ export const FeedbackContent = ({
 }) => {
   const { feedback } = useRoomLayoutLeaveScreen();
   const { endpoints } = useHMSPrebuiltContext();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const hmsActions = useHMSActions();
   const [comment, setComment] = useState('');
   const [selectedReasons, setSelectedReasons] = useState(new Set<number>());
@@ -158,7 +158,7 @@ export const FeedbackHeader = ({
   ratings: Rating[];
   indexSelected?: number;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const { feedback } = useRoomLayoutLeaveScreen();
   return (
     <>

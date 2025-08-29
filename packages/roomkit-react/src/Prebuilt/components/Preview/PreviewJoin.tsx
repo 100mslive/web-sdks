@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useMeasure, useMedia } from 'react-use';
+import { useMeasure } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
@@ -37,6 +37,7 @@ import {
   useUISettings,
   // @ts-ignore: No implicit Any
 } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
@@ -54,7 +55,7 @@ const getParticipantChipContent = (peerCount = 0) => {
 const useLocalTileAspectRatio = () => {
   const localPeer = useHMSStore(selectLocalPeer);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   let aspectRatio = 0;
   if (videoTrack?.width && videoTrack?.height) {
     aspectRatio = videoTrack.width / videoTrack.height;
@@ -254,7 +255,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 };
 
 export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isVBEnabledForUser = useHMSStore(selectIsVBEnabled);
   return (
     <Flex

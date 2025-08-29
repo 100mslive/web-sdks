@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSPeer,
   HMSPeerType,
@@ -16,6 +15,7 @@ import { ParticipantSearch } from '../Footer/ParticipantList';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useFilteredRoles } from '../../common/hooks';
 import { CHAT_SELECTOR } from '../../common/constants';
 
@@ -36,7 +36,7 @@ const SelectorItem = ({
   unreadCount: number;
   icon?: React.JSX.Element;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   const Root = !isMobile
     ? Dropdown.Item

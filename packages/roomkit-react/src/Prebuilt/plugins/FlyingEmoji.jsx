@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectIsLargeRoom,
   selectLocalPeerID,
@@ -12,6 +11,7 @@ import {
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config as cssConfig, keyframes } from '../../Theme';
+import { useContainerQuery } from '../components/hooks/useContainerQuery';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 let emojiCount = 1;
@@ -47,7 +47,7 @@ export function FlyingEmoji() {
   const vanillaStore = useHMSVanillaStore();
   const hmsActions = useHMSActions();
   const [emojis, setEmojis] = useState([]);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   const startingPoints = useMemo(() => getStartingPoints(isMobile), [isMobile]);

@@ -1,5 +1,4 @@
 import React, { MutableRefObject, useCallback, useRef } from 'react';
-import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
 import { match } from 'ts-pattern';
@@ -19,6 +18,7 @@ import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -28,7 +28,7 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeStream = useLandscapeHLSStream();
   useSidepaneResetOnLayoutUpdate('chat', SIDE_PANE_OPTIONS.CHAT);

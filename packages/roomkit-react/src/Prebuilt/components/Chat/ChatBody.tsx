@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
@@ -27,6 +26,7 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { usePinnedBy } from '../hooks/usePinnedBy';
 import { formatTime } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
@@ -178,7 +178,7 @@ const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
-    const isMobile = useMedia(cssConfig.media.md);
+    const isMobile = useContainerQuery(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const localPeerId = useHMSStore(selectLocalPeerID);

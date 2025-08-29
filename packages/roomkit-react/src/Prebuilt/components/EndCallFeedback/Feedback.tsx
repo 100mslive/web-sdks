@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 import { FEEBACK_INDEX, FeedbackHeader, FeedbackModal } from './FeedbackForm';
 import { ThankyouView } from './ThankyouView';
 import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 
 export const Feedback = () => {
   const { feedback } = useRoomLayoutLeaveScreen();
   const [index, setIndex] = useState(FEEBACK_INDEX.INIT);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   if (!feedback) {
     return null;

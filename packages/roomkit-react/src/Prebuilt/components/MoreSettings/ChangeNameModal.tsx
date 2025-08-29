@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
@@ -7,6 +6,7 @@ import { Sheet } from '../../../Sheet';
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore: No implicit Any
 import { ChangeNameContent } from './ChangeNameContent';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 // @ts-ignore: No implicit Any
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 
@@ -21,7 +21,7 @@ export const ChangeNameModal = ({
   const hmsActions = useHMSActions();
   const localPeerName = useHMSStore(selectLocalPeerName);
   const [currentName, setCurrentName] = useState(localPeerName);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   const changeName = async () => {
     const name = currentName?.trim() || '';

@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import {
   selectHMSStats,
@@ -23,12 +22,13 @@ import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
+import { useContainerQuery } from './hooks/useContainerQuery';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { UI_SETTINGS } from '../common/constants';
 
 export const StatsForNerds = ({ open, onOpenChange }) => {
   const mediaQueryLg = cssConfig.media.md;
-  const isMobile = useMedia(mediaQueryLg);
+  const isMobile = useContainerQuery(mediaQueryLg);
 
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(

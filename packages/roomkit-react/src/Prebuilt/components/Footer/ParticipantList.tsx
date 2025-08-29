@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useState } from 'react';
-import { useDebounce, useMedia } from 'react-use';
+import { useDebounce } from 'react-use';
 import {
   HMSPeer,
   HMSPeerType,
@@ -37,6 +37,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useSidepaneResetOnLayoutUpdate } from '../AppData/useSidepaneResetOnLayoutUpdate';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { usePeerOnStageActions } from '../hooks/usePeerOnStageActions';
 import { useParticipants } from '../../common/hooks';
 // @ts-ignore: No implicit Any
@@ -436,7 +437,7 @@ export const ParticipantSearch = ({
   onSearch: (val: string) => void;
 }) => {
   const [value, setValue] = React.useState('');
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   useDebounce(
     () => {

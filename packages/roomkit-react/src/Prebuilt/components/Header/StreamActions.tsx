@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { HMSRecordingState } from '@100mslive/hms-video-store';
 import {
   HMSRoomState,
@@ -18,6 +17,7 @@ import { Sheet } from '../../../Sheet';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useRecordingHandler } from '../../common/hooks';
 // @ts-ignore
 import { formatTime } from '../../common/utils';
@@ -49,7 +49,7 @@ export const getRecordingText = (
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const hlsState = useHMSStore(selectHLSState);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { screenType } = useRoomLayoutConferencingScreen();
   const [liveTime, setLiveTime] = useState(0);
@@ -102,7 +102,7 @@ export const LiveStatus = () => {
 export const RecordingStatus = () => {
   const { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn, isRecordingOn } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
 
   if (
     !isRecordingOn ||
@@ -236,7 +236,7 @@ const StartRecording = () => {
  */
 export const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const roomState = useHMSStore(selectRoomState);
 
   return (

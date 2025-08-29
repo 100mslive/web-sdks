@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -10,6 +9,7 @@ import { DesktopOptions } from './SplitComponents/DesktopOptions';
 // @ts-ignore: No implicit Any
 import { MwebOptions } from './SplitComponents/MwebOptions';
 import { config as cssConfig } from '../../..';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useLandscapeHLSStream } from '../../common/hooks';
 
 export const MoreSettings = ({
@@ -19,7 +19,7 @@ export const MoreSettings = ({
   elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
   screenType: keyof ConferencingScreen;
 }) => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const isLandscapeHLSStream = useLandscapeHLSStream();
   return isMobile || isLandscapeHLSStream ? (
     <MwebOptions elements={elements} screenType={screenType} />

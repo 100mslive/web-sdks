@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
@@ -10,6 +9,7 @@ import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
+import { useContainerQuery } from '../hooks/useContainerQuery';
 import { useRoleProminencePeers } from '../hooks/useRoleProminencePeers';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 import { UI_SETTINGS } from '../../common/constants';
@@ -24,7 +24,7 @@ export function RoleProminence({
 }: LayoutProps) {
   const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? 4 : maxTileCount;
   const pageList = usePagesWithTiles({

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useFullscreen, useMedia } from 'react-use';
+import { useFullscreen } from 'react-use';
 import screenfull from 'screenfull';
 import {
   selectLocalPeerID,
@@ -20,6 +20,7 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
 // @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
+import { useContainerQuery } from './hooks/useContainerQuery';
 import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {
@@ -38,7 +39,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useContainerQuery(cssConfig.media.md);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const fullscreenRef = useRef<HTMLDivElement | null>(null);
   // fullscreen is for desired state
