@@ -32,7 +32,7 @@ const IconSection = styled(IconButton, {
   '&:not([disabled]):focus-visible': {
     zIndex: 1,
   },
-  '@md': {
+  containerMd: {
     mx: 0,
     borderTopRightRadius: '$1 !important',
     borderBottomRightRadius: '$1 !important',
@@ -61,7 +61,7 @@ const OptionsSection = styled(IconButton, {
   '&:not([disabled]):focus-visible': {
     zIndex: 1,
   },
-  '@md': {
+  containerMd: {
     display: 'none',
   },
   variants,

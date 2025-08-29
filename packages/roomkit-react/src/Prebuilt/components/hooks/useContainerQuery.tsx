@@ -18,6 +18,7 @@ export function useContainerQuery(query: string) {
           const minMatch = /min-width:\s*(\d+)px/.exec(query);
 
           let ok = true;
+          console.log({ width, maxMatch, minMatch });
           if (maxMatch) ok &&= width <= parseInt(maxMatch[1], 10);
           if (minMatch) ok &&= width >= parseInt(minMatch[1], 10);
 

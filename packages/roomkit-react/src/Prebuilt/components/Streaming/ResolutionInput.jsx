@@ -46,7 +46,7 @@ export const ResolutionInput = ({ onResolutionChange, disabled, tooltipText, css
       </Flex>
       <Flex
         justify="between"
-        css={{ width: !tooltipText ? '100%' : '70%', '@sm': { width: '100%' } }}
+        css={{ width: !tooltipText ? '100%' : '70%', containerSm: { width: '100%' } }}
         gap={2}
         direction="column"
       >

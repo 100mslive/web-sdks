@@ -121,7 +121,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
         align="center"
         css={{
           gap: '$4',
-          '@md': {
+          containerMd: {
             flexDirection: children ? 'column' : 'row',
             alignItems: children ? 'start' : 'center',
           },
@@ -134,7 +134,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
             minWidth: 0,
             w: '100%',
             maxWidth: '100%',
-            '@md': {
+            containerMd: {
               mb: children ? '$8' : 0,
             },
           }}
@@ -181,7 +181,7 @@ const TestAudio = ({ id }) => {
         css={{
           flexShrink: 0,
           p: '$6 $9',
-          '@md': {
+          containerMd: {
             w: '100%',
           },
         }}
@@ -190,7 +190,7 @@ const TestAudio = ({ id }) => {
       >
         <SpeakerIcon />
         &nbsp;Test{' '}
-        <Text as="span" css={{ display: 'none', '@md': { display: 'inline' } }}>
+        <Text as="span" css={{ display: 'none', containerMd: { display: 'inline' } }}>
           &nbsp; speaker
         </Text>
       </Button>

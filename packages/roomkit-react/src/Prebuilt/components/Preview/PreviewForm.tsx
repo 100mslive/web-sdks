@@ -43,7 +43,7 @@ const PreviewForm = ({
 
   return (
     <Form
-      css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}
+      css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', containerMd: { flexDirection: 'row' } }}
       onSubmit={formSubmit}
     >
       <Flex align="center" css={{ gap: '$8', w: '100%' }}>
@@ -86,7 +86,7 @@ const Form = styled('form', {
   gap: '$8',
   mt: '$10',
   mb: '$10',
-  '@md': {
+  containerMd: {
     gap: '$4',
   },
 });

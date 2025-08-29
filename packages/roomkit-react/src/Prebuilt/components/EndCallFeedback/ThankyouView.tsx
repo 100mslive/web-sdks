@@ -25,7 +25,7 @@ export const ThankyouView = () => {
         w: !isMobile ? '528px' : '410px',
         p: '$12',
         pb: isMobile ? '$16' : '$12',
-        '@md': {
+        containerMd: {
           position: 'absolute',
           bottom: '0',
         },

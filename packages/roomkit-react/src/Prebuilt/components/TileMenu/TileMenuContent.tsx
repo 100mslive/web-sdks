@@ -53,7 +53,7 @@ export const isSameTile = ({
   audioTrackID?: string;
 }) => !!trackId && ((!!videoTrackID && videoTrackID === trackId) || (!!audioTrackID && audioTrackID === trackId));
 
-const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
+const spacingCSS = { containerMd: { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
 const SpotlightActions = ({
   peerId,
@@ -276,7 +276,7 @@ export const TileMenuContent = ({
             }}
           >
             <PencilIcon height={20} width={20} />
-            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+            <Text variant="sm" css={{ containerMd: { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
               Change Name
             </Text>
           </StyledMenuTile.ItemButton>

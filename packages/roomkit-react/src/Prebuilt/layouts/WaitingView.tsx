@@ -36,12 +36,12 @@ export const WaitingView = React.memo(
             gap: '$4',
           }}
         >
-          <Text variant="h4" css={{ '@md': { fontSize: '$lg', color: '$on_surface_high' } }}>
+          <Text variant="h4" css={{ containerMd: { fontSize: '$lg', color: '$on_surface_high' } }}>
             {title}
           </Text>
           <Text
             variant="body1"
-            css={{ fontWeight: '$regular', color: '$on_surface_medium', '@md': { fontSize: '$md' } }}
+            css={{ fontWeight: '$regular', color: '$on_surface_medium', containerMd: { fontSize: '$md' } }}
           >
             {subtitle}
           </Text>

@@ -66,8 +66,8 @@ const HlsStatsRow = memo(({ label, children }) => {
       <Text
         css={{
           width: '50%',
-          '@md': { fontSize: '$md' },
-          '@sm': { fontSize: '$sm' },
+          containerMd: { fontSize: '$md' },
+          containerSm: { fontSize: '$sm' },
           // textAlign: "right",
         }}
       >
@@ -75,8 +75,8 @@ const HlsStatsRow = memo(({ label, children }) => {
       </Text>
       <Text
         css={{
-          '@md': { fontSize: '$md' },
-          '@sm': { fontSize: '$sm' },
+          containerMd: { fontSize: '$md' },
+          containerSm: { fontSize: '$sm' },
           width: '50%',
           overflowWrap: 'break-word',
           // textAlign: "left",

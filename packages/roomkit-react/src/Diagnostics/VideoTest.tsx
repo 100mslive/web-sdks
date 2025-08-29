@@ -34,14 +34,14 @@ export const VideoTest = () => {
 
   return (
     <>
-      <TestContainer css={{ display: 'flex', '@lg': { flexDirection: 'column', alignItems: 'center' } }}>
+      <TestContainer css={{ display: 'flex', containerLg: { flexDirection: 'column', alignItems: 'center' } }}>
         {trackID && (
           <StyledVideoTile.Container
             css={{
               width: '90%',
               aspectRatio: '16/9',
               mr: '$10',
-              '@lg': { mr: 0, mb: '$10', aspectRatio: '1/1' },
+              containerLg: { mr: 0, mb: '$10', aspectRatio: '1/1' },
             }}
           >
             <Video mirror={true} trackId={trackID} />

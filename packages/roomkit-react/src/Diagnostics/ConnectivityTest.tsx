@@ -200,7 +200,7 @@ const Footer = ({
 }) => {
   return (
     <TestFooter error={error}>
-      <Flex css={{ gap: '$8', '@lg': { flexDirection: 'column' } }}>
+      <Flex css={{ gap: '$8', containerLg: { flexDirection: 'column' } }}>
         <Button variant="standard" onClick={restart}>
           Restart Test
         </Button>
@@ -296,7 +296,7 @@ const RegionSelector = ({
         justify="between"
         css={{
           mt: '$md',
-          '@lg': {
+          containerLg: {
             flexDirection: 'column',
             gap: '$8',
           },
@@ -305,7 +305,7 @@ const RegionSelector = ({
         <Flex
           css={{
             gap: '$4',
-            '@lg': {
+            containerLg: {
               flexDirection: 'column',
             },
           }}
@@ -322,7 +322,7 @@ const RegionSelector = ({
             </Button>
           ))}
         </Flex>
-        <Flex css={{ '@lg': { flexDirection: 'column' } }}>
+        <Flex css={{ containerLg: { flexDirection: 'column' } }}>
           <Button variant="primary" onClick={startTest} disabled={!startTest}>
             {startTest ? 'Start Test' : 'Testing...'}
           </Button>

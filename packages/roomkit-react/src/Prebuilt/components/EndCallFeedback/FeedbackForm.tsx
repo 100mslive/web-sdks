@@ -198,7 +198,7 @@ export const FeedbackHeader = ({
         css={{
           gap: '$17',
           c: '$on_surface_high',
-          '@md': {
+          containerMd: {
             gap: '0',
           },
         }}
@@ -225,7 +225,7 @@ export const FeedbackHeader = ({
                   pb: '$1',
                   cursor: 'pointer',
                   opacity: indexSelected === index || indexSelected === FEEBACK_INDEX.INIT ? 1 : 0.2,
-                  '@md': {
+                  containerMd: {
                     fontSize: '$h5',
                   },
                 }}
@@ -292,10 +292,10 @@ export const FeedbackForm = ({
               flexWrap: 'wrap',
               gap: '$6',
               flex: '1 1 calc(25% - 12px)',
-              '@md': {
+              containerMd: {
                 flex: '1 1 calc(50% - 12px)',
               },
-              '@sm': {
+              containerSm: {
                 flex: '1 1 100%',
               },
             }}

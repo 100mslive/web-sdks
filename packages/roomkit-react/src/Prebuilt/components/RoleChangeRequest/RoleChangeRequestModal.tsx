@@ -48,7 +48,7 @@ export const RoleChangeRequestModal = () => {
         css={{
           c: '$on_surface_medium',
           textAlign: 'center',
-          '@md': { textAlign: 'left', borderBottom: '1px solid $border_bright', pb: '$4', px: '$8' },
+          containerMd: { textAlign: 'left', borderBottom: '1px solid $border_bright', pb: '$4', px: '$8' },
         }}
       >
         Setup your audio and video before joining
@@ -57,10 +57,10 @@ export const RoleChangeRequestModal = () => {
         align="center"
         justify="center"
         css={{
-          '@sm': { width: '100%' },
+          containerSm: { width: '100%' },
           flexDirection: 'column',
           mt: '$6',
-          '@md': { px: '$8' },
+          containerMd: { px: '$8' },
         }}
       >
         <PreviewTile name={name || ''} />

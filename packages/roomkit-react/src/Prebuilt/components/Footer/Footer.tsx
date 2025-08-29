@@ -56,7 +56,8 @@ export const Footer = ({
     <AppFooter.Root
       css={{
         flexWrap: 'nowrap',
-        '@md': {
+        // Using container queries instead of conditional styles
+        containerMd: {
           justifyContent: 'center',
           gap: '$10',
           position: 'relative',
@@ -67,7 +68,8 @@ export const Footer = ({
     >
       <AppFooter.Left
         css={{
-          '@md': {
+          // Using container queries instead of conditional styles
+          containerMd: {
             w: 'unset',
             p: '0',
             gap: '$10',
@@ -80,7 +82,8 @@ export const Footer = ({
       </AppFooter.Left>
       <AppFooter.Center
         css={{
-          '@md': {
+          // Using container queries instead of conditional styles
+          containerMd: {
             w: 'unset',
             gap: '$10',
           },

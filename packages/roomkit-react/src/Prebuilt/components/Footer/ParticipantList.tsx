@@ -389,7 +389,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
             '&:hover': {
               bg: '$surface_bright',
             },
-            '@md': {
+            containerMd: {
               display: 'flex',
             },
           }}

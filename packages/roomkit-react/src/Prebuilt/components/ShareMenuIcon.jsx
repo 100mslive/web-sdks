@@ -7,7 +7,7 @@ export const ScreenShareButton = styled(IconButton, {
   r: '$1',
   borderTopRightRadius: 0,
   borderBottomRightRadius: 0,
-  '@md': {
+  containerMd: {
     px: '$4',
     mx: 0,
   },
@@ -20,7 +20,7 @@ export const ShareMenuIcon = styled(ScreenShareButton, {
   borderBottomRightRadius: '$1',
   borderLeftWidth: 0,
   w: '$4',
-  '@md': {
+  containerMd: {
     w: 'unset',
     px: '$2',
   },

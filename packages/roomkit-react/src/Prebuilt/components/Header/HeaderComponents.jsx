@@ -12,7 +12,7 @@ export const SpeakerTag = () => {
       <Flex
         align="center"
         justify="center"
-        css={{ flex: '1 1 0', color: '$on_surface_high', '@md': { display: 'none' } }}
+        css={{ flex: '1 1 0', color: '$on_surface_high', containerMd: { display: 'none' } }}
       >
         <VolumeOneIcon />
         <Text variant="sm" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
@@ -27,7 +27,7 @@ const LogoImg = styled('img', {
   maxHeight: '$14',
   w: 'auto',
   objectFit: 'contain',
-  '@md': {
+  containerMd: {
     maxHeight: '$12',
   },
 });

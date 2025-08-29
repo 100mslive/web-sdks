@@ -41,7 +41,7 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
       h: '100%',
-      '@lg': {
+      containerLg: {
         p: '$12',
       },
       overflowY: 'auto',
@@ -99,7 +99,9 @@ const DiagnosticsStepHeader = () => {
 
 const DiagnosticsStepContainer = () => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
+    <Box
+      css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', containerLg: { w: '100%' } }}
+    >
       <DiagnosticsStepHeader />
       <DiagnosticsStepTest />
     </Box>
@@ -110,7 +112,7 @@ const DiagnosticsStepsList = () => {
   const { activeStepIndex, activeStep, steps } = useDiagnostics();
 
   return (
-    <Box css={{ w: '25%', '@lg': { display: 'none' } }}>
+    <Box css={{ w: '25%', containerLg: { display: 'none' } }}>
       {Object.keys(DiagnosticsStep)
         .filter(key => !isNaN(Number(key)))
         .map(key => {

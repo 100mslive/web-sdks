@@ -23,7 +23,7 @@ import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputT
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
 const SelectContainer = ({ children }: { children: React.ReactNode }) => (
-  <Box css={{ w: 'calc(50% - 0.75rem)', '@lg': { w: '100%' } }}>{children}</Box>
+  <Box css={{ w: 'calc(50% - 0.75rem)', containerLg: { w: '100%' } }}>{children}</Box>
 );
 
 const MicTest = ({ setError }: { setError: (err?: Error) => void }) => {
@@ -171,7 +171,7 @@ export const AudioTest = () => {
           css={{
             mt: '$10',
             gap: '$10',
-            '@lg': {
+            containerLg: {
               flexDirection: 'column',
               gap: '$8',
             },

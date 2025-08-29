@@ -213,7 +213,7 @@ export const ChatActions = ({
   }
 
   return (
-    <Dropdown.Root open={open} onOpenChange={setOpen} css={{ '@md': { display: 'none' } }}>
+    <Dropdown.Root open={open} onOpenChange={setOpen} css={{ containerMd: { display: 'none' } }}>
       <Flex
         className="chat_actions"
         css={{
@@ -225,7 +225,7 @@ export const ChatActions = ({
           top: 0,
           right: 0,
           zIndex: 1,
-          '@md': { opacity: 1 },
+          containerMd: { opacity: 1 },
         }}
       >
         {options.reply.show ? (

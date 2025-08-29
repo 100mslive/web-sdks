@@ -15,7 +15,7 @@ export const DeviceSelector = ({ title, devices, selection, onChange, icon, chil
         align="center"
         css={{
           gap: '$4',
-          '@md': {
+          containerMd: {
             flexDirection: children ? 'column' : 'row',
             alignItems: children ? 'start' : 'center',
           },

@@ -224,7 +224,7 @@ const ChatMessage = React.memo(
             r: '$1',
             p: '$4',
             userSelect: 'none',
-            '@md': {
+            containerMd: {
               cursor: 'pointer',
             },
             '&:hover': {

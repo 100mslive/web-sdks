@@ -31,7 +31,7 @@ export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoR
         position: 'relative',
         justifyContent: 'center',
         transition: 'all 0.3s ease-in-out',
-        '@md': {
+        containerMd: {
           '& video': {
             height: isFullScreen ? '' : '$60 !important',
           },

@@ -53,7 +53,7 @@ export const Feedback = () => {
             bg: '$surface_dim',
             borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
             gap: '$10',
-            '@md': {
+            containerMd: {
               position: 'absolute',
               bottom: '0',
               w: '100%',

@@ -137,7 +137,7 @@ export const DesktopOptions = ({
           css={{
             py: '$0',
             maxHeight: 'unset',
-            '@md': { w: '$64' },
+            containerMd: { w: '$64' },
             "div[role='separator']:first-child": {
               display: 'none',
             },

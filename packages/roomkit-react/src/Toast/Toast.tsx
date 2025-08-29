@@ -27,7 +27,7 @@ const getToastVariant = (base: string) => {
       height: '100%',
       zIndex: 10,
     },
-    '@sm': {
+    containerSm: {
       '&:before': {
         content: 'none',
       },
@@ -47,7 +47,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   border: 'solid $space$px $border_bright',
   overflow: 'hidden',
   ...toastAnimation,
-  '@sm': {
+  containerSm: {
     p: '$8 $11',
   },
   variants: {
@@ -89,7 +89,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   padding: '$8',
   gap: 10,
   width: 390,
-  '@sm': {
+  containerSm: {
     width: '100%',
     padding: '$6',
   },

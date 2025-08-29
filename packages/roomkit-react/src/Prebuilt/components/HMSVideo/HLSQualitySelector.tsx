@@ -150,8 +150,8 @@ export function HLSQualitySelector({
               </Box>
               <Text
                 variant={{
-                  '@md': 'sm',
-                  '@sm': 'xs',
+                  containerMd: 'sm',
+                  containerSm: 'xs',
                   '@xs': 'tiny',
                 }}
                 css={{ display: 'flex', alignItems: 'center', ml: '$2', c: '$on_surface_medium' }}

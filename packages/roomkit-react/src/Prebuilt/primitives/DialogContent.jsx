@@ -154,7 +154,11 @@ export const DialogSelect = ({ title, options, keyField, labelField, selected, o
   return (
     <DialogRow breakSm>
       <Label>{title}</Label>
-      <Select.Root data-testid={`dialog_select_${title}`} css={{ width: '70%', '@sm': { width: '100%' } }} {...props}>
+      <Select.Root
+        data-testid={`dialog_select_${title}`}
+        css={{ width: '70%', containerSm: { width: '100%' } }}
+        {...props}
+      >
         <Select.DefaultDownIcon />
         <Select.Select onChange={e => onChange(e.target.value)} value={selected} css={{ width: '100%' }}>
           {options.map(option => {
@@ -177,7 +181,7 @@ export const DialogInput = ({ title, value, onChange, placeholder, disabled, typ
     <DialogRow breakSm>
       <Label>{title}</Label>
       <Input
-        css={{ width: '70%', '@sm': { width: '100%' }, bg: '$surface_bright' }}
+        css={{ width: '70%', containerSm: { width: '100%' }, bg: '$surface_bright' }}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
@@ -230,7 +234,7 @@ export const DialogInputFile = ({ value, onChange, placeholder, disabled, type, 
       <Flex direction="row">
         <Input
           ref={inputRef}
-          css={{ width: '70%', '@sm': { width: '100%' } }}
+          css={{ width: '70%', containerSm: { width: '100%' } }}
           value={value}
           onChange={e => onChange(e.target)}
           placeholder={placeholder}

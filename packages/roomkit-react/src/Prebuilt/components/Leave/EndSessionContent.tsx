@@ -41,7 +41,7 @@ export const EndSessionContent = ({
         <Button
           outlined
           variant="standard"
-          css={{ w: '100%', '@md': { display: 'none' } }}
+          css={{ w: '100%', containerMd: { display: 'none' } }}
           onClick={() => setShowEndStreamAlert(false)}
         >
           Cancel

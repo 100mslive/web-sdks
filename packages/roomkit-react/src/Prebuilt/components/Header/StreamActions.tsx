@@ -178,7 +178,7 @@ const StartRecording = () => {
         <Popover.Trigger asChild>
           <Button variant="danger" data-testid="stop_recording" icon outlined onClick={() => setOpen(true)}>
             <RecordIcon />
-            <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
+            <Text as="span" css={{ containerMd: { display: 'none' }, color: 'currentColor' }}>
               Stop Recording
             </Text>
           </Button>
@@ -224,7 +224,7 @@ const StartRecording = () => {
       }}
     >
       {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}
-      <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
+      <Text as="span" css={{ containerMd: { display: 'none' }, color: 'currentColor' }}>
         {recordingStarted ? 'Starting' : 'Start'} Recording
       </Text>
     </Button>

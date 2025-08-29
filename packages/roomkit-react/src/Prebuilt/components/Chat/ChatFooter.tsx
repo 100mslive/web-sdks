@@ -227,7 +227,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               pl: '$8',
               flexGrow: 1,
               r: '$1',
-              '@md': {
+              containerMd: {
                 minHeight: '$14',
                 boxSizing: 'border-box',
               },

@@ -26,7 +26,7 @@ export const RequestPrompt = ({
     return (
       <Sheet.Root open={open} onOpenChange={onOpenChange}>
         <Sheet.Content css={{ py: '$8' }}>
-          <Text css={{ fontWeight: '$semiBold', c: '$on_surface_high', '@md': { px: '$8' } }}>{title}</Text>
+          <Text css={{ fontWeight: '$semiBold', c: '$on_surface_high', containerMd: { px: '$8' } }}>{title}</Text>
           {body}
           <RequestActions actionText={actionText} onAction={onAction} disabled={disableActions} />
         </Sheet.Content>
@@ -58,7 +58,7 @@ const RequestActions = ({
   onAction: () => void;
   disabled?: boolean;
 }) => (
-  <Flex justify="center" align="center" css={{ width: '100%', gap: '$md', '@md': { mt: '$8', px: '$8' } }}>
+  <Flex justify="center" align="center" css={{ width: '100%', gap: '$md', containerMd: { mt: '$8', px: '$8' } }}>
     <Box css={{ width: '50%' }}>
       <Dialog.Close css={{ width: '100%', height: '100%' }} asChild>
         <Button variant="standard" outlined css={{ width: '100%', p: '$4 $8' }} disabled={disabled}>

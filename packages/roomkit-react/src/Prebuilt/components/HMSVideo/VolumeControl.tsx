@@ -38,7 +38,7 @@ export const VolumeControl = () => {
           mx: '$4',
           w: '$20',
           cursor: 'pointer',
-          '@sm': { w: '$14' },
+          containerSm: { w: '$14' },
           '@xs': { w: '$14' },
           opacity: showSlider ? '1' : '0',
           display: showSlider ? '' : 'none',

@@ -6,7 +6,7 @@ export const textVariants = {
     letterSpacing: '-1.5px',
     fontSize: '$h1',
     lineHeight: '$h1',
-    '@md': {
+    containerMd: {
       fontSize: '4.5rem',
       lineHeight: '4.75rem',
     },
@@ -16,7 +16,7 @@ export const textVariants = {
     lineHeight: '$h2',
     fontWeight: '$semiBold',
     letterSpacing: '-0.5px',
-    '@md': {
+    containerMd: {
       fontSize: '3rem',
       lineHeight: '3.25rem',
     },
@@ -25,7 +25,7 @@ export const textVariants = {
     fontSize: '$h3',
     lineHeight: '$h3',
     fontWeight: '$semiBold',
-    '@md': {
+    containerMd: {
       fontSize: '2.5rem',
       lineHeight: '2.75rem',
     },
@@ -35,7 +35,7 @@ export const textVariants = {
     lineHeight: '$h4',
     fontWeight: '$semiBold',
     letterSpacing: '0.25px',
-    '@md': {
+    containerMd: {
       fontSize: '1.75rem',
       lineHeight: '2rem',
     },
@@ -44,7 +44,7 @@ export const textVariants = {
     fontSize: '$h5',
     lineHeight: '$h5',
     fontWeight: '$semiBold',
-    '@md': {
+    containerMd: {
       fontSize: '1.5rem',
       lineHeight: '1.75rem',
     },
@@ -54,7 +54,7 @@ export const textVariants = {
     lineHeight: '$h6',
     fontWeight: '$semiBold',
     letterSpacing: '0.15px',
-    '@md': {
+    containerMd: {
       fontSize: '1.25rem',
       lineHeight: '1.5rem',
     },

@@ -14,7 +14,7 @@ const Root = ({
   return (
     <Flex
       direction={hasSidebar ? 'row' : 'column'}
-      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
+      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', containerMd: { gap: edgeToEdge ? 0 : '$6' } }}
     >
       {children}
     </Flex>
@@ -58,7 +58,7 @@ const SecondarySection = ({
         gap: hasSidebar ? '$8' : '$2 $4',
         placeItems: 'center',
         ...gridStyles,
-        '@md': { gap: edgeToEdge ? 0 : '$4' },
+        containerMd: { gap: edgeToEdge ? 0 : '$4' },
       }}
     >
       {tiles.map(tile => {
@@ -72,7 +72,7 @@ const SecondarySection = ({
               maxWidth: 240,
               aspectRatio: '16 / 9',
               ...(hasSidebar ? { w: '100%' } : { h: '100%' }),
-              '@md': { aspectRatio: '1' },
+              containerMd: { aspectRatio: '1' },
             }}
             objectFit="contain"
             {...tileLayoutProps}

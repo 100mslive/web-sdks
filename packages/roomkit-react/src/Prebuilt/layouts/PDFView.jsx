@@ -42,7 +42,7 @@ export const PDFView = () => {
         css={{
           mx: '$8',
           flex: '3 1 0',
-          '@lg': {
+          containerLg: {
             flex: '2 1 0',
             display: 'flex',
             alignItems: 'center',

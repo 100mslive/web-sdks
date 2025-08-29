@@ -20,7 +20,7 @@ export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDi
           justifyContent: 'center',
           flexFlow: 'row wrap',
           minHeight: 0,
-          '@lg': { gap: edgeToEdge ? 0 : '$4' },
+          containerLg: { gap: edgeToEdge ? 0 : '$4' },
         }}
       >
         {tiles?.map(tile => {

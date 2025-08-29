@@ -233,6 +233,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                               lineHeight: '1.5',
                               '-webkit-text-size-adjust': '100%',
                               position: 'relative',
+                              containerName: DEFAULT_PORTAL_CONTAINER.slice(1),
+                              containerType: 'inline-size',
                             }}
                           >
                             <AppRoutes

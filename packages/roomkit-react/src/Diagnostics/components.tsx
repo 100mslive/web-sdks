@@ -46,14 +46,14 @@ export const TestFooter = ({
         borderBottomRightRadius: '$1',
         lineHeight: '$sm',
         zIndex: 1001,
-        '@lg': { flexDirection: 'column', gap: '$8' },
+        containerLg: { flexDirection: 'column', gap: '$8' },
       }}
     >
       <Box>{error && <Text css={{ c: '$alert_error_default' }}>Error: {error.message}</Text>}</Box>
       {children ? (
         children
       ) : (
-        <Flex align="center" css={{ gap: '$8', '@lg': { flexDirection: 'column' } }}>
+        <Flex align="center" css={{ gap: '$8', containerLg: { flexDirection: 'column' } }}>
           <Text css={{ c: '$on_primary_medium' }}>{ctaText}</Text>
           <Flex align="center" gap="4">
             <Button onClick={onNextStep} variant="standard" outlined={true}>

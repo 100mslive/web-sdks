@@ -145,6 +145,25 @@ export const defaultUtils = {
   r: (value: Stitches.ScaleValue<'radii'>) => ({
     borderRadius: value,
   }),
+  // Container query utilities - use these instead of @md, @lg, etc.
+  containerSm: (styles: any) => ({
+    '@container (max-width: 640px)': styles,
+  }),
+  containerMd: (styles: any) => ({
+    '@container (max-width: 768px)': styles,
+  }),
+  containerLg: (styles: any) => ({
+    '@container (max-width: 1024px)': styles,
+  }),
+  containerXl: (styles: any) => ({
+    '@container (max-width: 1280px)': styles,
+  }),
+  container2xl: (styles: any) => ({
+    '@container (max-width: 1536px)': styles,
+  }),
+  containerLs: (styles: any) => ({
+    '@container (max-width: 1024px) and (orientation: landscape)': styles,
+  }),
   fs: (value: Stitches.PropertyValue<'fontSize'> | number | string) => ({
     fontSize: value,
   }),

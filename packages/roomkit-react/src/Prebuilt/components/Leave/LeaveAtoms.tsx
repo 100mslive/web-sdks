@@ -13,7 +13,7 @@ export const LeaveIconButton = styled(IconButton, {
   '&:not([disabled]):active': {
     bg: '$alert_error_default',
   },
-  '@md': {
+  containerMd: {
     mx: 0,
   },
 });

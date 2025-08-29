@@ -118,7 +118,7 @@ export const ConferenceScreen = () => {
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
               marginTop: isMwebHLSStream ? `-${headerRef.current?.clientHeight}px` : 'none',
-              '@md': {
+              containerMd: {
                 h: '$17',
               },
             }}
@@ -137,7 +137,7 @@ export const ConferenceScreen = () => {
               ? 0
               : '$10', // TODO: padding to be controlled by section/element
             paddingBottom: 'env(safe-area-inset-bottom)',
-            '@lg': {
+            containerLg: {
               px: 0,
             },
           }}
@@ -161,7 +161,7 @@ export const ConferenceScreen = () => {
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
               marginBottom: isMwebHLSStream ? `-${footerRef.current?.clientHeight}px` : undefined,
-              '@md': {
+              containerMd: {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
               },

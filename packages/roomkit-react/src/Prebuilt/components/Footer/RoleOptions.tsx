@@ -53,7 +53,7 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
           '&:hover': {
             c: '$on_surface_medium',
           },
-          '@md': {
+          containerMd: {
             visibility: 'visible',
           },
         }}
