@@ -23,3 +23,13 @@ body {
 .tl-container {
   border-radius: 0.75rem;
 }
+
+.example-prebuilt-container {
+  height: 100%;
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

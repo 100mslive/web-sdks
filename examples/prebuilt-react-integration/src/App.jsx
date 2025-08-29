@@ -9,5 +9,9 @@ export default function App() {
     return <Diagnostics />;
   }
 
-  return <HMSPrebuilt roomCode={roomCode} />;
+  return (
+    <div className="example-prebuilt-container">
+      <HMSPrebuilt roomCode={roomCode} />;
+    </div>
+  );
 }
