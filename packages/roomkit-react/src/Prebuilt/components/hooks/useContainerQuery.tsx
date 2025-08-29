@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { DEFAULT_PORTAL_CONTAINER } from '../../common/constants';
 
-export function useContainerQuery(query: string, ref?: React.RefObject<HTMLElement>) {
+export function useContainerQuery(query: string) {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     // CASE 1: Container query (ref provided)
-    if (ref?.current) {
-      const el = ref.current;
+    const container = document.querySelector(DEFAULT_PORTAL_CONTAINER);
+    if (container) {
+      const el = container;
 
       const ro = new ResizeObserver(entries => {
         for (const entry of entries) {
@@ -35,7 +37,7 @@ export function useContainerQuery(query: string, ref?: React.RefObject<HTMLEleme
     mql.addEventListener('change', listener);
 
     return () => mql.removeEventListener('change', listener);
-  }, [query, ref]);
+  }, [query]);
 
   return matches;
 }
