@@ -27,6 +27,7 @@ import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/ho
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useShowPolls } from '../AppData/useUISettings';
+import { getMobileStyles } from '../../common/cssUtils';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -56,6 +57,13 @@ export const Footer = ({
     <AppFooter.Root
       css={{
         flexWrap: 'nowrap',
+        ...getMobileStyles({
+          justifyContent: 'center',
+          gap: '$10',
+          position: 'relative',
+          // To prevent it from showing over the sidepane if chat type is not overlay
+          zIndex: isOverlayChat && isChatOpen ? 20 : 1,
+        }),
         '@md': {
           justifyContent: 'center',
           gap: '$10',
@@ -67,6 +75,11 @@ export const Footer = ({
     >
       <AppFooter.Left
         css={{
+          ...getMobileStyles({
+            w: 'unset',
+            p: '0',
+            gap: '$10',
+          }),
           '@md': {
             w: 'unset',
             p: '0',
@@ -80,6 +93,10 @@ export const Footer = ({
       </AppFooter.Left>
       <AppFooter.Center
         css={{
+          ...getMobileStyles({
+            w: 'unset',
+            gap: '$10',
+          }),
           '@md': {
             w: 'unset',
             gap: '$10',
