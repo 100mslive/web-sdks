@@ -3,6 +3,7 @@ import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
 
 const StyledContent = styled(Content, {
+  containerType: 'inline-size', // Enable container queries for popover content
   padding: '$6',
   borderRadius: '$2',
   backgroundColor: '$background_default',

@@ -37,6 +37,7 @@ const getToastVariant = (base: string) => {
 };
 
 const ToastRoot = styled(ToastPrimitives.Root, {
+  containerType: 'inline-size', // Enable container queries for toast
   r: '$3',
   bg: '$surface_default',
   p: '$10',

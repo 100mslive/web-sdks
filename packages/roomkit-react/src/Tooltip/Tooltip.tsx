@@ -4,6 +4,7 @@ import { CSS, styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
 
 const TooltipBox = styled(BaseTooltip.Content, {
+  containerType: 'inline-size', // Enable container queries for tooltip content
   fontFamily: '$sans',
   borderRadius: '$2',
   padding: '$2 $4',

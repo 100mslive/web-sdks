@@ -26,6 +26,7 @@ export const CustomDialogOverlay = styled(DialogPrimitive.Overlay, {
 export const StyledDialogPortal = styled(DialogPrimitive.Portal, {});
 
 export const CustomDialogContent = styled(DialogPrimitive.Content, {
+  containerType: 'inline-size', // Enable container queries for dialog content
   color: '$on_surface_medium',
   backgroundColor: '$surface_dim',
   borderRadius: '8px',

@@ -29,6 +29,7 @@ const StyledOverlay = styled(Dialog.Overlay, {
 });
 
 const StyledContent = styled(DialogPrimitive.Content, {
+  containerType: 'inline-size', // Enable container queries for sheet content
   color: '$on_surface_medium',
   backgroundColor: '$surface_default',
   borderTopLeftRadius: '$3',

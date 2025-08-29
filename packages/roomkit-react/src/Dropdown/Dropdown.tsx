@@ -71,6 +71,7 @@ const DropdownItemSeparator = styled(Separator, {
 });
 
 const DropdownContent = styled(Content, {
+  containerType: 'inline-size', // Enable container queries for dropdown content
   w: '$80',
   maxHeight: '$64',
   r: '$1',
@@ -95,6 +96,7 @@ const DropdownGroup = styled(Group, {});
 const DropdownSubMenu = styled(Sub, {});
 
 const DropdownSubMenuContent = styled(SubContent, {
+  containerType: 'inline-size', // Enable container queries for submenu content
   w: '$80',
   maxHeight: '$64',
   r: '$1',
