@@ -54,17 +54,22 @@ export const Slider: React.FC<SliderProps & { showTooltip?: boolean }> = ({
   showTooltip = true,
   thumbStyles,
   ...props
-}) => (
-  <Root {...props}>
-    <Track>
-      <Range />
-    </Track>
-    {showTooltip ? (
-      <Tooltip title={String(props.value?.[0])}>
-        <Thumb css={thumbStyles} />
-      </Tooltip>
-    ) : (
-      <Thumb css={thumbStyles} />
-    )}
-  </Root>
-);
+}) => {
+  const values = props.value || props.defaultValue || [0];
+  return (
+    <Root {...props}>
+      <Track>
+        <Range />
+      </Track>
+      {values.map((_, index) =>
+        showTooltip ? (
+          <Tooltip key={index} title={String(values[index])}>
+            <Thumb css={thumbStyles} />
+          </Tooltip>
+        ) : (
+          <Thumb key={index} css={thumbStyles} />
+        ),
+      )}
+    </Root>
+  );
+};
