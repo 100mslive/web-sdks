@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { useResizeDetector } from 'react-resize-detector';
 import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
+import { useResizeDetector } from './useResizeObserver';
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import {
   calculateLayoutSizes,
@@ -76,6 +76,9 @@ const DEFAULTS = {
 };
 
 /**
+ * @deprecated This hook is deprecated and will not receive further updates.
+ * It will continue to work but is no longer actively supported.
+ *
  * This hook can be used to build a paginated gallery view of video tiles. You can give the hook
  * a list of all the peers which need to be shown and it tells you how to structure the UI by giving
  * a list of pages with every page having a list of video tiles.
