@@ -3,7 +3,7 @@ import { styled } from '../Theme';
 
 const StyledRoot = styled(SelectPrimitive.Root, {});
 
-const StyledTrigger = styled(SelectPrimitive.SelectTrigger, {
+const StyledTrigger = styled(SelectPrimitive.Trigger, {
   all: 'unset',
   display: 'inline-flex',
   alignItems: 'center',
