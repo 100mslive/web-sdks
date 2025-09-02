@@ -11,11 +11,15 @@ export function useResizeDetector<T extends HTMLElement = HTMLElement>() {
   const observerRef = useRef<ResizeObserver | null>(null);
 
   const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
-    if (entries.length === 0) {
+    if (!entries || entries.length === 0) {
       return;
     }
 
     const entry = entries[0];
+    if (!entry) {
+      return;
+    }
+
     const { width, height } = entry.contentRect;
 
     setSize(prevSize => {
@@ -32,15 +36,37 @@ export function useResizeDetector<T extends HTMLElement = HTMLElement>() {
       return;
     }
 
-    if (!observerRef.current) {
-      observerRef.current = new ResizeObserver(handleResize);
+    // Check if ResizeObserver is available
+    if (typeof ResizeObserver === 'undefined') {
+      console.warn('ResizeObserver is not available');
+      // Fallback to getting initial size
+      const { width, height } = element.getBoundingClientRect();
+      setSize({ width, height });
+      return;
     }
 
-    observerRef.current.observe(element);
+    if (!observerRef.current) {
+      try {
+        observerRef.current = new ResizeObserver(handleResize);
+      } catch (error) {
+        console.error('Failed to create ResizeObserver:', error);
+        return;
+      }
+    }
+
+    try {
+      observerRef.current.observe(element);
+    } catch (error) {
+      console.error('Failed to observe element:', error);
+    }
 
     return () => {
       if (observerRef.current && element) {
-        observerRef.current.unobserve(element);
+        try {
+          observerRef.current.unobserve(element);
+        } catch (error) {
+          console.error('Failed to unobserve element:', error);
+        }
       }
     };
   }, [handleResize]);
@@ -48,8 +74,12 @@ export function useResizeDetector<T extends HTMLElement = HTMLElement>() {
   useEffect(() => {
     return () => {
       if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
+        try {
+          observerRef.current.disconnect();
+          observerRef.current = null;
+        } catch (error) {
+          console.error('Failed to disconnect ResizeObserver:', error);
+        }
       }
     };
   }, []);
