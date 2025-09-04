@@ -140,14 +140,14 @@ const AddMenu = () => {
           type="text"
           placeholder="Enter a name to continue"
           value={title}
-          onChange={event => setTitle(event.target.value.trimStart())}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value.trimStart())}
           css={{
             backgroundColor: '$surface_bright',
             border: '1px solid $border_default',
           }}
         />
         <Flex align="center" css={{ mt: '$10' }}>
-          <Switch onCheckedChange={value => setHideVoteCount(value)} css={{ mr: '$6' }} />
+          <Switch onCheckedChange={(value: boolean) => setHideVoteCount(value)} css={{ mr: '$6' }} />
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             Hide Vote Count
           </Text>

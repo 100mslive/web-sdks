@@ -73,7 +73,7 @@ export const ChangeNameContent = ({
           autoComplete="name"
           required
           data-testid="change_name_field"
-          onKeyDown={async e => {
+          onKeyDown={async (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter' && currentName && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
               if (isMobile) {

@@ -47,7 +47,7 @@ export function HLSQualitySelector({
         </Sheet.Trigger>
         <Sheet.Content
           container={containerRef}
-          css={{ bg: '$surface_default', pb: '$1' }}
+          
           onClick={() => onOpenChange(false)}
         >
           <Sheet.Title

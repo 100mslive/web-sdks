@@ -130,7 +130,7 @@ export const DesktopOptions = ({
 
         <Dropdown.Content
           sideOffset={5}
-          onCloseAutoFocus={e => {
+          onCloseAutoFocus={(e: Event) => {
             e.preventDefault();
           }}
           align="end"

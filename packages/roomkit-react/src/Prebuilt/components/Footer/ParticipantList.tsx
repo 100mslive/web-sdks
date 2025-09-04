@@ -464,10 +464,10 @@ export const ParticipantSearch = ({
         placeholder={placeholder}
         css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
-        onKeyDown={event => {
+        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
           event.stopPropagation();
         }}
-        onChange={event => {
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setValue(event.currentTarget.value);
         }}
         autoComplete="off"

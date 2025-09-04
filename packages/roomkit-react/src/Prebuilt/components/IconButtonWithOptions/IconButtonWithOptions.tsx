@@ -129,7 +129,7 @@ export const IconButtonWithOptions = ({
           <Dropdown.Trigger
             asChild
             // onClick does not work
-            onPointerDown={e => {
+            onPointerDown={(e: React.PointerEvent) => {
               if (disabled) {
                 e.preventDefault();
                 onDisabledClick();

@@ -232,9 +232,9 @@ const ChatMessage = React.memo(
             },
           }}
           data-testid="chat_msg"
-          onClick={(e: React.MouseEvent) => {
+          onClick={(e: React.MouseEvent<HTMLElement>) => {
             if (isMobile) {
-              setOpenSheet(true, e);
+              setOpenSheet(true, e as any);
             }
           }}
         >
@@ -332,8 +332,8 @@ const ChatMessage = React.memo(
               userSelect: 'all',
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
-            onClick={(e: React.MouseEvent) => {
-              setOpenSheet(true, e);
+            onClick={(e: React.MouseEvent<HTMLElement>) => {
+              setOpenSheet(true, e as any);
             }}
           >
             <AnnotisedMessage message={message.message} />

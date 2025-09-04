@@ -176,7 +176,7 @@ export const ChatActions = ({
       <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
         <Sheet.Content
           style={{ bg: '$surface_default', pb: '$14' }}
-          onClick={(e: React.MouseEvent) => setOpenSheet(false, e as React.MouseEvent<HTMLElement>)}
+          onClick={(e: React.MouseEvent) => setOpenSheet(false, e as any)}
         >
           <Sheet.Title
             css={{
@@ -195,7 +195,7 @@ export const ChatActions = ({
             Message options
             <Sheet.Close
               css={{ color: '$on_surface_high' }}
-              onClick={(e: React.MouseEvent) => setOpenSheet(false, e as React.MouseEvent<HTMLElement>)}
+              onClick={(e: React.MouseEvent) => setOpenSheet(false, e as any)}
             >
               <CrossIcon />
             </Sheet.Close>

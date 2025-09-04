@@ -12,11 +12,11 @@ export const VolumeControl = () => {
     <Flex
       align="center"
       css={{ color: '$on_surface_high' }}
-      onMouseOver={event => {
+      onMouseOver={(event: React.MouseEvent) => {
         event.stopPropagation();
         setShowSlider(true);
       }}
-      onMouseLeave={event => {
+      onMouseLeave={(event: React.MouseEvent) => {
         event.stopPropagation();
         setShowSlider(false);
       }}
@@ -48,7 +48,7 @@ export const VolumeControl = () => {
         max={100}
         step={1}
         value={[volume]}
-        onValueChange={volume => {
+        onValueChange={(volume: number[]) => {
           hlsPlayer?.setVolume(volume[0]);
           setVolume(volume[0]);
         }}

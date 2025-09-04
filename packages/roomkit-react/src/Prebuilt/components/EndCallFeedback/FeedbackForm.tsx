@@ -376,7 +376,7 @@ export const FeedbackForm = ({
               display: 'flex',
             }}
             value={comment}
-            onChange={event => setComment(event.target.value.trimStart())}
+            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setComment(event.target.value.trimStart())}
           />
         </Flex>
       )}

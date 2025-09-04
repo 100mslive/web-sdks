@@ -159,7 +159,7 @@ export const QuestionForm = ({
           maxHeight: '$32',
         }}
         value={text}
-        onChange={event => setText(event.target.value.trimStart())}
+        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setText(event.target.value.trimStart())}
       />
       <Text variant="xs" css={{ color: '$on_surface_medium', textAlign: 'end', mt: '$4' }}>
         {text?.length || 0}/1024

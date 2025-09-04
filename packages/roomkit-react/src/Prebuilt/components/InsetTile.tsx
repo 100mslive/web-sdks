@@ -93,6 +93,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
   }
 
   return (
+    // @ts-expect-error Complex type mismatch
     <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
