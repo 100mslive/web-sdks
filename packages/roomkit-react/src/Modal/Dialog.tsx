@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '../styled-system';
 import {
@@ -8,7 +9,6 @@ import {
   DialogDefaultCloseIcon,
   DialogDescription,
   DialogTitle,
-  StyledDialogPortal,
   StyledDialogTrigger,
 } from './DialogContent';
 import { useDialogContainerSelector } from '../hooks/useDialogContainerSelector';
@@ -37,10 +37,11 @@ const CustomDialogPortal = ({ children, container }: { children: ReactNode; cont
   } else if (!containerRef.current) {
     containerRef.current = document.body;
   }
+  // Use DialogPrimitive.Portal directly to avoid passing DOM element through styled component
   return (
-    <StyledDialogPortal container={containerRef.current}>
+    <DialogPrimitive.Portal container={containerRef.current}>
       <>{children}</>
-    </StyledDialogPortal>
+    </DialogPrimitive.Portal>
   );
 };
 
