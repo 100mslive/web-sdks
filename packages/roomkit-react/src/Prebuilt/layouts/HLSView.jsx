@@ -32,7 +32,7 @@ import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
-import { config, theme, useTheme } from '../../Theme';
+import { config, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { WaitingView } from './WaitingView';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
@@ -645,9 +645,7 @@ const HLSView = () => {
                     left: '0',
                     zIndex: 1,
                     background:
-                      isMobile || isLandscape
-                        ? ''
-                        : `linear-gradient(180deg, ${theme.colors.background_dim.value}00 29.46%, ${theme.colors.background_dim.value}A3 100%);`,
+                      isMobile || isLandscape ? '' : `linear-gradient(180deg, #00000000 29.46%, #000000A3 100%);`,
                     width: '100%',
                     pt: '$8',
                     flexShrink: 0,

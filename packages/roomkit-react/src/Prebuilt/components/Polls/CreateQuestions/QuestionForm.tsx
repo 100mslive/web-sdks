@@ -234,7 +234,9 @@ export const QuestionForm = ({
                   value={weight}
                   min={1}
                   max={999}
-                  onChange={e => setWeight(Math.min(Number(e.target.value), 999))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setWeight(Math.min(Number(e.target.value), 999))
+                  }
                   css={{
                     backgroundColor: '$surface_bright',
                     border: '1px solid $border_bright',
@@ -246,7 +248,7 @@ export const QuestionForm = ({
                 <Text variant="sm" css={{ color: '$on_surface_medium' }}>
                   Allow to skip
                 </Text>
-                <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
+                <Switch defaultChecked={skippable} onCheckedChange={(checked: boolean) => setSkippable(checked)} />
               </Flex> */}
             </>
           ) : null}
@@ -264,7 +266,7 @@ export const QuestionForm = ({
               ? 'At least two options must be added'
               : `Please fill all the fields ${isQuiz ? 'and mark the correct answer(s)' : ''} to continue`
           }
-          boxCss={{ maxWidth: '$40' }}
+          boxStyle={{ maxWidth: '$40' }}
         >
           <Button
             variant="standard"

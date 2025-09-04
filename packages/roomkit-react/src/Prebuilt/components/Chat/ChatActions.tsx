@@ -174,7 +174,10 @@ export const ChatActions = ({
   if (isMobile) {
     return (
       <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
-        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={e => setOpenSheet(false, e)}>
+        <Sheet.Content
+          style={{ bg: '$surface_default', pb: '$14' }}
+          onClick={(e: React.MouseEvent) => setOpenSheet(false, e as React.MouseEvent<HTMLElement>)}
+        >
           <Sheet.Title
             css={{
               display: 'flex',
@@ -190,7 +193,10 @@ export const ChatActions = ({
             }}
           >
             Message options
-            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={e => setOpenSheet(false, e)}>
+            <Sheet.Close
+              css={{ color: '$on_surface_high' }}
+              onClick={(e: React.MouseEvent) => setOpenSheet(false, e as React.MouseEvent<HTMLElement>)}
+            >
               <CrossIcon />
             </Sheet.Close>
           </Sheet.Title>
@@ -229,21 +235,21 @@ export const ChatActions = ({
         }}
       >
         {options.reply.show ? (
-          <Tooltip boxCss={tooltipBoxCSS} title={options.reply.tooltipText}>
+          <Tooltip boxStyle={tooltipBoxCSS} title={options.reply.tooltipText}>
             <IconButton data-testid="reply_message_btn" onClick={options.reply.onClick}>
               {options.reply.icon}
             </IconButton>
           </Tooltip>
         ) : null}
         {options.replyGroup.show ? (
-          <Tooltip boxCss={tooltipBoxCSS} title={options.replyGroup.tooltipText}>
+          <Tooltip boxStyle={tooltipBoxCSS} title={options.replyGroup.tooltipText}>
             <IconButton data-testid="reply_group_message_btn" onClick={options.replyGroup.onClick}>
               {options.replyGroup.icon}
             </IconButton>
           </Tooltip>
         ) : null}
         {options.pin.show ? (
-          <Tooltip boxCss={tooltipBoxCSS} title={options.pin.tooltipText}>
+          <Tooltip boxStyle={tooltipBoxCSS} title={options.pin.tooltipText}>
             <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
               {options.pin.icon}
             </IconButton>
@@ -251,7 +257,7 @@ export const ChatActions = ({
         ) : null}
 
         {options.copy.show ? (
-          <Tooltip boxCss={tooltipBoxCSS} title={options.copy.tooltipText}>
+          <Tooltip boxStyle={tooltipBoxCSS} title={options.copy.tooltipText}>
             <IconButton onClick={options.copy.onClick} data-testid="copy_message_btn">
               <CopyIcon style={iconStyle} />
             </IconButton>
@@ -259,7 +265,7 @@ export const ChatActions = ({
         ) : null}
 
         {options.block.show || options.hide.show || options.remove.show ? (
-          <Tooltip boxCss={tooltipBoxCSS} title="More actions">
+          <Tooltip boxStyle={tooltipBoxCSS} title="More actions">
             <Dropdown.Trigger asChild>
               <IconButton>
                 <VerticalMenuIcon style={iconStyle} />

@@ -90,7 +90,7 @@ const TileMenu = ({
         <StyledMenuTile.Trigger
           data-testid="participant_menu_btn"
           css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
-          onClick={e => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
           className={dragClassName}
         >
           <VerticalMenuIcon width={20} height={20} />
@@ -98,7 +98,7 @@ const TileMenu = ({
 
         {isMobile ? (
           <Sheet.Root open={open} onOpenChange={setOpen}>
-            <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
+            <Sheet.Content style={{ bg: '$surface_dim', pt: '$8' }}>
               <Flex
                 css={{
                   color: '$on_surface_high',

@@ -53,11 +53,11 @@ const PreviewForm = ({
           disabled={disabled}
           css={{ w: '100%', boxSizing: 'border-box' }}
           value={name}
-          onChange={e => onChange(e.target.value.trimStart())}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value.trimStart())}
           placeholder="Enter name"
           autoFocus
           autoComplete="name"
-          onKeyDown={e => {
+          onKeyDown={(e: React.KeyboardEvent) => {
             if (e.key === 'Enter' && name.trim().length > 0) {
               e.preventDefault();
               if (isMobile) {

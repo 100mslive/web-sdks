@@ -8,6 +8,6 @@
     "sourceMap": false,
     "emitDeclarationOnly": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "styled-system/**/*"],
   "exclude": ["node_modules", "dist", "**/*.stories.tsx", "src/store/**", "**/*.mdx"]
 }

@@ -33,7 +33,7 @@ import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
-import { globalStyles, HMSThemeProvider } from '../Theme';
+import { HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
 import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
@@ -101,7 +101,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const reactiveStore = useRef<HMSPrebuiltRefType>();
+    const reactiveStore = useRef<HMSPrebuiltRefType>(null);
     const [hydrated, setHydrated] = React.useState(false);
 
     useEffect(() => {
@@ -168,7 +168,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       return null;
     }
 
-    globalStyles();
+    // Global styles are handled by Panda CSS at build time
 
     return (
       <ErrorBoundary>
@@ -214,10 +214,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}
                       theme={{
-                        //@ts-ignore: Prebuilt theme to match stitches theme
+                        themeType: theme.name || '',
                         colors: theme.palette,
                         fonts: {
-                          //@ts-ignore: font list to match token types of stitches
                           sans: fontFamily,
                         },
                       }}

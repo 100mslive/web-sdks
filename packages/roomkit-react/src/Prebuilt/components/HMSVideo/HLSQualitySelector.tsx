@@ -125,7 +125,7 @@ export function HLSQualitySelector({
     );
   }
   return (
-    <Dropdown.Root open={open} onOpenChange={value => onOpenChange(value)} modal={false}>
+    <Dropdown.Root open={open} onOpenChange={(value: boolean) => onOpenChange(value)} modal={false}>
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{

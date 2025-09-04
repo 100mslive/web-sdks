@@ -42,7 +42,7 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
     <Dropdown.Root open={openOptions} onOpenChange={setOpenOptions}>
       <Dropdown.Trigger
         data-testid="role_group_options"
-        onClick={e => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
         className="role_actions"
         asChild
         css={{
@@ -63,7 +63,7 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
         </Flex>
       </Dropdown.Trigger>
       <Dropdown.Content
-        onClick={e => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
         css={{ w: 'max-content', bg: '$surface_default', py: 0 }}
         align="end"
       >

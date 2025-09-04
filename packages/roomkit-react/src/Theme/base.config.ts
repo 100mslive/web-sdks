@@ -1,5 +1,5 @@
-import type * as Stitches from '@stitches/react';
-import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
+// Removed Stitches imports - using Panda CSS now
+const defaultStitchesThemeMap = {};
 
 export const baseConfig = {
   theme: {
@@ -136,71 +136,71 @@ export const baseConfig = {
 };
 
 export const defaultUtils = {
-  bg: (value: Stitches.PropertyValue<'backgroundColor'>) => ({
+  bg: (value: any) => ({
     backgroundColor: value,
   }),
-  c: (value: Stitches.PropertyValue<'color'>) => ({
+  c: (value: any) => ({
     color: value,
   }),
-  r: (value: Stitches.ScaleValue<'radii'>) => ({
+  r: (value: any) => ({
     borderRadius: value,
   }),
-  fs: (value: Stitches.PropertyValue<'fontSize'> | number | string) => ({
+  fs: (value: any | number | string) => ({
     fontSize: value,
   }),
-  size: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  size: (value: any | number | string) => ({
     height: value,
     width: value,
   }),
-  w: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  w: (value: any | number | string) => ({
     width: value,
   }),
-  h: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  h: (value: any | number | string) => ({
     height: value,
   }),
-  p: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  p: (value: any | number | string) => ({
     padding: value,
   }),
-  pt: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  pt: (value: any | number | string) => ({
     paddingTop: value,
   }),
-  pr: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  pr: (value: any | number | string) => ({
     paddingRight: value,
   }),
-  pb: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  pb: (value: any | number | string) => ({
     paddingBottom: value,
   }),
-  pl: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  pl: (value: any | number | string) => ({
     paddingLeft: value,
   }),
-  px: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  px: (value: any | number | string) => ({
     paddingLeft: value,
     paddingRight: value,
   }),
-  py: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  py: (value: any | number | string) => ({
     paddingTop: value,
     paddingBottom: value,
   }),
-  m: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  m: (value: any | number | string) => ({
     margin: value,
   }),
-  mt: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  mt: (value: any | number | string) => ({
     marginTop: value,
   }),
-  mr: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  mr: (value: any | number | string) => ({
     marginRight: value,
   }),
-  mb: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  mb: (value: any | number | string) => ({
     marginBottom: value,
   }),
-  ml: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  ml: (value: any | number | string) => ({
     marginLeft: value,
   }),
-  mx: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  mx: (value: any | number | string) => ({
     marginLeft: value,
     marginRight: value,
   }),
-  my: (value: Stitches.ScaleValue<'space'> | number | string) => ({
+  my: (value: any | number | string) => ({
     marginTop: value,
     marginBottom: value,
   }),

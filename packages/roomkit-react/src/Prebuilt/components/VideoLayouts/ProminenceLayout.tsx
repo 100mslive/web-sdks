@@ -1,7 +1,6 @@
 import React from 'react';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../Layout';
-import { CSS } from '../../../Theme';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
@@ -21,7 +20,7 @@ const Root = ({
   );
 };
 
-const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
+const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: Record<string, any> }>) => {
   return (
     <Flex direction="column" css={{ flex: '1 1 0', gap: '$2', minHeight: 0, ...css }}>
       {children}

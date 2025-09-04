@@ -214,7 +214,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                 <Slider
                   showTooltip={false}
                   value={[blurAmount]}
-                  onValueChange={async e => {
+                  onValueChange={async (e: number[]) => {
                     setBlurAmount(e[0]);
                     await VBHandler.setBlur(e[0]);
                   }}

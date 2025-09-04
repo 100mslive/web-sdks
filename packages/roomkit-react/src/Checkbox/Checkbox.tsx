@@ -1,32 +1,35 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { styled } from '../Theme';
+import { styled } from '../styled-system';
 
 const CheckboxRoot = styled(CheckboxPrimitive.Root, {
-  all: 'unset',
-  border: '1px solid $primary_default',
-  backgroundColor: '$on_primary_high',
-  width: '$8',
-  height: '$8',
-  borderRadius: '$0',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  boxShadow: 'none',
-  outline: 'none',
-  cursor: 'pointer',
-  '&:focus': {
+  base: {
+    all: 'unset',
+    border: '1px solid token(colors.primary.default)',
+    backgroundColor: 'onPrimary.high',
+    width: 'token(spacing.8)',
+    height: 'token(spacing.8)',
+    borderRadius: 'token(radii.0)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     boxShadow: 'none',
     outline: 'none',
-  },
-  '&[data-state="checked"]': {
-    backgroundColor: '$primary_default',
+    cursor: 'pointer',
+    '&:focus': {
+      boxShadow: 'none',
+      outline: 'none',
+    },
+    '&[data-state="checked"]': {
+      backgroundColor: 'primary.default',
+    },
   },
 });
 
 const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
-  color: '$on_primary_high',
-  // center check svg within button box
-  lineHeight: 0,
+  base: {
+    color: 'onPrimary.high',
+    lineHeight: '0',
+  },
 });
 
 export const Checkbox = {

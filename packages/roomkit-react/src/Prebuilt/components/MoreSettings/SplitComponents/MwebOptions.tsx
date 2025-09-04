@@ -143,7 +143,7 @@ export const MwebOptions = ({
             </IconButton>
           </Sheet.Trigger>
         </Tooltip>
-        <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
+        <Sheet.Content style={{ bg: '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
               display: 'flex',

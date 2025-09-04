@@ -19,7 +19,7 @@ export const PlayPauseSeekControls = ({
   return (
     <>
       <SeekControl
-        onClick={e => {
+        onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
           onSeekTo(-10);
         }}
@@ -29,7 +29,7 @@ export const PlayPauseSeekControls = ({
       </SeekControl>
       <PlayPauseButton isPaused={isPaused} />
       <SeekControl
-        onClick={e => {
+        onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
           onSeekTo(10);
         }}

@@ -120,6 +120,7 @@ export const RoleAccordion = ({
         </Flex>
       </Accordion.Header>
       <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
+        {/* @ts-expect-error React 19 type incompatibility with react-window */}
         <FixedSizeList
           itemSize={ROW_HEIGHT}
           itemData={{

@@ -1,3 +1,7 @@
-import { styled } from '../Theme';
+import type { HTMLStyledProps } from '../styled-system';
+import { styled } from '../styled-system';
 
-export const Box = styled('div', {});
+const StyledBox = styled('div', {});
+
+export type BoxProps = HTMLStyledProps<typeof StyledBox>;
+export const Box = StyledBox;

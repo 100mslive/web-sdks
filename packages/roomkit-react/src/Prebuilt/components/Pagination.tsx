@@ -44,7 +44,7 @@ export const Pagination = ({
             <StyledPagination.Dot
               key={i}
               active={page === i}
-              onClick={e => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 onPageChange(i);
               }}

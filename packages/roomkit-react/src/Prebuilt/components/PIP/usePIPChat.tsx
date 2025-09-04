@@ -1,19 +1,14 @@
 import { useEffect } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
-import { getCssText } from '../../../Theme';
 import { usePIPWindow } from './usePIPWindow';
 
 export const usePIPChat = () => {
   const hmsActions = useHMSActions();
   const { isSupported, requestPipWindow, pipWindow, closePipWindow } = usePIPWindow();
 
+  // Panda CSS doesn't require runtime CSS injection
   useEffect(() => {
-    if (document && pipWindow) {
-      const style = document.createElement('style');
-      style.id = 'stitches';
-      style.textContent = getCssText();
-      pipWindow.document.head.appendChild(style);
-    }
+    // CSS is already compiled at build time
   }, [pipWindow]);
 
   // @ts-ignore

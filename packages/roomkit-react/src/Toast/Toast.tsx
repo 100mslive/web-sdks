@@ -1,61 +1,54 @@
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import type { ToastProps } from '@radix-ui/react-toast';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { Box, Flex } from '../Layout';
+import { cva, styled } from '../styled-system';
 import { Text } from '../Text';
-import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
 
 const getToastVariant = (base: string) => {
   return {
     borderLeftColor: base,
-    borderLeft: 0,
+    borderLeft: '0',
     '&:before': {
       position: 'absolute',
       top: '-1px',
-      left: '-$4',
-      width: '$8',
-      borderLeft: `solid $space$px ${base}`,
-      borderTop: `solid $space$px ${base}`,
-      borderBottom: `solid $space$px ${base}`,
-      borderTopLeftRadius: '$3',
-      borderBottomLeftRadius: '$3',
-      bg: base,
-      content: ' ',
+      left: 'token(spacing.-4)',
+      width: 'token(spacing.8)',
+      borderLeft: `solid 1px ${base}`,
+      borderTop: `solid 1px ${base}`,
+      borderBottom: `solid 1px ${base}`,
+      borderTopLeftRadius: 'token(radii.3)',
+      borderBottomLeftRadius: 'token(radii.3)',
+      backgroundColor: base,
+      content: '" "',
       height: '100%',
-      zIndex: 10,
-    },
-    '@sm': {
-      '&:before': {
-        content: 'none',
-      },
-      border: `solid $space$px ${base}`,
+      zIndex: '10',
     },
   };
 };
 
-const ToastRoot = styled(ToastPrimitives.Root, {
-  r: '$3',
-  bg: '$surface_default',
-  p: '$10',
-  display: 'flex',
-  flexDirection: 'column',
-  position: 'relative',
-  fontFamily: '$sans',
-  border: 'solid $space$px $border_bright',
-  overflow: 'hidden',
-  ...toastAnimation,
-  '@sm': {
-    p: '$8 $11',
+const toastRootVariants = cva({
+  base: {
+    borderRadius: 'token(radii.3)',
+    backgroundColor: 'surface.default',
+    padding: 'token(spacing.10)',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    fontFamily: 'sans',
+    border: '1px solid token(colors.border.bright)',
+    overflow: 'hidden',
+    ...toastAnimation,
   },
   variants: {
     variant: {
-      standard: getToastVariant('$secondary_default'),
-      warning: getToastVariant('$alert_warning'),
-      error: getToastVariant('$alert_error_default'),
-      success: getToastVariant('$alert_success'),
+      standard: getToastVariant('token(colors.secondary.default)'),
+      warning: getToastVariant('token(colors.alert.warning)'),
+      error: getToastVariant('token(colors.alert.error.default)'),
+      success: getToastVariant('token(colors.alert.success)'),
     },
   },
   defaultVariants: {
@@ -63,45 +56,61 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   },
 });
 
+const ToastRoot = styled(ToastPrimitives.Root, toastRootVariants);
+
 const ToastTitle = styled(ToastPrimitives.Title, {
-  fontSize: '$md',
-  color: '$on_surface_high',
-  fontWeight: '$semiBold',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-});
-const ToastDescription = styled(ToastPrimitives.Description, {
-  color: '$on_surface_medium',
-});
-const ToastClose = styled(ToastPrimitives.Close, {});
-const ToastAction = styled(ToastPrimitives.Action, {
-  cursor: 'pointer',
-  background: 'none',
-  border: 'none',
-});
-const ToastViewport = styled(ToastPrimitives.Viewport, {
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '$8',
-  gap: 10,
-  width: 390,
-  '@sm': {
-    width: '100%',
-    padding: '$6',
+  base: {
+    fontSize: 'md',
+    color: 'onSurface.high',
+    fontWeight: 'semiBold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  maxWidth: '100vw',
-  margin: 0,
-  listStyle: 'none',
-  zIndex: 1000,
 });
 
-const DefaultClose = ({ css }: Pick<ComponentProps<typeof ToastClose>, 'css'>) => {
+const ToastDescription = styled(ToastPrimitives.Description, {
+  base: {
+    color: 'onSurface.medium',
+  },
+});
+
+const ToastClose = styled(ToastPrimitives.Close, {});
+
+const ToastAction = styled(ToastPrimitives.Action, {
+  base: {
+    cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+  },
+});
+
+const ToastViewport = styled(ToastPrimitives.Viewport, {
+  base: {
+    position: 'fixed',
+    bottom: '0',
+    left: '0',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 'token(spacing.8)',
+    gap: '10px',
+    width: '390px',
+    maxWidth: '100vw',
+    margin: '0',
+    listStyle: 'none',
+    zIndex: '1000',
+  },
+  conditions: {
+    sm: {
+      width: '100%',
+      padding: 'token(spacing.6)',
+    },
+  },
+});
+
+const DefaultClose = ({ style }: { style?: Record<string, any> }) => {
   return (
-    <ToastClose css={css} asChild>
+    <ToastClose style={style} asChild>
       <IconButton>
         <CrossIcon />
       </IconButton>

@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { Root } from '@radix-ui/react-dialog';
-import { styled } from '@stitches/react';
+import { styled } from '../styled-system';
 import {
   CustomDialogContent,
   CustomDialogOverlay,

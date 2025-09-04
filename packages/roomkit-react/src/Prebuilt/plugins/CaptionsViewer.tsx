@@ -192,7 +192,7 @@ export const CaptionsViewer = ({
 
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
 
-  const nodeRef = useRef<HTMLDivElement>(null);
+  const nodeRef = useRef<HTMLElement>(null!);
 
   useEffect(() => {
     const timeInterval = setInterval(() => {

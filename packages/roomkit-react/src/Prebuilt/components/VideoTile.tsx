@@ -17,7 +17,6 @@ import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { AudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
-import { CSS } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
@@ -71,8 +70,8 @@ const Tile = ({
   objectFit?: string;
   canMinimise?: boolean;
   isDragabble?: boolean;
-  rootCSS?: CSS;
-  containerCSS?: CSS;
+  rootCSS?: any;
+  containerCSS?: any;
   enableSpotlightingPeer?: boolean;
   hideParticipantNameOnTile?: boolean;
   roundedVideoTile?: boolean;

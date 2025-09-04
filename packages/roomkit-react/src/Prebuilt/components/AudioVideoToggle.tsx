@@ -195,7 +195,7 @@ export const NoiseCancellation = ({
           fontSize: '$xs',
           justifyContent: 'space-between',
         }}
-        onClick={async e => {
+        onClick={async (e: React.MouseEvent) => {
           e.preventDefault();
           await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
         }}
@@ -208,8 +208,8 @@ export const NoiseCancellation = ({
           id="noise_cancellation"
           checked={isNoiseCancellationEnabled && isKrispPluginAdded}
           disabled={inProgress}
-          onClick={e => e.stopPropagation()}
-          onCheckedChange={async value => {
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+          onCheckedChange={async (value: boolean) => {
             await setNoiseCancellationWithPlugin(value);
           }}
         />

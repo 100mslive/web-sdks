@@ -52,7 +52,10 @@ export const MuteAllContent = (props: {
       />
       <DialogRow>
         <Text variant="md">Track status</Text>
-        <RadioGroup.Root value={String(props.enabled)} onValueChange={value => props.setEnabled(value === 'true')}>
+        <RadioGroup.Root
+          value={String(props.enabled)}
+          onValueChange={(value: string) => props.setEnabled(value === 'true')}
+        >
           {permissions?.mute && (
             <Flex align="center" css={{ mr: '$8' }}>
               <RadioGroup.Item value="false" id="trackDisableRadio" css={{ mr: '$4' }}>

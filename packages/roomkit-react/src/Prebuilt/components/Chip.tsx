@@ -1,7 +1,6 @@
 import React from 'react';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { CSS } from '../../Theme';
 
 const Chip = ({
   icon = <></>,
@@ -18,7 +17,7 @@ const Chip = ({
   textColor?: string;
   hideIfNoContent?: boolean;
   onClick?: () => void | Promise<void>;
-  css?: CSS;
+  css?: Record<string, any>;
 }) => {
   if (hideIfNoContent && !content) {
     return null;

@@ -1,4 +1,5 @@
-import { styled } from '../Theme';
+import type { HTMLStyledProps } from '../styled-system';
+import { styled } from '../styled-system';
 
 /**
  * @see https://tailwindcss.com/docs/space
@@ -12,8 +13,10 @@ const gapStyles = (value: number) => {
   };
 };
 
-export const Flex = styled('div', {
-  display: 'flex',
+const StyledFlex = styled('div', {
+  base: {
+    display: 'flex',
+  },
   variants: {
     justify: {
       start: {
@@ -74,3 +77,6 @@ export const Flex = styled('div', {
     },
   },
 });
+
+export type FlexProps = HTMLStyledProps<typeof StyledFlex>;
+export const Flex = StyledFlex;

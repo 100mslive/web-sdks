@@ -1,21 +1,23 @@
 import React from 'react';
-import { VariantProps } from '@stitches/react';
 import { PersonIcon } from '@100mslive/react-icons';
-import { styled } from '../Theme';
+import type { HTMLStyledProps } from '../styled-system';
+import { cva, styled } from '../styled-system';
 import { getAvatarBg } from './getAvatarBg';
 import { flexCenter } from '../utils/styles';
 
 const getAvatarShape = (radii: string) => ({
-  borderRadius: radii,
+  borderRadius: radii === '$round' ? 'round' : '1',
 });
 
-export const StyledAvatar = styled('div', {
-  ...flexCenter,
-  color: '$colors$on_primary_high',
-  fontFamily: '$sans',
-  aspectRatio: '1',
-  fontWeight: 600,
-  fontSize: '$space$9',
+const avatarVariants = cva({
+  base: {
+    ...flexCenter,
+    color: 'onPrimary.high',
+    fontFamily: 'sans',
+    aspectRatio: '1',
+    fontWeight: 600,
+    fontSize: '9',
+  },
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
@@ -23,16 +25,25 @@ export const StyledAvatar = styled('div', {
     },
     size: {
       small: {
-        height: '$16 !important',
-        fontSize: '$space$6',
+        height: '16',
+        fontSize: '6',
+        '& *': {
+          fontSize: '6 !important',
+        },
       },
       medium: {
-        height: '$18 !important',
-        fontSize: '$space$10',
+        height: '18',
+        fontSize: '10',
+        '& *': {
+          fontSize: '10 !important',
+        },
       },
       large: {
-        height: '$20 !important',
-        fontSize: '$space$12',
+        height: '20',
+        fontSize: '12',
+        '& *': {
+          fontSize: '12 !important',
+        },
       },
     },
   },
@@ -41,19 +52,20 @@ export const StyledAvatar = styled('div', {
   },
 });
 
-type Props = VariantProps<typeof StyledAvatar> &
-  React.ComponentProps<typeof StyledAvatar> & {
-    name: string;
-  };
+export const StyledAvatar = styled('div', avatarVariants);
 
-export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
+export type AvatarProps = HTMLStyledProps<typeof StyledAvatar> & {
+  name: string;
+};
+
+export const Avatar: React.FC<AvatarProps> = ({ name, style, ...props }) => {
   const info = getAvatarBg(name);
   let { color } = info;
   if (!name) {
     color = '#7E47EB';
   }
   return (
-    <StyledAvatar css={{ bg: color, ...css }} {...props}>
+    <StyledAvatar style={{ backgroundColor: color, ...style }} {...props}>
       {info.initials || <PersonIcon height={40} width={40} />}
     </StyledAvatar>
   );

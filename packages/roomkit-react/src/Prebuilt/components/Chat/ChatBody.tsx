@@ -232,7 +232,7 @@ const ChatMessage = React.memo(
             },
           }}
           data-testid="chat_msg"
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             if (isMobile) {
               setOpenSheet(true, e);
             }
@@ -268,7 +268,7 @@ const ChatMessage = React.memo(
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
-                <Tooltip title={message.senderName} side="top" align="start" boxCss={{ zIndex: 50 }}>
+                <Tooltip title={message.senderName} side="top" align="start" boxStyle={{ zIndex: 50 }}>
                   <SenderName
                     as="span"
                     variant="sub2"
@@ -332,7 +332,7 @@ const ChatMessage = React.memo(
               userSelect: 'all',
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
-            onClick={e => {
+            onClick={(e: React.MouseEvent) => {
               setOpenSheet(true, e);
             }}
           >
@@ -374,7 +374,9 @@ const VirtualizedChatMessages = React.forwardRef<
         }}
       >
         {({ height, width }: { height: number; width: number }) => (
+          // @ts-expect-error - React 19 type incompatibility with react-window
           <VariableSizeList
+            // @ts-ignore - React 19 type incompatibility with react-window
             ref={node => {
               if (node) {
                 // @ts-ignore

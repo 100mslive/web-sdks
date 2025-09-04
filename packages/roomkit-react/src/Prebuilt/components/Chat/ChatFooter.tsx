@@ -133,7 +133,9 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
-      inputRef.current.value = '';
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
       resetInputHeight();
       setTimeout(() => {
         onSend(1);
@@ -171,7 +173,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={e => e.stopPropagation()}>
+          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
@@ -248,7 +250,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               ref={inputRef}
               required
               autoFocus={!(isMobile || isLandscapeHLSStream)}
-              onKeyPress={async event => {
+              onKeyPress={async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey && !messageLengthExceeded) {
                     event.preventDefault();
@@ -258,14 +260,14 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               }}
               autoComplete="off"
               aria-autocomplete="none"
-              onChange={e => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 updateInputHeight();
                 setMessageLengthExceeded(e.target.value.length > CHAT_MESSAGE_LIMIT);
               }}
               onBlur={resetInputHeight}
-              onPaste={e => e.stopPropagation()}
-              onCut={e => e.stopPropagation()}
-              onCopy={e => e.stopPropagation()}
+              onPaste={(e: React.ClipboardEvent) => e.stopPropagation()}
+              onCut={(e: React.ClipboardEvent) => e.stopPropagation()}
+              onCopy={(e: React.ClipboardEvent) => e.stopPropagation()}
             />
             {!isMobile && !isLandscapeHLSStream ? (
               <EmojiPicker

@@ -55,7 +55,7 @@ export const MuteAllModal = ({
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ px: '$10' }}>
+        <Sheet.Content style={{ px: '$10' }}>
           <MuteAllContent {...props} />
         </Sheet.Content>
       </Sheet.Root>

@@ -1,35 +1,37 @@
-import React, { ComponentProps, PropsWithChildren, PropsWithRef } from 'react';
-import { CSS } from '@stitches/react';
+import React, { ComponentProps, CSSProperties, PropsWithChildren, PropsWithRef } from 'react';
 import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
 import { Flex } from '../Layout';
-import { styled } from '../Theme';
+import type { HTMLStyledProps } from '../styled-system';
+import { styled } from '../styled-system';
 
-export const Input = styled('input', {
-  fontFamily: '$sans',
-  lineHeight: 'inherit',
-  backgroundColor: '$surface_default',
-  borderRadius: '8px',
-  outline: 'none',
-  border: '1px solid $border_default',
-  padding: '0.5rem 0.75rem',
-  minHeight: '30px',
-  color: '$on_surface_high',
-  fontSize: '$md',
-  '&:disabled': {
-    cursor: 'not-allowed',
-  },
-  '&:focus': {
-    boxShadow: '0 0 0 1px $colors$primary_default',
-    border: '1px solid transparent',
-  },
-  '&::placeholder': {
-    color: '$on_surface_medium',
+const StyledInput = styled('input', {
+  base: {
+    fontFamily: 'sans',
+    lineHeight: 'inherit',
+    backgroundColor: 'surface.default',
+    borderRadius: '8px',
+    outline: 'none',
+    border: '1px solid {colors.border.default}',
+    padding: '0.5rem 0.75rem',
+    minHeight: '30px',
+    color: 'onSurface.high',
+    fontSize: 'md',
+    '&:disabled': {
+      cursor: 'not-allowed',
+    },
+    '&:focus': {
+      boxShadow: '0 0 0 1px {colors.primary.default}',
+      border: '1px solid transparent',
+    },
+    '&::placeholder': {
+      color: 'onSurface.medium',
+    },
   },
   variants: {
     error: {
       true: {
         '&:focus': {
-          boxShadow: '0 0 0 3px $colors$alert_error_default',
+          boxShadow: '0 0 0 3px {colors.alert.error.default}',
         },
       },
     },
@@ -37,68 +39,75 @@ export const Input = styled('input', {
 });
 
 const PasswordRoot = styled('div', {
-  w: '100%',
-  position: 'relative',
-  display: 'flex',
+  base: {
+    width: '100%',
+    position: 'relative',
+    display: 'flex',
+  },
 });
 
-const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: boolean; css?: CSS }> = ({
+export type InputProps = HTMLStyledProps<typeof StyledInput>;
+export const Input = StyledInput;
+
+const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: boolean; style?: CSSProperties }> = ({
   showPassword,
-  css,
+  style,
   ...props
 }) => {
   return (
-    <Flex css={{ ...css }} {...props}>
+    <Flex style={{ ...style }} {...props}>
       {showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}
     </Flex>
   );
 };
 
-const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex & { css?: CSS }>> = ({ css, ...props }) => {
+const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex> & { style?: CSSProperties }> = ({ style, ...props }) => {
   return (
-    <Flex css={{ ...css }} {...props}>
+    <Flex style={{ ...style }} {...props}>
       <CopyIcon />
     </Flex>
   );
 };
 
-const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<ComponentProps<typeof Flex & { css?: CSS }>>>(
-  ({ css, ...props }, ref) => {
-    return (
-      <Flex
-        css={{
-          position: 'absolute',
-          top: 0,
-          height: '100%',
-          zIndex: 10,
-          right: '$4',
-          bg: '$surface_bright',
-          alignItems: 'center',
-          ...css,
-        }}
-        ref={ref}
-        {...props}
-      >
-        {props.children}
-      </Flex>
-    );
-  },
-);
+const PasswordIcons = React.forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<ComponentProps<typeof Flex> & { style?: CSSProperties }>
+>(({ style, ...props }, ref) => {
+  return (
+    <Flex
+      style={{
+        position: 'absolute',
+        top: 0,
+        height: '100%',
+        zIndex: 10,
+        right: 'var(--spacing-4)',
+        backgroundColor: 'var(--colors-surface-bright)',
+        alignItems: 'center',
+        ...style,
+      }}
+      ref={ref}
+      {...props}
+    >
+      {props.children}
+    </Flex>
+  );
+});
 
-const ReactInput: React.FC<PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>> =
-  React.forwardRef<
-    HTMLInputElement,
-    PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>
-  >(({ showPassword = false, css, ...props }, ref) => {
-    return (
-      <Input
-        css={{ flexGrow: 1, width: '100%', ...css }}
-        type={showPassword ? 'text' : 'password'}
-        {...props}
-        ref={ref}
-      />
-    );
-  });
+const ReactInput: React.FC<
+  PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; style?: CSSProperties }>
+> = React.forwardRef<
+  HTMLInputElement,
+  PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; style?: CSSProperties }>
+>(({ showPassword = false, style, ...props }, ref) => {
+  return (
+    <Input
+      style={{ flexGrow: 1, width: '100%', ...style }}
+      type={showPassword ? 'text' : 'password'}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 export const PasswordInput = {
   Root: PasswordRoot,

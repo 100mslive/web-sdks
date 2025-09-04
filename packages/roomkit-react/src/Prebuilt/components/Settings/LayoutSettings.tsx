@@ -51,7 +51,7 @@ export const LayoutSettings = () => {
             value={[maxTileCount]}
             min={1}
             max={49}
-            onValueChange={e => {
+            onValueChange={(e: number[]) => {
               setUISettings({ [UI_SETTINGS.maxTileCount]: e[0] });
             }}
             css={{ w: '70%' }}

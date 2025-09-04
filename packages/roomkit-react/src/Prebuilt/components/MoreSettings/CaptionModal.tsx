@@ -17,7 +17,7 @@ export const CaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) 
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$8 0' }}>
+        <Sheet.Content style={{ bg: '$surface_dim', p: '$8 0' }}>
           <CaptionContent {...props} />
         </Sheet.Content>
       </Sheet.Root>

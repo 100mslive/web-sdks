@@ -1,6 +1,6 @@
 import React from 'react';
-import type { VariantProps } from '@stitches/react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
+import type { HTMLStyledProps } from '../Theme';
 import { styled } from '../Theme';
 
 export const StyledVideo = styled('video', {
@@ -41,7 +41,7 @@ export const StyledVideo = styled('video', {
   },
 });
 
-type StyledProps = VariantProps<typeof StyledVideo> & React.ComponentProps<typeof StyledVideo>;
+type StyledProps = HTMLStyledProps<typeof StyledVideo>;
 
 interface Props {
   /**

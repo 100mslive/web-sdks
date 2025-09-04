@@ -139,7 +139,7 @@ export const SidePaneTabs = React.memo<{
                         '&:hover': { color: '$on_surface_high' },
                         '&:empty': { display: 'none' },
                       }}
-                      onClick={e => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
                           toggleChat();
@@ -186,7 +186,7 @@ export const SidePaneTabs = React.memo<{
                 {isOverlayChat && isChatOpen ? null : (
                   <IconButton
                     css={{ my: '$1', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-                    onClick={e => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
                         toggleChat();

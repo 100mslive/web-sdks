@@ -43,7 +43,7 @@ export function HLSAutoplayBlockedPrompt({
   return (
     <Dialog.Root
       open={open}
-      onOpenChange={async value => {
+      onOpenChange={async (value: boolean) => {
         if (!value) {
           await unblockAutoPlay();
         }

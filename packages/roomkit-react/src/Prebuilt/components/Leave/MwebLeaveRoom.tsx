@@ -85,7 +85,7 @@ export const MwebLeaveRoom = ({
         <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
+        <Sheet.Content style={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
             leaveRoom={isStreamingOn ? leaveRoom : endRoom}
@@ -95,7 +95,7 @@ export const MwebLeaveRoom = ({
       </Sheet.Root>
 
       <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
+        <Sheet.Content style={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
         </Sheet.Content>
       </Sheet.Root>

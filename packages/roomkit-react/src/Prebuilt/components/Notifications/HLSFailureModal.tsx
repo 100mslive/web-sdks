@@ -31,7 +31,7 @@ export function HLSFailureModal() {
   return hlsError ? (
     <Dialog.Root
       open={openModal}
-      onOpenChange={value => {
+      onOpenChange={(value: boolean) => {
         if (!value) {
           setOpenModal(false);
         }

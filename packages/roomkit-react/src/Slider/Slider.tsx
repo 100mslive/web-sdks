@@ -1,52 +1,65 @@
 import React from 'react';
 import * as BaseSlider from '@radix-ui/react-slider';
-import { CSS } from '@stitches/react';
-import { styled } from '../Theme';
+import { styled } from '../styled-system';
 import { Tooltip } from '../Tooltip';
 
 const Root = styled(BaseSlider.Root, {
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  userSelect: 'none',
-  touchAction: 'none',
-  width: '100%',
-  '&[data-orientation="horizontal"]': {
-    height: 20,
+  base: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    userSelect: 'none',
+    touchAction: 'none',
+    width: '100%',
+    '&[data-orientation="horizontal"]': {
+      height: '20px',
+    },
   },
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$surface_bright',
-  position: 'relative',
-  flexGrow: 1,
-  borderRadius: '$round',
-  cursor: 'pointer',
-  '&[data-orientation="horizontal"]': { height: 3 },
+  base: {
+    backgroundColor: 'surface.bright',
+    position: 'relative',
+    flexGrow: '1',
+    borderRadius: 'token(radii.round)',
+    cursor: 'pointer',
+    '&[data-orientation="horizontal"]': {
+      height: '3px',
+    },
+  },
 });
 
 const Range = styled(BaseSlider.Range, {
-  position: 'absolute',
-  backgroundColor: '$primary_default',
-  borderRadius: '$round',
-  height: '100%',
+  base: {
+    position: 'absolute',
+    backgroundColor: 'primary.default',
+    borderRadius: 'token(radii.round)',
+    height: '100%',
+  },
 });
 
 const Thumb = styled(BaseSlider.Thumb, {
-  all: 'unset',
-  display: 'block',
-  width: '$8',
-  height: '$8',
-  backgroundColor: '$primary_default',
-  cursor: 'pointer',
-  boxShadow: `0 2px 10px $colors$surface_default`,
-  borderRadius: 10,
-  '&:hover': { backgroundColor: '$primary_default' },
-  '&:focus': { boxShadow: 'none' },
+  base: {
+    all: 'unset',
+    display: 'block',
+    width: 'token(spacing.8)',
+    height: 'token(spacing.8)',
+    backgroundColor: 'primary.default',
+    cursor: 'pointer',
+    boxShadow: '0 2px 10px token(colors.surface.default)',
+    borderRadius: '10px',
+    '&:hover': {
+      backgroundColor: 'primary.default',
+    },
+    '&:focus': {
+      boxShadow: 'none',
+    },
+  },
 });
 
 type SliderProps = React.ComponentProps<typeof Root> & {
-  thumbStyles?: CSS;
+  thumbStyles?: Record<string, any>;
   showTooltip?: boolean;
 };
 
@@ -61,13 +74,13 @@ export const Slider: React.FC<SliderProps & { showTooltip?: boolean }> = ({
       <Track>
         <Range />
       </Track>
-      {values.map((_, index) =>
+      {values.map((_: any, index: number) =>
         showTooltip ? (
           <Tooltip key={index} title={String(values[index])}>
-            <Thumb css={thumbStyles} />
+            <Thumb style={thumbStyles} />
           </Tooltip>
         ) : (
-          <Thumb key={index} css={thumbStyles} />
+          <Thumb key={index} style={thumbStyles} />
         ),
       )}
     </Root>

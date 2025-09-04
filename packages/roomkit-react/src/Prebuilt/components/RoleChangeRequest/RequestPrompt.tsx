@@ -25,7 +25,7 @@ export const RequestPrompt = ({
   if (isMobile) {
     return (
       <Sheet.Root open={open} onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ py: '$8' }}>
+        <Sheet.Content style={{ py: '$8' }}>
           <Text css={{ fontWeight: '$semiBold', c: '$on_surface_high', '@md': { px: '$8' } }}>{title}</Text>
           {body}
           <RequestActions actionText={actionText} onAction={onAction} disabled={disableActions} />
@@ -37,7 +37,7 @@ export const RequestPrompt = ({
   return (
     <Dialog.Root open={open} modal={false} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Content css={{ p: '$10' }} onInteractOutside={e => e.preventDefault()}>
+        <Dialog.Content css={{ p: '$10' }} onInteractOutside={(e: any) => e.preventDefault()}>
           <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>
             <Text variant="h6">{title}</Text>
           </Dialog.Title>

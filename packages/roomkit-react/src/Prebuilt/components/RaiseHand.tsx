@@ -1,13 +1,12 @@
 import React from 'react';
 import { HandIcon, HandRaiseSlashedIcon } from '@100mslive/react-icons';
-import { CSS } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 // @ts-ignore: No implicit Any
 import IconButton from '../IconButton';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useMyMetadata } from './hooks/useMetadata';
 
-export const RaiseHand = ({ css }: { css?: CSS }) => {
+export const RaiseHand = ({ css }: { css?: Record<string, any> }) => {
   const { isHandRaised, toggleHandRaise } = useMyMetadata();
   const { elements } = useRoomLayoutConferencingScreen();
 

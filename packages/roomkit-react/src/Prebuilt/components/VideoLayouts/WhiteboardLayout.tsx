@@ -36,6 +36,7 @@ const WhiteboardEmbed = () => {
       }}
     >
       <Box css={{ size: '100%' }}>
+        {/* @ts-expect-error React 19 type incompatibility */}
         <Whiteboard token={token} endpoint={`https://${endpoint}`} zoomToContent={zoomToContent} />
       </Box>
     </Box>

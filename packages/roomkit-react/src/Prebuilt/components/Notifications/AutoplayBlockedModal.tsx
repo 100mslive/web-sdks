@@ -9,7 +9,7 @@ export function AutoplayBlockedModal() {
   return (
     <Dialog.Root
       open={!!error}
-      onOpenChange={async value => {
+      onOpenChange={async (value: boolean) => {
         if (!value) {
           await unblockAudio();
         }

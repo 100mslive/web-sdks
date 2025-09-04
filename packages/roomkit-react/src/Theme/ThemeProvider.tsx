@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Theme } from './stitches.config';
-import { createTheme, theme } from './stitches.config';
+import React, { useCallback, useEffect, useState } from 'react';
 import useSSR from './useSSR';
 
 const defaultAspectRatio = {
@@ -12,6 +10,11 @@ export enum ThemeTypes {
   // eslint-disable-next-line no-unused-vars
   default = 'default',
 }
+
+export type Theme = {
+  themeType: string;
+  [key: string]: any;
+};
 
 export type ThemeContextValue = {
   themeType: string;
@@ -32,14 +35,19 @@ export type ThemeProviderProps = {
   aspectRatio?: { width: number; height: number };
 };
 
+const defaultTheme: Theme = {
+  themeType: ThemeTypes.default,
+};
+
 const defaultContext = {
   themeType: ThemeTypes.default,
-  theme,
+  theme: defaultTheme,
   aspectRatio: { width: 1, height: 1 },
   toggleTheme: (_themeToUpdateTo?: ThemeTypes) => {
     return;
   },
 };
+
 export const ThemeContext = React.createContext<ThemeContextValue>(defaultContext);
 
 /**
@@ -57,20 +65,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
 }) => {
   const systemTheme = ThemeTypes.default;
   const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
-  const previousClassName = useRef('');
-  const { isBrowser } = useSSR();
-  const updatedTheme = useMemo(() => {
-    const updatedTheme = createTheme({ themeType: currentTheme, theme: userTheme || {} });
-    if (!isBrowser) {
-      return updatedTheme;
-    }
-    if (previousClassName.current) {
-      document.documentElement.classList.remove(previousClassName.current);
-    }
-    previousClassName.current = updatedTheme.className;
-    document.documentElement.classList.add(updatedTheme);
-    return updatedTheme;
-  }, [userTheme, currentTheme, isBrowser]);
+  useSSR();
 
   const toggleTheme = useCallback((themeToUpdateTo?: ThemeTypes) => {
     if (themeToUpdateTo) {
@@ -86,10 +81,10 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     }
   }, [themeType]);
 
+  const theme = userTheme || defaultTheme;
+
   return (
-    <ThemeContext.Provider
-      value={{ themeType: currentTheme, theme: updatedTheme as unknown as Theme, aspectRatio, toggleTheme }}
-    >
+    <ThemeContext.Provider value={{ themeType: currentTheme, theme, aspectRatio, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

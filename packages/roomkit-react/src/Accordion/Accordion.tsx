@@ -1,88 +1,106 @@
 import React, { PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
-import { CSS } from '@stitches/react';
 import { ChevronUpIcon } from '@100mslive/react-icons';
 import { Box } from '../Layout';
-import { styled } from '../Theme';
+import { styled } from '../styled-system';
 import { slideDown, slideUp } from '../utils';
 
-const StyledAccordion = styled(BaseAccordion.Root, {});
+const StyledAccordion = styled(BaseAccordion.Root, {
+  base: {},
+});
 
 const StyledItem = styled(BaseAccordion.Item, {
-  marginTop: '$px',
-  display: 'block',
-  '&:first-child': {
-    marginTop: 0,
-    borderTopLeftRadius: '$0',
-    borderTopRightRadius: '$0',
-  },
-  '&:last-child': {
-    borderBottomLeftRadius: '$4',
-    borderBottomRightRadius: '$4',
+  base: {
+    marginTop: 'px',
+    display: 'block',
+    '&:first-child': {
+      marginTop: 0,
+      borderTopLeftRadius: '0',
+      borderTopRightRadius: '0',
+    },
+    '&:last-child': {
+      borderBottomLeftRadius: '4',
+      borderBottomRightRadius: '4',
+    },
   },
 });
 
 const StyledHeader = styled(BaseAccordion.Header, {
-  all: 'unset',
-  display: 'flex',
-  fontFamily: '$sans',
+  base: {
+    all: 'unset',
+    display: 'flex',
+    fontFamily: 'sans',
+  },
 });
 
 const StyledTrigger = styled(BaseAccordion.Trigger, {
-  all: 'unset',
-  fontFamily: '$sans',
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  fontSize: '$md',
-  lineHeight: '$md',
-  color: '$on_surface_high',
+  base: {
+    all: 'unset',
+    fontFamily: 'sans',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    fontSize: 'md',
+    lineHeight: 'md',
+    color: 'onSurface.high',
+  },
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
-  display: 'contents',
-  fontSize: '$md',
-  fontFamily: '$sans',
-  color: '$on_surface_medium',
-  '&[data-state="open"]': {
-    animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
-  },
-  '&[data-state="closed"]': {
-    animation: `${slideUp('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+  base: {
+    display: 'contents',
+    fontSize: 'md',
+    fontFamily: 'sans',
+    color: 'onSurface.medium',
+    '&[data-state="open"]': {
+      animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    },
+    '&[data-state="closed"]': {
+      animation: `${slideUp('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    },
   },
 });
 
 const StyledChevron = styled(ChevronUpIcon, {
-  color: '$on_primary_high',
-  transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-  '[data-state=closed] &': { transform: 'rotate(180deg)' },
+  base: {
+    color: 'onPrimary.high',
+    transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+    '[data-state=closed] &': { transform: 'rotate(180deg)' },
+  },
 });
 
 // Exports
 export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
+type StyleProp = Record<string, any>;
+
 export const AccordionHeader: React.FC<
-  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
+  PropsWithChildren<
+    BaseAccordion.AccordionTriggerProps & { iconStyles?: StyleProp; css?: StyleProp; chevronID?: string }
+  >
 > = React.forwardRef<
   HTMLButtonElement,
-  PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
+  PropsWithChildren<
+    BaseAccordion.AccordionTriggerProps & { iconStyles?: StyleProp; css?: StyleProp; chevronID?: string }
+  >
 >(({ children, iconStyles, css, chevronID, ...props }, forwardedRef) => (
-  <StyledHeader css={css}>
+  <StyledHeader style={css}>
     <StyledTrigger {...props} ref={forwardedRef}>
       {children}
-      <StyledChevron data-testid={chevronID} aria-hidden css={iconStyles} />
+      <StyledChevron data-testid={chevronID} aria-hidden style={iconStyles} />
     </StyledTrigger>
   </StyledHeader>
 ));
 
 export const AccordionContent: React.FC<
-  PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>
-> = React.forwardRef<HTMLDivElement, PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>>(
-  ({ children, contentStyles, ...props }, forwardedRef) => (
-    <StyledContent {...props} ref={forwardedRef}>
-      <Box css={contentStyles}>{children}</Box>
-    </StyledContent>
-  ),
-);
+  PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: StyleProp }>
+> = React.forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: StyleProp }>
+>(({ children, contentStyles, ...props }, forwardedRef) => (
+  <StyledContent {...props} ref={forwardedRef}>
+    <Box style={contentStyles}>{children}</Box>
+  </StyledContent>
+));

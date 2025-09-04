@@ -16,7 +16,7 @@ export const RoomDetailsSheet = () => {
   const showRoomDetailsSheet = useIsSheetTypeOpen(SHEET_OPTIONS.ROOM_DETAILS);
   return (
     <Sheet.Root open={showRoomDetailsSheet} onOpenChange={toggleSheet}>
-      <Sheet.Content css={{ py: '$8', pb: '$12' }}>
+      <Sheet.Content style={{ py: '$8', pb: '$12' }}>
         <Flex
           justify="between"
           align="center"

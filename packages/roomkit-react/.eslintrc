@@ -83,5 +83,5 @@
       }
     }
   },
-  "ignorePatterns": ["src/*.css", "src/images/*"]
+  "ignorePatterns": ["src/*.css", "src/images/*", "styled-system/**/*"]
 }

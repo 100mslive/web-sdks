@@ -1,8 +1,14 @@
 import * as LabelPrimitive from '@radix-ui/react-label';
-import { styled } from '../Theme';
+import type { HTMLStyledProps } from '../styled-system';
+import { styled } from '../styled-system';
 
-export const Label = styled(LabelPrimitive.Root, {
-  fontFamily: '$sans',
-  fontSize: '$md',
-  color: '$on_primary_high',
+const StyledLabel = styled(LabelPrimitive.Root, {
+  base: {
+    fontFamily: 'sans',
+    fontSize: 'md',
+    color: 'onPrimary.high',
+  },
 });
+
+export type LabelProps = HTMLStyledProps<typeof StyledLabel>;
+export const Label = StyledLabel;

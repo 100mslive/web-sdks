@@ -2,7 +2,6 @@ import React from 'react';
 import { Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
-import { CSS } from '../../Theme';
 
 const FullPageProgress = ({
   loaderColor = '$primary_default',
@@ -11,7 +10,7 @@ const FullPageProgress = ({
 }: {
   loaderColor?: string;
   text?: string;
-  css?: CSS;
+  css?: Record<string, any>;
 }) => (
   <Flex direction="column" justify="center" align="center" css={{ size: '100%', color: loaderColor, ...css }}>
     <Loading color="currentColor" size={100} />

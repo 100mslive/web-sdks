@@ -10,7 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon, PeopleIcon } from '@100mslive/react-icons';
-import { Box, CSS, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
+import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
 import { config as cssConfig } from '../../../Theme';
 import { ParticipantSearch } from '../Footer/ParticipantList';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -40,7 +40,7 @@ const SelectorItem = ({
 
   const Root = !isMobile
     ? Dropdown.Item
-    : ({ children, ...rest }: { children: React.ReactNode; css: CSS }) => (
+    : ({ children, ...rest }: { children: React.ReactNode; css: Record<string, any> }) => (
         <Flex {...rest} css={{ p: '$6 $8', ...rest.css }}>
           {children}
         </Flex>

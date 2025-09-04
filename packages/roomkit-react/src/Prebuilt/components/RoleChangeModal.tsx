@@ -45,7 +45,7 @@ const RoleChangeContent = ({
   const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement | undefined>();
+  const triggerRef = useRef<HTMLButtonElement | undefined>(undefined);
 
   return (
     <>
@@ -168,7 +168,7 @@ export const RoleChangeModal = ({
   if (isMobile) {
     return (
       <Sheet.Root open={true} onOpenChange={onOpenChange} css={{ borderRadius: '$0 $0 0 0' }}>
-        <Sheet.Content css={{ p: '$10 $8', background: '$surface_dim', border: '1px solid $border_default' }}>
+        <Sheet.Content style={{ p: '$10 $8', background: '$surface_dim', border: '1px solid $border_default' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} isMobile />
         </Sheet.Content>
       </Sheet.Root>

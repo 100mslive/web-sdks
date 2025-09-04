@@ -2,11 +2,10 @@ import React from 'react';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
-import { CSS } from '../Theme';
 import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
-export const TestContainer = ({ css, children }: { css?: CSS; children: React.ReactNode }) => {
-  return <Box css={{ p: '$10', ...css }}>{children}</Box>;
+export const TestContainer = ({ css: cssStyle, children }: { css?: any; children: React.ReactNode }) => {
+  return <Box css={{ p: '$10', ...cssStyle }}>{children}</Box>;
 };
 
 export const TestFooter = ({

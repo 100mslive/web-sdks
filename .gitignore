@@ -25,3 +25,7 @@ slackMessage.json
 package-lock.json
 slackMessage.txt
 .DS_Store
+## Panda
+styled-system
+styled-system-studio
+src/styled-system

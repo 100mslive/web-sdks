@@ -34,8 +34,8 @@ export const useFetchRoomLayout = ({
   authToken = '',
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
-  const layoutResp = useRef<GetResponse>();
-  const originalLayout = useRef<Layout>();
+  const layoutResp = useRef<GetResponse>(null as any);
+  const originalLayout = useRef<Layout>(null as any);
   const isFetchInProgress = useRef(false);
 
   const setOriginalLayout = useCallback(() => setLayout(originalLayout.current), []);

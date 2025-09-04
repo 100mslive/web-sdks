@@ -67,7 +67,7 @@ export const ChangeNameContent = ({
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
           type="text"
-          onChange={e => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setCurrentName(e.target.value);
           }}
           autoComplete="name"

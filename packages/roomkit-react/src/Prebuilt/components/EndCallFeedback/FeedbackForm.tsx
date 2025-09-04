@@ -39,7 +39,11 @@ export const FeedbackModal = ({
     return (
       <Sheet.Root open={index !== FEEBACK_INDEX.INIT} onOpenChange={onOpenChange}>
         <Sheet.Content
-          css={{ bg: '$surface_dim', p: '$10', overflowY: 'auto' }}
+          style={{
+            backgroundColor: 'var(--hms-ui-colors-surface_dim)',
+            padding: 'var(--hms-ui-spacing-10)',
+            overflowY: 'auto',
+          }}
           onPointerDownOutside={avoidDefaultDomBehavior}
           onInteractOutside={avoidDefaultDomBehavior}
         >
@@ -315,7 +319,7 @@ export const FeedbackForm = ({
                   <Checkbox.Root
                     id={`${option}-${index}`}
                     checked={selectedReasons.has(index)}
-                    onCheckedChange={checked => handleCheckedChange(checked, index)}
+                    onCheckedChange={(checked: boolean) => handleCheckedChange(checked, index)}
                     css={{
                       cursor: 'pointer',
                       flexShrink: 0,

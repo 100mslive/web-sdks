@@ -90,7 +90,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           </Text>
         </Flex>
         <IconButton
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             resetSidePane();
           }}
@@ -107,6 +107,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           </Text>
         </Flex>
         <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
+          {/* @ts-expect-error React 19 type incompatibility with react-window */}
           <VariableSizeList
             itemSize={index => (index === filteredPeers.length + 1 ? 16 : ROW_HEIGHT)}
             itemData={{ peerList: filteredPeers, hasNext: hasNext(), loadMorePeers, isConnected: isConnected === true }}

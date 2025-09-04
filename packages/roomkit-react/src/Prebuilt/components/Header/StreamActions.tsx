@@ -118,7 +118,7 @@ export const RecordingStatus = () => {
 
   return (
     <Tooltip
-      boxCss={{ zIndex: 1 }}
+      boxStyle={{ zIndex: 1 }}
       title={getRecordingText({
         isBrowserRecordingOn,
         isServerRecordingOn,
@@ -142,7 +142,7 @@ export const RecordingPauseStatus = () => {
   if (recording.hls && recording.hls.state === HMSRecordingState.PAUSED) {
     return (
       <Tooltip
-        boxCss={{ zIndex: 1 }}
+        boxStyle={{ zIndex: 1 }}
         title={getRecordingText({
           isBrowserRecordingOn: false,
           isServerRecordingOn: false,

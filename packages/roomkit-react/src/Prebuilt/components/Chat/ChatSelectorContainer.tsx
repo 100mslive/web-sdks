@@ -40,7 +40,7 @@ export const ChatSelectorContainer = () => {
             align="center"
             css={{ c: '$on_surface_medium', border: '1px solid $border_bright', r: '$0', p: '$1 $2', ml: '$6' }}
             gap="1"
-            onClick={e => {
+            onClick={(e: React.MouseEvent) => {
               setOpen(value => !value);
               e.stopPropagation();
             }}
@@ -67,7 +67,7 @@ export const ChatSelectorContainer = () => {
               (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
           </Flex>
         ) : (
-          <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+          <Dropdown.Root open={open} onOpenChange={(value: boolean) => setOpen(value)}>
             <Dropdown.Trigger
               asChild
               data-testid="participant_list_filter"
@@ -125,8 +125,8 @@ export const ChatSelectorContainer = () => {
         )}
       </Flex>
       {isMobile ? (
-        <Sheet.Root open={open} onOpenChange={value => setOpen(value)}>
-          <Sheet.Content css={{ pt: '$8' }}>
+        <Sheet.Root open={open} onOpenChange={(value: boolean) => setOpen(value)}>
+          <Sheet.Content style={{ pt: '$8' }}>
             <Sheet.Title
               css={{
                 display: 'flex',

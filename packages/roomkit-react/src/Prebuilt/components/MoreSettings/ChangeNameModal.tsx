@@ -58,7 +58,7 @@ export const ChangeNameModal = ({
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$8 0' }} onOpenAutoFocus={e => e.preventDefault()}>
+        <Sheet.Content style={{ bg: '$surface_dim', p: '$8 0' }} onOpenAutoFocus={e => e.preventDefault()}>
           <ChangeNameContent {...props} />
         </Sheet.Content>
       </Sheet.Root>

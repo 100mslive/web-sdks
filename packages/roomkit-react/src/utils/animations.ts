@@ -1,4 +1,4 @@
-import { keyframes } from '../Theme';
+import { keyframes } from '../styled-system';
 
 export const slideDown = (controller: string) =>
   keyframes({

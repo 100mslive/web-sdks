@@ -344,7 +344,7 @@ export const TileMenuContent = ({
             css={{ my: '0.5rem' }}
             step={5}
             value={[typeof volume === 'number' ? volume : 100]}
-            onValueChange={e => setVolume?.(e[0])}
+            onValueChange={(e: number[]) => setVolume?.(e[0])}
           />
         </StyledMenuTile.VolumeItem>
       ) : null}

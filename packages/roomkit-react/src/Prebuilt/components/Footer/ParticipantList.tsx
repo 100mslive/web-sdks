@@ -375,7 +375,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
 
   return (
     <>
-      <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
+      <Dropdown.Root open={open} onOpenChange={(value: boolean) => setOpen(value)} modal={false}>
         <Dropdown.Trigger
           asChild
           data-testid="participant_more_actions"
@@ -456,7 +456,7 @@ export const ParticipantSearch = ({
         color: '$on_surface_medium',
         mt: inSidePane ? '$4' : '',
       }}
-      onClick={e => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
     >
       <SearchIcon style={{ position: 'absolute', left: '0.5rem' }} />
       <Input

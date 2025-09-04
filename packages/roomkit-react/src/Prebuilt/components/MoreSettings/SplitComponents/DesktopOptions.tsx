@@ -117,7 +117,7 @@ export const DesktopOptions = ({
       ) : null}
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
-        onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
+        onOpenChange={(value: boolean) => updateState(MODALS.MORE_SETTINGS, value)}
         modal={false}
       >
         <Tooltip title="More options">
@@ -275,7 +275,7 @@ export const DesktopOptions = ({
         <CaptionModal onOpenChange={(value: boolean) => updateState(MODALS.CAPTION, value)} />
       )}
       {/* {openModals.has(MODALS.EMBED_URL) && (
-        <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
+        <EmbedUrlModal onOpenChange={(value: boolean) => updateState(MODALS.EMBED_URL, value)} />
       )} */}
     </Fragment>
   );

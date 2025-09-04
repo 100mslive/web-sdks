@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { CSS } from '../../../Theme';
 
 export const LeaveCard = ({
   icon,
@@ -18,7 +17,7 @@ export const LeaveCard = ({
   onClick: () => void;
   titleColor: string;
   bg: string;
-  css?: CSS;
+  css?: Record<string, any>;
 }) => {
   return (
     <Flex css={{ p: '$10', flexGrow: 1, gap: '$8', bg, ...css }} onClick={onClick}>

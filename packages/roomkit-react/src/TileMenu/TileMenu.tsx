@@ -73,7 +73,7 @@ export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
               css={{ my: '0.5rem' }}
               step={5}
               value={[trackVolume || 0]}
-              onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
+              onValueChange={(e: number[]) => actions.setVolume(e[0], audioTrack?.id)}
             />
           </StyledMenuTile.VolumeItem>
         ) : null}
