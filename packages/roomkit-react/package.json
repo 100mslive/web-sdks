@@ -72,6 +72,7 @@
     "esbuild-loader": "^4.0.2",
     "knip": "^5.11.0",
     "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "storybook-dark-mode": "^3.0.0"
   },
   "peerDependencies": {

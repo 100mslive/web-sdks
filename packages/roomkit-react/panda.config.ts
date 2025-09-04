@@ -10,9 +10,6 @@ export default defineConfig({
   // Exclude paths
   exclude: [],
 
-  // Emit package configuration for better module resolution
-  emitPackage: true,
-
   // Set jsx framework
   jsxFramework: 'react',
 
