@@ -70,12 +70,21 @@ export class ErrorBoundary extends Component {
                   <Button
                     onClick={() => {
                       const { error, errorInfo } = this.state;
-                      navigator.clipboard.writeText(
-                        JSON.stringify({
+                      try {
+                        // Use structuredClone to safely copy only the cloneable parts
+                        const errorDetails = {
                           error,
-                          errorInfo,
-                        }),
-                      );
+                          componentStack: errorInfo?.componentStack,
+                        };
+                        const clonedDetails = structuredClone(errorDetails);
+                        navigator.clipboard.writeText(JSON.stringify(clonedDetails, null, 2));
+                      } catch (e) {
+                        // Fallback to just copying the error message and component stack as strings
+                        const fallbackText = `Error: ${error}\n\nComponent Stack:\n${
+                          errorInfo?.componentStack || 'N/A'
+                        }`;
+                        navigator.clipboard.writeText(fallbackText);
+                      }
                       this.setState({ isErrorCopied: true });
                     }}
                     css={{ mx: '$8' }}
@@ -89,7 +98,7 @@ export class ErrorBoundary extends Component {
               <details style={{ whiteSpace: 'pre-wrap', margin: '1.5rem' }}>
                 <Text>{this.state.error && this.state.error.toString()}</Text>
                 <br />
-                <Text>{JSON.stringify(this.state.errorInfo)}</Text>
+                <Text>{this.state.errorInfo?.componentStack}</Text>
               </details>
             </Flex>
           </Box>
