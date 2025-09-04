@@ -277,6 +277,99 @@ export default defineConfig({
     },
   },
 
+  // Custom utilities for Stitches compatibility
+  utilities: {
+    extend: {
+      // Size utility - sets both width and height
+      size: {
+        property: ['width', 'height'],
+        transform(value: string) {
+          return { width: value, height: value };
+        },
+      },
+      // Background shorthand
+      bg: {
+        property: 'background',
+      },
+      // Color shorthand
+      c: {
+        property: 'color',
+      },
+      // Border radius shorthand
+      r: {
+        property: 'borderRadius',
+      },
+      // Font size shorthand
+      fs: {
+        property: 'fontSize',
+      },
+      // Width shorthand
+      w: {
+        property: 'width',
+      },
+      // Height shorthand
+      h: {
+        property: 'height',
+      },
+      // Padding shorthands
+      p: {
+        property: 'padding',
+      },
+      pt: {
+        property: 'paddingTop',
+      },
+      pr: {
+        property: 'paddingRight',
+      },
+      pb: {
+        property: 'paddingBottom',
+      },
+      pl: {
+        property: 'paddingLeft',
+      },
+      px: {
+        property: ['paddingLeft', 'paddingRight'],
+        transform(value: string) {
+          return { paddingLeft: value, paddingRight: value };
+        },
+      },
+      py: {
+        property: ['paddingTop', 'paddingBottom'],
+        transform(value: string) {
+          return { paddingTop: value, paddingBottom: value };
+        },
+      },
+      // Margin shorthands
+      m: {
+        property: 'margin',
+      },
+      mt: {
+        property: 'marginTop',
+      },
+      mr: {
+        property: 'marginRight',
+      },
+      mb: {
+        property: 'marginBottom',
+      },
+      ml: {
+        property: 'marginLeft',
+      },
+      mx: {
+        property: ['marginLeft', 'marginRight'],
+        transform(value: string) {
+          return { marginLeft: value, marginRight: value };
+        },
+      },
+      my: {
+        property: ['marginTop', 'marginBottom'],
+        transform(value: string) {
+          return { marginTop: value, marginBottom: value };
+        },
+      },
+    },
+  },
+
   // Global CSS
   globalCss: {
     '.hms-ui-root *': {

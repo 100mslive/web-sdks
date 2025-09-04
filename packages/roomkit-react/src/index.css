@@ -1,7 +1,7 @@
 /* Import fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Panda CSS layers - processed by PostCSS */
+/* Panda CSS layers */
 @layer reset, base, tokens, recipes, utilities;
 
 /* Additional global styles */

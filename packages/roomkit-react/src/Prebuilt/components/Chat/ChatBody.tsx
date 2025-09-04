@@ -208,7 +208,7 @@ const ChatMessage = React.memo(
           mb: '$5',
           pr: '$10',
           mt: '$4',
-          '&:not(:hover} .chat_actions': { display: 'none' },
+          '&:not(:hover) .chat_actions': { display: 'none' },
           '&:hover .chat_actions': { display: 'flex', opacity: 1 },
         }}
         style={style}
