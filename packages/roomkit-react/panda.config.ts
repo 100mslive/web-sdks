@@ -10,6 +10,15 @@ export default defineConfig({
   // Exclude paths
   exclude: [],
 
+  // Emit package configuration for better module resolution
+  emitPackage: true,
+
+  // Set jsx framework
+  jsxFramework: 'react',
+
+  // Prefix for CSS classes
+  prefix: 'hms-ui',
+
   // Theme configuration matching Stitches base config
   theme: {
     keyframes: {
@@ -270,12 +279,6 @@ export default defineConfig({
       ls: '@media (max-width: 1024px) and (orientation: landscape)',
     },
   },
-
-  // CSS generation
-  jsxFramework: 'react',
-
-  // Prefix for generated classes
-  prefix: 'hms-ui',
 
   // Global CSS
   globalCss: {

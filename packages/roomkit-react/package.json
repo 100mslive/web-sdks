@@ -75,7 +75,8 @@
     "storybook-dark-mode": "^3.0.0"
   },
   "peerDependencies": {
-    "react": ">=17.0.2 <20.0.0"
+    "react": ">=17.0.2 <20.0.0",
+    "react-dom": ">=17.0.2 <20.0.0"
   },
   "dependencies": {
     "@100mslive/hls-player": "0.3.38",
@@ -106,7 +107,6 @@
     "eventemitter2": "^6.4.9",
     "lodash.merge": "^4.6.2",
     "qrcode.react": "^4.2.0",
-    "react-dom": "^19.0.0",
     "react-draggable": "^4.4.5",
     "react-intersection-observer": "^9.4.3",
     "react-swipeable": "^7.0.1",
