@@ -12,6 +12,89 @@ export default defineConfig({
 
   // Theme configuration matching Stitches base config
   theme: {
+    keyframes: {
+      slideDown: {
+        from: { height: 0 },
+        to: { height: 'var(--controller-height)' },
+      },
+      slideUp: {
+        from: { height: 'var(--controller-height)' },
+        to: { height: 0 },
+      },
+      dialogOpen: {
+        '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
+        '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+      },
+      dialogClose: {
+        '0%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+        '100%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
+      },
+      slideUpAndFade: {
+        '0%': { opacity: 0, transform: 'translateY(2px)' },
+        '100%': { opacity: 1, transform: 'translateY(0)' },
+      },
+      slideRightAndFade: {
+        '0%': { opacity: 0, transform: 'translateX(-2px)' },
+        '100%': { opacity: 1, transform: 'translateX(0)' },
+      },
+      slideDownAndFade: {
+        '0%': { opacity: 0, transform: 'translateY(-2px)' },
+        '100%': { opacity: 1, transform: 'translateY(0)' },
+      },
+      slideLeftAndFade: {
+        '0%': { opacity: 0, transform: 'translateX(2px)' },
+        '100%': { opacity: 1, transform: 'translateX(0)' },
+      },
+      slideLeftAndFadeOut: {
+        '0%': { opacity: 1, transform: 'translateX(0)' },
+        '100%': { opacity: 0, transform: 'translateX(-100%)' },
+      },
+      sheetSlideIn: {
+        from: { transform: 'var(--transform-value)' },
+        to: { transform: 'translate3d(0,0,0)' },
+      },
+      sheetSlideOut: {
+        from: { transform: 'translate3d(0,0,0)' },
+        to: { transform: 'var(--transform-value)' },
+      },
+      sheetFadeIn: {
+        from: { opacity: '0' },
+        to: { opacity: '1' },
+      },
+      sheetFadeOut: {
+        from: { opacity: '1' },
+        to: { opacity: '0' },
+      },
+      barAnimation: {
+        from: {
+          maskSize: '4em .8em',
+          WebkitMaskPositionY: '.1em',
+          maskPosition: 'initial .1em',
+        },
+        '50%': {
+          maskSize: '4em 1em',
+          WebkitMaskPositionY: '0',
+          maskPosition: 'initial 0',
+        },
+        to: {
+          maskSize: '4em .8em',
+          WebkitMaskPositionY: '.1em',
+          maskPosition: 'initial 0.1em',
+        },
+      },
+      flyAndFade: {
+        '20%': { opacity: 1 },
+        '100%': { bottom: '60%', opacity: 0 },
+      },
+      wiggleLeftRight: {
+        '0%': { marginLeft: '-50px' },
+        '100%': { marginLeft: '50px' },
+      },
+      wiggleRightLeft: {
+        '0%': { marginLeft: '50px' },
+        '100%': { marginLeft: '-50px' },
+      },
+    },
     tokens: {
       colors: {
         primary: {

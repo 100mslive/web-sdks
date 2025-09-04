@@ -54,10 +54,12 @@ const StyledContent = styled(BaseAccordion.Content, {
     fontFamily: 'sans',
     color: 'onSurface.medium',
     '&[data-state="open"]': {
-      animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+      '--controller-height': 'var(--radix-accordion-content-height)',
+      animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
     },
     '&[data-state="closed"]': {
-      animation: `${slideUp('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+      '--controller-height': 'var(--radix-accordion-content-height)',
+      animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
     },
   },
 });

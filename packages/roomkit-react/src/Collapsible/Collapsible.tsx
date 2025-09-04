@@ -24,10 +24,12 @@ const CollapsibleContent = styled(Content, {
     borderRadius: '1',
     overflowY: 'auto',
     '&[data-state="open"]': {
-      animation: `${slideDown('--radix-collapsible-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+      '--controller-height': 'var(--radix-collapsible-content-height)',
+      animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
     },
     '&[data-state="closed"]': {
-      animation: `${slideUp('--radix-collapsible-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+      '--controller-height': 'var(--radix-collapsible-content-height)',
+      animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
     },
   },
 });

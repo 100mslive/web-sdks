@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { selectTrackAudioByID, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../Layout';
-import { keyframes } from '../Theme';
 //@ts-ignore
 import bg from './audio-level.png';
 
@@ -11,25 +10,8 @@ const positionValues = new Array(101).fill(0).reduce((acc, _, index) => {
   return acc;
 }, {});
 
-const barAnimation = keyframes({
-  from: {
-    maskSize: '4em .8em',
-    '-webkit-mask-position-y': '.1em',
-    maskPosition: 'initial .1em',
-  },
-
-  '50%': {
-    maskSize: '4em 1em',
-    '-webkit-mask-position-y': 0,
-    maskPosition: 'initial 0',
-  },
-
-  to: {
-    maskSize: '4em .8em',
-    '-webkit-mask-position-y': '.1em',
-    maskPosition: 'initial 0.1em',
-  },
-});
+// Use the barAnimation keyframe from panda.config.ts
+const barAnimation = 'barAnimation';
 
 const AudioBar = () => {
   return (

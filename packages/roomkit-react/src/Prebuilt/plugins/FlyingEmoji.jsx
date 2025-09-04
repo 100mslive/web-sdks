@@ -11,25 +11,15 @@ import {
 } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { config as cssConfig, keyframes } from '../../Theme';
+import { config as cssConfig } from '../../Theme';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 let emojiCount = 1;
 
-const flyAndFade = keyframes({
-  '20%': { opacity: 1 },
-  '100%': { bottom: '60%', opacity: 0 },
-});
-
-const wiggleLeftRight = keyframes({
-  '0%': { marginLeft: '-50px' },
-  '100%': { marginLeft: '50px' },
-});
-
-const wiggleRightLeft = keyframes({
-  '0%': { marginLeft: '50px' },
-  '100%': { marginLeft: '-50px' },
-});
+// Use animation names from panda.config.ts
+const flyAndFade = 'flyAndFade';
+const wiggleLeftRight = 'wiggleLeftRight';
+const wiggleRightLeft = 'wiggleRightLeft';
 
 const getStartingPoints = isMobile => {
   let arr = [];

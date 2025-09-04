@@ -1,80 +1,26 @@
-import { keyframes } from '../styled-system';
+// Animation names from panda.config.ts keyframes
+export const slideDown = 'slideDown';
+export const slideUp = 'slideUp';
+export const dialogOpen = 'dialogOpen';
+export const dialogClose = 'dialogClose';
+export const sheetSlideIn = 'sheetSlideIn';
+export const sheetSlideOut = 'sheetSlideOut';
+export const sheetFadeIn = 'sheetFadeIn';
+export const sheetFadeOut = 'sheetFadeOut';
+export const slideUpAndFade = 'slideUpAndFade';
+export const slideRightAndFade = 'slideRightAndFade';
+export const slideDownAndFade = 'slideDownAndFade';
+export const slideLeftAndFade = 'slideLeftAndFade';
+export const slideLeftAndFadeOut = 'slideLeftAndFadeOut';
 
-export const slideDown = (controller: string) =>
-  keyframes({
-    from: { height: 0 },
-    to: { height: `var(${controller})` },
-  });
-
-export const slideUp = (controller: string) =>
-  keyframes({
-    from: { height: `var(${controller})` },
-    to: { height: 0 },
-  });
-
-export const translateAcross = ({ xFrom = '0', yFrom = '0', zFrom = '0', xTo = '0', yTo = '0', zTo = '0' }) =>
-  keyframes({
+// For translateAcross, we'll need to use inline styles since it's dynamic
+export const translateAcross = ({ xFrom = '0', yFrom = '0', zFrom = '0', xTo = '0', yTo = '0', zTo = '0' }) => ({
+  '@keyframes translateAcross': {
     from: { transform: `translate3d(${xFrom}, ${yFrom}, ${zFrom})` },
-    to: { transform: `translate3d(${xTo}, ${yTo}, ${zTo}` },
-  });
-
-export const dialogOpen = keyframes({
-  '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
-  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+    to: { transform: `translate3d(${xTo}, ${yTo}, ${zTo})` },
+  },
+  animation: 'translateAcross',
 });
-
-export const dialogClose = keyframes({
-  '0%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
-  '100%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
-});
-
-export const slideUpAndFade = (start = '2px') =>
-  keyframes({
-    '0%': { opacity: 0, transform: `translateY(${start})` },
-    '100%': { opacity: 1, transform: 'translateY(0)' },
-  });
-
-export const slideRightAndFade = (start = '-2px') =>
-  keyframes({
-    '0%': { opacity: 0, transform: `translateX(${start})` },
-    '100%': { opacity: 1, transform: 'translateX(0)' },
-  });
-
-export const sheetSlideIn = keyframes({
-  from: { transform: '$$transformValue' },
-  to: { transform: 'translate3d(0,0,0)' },
-});
-
-export const sheetSlideOut = keyframes({
-  from: { transform: 'translate3d(0,0,0)' },
-  to: { transform: '$$transformValue' },
-});
-export const sheetFadeIn = keyframes({
-  from: { opacity: '0' },
-  to: { opacity: '1' },
-});
-
-export const sheetFadeOut = keyframes({
-  from: { opacity: '1' },
-  to: { opacity: '0' },
-});
-export const slideDownAndFade = (start = '-2px') =>
-  keyframes({
-    '0%': { opacity: 0, transform: `translateY(${start})` },
-    '100%': { opacity: 1, transform: 'translateY(0)' },
-  });
-
-export const slideLeftAndFade = (start = '2px') =>
-  keyframes({
-    '0%': { opacity: 0, transform: `translateX(${start})` },
-    '100%': { opacity: 1, transform: 'translateX(0)' },
-  });
-
-const slideLeftAndFadeOut = (end = '-100%') =>
-  keyframes({
-    '0%': { opacity: 1, transform: `translateX(0)` },
-    '100%': { opacity: 0, transform: `translateX(${end})` },
-  });
 
 export const popoverAnimation = {
   '@media (prefers-reduced-motion: no-preference)': {
@@ -82,10 +28,10 @@ export const popoverAnimation = {
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
     willChange: 'transform, opacity',
     '&[data-state="open"]': {
-      '&[data-side="top"]': { animationName: slideDownAndFade() },
-      '&[data-side="right"]': { animationName: slideLeftAndFade() },
-      '&[data-side="bottom"]': { animationName: slideUpAndFade() },
-      '&[data-side="left"]': { animationName: slideRightAndFade() },
+      '&[data-side="top"]': { animationName: 'slideDownAndFade' },
+      '&[data-side="right"]': { animationName: 'slideLeftAndFade' },
+      '&[data-side="bottom"]': { animationName: 'slideUpAndFade' },
+      '&[data-side="left"]': { animationName: 'slideRightAndFade' },
     },
   },
 };
@@ -95,10 +41,10 @@ export const toastAnimation = {
     animationDuration: '500ms',
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
     willChange: 'transform, opacity',
-    animationName: slideLeftAndFadeOut(),
+    animationName: 'slideLeftAndFadeOut',
 
     '&[data-state="open"]': {
-      animationName: slideRightAndFade('-100%'),
+      animationName: 'slideRightAndFade',
     },
     '&[data-swipe="move"]': {
       transform: 'translateX(var(--radix-toast-swipe-move-x))',
@@ -108,7 +54,7 @@ export const toastAnimation = {
       transition: 'transform 200ms ease-out',
     },
     '&[data-swipe="end"]': {
-      animation: `${slideLeftAndFadeOut()} 100ms ease-out forwards`,
+      animation: 'slideLeftAndFadeOut 100ms ease-out forwards',
     },
   },
 };
