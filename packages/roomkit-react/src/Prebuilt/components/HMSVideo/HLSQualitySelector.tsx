@@ -45,11 +45,7 @@ export function HLSQualitySelector({
             <SettingsIcon />
           </Flex>
         </Sheet.Trigger>
-        <Sheet.Content
-          container={containerRef}
-          
-          onClick={() => onOpenChange(false)}
-        >
+        <Sheet.Content container={containerRef} onClick={() => onOpenChange(false)}>
           <Sheet.Title
             css={{
               display: 'flex',
