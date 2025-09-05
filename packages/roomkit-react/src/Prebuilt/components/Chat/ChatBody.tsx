@@ -63,8 +63,8 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
     <Flex
       align="center"
       css={{
-        ml: '$2',
-        mr: '$4',
+        ml: '2',
+        mr: '4',
         gap: '$space$2',
         flexWrap: 'nowrap',
       }}
@@ -74,7 +74,7 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
           variant="xs"
           as="span"
           css={{
-            color: '$on_surface_medium',
+            color: 'onSurface.medium',
             textTransform: 'capitalize',
             fontWeight: '$regular',
             whiteSpace: 'nowrap',
@@ -88,7 +88,7 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
           as="span"
           variant="overline"
           css={{
-            color: '$on_surface_medium',
+            color: 'onSurface.medium',
             fontWeight: '$regular',
             whiteSpace: 'nowrap',
           }}
@@ -127,7 +127,7 @@ const URL_REGEX =
   /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 const Link = styled('a', {
-  color: '$primary_default',
+  color: 'primary.default',
   wordBreak: 'break-word',
   '&:hover': {
     textDecoration: 'underline',
@@ -170,7 +170,7 @@ export const SenderName = styled(Text, {
   whiteSpace: 'nowrap',
   width: '100%',
   minWidth: 0,
-  color: '$on_surface_high',
+  color: 'onSurface.high',
   fontWeight: '$semiBold',
 });
 
@@ -205,9 +205,9 @@ const ChatMessage = React.memo(
     return (
       <Box
         css={{
-          mb: '$5',
-          pr: '$10',
-          mt: '$4',
+          mb: '5',
+          pr: '10',
+          mt: '4',
           '&:not(:hover) .chat_actions': { display: 'none' },
           '&:hover .chat_actions': { display: 'flex', opacity: 1 },
         }}
@@ -221,8 +221,8 @@ const ChatMessage = React.memo(
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
             background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay),
-            r: '$1',
-            p: '$4',
+            r: '1',
+            p: '4',
             userSelect: 'none',
             '@md': {
               cursor: 'pointer',
@@ -290,13 +290,13 @@ const ChatMessage = React.memo(
                 as="span"
                 variant="caption"
                 css={{
-                  color: '$on_surface_medium',
+                  color: 'onSurface.medium',
                   flexShrink: 0,
                   position: 'absolute',
                   right: 0,
                   zIndex: 1,
-                  mr: '$4',
-                  p: '$2',
+                  mr: '4',
+                  p: '2',
                 }}
               >
                 {formatTime(message.time)}
@@ -326,7 +326,7 @@ const ChatMessage = React.memo(
             variant="sm"
             css={{
               w: '100%',
-              mt: '$2',
+              mt: '2',
               wordBreak: 'break-word',
               whiteSpace: 'pre-wrap',
               userSelect: 'all',
@@ -485,7 +485,7 @@ const PinnedBy = ({
   }
 
   return (
-    <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
+    <Flex align="center" css={{ gap: '2', mb: '2', color: 'onSurface.low' }}>
       <SolidPinIcon height={12} width={12} />
       <Text variant="xs" css={{ color: 'inherit' }}>
         Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}

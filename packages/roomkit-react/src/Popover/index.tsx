@@ -3,10 +3,10 @@ import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
 
 const StyledContent = styled(Content, {
-  padding: '$6',
-  borderRadius: '$2',
-  backgroundColor: '$background_default',
-  boxShadow: '$sm',
+  padding: '6',
+  borderRadius: '2',
+  backgroundColor: 'background.default',
+  boxShadow: 'sm',
   zIndex: 12,
   ...popoverAnimation,
 });

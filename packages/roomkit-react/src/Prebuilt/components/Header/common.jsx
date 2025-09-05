@@ -124,7 +124,7 @@ const AudioSelectionSheet = ({ audioDevices, audioSelected, onChange, children }
     <Sheet.Root>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
       <Sheet.Content>
-        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+        <Sheet.Title css={{ py: '10', px: '8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Text variant="h6" css={{ display: 'flex' }}>
               Audio
@@ -140,7 +140,7 @@ const AudioSelectionSheet = ({ audioDevices, audioSelected, onChange, children }
         <Flex
           direction="column"
           css={{
-            px: '$8',
+            px: '8',
             maxHeight: '80vh',
             overflowY: 'auto',
           }}
@@ -167,8 +167,8 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
     <Flex
       align="center"
       css={{
-        my: '$2',
-        py: '$8',
+        my: '2',
+        py: '8',
         w: '100%',
         borderBottom: '1px solid $border_default',
       }}
@@ -177,13 +177,13 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
       <Label
         htmlFor={id}
         css={{
-          fontSize: '$md',
+          fontSize: 'md',
           fontWeight: '$semiBold',
-          color: '$on_surface_high',
+          color: 'onSurface.high',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: '$8',
+          gap: '8',
           flex: '1 1 0',
         }}
       >

@@ -62,7 +62,7 @@ export const MwebLeaveRoom = ({
               titleColor="$on_surface_high"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={async () => await leaveRoom({ sendReason: true })}
-              css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
+              css={{ pt: 0, mt: '10', color: 'onSurface.low', '&:hover': { color: 'onSurface.high' } }}
             />
 
             <LeaveCard
@@ -72,7 +72,7 @@ export const MwebLeaveRoom = ({
               } for everyone. You can't undo this action.`}
               bg="$alert_error_dim"
               titleColor="$alert_error_brighter"
-              css={{ color: '$alert_error_bright', '&:hover': { color: '$alert_error_brighter' } }}
+              css={{ color: 'alert.error.bright', '&:hover': { color: 'alert.error.brighter' } }}
               icon={<StopIcon height={24} width={24} />}
               onClick={() => {
                 setOpen(false);
@@ -85,7 +85,7 @@ export const MwebLeaveRoom = ({
         <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
-        <Sheet.Content style={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
+        <Sheet.Content style={{ bg: 'surface.dim', p: '10', pb: '12' }} container={container}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
             leaveRoom={isStreamingOn ? leaveRoom : endRoom}
@@ -95,7 +95,7 @@ export const MwebLeaveRoom = ({
       </Sheet.Root>
 
       <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
-        <Sheet.Content style={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
+        <Sheet.Content style={{ bg: 'surface.dim', p: '10', pb: '12' }} container={container}>
           <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
         </Sheet.Content>
       </Sheet.Root>

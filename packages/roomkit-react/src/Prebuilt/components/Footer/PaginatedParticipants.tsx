@@ -81,7 +81,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
   }, []);
 
   return (
-    <Flex ref={ref} direction="column" css={{ size: '100%', gap: '$4' }}>
+    <Flex ref={ref} direction="column" css={{ size: '100%', gap: '4' }}>
       <Flex align="center">
         <Flex align="center" css={{ flex: '1 1 0', cursor: 'pointer' }} onClick={onBack}>
           <ChevronLeftIcon />
@@ -100,8 +100,8 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         </IconButton>
       </Flex>
       <ParticipantSearch onSearch={(search: string) => setSearch(search)} placeholder={`Search for ${roleName}`} />
-      <Flex direction="column" css={{ border: '1px solid $border_default', borderRadius: '$1', flex: '1 1 0' }}>
-        <Flex align="center" css={{ height: ROW_HEIGHT, borderBottom: '1px solid $border_default', px: '$8' }}>
+      <Flex direction="column" css={{ border: '1px solid $border_default', borderRadius: '1', flex: '1 1 0' }}>
+        <Flex align="center" css={{ height: ROW_HEIGHT, borderBottom: '1px solid $border_default', px: '8' }}>
           <Text css={{ fontSize: '$space$7' }}>
             {roleName}({getFormattedCount(peers.length)}/{getFormattedCount(total)})
           </Text>

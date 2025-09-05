@@ -30,15 +30,15 @@ export const ChatSelectorContainer = () => {
   }
   return (
     <>
-      <Flex align="center" css={{ mb: '$8', flex: '1 1 0', pl: '$2' }}>
-        <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+      <Flex align="center" css={{ mb: '8', flex: '1 1 0', pl: '2' }}>
+        <Text variant="xs" css={{ color: 'onSurface.medium' }}>
           {selection ? 'To' : 'Choose Participant'}
         </Text>
 
         {isMobile ? (
           <Flex
             align="center"
-            css={{ c: '$on_surface_medium', border: '1px solid $border_bright', r: '$0', p: '$1 $2', ml: '$6' }}
+            css={{ c: 'onSurface.medium', border: '1px solid $border_bright', r: '0', p: '$1 $2', ml: '6' }}
             gap="1"
             onClick={(e: React.MouseEvent) => {
               setOpen(value => !value);
@@ -48,11 +48,11 @@ export const ChatSelectorContainer = () => {
             <Text
               variant="caption"
               css={{
-                c: '$on_surface_high',
-                pr: '$2',
+                c: 'onSurface.high',
+                pr: '2',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '$1',
+                gap: '1',
                 textTransform: selection !== selectedPeer.name ? 'capitalize' : undefined,
               }}
             >
@@ -73,10 +73,10 @@ export const ChatSelectorContainer = () => {
               data-testid="participant_list_filter"
               css={{
                 background: '$primary_default',
-                c: '$on_primary_high',
-                r: '$0',
+                c: 'onPrimary.high',
+                r: '0',
                 p: '$1 $2',
-                ml: '$6',
+                ml: '6',
               }}
               tabIndex={0}
             >
@@ -85,10 +85,10 @@ export const ChatSelectorContainer = () => {
                   variant="caption"
                   css={{
                     c: 'inherit',
-                    pr: '$2',
+                    pr: '2',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '$1',
+                    gap: '1',
                     textTransform: selection !== selectedPeer.name ? 'capitalize' : undefined,
                   }}
                 >
@@ -111,10 +111,10 @@ export const ChatSelectorContainer = () => {
 
             <Dropdown.Content
               css={{
-                w: '$64',
+                w: '64',
                 overflow: 'hidden',
                 maxHeight: 'unset',
-                bg: '$surface_default',
+                bg: 'surface.default',
               }}
               align="start"
               sideOffset={8}
@@ -126,20 +126,20 @@ export const ChatSelectorContainer = () => {
       </Flex>
       {isMobile ? (
         <Sheet.Root open={open} onOpenChange={(value: boolean) => setOpen(value)}>
-          <Sheet.Content style={{ pt: '$8' }}>
+          <Sheet.Content style={{ pt: '8' }}>
             <Sheet.Title
               css={{
                 display: 'flex',
                 w: '100%',
                 justifyContent: 'space-between',
-                px: '$10',
-                pb: '$4',
-                mb: '$8',
+                px: '10',
+                pb: '4',
+                mb: '8',
                 borderBottom: '1px solid $border_bright',
               }}
             >
-              <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>Chat with</Text>
-              <Sheet.Close css={{ color: '$on_surface_medium' }}>
+              <Text css={{ color: 'onSurface.medium', fontWeight: '$semiBold' }}>Chat with</Text>
+              <Sheet.Close css={{ color: 'onSurface.medium' }}>
                 <CrossIcon />
               </Sheet.Close>
             </Sheet.Title>

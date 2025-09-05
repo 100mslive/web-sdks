@@ -24,9 +24,9 @@ export const LayoutModeSelector = () => {
         <Flex
           align="center"
           css={{
-            gap: '$4',
+            gap: '4',
             color: open ? '$on_surface_low' : '$on_surface_medium',
-            r: '$1',
+            r: '1',
             p: '$2 $4',
             height: '100%',
           }}
@@ -37,8 +37,8 @@ export const LayoutModeSelector = () => {
             css={{
               color: 'inherit',
               '& > svg': {
-                w: '$9',
-                h: '$9',
+                w: '9',
+                h: '9',
               },
             }}
           >
@@ -53,14 +53,14 @@ export const LayoutModeSelector = () => {
       <Popover.Content
         css={{
           w: '10.75rem',
-          r: '$1',
-          py: '$4',
+          r: '1',
+          py: '4',
           px: 0,
-          backgroundColor: '$surface_default',
+          backgroundColor: 'surface.default',
           overflowY: 'auto',
           boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
           fontFamily: '$sans',
-          color: '$on_surface_high',
+          color: 'onSurface.high',
         }}
         side="bottom"
         sideOffset={8}
@@ -74,15 +74,15 @@ export const LayoutModeSelector = () => {
               onClick={() => updateLayoutMode(value)}
               align="center"
               css={{
-                gap: '$4',
+                gap: '4',
                 borderBottom: '1px solid $border_bright',
-                p: '$8',
+                p: '8',
                 '&:hover': {
                   cursor: 'pointer',
-                  bg: '$surface_bright',
+                  bg: 'surface.bright',
                 },
                 '&:focus-visible': {
-                  bg: '$surface_bright',
+                  bg: 'surface.bright',
                 },
               }}
             >
@@ -90,10 +90,10 @@ export const LayoutModeSelector = () => {
                 align="center"
                 justify="center"
                 css={{
-                  color: '$on_surface_medium',
+                  color: 'onSurface.medium',
                   '& > svg': {
-                    w: '$9',
-                    h: '$9',
+                    w: '9',
+                    h: '9',
                   },
                 }}
               >

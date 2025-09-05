@@ -20,7 +20,7 @@ import { useFilteredRoles } from '../../common/hooks';
 import { CHAT_SELECTOR } from '../../common/constants';
 
 const ChatDotIcon = () => {
-  return <Box css={{ size: '$6', bg: '$primary_default', mx: '$2', r: '$round' }} />;
+  return <Box css={{ size: '6', bg: 'primary.default', mx: '2', r: 'round' }} />;
 };
 
 const SelectorItem = ({
@@ -48,17 +48,17 @@ const SelectorItem = ({
   return (
     <Root
       data-testid="chat_members"
-      css={{ align: 'center', px: '$10', py: '$4', bg: '$surface_default' }}
+      css={{ align: 'center', px: '10', py: '4', bg: 'surface.default' }}
       onClick={onClick}
     >
       <Text
         variant="sm"
-        css={{ display: 'flex', alignItems: 'center', gap: '$4', fontWeight: '$semiBold', color: '$on_surface_high' }}
+        css={{ display: 'flex', alignItems: 'center', gap: '4', fontWeight: '$semiBold', color: 'onSurface.high' }}
       >
         {icon}
         {value}
       </Text>
-      <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
+      <Flex align="center" css={{ ml: 'auto', color: 'onPrimary.high' }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
             <Box css={{ mr: active ? '$3' : 0 }}>
@@ -79,7 +79,7 @@ const SelectorHeader = React.memo(
         {isHorizontalDivider && <HorizontalDivider space={4} />}
         <Text
           variant="overline"
-          css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase', color: '$on_surface_medium' }}
+          css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase', color: 'onSurface.medium' }}
         >
           {children}
         </Text>
@@ -193,7 +193,7 @@ const VirtualizedSelectItemList = ({
   }, [isPublicChatEnabled, searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
-    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '64', bg: 'surface.default' }}>
       {listItems.map((item, index) => (
         <Box key={index}>{item}</Box>
       ))}
@@ -212,7 +212,7 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
   return (
     <>
       {peers.length > 0 && isPrivateChatEnabled && (
-        <Box css={{ px: '$4' }}>
+        <Box css={{ px: '4' }}>
           <ParticipantSearch onSearch={setSearch} placeholder="Search for participants" />
         </Box>
       )}

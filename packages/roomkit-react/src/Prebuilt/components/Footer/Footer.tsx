@@ -58,7 +58,7 @@ export const Footer = ({
         flexWrap: 'nowrap',
         '@md': {
           justifyContent: 'center',
-          gap: '$10',
+          gap: '10',
           position: 'relative',
           // To prevent it from showing over the sidepane if chat type is not overlay
           zIndex: isOverlayChat && isChatOpen ? 20 : 1,
@@ -70,7 +70,7 @@ export const Footer = ({
           '@md': {
             w: 'unset',
             p: '0',
-            gap: '$10',
+            gap: '10',
           },
         }}
       >
@@ -82,7 +82,7 @@ export const Footer = ({
         css={{
           '@md': {
             w: 'unset',
-            gap: '$10',
+            gap: '10',
           },
         }}
       >

@@ -18,14 +18,14 @@ import { getFormattedCount } from '../common/utils';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
-  color: '$on_surface_low',
-  p: '$4',
+  color: 'onSurface.low',
+  p: '4',
   fontWeight: '$semiBold',
-  fontSize: '$sm',
+  fontSize: 'sm',
   w: '100%',
   justifyContent: 'center',
   '&[data-state="active"]': {
-    color: '$on_surface_high',
+    color: 'onSurface.high',
   },
 };
 
@@ -82,13 +82,13 @@ export const SidePaneTabs = React.memo<{
       <Flex
         direction="column"
         css={{
-          color: '$on_primary_high',
+          color: 'onPrimary.high',
           h: '100%',
           transition: 'margin 0.3s ease-in-out',
           position: 'relative',
         }}
       >
-        <Box css={{ position: 'absolute', left: 0, top: 0, size: '100%', zIndex: 21, bg: '$surface_dim' }}>
+        <Box css={{ position: 'absolute', left: 0, top: 0, size: '100%', zIndex: 21, bg: 'surface.dim' }}>
           <PaginatedParticipants roleName={activeRole} onBack={() => setActiveRole('')} />
         </Box>
       </Flex>
@@ -99,7 +99,7 @@ export const SidePaneTabs = React.memo<{
     <Flex
       direction="column"
       css={{
-        color: '$on_primary_high',
+        color: 'onPrimary.high',
         h: '100%',
         transition: 'margin 0.3s ease-in-out',
       }}
@@ -114,9 +114,9 @@ export const SidePaneTabs = React.memo<{
                   variant="sm"
                   css={{
                     fontWeight: '$semiBold',
-                    p: '$4',
-                    c: '$on_surface_high',
-                    pr: '$12',
+                    p: '4',
+                    c: 'onSurface.high',
+                    pr: '12',
                     '&:empty': { display: 'none' },
                   }}
                 >
@@ -134,9 +134,9 @@ export const SidePaneTabs = React.memo<{
                   {isOverlayChat && isChatOpen ? null : (
                     <IconButton
                       css={{
-                        my: '$1',
-                        color: '$on_surface_medium',
-                        '&:hover': { color: '$on_surface_high' },
+                        my: '1',
+                        color: 'onSurface.medium',
+                        '&:hover': { color: 'onSurface.high' },
                         '&:empty': { display: 'none' },
                       }}
                       onClick={(e: React.MouseEvent) => {
@@ -173,7 +173,7 @@ export const SidePaneTabs = React.memo<{
               }}
             >
               <Flex css={{ w: '100%' }}>
-                <Tabs.List css={{ flexGrow: 1, borderRadius: '$2', bg: '$surface_default' }}>
+                <Tabs.List css={{ flexGrow: 1, borderRadius: '2', bg: 'surface.default' }}>
                   <Tabs.Trigger value={SIDE_PANE_OPTIONS.CHAT} onClick={toggleChat} css={tabTriggerCSS}>
                     {chat_title}
                   </Tabs.Trigger>
@@ -185,7 +185,7 @@ export const SidePaneTabs = React.memo<{
                 {showChatSettings ? <ChatSettings /> : null}
                 {isOverlayChat && isChatOpen ? null : (
                   <IconButton
-                    css={{ my: '$1', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+                    css={{ my: '1', color: 'onSurface.medium', '&:hover': { color: 'onSurface.high' } }}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       if (activeTab === SIDE_PANE_OPTIONS.CHAT) {

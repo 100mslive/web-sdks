@@ -24,18 +24,18 @@ export const LeaderboardEntry = ({
   duration: number;
 }) => {
   return (
-    <Flex align="center" justify="between" css={{ my: '$8' }}>
-      <Flex align="center" css={{ gap: '$6' }}>
+    <Flex align="center" justify="between" css={{ my: '8' }}>
+      <Flex align="center" css={{ gap: '6' }}>
         <Flex
           align="center"
           justify="center"
           css={{
             backgroundColor: positionColorMap[position] || '',
-            h: '$10',
-            w: '$10',
-            borderRadius: '$round',
+            h: '10',
+            w: '10',
+            borderRadius: 'round',
             color: position > 3 ? '$on_surface_low' : '#FFF',
-            fontSize: '$xs',
+            fontSize: 'xs',
             fontWeight: '$semiBold',
           }}
         >
@@ -43,17 +43,17 @@ export const LeaderboardEntry = ({
         </Flex>
 
         <Box>
-          <Text variant="sm" css={{ fontWeight: '$semiBold', color: '$on_surface_high' }}>
+          <Text variant="sm" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
             {userName}
           </Text>
 
-          <Text variant="sm" css={{ mt: '$1' }}>
+          <Text variant="sm" css={{ mt: '1' }}>
             {score} / {maxPossibleScore} points
           </Text>
         </Box>
       </Flex>
 
-      <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
+      <Flex align="center" css={{ gap: '4', color: 'onSurface.medium' }}>
         {position === 1 && score ? <TrophyFilledIcon height={16} width={16} /> : null}
         {questionCount ? (
           <>
@@ -65,7 +65,7 @@ export const LeaderboardEntry = ({
         ) : null}
 
         {duration ? (
-          <Flex align="center" css={{ gap: '$2', color: '$on_surface_medium' }}>
+          <Flex align="center" css={{ gap: '2', color: 'onSurface.medium' }}>
             <ClockIcon height={16} width={16} />
             <Text variant="xs">{getFormattedTime(duration)}</Text>
           </Flex>

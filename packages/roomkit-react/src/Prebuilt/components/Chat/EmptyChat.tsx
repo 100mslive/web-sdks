@@ -31,24 +31,21 @@ export const EmptyChat = () => {
         width: '100%',
         flex: '1 1 0',
         textAlign: 'center',
-        px: '$4',
+        px: '4',
       }}
       align="center"
       justify="center"
     >
       <Box>
-        <Box css={{ m: '0 auto', mt: '$4', '@media (max-height: 575px)': { display: 'none' } }}>
+        <Box css={{ m: '0 auto', mt: '4', '@media (max-height: 575px)': { display: 'none' } }}>
           <img src={emptyChat} style={{ display: 'inline' }} alt="Empty Chat" height={132} width={185} />
         </Box>
 
-        <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+        <Text variant="h5" css={{ mt: '8', c: 'onSurface.high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
         </Text>
         {canSendMessages ? (
-          <Text
-            variant="sm"
-            css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
-          >
+          <Text variant="sm" css={{ mt: '4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: 'onSurface.medium' }}>
             There are no messages here yet. Start a conversation by sending a message.
           </Text>
         ) : null}

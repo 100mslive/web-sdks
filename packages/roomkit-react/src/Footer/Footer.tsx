@@ -4,17 +4,17 @@ import { styled } from '../Theme';
 const Root = styled(Flex, {
   justifyContent: 'space-between',
   alignItems: 'center',
-  py: '$4',
+  py: '4',
   position: 'relative',
   height: '100%',
-  '@md': { flexWrap: 'wrap', gap: '$4' },
+  '@md': { flexWrap: 'wrap', gap: '4' },
 });
 
 const Left = styled(Flex, {
   alignItems: 'center',
   position: 'absolute',
-  left: '$10',
-  gap: '$8',
+  left: '10',
+  gap: '8',
   '@md': {
     position: 'unset',
     justifyContent: 'center',
@@ -26,14 +26,14 @@ const Center = styled(Flex, {
   w: '100%',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '$8',
+  gap: '8',
 });
 
 const Right = styled(Flex, {
   alignItems: 'center',
   position: 'absolute',
-  right: '$10',
-  gap: '$8',
+  right: '10',
+  gap: '8',
   '@md': {
     display: 'none',
   },

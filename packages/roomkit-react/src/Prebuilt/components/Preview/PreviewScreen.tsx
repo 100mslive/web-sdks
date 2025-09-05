@@ -23,7 +23,7 @@ export const PreviewScreen = () => {
   return (
     <Flex direction="column" css={{ size: '100%' }}>
       <Flex
-        css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primary_default' }}
+        css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: 'primary.default' }}
         justify="center"
         align="center"
       >

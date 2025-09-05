@@ -7,10 +7,10 @@ export const StatisticBox = ({ title, value = 0 }: { title: string; value: strin
     return <></>;
   }
   return (
-    <Box css={{ p: '$8', background: '$surface_default', borderRadius: '$1', w: '100%' }}>
+    <Box css={{ p: '8', background: '$surface_default', borderRadius: '1', w: '100%' }}>
       <Text
         variant="tiny"
-        css={{ textTransform: 'uppercase', color: '$on_surface_medium', fontWeight: '$semiBold', my: '$4' }}
+        css={{ textTransform: 'uppercase', color: 'onSurface.medium', fontWeight: '$semiBold', my: '4' }}
       >
         {title}
       </Text>

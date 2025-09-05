@@ -97,7 +97,7 @@ export const ParticipantList = ({
         direction="column"
         css={{
           size: '100%',
-          gap: '$4',
+          gap: '4',
         }}
       >
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
@@ -138,7 +138,7 @@ export const ParticipantCount = () => {
     <IconButton
       css={{
         w: 'auto',
-        p: '$4',
+        p: '4',
         h: 'auto',
         bg: isPeerListOpen ? '$surface_brighter' : '',
       }}
@@ -150,7 +150,7 @@ export const ParticipantCount = () => {
       data-testid="participant_list"
     >
       <PeopleIcon />
-      <Text variant="sm" css={{ mx: '$4', c: 'inherit' }}>
+      <Text variant="sm" css={{ mx: '4', c: 'inherit' }}>
         {getFormattedCount(peerCount)}
       </Text>
     </IconButton>
@@ -175,8 +175,8 @@ export const Participant = ({
       css={{
         w: '100%',
         p: '$4 $8',
-        pr: '$6',
-        h: '$16',
+        pr: '6',
+        h: '16',
         '&:hover .participant_item': { display: 'flex' },
       }}
       align="center"
@@ -186,7 +186,7 @@ export const Participant = ({
     >
       <Text
         variant="sm"
-        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '$8', fontWeight: '$semiBold', color: '$on_surface_high' }}
+        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '8', fontWeight: '$semiBold', color: 'onSurface.high' }}
       >
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
@@ -225,10 +225,10 @@ const VirtualizedParticipants = ({
     <Flex
       direction="column"
       css={{
-        gap: '$8',
+        gap: '8',
         overflowY: 'auto',
         overflowX: 'hidden',
-        pr: '$10',
+        pr: '10',
         mr: '-$10',
         flex: '1 1 0',
         '& > div:empty ~ .emptyParticipants': {
@@ -292,7 +292,7 @@ const ParticipantActions = React.memo(
         align="center"
         css={{
           flexShrink: 0,
-          gap: '$8',
+          gap: '8',
         }}
       >
         {isHandRaisedAccordion ? (
@@ -304,7 +304,7 @@ const ParticipantActions = React.memo(
               <Flex
                 align="center"
                 justify="center"
-                css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+                css={{ p: '1', c: 'onSurface.high', bg: 'surface.bright', borderRadius: 'round' }}
               >
                 <CallIcon width={19} height={19} />
               </Flex>
@@ -313,7 +313,7 @@ const ParticipantActions = React.memo(
               <Flex
                 align="center"
                 justify="center"
-                css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+                css={{ p: '1', c: 'onSurface.high', bg: 'surface.bright', borderRadius: 'round' }}
               >
                 <HandIcon height={19} width={19} />
               </Flex>
@@ -322,7 +322,7 @@ const ParticipantActions = React.memo(
               <Flex
                 align="center"
                 justify="center"
-                css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+                css={{ p: '2', c: 'onSurface.high', bg: 'surface.bright', borderRadius: 'round' }}
               >
                 <MicOffIcon height={19} width={19} />
               </Flex>
@@ -336,7 +336,7 @@ const ParticipantActions = React.memo(
   },
 );
 
-const quickActionStyle = { p: '$1', borderRadius: '$round' };
+const quickActionStyle = { p: '1', borderRadius: 'round' };
 const HandRaisedAccordionParticipantActions = ({ peerId, role }: { peerId: string; role: string }) => {
   const { handleStageAction, lowerPeerHand, shouldShowStageRoleChange, isInStage } = usePeerOnStageActions({
     peerId,
@@ -381,12 +381,12 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
           data-testid="participant_more_actions"
           className="participant_item"
           css={{
-            p: '$1',
-            r: '$0',
-            c: '$on_surface_high',
+            p: '1',
+            r: '0',
+            c: 'onSurface.high',
             display: open ? 'flex' : 'none',
             '&:hover': {
-              bg: '$surface_bright',
+              bg: 'surface.bright',
             },
             '@md': {
               display: 'flex',
@@ -399,20 +399,20 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
           </Box>
         </Dropdown.Trigger>
         <Dropdown.Portal>
-          <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
+          <Dropdown.Content align="end" sideOffset={8} css={{ w: '64', bg: 'surface.default' }}>
             {shouldShowStageRoleChange ? (
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
+              <Dropdown.Item css={{ bg: 'surface.default' }} onClick={() => handleStageAction()}>
                 <ChangeRoleIcon />
-                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold', c: 'onSurface.high' }}>
                   {isInStage ? remove_from_stage_label : bring_to_stage_label}
                 </Text>
               </Dropdown.Item>
             ) : null}
 
             {canChangeRole && roles.length > 1 ? (
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => setOpenRoleChangeModal(true)}>
+              <Dropdown.Item css={{ bg: 'surface.default' }} onClick={() => setOpenRoleChangeModal(true)}>
                 <PersonSettingsIcon />
-                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold', c: 'onSurface.high' }}>
                   Switch Role
                 </Text>
               </Dropdown.Item>
@@ -451,9 +451,9 @@ export const ParticipantSearch = ({
       align="center"
       css={{
         p: isMobile ? '0' : '$2 0',
-        mb: '$2',
+        mb: '2',
         position: 'relative',
-        color: '$on_surface_medium',
+        color: 'onSurface.medium',
         mt: inSidePane ? '$4' : '',
       }}
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -462,7 +462,7 @@ export const ParticipantSearch = ({
       <Input
         type="text"
         placeholder={placeholder}
-        css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '6', pl: '14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
           event.stopPropagation();

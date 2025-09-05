@@ -53,7 +53,7 @@ export const isSameTile = ({
   audioTrackID?: string;
 }) => !!trackId && ((!!videoTrackID && videoTrackID === trackId) || (!!audioTrackID && audioTrackID === trackId));
 
-const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
+const spacingCSS = { '@md': { my: '8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
 const SpotlightActions = ({
   peerId,
@@ -142,7 +142,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
   const dragClassName = getDragClassName();
   return (
     <Fragment>
-      <StyledMenuTile.ItemButton className={dragClassName} css={{ color: '$on_surface_medium', cursor: 'default' }}>
+      <StyledMenuTile.ItemButton className={dragClassName} css={{ color: 'onSurface.medium', cursor: 'default' }}>
         Select maximum resolution
       </StyledMenuTile.ItemButton>
       {track.layerDefinitions.map((layer: HMSSimulcastLayerDefinition) => {
@@ -165,7 +165,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
               as="span"
               css={{
                 textTransform: 'capitalize',
-                mr: '$2',
+                mr: '2',
                 fontWeight: track.preferredLayer === layer.layer ? '$semiBold' : '$regular',
                 color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
               }}
@@ -185,7 +185,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
         );
       })}
       <StyledMenuTile.ItemButton className={dragClassName}>
-        <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
+        <Text as="span" variant="xs" css={{ color: 'onSurface.medium' }}>
           Currently streaming:
           <Text
             as="span"
@@ -193,8 +193,8 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
             css={{
               fontWeight: '$semiBold',
               textTransform: 'capitalize',
-              color: '$on_surface_medium',
-              ml: '$2',
+              color: 'onSurface.medium',
+              ml: '2',
             }}
           >
             {currentLayer ? (
@@ -276,7 +276,7 @@ export const TileMenuContent = ({
             }}
           >
             <PencilIcon height={20} width={20} />
-            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: 'onSurface.high' }}>
               Change Name
             </Text>
           </StyledMenuTile.ItemButton>
@@ -333,10 +333,10 @@ export const TileMenuContent = ({
       ) : null}
 
       {!isIOS && audioTrackID ? (
-        <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
+        <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '0' }}>
           <Flex align="center" gap={1}>
             <SpeakerIcon height={20} width={20} />
-            <Box as="span" css={{ ml: '$4' }}>
+            <Box as="span" css={{ ml: '4' }}>
               Volume ({volume})
             </Box>
           </Flex>

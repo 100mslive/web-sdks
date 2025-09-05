@@ -16,7 +16,7 @@ export const RemoveParticipant = ({ peerId }: { peerId: HMSPeerID }) => {
   }
   return (
     <Dropdown.Item
-      css={{ color: '$alert_error_default', bg: '$surface_default' }}
+      css={{ color: 'alert.error.default', bg: 'surface.default' }}
       onClick={async () => {
         try {
           await actions.removePeer(peerId, '');
@@ -27,7 +27,7 @@ export const RemoveParticipant = ({ peerId }: { peerId: HMSPeerID }) => {
       }}
     >
       <PeopleRemoveIcon />
-      <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
         Remove Participant
       </Text>
     </Dropdown.Item>

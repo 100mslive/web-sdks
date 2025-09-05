@@ -22,7 +22,7 @@ export function HLSAutoplayBlockedPrompt({
           border: '1px solid white',
           bg: 'white',
           color: '#000',
-          r: '$2',
+          r: '2',
         }}
         onClick={async () => await unblockAutoPlay()}
       >
@@ -31,7 +31,7 @@ export function HLSAutoplayBlockedPrompt({
           variant="body1"
           css={{
             fontWeight: '$semiBold',
-            px: '$2',
+            px: '2',
             color: '#000',
           }}
         >

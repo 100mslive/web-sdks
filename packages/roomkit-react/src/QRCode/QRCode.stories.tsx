@@ -21,7 +21,7 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof QRCode> = ({ ...args }) => (
-  <Flex css={{ w: '$80' }} justify="center">
+  <Flex css={{ w: '80' }} justify="center">
     <QRCode {...args} />
   </Flex>
 );

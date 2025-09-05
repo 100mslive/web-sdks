@@ -108,10 +108,10 @@ export const QuestionForm = ({
 
   return (
     <>
-      <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
+      <Text variant="overline" css={{ c: 'onSurface.low', textTransform: 'uppercase' }}>
         Question {index + 1} of {length}
       </Text>
-      <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>
+      <Text variant="body2" css={{ mt: '4', mb: 'md' }}>
         Question Type
       </Text>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -120,7 +120,7 @@ export const QuestionForm = ({
           // @ts-ignore
           title={QUESTION_TYPE_TITLE[type]}
           css={{
-            backgroundColor: '$surface_bright',
+            backgroundColor: 'surface.bright',
             border: '1px solid $border_bright',
           }}
           open={open}
@@ -135,7 +135,7 @@ export const QuestionForm = ({
                   // @ts-ignore
                   onSelect={() => setType(value)}
                   css={{
-                    px: '$9',
+                    px: '9',
                     bg: type === value ? selectionBg : undefined,
                   }}
                 >
@@ -151,29 +151,29 @@ export const QuestionForm = ({
         maxLength={1024}
         placeholder="Ask a question"
         css={{
-          mt: '$md',
-          backgroundColor: '$surface_bright',
+          mt: 'md',
+          backgroundColor: 'surface.bright',
           border: '1px solid $border_bright',
-          minHeight: '$14',
+          minHeight: '14',
           resize: 'vertical',
-          maxHeight: '$32',
+          maxHeight: '32',
         }}
         value={text}
         onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setText(event.target.value.trimStart())}
       />
-      <Text variant="xs" css={{ color: '$on_surface_medium', textAlign: 'end', mt: '$4' }}>
+      <Text variant="xs" css={{ color: 'onSurface.medium', textAlign: 'end', mt: '4' }}>
         {text?.length || 0}/1024
       </Text>
       <Line />
       {/* @ts-ignore */}
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
-          <Text variant="body2" css={{ mb: '$6', c: '$on_surface_medium' }}>
+          <Text variant="body2" css={{ mb: '6', c: 'onSurface.medium' }}>
             Options
           </Text>
 
           {isQuiz && (
-            <Text variant="xs" css={{ c: '$on_surface_medium', mb: '$md' }}>
+            <Text variant="xs" css={{ c: 'onSurface.medium', mb: 'md' }}>
               {type === QUESTION_TYPE.SINGLE_CHOICE
                 ? 'Use the radio buttons to indicate the correct answer'
                 : 'Use the checkboxes to indicate the correct answer(s)'}
@@ -203,9 +203,9 @@ export const QuestionForm = ({
           {options?.length < 20 && (
             <Flex
               css={{
-                c: '$on_surface_medium',
+                c: 'onSurface.medium',
                 cursor: 'pointer',
-                '&:hover': { c: '$on_surface_high' },
+                '&:hover': { c: 'onSurface.high' },
               }}
               onClick={() => setOptions([...options, { text: '', isCorrectAnswer: false }])}
             >
@@ -214,7 +214,7 @@ export const QuestionForm = ({
               <Text
                 variant="sm"
                 css={{
-                  ml: '$4',
+                  ml: '4',
                   c: 'inherit',
                 }}
               >
@@ -225,8 +225,8 @@ export const QuestionForm = ({
           <Line />
           {isQuiz ? (
             <>
-              <Flex justify="between" align="center" css={{ gap: '$6', w: '100%' }}>
-                <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+              <Flex justify="between" align="center" css={{ gap: '6', w: '100%' }}>
+                <Text variant="sm" css={{ color: 'onSurface.medium' }}>
                   Point Weightage
                 </Text>
                 <Input
@@ -238,14 +238,14 @@ export const QuestionForm = ({
                     setWeight(Math.min(Number(e.target.value), 999))
                   }
                   css={{
-                    backgroundColor: '$surface_bright',
+                    backgroundColor: 'surface.bright',
                     border: '1px solid $border_bright',
-                    maxWidth: '$20',
+                    maxWidth: '20',
                   }}
                 />
               </Flex>
-              {/* <Flex justify="between" css={{ mt: '$md', gap: '$6', w: '100%' }}>
-                <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+              {/* <Flex justify="between" css={{ mt: 'md', gap: '6', w: '100%' }}>
+                <Text variant="sm" css={{ color: 'onSurface.medium' }}>
                   Allow to skip
                 </Text>
                 <Switch defaultChecked={skippable} onCheckedChange={(checked: boolean) => setSkippable(checked)} />
@@ -255,7 +255,7 @@ export const QuestionForm = ({
         </>
       ) : null}
 
-      <Flex justify="end" align="center" css={{ mt: '$12', gap: '$8' }}>
+      <Flex justify="end" align="center" css={{ mt: '12', gap: '8' }}>
         <IconButton css={{ border: '1px solid $border_bright' }}>
           <TrashIcon onClick={() => setOpenDelete(!open)} />
         </IconButton>
@@ -266,7 +266,7 @@ export const QuestionForm = ({
               ? 'At least two options must be added'
               : `Please fill all the fields ${isQuiz ? 'and mark the correct answer(s)' : ''} to continue`
           }
-          boxStyle={{ maxWidth: '$40' }}
+          boxStyle={{ maxWidth: '40' }}
         >
           <Button
             variant="standard"

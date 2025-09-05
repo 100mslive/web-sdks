@@ -13,7 +13,7 @@ const Root = ({
   return (
     <Flex
       direction={hasSidebar ? 'row' : 'column'}
-      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
+      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
     >
       {children}
     </Flex>
@@ -22,7 +22,7 @@ const Root = ({
 
 const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: Record<string, any> }>) => {
   return (
-    <Flex direction="column" css={{ flex: '1 1 0', gap: '$2', minHeight: 0, ...css }}>
+    <Flex direction="column" css={{ flex: '1 1 0', gap: '2', minHeight: 0, ...css }}>
       {children}
     </Flex>
   );

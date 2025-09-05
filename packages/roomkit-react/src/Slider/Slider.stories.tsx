@@ -11,7 +11,7 @@ export default {
 const Template: ComponentStory<typeof Slider> = () => {
   const [volume, setVolume] = React.useState<number>(25);
   return (
-    <Box css={{ width: '$80' }}>
+    <Box css={{ width: '80' }}>
       <Slider defaultValue={[25]} step={1} value={[volume]} onValueChange={e => setVolume(e[0])} />
     </Box>
   );

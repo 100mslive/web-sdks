@@ -36,10 +36,10 @@ export function HLSQualitySelector({
         <Sheet.Trigger asChild data-testid="quality_selector">
           <Flex
             css={{
-              color: '$on_primary_high',
-              r: '$1',
+              color: 'onPrimary.high',
+              r: '1',
               cursor: 'pointer',
-              p: '$2',
+              p: '2',
             }}
           >
             <SettingsIcon />
@@ -49,19 +49,19 @@ export function HLSQualitySelector({
           <Sheet.Title
             css={{
               display: 'flex',
-              color: '$on_surface_high',
+              color: 'onSurface.high',
               w: '100%',
               justifyContent: 'space-between',
-              mt: '$8',
-              fontSize: '$md',
-              px: '$10',
-              pb: '$8',
+              mt: '8',
+              fontSize: 'md',
+              px: '10',
+              pb: '8',
               borderBottom: '1px solid $border_bright',
               alignItems: 'center',
             }}
           >
             Quality
-            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpenChange(false)}>
+            <Sheet.Close css={{ color: 'onSurface.high' }} onClick={() => onOpenChange(false)}>
               <CrossIcon />
             </Sheet.Close>
           </Sheet.Title>
@@ -71,14 +71,14 @@ export function HLSQualitySelector({
                 align="center"
                 css={{
                   w: '100%',
-                  bg: '$surface_default',
+                  bg: 'surface.default',
                   '&:hover': {
-                    bg: '$surface_brighter',
+                    bg: 'surface.brighter',
                   },
                   cursor: 'pointer',
-                  gap: '$4',
-                  py: '$8',
-                  px: '$10',
+                  gap: '4',
+                  py: '8',
+                  px: '10',
                 }}
                 key={layer.width}
                 onClick={() => onQualityChange(layer)}
@@ -86,7 +86,7 @@ export function HLSQualitySelector({
                 <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
                   {getQualityText(layer)}
                 </Text>
-                <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                <Text variant="caption" css={{ flex: '1 1 0', c: 'onSurface.low', pl: '2' }}>
                   {getBitrateText(layer)}
                 </Text>
                 {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
@@ -99,14 +99,14 @@ export function HLSQualitySelector({
             align="center"
             css={{
               w: '100%',
-              bg: '$surface_default',
+              bg: 'surface.default',
               '&:hover': {
-                bg: '$surface_brighter',
+                bg: 'surface.brighter',
               },
               cursor: 'pointer',
-              gap: '$4',
-              py: '$8',
-              px: '$10',
+              gap: '4',
+              py: '8',
+              px: '10',
             }}
             key="auto"
             onClick={() => onQualityChange({ height: 'auto' })}
@@ -125,21 +125,21 @@ export function HLSQualitySelector({
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{
-            color: '$on_primary_high',
-            r: '$1',
+            color: 'onPrimary.high',
+            r: '1',
             cursor: 'pointer',
-            p: '$2',
+            p: '2',
           }}
         >
           <Tooltip title="Select Quality" side="top">
             <Flex align="center">
               <Box
                 css={{
-                  w: '$9',
-                  h: '$9',
+                  w: '9',
+                  h: '9',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  c: '$on_surface_high',
+                  c: 'onSurface.high',
                 }}
               >
                 <SettingsIcon />
@@ -150,18 +150,18 @@ export function HLSQualitySelector({
                   '@sm': 'xs',
                   '@xs': 'tiny',
                 }}
-                css={{ display: 'flex', alignItems: 'center', ml: '$2', c: '$on_surface_medium' }}
+                css={{ display: 'flex', alignItems: 'center', ml: '2', c: 'onSurface.medium' }}
               >
                 {isAuto && (
                   <>
                     Auto
                     <Box
                       css={{
-                        mx: '$2',
-                        w: '$2',
-                        h: '$2',
+                        mx: '2',
+                        w: '2',
+                        h: '2',
                         background: '$on_surface_medium',
-                        r: '$1',
+                        r: '1',
                       }}
                     />
                   </>
@@ -178,11 +178,11 @@ export function HLSQualitySelector({
           align="end"
           css={{
             height: 'auto',
-            maxHeight: '$52',
-            w: '$40',
-            bg: '$surface_bright',
-            py: '$4',
-            gap: '$4',
+            maxHeight: '52',
+            w: '40',
+            bg: 'surface.bright',
+            py: '4',
+            gap: '4',
             display: 'grid',
           }}
         >
@@ -197,17 +197,17 @@ export function HLSQualitySelector({
                       ? '$surface_default'
                       : '$surface_bright',
                   '&:hover': {
-                    bg: '$surface_brighter',
+                    bg: 'surface.brighter',
                   },
                   p: '$2 $4 $2 $8',
-                  h: '$12',
-                  gap: '$2',
+                  h: '12',
+                  gap: '2',
                 }}
               >
                 <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
                   {getQualityText(layer)}
                 </Text>
-                <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                <Text variant="caption" css={{ flex: '1 1 0', c: 'onSurface.low', pl: '2' }}>
                   {getBitrateText(layer)}
                 </Text>
                 {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
@@ -222,11 +222,11 @@ export function HLSQualitySelector({
             css={{
               bg: !isAuto ? '$surface_bright' : '$surface_default',
               '&:hover': {
-                bg: '$surface_brighter',
+                bg: 'surface.brighter',
               },
               p: '$2 $4 $2 $8',
-              h: '$12',
-              gap: '$2',
+              h: '12',
+              gap: '2',
             }}
           >
             <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>

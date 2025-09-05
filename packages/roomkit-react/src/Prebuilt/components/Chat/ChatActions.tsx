@@ -27,11 +27,11 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 
 const iconStyle = { height: '1.125rem', width: '1.125rem' };
 const tooltipBoxCSS = {
-  fontSize: '$xs',
-  backgroundColor: '$surface_default',
+  fontSize: 'xs',
+  backgroundColor: 'surface.default',
   p: '$1 $5',
   fontWeight: '$regular',
-  borderRadius: '$3',
+  borderRadius: '3',
 };
 
 export const ChatActions = ({
@@ -150,13 +150,13 @@ export const ChatActions = ({
           blacklistPeer(message.senderUserId);
         }
       },
-      color: '$alert_error_default',
+      color: 'alert.error.default',
       show: !!can_block_user && !sentByLocalPeer && !isSenderBlocked,
     },
     remove: {
       text: 'Remove participant',
       icon: <PeopleRemoveIcon style={iconStyle} />,
-      color: '$alert_error_default',
+      color: 'alert.error.default',
       show: !!canRemoveOthers && !sentByLocalPeer,
       onClick: async () => {
         if (!message.sender) {
@@ -175,26 +175,26 @@ export const ChatActions = ({
     return (
       <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
         <Sheet.Content
-          style={{ bg: '$surface_default', pb: '$14' }}
+          style={{ bg: 'surface.default', pb: '14' }}
           onClick={(e: React.MouseEvent) => setOpenSheet(false, e as any)}
         >
           <Sheet.Title
             css={{
               display: 'flex',
-              color: '$on_surface_high',
+              color: 'onSurface.high',
               w: '100%',
               justifyContent: 'space-between',
-              mt: '$8',
-              fontSize: '$md',
-              px: '$10',
-              pb: '$8',
+              mt: '8',
+              fontSize: 'md',
+              px: '10',
+              pb: '8',
               borderBottom: '1px solid $border_bright',
               alignItems: 'center',
             }}
           >
             Message options
             <Sheet.Close
-              css={{ color: '$on_surface_high' }}
+              css={{ color: 'onSurface.high' }}
               onClick={(e: React.MouseEvent) => setOpenSheet(false, e as any)}
             >
               <CrossIcon />
@@ -224,8 +224,8 @@ export const ChatActions = ({
         className="chat_actions"
         css={{
           background: '$surface_bright',
-          borderRadius: '$1',
-          p: '$2',
+          borderRadius: '1',
+          p: '2',
           opacity: open ? 1 : 0,
           position: 'absolute',
           top: 0,
@@ -278,12 +278,12 @@ export const ChatActions = ({
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
+          css={{ width: '48', backgroundColor: 'surface.bright', py: '0', border: '1px solid $border_bright' }}
         >
           {options.hide.show ? (
             <Dropdown.Item data-testid="hide_message_btn" onClick={options.hide.onClick}>
               {options.hide.icon}
-              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold' }}>
                 {options.hide.text}
               </Text>
             </Dropdown.Item>
@@ -296,7 +296,7 @@ export const ChatActions = ({
               css={{ color: options.block.color }}
             >
               {options.block.icon}
-              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
                 {options.block.text}
               </Text>
             </Dropdown.Item>
@@ -308,7 +308,7 @@ export const ChatActions = ({
               css={{ color: options.remove.color }}
             >
               {options.remove.icon}
-              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
                 {options.remove.text}
               </Text>
             </Dropdown.Item>

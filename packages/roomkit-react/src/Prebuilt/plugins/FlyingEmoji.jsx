@@ -120,14 +120,14 @@ export function FlyingEmoji() {
                   width: 'fit-content',
                   padding: '$2 $4',
                   background: '$surface_bright',
-                  borderRadius: '$1',
+                  borderRadius: '1',
                 }}
               >
                 <Text
                   css={{
                     fontSize: '$space$6',
                     lineHeight: '$xs',
-                    color: '$on_surface_high',
+                    color: 'onSurface.high',
                   }}
                 >
                   {emoji.senderName}

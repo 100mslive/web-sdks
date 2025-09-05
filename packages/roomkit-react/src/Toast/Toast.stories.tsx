@@ -35,7 +35,7 @@ const ToastComponent = ({ ...props }) => {
       <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</Button>
       <Toast.Root open={isOpen} onOpenChange={o => setIsOpen(o)} {...props}>
         <Toast.Title asChild>
-          <Flex align="center" css={{ gap: '$4', flex: '1 1 0', minWidth: 0 }}>
+          <Flex align="center" css={{ gap: '4', flex: '1 1 0', minWidth: 0 }}>
             <Text variant="sub1" css={{ c: 'inherit', wordBreak: 'break-word' }}>
               Hello from toast.
             </Text>
@@ -46,7 +46,7 @@ const ToastComponent = ({ ...props }) => {
           This is a custom toast component using primitives with controlled open and close state using React state.
         </Toast.Description>
       </Toast.Root>
-      <Toast.Viewport css={{ bottom: '$24' }} />
+      <Toast.Viewport css={{ bottom: '24' }} />
     </>
   );
 };

@@ -57,8 +57,8 @@ export const MuteAllContent = (props: {
           onValueChange={(value: string) => props.setEnabled(value === 'true')}
         >
           {permissions?.mute && (
-            <Flex align="center" css={{ mr: '$8' }}>
-              <RadioGroup.Item value="false" id="trackDisableRadio" css={{ mr: '$4' }}>
+            <Flex align="center" css={{ mr: '8' }}>
+              <RadioGroup.Item value="false" id="trackDisableRadio" css={{ mr: '4' }}>
                 <RadioGroup.Indicator />
               </RadioGroup.Item>
               <Label htmlFor="trackDisableRadio">Mute</Label>
@@ -66,7 +66,7 @@ export const MuteAllContent = (props: {
           )}
           {permissions?.unmute && (
             <Flex align="center" css={{ cursor: 'pointer' }}>
-              <RadioGroup.Item value="true" id="trackEnableRadio" css={{ mr: '$4' }}>
+              <RadioGroup.Item value="true" id="trackEnableRadio" css={{ mr: '4' }}>
                 <RadioGroup.Indicator />
               </RadioGroup.Item>
               <Label htmlFor="trackEnableRadio">Request Unmute</Label>

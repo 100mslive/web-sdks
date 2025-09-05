@@ -89,11 +89,11 @@ export const browserTypeIconInfo = {
 };
 
 const CheckDetails = ({ title, value, iconURL }: { title: string; value: string; iconURL?: string }) => (
-  <Box css={{ w: '100%', my: '$10', p: '$10', r: '$1', bg: '$surface_default', '@lg': { w: 'auto' } }}>
-    <Text css={{ c: '$on_primary_medium', mb: '$6' }}>{title}</Text>
+  <Box css={{ w: '100%', my: '10', p: '10', r: '1', bg: 'surface.default', '@lg': { w: 'auto' } }}>
+    <Text css={{ c: 'onPrimary.medium', mb: '6' }}>{title}</Text>
     <Flex align="center">
       {iconURL && (
-        <Box css={{ size: '2rem', r: '$round', bg: '$surface_brighter', mr: '$4' }}>
+        <Box css={{ size: '2rem', r: 'round', bg: 'surface.brighter', mr: '4' }}>
           <img style={{ objectFit: 'contain', width: '2rem' }} src={iconURL} alt={value} />
         </Box>
       )}
@@ -115,7 +115,7 @@ export const BrowserTest = () => {
   }, [hmsDiagnostics, updateStep]);
   return (
     <>
-      <TestContainer css={{ display: 'flex', gap: '$8', '@lg': { display: 'block' } }}>
+      <TestContainer css={{ display: 'flex', gap: '8', '@lg': { display: 'block' } }}>
         <CheckDetails
           title="Browser"
           iconURL={

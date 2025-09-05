@@ -46,7 +46,7 @@ const ReactToastComponent: ComponentStory<typeof ReactToastStory> = args => {
         onOpenChange={o => setIsOpen(o)}
         {...args}
       />
-      <Toast.Viewport css={{ bottom: '$24' }} />
+      <Toast.Viewport css={{ bottom: '24' }} />
     </>
   );
 };

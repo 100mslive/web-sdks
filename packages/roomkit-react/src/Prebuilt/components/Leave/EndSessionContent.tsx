@@ -19,7 +19,7 @@ export const EndSessionContent = ({
     <Box>
       <Flex
         css={{
-          color: '$alert_error_default',
+          color: 'alert.error.default',
           display: 'flex',
           alignItems: 'center',
         }}
@@ -29,15 +29,15 @@ export const EndSessionContent = ({
           End {isStreamingOn ? 'Stream' : 'Session'}
         </Text>
         {isModal ? null : (
-          <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowEndStreamAlert(false)}>
+          <Box css={{ color: 'onSurface.high', ml: 'auto' }} onClick={() => setShowEndStreamAlert(false)}>
             <CrossIcon />
           </Box>
         )}
       </Flex>
-      <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
+      <Text variant="sm" css={{ color: 'onSurface.medium', mb: '8', mt: '4' }}>
         The {isStreamingOn ? 'stream' : 'session'} will end for everyone. You can't undo this action.
       </Text>
-      <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
+      <Flex align="center" justify="between" css={{ w: '100%', gap: '8' }}>
         <Button
           outlined
           variant="standard"

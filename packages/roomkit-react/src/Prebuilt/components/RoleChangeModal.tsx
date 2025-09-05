@@ -17,7 +17,7 @@ const HighlightTerm = ({ value }: { value: string | undefined }) => {
       <Text
         variant="body2"
         css={{
-          color: '$on_surface_medium',
+          color: 'onSurface.medium',
           fontWeight: '$semiBold',
         }}
       >
@@ -60,9 +60,9 @@ const RoleChangeContent = ({
         <Text
           variant="sm"
           css={{
-            mt: '$4',
-            mb: '$8',
-            c: '$on_surface_medium',
+            mt: '4',
+            mb: '8',
+            c: 'onSurface.medium',
             display: 'flex',
             flexWrap: 'wrap',
             columnGap: '4px',
@@ -77,7 +77,7 @@ const RoleChangeContent = ({
         align="center"
         css={{
           w: '100%',
-          mb: '$10',
+          mb: '10',
         }}
       >
         <Box
@@ -94,8 +94,8 @@ const RoleChangeContent = ({
               data-testid="open_role_selection_dropdown"
               asChild
               css={{
-                bg: '$surface_default',
-                r: '$1',
+                bg: 'surface.default',
+                r: '1',
                 p: '$6 $9',
               }}
             >
@@ -111,7 +111,7 @@ const RoleChangeContent = ({
                   data-testid={role}
                   key={role}
                   onSelect={() => setRole(role)}
-                  css={{ w: `${triggerRef.current?.clientWidth}px` }}
+                  css={{ w: `{triggerRef.current?.clientWidth}px` }}
                 >
                   {role}
                 </Dropdown.Item>
@@ -120,7 +120,7 @@ const RoleChangeContent = ({
           </Dropdown.Root>
         </Box>
       </Flex>
-      <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
+      <Flex justify="center" align="center" css={{ width: '100%', gap: 'md' }}>
         {!isMobile && (
           <Button
             variant="standard"
@@ -179,7 +179,7 @@ export const RoleChangeModal = ({
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10', overflow: 'visible' }}>
+        <Dialog.Content css={{ width: 'min(400px,80%)', p: '10', overflow: 'visible' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} />
         </Dialog.Content>
       </Dialog.Portal>

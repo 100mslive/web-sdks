@@ -20,9 +20,9 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
       <Dialog.Content css={{ width: 'min(600px, 100%)', ...css }} {...props}>
         <Dialog.Title>
           <Flex justify="between">
-            <Flex align="center" css={{ mb: '$1' }}>
+            <Flex align="center" css={{ mb: '1' }}>
               {Icon ? (
-                <Flex css={{ mr: '$2', color: '$on_primary_high', ...flexCenter, ...iconCSS }}>
+                <Flex css={{ mr: '2', color: 'onPrimary.high', ...flexCenter, ...iconCSS }}>
                   <Icon />
                 </Flex>
               ) : null}
@@ -50,10 +50,10 @@ export const ErrorDialog = ({ open = true, onOpenChange, title, children, ...pro
         onEscapeKeyDown={e => e.preventDefault()}
         onPointerDownOutside={e => e.preventDefault()}
         closeable={false}
-        iconCSS={{ color: '$alert_error_default' }}
+        iconCSS={{ color: 'alert.error.default' }}
         {...props}
       >
-        <Box css={{ mt: '$lg' }}>{children}</Box>
+        <Box css={{ mt: 'lg' }}>{children}</Box>
       </DialogContent>
     </Dialog.Root>
   );
@@ -63,8 +63,8 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
     <Dialog.Portal>
       <Dialog.Overlay />
-      <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
-        <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md' }}>
+      <Dialog.Content css={{ width: 'min(400px,80%)', p: '10' }}>
+        <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: 'md' }}>
           {Icon ? Icon : null}
           <Text variant="h6">{title}</Text>
         </Dialog.Title>
@@ -73,17 +73,17 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
             variant="md"
             css={{
               fontWeight: 400,
-              mt: '$4',
-              mb: '$10',
-              c: '$on_surface_medium',
+              mt: '4',
+              mb: '10',
+              c: 'onSurface.medium',
             }}
           >
             {body}
           </Text>
         ) : (
-          <Box css={{ mt: '$4', mb: '$10' }}>{body}</Box>
+          <Box css={{ mt: '4', mb: '10' }}>{body}</Box>
         )}
-        <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
+        <Flex justify="center" align="center" css={{ width: '100%', gap: 'md' }}>
           <Box css={{ width: '50%' }}>
             <Dialog.Close css={{ width: '100%' }}>
               <Button variant="standard" outlined css={{ width: '100%' }}>
@@ -177,7 +177,7 @@ export const DialogInput = ({ title, value, onChange, placeholder, disabled, typ
     <DialogRow breakSm>
       <Label>{title}</Label>
       <Input
-        css={{ width: '70%', '@sm': { width: '100%' }, bg: '$surface_bright' }}
+        css={{ width: '70%', '@sm': { width: '100%' }, bg: 'surface.bright' }}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
@@ -199,9 +199,9 @@ export const DialogInputFile = ({ value, onChange, placeholder, disabled, type, 
         justifyContent: 'center',
         position: 'relative',
         cursor: 'pointer',
-        py: '$12',
+        py: '12',
         border: '1px dashed $border_bright',
-        r: '$1',
+        r: '1',
         height: 'max(140px, 30%)',
         alignItems: 'center',
         m: '$6 0',

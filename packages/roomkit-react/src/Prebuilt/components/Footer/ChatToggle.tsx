@@ -32,7 +32,7 @@ export const ChatToggle = ({ onClick }: { onClick?: () => void }) => {
       {countUnreadMessages > 0 && (
         <Flex
           css={{
-            height: '$8',
+            height: '8',
             p: '$4 4.5px',
             justifyContent: 'center',
             alignItems: 'center',
@@ -43,7 +43,7 @@ export const ChatToggle = ({ onClick }: { onClick?: () => void }) => {
             background: '$primary_default',
           }}
         >
-          <Text variant="overline" css={{ color: '$on_primary_high' }}>
+          <Text variant="overline" css={{ color: 'onPrimary.high' }}>
             {countUnreadMessages > 99 ? '99+' : countUnreadMessages}
           </Text>
         </Flex>

@@ -48,7 +48,7 @@ import { useAudioOutputTest } from './hooks/useAudioOutputTest';
 import { isAndroid, isIOS, isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 const krispPlugin = new HMSKrispPlugin();
-// const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
+// const optionsCSS = { fontWeight: '$semiBold', color: 'onSurface.high', w: '100%' };
 
 export const Options = ({
   options,
@@ -65,10 +65,10 @@ export const Options = ({
         <Dropdown.Item
           key={option.label}
           css={{
-            backgroundColor: '$surface_dim',
+            backgroundColor: 'surface.dim',
             p: '$4 $8',
-            h: '$15',
-            fontSize: '$xs',
+            h: '15',
+            fontSize: 'xs',
             justifyContent: 'space-between',
             color: selectedDeviceId === option.deviceId ? '$primary_bright' : '',
           }}
@@ -88,16 +88,16 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
   return (
     <Dropdown.Label
       css={{
-        h: '$16',
+        h: '16',
         p: '$4 $8',
-        color: '$on_surface_medium',
+        color: 'onSurface.medium',
         bg: 'transparent',
-        fontSize: '$xs',
-        gap: '$4',
+        fontSize: 'xs',
+        gap: '4',
         alignItems: 'center',
       }}
     >
-      <Flex css={{ alignItems: 'center', justifyContent: 'center', '& svg': { size: '$8' } }}>{icon}</Flex> {children}
+      <Flex css={{ alignItems: 'center', justifyContent: 'center', '& svg': { size: '8' } }}>{icon}</Flex> {children}
     </Dropdown.Label>
   );
 };
@@ -191,8 +191,8 @@ export const NoiseCancellation = ({
       <Dropdown.Item
         css={{
           p: '$4 $8',
-          h: '$15',
-          fontSize: '$xs',
+          h: '15',
+          fontSize: 'xs',
           justifyContent: 'space-between',
         }}
         onClick={async (e: React.MouseEvent) => {
@@ -200,7 +200,7 @@ export const NoiseCancellation = ({
           await setNoiseCancellationWithPlugin(!isNoiseCancellationEnabled);
         }}
       >
-        <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
+        <Text css={{ display: 'flex', alignItems: 'center', gap: '2', fontSize: 'xs', '& svg': { size: '8' } }}>
           <AudioLevelIcon />
           Reduce Noise
         </Text>
@@ -226,7 +226,7 @@ const AudioOutputLabel = ({ deviceId }: { deviceId: string }) => {
       <Box css={{ flex: '1 1 0' }}>Speakers</Box>
       <Text
         variant="xs"
-        css={{ color: '$primary_bright', '&:hover': { cursor: 'pointer' } }}
+        css={{ color: 'primary.bright', '&:hover': { cursor: 'pointer' } }}
         onClick={async () => {
           if (playing) {
             return;
@@ -252,13 +252,13 @@ const AudioSettings = ({ onClick }: { onClick: () => void }) => {
     <>
       <Dropdown.Item
         css={{
-          backgroundColor: '$surface_dim',
+          backgroundColor: 'surface.dim',
           p: '$4 $8',
-          h: '$15',
+          h: '15',
           alignItems: 'center',
-          gap: '$2',
-          fontSize: '$xs',
-          '& svg': { size: '$8' },
+          gap: '2',
+          fontSize: 'xs',
+          '& svg': { size: '8' },
         }}
         onClick={onClick}
       >

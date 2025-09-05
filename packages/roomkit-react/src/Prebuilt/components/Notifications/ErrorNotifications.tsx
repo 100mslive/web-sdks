@@ -26,7 +26,7 @@ export const ErrorNotifications = () => {
           title: 'The room is currently full, try joining later',
           close: true,
           icon: (
-            <Box css={{ color: '$alert_error_default' }}>
+            <Box css={{ color: 'alert.error.default' }}>
               <GroupIcon />
             </Box>
           ),

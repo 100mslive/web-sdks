@@ -65,8 +65,8 @@ export const PlayPauseSeekOverlayControls = ({
         <Flex
           css={{
             bg: 'rgba(0, 0, 0, 0.6)',
-            r: '$round',
-            size: '$24',
+            r: 'round',
+            size: '24',
             visibility: hoverControlsVisible.seekBackward ? `` : `hidden`,
             opacity: hoverControlsVisible.seekBackward ? `1` : '0',
           }}
@@ -83,7 +83,7 @@ export const PlayPauseSeekOverlayControls = ({
         <Box
           css={{
             bg: 'rgba(0, 0, 0, 0.6)',
-            r: '$round',
+            r: 'round',
             visibility: hoverControlsVisible.pausePlay ? `` : `hidden`,
             opacity: hoverControlsVisible.pausePlay ? `1` : '0',
           }}
@@ -93,8 +93,8 @@ export const PlayPauseSeekOverlayControls = ({
         <Flex
           css={{
             bg: 'rgba(0, 0, 0, 0.6)',
-            r: '$round',
-            size: '$24',
+            r: 'round',
+            size: '24',
             visibility: hoverControlsVisible.seekForward ? `` : `hidden`,
             opacity: hoverControlsVisible.seekForward ? `1` : '0',
           }}
@@ -120,7 +120,7 @@ export const PlayPauseSeekOverlayControls = ({
         position: 'absolute',
         bg: '#00000066',
         display: 'inline-flex',
-        gap: '$2',
+        gap: '2',
         zIndex: 1,
         size: '100%',
         visibility: showControls ? `` : `hidden`,
@@ -139,7 +139,7 @@ export const PlayPauseSeekOverlayControls = ({
       <Box
         css={{
           bg: 'rgba(0, 0, 0, 0.6)',
-          r: '$round',
+          r: 'round',
         }}
       >
         <PlayPauseButton isPaused={isPaused} width={48} height={48} />

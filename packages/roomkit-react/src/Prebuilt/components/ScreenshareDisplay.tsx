@@ -15,8 +15,8 @@ export const ScreenshareDisplay = () => {
       justify="center"
       css={{
         size: '100%',
-        bg: '$background_default',
-        color: '$on_surface_high',
+        bg: 'background.default',
+        color: 'onSurface.high',
       }}
     >
       <ShareScreenIcon width={48} height={48} />

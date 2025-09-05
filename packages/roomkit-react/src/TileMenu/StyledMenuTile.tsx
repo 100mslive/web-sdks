@@ -7,14 +7,14 @@ const Root = Popover.Root;
 
 const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
-  bottom: '$2',
-  right: '$2',
+  bottom: '2',
+  right: '2',
   zIndex: 10,
-  width: '$13',
-  height: '$13',
-  color: '$on_surface_high',
-  borderRadius: '$2',
-  backgroundColor: '$surface_bright',
+  width: '13',
+  height: '13',
+  color: 'onSurface.high',
+  borderRadius: '2',
+  backgroundColor: 'surface.bright',
   cursor: 'pointer',
   border: 'none',
   ...flexCenter,
@@ -26,19 +26,19 @@ const StyledTrigger = styled(Popover.Trigger, {
 
 const StyledContent = styled(Popover.Content, {
   fontFamily: '$sans',
-  backgroundColor: '$surface_dim',
+  backgroundColor: 'surface.dim',
   padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
   borderRadius: '$space$6',
   zIndex: 11,
-  width: '$60',
+  width: '60',
   ...popoverAnimation,
 });
 
 const styledItem = {
-  fontSize: '$sm',
-  color: '$on_surface_high',
+  fontSize: 'sm',
+  color: 'onSurface.high',
   display: 'flex',
   alignItems: 'center',
   padding: '$4 $6',
@@ -48,10 +48,10 @@ const styledItem = {
 
 const StyledItemButton = styled('button', {
   ...styledItem,
-  height: '$14',
+  height: '14',
   border: 'none',
   '&:hover': {
-    backgroundColor: '$surface_brighter',
+    backgroundColor: 'surface.brighter',
   },
   cursor: 'pointer',
   // TODO: default focus applied cause issues with this style
@@ -61,7 +61,7 @@ const StyledItemButton = styled('button', {
   },
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '$4',
+    marginLeft: '4',
   },
 });
 
@@ -77,12 +77,12 @@ export const Flex = styled('div', {
   display: 'flex',
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '$4',
+    marginLeft: '4',
   },
 });
 
 const RemoveMenuItem = styled(StyledItemButton, {
-  color: '$alert_error_default',
+  color: 'alert.error.default',
   borderTop: '1px solid $border_bright',
 });
 

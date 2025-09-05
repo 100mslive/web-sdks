@@ -206,9 +206,9 @@ const HLSView = () => {
                 }}
                 variant="standard"
                 css={{
-                  backgroundColor: '$surface_bright',
+                  backgroundColor: 'surface.bright',
                   fontWeight: '$semiBold',
-                  color: '$on_surface_high',
+                  color: 'onSurface.high',
                   p: '$xs $md',
                 }}
               >
@@ -444,7 +444,7 @@ const HLSView = () => {
       <>
         <ToggleChat />
         {hlsViewRef.current && (isMobile || isLandscape) && (
-          <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
+          <Box css={{ position: 'fixed', left: '4', top: '4', zIndex: 11 }}>
             <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
           </Box>
         )}
@@ -488,7 +488,7 @@ const HLSView = () => {
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (
-        <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
+        <Box css={{ position: 'fixed', left: '4', top: '4', zIndex: 11 }}>
           <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
         </Box>
       )}
@@ -556,7 +556,7 @@ const HLSView = () => {
                         : ''
                     }`,
                     display: 'inline-flex',
-                    gap: '$2',
+                    gap: '2',
                     zIndex: 1,
                     size: '100%',
                   }}
@@ -647,7 +647,7 @@ const HLSView = () => {
                     background:
                       isMobile || isLandscape ? '' : `linear-gradient(180deg, #00000000 29.46%, #000000A3 100%);`,
                     width: '100%',
-                    pt: '$8',
+                    pt: '8',
                     flexShrink: 0,
                     transition: 'visibility 0s 0.5s, opacity 0.5s linear',
                   }}
@@ -674,7 +674,7 @@ const HLSView = () => {
                         </>
                       )}
                       <IconButton
-                        css={{ px: '$2' }}
+                        css={{ px: '2' }}
                         onClick={async e => {
                           e.stopPropagation();
                           await hlsPlayer?.seekToLivePosition();
@@ -687,10 +687,10 @@ const HLSView = () => {
                           <Flex justify="center" gap={2} align="center">
                             <Box
                               css={{
-                                height: '$4',
-                                width: '$4',
+                                height: '4',
+                                width: '4',
                                 background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
-                                r: '$1',
+                                r: '1',
                               }}
                             />
                             <Text

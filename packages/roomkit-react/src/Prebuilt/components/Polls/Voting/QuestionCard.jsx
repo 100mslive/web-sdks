@@ -100,10 +100,10 @@ export const QuestionCard = ({
   return (
     <Box
       css={{
-        backgroundColor: '$surface_bright',
-        borderRadius: '$1',
-        p: '$md',
-        mt: '$md',
+        backgroundColor: 'surface.bright',
+        borderRadius: '1',
+        p: 'md',
+        mt: 'md',
         border:
           respondedToQuiz && !isLive
             ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}`
@@ -123,7 +123,7 @@ export const QuestionCard = ({
             fontWeight: '$semiBold',
             display: 'flex',
             alignItems: 'center',
-            gap: '$4',
+            gap: '4',
           }}
         >
           {match({ respondedToQuiz, pollEnded, isCorrectAnswer })
@@ -142,10 +142,10 @@ export const QuestionCard = ({
         </Text>
       </Flex>
 
-      <Flex justify="between" css={{ my: '$md' }}>
-        <Text css={{ color: '$on_surface_high' }}>{text}</Text>
+      <Flex justify="between" css={{ my: 'md' }}>
+        <Text css={{ color: 'onSurface.high' }}>{text}</Text>
         <Box
-          css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
+          css={{ color: 'onSurface.medium', '&:hover': { color: 'onSurface.high', cursor: 'pointer' } }}
           onClick={() => setShowOptions(prev => !prev)}
         >
           <ChevronDownIcon
@@ -155,7 +155,7 @@ export const QuestionCard = ({
       </Flex>
 
       <Box
-        css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'auto', mb: '$4' }}
+        css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'auto', mb: '4' }}
       >
         {type === QUESTION_TYPE.SINGLE_CHOICE ? (
           <SingleChoiceOptions
@@ -204,9 +204,9 @@ export const QuestionCard = ({
 
 const QuestionActions = ({ isValidVote, response, isQuiz, onVote, disableVote }) => {
   return (
-    <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
+    <Flex align="center" justify="end" css={{ gap: '4', w: '100%' }}>
       {response ? (
-        <Text css={{ fontWeight: '$semiBold', color: '$on_surface_medium' }}>
+        <Text css={{ fontWeight: '$semiBold', color: 'onSurface.medium' }}>
           {response.skipped ? 'Skipped' : null}
           {isQuiz && !response.skipped ? 'Answered' : null}
           {!isQuiz && !response.skipped ? 'Voted' : null}

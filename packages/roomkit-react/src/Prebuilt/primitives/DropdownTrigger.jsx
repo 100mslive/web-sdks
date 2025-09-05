@@ -9,8 +9,8 @@ const DialogDropdownTrigger = React.forwardRef(({ title, css, open, icon, titleC
       data-testid={`${title}_selector`}
       css={{
         border: '1px solid $border_bright',
-        bg: '$surface_bright',
-        r: '$1',
+        bg: 'surface.bright',
+        r: '1',
         p: '$6 $9',
         zIndex: 10,
         ...css,
@@ -21,7 +21,7 @@ const DialogDropdownTrigger = React.forwardRef(({ title, css, open, icon, titleC
         css={{
           display: 'flex',
           justifyContent: 'space-between',
-          color: '$on_surface_high',
+          color: 'onSurface.high',
           w: '100%',
         }}
       >

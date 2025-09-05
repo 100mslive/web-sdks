@@ -8,25 +8,25 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
     <Flex
       css={{
         w: '100%',
-        p: '$10',
-        r: '$1',
+        p: '10',
+        r: '1',
         cursor: 'pointer',
-        bg: '$surface_bright',
-        mb: '$10',
-        mt: '$8',
+        bg: 'surface.bright',
+        mb: '10',
+        mt: '8',
         ...css,
       }}
       data-testid={testId}
       onClick={onClick}
     >
-      <Text css={{ alignSelf: 'center', p: '$4' }}>
+      <Text css={{ alignSelf: 'center', p: '4' }}>
         {imgSrc ? <img src={imgSrc} height={40} width={40} alt="Streaming" /> : <Icon width={40} height={40} />}
       </Text>
-      <Box css={{ flex: '1 1 0', mx: '$8' }}>
-        <Text variant="h6" css={{ mb: '$4' }}>
+      <Box css={{ flex: '1 1 0', mx: '8' }}>
+        <Text variant="h6" css={{ mb: '4' }}>
           {title}
         </Text>
-        <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+        <Text variant="sm" css={{ color: 'onSurface.medium' }}>
           {subtitle}
         </Text>
       </Box>
@@ -39,15 +39,13 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
 
 export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
   return (
-    <Flex
-      css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer', borderBottom: '1px solid $border_bright', mb: '$8' }}
-    >
+    <Flex css={{ w: '100%', py: '8', px: '10', cursor: 'pointer', borderBottom: '1px solid $border_bright', mb: '8' }}>
       {onBack ? (
         <Flex
           align="center"
           css={{
-            mr: '$8',
-            color: '$on_surface_high',
+            mr: '8',
+            color: 'onSurface.high',
           }}
           onClick={onBack}
           data-testid="go_back"
@@ -62,7 +60,7 @@ export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
             css={{
               textTransform: 'uppercase',
               fontWeight: '$semiBold',
-              color: '$on_surface_medium',
+              color: 'onSurface.medium',
             }}
           >
             {title}
@@ -87,7 +85,7 @@ export const Container = ({ children, rounded = false }) => {
         position: 'absolute',
         top: 0,
         left: 0,
-        bg: '$surface_dim',
+        bg: 'surface.dim',
         transform: 'translateX(10%)',
         animation: `${slideLeftAndFade('10%')} 100ms ease-out forwards`,
         display: 'flex',
@@ -103,13 +101,13 @@ export const Container = ({ children, rounded = false }) => {
 export const ContentBody = ({ Icon, title, removeVerticalPadding = false, children }) => {
   return (
     <Box css={{ p: removeVerticalPadding ? '$0 $10' : '$10' }}>
-      <Text css={{ display: 'flex', alignItems: 'center', mb: '$4' }}>
+      <Text css={{ display: 'flex', alignItems: 'center', mb: '4' }}>
         <Icon />
-        <Text as="span" css={{ fontWeight: '$semiBold', ml: '$4' }}>
+        <Text as="span" css={{ fontWeight: '$semiBold', ml: '4' }}>
           {title}
         </Text>
       </Text>
-      <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+      <Text variant="sm" css={{ color: 'onSurface.medium' }}>
         {children}
       </Text>
     </Box>
@@ -119,11 +117,11 @@ export const ContentBody = ({ Icon, title, removeVerticalPadding = false, childr
 export const RecordStream = ({ record, setRecord, testId }) => {
   const permissions = useHMSStore(selectPermissions);
   return permissions?.browserRecording ? (
-    <Flex align="center" css={{ bg: '$surface_bright', m: '$8 $10', p: '$8', r: '$0' }}>
-      <Text css={{ color: '$alert_error_default' }}>
+    <Flex align="center" css={{ bg: 'surface.bright', m: '$8 $10', p: '8', r: '0' }}>
+      <Text css={{ color: 'alert.error.default' }}>
         <RecordIcon />
       </Text>
-      <Text variant="sm" css={{ flex: '1 1 0', mx: '$8' }}>
+      <Text variant="sm" css={{ flex: '1 1 0', mx: '8' }}>
         Record the stream
       </Text>
       <Switch checked={record} onCheckedChange={setRecord} data-testid={testId} />
@@ -136,7 +134,7 @@ export const ErrorText = ({ error }) => {
     return null;
   }
   return (
-    <Text variant="sm" css={{ my: '$4', color: '$alert_error_default' }}>
+    <Text variant="sm" css={{ my: '4', color: 'alert.error.default' }}>
       {error}
     </Text>
   );

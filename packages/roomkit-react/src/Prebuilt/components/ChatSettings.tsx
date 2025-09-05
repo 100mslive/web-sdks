@@ -21,10 +21,10 @@ export const ChatSettings = () => {
 
   return (
     <Popover.Root>
-      <Popover.Trigger asChild css={{ px: '$4' }}>
+      <Popover.Trigger asChild css={{ px: '4' }}>
         <Flex
           align="center"
-          css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' }, cursor: 'pointer' }}
+          css={{ color: 'onSurface.medium', '&:hover': { color: 'onSurface.high' }, cursor: 'pointer' }}
         >
           <SettingsIcon />
         </Flex>
@@ -47,14 +47,14 @@ export const ChatSettings = () => {
             hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, chatState);
           }}
           css={{
-            backgroundColor: '$surface_default',
+            backgroundColor: 'surface.default',
             display: 'flex',
             alignItems: 'center',
-            gap: '$4',
-            borderRadius: '$1',
-            color: '$on_surface_high',
+            gap: '4',
+            borderRadius: '1',
+            color: 'onSurface.high',
             cursor: 'pointer',
-            '&:hover': { backgroundColor: '$surface_dim' },
+            '&:hover': { backgroundColor: 'surface.dim' },
           }}
         >
           <PauseCircleIcon />

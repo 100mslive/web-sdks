@@ -46,17 +46,17 @@ export function HLSFailureModal() {
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: '1px solid $border_default',
-              mt: '$4',
+              mt: '4',
             }}
           >
             <Text variant="h6" css={{ fontWeight: '$semiBold' }}>
               Failed to Go Live
             </Text>
           </Dialog.Title>
-          <Text variant="sm" css={{ mb: '$10', color: '$on_surface_medium' }}>
+          <Text variant="sm" css={{ mb: '10', color: 'onSurface.medium' }}>
             Something went wrong and your live broadcast failed. Please try again.
           </Text>
-          <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
+          <Flex align="center" justify="between" css={{ w: '100%', gap: '8' }}>
             <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setOpenModal(false)}>
               Dismiss
             </Button>

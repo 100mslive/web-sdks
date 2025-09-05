@@ -25,7 +25,7 @@ const Chip = ({
   return (
     <Flex
       align="center"
-      css={{ backgroundColor, p: '$4 $6', gap: '$2', borderRadius: '$4', ...css }}
+      css={{ backgroundColor, p: '$4 $6', gap: '2', borderRadius: '4', ...css }}
       onClick={() => onClick?.()}
     >
       {icon}

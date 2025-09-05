@@ -13,7 +13,7 @@ export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDi
         ref={ref}
         css={{
           flex: '1 1 0',
-          gap: '$4',
+          gap: '4',
           display: 'flex',
           placeContent: 'center',
           alignItems: 'center',

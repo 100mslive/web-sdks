@@ -84,7 +84,7 @@ const AuthToken = React.memo<{
       <Dialog.Root open={true}>
         <Dialog.Content
           css={{
-            maxWidth: '$100',
+            maxWidth: '100',
             boxSizing: 'border-box',
             p: '$10 $12',
             display: 'flex',
@@ -93,10 +93,10 @@ const AuthToken = React.memo<{
           }}
         >
           <img src={errorImage} height={80} width={80} alt="Token Error" />
-          <Text variant="h4" css={{ textAlign: 'center', mb: '$4', mt: '$10' }}>
+          <Text variant="h4" css={{ textAlign: 'center', mb: '4', mt: '10' }}>
             {error.title}
           </Text>
-          <Text css={{ c: '$on_surface_medium', textAlign: 'center' }}>{error.body}</Text>
+          <Text css={{ c: 'onSurface.medium', textAlign: 'center' }}>{error.body}</Text>
         </Dialog.Content>
       </Dialog.Root>
     );

@@ -20,15 +20,15 @@ const Root = ({
     direction="column"
     align="center"
     css={{
-      p: '$5',
-      borderRadius: '$1',
-      bg: '$surface_bright',
+      p: '5',
+      borderRadius: '1',
+      bg: 'surface.bright',
       border: `4px solid ${isActive ? '$primary_default' : '$surface_dim'}`,
       cursor: 'pointer',
       '@media (hover:hover)': {
         '&:hover': { border: '4px solid $primary_dim' },
       },
-      ...(mediaURL ? { height: '$20', backgroundImage: `url("${mediaURL}")`, backgroundSize: 'cover' } : {}),
+      ...(mediaURL ? { height: '20', backgroundImage: `url("${mediaURL}")`, backgroundSize: 'cover' } : {}),
     }}
     onClick={async () => {
       await onClick?.();
@@ -40,14 +40,14 @@ const Root = ({
 
 const Title = ({ children }: { children?: string }) => {
   return children ? (
-    <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+    <Text variant="xs" css={{ color: 'onSurface.medium' }}>
       {children}
     </Text>
   ) : null;
 };
 
 const Icon = ({ children }: { children?: React.JSX.Element }) => {
-  return children ? <Box css={{ color: '$on_surface_high' }}>{children}</Box> : null;
+  return children ? <Box css={{ color: 'onSurface.high' }}>{children}</Box> : null;
 };
 
 export const VBOption = {

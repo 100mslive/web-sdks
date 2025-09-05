@@ -12,10 +12,10 @@ export const SpeakerTag = () => {
       <Flex
         align="center"
         justify="center"
-        css={{ flex: '1 1 0', color: '$on_surface_high', '@md': { display: 'none' } }}
+        css={{ flex: '1 1 0', color: 'onSurface.high', '@md': { display: 'none' } }}
       >
         <VolumeOneIcon />
-        <Text variant="sm" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
+        <Text variant="sm" css={{ ...textEllipsis(200), ml: '2' }} title={dominantSpeaker.name}>
           {dominantSpeaker.name}
         </Text>
       </Flex>
@@ -24,11 +24,11 @@ export const SpeakerTag = () => {
 };
 
 const LogoImg = styled('img', {
-  maxHeight: '$14',
+  maxHeight: '14',
   w: 'auto',
   objectFit: 'contain',
   '@md': {
-    maxHeight: '$12',
+    maxHeight: '12',
   },
 });
 

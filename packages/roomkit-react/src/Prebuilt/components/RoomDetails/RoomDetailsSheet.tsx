@@ -16,27 +16,27 @@ export const RoomDetailsSheet = () => {
   const showRoomDetailsSheet = useIsSheetTypeOpen(SHEET_OPTIONS.ROOM_DETAILS);
   return (
     <Sheet.Root open={showRoomDetailsSheet} onOpenChange={toggleSheet}>
-      <Sheet.Content style={{ py: '$8', pb: '$12' }}>
+      <Sheet.Content style={{ py: '8', pb: '12' }}>
         <Flex
           justify="between"
           align="center"
-          css={{ w: '100%', borderBottom: '1px solid $border_bright', pb: '$4', mb: '$4', px: '$8' }}
+          css={{ w: '100%', borderBottom: '1px solid $border_bright', pb: '4', mb: '4', px: '8' }}
         >
-          <Text css={{ fontWeight: '$semiBold', color: '$on_surface_high' }}>Description</Text>
-          <Sheet.Close css={{ color: '$on_surface_high' }}>
+          <Text css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>Description</Text>
+          <Sheet.Close css={{ color: 'onSurface.high' }}>
             <CrossIcon />
           </Sheet.Close>
         </Flex>
-        <Flex align="center" css={{ w: '100%', gap: '$4', pb: '$8', px: '$8' }}>
+        <Flex align="center" css={{ w: '100%', gap: '4', pb: '8', px: '8' }}>
           <Logo />
           <Box>
-            <Text variant="sm" css={{ c: '$on_secondary_high', fontWeight: '$semiBold' }}>
+            <Text variant="sm" css={{ c: 'onSecondary.high', fontWeight: '$semiBold' }}>
               {title}
             </Text>
             <RoomDetailsRow details={details} />
           </Box>
         </Flex>
-        <Text variant="sm" css={{ color: '$on_surface_medium', px: '$8' }}>
+        <Text variant="sm" css={{ color: 'onSurface.medium', px: '8' }}>
           {description}
         </Text>
       </Sheet.Content>

@@ -26,7 +26,7 @@ const WhiteboardEmbed = () => {
   return (
     <Box
       css={{
-        mx: '$8',
+        mx: '8',
         flex: '3 1 0',
         '@lg': {
           flex: '2 1 0',

@@ -140,13 +140,13 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   useSidepaneResetOnLayoutUpdate('virtual_background', SIDE_PANE_OPTIONS.VB);
 
   return (
-    <Flex css={{ pr: '$6', size: '100%' }} direction="column">
-      <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
-        <Text variant="h6" css={{ color: '$on_surface_high', display: 'flex', alignItems: 'center' }}>
+    <Flex css={{ pr: '6', size: '100%' }} direction="column">
+      <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '4' }}>
+        <Text variant="h6" css={{ color: 'onSurface.high', display: 'flex', alignItems: 'center' }}>
           Virtual Background {isMobile && loadingEffects ? <Loading size={18} style={{ marginLeft: '0.5rem' }} /> : ''}
         </Text>
         <Box
-          css={{ color: '$on_surface_high', '&:hover': { color: '$on_surface_medium' }, cursor: 'pointer' }}
+          css={{ color: 'onSurface.high', '&:hover': { color: 'onSurface.medium' }, cursor: 'pointer' }}
           onClick={toggleVB}
         >
           <CrossIcon />
@@ -163,11 +163,11 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       ) : null}
       <Box
         css={{
-          mt: '$4',
+          mt: '4',
           overflowY: 'auto',
           flex: '1 1 0',
           mr: '-$10',
-          pr: '$10',
+          pr: '10',
         }}
       >
         <VBCollection
@@ -201,14 +201,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         />
 
         {/* Slider */}
-        <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+        <Flex direction="column" css={{ w: '100%', gap: '8', mt: '8' }}>
           {background === HMSVirtualBackgroundTypes.BLUR && isBlurSupported ? (
             <Box>
-              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+              <Text variant="sm" css={{ color: 'onSurface.high', fontWeight: '$semiBold', mb: '4' }}>
                 Blur intensity
               </Text>
-              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
-                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: 'onSurface.medium' }}>
                   Low
                 </Text>
                 <Slider
@@ -222,7 +222,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                   min={0.1}
                   max={1}
                 />
-                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: 'onSurface.medium' }}>
                   High
                 </Text>
               </Flex>

@@ -39,8 +39,8 @@ export const VideoTime = () => {
     <Text
       variant="body1"
       css={{
-        minWidth: '$16',
-        c: '$on_surface_medium',
+        minWidth: '16',
+        c: 'onSurface.medium',
         display: 'flex',
         justifyContent: 'center',
         fontWeight: '$regular',

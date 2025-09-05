@@ -77,9 +77,7 @@ export const EmojiReaction = ({ showCard = false }) => {
     <Dropdown.Root open={open} onOpenChange={setOpen}>
       <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
         <IconButton
-          css={
-            isMobile || isLandscape ? { bg: '$surface_default', r: '$round', border: '1px solid $border_bright' } : {}
-          }
+          css={isMobile || isLandscape ? { bg: 'surface.default', r: 'round', border: '1px solid $border_bright' } : {}}
         >
           <Tooltip title="Emoji reaction">
             <Box>
@@ -91,7 +89,7 @@ export const EmojiReaction = ({ showCard = false }) => {
       <Dropdown.Content
         sideOffset={5}
         align={isMobileHLSStream || isLandscapeStream ? 'end' : 'center'}
-        css={{ p: '$8', bg: '$surface_default' }}
+        css={{ p: '8', bg: 'surface.default' }}
       >
         <EmojiCard sendReaction={sendReaction} />
       </Dropdown.Content>

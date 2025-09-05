@@ -55,7 +55,7 @@ const TileConnection = ({
               )}
               <Text
                 css={{
-                  c: '$on_surface_high',
+                  c: 'onSurface.high',
                   verticalAlign: 'baseline',
                   ...(width ? textEllipsis((width as number) - 60) : {}),
                 }}
@@ -72,17 +72,17 @@ const TileConnection = ({
   );
 };
 
-const IconWrapper = styled('div', { c: '$on_surface_high', ml: '$3', mt: '$1', display: 'flex' });
+const IconWrapper = styled('div', { c: 'onSurface.high', ml: '3', mt: '1', display: 'flex' });
 
 const Wrapper = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   position: 'absolute',
-  bottom: '$2',
-  left: '$2',
-  backgroundColor: '$background_dim',
-  borderRadius: '$1',
+  bottom: '2',
+  left: '2',
+  backgroundColor: 'background.dim',
+  borderRadius: '1',
   maxWidth: '85%',
   zIndex: 1,
   '& p,span': {

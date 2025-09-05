@@ -42,29 +42,29 @@ export const ChangeNameContent = ({
       <Text
         variant={isMobile ? 'md' : 'lg'}
         css={{
-          color: '$on_surface_high',
+          color: 'onSurface.high',
           fontWeight: '$semiBold',
           display: 'flex',
-          pb: '$4',
-          '@md': { px: '$8', borderBottom: '1px solid $border_default' },
+          pb: '4',
+          '@md': { px: '8', borderBottom: '1px solid $border_default' },
         }}
       >
         {isMobile ? <ChevronLeftIcon onClick={onBackClick} style={{ marginRight: '0.5rem' }} /> : null}
         Change Name
         <Box
-          css={{ color: 'inherit', ml: 'auto', '&:hover': { color: '$on_surface_medium', cursor: 'pointer' } }}
+          css={{ color: 'inherit', ml: 'auto', '&:hover': { color: 'onSurface.medium', cursor: 'pointer' } }}
           onClick={onExit}
         >
           <CrossIcon />
         </Box>
       </Text>
-      <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
+      <Text variant="sm" css={{ color: 'onSurface.medium', pb: '6', mb: '8', '@md': { px: '8', mt: '4' } }}>
         Your name will be visible to other participants in the session.
       </Text>
-      <Flex justify="center" align="center" css={{ my: '$8', w: '100%', '@md': { px: '$8' } }}>
+      <Flex justify="center" align="center" css={{ my: '8', w: '100%', '@md': { px: '8' } }}>
         <Input
           ref={inputRef}
-          css={{ width: '100%', bg: '$surface_default' }}
+          css={{ width: '100%', bg: 'surface.default' }}
           value={currentName}
           type="text"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,9 +90,9 @@ export const ChangeNameContent = ({
         align="center"
         css={{
           width: '100%',
-          gap: '$md',
-          mt: '$10',
-          '@md': { px: '$4' },
+          gap: 'md',
+          mt: '10',
+          '@md': { px: '4' },
         }}
       >
         {isMobile ? null : (

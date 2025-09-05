@@ -13,7 +13,7 @@ export default {
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof RadioGroup.Root> = args => (
   <RadioGroup.Root {...args} css={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-    <Flex align="center" css={{ my: '$4' }} gap="2">
+    <Flex align="center" css={{ my: '4' }} gap="2">
       <RadioGroup.Item value="grid" id="gridView">
         <RadioGroup.Indicator />
       </RadioGroup.Item>

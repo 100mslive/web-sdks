@@ -57,7 +57,7 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
         <Dialog.Content
           css={{
             w: 'min(380px, 90%)',
-            p: '$8',
+            p: '8',
             // overlay over Sheet.tsx
             zIndex: 23,
           }}
@@ -83,7 +83,7 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
             <Text variant="h6">We can't access your {deviceType}</Text>
           </Dialog.Title>
 
-          <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
+          <Text variant="sm" css={{ pt: '4', pb: '10', color: 'onSurface.medium' }}>
             {/* IOS prompt text */}
             {isMobile && isIOS
               ? 'Enable permissions by reloading this page and clicking "Allow" on the pop-up, or change settings from the address bar.'
@@ -110,7 +110,7 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
           {/* CTA section */}
           {isMobile && isIOS ? (
             <>
-              <Button onClick={() => window.location.reload()} css={{ w: '100%', mb: '$6' }}>
+              <Button onClick={() => window.location.reload()} css={{ w: '100%', mb: '6' }}>
                 Reload
               </Button>
               <Button outlined variant="standard" onClick={() => setDeviceType('')} css={{ w: '100%' }}>
@@ -121,7 +121,7 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
 
           {isMobile && isAndroid ? (
             <>
-              <Button onClick={() => setDeviceType('')} css={{ w: '100%', mb: '$6' }}>
+              <Button onClick={() => setDeviceType('')} css={{ w: '100%', mb: '6' }}>
                 I've allowed access
               </Button>
               <Button outlined variant="standard" onClick={() => setDeviceType('')} css={{ w: '100%' }}>

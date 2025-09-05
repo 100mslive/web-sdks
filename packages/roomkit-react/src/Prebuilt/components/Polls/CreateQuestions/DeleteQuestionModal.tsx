@@ -18,11 +18,11 @@ export const DeleteQuestionModal = ({
     <Dialog.Root open={open}>
       <Dialog.Overlay />
       <Dialog.Portal>
-        <Dialog.Content css={{ p: '$10' }}>
+        <Dialog.Content css={{ p: '10' }}>
           <Box>
             <Flex
               css={{
-                color: '$alert_error_default',
+                color: 'alert.error.default',
                 display: 'flex',
                 alignItems: 'center',
               }}
@@ -35,28 +35,28 @@ export const DeleteQuestionModal = ({
               <Box
                 css={{
                   ml: 'auto',
-                  color: '$on_surface_medium',
-                  '&:hover': { color: '$on_surface_high', cursor: 'pointer' },
+                  color: 'onSurface.medium',
+                  '&:hover': { color: 'onSurface.high', cursor: 'pointer' },
                 }}
                 onClick={() => setOpen(false)}
               >
                 <CrossIcon />
               </Box>
             </Flex>
-            <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
+            <Text variant="sm" css={{ color: 'onSurface.medium', mb: '8', mt: '4' }}>
               The question will be deleted. You can't undo this action.
             </Text>
-            <Flex css={{ w: '100%', mt: '$12', gap: '$md' }}>
+            <Flex css={{ w: '100%', mt: '12', gap: 'md' }}>
               <Button
                 variant="standard"
                 outlined
                 onClick={() => setOpen(false)}
-                css={{ w: '100%', fontSize: '$md', fontWeight: '$semiBold' }}
+                css={{ w: '100%', fontSize: 'md', fontWeight: '$semiBold' }}
               >
                 Cancel
               </Button>
               <Button
-                css={{ w: '100%', fontSize: '$md', fontWeight: '$semiBold' }}
+                css={{ w: '100%', fontSize: 'md', fontWeight: '$semiBold' }}
                 variant="danger"
                 onClick={() => {
                   removeQuestion();

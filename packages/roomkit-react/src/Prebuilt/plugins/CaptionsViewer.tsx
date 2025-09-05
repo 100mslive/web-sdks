@@ -241,10 +241,10 @@ export const CaptionsViewer = ({
           background: '#000000A3',
           overflow: 'clip',
           zIndex: 10,
-          color: '$on_primary_high',
+          color: 'onPrimary.high',
           height: 'fit-content',
-          r: '$1',
-          p: '$6',
+          r: '1',
+          p: '6',
           transition: 'bottom 0.3s ease-in-out',
           '&:empty': { display: 'none' },
         }}

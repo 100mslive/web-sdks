@@ -56,17 +56,17 @@ export const Chat = () => {
       justify="end"
       css={{
         size: '100%',
-        gap: '$4',
+        gap: '4',
       }}
     >
       {isMobile && elements?.chat?.is_overlay && !streaming ? null : <PinnedMessage />}
       <ChatBody ref={listRef} scrollToBottom={scrollToBottom} />
-      <Flex align="center" css={{ w: '100%', gap: '$2' }}>
+      <Flex align="center" css={{ w: '100%', gap: '2' }}>
         <ChatPaused />
         <ChatBlocked />
         {streaming && (!isChatEnabled || isLocalPeerBlacklisted) && (
           <>
-            <RaiseHand css={{ bg: '$surface_default' }} />
+            <RaiseHand css={{ bg: 'surface.default' }} />
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         )}
@@ -87,21 +87,21 @@ export const Chat = () => {
                   isLandscapeStream: true,
                   isChatEnabled: true,
                 },
-                () => ({ bottom: '$19', right: '$10' }),
+                () => ({ bottom: '19', right: '10' }),
               )
               .with(
                 {
                   isLandscapeStream: true,
                   isChatEnabled: false,
                 },
-                () => ({ bottom: '$20', right: '$10' }),
+                () => ({ bottom: '20', right: '10' }),
               )
               .with(
                 {
                   isMobileHLSStream: true,
                   isChatEnabled: false,
                 },
-                () => ({ bottom: '$19', right: '$8' }),
+                () => ({ bottom: '19', right: '8' }),
               )
               .with(
                 {
@@ -109,7 +109,7 @@ export const Chat = () => {
                   isChatEnabled: true,
                   isLocalPeerBlacklisted: false,
                 },
-                () => ({ bottom: '$17', right: '$8' }),
+                () => ({ bottom: '17', right: '8' }),
               )
               .with(
                 {
@@ -117,14 +117,14 @@ export const Chat = () => {
                   isChatEnabled: true,
                   isLocalPeerBlacklisted: true,
                 },
-                () => ({ bottom: '$18', right: '$8' }),
+                () => ({ bottom: '18', right: '8' }),
               )
               .with(
                 {
                   isMobileHLSStream: true,
                   isLocalPeerBlacklisted: true,
                 },
-                () => ({ bottom: '$20', right: '$8' }),
+                () => ({ bottom: '20', right: '8' }),
               )
               .otherwise(() => ({})),
           }}
@@ -162,7 +162,7 @@ const NewMessageIndicator = ({
       css={{
         width: '100%',
         left: 0,
-        bottom: '$28',
+        bottom: '28',
         position: 'absolute',
       }}
     >
@@ -174,12 +174,12 @@ const NewMessageIndicator = ({
         icon
         css={{
           p: '$3 $4',
-          pl: '$6',
-          '& > svg': { ml: '$4' },
-          borderRadius: '$round',
-          fontSize: '$xs',
+          pl: '6',
+          '& > svg': { ml: '4' },
+          borderRadius: 'round',
+          fontSize: 'xs',
           fontWeight: '$semiBold',
-          c: '$on_secondary_high',
+          c: 'onSecondary.high',
         }}
       >
         New {unreadCount === 1 ? 'message' : 'messages'}

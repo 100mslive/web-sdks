@@ -47,19 +47,19 @@ export function ShareScreenOptions() {
         <Dropdown.Content
           sideOffset={5}
           css={{
-            w: '$96',
-            maxHeight: '$96',
+            w: '96',
+            maxHeight: '96',
             p: 0,
-            bg: '$surface_dim',
+            bg: 'surface.dim',
           }}
         >
           <Dropdown.Item
             css={{
               flexDirection: 'column',
               alignItems: 'flex-start',
-              px: '$10',
-              pt: '$10',
-              pb: '$6',
+              px: '10',
+              pt: '10',
+              pb: '6',
               '&:hover': {
                 bg: 'transparent',
                 cursor: 'default',
@@ -73,10 +73,10 @@ export function ShareScreenOptions() {
             css={{
               flexDirection: 'row',
               alignItems: 'flex-start',
-              gap: '$8',
-              px: '$10',
-              pt: '$6',
-              pb: '$10',
+              gap: '8',
+              px: '10',
+              pt: '6',
+              pb: '10',
               '&:hover': {
                 bg: 'transparent',
                 cursor: 'default',
@@ -87,19 +87,19 @@ export function ShareScreenOptions() {
               direction="column"
               align="center"
               css={{
-                gap: '$6',
+                gap: '6',
               }}
             >
               <IconButton
                 as="div"
                 onClick={toggleScreenShare}
                 css={{
-                  p: '$6',
+                  p: '6',
                   display: 'flex',
                   justifyContent: 'center',
                   border: '1px solid $border_bright',
-                  r: '$2',
-                  bg: '$surface_brighter',
+                  r: '2',
+                  bg: 'surface.brighter',
                   pb: '0',
                 }}
               >
@@ -119,7 +119,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$on_surface_low',
+                    c: 'onSurface.low',
                     textAlign: 'center',
                   }}
                 >
@@ -131,7 +131,7 @@ export function ShareScreenOptions() {
               direction="column"
               align="center"
               css={{
-                gap: '$6',
+                gap: '6',
               }}
             >
               <IconButton
@@ -140,12 +140,12 @@ export function ShareScreenOptions() {
                 }}
                 disabled={amIScreenSharing}
                 css={{
-                  p: '$6',
+                  p: '6',
                   display: 'flex',
                   justifyContent: 'center',
                   border: '$border_bright 1px solid',
-                  r: '$2',
-                  bg: '$surface_bright',
+                  r: '2',
+                  bg: 'surface.bright',
                   pb: '0',
                 }}
               >
@@ -167,10 +167,10 @@ export function ShareScreenOptions() {
                     top: '35%',
                     left: '54%',
                     padding: '$2 $4',
-                    r: '$2',
-                    bg: '$primary_bright',
+                    r: '2',
+                    bg: 'primary.bright',
                     zIndex: '2',
-                    gap: '$2',
+                    gap: '2',
                   }}
                 >
                   <StarIcon height={14} width={14} />
@@ -179,8 +179,8 @@ export function ShareScreenOptions() {
                     variant="xs"
                     css={{
                       fontWeight: '$semiBold',
-                      c: '$on_primary_high',
-                      pr: '$4',
+                      c: 'onPrimary.high',
+                      pr: '4',
                     }}
                   >
                     New
@@ -192,7 +192,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$on_surface_low',
+                    c: 'onSurface.low',
                     textAlign: 'center',
                   }}
                 >

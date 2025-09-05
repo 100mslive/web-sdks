@@ -19,7 +19,7 @@ export default {
 } as Meta;
 
 const Template = args => (
-  <Box css={{ ml: '$20', bg: '$background_dim', p: '$8' }}>
+  <Box css={{ ml: '20', bg: 'background.dim', p: '8' }}>
     <IconButtonWithOptions {...args} />
   </Box>
 );

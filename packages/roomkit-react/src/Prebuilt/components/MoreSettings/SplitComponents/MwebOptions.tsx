@@ -143,25 +143,25 @@ export const MwebOptions = ({
             </IconButton>
           </Sheet.Trigger>
         </Tooltip>
-        <Sheet.Content style={{ bg: '$surface_dim', pb: '$14' }}>
+        <Sheet.Content style={{ bg: 'surface.dim', pb: '14' }}>
           <Sheet.Title
             css={{
               display: 'flex',
-              color: '$on_surface_high',
+              color: 'onSurface.high',
               w: '100%',
               justifyContent: 'space-between',
-              fontSize: '$md',
-              mt: '$8',
-              px: '$10',
-              pb: '$8',
+              fontSize: 'md',
+              mt: '8',
+              px: '10',
+              pb: '8',
               borderBottom: '1px solid $border_default',
-              mb: '$8',
+              mb: '8',
               alignItems: 'center',
             }}
           >
             Options
             <Sheet.Close>
-              <Box css={{ color: '$on_surface_high' }}>
+              <Box css={{ color: 'onSurface.high' }}>
                 <CrossIcon />
               </Box>
             </Sheet.Close>
@@ -171,9 +171,9 @@ export const MwebOptions = ({
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr',
               gridTemplateRows: 'auto',
-              gridColumnGap: '$6',
-              gridRowGap: '$8',
-              px: '$9',
+              gridColumnGap: '6',
+              gridRowGap: '8',
+              px: '9',
             }}
           >
             {elements?.participant_list && (
@@ -353,13 +353,13 @@ export const MwebOptions = ({
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: '$18',
-            bg: '$surface_default',
+            bottom: '18',
+            bg: 'surface.default',
             zIndex: '10',
-            p: '$8',
+            p: '8',
             pb: 0,
-            r: '$1',
-            mx: '$4',
+            r: '1',
+            mx: '4',
           }}
         >
           <EmojiReaction showCard />

@@ -11,7 +11,7 @@ const Container = styled('div', {
   height: '100%',
   position: 'relative',
   overflow: 'hidden',
-  borderRadius: '$2',
+  borderRadius: '2',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -37,11 +37,11 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$on_primary_high',
+  color: 'onPrimary.high',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
-  fontSize: '$sm',
+  fontSize: 'sm',
   transform: 'translateX(-50%)',
   textAlign: 'center',
   width: '80%',
@@ -53,32 +53,32 @@ const Info = styled('div', {
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  top: '$4',
-  color: '$on_secondary_high',
-  bg: '$secondary_dim',
-  borderRadius: '$round',
-  width: '$14',
-  height: '$14',
+  top: '4',
+  color: 'onSecondary.high',
+  bg: 'secondary.dim',
+  borderRadius: 'round',
+  width: '14',
+  height: '14',
   mb: '5px',
   ...flexCenter,
   variants: {
     size: {
       small: {
-        width: '$10',
-        height: '$10',
+        width: '10',
+        height: '10',
         '& > svg': {
-          width: '$8',
-          height: '$8',
+          width: '8',
+          height: '8',
         },
       },
       medium: {
-        width: '$13',
-        height: '$13',
+        width: '13',
+        height: '13',
       },
     },
     position: {
-      left: { left: '$4' },
-      right: { right: '$4' },
+      left: { left: '4' },
+      right: { right: '4' },
     },
   },
   defaultVariants: {
@@ -90,17 +90,17 @@ const AttributeBox = styled('div', {
 const AudioIndicator = styled(AttributeBox, { defaultVariants: { position: 'right' } });
 
 const FullScreenButton = styled('button', {
-  height: '$14',
+  height: '14',
   p: '$2 $4',
-  color: '$on_surface_high',
-  borderRadius: '$1',
+  color: 'onSurface.high',
+  borderRadius: '1',
   border: 'none',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   position: 'absolute',
-  top: '$2',
-  right: '$2',
+  top: '2',
+  right: '2',
   zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
@@ -118,7 +118,7 @@ const AvatarContainer = styled(Box, {
   width: '40%',
   height: '40%',
   '& > div': {
-    maxHeight: '$20',
+    maxHeight: '20',
     height: '100%',
   },
 });

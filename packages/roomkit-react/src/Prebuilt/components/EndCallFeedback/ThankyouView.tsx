@@ -18,12 +18,12 @@ export const ThankyouView = () => {
       direction={isMobile ? 'column' : 'row'}
       align="center"
       css={{
-        gap: '$10',
+        gap: '10',
         border: '1px solid $border_default',
         borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
-        bg: '$surface_dim',
+        bg: 'surface.dim',
         w: !isMobile ? '528px' : '410px',
-        p: '$12',
+        p: '12',
         pb: isMobile ? '$16' : '$12',
         '@md': {
           position: 'absolute',
@@ -52,7 +52,7 @@ export const ThankyouView = () => {
           variant="body1"
           css={{
             fontWeight: '$regular',
-            fontSize: '$md',
+            fontSize: 'md',
             opacity: '0.9',
           }}
         >

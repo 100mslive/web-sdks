@@ -35,7 +35,7 @@ export const ResolutionInput = ({ onResolutionChange, disabled, tooltipText, css
   return (
     <DialogRow breakSm css={css}>
       <Flex gap={1}>
-        <Label css={{ mb: '$8' }}>Resolution</Label>
+        <Label css={{ mb: '8' }}>Resolution</Label>
         {tooltipText && (
           <Tooltip title={tooltipText}>
             <div>
@@ -55,7 +55,7 @@ export const ResolutionInput = ({ onResolutionChange, disabled, tooltipText, css
             <Text variant="xs">Width</Text>
             <Input
               data-testid={`${testId}_width`}
-              css={{ width: '100%', mt: '$4' }}
+              css={{ width: '100%', mt: '4' }}
               name="resWidth"
               value={resolution.width}
               onChange={resolutionChangeHandler}
@@ -70,7 +70,7 @@ export const ResolutionInput = ({ onResolutionChange, disabled, tooltipText, css
             <Text variant="xs">Height</Text>
             <Input
               data-testid={`${testId}_height`}
-              css={{ width: '100%', mt: '$4' }}
+              css={{ width: '100%', mt: '4' }}
               name="resHeight"
               value={resolution.height}
               onChange={resolutionChangeHandler}

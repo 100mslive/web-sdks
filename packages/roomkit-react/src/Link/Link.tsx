@@ -8,19 +8,19 @@ const LinkComponent = styled('a', {
   textDecoration: 'none',
   display: 'flex',
   alignItems: 'center',
-  gap: '$5',
+  gap: '5',
   variants: {
     color: {
       highEmp: {
-        color: '$on_surface_high',
+        color: 'onSurface.high',
         '&:hover': {
-          color: '$on_surface_medium',
+          color: 'onSurface.medium',
         },
       },
       primary: {
-        color: '$primary_default',
+        color: 'primary.default',
         '&:hover': {
-          color: '$primary_bright',
+          color: 'primary.bright',
         },
       },
     },

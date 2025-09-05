@@ -26,7 +26,7 @@ const labelStyles = {
   position: 'unset',
   width: '100%',
   textAlign: 'center',
-  c: '$on_surface_high',
+  c: 'onSurface.high',
   transform: 'none',
   flexShrink: 0,
 };
@@ -78,7 +78,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
       <StyledVideoTile.Container
         transparentBg
         ref={fullscreenRef}
-        css={{ flexDirection: 'column', gap: '$2' }}
+        css={{ flexDirection: 'column', gap: '2' }}
         onMouseEnter={() => setIsMouseHovered(true)}
         onMouseLeave={() => {
           setIsMouseHovered(false);
@@ -99,9 +99,9 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
           <Box
             css={{
               position: 'absolute',
-              top: '$2',
-              r: '$1',
-              h: '$14',
+              top: '2',
+              r: '1',
+              h: '14',
               right: isFullScreenSupported ? '$17' : '$2',
               zIndex: 5,
               bg: `${theme.colors.background_dim.value}A3`,

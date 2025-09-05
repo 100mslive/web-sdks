@@ -29,7 +29,7 @@ const Template: ComponentStory<typeof Switch> = ({ checked: initialChecked, ...a
     onCheckedChange(!!initialChecked);
   }, [initialChecked]);
   return (
-    <Flex align="center" justify="center" css={{ w: '$20', h: '$20' }}>
+    <Flex align="center" justify="center" css={{ w: '20', h: '20' }}>
       <Switch checked={checked} {...args} onCheckedChange={onCheckedChange} />
     </Flex>
   );

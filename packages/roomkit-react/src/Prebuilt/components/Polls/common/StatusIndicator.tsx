@@ -17,14 +17,14 @@ export const StatusIndicator = ({ status }: { status?: HMSPollState }) => {
         css={{
           backgroundColor: statusMap[status] === PollStage.LIVE ? '$alert_error_default' : '$secondary_default',
           p: '$2 $4',
-          borderRadius: '$0',
+          borderRadius: '0',
         }}
       >
         <Text
           variant="caption"
           css={{
             fontWeight: '$semiBold',
-            color: '$on_primary_high',
+            color: 'onPrimary.high',
           }}
         >
           {statusMap[status]}

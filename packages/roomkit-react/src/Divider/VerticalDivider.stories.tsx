@@ -19,14 +19,14 @@ export default {
 
 const VerticalDividerComponent: ComponentStory<typeof VerticalDivider> = ({ space, css }) => {
   return (
-    <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
+    <Flex align="center" css={{ position: 'absolute', left: '10' }}>
       <Button icon variant="primary">
         <AddIcon />
         <Text as="span" variant="button" css={{ c: 'white' }}>
           Add Stuff
         </Text>
       </Button>
-      <VerticalDivider space={space} css={{ bg: '$on_primary_high', ...css }} />
+      <VerticalDivider space={space} css={{ bg: 'onPrimary.high', ...css }} />
       <Button icon variant="danger">
         <AddIcon />
         <Text as="span" variant="button" css={{ c: 'white' }}>

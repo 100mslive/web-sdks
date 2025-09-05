@@ -46,7 +46,7 @@ function CheckboxWithLabelComponent({ label, checked = true, css, onCheckedChang
           <CheckIcon width={16} height={16} />
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <Label htmlFor={label} css={{ ml: '$4', fontSize: '$sm', cursor: 'pointer' }}>
+      <Label htmlFor={label} css={{ ml: '4', fontSize: 'sm', cursor: 'pointer' }}>
         {label}
       </Label>
     </Flex>

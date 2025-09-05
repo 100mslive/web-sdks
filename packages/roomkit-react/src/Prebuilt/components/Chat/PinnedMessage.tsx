@@ -59,7 +59,7 @@ export const PinnedMessage = () => {
   }
 
   return (
-    <Flex align="center" css={{ w: '100%', gap: '$4' }}>
+    <Flex align="center" css={{ w: '100%', gap: '4' }}>
       {!isMobile ? (
         <ArrowNavigation
           index={pinnedMessageIndex}
@@ -70,13 +70,13 @@ export const PinnedMessage = () => {
       ) : null}
       <Flex
         css={{
-          p: '$4',
-          color: '$on_surface_high',
+          p: '4',
+          color: 'onSurface.high',
           bg: isMobile && elements?.chat?.is_overlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_brighter',
-          r: '$1',
-          gap: '$4',
-          mb: '$8',
-          mt: '$8',
+          r: '1',
+          gap: '4',
+          mb: '8',
+          mt: '8',
           flexGrow: 1,
           border: '1px solid $border_bright',
         }}
@@ -88,18 +88,18 @@ export const PinnedMessage = () => {
         <Box
           css={{
             w: '100%',
-            maxHeight: '$18',
+            maxHeight: '18',
             overflowY: 'auto',
             overflowX: 'hidden',
             wordBreak: 'break-word',
             '& p span': {
-              color: '$primary_default',
+              color: 'primary.default',
             },
           }}
         >
           <Text
             variant="sm"
-            css={{ color: '$on_surface_high' }}
+            css={{ color: 'onSurface.high' }}
             {...swipeHandlers}
             title={pinnedMessages[pinnedMessageIndex]?.text}
           >
@@ -123,8 +123,8 @@ export const PinnedMessage = () => {
             }}
             css={{
               cursor: 'pointer',
-              color: '$on_surface_medium',
-              '&:hover': { color: '$on_surface_high' },
+              color: 'onSurface.medium',
+              '&:hover': { color: 'onSurface.high' },
               '&:hover .hide-on-hover': { display: 'none !important' },
               '&:hover .show-on-hover': { display: 'block !important' },
             }}

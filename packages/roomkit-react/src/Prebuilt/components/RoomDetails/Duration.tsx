@@ -17,7 +17,7 @@ export const Duration = ({ timestamp }: { timestamp: Date }) => {
   }, [timestamp]);
 
   return (
-    <Flex css={{ color: '$on_surface_medium' }}>
+    <Flex css={{ color: 'onSurface.medium' }}>
       <Text variant="xs" css={{ color: 'inherit' }}>
         Started {elapsedTime} ago
       </Text>

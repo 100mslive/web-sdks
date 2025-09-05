@@ -57,7 +57,7 @@ export const FeedbackModal = ({
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
-          css={{ bg: '$surface_dim', width: '528px', p: '$12' }}
+          css={{ bg: 'surface.dim', width: '528px', p: '12' }}
           onPointerDownOutside={avoidDefaultDomBehavior}
           onInteractOutside={avoidDefaultDomBehavior}
         >
@@ -119,9 +119,9 @@ export const FeedbackContent = ({
     <Flex
       css={{
         p: indexSelected === FEEBACK_INDEX.INIT ? '$12 !important' : '0',
-        bg: '$surface_dim',
-        r: '$3',
-        gap: '$10',
+        bg: 'surface.dim',
+        r: '3',
+        gap: '10',
       }}
       direction="column"
     >
@@ -176,7 +176,7 @@ export const FeedbackHeader = ({
           <Text
             variant={isMobile ? 'h6' : 'h5'}
             css={{
-              c: '$on_surface_high',
+              c: 'onSurface.high',
               fontStyle: 'normal',
             }}
           >
@@ -185,7 +185,7 @@ export const FeedbackHeader = ({
           <Text
             variant={isMobile ? 'body2' : 'body1'}
             css={{
-              c: '$on_surface_medium',
+              c: 'onSurface.medium',
               opacity: 0.9,
               fontWeight: '$regular',
             }}
@@ -200,8 +200,8 @@ export const FeedbackHeader = ({
       <Flex
         justify="between"
         css={{
-          gap: '$17',
-          c: '$on_surface_high',
+          gap: '17',
+          c: 'onSurface.high',
           '@md': {
             gap: '0',
           },
@@ -217,7 +217,7 @@ export const FeedbackHeader = ({
                   indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
                     ? '$on_surface_high'
                     : '$on_surface_default',
-                gap: '$4',
+                gap: '4',
               }}
               onClick={() => onEmojiClicked(index)}
               key={`${index}`}
@@ -225,12 +225,12 @@ export const FeedbackHeader = ({
               <Text
                 css={{
                   fontWeight: '$semiBold',
-                  fontSize: '$h4',
-                  pb: '$1',
+                  fontSize: 'h4',
+                  pb: '1',
                   cursor: 'pointer',
                   opacity: indexSelected === index || indexSelected === FEEBACK_INDEX.INIT ? 1 : 0.2,
                   '@md': {
-                    fontSize: '$h5',
+                    fontSize: 'h5',
                   },
                 }}
               >
@@ -275,16 +275,16 @@ export const FeedbackForm = ({
         <Flex
           direction="column"
           css={{
-            gap: '$4',
+            gap: '4',
           }}
         >
           <Text
             variant="sub2"
             css={{
-              c: '$on_surface_high',
+              c: 'onSurface.high',
               fontWeight: '$semiBold',
-              fontSize: '$sm',
-              px: '$2',
+              fontSize: 'sm',
+              px: '2',
             }}
           >
             {rating.question || 'What do you like/dislike here?'}
@@ -294,7 +294,7 @@ export const FeedbackForm = ({
               alignItems: 'flex-start',
               alignSelf: 'stretch',
               flexWrap: 'wrap',
-              gap: '$6',
+              gap: '6',
               flex: '1 1 calc(25% - 12px)',
               '@md': {
                 flex: '1 1 calc(50% - 12px)',
@@ -312,8 +312,8 @@ export const FeedbackForm = ({
                   key={index}
                   css={{
                     border: '1px solid $border_bright',
-                    r: '$1',
-                    p: '$6',
+                    r: '1',
+                    p: '6',
                   }}
                 >
                   <Checkbox.Root
@@ -323,7 +323,7 @@ export const FeedbackForm = ({
                     css={{
                       cursor: 'pointer',
                       flexShrink: 0,
-                      bg: '$on_secondary_low',
+                      bg: 'onSecondary.low',
                       border: '1px solid $border_bright',
                     }}
                   >
@@ -334,8 +334,8 @@ export const FeedbackForm = ({
                   <Label
                     htmlFor={`${option}-${index}`}
                     css={{
-                      color: '$on_surface_high',
-                      fontSize: '$sm',
+                      color: 'onSurface.high',
+                      fontSize: 'sm',
                       fontWeight: '$regular',
                       lineHeight: '20px' /* 142.857% */,
                     }}
@@ -352,15 +352,15 @@ export const FeedbackForm = ({
         <Flex
           direction="column"
           css={{
-            gap: '$4',
+            gap: '4',
           }}
         >
           <Text
             variant="body2"
             css={{
-              c: '$on_surface_high',
+              c: 'onSurface.high',
               fontWeight: '$regular',
-              fontSize: '$sm',
+              fontSize: 'sm',
             }}
           >
             {feedback?.comment.label || 'Additional comments (optional)'}
@@ -369,10 +369,10 @@ export const FeedbackForm = ({
             maxLength={1024}
             placeholder={feedback?.comment.placeholder || 'Tell us more...'}
             css={{
-              backgroundColor: '$surface_bright',
+              backgroundColor: 'surface.bright',
               border: '1px solid $border_bright',
               resize: 'none',
-              height: '$36',
+              height: '36',
               display: 'flex',
             }}
             value={comment}

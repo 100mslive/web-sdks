@@ -107,7 +107,7 @@ export const ConferenceScreen = () => {
     <>
       {isHLSStarted ? (
         <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
-          <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
+          <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: 'background.dim' }} />
         </Box>
       ) : null}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
@@ -115,11 +115,11 @@ export const ConferenceScreen = () => {
           <Box
             ref={headerRef}
             css={{
-              h: '$18',
+              h: '18',
               transition: 'margin 0.3s ease-in-out',
               marginTop: isMwebHLSStream ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
-                h: '$17',
+                h: '17',
               },
             }}
             data-testid="header"
@@ -157,9 +157,9 @@ export const ConferenceScreen = () => {
             ref={footerRef}
             css={{
               flexShrink: 0,
-              maxHeight: '$24',
+              maxHeight: '24',
               transition: 'margin 0.3s ease-in-out',
-              bg: '$background_dim',
+              bg: 'background.dim',
               marginBottom: isMwebHLSStream ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
@@ -175,8 +175,8 @@ export const ConferenceScreen = () => {
           <Flex
             css={{
               alignItems: 'center',
-              pr: '$4',
-              pb: '$4',
+              pr: '4',
+              pb: '4',
               position: 'relative',
             }}
             justify="end"
@@ -188,7 +188,7 @@ export const ConferenceScreen = () => {
               css={{
                 position: 'absolute',
                 bottom: '100%',
-                mb: '$4',
+                mb: '4',
               }}
             >
               <EmojiReaction />

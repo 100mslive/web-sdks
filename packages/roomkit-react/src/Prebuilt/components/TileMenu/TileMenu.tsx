@@ -89,7 +89,7 @@ const TileMenu = ({
       <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
         <StyledMenuTile.Trigger
           data-testid="participant_menu_btn"
-          css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
+          css={{ bg: `${theme.colors.background_dim.value}A3`, p: '2', w: 'unset', h: 'unset' }}
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
           className={dragClassName}
         >
@@ -98,25 +98,25 @@ const TileMenu = ({
 
         {isMobile ? (
           <Sheet.Root open={open} onOpenChange={setOpen}>
-            <Sheet.Content style={{ bg: '$surface_dim', pt: '$8' }}>
+            <Sheet.Content style={{ bg: 'surface.dim', pt: '8' }}>
               <Flex
                 css={{
-                  color: '$on_surface_high',
+                  color: 'onSurface.high',
                   display: 'flex',
                   w: '100%',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  px: '$10',
-                  pb: '$8',
+                  px: '10',
+                  pb: '8',
                   borderBottom: '1px solid $border_default',
                 }}
               >
                 <Box>
-                  <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                  <Text css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
                     {getVideoTileLabel({ peerName: peer?.name, isLocal, audioTrack, videoTrack: track })}
                   </Text>
                   {peer?.roleName ? (
-                    <Text variant="xs" css={{ color: '$on_surface_low', mt: '$2' }}>
+                    <Text variant="xs" css={{ color: 'onSurface.low', mt: '2' }}>
                       {peer.roleName}
                     </Text>
                   ) : null}
@@ -126,13 +126,13 @@ const TileMenu = ({
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8', pb: '$8', maxHeight: '80vh', overflowY: 'auto' }}>
+              <Box css={{ px: '8', pb: '8', maxHeight: '80vh', overflowY: 'auto' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
           </Sheet.Root>
         ) : (
-          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '80', overflowY: 'auto' }}>
             <TileMenuContent {...props} />
           </StyledMenuTile.Content>
         )}

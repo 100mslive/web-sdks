@@ -32,8 +32,8 @@ export const HLSViewTitle = () => {
           h: 'fit-content',
           w: '100%',
           borderBottom: '1px solid $border_bright',
-          p: '$8',
-          backgroundColor: '$surface_dim',
+          p: '8',
+          backgroundColor: 'surface.dim',
         }}
       >
         <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
@@ -42,7 +42,7 @@ export const HLSViewTitle = () => {
         <Flex
           onClick={toggleDetailsPane}
           css={{
-            color: '$on_surface_high',
+            color: 'onSurface.high',
             cursor: 'pointer',
             '&:hover': { opacity: '0.8' },
           }}
@@ -61,8 +61,8 @@ export const HLSViewTitle = () => {
         h: 'fit-content',
         w: '100%',
         borderBottom: '1px solid $border_bright',
-        p: '$8',
-        backgroundColor: '$surface_dim',
+        p: '8',
+        backgroundColor: 'surface.dim',
       }}
     >
       <Logo />
@@ -75,7 +75,7 @@ export const HLSViewTitle = () => {
         <Flex>
           <RoomDetailsRow details={details} />
           {description ? (
-            <Text variant="caption" css={{ color: '$on_surface_medium' }} onClick={toggleDetailsPane}>
+            <Text variant="caption" css={{ color: 'onSurface.medium' }} onClick={toggleDetailsPane}>
               &nbsp;...more
             </Text>
           ) : null}

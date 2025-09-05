@@ -26,7 +26,7 @@ import { APP_DATA } from '../common/constants';
 
 const MinimisedTile = ({ setMinimised }: { setMinimised: (value: boolean) => void }) => {
   return (
-    <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
+    <Flex align="center" css={{ gap: '6', r: '1', bg: 'surface.default', p: '4', color: 'onSurface.high' }}>
       <AudioVideoToggle hideOptions={true} />
       <Text>You</Text>
       <IconButton
@@ -103,7 +103,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
           right: 0,
           zIndex: 10,
           boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
-          r: '$2',
+          r: '2',
           ...(!minimised
             ? {
                 aspectRatio: `${aspectRatio}`,

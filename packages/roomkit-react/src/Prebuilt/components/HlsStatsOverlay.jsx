@@ -9,16 +9,16 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
     <Flex
       css={{
         position: 'absolute',
-        width: '$80',
-        marginLeft: '$8',
+        width: '80',
+        marginLeft: '8',
         padding: '$8 $8 $10',
         zIndex: 10,
-        backgroundColor: '$surface_brighter',
-        borderRadius: '$1',
+        backgroundColor: 'surface.brighter',
+        borderRadius: '1',
       }}
       direction="column"
     >
-      <IconButton css={{ position: 'absolute', top: '$2', right: '$2' }} onClick={onClose}>
+      <IconButton css={{ position: 'absolute', top: '2', right: '2' }} onClick={onClose}>
         <CrossIcon />
       </IconButton>
       <HlsStatsRow label="Video size">
@@ -66,8 +66,8 @@ const HlsStatsRow = memo(({ label, children }) => {
       <Text
         css={{
           width: '50%',
-          '@md': { fontSize: '$md' },
-          '@sm': { fontSize: '$sm' },
+          '@md': { fontSize: 'md' },
+          '@sm': { fontSize: 'sm' },
           // textAlign: "right",
         }}
       >
@@ -75,8 +75,8 @@ const HlsStatsRow = memo(({ label, children }) => {
       </Text>
       <Text
         css={{
-          '@md': { fontSize: '$md' },
-          '@sm': { fontSize: '$sm' },
+          '@md': { fontSize: 'md' },
+          '@sm': { fontSize: 'sm' },
           width: '50%',
           overflowWrap: 'break-word',
           // textAlign: "left",

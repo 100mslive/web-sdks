@@ -12,7 +12,7 @@ export const SubmitPDF = ({ pdfFile, onOpenChange }) => {
       css={{
         mb: '0',
         mt: 'auto',
-        gap: '$8',
+        gap: '8',
       }}
     >
       <Button

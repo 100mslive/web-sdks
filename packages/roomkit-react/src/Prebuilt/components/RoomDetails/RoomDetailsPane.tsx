@@ -24,11 +24,11 @@ export const RoomDetailsPane = () => {
       ) : (
         <ShowRoomDetailHeader />
       )}
-      <Box css={{ mt: '$10' }}>
-        <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold', display: isMwebHLSStream ? 'none' : '' }}>
+      <Box css={{ mt: '10' }}>
+        <Text css={{ color: 'onSurface.high', fontWeight: '$semiBold', display: isMwebHLSStream ? 'none' : '' }}>
           Description
         </Text>
-        <Text variant="sm" css={{ c: '$on_surface_medium' }}>
+        <Text variant="sm" css={{ c: 'onSurface.medium' }}>
           {description}
         </Text>
       </Box>
@@ -41,14 +41,14 @@ const ShowRoomDetailHeader = () => {
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const isMwebHLSStream = useMobileHLSStream();
   return (
-    <Flex direction="column" css={{ position: 'sticky', top: 0, bg: '$surface_dim' }}>
+    <Flex direction="column" css={{ position: 'sticky', top: 0, bg: 'surface.dim' }}>
       <Flex justify="between" align="center" css={{ w: '100%' }}>
         <Text variant="h6">{title}</Text>
         {!isMwebHLSStream && (
           <Flex
             onClick={toggleDetailsPane}
             css={{
-              color: '$on_surface_high',
+              color: 'onSurface.high',
               cursor: 'pointer',
               '&:hover': { opacity: '0.8' },
             }}

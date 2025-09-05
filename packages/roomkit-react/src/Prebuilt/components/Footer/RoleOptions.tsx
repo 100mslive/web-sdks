@@ -25,10 +25,10 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
 
-const dropdownItemCSS = { backgroundColor: '$surface_default', gap: '$4', p: '$8' };
+const dropdownItemCSS = { backgroundColor: 'surface.default', gap: '4', p: '8' };
 const optionTextCSS = {
   fontWeight: '$semiBold',
-  color: '$on_surface_high',
+  color: 'onSurface.high',
   textTransform: 'none',
   whiteSpace: 'nowrap',
 };
@@ -46,12 +46,12 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
         className="role_actions"
         asChild
         css={{
-          p: '$1',
-          r: '$0',
-          c: '$on_surface_high',
+          p: '1',
+          r: '0',
+          c: 'onSurface.high',
           visibility: openOptions ? 'visible' : 'hidden',
           '&:hover': {
-            c: '$on_surface_medium',
+            c: 'onSurface.medium',
           },
           '@md': {
             visibility: 'visible',
@@ -64,7 +64,7 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
       </Dropdown.Trigger>
       <Dropdown.Content
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
-        css={{ w: 'max-content', bg: '$surface_default', py: 0 }}
+        css={{ w: 'max-content', bg: 'surface.default', py: 0 }}
         align="end"
       >
         {children}
@@ -201,7 +201,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
 
       {canRemoveRoleFromRoom ? (
         <Dropdown.Item
-          css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: '$alert_error_default' }}
+          css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: 'alert.error.default' }}
           onClick={removePeersFromRoom}
         >
           <RemoveUserIcon />

@@ -7,7 +7,7 @@ export const VoteProgress = ({ option, totalResponses }: { option: HMSPollQuesti
   const progressValue = (100 * (option.voteCount || 0)) / totalResponses;
 
   return showProgress ? (
-    <Progress.Root value={progressValue} css={{ mt: '$4' }}>
+    <Progress.Root value={progressValue} css={{ mt: '4' }}>
       <Progress.Content
         style={{
           transform: `translateX(-${100 - progressValue}%)`,

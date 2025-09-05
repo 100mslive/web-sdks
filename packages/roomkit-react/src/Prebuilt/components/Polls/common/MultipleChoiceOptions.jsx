@@ -30,10 +30,10 @@ export const MultipleChoiceOptions = ({
   };
 
   return (
-    <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
+    <Flex direction="column" css={{ gap: 'md', w: '100%', mb: 'md' }}>
       {options.map(option => {
         return (
-          <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$4' }}>
+          <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '4' }}>
             {!isStopped || !isQuiz ? (
               <Checkbox.Root
                 id={`${questionIndex}-${option.index}`}
@@ -52,7 +52,7 @@ export const MultipleChoiceOptions = ({
             ) : null}
 
             {isStopped && correctOptionIndexes?.includes(option.index) ? (
-              <Flex align="center" css={{ color: '$on_surface_high' }}>
+              <Flex align="center" css={{ color: 'onSurface.high' }}>
                 <CheckCircleIcon height={20} width={20} />
               </Flex>
             ) : null}
@@ -70,7 +70,7 @@ export const MultipleChoiceOptions = ({
             </Flex>
 
             {isStopped && isQuiz && localPeerResponse?.options.includes(option.index) ? (
-              <Text variant="sm" css={{ color: '$on_surface_medium', maxWidth: 'max-content' }}>
+              <Text variant="sm" css={{ color: 'onSurface.medium', maxWidth: 'max-content' }}>
                 Your Answer
               </Text>
             ) : null}
@@ -83,17 +83,17 @@ export const MultipleChoiceOptions = ({
 
 export const MultipleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handleOptionTextChange, removeOption }) => {
   return (
-    <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
+    <Flex direction="column" css={{ gap: 'md', w: '100%', mb: 'md' }}>
       {options.map((option, index) => {
         return (
-          <Flex align="center" key={index} css={{ w: '100%', gap: '$4' }}>
+          <Flex align="center" key={index} css={{ w: '100%', gap: '4' }}>
             {isQuiz && (
               <Checkbox.Root
                 onCheckedChange={checked => selectAnswer(checked, index)}
                 checked={option.isCorrectAnswer}
                 css={{
                   cursor: 'pointer',
-                  width: '$9',
+                  width: '9',
                 }}
               >
                 <Checkbox.Indicator>

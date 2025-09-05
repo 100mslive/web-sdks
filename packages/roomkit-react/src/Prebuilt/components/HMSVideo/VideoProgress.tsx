@@ -12,7 +12,7 @@ export const VideoProgress = ({
 }) => {
   const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState<number>(0);
-  const [bufferProgress, setBufferProgress] = useState(0);
+  const [, setBufferProgress] = useState(0);
   const videoEl = hlsPlayer?.getVideoElement();
 
   const setProgress = useCallback(() => {
@@ -65,12 +65,12 @@ export const VideoProgress = ({
     return null;
   }
   return (
-    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}>
+    <Flex align="center" css={{ cursor: 'pointer', h: '2', alignSelf: 'stretch' }}>
       <Slider
         id="video-actual-rest"
         css={{
           cursor: 'pointer',
-          h: '$2',
+          h: '2',
           zIndex: 1,
           transition: `all .2s ease .5s`,
         }}
@@ -82,16 +82,16 @@ export const VideoProgress = ({
         onValueChange={onProgress}
         onPointerDown={() => setSeekProgress(true)}
         onPointerUp={() => setSeekProgress(false)}
-        thumbStyles={{ w: '$6', h: '$6' }}
+        thumbStyles={{ w: '6', h: '6' }}
       />
       <Box
         id="video-buffer"
         css={{
-          h: '$2',
-          width: `${bufferProgress - videoProgress}%`,
+          h: '2',
+          width: `{bufferProgress - videoProgress}%`,
           background: '$on_surface_high',
           position: 'absolute',
-          left: `${videoProgress}%`,
+          left: `{videoProgress}%`,
           opacity: '25%',
         }}
       />

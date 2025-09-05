@@ -24,12 +24,12 @@ import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
 
 const Wrapper = styled('div', {
-  w: '$100',
+  w: '100',
   h: '100%',
-  p: '$10',
+  p: '10',
   flex: '1 1 0',
   background: '$surface_dim',
-  r: '$1',
+  r: '1',
   position: 'relative',
   '@lg': {
     w: '100%',
@@ -113,7 +113,7 @@ const Wrapper = styled('div', {
       hideControls: false,
       overlayChat: true,
       css: {
-        pb: '$17',
+        pb: '17',
       },
     },
   ],
@@ -214,7 +214,7 @@ const SidePane = ({
           .otherwise(() => '$100'),
         h: '100%',
         flexShrink: 0,
-        gap: '$4',
+        gap: '4',
         position: 'relative',
         '&:empty': { display: 'none' },
         '@md': {

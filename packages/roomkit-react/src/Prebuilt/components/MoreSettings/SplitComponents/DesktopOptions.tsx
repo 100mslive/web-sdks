@@ -135,9 +135,9 @@ export const DesktopOptions = ({
           }}
           align="end"
           css={{
-            py: '$0',
+            py: '0',
             maxHeight: 'unset',
-            '@md': { w: '$64' },
+            '@md': { w: '64' },
             "div[role='separator']:first-child": {
               display: 'none',
             },
@@ -146,10 +146,10 @@ export const DesktopOptions = ({
           {isBRBEnabled && screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
-              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+              <Text variant="sm" css={{ ml: '4', color: 'onSurface.high' }}>
                 Be Right Back
               </Text>
-              <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
+              <Flex justify="end" css={{ color: 'onSurface.high', flexGrow: '1' }}>
                 {isBRBOn ? <CheckIcon /> : null}
               </Flex>
             </Dropdown.Item>
@@ -163,10 +163,10 @@ export const DesktopOptions = ({
             >
               <OpenCaptionIcon />
               <Flex direction="column" css={{ flexGrow: '1' }}>
-                <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                <Text variant="sm" css={{ ml: '4', color: 'onSurface.high' }}>
                   Closed Captions
                 </Text>
-                <Text variant="caption" css={{ ml: '$4', color: '$on_surface_medium' }}>
+                <Text variant="caption" css={{ ml: '4', color: 'onSurface.medium' }}>
                   {isTranscriptionEnabled ? 'Enabled' : 'Disabled'}
                 </Text>
               </Flex>
@@ -177,9 +177,9 @@ export const DesktopOptions = ({
             <Dropdown.Item css={{ p: 0, '&:empty': { display: 'none' } }}>
               <PIP
                 content={
-                  <Flex css={{ w: '100%', h: '100%', p: '$8' }}>
+                  <Flex css={{ w: '100%', h: '100%', p: '8' }}>
                     <PipIcon />
-                    <Text variant="sm" css={{ ml: '$4' }}>
+                    <Text variant="sm" css={{ ml: '4' }}>
                       {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
                     </Text>
                   </Flex>
@@ -199,7 +199,7 @@ export const DesktopOptions = ({
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
-            <Text variant="sm" css={{ ml: '$4' }}>
+            <Text variant="sm" css={{ ml: '4' }}>
               Settings
             </Text>
           </Dropdown.Item>
@@ -212,7 +212,7 @@ export const DesktopOptions = ({
                   data-testid="hls_stats"
                 >
                   <Checkbox.Root
-                    css={{ margin: '$2' }}
+                    css={{ margin: '2' }}
                     checked={enablHlsStats}
                     onCheckedChange={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
                   >
@@ -221,11 +221,11 @@ export const DesktopOptions = ({
                     </Checkbox.Indicator>
                   </Checkbox.Root>
                   <Flex justify="between" css={{ width: '100%' }}>
-                    <Text variant="sm" css={{ ml: '$4' }}>
+                    <Text variant="sm" css={{ ml: '4' }}>
                       Show HLS Stats
                     </Text>
 
-                    <Text variant="sm" css={{ ml: '$4' }}>
+                    <Text variant="sm" css={{ ml: '4' }}>
                       {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
                     </Text>
                   </Flex>
@@ -238,7 +238,7 @@ export const DesktopOptions = ({
                 data-testid="stats_for_nerds_btn"
               >
                 <InfoIcon />
-                <Text variant="sm" css={{ ml: '$4' }}>
+                <Text variant="sm" css={{ ml: '4' }}>
                   Stats for Nerds
                 </Text>
               </Dropdown.Item>

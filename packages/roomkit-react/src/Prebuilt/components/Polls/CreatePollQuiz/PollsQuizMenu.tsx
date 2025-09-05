@@ -27,7 +27,7 @@ export const PollsQuizMenu = () => {
   return (
     <Container rounded>
       <ContentHeader content="Polls and Quizzes" onClose={togglePollView} />
-      <Flex direction="column" css={{ px: '$10', pb: '$10', overflowY: 'auto' }}>
+      <Flex direction="column" css={{ px: '10', pb: '10', overflowY: 'auto' }}>
         {permissions?.pollWrite && <AddMenu />}
         <PrevMenu />
       </Flex>
@@ -52,8 +52,8 @@ function InteractionSelectionCard({
       onClick={onClick}
       css={{
         border: activeBorderStyle,
-        p: '$4',
-        r: '$2',
+        p: '4',
+        r: '2',
         w: '100%',
         cursor: 'pointer',
       }}
@@ -62,15 +62,15 @@ function InteractionSelectionCard({
       <Flex
         css={{
           border: activeBorderStyle,
-          p: '$4',
-          bg: '$surface_bright',
-          c: '$on_surface_high',
-          r: '$0',
+          p: '4',
+          bg: 'surface.bright',
+          c: 'onSurface.high',
+          r: '0',
         }}
       >
         {icon}
       </Flex>
-      <Text variant="sub1" css={{ ml: '$md' }}>
+      <Text variant="sub1" css={{ ml: 'md' }}>
         {title}
       </Text>
     </Flex>
@@ -116,10 +116,10 @@ const AddMenu = () => {
 
   return (
     <>
-      <Text variant="caption" css={{ c: '$on_surface_medium', mb: '$md' }}>
+      <Text variant="caption" css={{ c: 'onSurface.medium', mb: 'md' }}>
         Select the type you want to continue with
       </Text>
-      <Flex css={{ w: '100%', gap: '$10', mb: '$md' }}>
+      <Flex css={{ w: '100%', gap: '10', mb: 'md' }}>
         <InteractionSelectionCard
           title={INTERACTION_TYPE.POLL}
           icon={<StatsIcon width={32} height={32} />}
@@ -133,8 +133,8 @@ const AddMenu = () => {
           active={interactionType === INTERACTION_TYPE.QUIZ}
         />
       </Flex>
-      <Flex direction="column" css={{ mb: '$10' }}>
-        <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
+      <Flex direction="column" css={{ mb: '10' }}>
+        <Text variant="body2" css={{ mb: '4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
           ref={inputRef}
           type="text"
@@ -142,13 +142,13 @@ const AddMenu = () => {
           value={title}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value.trimStart())}
           css={{
-            backgroundColor: '$surface_bright',
+            backgroundColor: 'surface.bright',
             border: '1px solid $border_default',
           }}
         />
-        <Flex align="center" css={{ mt: '$10' }}>
-          <Switch onCheckedChange={(value: boolean) => setHideVoteCount(value)} css={{ mr: '$6' }} />
-          <Text variant="body2" css={{ c: '$on_surface_medium' }}>
+        <Flex align="center" css={{ mt: '10' }}>
+          <Switch onCheckedChange={(value: boolean) => setHideVoteCount(value)} css={{ mr: '6' }} />
+          <Text variant="body2" css={{ c: 'onSurface.medium' }}>
             Hide Vote Count
           </Text>
         </Flex>
@@ -156,7 +156,7 @@ const AddMenu = () => {
         <Button
           variant="primary"
           disabled={validateTitle}
-          css={{ mt: '$10' }}
+          css={{ mt: '10' }}
           onClick={async () => {
             const id = Date.now().toString();
             await actions.interactivityCenter
@@ -204,13 +204,13 @@ const PrevMenu = () => {
       direction="column"
       css={{
         width: '100%',
-        ...(permissions?.pollWrite ? { borderTop: '$space$px solid $border_bright', paddingTop: '$10' } : {}),
+        ...(permissions?.pollWrite ? { borderTop: '$space$px solid $border_bright', paddingTop: '10' } : {}),
       }}
     >
-      <Text variant="h6" css={{ c: '$on_surface_high' }}>
+      <Text variant="h6" css={{ c: 'onSurface.high' }}>
         Previous Polls and Quizzes
       </Text>
-      <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
+      <Flex direction="column" css={{ gap: '10', mt: '8' }}>
         {sortedPolls?.map(poll => (
           <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
         ))}
@@ -223,14 +223,14 @@ const InteractionCard = ({ id, title, status }: { id: string; title: string; sta
   const { setPollState } = usePollViewState();
 
   return (
-    <Flex direction="column" css={{ backgroundColor: '$surface_bright', borderRadius: '$1', p: '$8' }}>
-      <Flex css={{ w: '100%', justifyContent: 'space-between', mb: '$sm' }}>
-        <Text variant="sub1" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
+    <Flex direction="column" css={{ backgroundColor: 'surface.bright', borderRadius: '1', p: '8' }}>
+      <Flex css={{ w: '100%', justifyContent: 'space-between', mb: 'sm' }}>
+        <Text variant="sub1" css={{ c: 'onSurface.high', fontWeight: '$semiBold' }}>
           {title}
         </Text>
         <StatusIndicator status={status} />
       </Flex>
-      <Flex css={{ w: '100%', gap: '$4' }} justify="end">
+      <Flex css={{ w: '100%', gap: '4' }} justify="end">
         <Button
           variant="primary"
           onClick={() =>

@@ -40,15 +40,15 @@ export const VideoTest = () => {
             css={{
               width: '90%',
               aspectRatio: '16/9',
-              mr: '$10',
-              '@lg': { mr: 0, mb: '$10', aspectRatio: '1/1' },
+              mr: '10',
+              '@lg': { mr: 0, mb: '10', aspectRatio: '1/1' },
             }}
           >
             <Video mirror={true} trackId={trackID} />
           </StyledVideoTile.Container>
         )}
         <Flex direction="column" css={{ w: '100%' }}>
-          <Text variant="body2" css={{ c: '$on_primary_medium', mb: '$10' }}>
+          <Text variant="body2" css={{ c: 'onPrimary.medium', mb: '10' }}>
             Move in front of your camera to make sure it's working. If you don't see your video, try changing the
             selected camera. If the camera isn't part of your computer, check your settings to make sure your system
             recognizes it.

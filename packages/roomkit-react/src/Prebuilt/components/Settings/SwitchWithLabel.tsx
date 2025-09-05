@@ -22,8 +22,8 @@ const SwitchWithLabel = ({
     <Flex
       align="center"
       css={{
-        my: '$2',
-        py: '$8',
+        my: '2',
+        py: '8',
         w: '100%',
         borderBottom: '1px solid $border_default',
         display: hide ? 'none' : 'flex',
@@ -32,13 +32,13 @@ const SwitchWithLabel = ({
       <Label
         htmlFor={id}
         css={{
-          fontSize: '$md',
+          fontSize: 'md',
           fontWeight: '$semiBold',
           color: checked ? '$on_surface_high' : '$on_surface_low',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: '$8',
+          gap: '8',
           flex: '1 1 0',
         }}
       >

@@ -16,8 +16,8 @@ export function PDFFileOptions({ onOpenChange }) {
           css={{
             w: 'min(420px,80%)',
             overflow: 'auto',
-            p: '$10',
-            bg: '$surface_dim',
+            p: '10',
+            bg: 'surface.dim',
           }}
         >
           <Flex direction="column">

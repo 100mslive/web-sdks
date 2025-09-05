@@ -227,7 +227,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           <Box
                             className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
                             css={{
-                              bg: '$background_dim',
+                              bg: 'background.dim',
                               size: '100%',
                               lineHeight: '1.5',
                               '-webkit-text-size-adjust': '100%',

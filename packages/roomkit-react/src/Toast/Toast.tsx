@@ -140,8 +140,8 @@ const HMSToast: React.FC<HMSToastProps> = ({
     <>
       <ToastRoot {...props}>
         <ToastTitle>
-          <Flex align="center" css={{ gap: '$4', flex: '1 1 0', minWidth: 0 }}>
-            {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start', mt: '$2' }}>{icon}</Box> : null}
+          <Flex align="center" css={{ gap: '4', flex: '1 1 0', minWidth: 0 }}>
+            {icon ? <Box css={{ w: '10', h: '10', alignSelf: 'start', mt: '2' }}>{icon}</Box> : null}
             <Text variant="sub1" css={{ c: 'inherit', wordBreak: 'break-word' }}>
               {title}
             </Text>
@@ -153,13 +153,13 @@ const HMSToast: React.FC<HMSToastProps> = ({
         </ToastTitle>
         {description ? (
           <ToastDescription>
-            <Text variant="body1" css={{ fontWeight: '$regular', c: '$on_surface_medium' }}>
+            <Text variant="body1" css={{ fontWeight: '$regular', c: 'onSurface.medium' }}>
               {description}
             </Text>
           </ToastDescription>
         ) : null}
         {!inlineAction && action ? (
-          <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
+          <ToastAction altText={`${title}Action`} css={{ mt: '10' }}>
             {action}
           </ToastAction>
         ) : null}

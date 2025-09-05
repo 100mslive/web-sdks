@@ -17,7 +17,7 @@ export const CaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) 
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content style={{ bg: '$surface_dim', p: '$8 0' }}>
+        <Sheet.Content style={{ bg: 'surface.dim', p: '$8 0' }}>
           <CaptionContent {...props} />
         </Sheet.Content>
       </Sheet.Root>
@@ -28,7 +28,7 @@ export const CaptionModal = ({ onOpenChange }: { onOpenChange: (value: boolean) 
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
+        <Dialog.Content css={{ bg: 'surface.dim', width: 'min(400px,80%)', p: '10' }}>
           <CaptionContent {...props} />
         </Dialog.Content>
       </Dialog.Portal>

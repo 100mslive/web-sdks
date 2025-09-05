@@ -20,7 +20,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
         data-testid="participant_list_filter"
         css={{
           border: '1px solid $on_surface_low',
-          r: '$0',
+          r: '0',
           p: '$2 $4',
         }}
         tabIndex={0}
@@ -29,7 +29,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
           <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || CHAT_SELECTOR.EVERYONE}
           </Text>
-          <Box css={{ ml: '$2', color: '$on_surface_low' }}>
+          <Box css={{ ml: '2', color: 'onSurface.low' }}>
             {open ? <ChevronUpIcon width={14} height={14} /> : <ChevronDownIcon width={14} height={14} />}
           </Box>
         </Flex>
@@ -39,9 +39,9 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
         sideOffset={8}
         css={{
           height: 'auto',
-          maxHeight: '$96',
-          boxShadow: '$md',
-          w: '$48',
+          maxHeight: '96',
+          boxShadow: 'md',
+          w: '48',
         }}
       >
         <Item selected={!selection} title="Everyone" onSelection={onItemClick} icon={<PeopleIcon />} />
@@ -77,7 +77,7 @@ const Item = ({ selected, title, onSelection, value, icon }) => {
     >
       <Flex align="center" css={{ flex: '1 1 0' }}>
         {icon && <Text>{icon}</Text>}
-        <Text css={{ ml: '$4' }}>{title}</Text>
+        <Text css={{ ml: '4' }}>{title}</Text>
       </Flex>
       {selected && (
         <Text>

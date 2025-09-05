@@ -18,7 +18,7 @@ export const FullScreenItem = () => {
       data-testid="full_screen_btn"
     >
       <ExpandIcon />
-      <Text variant="sm" css={{ ml: '$4' }}>
+      <Text variant="sm" css={{ ml: '4' }}>
         {isFullscreen ? 'Exit ' : 'Go '}Fullscreen
       </Text>
     </Dropdown.Item>

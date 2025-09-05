@@ -30,11 +30,11 @@ export class ErrorBoundary extends Component {
             size: '100%',
             height: '100vh',
             width: '100%',
-            color: '$on_primary_high',
-            backgroundColor: '$background_default',
+            color: 'onPrimary.high',
+            backgroundColor: 'background.default',
           }}
         >
-          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3', height: '100%', width: '100%' }}>
+          <Box css={{ position: 'relative', overflow: 'hidden', r: '3', height: '100%', width: '100%' }}>
             <Flex
               direction="column"
               css={{
@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component {
                     onClick={() => {
                       window.location.reload();
                     }}
-                    css={{ mx: '$8' }}
+                    css={{ mx: '8' }}
                     data-testid="join_again_btn"
                   >
                     Reload
@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component {
                       }
                       this.setState({ isErrorCopied: true });
                     }}
-                    css={{ mx: '$8' }}
+                    css={{ mx: '8' }}
                     data-testid="join_again_btn"
                   >
                     <CopyIcon /> {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}

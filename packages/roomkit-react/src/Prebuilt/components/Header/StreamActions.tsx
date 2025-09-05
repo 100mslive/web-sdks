@@ -87,10 +87,10 @@ export const LiveStatus = () => {
       css={{
         border: '1px solid $border_default',
         padding: '$4 $6 $4 $6',
-        borderRadius: '$1',
+        borderRadius: '1',
       }}
     >
-      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
+      <Box css={{ w: '4', h: '4', r: 'round', bg: 'alert.error.default', mr: '2' }} />
       <Flex align="center" gap="2">
         <Text variant={!isMobile ? 'button' : 'body2'}>LIVE</Text>
         <Text variant="caption">{hlsState?.variants?.length > 0 && isHLSRunning ? formatTime(liveTime) : ''}</Text>
@@ -127,7 +127,7 @@ export const RecordingStatus = () => {
     >
       <Flex
         css={{
-          color: '$alert_error_default',
+          color: 'alert.error.default',
           alignItems: 'center',
         }}
       >
@@ -151,7 +151,7 @@ export const RecordingPauseStatus = () => {
       >
         <Flex
           css={{
-            color: '$on_surface_high',
+            color: 'onSurface.high',
             alignItems: 'center',
           }}
         >
@@ -184,8 +184,8 @@ const StartRecording = () => {
           </Button>
         </Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content align="end" sideOffset={8} css={{ w: '$64' }}>
-            <Text variant="body1" css={{ color: '$on_surface_medium' }}>
+          <Popover.Content align="end" sideOffset={8} css={{ w: '64' }}>
+            <Text variant="body1" css={{ color: 'onSurface.medium' }}>
               Are you sure you want to end the recording?
             </Text>
             <Button
@@ -240,9 +240,9 @@ export const StreamActions = () => {
   const roomState = useHMSStore(selectRoomState);
 
   return (
-    <Flex align="center" css={{ gap: '$4' }}>
+    <Flex align="center" css={{ gap: '4' }}>
       {!isMobile && (
-        <Flex align="center" css={{ gap: '$4' }}>
+        <Flex align="center" css={{ gap: '4' }}>
           <RecordingPauseStatus />
           <RecordingStatus />
           {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
@@ -263,11 +263,11 @@ export const StopRecordingInSheet = ({
   return (
     <Sheet.Root open={true}>
       <Sheet.Content>
-        <Sheet.Title css={{ p: '$10' }}>
-          <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
+        <Sheet.Title css={{ p: '10' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%', c: 'alert.error.default' }}>
             <Flex justify="start" align="center" gap="3">
               <AlertTriangleIcon />
-              <Text variant="h5" css={{ c: '$alert_error_default' }}>
+              <Text variant="h5" css={{ c: 'alert.error.default' }}>
                 Stop Recording
               </Text>
             </Flex>
@@ -277,8 +277,8 @@ export const StopRecordingInSheet = ({
           </Flex>
         </Sheet.Title>
         <HorizontalDivider />
-        <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
-          <Text variant="caption" css={{ c: '$on_surface_medium', pb: '$8' }}>
+        <Box as="div" css={{ p: '10', overflowY: 'scroll', maxHeight: '70vh' }}>
+          <Text variant="caption" css={{ c: 'onSurface.medium', pb: '8' }}>
             Are you sure you want to stop recording? You can’t undo this action.
           </Text>
           <Button

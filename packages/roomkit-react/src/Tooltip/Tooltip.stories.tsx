@@ -39,7 +39,7 @@ const TooltipStoryWithString = (
 export const ExampleWithString = TooltipStoryWithString.bind({});
 
 const ExampleTitle = () => {
-  return <h3 style={{ color: '$on_primary_high' }}>This is title</h3>;
+  return <h3 style={{ color: 'onPrimary.high' }}>This is title</h3>;
 };
 
 const TooltipStorywithReactNode = (

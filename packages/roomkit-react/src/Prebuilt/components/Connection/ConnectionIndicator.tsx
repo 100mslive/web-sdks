@@ -11,7 +11,7 @@ const Wrapper = styled('span', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '$round',
+  borderRadius: 'round',
   variants: {
     isTile: {
       true: {

@@ -36,13 +36,13 @@ const Container = ({ children }: { children: React.ReactNode }) => (
       px: '120px',
       pt: '120px',
       pb: '24px',
-      bg: '$background_dim',
+      bg: 'background.dim',
       lineHeight: '1.5',
       '-webkit-text-size-adjust': '100%',
       position: 'relative',
       h: '100%',
       '@lg': {
-        p: '$12',
+        p: '12',
       },
       overflowY: 'auto',
       boxSizing: 'border-box',
@@ -90,16 +90,16 @@ const DiagnosticsStepTest = () => {
 const DiagnosticsStepHeader = () => {
   const { activeStepIndex, activeStep } = useDiagnostics();
   return (
-    <Flex css={{ py: '$8', px: '$10', alignItems: 'center', borderBottom: '1px solid $border_default' }}>
-      <Text css={{ c: '$primary_bright', mt: '$xs' }}>{DiagnosticsStepIcon[activeStepIndex]}</Text>
-      <Text css={{ fontSize: '$h6', ml: '$9' }}>{activeStep.name}</Text>
+    <Flex css={{ py: '8', px: '10', alignItems: 'center', borderBottom: '1px solid $border_default' }}>
+      <Text css={{ c: 'primary.bright', mt: 'xs' }}>{DiagnosticsStepIcon[activeStepIndex]}</Text>
+      <Text css={{ fontSize: 'h6', ml: '9' }}>{activeStep.name}</Text>
     </Flex>
   );
 };
 
 const DiagnosticsStepContainer = () => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '$1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
+    <Box css={{ border: '1px solid $border_default', r: '1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
       <DiagnosticsStepTest />
     </Box>
@@ -135,7 +135,7 @@ const DiagnosticsStepsList = () => {
           }
 
           return (
-            <Flex key={key} css={{ mb: '$10', c: color, gap: '$4', alignItems: 'center' }}>
+            <Flex key={key} css={{ mb: '10', c: color, gap: '4', alignItems: 'center' }}>
               {icon}
               <Text css={{ c: color }}>{step.name}</Text>
             </Flex>
@@ -167,10 +167,10 @@ const DiagnosticsProvider = () => {
     >
       <Container>
         <Text variant="h4">Pre-call Test</Text>
-        <Text variant="md" css={{ c: '$on_primary_medium' }}>
+        <Text variant="md" css={{ c: 'onPrimary.medium' }}>
           Make sure your devices and network are good to go, let's get started.
         </Text>
-        <Flex css={{ direction: 'column', mt: '$12', justifyItems: 'center' }}>
+        <Flex css={{ direction: 'column', mt: '12', justifyItems: 'center' }}>
           <DiagnosticsStepsList />
           <DiagnosticsStepContainer />
         </Flex>

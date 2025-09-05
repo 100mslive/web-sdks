@@ -9,7 +9,7 @@ export const StyledVideo = styled('video', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: '$2',
+  borderRadius: '2',
   objectFit: 'cover',
   background: '$background_default',
   variants: {

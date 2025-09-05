@@ -17,7 +17,7 @@ export const LeaveSessionContent = ({
     <Box>
       <Flex
         css={{
-          color: '$alert_error_default',
+          color: 'alert.error.default',
           display: 'flex',
           alignItems: 'center',
         }}
@@ -27,15 +27,15 @@ export const LeaveSessionContent = ({
           Leave
         </Text>
         {isModal ? null : (
-          <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowLeaveRoomAlert(false)}>
+          <Box css={{ color: 'onSurface.high', ml: 'auto' }} onClick={() => setShowLeaveRoomAlert(false)}>
             <CrossIcon />
           </Box>
         )}
       </Flex>
-      <Text variant="sm" css={{ color: '$on_surface_low', mb: '$8', mt: '$4' }}>
+      <Text variant="sm" css={{ color: 'onSurface.low', mb: '8', mt: '4' }}>
         Others will continue after you leave. You can join the session again.
       </Text>
-      <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
+      <Flex align="center" justify="between" css={{ w: '100%', gap: '8' }}>
         <Button
           outlined
           variant="standard"

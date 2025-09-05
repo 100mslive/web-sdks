@@ -38,23 +38,23 @@ export const ConnectivityTestStepResult = ({
   const [hideDetails, setHideDetails] = useState(true);
 
   return (
-    <Box css={{ my: '$10', p: '$10', r: '$1', bg: '$surface_bright' }}>
-      <Text css={{ c: '$on_primary_medium', mb: '$6' }}>{title}</Text>
+    <Box css={{ my: '10', p: '10', r: '1', bg: 'surface.bright' }}>
+      <Text css={{ c: 'onPrimary.medium', mb: '6' }}>{title}</Text>
       {success ? (
         <Flex>
-          <Text css={{ c: '$alert_success' }}>
+          <Text css={{ c: 'alert.success' }}>
             <CheckCircleIcon width="1.5rem" height="1.5rem" />
           </Text>
-          <Text variant="lg" css={{ ml: '$4' }}>
+          <Text variant="lg" css={{ ml: '4' }}>
             {status}
           </Text>
         </Flex>
       ) : (
         <Flex>
-          <Text css={{ c: '$alert_error_bright' }}>
+          <Text css={{ c: 'alert.error.bright' }}>
             <CrossCircleIcon width="1.5rem" height="1.5rem" />
           </Text>
-          <Text variant="lg" css={{ ml: '$4' }}>
+          <Text variant="lg" css={{ ml: '4' }}>
             Failed
           </Text>
         </Flex>
@@ -64,14 +64,14 @@ export const ConnectivityTestStepResult = ({
         align="center"
         gap="2"
         css={{
-          color: '$primary_bright',
+          color: 'primary.bright',
         }}
       >
         {hideDetails ? <EyeOpenIcon /> : <EyeCloseIcon />}
         <Text
           variant="caption"
           css={{
-            color: '$primary_bright',
+            color: 'primary.bright',
           }}
         >
           {hideDetails ? 'View' : 'Hide'} detailed information
@@ -92,13 +92,13 @@ const DetailedInfo = ({
   Icon?: (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element;
 }) => {
   return (
-    <Box css={{ flex: '50%', mt: '$6' }}>
-      <Text variant="caption" css={{ fontWeight: '$semiBold', c: '$on_primary_medium' }}>
+    <Box css={{ flex: '50%', mt: '6' }}>
+      <Text variant="caption" css={{ fontWeight: '$semiBold', c: 'onPrimary.medium' }}>
         {title}
       </Text>
-      <Flex css={{ mt: '$xs', alignItems: 'flex-start' }}>
+      <Flex css={{ mt: 'xs', alignItems: 'flex-start' }}>
         {Icon && (
-          <Text css={{ mr: '$4' }}>
+          <Text css={{ mr: '4' }}>
             <Icon width="1rem" height="1rem" />
           </Text>
         )}
@@ -200,7 +200,7 @@ const Footer = ({
 }) => {
   return (
     <TestFooter error={error}>
-      <Flex css={{ gap: '$8', '@lg': { flexDirection: 'column' } }}>
+      <Flex css={{ gap: '8', '@lg': { flexDirection: 'column' } }}>
         <Button variant="standard" onClick={restart}>
           Restart Test
         </Button>
@@ -227,11 +227,11 @@ const ConnectivityTestReport = ({
     return (
       <>
         <TestContainer css={{ textAlign: 'center' }}>
-          <Text css={{ c: '$alert_error_default', mb: '$4' }}>
+          <Text css={{ c: 'alert.error.default', mb: '4' }}>
             <CrossCircleIcon />
           </Text>
           <Text variant="h6">Connectivity Test Failed</Text>
-          <Text variant="body2" css={{ c: '$on_primary_medium' }}>
+          <Text variant="body2" css={{ c: 'onPrimary.medium' }}>
             {error.message}
           </Text>
         </TestContainer>
@@ -246,7 +246,7 @@ const ConnectivityTestReport = ({
     return (
       <>
         <TestContainer>
-          <Text css={{ c: '$on_primary_medium' }}>Connectivity test has been completed.</Text>
+          <Text css={{ c: 'onPrimary.medium' }}>Connectivity test has been completed.</Text>
           <SignallingResult result={result?.signallingReport} />
           <MediaServerResult result={result?.mediaServerReport} />
           <AudioStats stats={result?.mediaServerReport?.stats?.audio} />
@@ -260,15 +260,15 @@ const ConnectivityTestReport = ({
   if (progress !== undefined) {
     return (
       <TestContainer css={{ textAlign: 'center' }}>
-        <Text css={{ c: '$primary_bright', display: 'flex', justifyContent: 'center' }}>
+        <Text css={{ c: 'primary.bright', display: 'flex', justifyContent: 'center' }}>
           <Loading size="3.5rem" color="currentColor" />
         </Text>
-        <Text variant="h6" css={{ mt: '$8' }}>
+        <Text variant="h6" css={{ mt: '8' }}>
           Checking your connection...
         </Text>
         <Text
           variant="body2"
-          css={{ c: '$on_primary_medium', mt: '$4' }}
+          css={{ c: 'onPrimary.medium', mt: '4' }}
         >{`${ConnectivityStateMessage[progress]}...`}</Text>
       </TestContainer>
     );
@@ -289,22 +289,22 @@ const RegionSelector = ({
   return (
     <TestContainer css={{ borderBottom: '1px solid $border_default' }}>
       <Text variant="body1">Select a region</Text>
-      <Text variant="body2" css={{ c: '$on_secondary_low' }}>
+      <Text variant="body2" css={{ c: 'onSecondary.low' }}>
         Select the closest region for best results
       </Text>
       <Flex
         justify="between"
         css={{
-          mt: '$md',
+          mt: 'md',
           '@lg': {
             flexDirection: 'column',
-            gap: '$8',
+            gap: '8',
           },
         }}
       >
         <Flex
           css={{
-            gap: '$4',
+            gap: '4',
             '@lg': {
               flexDirection: 'column',
             },
@@ -315,7 +315,7 @@ const RegionSelector = ({
               key={key}
               outlined={region !== key}
               variant={region === key ? 'primary' : 'standard'}
-              css={region === key ? { bg: '$primary_dim' } : {}}
+              css={region === key ? { bg: 'primary.dim' } : {}}
               onClick={() => setRegion(key)}
             >
               {value}

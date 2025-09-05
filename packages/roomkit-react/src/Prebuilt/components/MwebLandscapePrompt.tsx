@@ -51,24 +51,24 @@ export const MwebLandscapePrompt = () => {
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+        <Dialog.Content css={{ w: 'min(420px, 90%)', p: '8', bg: 'surface.dim' }}>
           <Box>
             <Flex
               css={{
-                color: '$primary_default',
+                color: 'primary.default',
                 display: 'flex',
                 alignItems: 'center',
               }}
             >
               <RefreshIcon style={{ marginRight: '0.5rem' }} />
-              <Text variant="lg" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+              <Text variant="lg" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
                 Please rotate your device
               </Text>
             </Flex>
-            <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
+            <Text variant="sm" css={{ color: 'onSurface.medium', mb: '8', mt: '4' }}>
               We do not support landscape mode as of now, please use the app in portrait mode for the best experience.
             </Text>
-            <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
+            <Flex align="center" justify="between" css={{ w: '100%', gap: '8' }}>
               <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setShowMwebLandscapePrompt(false)}>
                 Continue anyway
               </Button>

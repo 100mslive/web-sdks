@@ -46,7 +46,7 @@ const PreviewForm = ({
       css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}
       onSubmit={formSubmit}
     >
-      <Flex align="center" css={{ gap: '$8', w: '100%' }}>
+      <Flex align="center" css={{ gap: '8', w: '100%' }}>
         <Input
           required
           id="name"
@@ -83,11 +83,11 @@ const Form = styled('form', {
   width: '100%',
   display: 'flex',
   alignItems: 'center',
-  gap: '$8',
-  mt: '$10',
-  mb: '$10',
+  gap: '8',
+  mt: '10',
+  mb: '10',
   '@md': {
-    gap: '$4',
+    gap: '4',
   },
 });
 

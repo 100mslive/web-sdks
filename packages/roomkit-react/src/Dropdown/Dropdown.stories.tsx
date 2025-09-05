@@ -27,15 +27,15 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
       <Dropdown.Trigger asChild>
         <Box
           css={{
-            color: '$on_surface_high',
-            borderRadius: '$1',
+            color: 'onSurface.high',
+            borderRadius: '1',
             border: '1px solid $border_default',
             padding: '$4 $4',
-            width: '$80',
+            width: '80',
           }}
         >
           <Box css={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Box css={{ display: 'flex', gap: '$4', mr: '$4' }}>
+            <Box css={{ display: 'flex', gap: '4', mr: '4' }}>
               <PeopleIcon />
               <Text variant="md">2</Text>
             </Box>
@@ -44,7 +44,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
         </Box>
       </Dropdown.Trigger>
       {open && (
-        <Dropdown.Content sideOffset={5} align="start" css={{ height: 'auto', maxHeight: '$96' }}>
+        <Dropdown.Content sideOffset={5} align="start" css={{ height: 'auto', maxHeight: '96' }}>
           <Dropdown.Group
             css={{
               h: 'auto',
@@ -61,14 +61,14 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
             {participants.map((peer, i) => (
               <Dropdown.Item css={{ justifyContent: 'space-between' }} data-testid={`participant_${i}`}>
                 <Flex>
-                  <Box css={{ width: '$16' }}>
+                  <Box css={{ width: '16' }}>
                     <Avatar
                       name={peer.name}
                       css={{
                         position: 'unset',
                         transform: 'unset',
-                        mr: '$4',
-                        fontSize: '$sm',
+                        mr: '4',
+                        fontSize: 'sm',
                       }}
                     />
                   </Box>
@@ -76,7 +76,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
                     <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
                       {peer.name}
                     </Text>
-                    <Text variant="sub2" css={{ color: '$on_surface_medium' }}>
+                    <Text variant="sub2" css={{ color: 'onSurface.medium' }}>
                       {peer.roleName}
                     </Text>
                   </Flex>

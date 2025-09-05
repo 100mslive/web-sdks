@@ -13,23 +13,23 @@ const StyledList = styled(TabsPrimitive.List, {
 const StyledTrigger = styled(TabsPrimitive.Trigger, {
   all: 'unset',
   fontFamily: '$sans',
-  p: '$8',
+  p: '8',
   display: 'flex',
   alignItems: 'center',
-  fontSize: '$sm',
+  fontSize: 'sm',
   lineHeight: '$sm',
-  color: '$on_surface_high',
+  color: 'onSurface.high',
   userSelect: 'none',
   cursor: 'pointer',
   '&[data-state="active"]': {
-    bg: '$surface_brighter',
-    r: '$1',
+    bg: 'surface.brighter',
+    r: '1',
   },
 });
 
 const StyledContent = styled(TabsPrimitive.Content, {
   flex: '1 1 0',
-  padding: '$10',
+  padding: '10',
   outline: 'none',
 });
 

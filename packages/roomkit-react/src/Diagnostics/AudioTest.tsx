@@ -51,7 +51,7 @@ const MicTest = ({ setError }: { setError: (err?: Error) => void }) => {
           hmsDiagnostics?.stopMicCheck();
         }}
       />
-      <Flex css={{ gap: '$6', alignItems: 'center' }}>
+      <Flex css={{ gap: '6', alignItems: 'center' }}>
         <Button
           variant="standard"
           icon
@@ -101,11 +101,11 @@ const MicTest = ({ setError }: { setError: (err?: Error) => void }) => {
         />
       </Flex>
 
-      <Flex align="center" css={{ mt: '$4', maxWidth: '10rem', opacity: isRecording ? '1' : '0', gap: '$4' }}>
+      <Flex align="center" css={{ mt: '4', maxWidth: '10rem', opacity: isRecording ? '1' : '0', gap: '4' }}>
         <Text>
           <MicOnIcon />
         </Text>
-        <Progress.Root value={audioLevel} css={{ h: '$2' }}>
+        <Progress.Root value={audioLevel} css={{ h: '2' }}>
           <Progress.Content
             style={{
               transform: `translateX(-${100 - audioLevel}%)`,
@@ -161,7 +161,7 @@ export const AudioTest = () => {
   return (
     <>
       <TestContainer>
-        <Text variant="body2" css={{ c: '$on_primary_medium' }}>
+        <Text variant="body2" css={{ c: 'onPrimary.medium' }}>
           Record a 10 second audio clip and play it back to check that your microphone and speaker are working. If they
           aren't, make sure your volume is turned up, try a different speaker or microphone, or check your bluetooth
           settings.
@@ -169,11 +169,11 @@ export const AudioTest = () => {
 
         <Flex
           css={{
-            mt: '$10',
-            gap: '$10',
+            mt: '10',
+            gap: '10',
             '@lg': {
               flexDirection: 'column',
-              gap: '$8',
+              gap: '8',
             },
           }}
         >

@@ -37,14 +37,14 @@ const data: {
 const Template: ComponentStory<typeof Select.Root> = () => {
   return (
     <Select.Root defaultValue="blueberry">
-      <Select.Trigger css={{ bg: '$background_dim' }}>
+      <Select.Trigger css={{ bg: 'background.dim' }}>
         <Select.Value />
-        <Flex css={{ color: '$on_primary_high' }}>
+        <Flex css={{ color: 'onPrimary.high' }}>
           <ChevronDownIcon />
         </Flex>
       </Select.Trigger>
       <Select.Content>
-        <Select.ScrollUpButton css={{ color: '$on_primary_high' }}>
+        <Select.ScrollUpButton css={{ color: 'onPrimary.high' }}>
           <ChevronUpIcon />
         </Select.ScrollUpButton>
         <Select.Viewport>
@@ -52,7 +52,7 @@ const Template: ComponentStory<typeof Select.Root> = () => {
             <>
               <Select.Group>
                 <Select.Label>
-                  <Text variant="xs" css={{ color: '$on_primary_medium' }}>
+                  <Text variant="xs" css={{ color: 'onPrimary.medium' }}>
                     {item}
                   </Text>
                 </Select.Label>
@@ -61,17 +61,17 @@ const Template: ComponentStory<typeof Select.Root> = () => {
                     <Select.ItemText>
                       <Text variant="md">{type?.name}</Text>
                     </Select.ItemText>
-                    <Select.ItemIndicator css={{ color: '$on_primary_high' }}>
+                    <Select.ItemIndicator css={{ color: 'onPrimary.high' }}>
                       <CheckIcon />
                     </Select.ItemIndicator>
                   </Select.Item>
                 ))}
               </Select.Group>
-              {index < Object.keys(data).length - 1 && <Select.Separator css={{ bg: '$border_default' }} />}
+              {index < Object.keys(data).length - 1 && <Select.Separator css={{ bg: 'border.default' }} />}
             </>
           ))}
         </Select.Viewport>
-        <Select.ScrollDownButton css={{ color: '$on_primary_high' }}>
+        <Select.ScrollDownButton css={{ color: 'onPrimary.high' }}>
           <ChevronDownIcon />
         </Select.ScrollDownButton>
       </Select.Content>

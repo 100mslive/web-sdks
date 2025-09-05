@@ -76,7 +76,7 @@ export const PIPChat = () => {
       <Box
         id="chat-container"
         css={{
-          bg: '$surface_dim',
+          bg: 'surface.dim',
           overflowY: 'auto',
           // Subtracting height of footer
           h: canSendChatMessages ? 'calc(100% - 87px)' : '100%',
@@ -114,7 +114,7 @@ export const PIPChat = () => {
               justifyContent: 'center',
             }}
           >
-            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+            <Text variant="h5" css={{ mt: '8', c: 'onSurface.high' }}>
               {canSendChatMessages ? 'Start a conversation' : 'No messages yet'}
             </Text>
             {canSendChatMessages ? (
@@ -132,18 +132,18 @@ export const PIPChat = () => {
                 <Text
                   style={{ display: 'flex', justifyContent: 'between', width: '100%', alignItems: 'center' }}
                   css={{
-                    color: '$on_surface_high',
+                    color: 'onSurface.high',
                     fontWeight: '$semiBold',
                   }}
                 >
                   <Flex style={{ flexGrow: 1, gap: '2px', alignItems: 'center' }}>
                     {message.senderName === 'You' || !message.senderName ? (
-                      <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                      <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
                         {message.senderName || 'Anonymous'}
                       </Text>
                     ) : (
                       <Tooltip title={message.senderName} side="top" align="start">
-                        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
                           {getSenderName(message.senderName, message?.sender)}
                         </Text>
                       </Tooltip>
@@ -158,9 +158,9 @@ export const PIPChat = () => {
                   <Text
                     variant="xs"
                     css={{
-                      color: '$on_surface_medium',
+                      color: 'onSurface.medium',
                       flexShrink: 0,
-                      p: '$2',
+                      p: '2',
                       whitespace: 'nowrap',
                     }}
                   >
@@ -172,11 +172,11 @@ export const PIPChat = () => {
                 variant="sm"
                 css={{
                   w: '100%',
-                  mt: '$2',
+                  mt: '2',
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
                   userSelect: 'all',
-                  color: '$on_surface_high',
+                  color: 'onSurface.high',
                 }}
               >
                 <AnnotisedMessage message={message.message} />
@@ -187,10 +187,10 @@ export const PIPChat = () => {
         <div id="marker" style={{ height: filteredMessages.length ? '1px' : 0 }} />
       </Box>
       {canSendChatMessages && (
-        <Box css={{ bg: '$surface_dim' }}>
-          <Flex css={{ px: '$4', pb: '3px', gap: '$2', alignItems: 'center' }}>
+        <Box css={{ bg: 'surface.dim' }}>
+          <Flex css={{ px: '4', pb: '3px', gap: '2', alignItems: 'center' }}>
             <Text variant="caption">To:</Text>
-            <Flex css={{ bg: '$primary_bright', color: '$on_primary_high', r: '$2' }}>
+            <Flex css={{ bg: 'primary.bright', color: 'onPrimary.high', r: '2' }}>
               <select
                 id="selector"
                 style={{
@@ -215,14 +215,14 @@ export const PIPChat = () => {
           <Flex
             align="center"
             css={{
-              bg: '$surface_default',
-              minHeight: '$16',
+              bg: 'surface.default',
+              minHeight: '16',
               width: '100%',
-              py: '$6',
-              pl: '$4',
+              py: '6',
+              pl: '4',
               boxSizing: 'border-box',
-              gap: '$2',
-              r: '$2',
+              gap: '2',
+              r: '2',
             }}
           >
             <TextArea
@@ -232,7 +232,7 @@ export const PIPChat = () => {
               rows={1}
               css={{
                 w: '100%',
-                c: '$on_surface_high',
+                c: 'onSurface.high',
                 p: '0.75rem 0.75rem !important',
                 border: 'none',
                 resize: 'none',
@@ -250,8 +250,8 @@ export const PIPChat = () => {
               css={{
                 ml: 'auto',
                 height: 'max-content',
-                mr: '$4',
-                '&:hover': { c: '$on_surface_medium' },
+                mr: '4',
+                '&:hover': { c: 'onSurface.medium' },
               }}
               data-testid="send_msg_btn"
             >
@@ -278,12 +278,12 @@ const MessageTitle = ({
   return (
     <>
       {recipientRoles ? (
-        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
           to {recipientRoles} (Group)
         </Text>
       ) : null}
       {recipientPeer ? (
-        <Text as="span" variant="sub2" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
           to {recipientPeer === localPeerID ? 'You' : peerName} (DM)
         </Text>
       ) : null}

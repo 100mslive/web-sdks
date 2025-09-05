@@ -16,8 +16,8 @@ export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
           css={{
             w: 'min(420px,80%)',
             overflow: 'auto',
-            p: '$10',
-            bg: '$surface_dim',
+            p: '10',
+            bg: 'surface.dim',
           }}
         >
           <Flex direction="column">
@@ -25,21 +25,21 @@ export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
             <DialogRow
               css={{
                 fontFamily: '$sans',
-                bg: '$surface_bright',
-                r: '$1',
+                bg: 'surface.bright',
+                r: '1',
                 outline: 'none',
                 border: '1px solid $border_bright',
                 p: '$4 $6',
-                minHeight: '$11',
-                c: '$on_primary_high',
-                fs: '$md',
+                minHeight: '11',
+                c: 'onPrimary.high',
+                fs: 'md',
                 w: '100%',
                 '&:focus': {
                   boxShadow: '0 0 0 1px $colors$primary_default',
                   border: '1px solid transparent',
                 },
                 mb: 0,
-                mt: '$6',
+                mt: '6',
               }}
             >
               <Flex direction="row" css={{ flexGrow: '1', maxWidth: '88%' }}>

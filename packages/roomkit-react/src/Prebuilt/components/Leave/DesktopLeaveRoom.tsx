@@ -63,7 +63,7 @@ export const DesktopLeaveRoom = ({
               asChild
               css={{
                 '&[data-state="open"]': {
-                  bg: '$alert_error_dim',
+                  bg: 'alert.error.dim',
                 },
               }}
             >
@@ -72,12 +72,12 @@ export const DesktopLeaveRoom = ({
               </MenuTriggerButton>
             </Dropdown.Trigger>
             <Dropdown.Portal container={container}>
-              <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
+              <Dropdown.Content css={{ p: 0, w: '100' }} alignOffset={-50} sideOffset={10}>
                 <Dropdown.Item
                   css={{
-                    bg: '$surface_dim',
-                    color: '$on_surface_medium',
-                    '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
+                    bg: 'surface.dim',
+                    color: 'onSurface.medium',
+                    '&:hover': { bg: 'surface.default', color: 'onSurface.high' },
                     p: '0',
                   }}
                   data-testid="just_leave_btn"
@@ -97,9 +97,9 @@ export const DesktopLeaveRoom = ({
 
                 <Dropdown.Item
                   css={{
-                    bg: '$alert_error_dim',
-                    color: '$alert_error_bright',
-                    '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+                    bg: 'alert.error.dim',
+                    color: 'alert.error.bright',
+                    '&:hover': { bg: 'alert.error.dim', color: 'alert.error.brighter' },
                     p: '0',
                   }}
                   data-testid="end_room_btn"
@@ -142,7 +142,7 @@ export const DesktopLeaveRoom = ({
       <Dialog.Root open={showEndStreamAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
-          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '8', bg: 'surface.dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
               leaveRoom={isStreamingOn ? () => leaveRoom({ endStream: true }) : endRoom}
@@ -156,7 +156,7 @@ export const DesktopLeaveRoom = ({
       <Dialog.Root open={showLeaveRoomAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
-          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '8', bg: 'surface.dim' }}>
             <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
           </Dialog.Content>
         </Dialog.Portal>

@@ -30,7 +30,7 @@ export const Feedback = () => {
       <Flex
         justify="center"
         css={{
-          pt: '$16',
+          pt: '16',
         }}
       >
         <ThankyouView />
@@ -41,7 +41,7 @@ export const Feedback = () => {
     <Flex
       justify="center"
       css={{
-        pt: '$16',
+        pt: '16',
         w: isMobile ? '100%' : '528px',
       }}
     >
@@ -50,9 +50,9 @@ export const Feedback = () => {
           css={{
             p: isMobile ? '$10' : '$12',
             border: '1px solid $border_default',
-            bg: '$surface_dim',
+            bg: 'surface.dim',
             borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
-            gap: '$10',
+            gap: '10',
             '@md': {
               position: 'absolute',
               bottom: '0',

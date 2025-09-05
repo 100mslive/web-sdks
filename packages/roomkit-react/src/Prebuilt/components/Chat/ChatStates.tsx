@@ -30,21 +30,21 @@ export const ChatPaused = () => {
     <Flex
       align="center"
       justify="between"
-      css={{ borderRadius: '$1', bg: '$surface_default', p: '$2 $4 $2 $8', w: '100%' }}
+      css={{ borderRadius: '1', bg: 'surface.default', p: '$2 $4 $2 $8', w: '100%' }}
     >
       <Box>
-        <Text variant="sm" css={{ fontWeight: '$semiBold', color: '$on_surface_high' }}>
+        <Text variant="sm" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
           Chat paused
         </Text>
         <Text
           variant="xs"
-          css={{ color: '$on_surface_medium', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          css={{ color: 'onSurface.medium', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
           Chat has been paused by {chatStateUpdatedBy?.peerId === localPeer?.id ? 'you' : chatStateUpdatedBy?.userName}
         </Text>
       </Box>
       {can_disable_chat ? (
-        <Button css={{ fontWeight: '$semiBold', fontSize: '$sm', borderRadius: '$2' }} onClick={unPauseChat}>
+        <Button css={{ fontWeight: '$semiBold', fontSize: 'sm', borderRadius: '2' }} onClick={unPauseChat}>
           Resume
         </Button>
       ) : (
@@ -63,9 +63,9 @@ export const ChatBlocked = () => {
     <Flex
       align="center"
       justify="between"
-      css={{ borderRadius: '$1', bg: '$surface_default', p: '$4 $4 $4 $8', w: '100%' }}
+      css={{ borderRadius: '1', bg: 'surface.default', p: '$4 $4 $4 $8', w: '100%' }}
     >
-      <Text variant="sm" css={{ color: '$on_surface_medium', textAlign: 'center', w: '100%' }}>
+      <Text variant="sm" css={{ color: 'onSurface.medium', textAlign: 'center', w: '100%' }}>
         You've been blocked from sending messages
       </Text>
     </Flex>

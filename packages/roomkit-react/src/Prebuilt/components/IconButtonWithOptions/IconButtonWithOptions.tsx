@@ -9,24 +9,24 @@ import IconButton from '../../IconButton';
 const variants = {
   disabled: {
     true: {
-      bg: '$surface_brighter',
+      bg: 'surface.brighter',
     },
   },
   active: {
     false: {
-      bg: '$secondary_dim',
+      bg: 'secondary.dim',
     },
   },
 };
 
 const IconSection = styled(IconButton, {
   w: 'unset',
-  h: '$14',
-  p: '$4',
-  r: '$1',
+  h: '14',
+  p: '4',
+  r: '1',
   bg: 'transparent',
   borderTopRightRadius: '0 !important',
-  borderColor: '$border_bright',
+  borderColor: 'border.bright',
   borderBottomRightRadius: '0 !important',
   position: 'relative',
   '&:not([disabled]):focus-visible': {
@@ -50,11 +50,11 @@ const IconSection = styled(IconButton, {
 
 const OptionsSection = styled(IconButton, {
   w: 'unset',
-  h: '$14',
+  h: '14',
   p: '$4 $2',
-  r: '$1',
+  r: '1',
   borderTopLeftRadius: '0 !important',
-  borderColor: '$border_bright',
+  borderColor: 'border.bright',
   borderBottomLeftRadius: '0 !important',
   borderLeftWidth: '0 !important',
   position: 'relative',
@@ -70,16 +70,16 @@ const OptionsSection = styled(IconButton, {
 const Icon = styled(Flex, {
   alignItems: 'center',
   justifyContent: 'center',
-  color: '$on_primary_high',
+  color: 'onPrimary.high',
   variants: {
     disabled: {
       true: {
-        color: '$on_surface_low',
+        color: 'onSurface.low',
       },
     },
     active: {
       true: {
-        color: '$on_surface_high',
+        color: 'onSurface.high',
       },
     },
   },
@@ -155,7 +155,7 @@ export const IconButtonWithOptions = ({
               maxHeight: 'unset',
               p: 0,
               border: 'none',
-              bg: '$surface_dim',
+              bg: 'surface.dim',
             }}
           >
             {children}

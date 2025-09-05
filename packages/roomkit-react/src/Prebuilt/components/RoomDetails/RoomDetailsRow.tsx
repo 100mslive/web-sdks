@@ -8,11 +8,11 @@ export const RoomDetailsRow = ({ details }: { details: (string | Date)[] }) => {
     <Flex align="center" css={{ w: '100%' }}>
       {details.map((detail, index) => (
         <React.Fragment key={detail.toString()}>
-          {index > 0 && <Box css={{ h: '$2', w: '$2', r: '$round', bg: '$on_surface_medium', m: '0 $2' }} />}
+          {index > 0 && <Box css={{ h: '2', w: '2', r: 'round', bg: 'onSurface.medium', m: '0 $2' }} />}
           {typeof detail !== 'string' ? (
             <Duration timestamp={detail} />
           ) : (
-            <Text variant="xs" css={{ c: '$on_surface_medium' }}>
+            <Text variant="xs" css={{ c: 'onSurface.medium' }}>
               {detail}
             </Text>
           )}

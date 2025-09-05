@@ -21,7 +21,7 @@ const AudioBar = () => {
         height: '1em',
         maskImage: `url(${bg})`,
         '-webkit-mask-repeat': 'no-repeat',
-        backgroundColor: '$on_primary_high',
+        backgroundColor: 'onPrimary.high',
         maskSize: '4em 1em',
       }}
     />

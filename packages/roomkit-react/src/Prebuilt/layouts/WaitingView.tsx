@@ -13,17 +13,17 @@ export const WaitingView = React.memo(
           margin: 'auto',
           h: '100%',
           justifyContent: 'center',
-          gap: '$8',
+          gap: '8',
         }}
       >
         <Box
           css={{
-            backgroundColor: '$surface_default',
+            backgroundColor: 'surface.default',
             display: 'flex',
             alignItems: 'center',
-            gap: '$4',
-            size: '$20',
-            r: '$round',
+            gap: '4',
+            size: '20',
+            r: 'round',
             justifyContent: 'center',
           }}
         >
@@ -32,17 +32,14 @@ export const WaitingView = React.memo(
         <Flex
           direction="column"
           css={{
-            p: '$1',
-            gap: '$4',
+            p: '1',
+            gap: '4',
           }}
         >
-          <Text variant="h4" css={{ '@md': { fontSize: '$lg', color: '$on_surface_high' } }}>
+          <Text variant="h4" css={{ '@md': { fontSize: 'lg', color: 'onSurface.high' } }}>
             {title}
           </Text>
-          <Text
-            variant="body1"
-            css={{ fontWeight: '$regular', color: '$on_surface_medium', '@md': { fontSize: '$md' } }}
-          >
+          <Text variant="body1" css={{ fontWeight: '$regular', color: 'onSurface.medium', '@md': { fontSize: 'md' } }}>
             {subtitle}
           </Text>
         </Flex>

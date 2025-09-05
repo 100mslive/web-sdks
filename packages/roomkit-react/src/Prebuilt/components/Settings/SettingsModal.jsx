@@ -110,11 +110,11 @@ const MobileSettingModal = ({
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
       <Sheet.Content
         css={{
-          bg: '$surface_dim',
+          bg: 'surface.dim',
           overflowY: 'auto',
         }}
       >
-        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+        <Sheet.Title css={{ py: '10', px: '8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             {!selection ? (
               <Text variant="h6" css={{ display: 'flex' }}>
@@ -122,7 +122,7 @@ const MobileSettingModal = ({
               </Text>
             ) : (
               <Text variant="h6" css={{ display: 'flex' }}>
-                <Box as="span" css={{ r: '$round', mr: '$2' }} onClick={resetSelection}>
+                <Box as="span" css={{ r: 'round', mr: '2' }} onClick={resetSelection}>
                   <ChevronLeftIcon />
                 </Box>
                 {selection?.charAt(0).toUpperCase() + selection.slice(1)}
@@ -140,7 +140,7 @@ const MobileSettingModal = ({
           <Flex
             direction="column"
             css={{
-              pb: '$8',
+              pb: '8',
               overflowY: 'auto',
             }}
           >
@@ -161,16 +161,16 @@ const MobileSettingModal = ({
                       p: '$10 $8',
                       display: 'flex',
                       alignItems: 'center',
-                      fontSize: '$sm',
+                      fontSize: 'sm',
                       lineHeight: '$sm',
-                      color: '$on_surface_high',
+                      color: 'onSurface.high',
                       userSelect: 'none',
-                      gap: '$8',
+                      gap: '8',
                       cursor: 'pointer',
                       '&:hover': {
-                        bg: '$surface_brighter',
-                        r: '$1',
-                        gap: '$8',
+                        bg: 'surface.brighter',
+                        r: '1',
+                        gap: '8',
                         border: 'none',
                       },
                       borderBottom: '1px solid $border_default',
@@ -185,7 +185,7 @@ const MobileSettingModal = ({
         ) : (
           <Box
             direction="column"
-            css={{ overflowY: 'scroll', px: '$8', py: '$10', maxHeight: '70vh', overflowX: 'hidden' }}
+            css={{ overflowY: 'scroll', px: '8', py: '10', maxHeight: '70vh', overflowX: 'hidden' }}
           >
             {settingsList
               .filter(({ tabName }) => showSetting[tabName] && selection === tabName)
@@ -218,7 +218,7 @@ const DesktopSettingModal = ({
             w: 'min(800px, 90%)',
             height: 'min(656px, 90%)',
             p: 0,
-            r: '$4',
+            r: '4',
           }}
         >
           <Tabs.Root
@@ -231,19 +231,19 @@ const DesktopSettingModal = ({
               css={{
                 w: '18.625rem',
                 flexDirection: 'column',
-                bg: '$background_default',
+                bg: 'background.default',
                 p: '$14 $10',
                 borderTopLeftRadius: '$4',
                 borderBottomLeftRadius: '$4',
               }}
             >
               <Text variant="h5">Settings </Text>
-              <Flex direction="column" css={{ mx: 0, overflowY: 'auto', pt: '$10' }}>
+              <Flex direction="column" css={{ mx: 0, overflowY: 'auto', pt: '10' }}>
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ icon: Icon, tabName, title }) => {
                     return (
-                      <Tabs.Trigger key={tabName} value={tabName} css={{ gap: '$8' }}>
+                      <Tabs.Trigger key={tabName} value={tabName} css={{ gap: '8' }}>
                         <Icon />
                         {title}
                       </Tabs.Trigger>
@@ -257,7 +257,7 @@ const DesktopSettingModal = ({
                 css={{
                   flex: '1 1 0',
                   minWidth: 0,
-                  mr: '$4',
+                  mr: '4',
                 }}
               >
                 {settingsList
@@ -275,7 +275,7 @@ const DesktopSettingModal = ({
               </Flex>
             )}
           </Tabs.Root>
-          <Dialog.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
+          <Dialog.Close css={{ position: 'absolute', right: '10', top: '10' }}>
             <IconButton as="div" data-testid="dialog_cross_icon">
               <CrossIcon />
             </IconButton>
@@ -287,9 +287,9 @@ const DesktopSettingModal = ({
 };
 const SettingsContentHeader = ({ children, isMobile, onBack }) => {
   return (
-    <Text variant="h6" css={{ mb: '$12', display: 'flex', alignItems: 'center' }}>
+    <Text variant="h6" css={{ mb: '12', display: 'flex', alignItems: 'center' }}>
       {isMobile && (
-        <Box as="span" css={{ bg: '$surface_bright', mr: '$4', r: '$round', p: '$2' }} onClick={onBack}>
+        <Box as="span" css={{ bg: 'surface.bright', mr: '4', r: 'round', p: '2' }} onClick={onBack}>
           <ChevronLeftIcon />
         </Box>
       )}

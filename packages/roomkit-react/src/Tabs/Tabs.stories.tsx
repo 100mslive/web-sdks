@@ -52,13 +52,13 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
     >
       <Tabs.List
         aria-label="tabs example"
-        css={{ bg: '$background_dim', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
+        css={{ bg: 'background.dim', r: '1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
       >
         <Tabs.Trigger value="tab1">One</Tabs.Trigger>
         <Tabs.Trigger value="tab2">Two</Tabs.Trigger>
         <Tabs.Trigger value="tab3">Three</Tabs.Trigger>
       </Tabs.List>
-      <Box css={{ r: '$1', bg: '$surface_brighter' }}>
+      <Box css={{ r: '1', bg: 'surface.brighter' }}>
         <Tabs.Content value="tab1">
           <Text>Tab one content</Text>
         </Tabs.Content>

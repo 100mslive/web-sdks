@@ -53,14 +53,14 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
         css={{
-          bg: '$surface_dim',
-          px: '$4',
-          pb: '$4',
+          bg: 'surface.dim',
+          px: '4',
+          pb: '4',
         }}
       >
-        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+        <Sheet.Title css={{ py: '10', px: '8', alignItems: 'center' }}>
           <Flex justify="between">
-            <Flex align="center" css={{ mb: '$1' }}>
+            <Flex align="center" css={{ mb: '1' }}>
               <Text variant="h6" inline>
                 Stats For Nerds
               </Text>
@@ -75,8 +75,8 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
             mr: '-$2',
             overflowY: 'auto',
             maxHeight: '65vh',
-            pr: '$6',
-            pl: '$4',
+            pr: '6',
+            pl: '4',
           }}
         >
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
@@ -89,18 +89,18 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           <Flex
             direction="column"
             css={{
-              mb: '$12',
+              mb: '12',
               position: 'relative',
               minWidth: 0,
             }}
           >
-            <Label variant="body2" css={{ c: '$on_surface_high' }}>
+            <Label variant="body2" css={{ c: 'onSurface.high' }}>
               Stats For
             </Label>
             <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
               <DialogDropdownTrigger
                 title={selectedStat.label || 'Select Stats'}
-                css={{ mt: '$4' }}
+                css={{ mt: '4' }}
                 titleCSS={{ mx: 0 }}
                 open={openDropdown}
                 ref={ref}
@@ -116,7 +116,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
                           setSelectedStat(option);
                         }}
                         css={{
-                          px: '$9',
+                          px: '9',
                           bg: isSelected ? selectionBg : undefined,
                         }}
                       >
@@ -154,7 +154,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           {/* Title */}
           <Dialog.Title css={{ p: '$4 0' }}>
             <Flex justify="between">
-              <Flex align="center" css={{ mb: '$1' }}>
+              <Flex align="center" css={{ mb: '1' }}>
                 <Text variant="h6" inline>
                   Stats For Nerds
                 </Text>
@@ -175,18 +175,18 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           <Flex
             direction="column"
             css={{
-              mb: '$12',
+              mb: '12',
               position: 'relative',
               minWidth: 0,
             }}
           >
-            <Label variant="body2" css={{ c: '$on_surface_high' }}>
+            <Label variant="body2" css={{ c: 'onSurface.high' }}>
               Stats For
             </Label>
             <Dropdown.Root data-testid="dialog_select_Stats For" open={openDropdown} onOpenChange={setOpenDropdown}>
               <DialogDropdownTrigger
                 title={selectedStat.label || 'Select Stats'}
-                css={{ mt: '$4' }}
+                css={{ mt: '4' }}
                 titleCSS={{ mx: 0 }}
                 open={openDropdown}
                 ref={ref}
@@ -202,7 +202,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
                           setSelectedStat(option);
                         }}
                         css={{
-                          px: '$9',
+                          px: '9',
                           bg: isSelected ? selectionBg : undefined,
                         }}
                       >
@@ -271,7 +271,7 @@ const LocalPeerStats = () => {
   }
 
   return (
-    <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
+    <Flex css={{ flexWrap: 'wrap', gap: '10' }}>
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={`${((stats.subscribe?.jitter ?? 0) * 1000).toFixed(2)} ms`} />
       <StatsRow label="Publish Bitrate" value={formatBytes(stats.publish?.bitrate, 'b/s')} />
@@ -310,7 +310,7 @@ const TrackStats = ({ trackID, layer, local }) => {
   const inbound = stats.type.includes('inbound');
 
   return (
-    <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
+    <Flex css={{ flexWrap: 'wrap', gap: '10' }}>
       <StatsRow label="Type" value={stats.type + ' ' + stats.kind} />
       <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, 'b/s')} />
       <StatsRow label="Packets Lost" value={stats.packetsLost} />
@@ -338,12 +338,12 @@ const DebugInfo = ({ details }) => {
     <Accordion.Root type="single" collapsible css={{ w: '100%' }}>
       <Accordion.Item value="Debug Info">
         <Accordion.Header>
-          <Label variant="body2" css={{ c: '$on_surface_high' }}>
+          <Label variant="body2" css={{ c: 'onSurface.high' }}>
             Debug Info
           </Label>
         </Accordion.Header>
         <Accordion.Content>
-          <Flex css={{ flexWrap: 'wrap', mt: '$10', gap: '$10' }}>
+          <Flex css={{ flexWrap: 'wrap', mt: '10', gap: '10' }}>
             <StatsRow css={{ w: '100%' }} label="Websocket URL" value={details?.websocketURL} />
             <StatsRow css={{ w: '100%' }} label="Init Endpoint" value={details?.initEndpoint} />
             <StatsRow css={{ w: '100%' }} label="Enabled flags" value={details?.enabledFlags?.join(', ')} />
@@ -355,18 +355,18 @@ const DebugInfo = ({ details }) => {
 };
 
 const StatsRow = React.memo(({ label, value, css }) => (
-  <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3', ...css }}>
+  <Box css={{ bg: 'surface.bright', w: 'calc(50% - $6)', p: '8', r: '3', ...css }}>
     <Text
       variant="overline"
       css={{
         fontWeight: '$semiBold',
-        color: '$on_surface_medium',
+        color: 'onSurface.medium',
         textTransform: 'uppercase',
       }}
     >
       {label}
     </Text>
-    <Text variant="sub1" css={{ fontWeight: '$semiBold', color: '$on_surface_high' }}>
+    <Text variant="sub1" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
       {value || '-'}
     </Text>
   </Box>

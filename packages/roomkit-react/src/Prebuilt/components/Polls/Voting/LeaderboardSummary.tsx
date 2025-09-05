@@ -35,11 +35,11 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
 
   return (
     <Container rounded>
-      <Flex direction="column" css={{ size: '100%', p: '$8' }}>
-        <Flex justify="between" align="center" css={{ pb: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
-          <Flex align="center" css={{ gap: '$4' }}>
+      <Flex direction="column" css={{ size: '100%', p: '8' }}>
+        <Flex justify="between" align="center" css={{ pb: '6', borderBottom: '1px solid $border_bright', mb: '8' }}>
+          <Flex align="center" css={{ gap: '4' }}>
             <Flex
-              css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
+              css={{ color: 'onSurface.medium', '&:hover': { color: 'onSurface.high', cursor: 'pointer' } }}
               onClick={() => setPollView(POLL_VIEWS.VOTE)}
             >
               <ChevronLeftIcon />
@@ -50,31 +50,31 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
             <StatusIndicator status={quiz.state} />
           </Flex>
           <Flex
-            css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
+            css={{ color: 'onSurface.medium', '&:hover': { color: 'onSurface.high', cursor: 'pointer' } }}
             onClick={toggleSidepane}
           >
             <CrossIcon />
           </Flex>
         </Flex>
-        <Box css={{ overflowY: 'auto', mr: '-$4', pr: '$4' }}>
+        <Box css={{ overflowY: 'auto', mr: '-$4', pr: '4' }}>
           {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
 
-          <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '$4' }}>
+          <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '4' }}>
             Leaderboard
           </Text>
-          <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+          <Text variant="xs" css={{ color: 'onSurface.medium' }}>
             Based on score and time taken to cast the correct answer
           </Text>
           <Box
             css={{
-              mt: '$8',
+              mt: '8',
               overflowY: 'auto',
               flex: viewAllEntries ? '1 1 0' : 'unset',
               mr: viewAllEntries ? '-$6' : 'unset',
               px: viewAllEntries ? '0' : '$4',
               pr: viewAllEntries ? '$6' : '$4',
               backgroundColor: viewAllEntries ? '' : '$surface_default',
-              borderRadius: '$1',
+              borderRadius: '1',
             }}
           >
             {quizLeaderboard?.entries &&
@@ -100,7 +100,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
                   w: '100%',
                   borderTop: '1px solid $border_bright',
                   cursor: 'pointer',
-                  color: '$on_surface_high',
+                  color: 'onSurface.high',
                   p: '$6 $2',
                 }}
                 onClick={() => setViewAllEntries(true)}

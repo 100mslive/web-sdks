@@ -4,11 +4,11 @@ import { styled } from '../styled-system';
 /**
  * @see https://tailwindcss.com/docs/space
  */
-const gapStyles = (value: number) => {
+const gapStyles = (num: number) => {
   return {
     '& > * + *': {
       marginRight: '0',
-      marginLeft: `${0.25 * value}rem`,
+      marginLeft: `${0.25 * num}rem`,
     },
   };
 };

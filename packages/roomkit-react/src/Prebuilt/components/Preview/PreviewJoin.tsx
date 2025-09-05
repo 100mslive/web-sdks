@@ -112,7 +112,7 @@ const PreviewJoin = ({
   }, [join, name, setPreviewPreference]);
   const { elements = {} } = useRoomLayoutPreviewScreen();
   const { preview_header: previewHeader = {}, virtual_background } = elements || {};
-  const aspectRatio = useLocalTileAspectRatio();
+  useLocalTileAspectRatio();
 
   useEffect(() => {
     if (authToken) {
@@ -133,33 +133,33 @@ const PreviewJoin = ({
 
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
-      <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
+      <Container css={{ h: '100%', pt: '6', '@md': { justifyContent: 'space-between', pt: '10' } }}>
         {toggleVideo ? null : <Box />}
-        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '$8' }}>
+        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '8' }}>
           <Logo />
           <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
             {previewHeader.title}
           </Text>
           <Text
-            css={{ c: '$on_surface_medium', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
+            css={{ c: 'onSurface.medium', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
             variant="sm"
           >
             {previewHeader.sub_title}
           </Text>
-          <Flex justify="center" css={{ gap: '$4' }}>
+          <Flex justify="center" css={{ gap: '4' }}>
             {isStreamingOn ? (
               <Chip
                 content="LIVE"
                 backgroundColor="$alert_error_default"
                 textColor="#FFF"
-                icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
+                icon={<Box css={{ h: 'sm', w: 'sm', backgroundColor: 'onPrimary.high', borderRadius: 'round' }} />}
               />
             ) : null}
             <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
+        <Box css={{ w: '100%', maxWidth: `{Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
@@ -185,7 +185,7 @@ const Container = styled('div', {
   width: '100%',
   ...flexCenter,
   flexDirection: 'column',
-  px: '$10',
+  px: '10',
 });
 
 export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) => {
@@ -207,18 +207,18 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     <StyledVideoTile.Container
       ref={ref}
       css={{
-        bg: '$surface_default',
+        bg: 'surface.default',
         aspectRatio,
         height: 'min(340px, 70vh)',
         width: 'auto',
         maxWidth: '600px',
         overflow: 'clip',
-        mt: '$10',
+        mt: '10',
         '@md': {
           mt: 0,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
-          my: '$4',
+          my: '4',
         },
       }}
     >
@@ -261,10 +261,10 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
       justify={hideSettings && isMobile ? 'center' : 'between'}
       css={{
         width: '100%',
-        mt: '$6',
+        mt: '6',
       }}
     >
-      <Flex css={{ gap: '$4' }}>
+      <Flex css={{ gap: '4' }}>
         <AudioVideoToggle />
         {vbEnabled && isVBEnabledForUser ? <VBToggle /> : null}
       </Flex>

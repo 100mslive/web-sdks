@@ -50,8 +50,8 @@ const Settings = ({ setHide }) => {
             <StyledVideoTile.Container
               css={{
                 w: '90%',
-                px: '$10',
-                height: '$48',
+                px: '10',
+                height: '48',
                 bg: 'transparent',
                 m: '$10 auto',
               }}
@@ -115,12 +115,12 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
   const ref = useRef(null);
 
   return (
-    <Box css={{ mb: '$10' }}>
-      <Text css={{ mb: '$4' }}>{title}</Text>
+    <Box css={{ mb: '10' }}>
+      <Text css={{ mb: '4' }}>{title}</Text>
       <Flex
         align="center"
         css={{
-          gap: '$4',
+          gap: '4',
           '@md': {
             flexDirection: children ? 'column' : 'row',
             alignItems: children ? 'start' : 'center',
@@ -154,7 +154,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
                       key={device.label}
                       onSelect={() => onChange(device.deviceId)}
                       css={{
-                        px: '$9',
+                        px: '9',
                         bg: device.deviceId === selection ? selectionBg : undefined,
                       }}
                     >

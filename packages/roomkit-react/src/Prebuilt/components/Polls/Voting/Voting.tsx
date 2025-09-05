@@ -78,18 +78,18 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       <Flex
         align="center"
         css={{
-          gap: '$4',
-          py: '$6',
-          px: '$8',
-          my: '$4',
+          gap: '4',
+          py: '6',
+          px: '8',
+          my: '4',
           w: '100%',
-          color: '$on_surface_high',
+          color: 'onSurface.high',
           borderBottom: '1px solid $border_default',
         }}
       >
         <Flex
           onClick={() => setPollView(POLL_VIEWS.CREATE_POLL_QUIZ)}
-          css={{ cursor: 'pointer', c: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+          css={{ cursor: 'pointer', c: 'onSurface.medium', '&:hover': { color: 'onSurface.high' } }}
         >
           <ChevronLeftIcon />
         </Flex>
@@ -109,7 +109,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
       <Flex direction="column" css={{ p: '$8 $10', flex: '1 1 0', overflowY: 'auto' }}>
         {poll.state === 'started' ? (
-          <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
+          <Text css={{ color: 'onSurface.medium', fontWeight: '$semiBold' }}>
             {pollCreatorName || 'Participant'} started a {poll.type}
           </Text>
         ) : null}
@@ -121,7 +121,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         )}
       </Flex>
       <Flex
-        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}
+        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '8', borderTop: '1px solid $border_bright' }}
       >
         {poll.state === 'started' && canEndActivity && (
           <Button

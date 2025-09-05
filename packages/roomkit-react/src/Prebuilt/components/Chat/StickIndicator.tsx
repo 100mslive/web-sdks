@@ -9,12 +9,12 @@ export const StickIndicator = ({ total, index }: { total: number; index: number 
   }
 
   return (
-    <Flex direction="column" css={{ gap: '$1' }}>
+    <Flex direction="column" css={{ gap: '1' }}>
       {[...Array(sticksCount)].map((_, i) => (
         <Box
           css={{
             borderLeft: '2px solid',
-            height: '$4',
+            height: '4',
             borderColor: i === index ? '$on_surface_high' : '$on_surface_low',
           }}
         />

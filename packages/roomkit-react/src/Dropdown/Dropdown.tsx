@@ -72,16 +72,16 @@ const DropdownItem = styled(Item, {
 
 const DropdownItemSeparator = styled(Separator, {
   h: 1,
-  backgroundColor: '$border_bright',
+  backgroundColor: 'border.bright',
   m: '$4 $8',
 });
 
 const DropdownContent = styled(Content, {
-  w: '$80',
-  maxHeight: '$64',
-  r: '$1',
-  py: '$4',
-  backgroundColor: '$surface_dim',
+  w: '80',
+  maxHeight: '64',
+  r: '1',
+  py: '4',
+  backgroundColor: 'surface.dim',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
@@ -91,7 +91,7 @@ const DropdownContent = styled(Content, {
 const DropdownLabel = styled(Label, {
   display: 'flex',
   alignItems: 'center',
-  h: '$12',
+  h: '12',
   w: '100%',
   p: '$8 $4',
 });
@@ -101,34 +101,34 @@ const DropdownGroup = styled(Group, {});
 const DropdownSubMenu = styled(Sub, {});
 
 const DropdownSubMenuContent = styled(SubContent, {
-  w: '$80',
-  maxHeight: '$64',
-  r: '$1',
-  py: '$4',
-  backgroundColor: '$surface_bright',
+  w: '80',
+  maxHeight: '64',
+  r: '1',
+  py: '4',
+  backgroundColor: 'surface.bright',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
 });
 
 const DropdownCheckboxItem = styled(CheckboxItem, {
-  color: '$on_surface_high',
-  p: '$8',
+  color: 'onSurface.high',
+  p: '8',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
   '&:hover': {
     cursor: 'pointer',
-    bg: '$surface_brighter',
+    bg: 'surface.brighter',
   },
   '&:focus-visible': {
-    bg: '$surface_brighter',
+    bg: 'surface.brighter',
   },
-  gap: '$2',
+  gap: '2',
 });
 
 const DropdownItemIndicator = styled(ItemIndicator, {
-  w: '$10',
+  w: '10',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',

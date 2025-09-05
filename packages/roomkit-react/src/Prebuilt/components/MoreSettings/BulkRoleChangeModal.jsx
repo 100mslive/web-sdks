@@ -52,7 +52,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
               title={selectedBulkRole.length === 0 ? 'Select Multiple Roles' : selectedBulkRole.toString()}
               css={{
                 w: '70%',
-                p: '$8',
+                p: '8',
               }}
               open={bulkRoleDialog}
             />
@@ -77,7 +77,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                         setErrorMessage('');
                       }}
                     >
-                      <Checkbox.Root css={{ margin: '$2' }} checked={selectedBulkRole.includes(role)}>
+                      <Checkbox.Root css={{ margin: '2' }} checked={selectedBulkRole.includes(role)}>
                         <Checkbox.Indicator>
                           <CheckIcon width={16} height={16} />
                         </Checkbox.Indicator>
@@ -97,7 +97,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
               title={selectedRole || 'Select Role'}
               css={{
                 w: '70%',
-                p: '$8',
+                p: '8',
               }}
               open={roleDialog}
             />
@@ -121,7 +121,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow>
           {errorMessage && (
-            <Flex gap={2} css={{ c: '$alert_error_default', w: '70%', ml: 'auto' }}>
+            <Flex gap={2} css={{ c: 'alert.error.default', w: '70%', ml: 'auto' }}>
               <AlertTriangleIcon />
               <Text css={{ c: 'inherit' }}>{errorMessage}</Text>
             </Flex>
@@ -129,7 +129,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow justify="end">
           <Button variant="primary" onClick={changeBulkRole} disabled={!(selectedRole && selectedBulkRole.length > 0)}>
-            {isSubmiting && <Loading css={{ color: '$on_primary_medium' }} />}
+            {isSubmiting && <Loading css={{ color: 'onPrimary.medium' }} />}
             Apply
           </Button>
         </DialogRow>

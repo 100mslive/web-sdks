@@ -29,28 +29,28 @@ export const SavedQuestion = ({
 
   return (
     <>
-      <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
+      <Text variant="overline" css={{ c: 'onSurface.low', textTransform: 'uppercase' }}>
         {/* @ts-ignore */}
         Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
       </Text>
-      <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>
+      <Text variant="body2" css={{ mt: '4', mb: 'md' }}>
         {question.text}
       </Text>
       {question.options?.map((option, index) => (
-        <Flex key={`${option.text}-${index}`} css={{ alignItems: 'center', my: '$xs' }}>
-          <Text variant="body2" css={{ c: '$on_surface_medium' }}>
+        <Flex key={`${option.text}-${index}`} css={{ alignItems: 'center', my: 'xs' }}>
+          <Text variant="body2" css={{ c: 'onSurface.medium' }}>
             {option.text}
           </Text>
           {/* @ts-ignore */}
           {(answerArray.includes(index + 1) || option.isCorrectAnswer) && (
-            <Flex css={{ color: '$alert_success', mx: '$xs' }}>
+            <Flex css={{ color: 'alert.success', mx: 'xs' }}>
               <CheckCircleIcon height={24} width={24} />
             </Flex>
           )}
         </Flex>
       ))}
       {question.skippable ? (
-        <Text variant="sm" css={{ color: '$on_surface_low', my: '$md' }}>
+        <Text variant="sm" css={{ color: 'onSurface.low', my: 'md' }}>
           Not required to answer
         </Text>
       ) : null}

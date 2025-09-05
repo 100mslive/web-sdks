@@ -29,7 +29,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
       <Button variant="standard">Open Sheet</Button>
     </Sheet.Trigger>
     <Sheet.Content>
-      <Sheet.Title css={{ p: '$10' }}>
+      <Sheet.Title css={{ p: '10' }}>
         <Flex direction="row" justify="between" css={{ w: '100%' }}>
           <Flex justify="start" align="center" gap="3">
             <InfoIcon />
@@ -41,8 +41,8 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
         </Flex>
       </Sheet.Title>
       <HorizontalDivider />
-      <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
-        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+      <Box as="div" css={{ p: '10', overflowY: 'scroll', maxHeight: '70vh' }}>
+        <Text variant="body1" css={{ c: 'onSurface.medium' }}>
           Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
           labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
@@ -55,7 +55,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
           <Label htmlFor="username">Username</Label>
           <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
         </Fieldset>
-        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+        <Text variant="body1" css={{ c: 'onSurface.medium' }}>
           Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
           labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
@@ -68,7 +68,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
           <Label htmlFor="username">Username</Label>
           <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
         </Fieldset>
-        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+        <Text variant="body1" css={{ c: 'onSurface.medium' }}>
           Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
           labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
@@ -81,7 +81,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
           <Label htmlFor="username">Username</Label>
           <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
         </Fieldset>
-        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+        <Text variant="body1" css={{ c: 'onSurface.medium' }}>
           Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
           labore et dolore magna aliqua. Ut enim ad minim veniam,im veni

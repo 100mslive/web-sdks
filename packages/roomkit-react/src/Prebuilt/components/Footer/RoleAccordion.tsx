@@ -91,17 +91,17 @@ export const RoleAccordion = ({
   const hasNext = total > peersInAccordion.length && !filter?.search;
 
   return (
-    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>
+    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '8' }} ref={ref}>
       <Accordion.Header
         chevronID={`role_accordion_btn_${roleName}`}
-        iconStyles={{ c: '$on_surface_high' }}
+        iconStyles={{ c: 'onSurface.high' }}
         css={{
           textTransform: 'capitalize',
           p: '$6 $8',
-          fontSize: '$sm',
+          fontSize: 'sm',
           fontWeight: '$semiBold',
-          c: '$on_surface_medium',
-          borderRadius: '$1',
+          c: 'onSurface.medium',
+          borderRadius: '1',
           border: '1px solid $border_default',
           '&[data-state="open"]': {
             borderBottomLeftRadius: 0,
@@ -109,11 +109,8 @@ export const RoleAccordion = ({
           },
         }}
       >
-        <Flex justify="between" align="center" css={{ flexGrow: 1, pr: '$6' }}>
-          <Text
-            variant="sm"
-            css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
-          >
+        <Flex justify="between" align="center" css={{ flexGrow: 1, pr: '6' }}>
+          <Text variant="sm" css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: 'onSurface.medium' }}>
             {roleName} {`(${getFormattedCount(isLargeRoom && isOffStageRole ? total : peerList.length)})`}
           </Text>
           <RoleOptions roleName={roleName} peerList={peersInAccordion} />
@@ -150,10 +147,10 @@ export const RoleAccordion = ({
             align="center"
             justify="end"
             css={{
-              gap: '$1',
+              gap: '1',
               cursor: 'pointer',
-              color: '$on_surface_high',
-              p: '$6',
+              color: 'onSurface.high',
+              p: '6',
               borderTop: '1px solid $border_default',
             }}
             onClick={() => onActive?.(roleName)}
@@ -167,12 +164,12 @@ export const RoleAccordion = ({
         {isHandRaisedAccordion && canBringToStage && (
           <>
             <HorizontalDivider />
-            <Flex css={{ w: '100%', p: '$6', gap: '$4' }} justify="center">
-              <Button variant="standard" onClick={lowerAllHands} icon css={{ pl: '$2' }}>
+            <Flex css={{ w: '100%', p: '6', gap: '4' }} justify="center">
+              <Button variant="standard" onClick={lowerAllHands} icon css={{ pl: '2' }}>
                 <CrossIcon /> Lower all hands
               </Button>
 
-              <Button onClick={bringAllToStage} icon css={{ pl: '$2' }}>
+              <Button onClick={bringAllToStage} icon css={{ pl: '2' }}>
                 <AddIcon /> {bring_to_stage_label}
               </Button>
             </Flex>

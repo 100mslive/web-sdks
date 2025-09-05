@@ -30,7 +30,7 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
     <Dialog.Portal>
       <Dialog.Overlay />
       <Dialog.Content>
-        <Dialog.Title css={{ c: '$on_surface_high', position: 'relative' }}>
+        <Dialog.Title css={{ c: 'onSurface.high', position: 'relative' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Flex justify="start" align="center" gap="3">
               <InfoIcon />
@@ -41,12 +41,12 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
             </Dialog.DefaultClose>
           </Flex>
         </Dialog.Title>
-        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+        <Text variant="body1" css={{ c: 'onSurface.medium' }}>
           Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
           labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
         </Text>
-        <Fieldset css={{ mt: '$4' }}>
+        <Fieldset css={{ mt: '4' }}>
           <Label htmlFor="name">Name</Label>
           <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
         </Fieldset>

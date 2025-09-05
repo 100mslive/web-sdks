@@ -26,7 +26,7 @@ import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 const TextArea = styled('textarea', {
   width: '100%',
   bg: 'transparent',
-  color: '$on_primary_high',
+  color: 'onPrimary.high',
   resize: 'none',
   lineHeight: '1rem',
   position: 'relative',
@@ -34,7 +34,7 @@ const TextArea = styled('textarea', {
   fontSize: '100%',
   margin: 0,
   padding: 0,
-  top: '$3',
+  top: '3',
   '&:focus': {
     boxShadow: 'none',
     outline: 'none',
@@ -173,7 +173,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+          <Flex align="center" justify="end" css={{ mb: '4' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
@@ -197,14 +197,14 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                     hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, chatState);
                   }}
                   css={{
-                    backgroundColor: '$surface_default',
+                    backgroundColor: 'surface.default',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '$4',
-                    borderRadius: '$1',
-                    color: '$on_surface_high',
+                    gap: '4',
+                    borderRadius: '1',
+                    color: 'onSurface.high',
                     cursor: 'pointer',
-                    '&:hover': { backgroundColor: '$surface_dim' },
+                    '&:hover': { backgroundColor: 'surface.dim' },
                   }}
                 >
                   <PauseCircleIcon />
@@ -218,32 +218,32 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         ) : null}
       </Flex>
       {selection && (
-        <Flex align={inputRef.current?.scrollHeight === 32 ? 'center' : 'end'} css={{ gap: '$4', w: '100%' }}>
+        <Flex align={inputRef.current?.scrollHeight === 32 ? 'center' : 'end'} css={{ gap: '4', w: '100%' }}>
           <Flex
             align="end"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
-              minHeight: '$16',
+              minHeight: '16',
               position: 'relative',
               py: isOverlayChat && isMobile ? '$2' : '$6',
-              pl: '$8',
+              pl: '8',
               flexGrow: 1,
-              r: '$1',
+              r: '1',
               '@md': {
-                minHeight: '$14',
+                minHeight: '14',
                 boxSizing: 'border-box',
               },
-              ...(isLandscapeHLSStream ? { minHeight: '$14', py: 0 } : {}),
+              ...(isLandscapeHLSStream ? { minHeight: '14', py: 0 } : {}),
             }}
           >
             {children}
             <TextArea
               maxLength={CHAT_MESSAGE_LIMIT + 10}
               css={{
-                c: '$on_surface_high',
-                '&:valid ~ .send-msg': { color: '$on_surface_high' },
-                '& ~ .send-msg': { color: '$on_surface_low' },
-                '&::placeholder': { color: '$on_surface_medium' },
+                c: 'onSurface.high',
+                '&:valid ~ .send-msg': { color: 'onSurface.high' },
+                '& ~ .send-msg': { color: 'onSurface.low' },
+                '&::placeholder': { color: 'onSurface.medium' },
                 border: 'none',
               }}
               placeholder={message_placeholder}
@@ -285,7 +285,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               css={{
                 ml: 'auto',
                 height: 'max-content',
-                mr: '$4',
+                mr: '4',
                 '&:hover': { c: isMobile ? '' : '$on_surface_medium' },
               }}
               data-testid="send_msg_btn"
@@ -301,7 +301,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 }}
                 gap="2"
               >
-                <RaiseHand css={{ bg: '$surface_default' }} />
+                <RaiseHand css={{ bg: 'surface.default' }} />
                 <MoreSettings elements={elements} screenType={screenType} />
               </Flex>
             </>
@@ -309,7 +309,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         </Flex>
       )}
       {messageLengthExceeded && (
-        <Text variant="xs" css={{ color: '$alert_error_default', fontWeight: '$semiBold', mt: '$1', ml: '$7' }}>
+        <Text variant="xs" css={{ color: 'alert.error.default', fontWeight: '$semiBold', mt: '1', ml: '7' }}>
           Message cannot exceed 2000 characters
         </Text>
       )}

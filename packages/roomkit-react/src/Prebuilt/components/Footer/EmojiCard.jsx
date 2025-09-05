@@ -10,7 +10,7 @@ const emojiReactionList = [
 
 export const EmojiCard = ({ sendReaction }) => {
   return emojiReactionList.map((emojiLine, index) => (
-    <Flex key={index} justify="between" css={{ mb: '$8' }}>
+    <Flex key={index} justify="between" css={{ mb: '8' }}>
       {emojiLine.map(emoji => (
         <EmojiContainer key={emoji.emojiId} onClick={() => sendReaction(emoji.emojiId)}>
           <em-emoji id={emoji.emojiId} size="100%" set="apple"></em-emoji>
@@ -23,12 +23,12 @@ export const EmojiCard = ({ sendReaction }) => {
 const EmojiContainer = styled('span', {
   position: 'relative',
   cursor: 'pointer',
-  width: '$16',
-  height: '$16',
-  p: '$4',
+  width: '16',
+  height: '16',
+  p: '4',
   '&:hover': {
     p: '7px',
-    bg: '$surface_brighter',
-    borderRadius: '$1',
+    bg: 'surface.brighter',
+    borderRadius: '1',
   },
 });

@@ -18,13 +18,13 @@ export const ArrowNavigation = ({
   }
 
   return (
-    <Flex direction="column" css={{ gap: '$1' }}>
+    <Flex direction="column" css={{ gap: '1' }}>
       <Flex
         onClick={showPrevious}
         css={
           index === 0
-            ? { cursor: 'not-allowed', color: '$on_surface_low' }
-            : { cursor: 'pointer', color: '$on_surface_medium' }
+            ? { cursor: 'not-allowed', color: 'onSurface.low' }
+            : { cursor: 'pointer', color: 'onSurface.medium' }
         }
       >
         <ChevronUpIcon height={20} width={20} />
@@ -33,8 +33,8 @@ export const ArrowNavigation = ({
         onClick={showNext}
         css={
           index === total - 1
-            ? { cursor: 'not-allowed', color: '$on_surface_low' }
-            : { cursor: 'pointer', color: '$on_surface_medium' }
+            ? { cursor: 'not-allowed', color: 'onSurface.low' }
+            : { cursor: 'pointer', color: 'onSurface.medium' }
         }
       >
         <ChevronDownIcon height={20} width={20} />

@@ -22,13 +22,13 @@ export const RoomDetailsHeader = () => {
   }
 
   return (
-    <Flex direction={isMobile ? 'row' : 'column'} css={{ ml: '$8', alignItems: isMobile ? 'center' : 'start' }}>
-      <Text variant="sm" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
+    <Flex direction={isMobile ? 'row' : 'column'} css={{ ml: '8', alignItems: isMobile ? 'center' : 'start' }}>
+      <Text variant="sm" css={{ c: 'onSurface.high', fontWeight: '$semiBold' }}>
         {title}
       </Text>
       {!isMobile && (
-        <Flex align="end" css={{ color: '$on_surface_high' }}>
-          <Text variant="xs" css={{ c: '$on_surface_medium' }}>
+        <Flex align="end" css={{ color: 'onSurface.high' }}>
+          <Text variant="xs" css={{ c: 'onSurface.medium' }}>
             {description.slice(0, clipLength)}
           </Text>
           {description.length > clipLength ? (
@@ -42,7 +42,7 @@ export const RoomDetailsHeader = () => {
         </Flex>
       )}
       {isMobile && description ? (
-        <Flex css={{ color: '$on_surface_medium' }}>
+        <Flex css={{ color: 'onSurface.medium' }}>
           <ChevronRightIcon height={16} width={16} onClick={toggleDetailsSheet} />
         </Flex>
       ) : null}

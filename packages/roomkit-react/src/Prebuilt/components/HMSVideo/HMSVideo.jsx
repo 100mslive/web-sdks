@@ -40,7 +40,7 @@ export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoR
           // default for on-surface-high
           color: '#EFF0FA',
           whiteSpace: 'pre-line',
-          fontSize: '$sm',
+          fontSize: 'sm',
           fontStyle: 'normal',
           fontWeight: '$regular',
           lineHeight: '$sm',

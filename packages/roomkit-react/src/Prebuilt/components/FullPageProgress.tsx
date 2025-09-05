@@ -14,7 +14,7 @@ const FullPageProgress = ({
 }) => (
   <Flex direction="column" justify="center" align="center" css={{ size: '100%', color: loaderColor, ...css }}>
     <Loading color="currentColor" size={100} />
-    {text ? <Text css={{ mt: '$10', color: '$on_surface_high' }}>{text}</Text> : null}
+    {text ? <Text css={{ mt: '10', color: 'onSurface.high' }}>{text}</Text> : null}
   </Flex>
 );
 

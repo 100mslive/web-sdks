@@ -13,7 +13,7 @@ import { ToastManager } from '../Toast/ToastManager';
 
 const Instruction = ({ description }: { description: string }) => (
   <li>
-    <DialogRow css={{ ml: '$4' }}>
+    <DialogRow css={{ ml: '4' }}>
       <Text variant="body2">{description}</Text>
     </DialogRow>
   </li>

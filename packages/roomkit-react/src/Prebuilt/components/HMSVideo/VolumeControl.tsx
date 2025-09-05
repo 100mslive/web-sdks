@@ -11,7 +11,7 @@ export const VolumeControl = () => {
   return (
     <Flex
       align="center"
-      css={{ color: '$on_surface_high' }}
+      css={{ color: 'onSurface.high' }}
       onMouseOver={(event: React.MouseEvent) => {
         event.stopPropagation();
         setShowSlider(true);
@@ -35,11 +35,11 @@ export const VolumeControl = () => {
       />
       <Slider
         css={{
-          mx: '$4',
-          w: '$20',
+          mx: '4',
+          w: '20',
           cursor: 'pointer',
-          '@sm': { w: '$14' },
-          '@xs': { w: '$14' },
+          '@sm': { w: '14' },
+          '@xs': { w: '14' },
           opacity: showSlider ? '1' : '0',
           display: showSlider ? '' : 'none',
           transition: `all .2s ease .5s`,
@@ -52,7 +52,7 @@ export const VolumeControl = () => {
           hlsPlayer?.setVolume(volume[0]);
           setVolume(volume[0]);
         }}
-        thumbStyles={{ w: '$6', h: '$6' }}
+        thumbStyles={{ w: '6', h: '6' }}
       />
     </Flex>
   );

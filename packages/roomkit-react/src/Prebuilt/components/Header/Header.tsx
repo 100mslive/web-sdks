@@ -19,12 +19,12 @@ export const Header = () => {
   }
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
-      <Flex align="center" gap="2" css={{ position: 'absolute', left: '$10' }}>
+      <Flex align="center" gap="2" css={{ position: 'absolute', left: '10' }}>
         <Logo />
         <RoomDetailsHeader />
         <SpeakerTag />
         {isMobile && (
-          <Flex align="center" css={{ gap: '$4' }}>
+          <Flex align="center" css={{ gap: '4' }}>
             <LiveStatus />
             <RecordingStatus />
             <RecordingPauseStatus />
@@ -35,8 +35,8 @@ export const Header = () => {
         align="center"
         css={{
           position: 'absolute',
-          right: '$10',
-          gap: '$4',
+          right: '10',
+          gap: '4',
         }}
       >
         <StreamActions />

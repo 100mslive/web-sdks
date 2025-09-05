@@ -39,9 +39,9 @@ export const PollNotificationModal = () => {
                 onClick={() => togglePollView(notification.data.id)}
                 variant="standard"
                 css={{
-                  backgroundColor: '$surface_bright',
+                  backgroundColor: 'surface.bright',
                   fontWeight: '$semiBold',
-                  color: '$on_surface_high',
+                  color: 'onSurface.high',
                   p: '$xs $md',
                 }}
               >
