@@ -25,7 +25,7 @@ const SwitchWithLabel = ({
         my: '2',
         py: '8',
         w: '100%',
-        borderBottom: '1px solid $border_default',
+        borderBottom: '1px solid border.default',
         display: hide ? 'none' : 'flex',
       }}
     >
@@ -33,8 +33,8 @@ const SwitchWithLabel = ({
         htmlFor={id}
         css={{
           fontSize: 'md',
-          fontWeight: '$semiBold',
-          color: checked ? '$on_surface_high' : '$on_surface_low',
+          fontWeight: 'semiBold',
+          color: checked ? 'onSurface.high' : 'onSurface.low',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',

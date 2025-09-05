@@ -30,7 +30,7 @@ export function HLSAutoplayBlockedPrompt({
         <Text
           variant="body1"
           css={{
-            fontWeight: '$semiBold',
+            fontWeight: 'semiBold',
             px: '2',
             color: '#000',
           }}

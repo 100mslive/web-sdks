@@ -6,7 +6,7 @@ export const MwebChatOption = ({
   icon,
   text,
   onClick,
-  color = '$on_surface_high',
+  color = 'onSurface.high',
 }: {
   icon: React.ReactNode;
   text: string;
@@ -16,7 +16,7 @@ export const MwebChatOption = ({
   return (
     <Flex align="center" css={{ w: '100%', color, cursor: 'pointer', gap: '4', p: '8' }} onClick={onClick}>
       {icon}
-      <Text variant="sm" css={{ color, fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ color, fontWeight: 'semiBold' }}>
         {text}
       </Text>
     </Flex>

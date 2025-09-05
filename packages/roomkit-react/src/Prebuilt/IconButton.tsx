@@ -4,7 +4,7 @@ import { styled } from '../Theme';
 const IconButton = styled(BaseIconButton, {
   width: '14',
   height: '14',
-  border: '1px solid $border_bright',
+  border: '1px solid border.bright',
   bg: 'background.dim',
   r: '1',
   '&[disabled]': {

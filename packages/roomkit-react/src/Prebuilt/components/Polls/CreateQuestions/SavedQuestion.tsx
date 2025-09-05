@@ -55,7 +55,7 @@ export const SavedQuestion = ({
         </Text>
       ) : null}
       <Flex justify="end" css={{ w: '100%', alignItems: 'center' }}>
-        <Button variant="standard" css={{ fontWeight: '$semiBold' }} onClick={() => convertToDraft(question.draftID)}>
+        <Button variant="standard" css={{ fontWeight: 'semiBold' }} onClick={() => convertToDraft(question.draftID)}>
           Edit
         </Button>
       </Flex>

@@ -15,7 +15,7 @@ export const StatusIndicator = ({ status }: { status?: HMSPollState }) => {
     <Flex align="center">
       <Flex
         css={{
-          backgroundColor: statusMap[status] === PollStage.LIVE ? '$alert_error_default' : '$secondary_default',
+          backgroundColor: statusMap[status] === PollStage.LIVE ? 'alert.error.default' : 'secondary.default',
           p: '$2 $4',
           borderRadius: '0',
         }}
@@ -23,7 +23,7 @@ export const StatusIndicator = ({ status }: { status?: HMSPollState }) => {
         <Text
           variant="caption"
           css={{
-            fontWeight: '$semiBold',
+            fontWeight: 'semiBold',
             color: 'onPrimary.high',
           }}
         >

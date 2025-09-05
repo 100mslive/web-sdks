@@ -8,7 +8,7 @@ const DialogDropdownTrigger = React.forwardRef(({ title, css, open, icon, titleC
       asChild
       data-testid={`${title}_selector`}
       css={{
-        border: '1px solid $border_bright',
+        border: '1px solid border.bright',
         bg: 'surface.bright',
         r: '1',
         p: '$6 $9',

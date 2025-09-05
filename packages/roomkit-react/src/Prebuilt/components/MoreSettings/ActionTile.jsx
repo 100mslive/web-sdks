@@ -11,8 +11,8 @@ const ActionTileRoot = ({ active, disabled = false, children, onClick, ...props 
       alignItems: 'center',
       p: '$4 $2',
       position: 'relative',
-      bg: active ? '$surface_bright' : '',
-      color: disabled ? '$on_surface_low' : '$on_surface_high',
+      bg: active ? 'surface.bright' : '',
+      color: disabled ? 'onSurface.low' : 'onSurface.high',
       gap: '4',
       r: '1',
       '&:hover': {
@@ -33,7 +33,7 @@ const ActionTileCount = styled(Text, {
   position: 'absolute',
   top: 0,
   right: 0,
-  fontWeight: '$semiBold',
+  fontWeight: 'semiBold',
   color: 'onSurface.high',
   p: '$1 $2',
   minWidth: '9',
@@ -47,7 +47,7 @@ const ActionTileCount = styled(Text, {
 });
 
 const ActionTileTitle = styled(Text, {
-  fontWeight: '$semiBold',
+  fontWeight: 'semiBold',
   color: 'inherit',
   textAlign: 'center',
   fontSize: '$xs !important',

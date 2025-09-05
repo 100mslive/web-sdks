@@ -40,7 +40,7 @@ export const PollNotificationModal = () => {
                 variant="standard"
                 css={{
                   backgroundColor: 'surface.bright',
-                  fontWeight: '$semiBold',
+                  fontWeight: 'semiBold',
                   color: 'onSurface.high',
                   p: '$xs $md',
                 }}

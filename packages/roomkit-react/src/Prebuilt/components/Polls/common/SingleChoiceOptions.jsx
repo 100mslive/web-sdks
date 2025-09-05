@@ -51,7 +51,7 @@ export const SingleChoiceOptions = ({
                     css={{
                       h: '80%',
                       w: '80%',
-                      background: '$primary_bright',
+                      background: 'primary.bright',
                       borderRadius: 'round',
                     }}
                   />
@@ -119,7 +119,7 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handle
                     css={{
                       h: '80%',
                       w: '80%',
-                      background: '$primary_bright',
+                      background: 'primary.bright',
                       borderRadius: 'round',
                     }}
                   />

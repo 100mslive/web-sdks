@@ -36,10 +36,10 @@ export const TestFooter = ({
       css={{
         py: '8',
         px: '10',
-        background: '$background_dim',
+        background: 'background.dim',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderTop: '1px solid $border_default',
+        borderTop: '1px solid border.default',
         fontSize: 'sm',
         borderBottomLeftRadius: '$1',
         borderBottomRightRadius: '$1',

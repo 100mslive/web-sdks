@@ -106,7 +106,7 @@ export const QuestionCard = ({
         mt: 'md',
         border:
           respondedToQuiz && !isLive
-            ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}`
+            ? `1px solid ${isCorrectAnswer ? 'alert.success' : 'alert.error.default'}`
             : 'none',
       }}
     >
@@ -117,10 +117,10 @@ export const QuestionCard = ({
             color: match({ respondedToQuiz, isLive, isCorrectAnswer })
               .when(
                 ({ respondedToQuiz, isLive }) => respondedToQuiz && !isLive,
-                ({ isCorrectAnswer }) => (isCorrectAnswer ? '$alert_success' : '$alert_error_default'),
+                ({ isCorrectAnswer }) => (isCorrectAnswer ? 'alert.success' : 'alert.error.default'),
               )
-              .otherwise(() => '$on_surface_low'),
-            fontWeight: '$semiBold',
+              .otherwise(() => 'onSurface.low'),
+            fontWeight: 'semiBold',
             display: 'flex',
             alignItems: 'center',
             gap: '4',
@@ -206,13 +206,13 @@ const QuestionActions = ({ isValidVote, response, isQuiz, onVote, disableVote })
   return (
     <Flex align="center" justify="end" css={{ gap: '4', w: '100%' }}>
       {response ? (
-        <Text css={{ fontWeight: '$semiBold', color: 'onSurface.medium' }}>
+        <Text css={{ fontWeight: 'semiBold', color: 'onSurface.medium' }}>
           {response.skipped ? 'Skipped' : null}
           {isQuiz && !response.skipped ? 'Answered' : null}
           {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
-        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote || disableVote} onClick={onVote}>
+        <Button css={{ p: '$xs $10', fontWeight: 'semiBold' }} disabled={!isValidVote || disableVote} onClick={onVote}>
           {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}

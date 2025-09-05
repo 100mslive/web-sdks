@@ -140,7 +140,7 @@ export const ParticipantCount = () => {
         w: 'auto',
         p: '4',
         h: 'auto',
-        bg: isPeerListOpen ? '$surface_brighter' : '',
+        bg: isPeerListOpen ? 'surface.brighter' : '',
       }}
       onClick={() => {
         if (peerCount > 0) {
@@ -186,7 +186,7 @@ export const Participant = ({
     >
       <Text
         variant="sm"
-        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '8', fontWeight: '$semiBold', color: 'onSurface.high' }}
+        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '8', fontWeight: 'semiBold', color: 'onSurface.high' }}
       >
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
@@ -403,7 +403,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
             {shouldShowStageRoleChange ? (
               <Dropdown.Item css={{ bg: 'surface.default' }} onClick={() => handleStageAction()}>
                 <ChangeRoleIcon />
-                <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold', c: 'onSurface.high' }}>
+                <Text variant="sm" css={{ ml: '4', fontWeight: 'semiBold', c: 'onSurface.high' }}>
                   {isInStage ? remove_from_stage_label : bring_to_stage_label}
                 </Text>
               </Dropdown.Item>
@@ -412,7 +412,7 @@ const ParticipantMoreActions = ({ peerId, role }: { peerId: string; role: string
             {canChangeRole && roles.length > 1 ? (
               <Dropdown.Item css={{ bg: 'surface.default' }} onClick={() => setOpenRoleChangeModal(true)}>
                 <PersonSettingsIcon />
-                <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold', c: 'onSurface.high' }}>
+                <Text variant="sm" css={{ ml: '4', fontWeight: 'semiBold', c: 'onSurface.high' }}>
                   Switch Role
                 </Text>
               </Dropdown.Item>
@@ -462,7 +462,7 @@ export const ParticipantSearch = ({
       <Input
         type="text"
         placeholder={placeholder}
-        css={{ w: '100%', p: '6', pl: '14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '6', pl: '14', bg: inSidePane ? 'surface.default' : 'surface.dim' }}
         value={value}
         onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
           event.stopPropagation();

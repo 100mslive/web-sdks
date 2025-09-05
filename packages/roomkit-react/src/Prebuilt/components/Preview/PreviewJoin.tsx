@@ -150,7 +150,7 @@ const PreviewJoin = ({
             {isStreamingOn ? (
               <Chip
                 content="LIVE"
-                backgroundColor="$alert_error_default"
+                backgroundColor="alert.error.default"
                 textColor="#FFF"
                 icon={<Box css={{ h: 'sm', w: 'sm', backgroundColor: 'onPrimary.high', borderRadius: 'round' }} />}
               />

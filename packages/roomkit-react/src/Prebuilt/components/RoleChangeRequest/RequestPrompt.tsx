@@ -26,7 +26,7 @@ export const RequestPrompt = ({
     return (
       <Sheet.Root open={open} onOpenChange={onOpenChange}>
         <Sheet.Content style={{ py: '8' }}>
-          <Text css={{ fontWeight: '$semiBold', c: 'onSurface.high', '@md': { px: '8' } }}>{title}</Text>
+          <Text css={{ fontWeight: 'semiBold', c: 'onSurface.high', '@md': { px: '8' } }}>{title}</Text>
           {body}
           <RequestActions actionText={actionText} onAction={onAction} disabled={disableActions} />
         </Sheet.Content>

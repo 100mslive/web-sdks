@@ -20,7 +20,7 @@ import { SIDE_PANE_OPTIONS } from '../common/constants';
 const tabTriggerCSS = {
   color: 'onSurface.low',
   p: '4',
-  fontWeight: '$semiBold',
+  fontWeight: 'semiBold',
   fontSize: 'sm',
   w: '100%',
   justifyContent: 'center',
@@ -113,7 +113,7 @@ export const SidePaneTabs = React.memo<{
                 <Text
                   variant="sm"
                   css={{
-                    fontWeight: '$semiBold',
+                    fontWeight: 'semiBold',
                     p: '4',
                     c: 'onSurface.high',
                     pr: '12',

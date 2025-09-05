@@ -19,7 +19,7 @@ export const ThankyouView = () => {
       align="center"
       css={{
         gap: '10',
-        border: '1px solid $border_default',
+        border: '1px solid border.default',
         borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
         bg: 'surface.dim',
         w: !isMobile ? '528px' : '410px',
@@ -51,7 +51,7 @@ export const ThankyouView = () => {
         <Text
           variant="body1"
           css={{
-            fontWeight: '$regular',
+            fontWeight: 'regular',
             fontSize: 'md',
             opacity: '0.9',
           }}

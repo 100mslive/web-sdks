@@ -121,7 +121,7 @@ export const QuestionForm = ({
           title={QUESTION_TYPE_TITLE[type]}
           css={{
             backgroundColor: 'surface.bright',
-            border: '1px solid $border_bright',
+            border: '1px solid border.bright',
           }}
           open={open}
         />
@@ -153,7 +153,7 @@ export const QuestionForm = ({
         css={{
           mt: 'md',
           backgroundColor: 'surface.bright',
-          border: '1px solid $border_bright',
+          border: '1px solid border.bright',
           minHeight: '14',
           resize: 'vertical',
           maxHeight: '32',
@@ -239,7 +239,7 @@ export const QuestionForm = ({
                   }
                   css={{
                     backgroundColor: 'surface.bright',
-                    border: '1px solid $border_bright',
+                    border: '1px solid border.bright',
                     maxWidth: '20',
                   }}
                 />
@@ -256,7 +256,7 @@ export const QuestionForm = ({
       ) : null}
 
       <Flex justify="end" align="center" css={{ mt: '12', gap: '8' }}>
-        <IconButton css={{ border: '1px solid $border_bright' }}>
+        <IconButton css={{ border: '1px solid border.bright' }}>
           <TrashIcon onClick={() => setOpenDelete(!open)} />
         </IconButton>
         <Tooltip

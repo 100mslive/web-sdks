@@ -89,7 +89,7 @@ export const VideoProgress = ({
         css={{
           h: '2',
           width: `{bufferProgress - videoProgress}%`,
-          background: '$on_surface_high',
+          background: 'onSurface.high',
           position: 'absolute',
           left: `{videoProgress}%`,
           opacity: '25%',

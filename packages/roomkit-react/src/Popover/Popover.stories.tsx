@@ -36,7 +36,7 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
             r: 'round',
             p: '$2 $2',
             bg: 'background.default',
-            '&:hover': { bg: '$background_dim !important' },
+            '&:hover': { bg: 'background.dim !important' },
           }}
         >
           <Box css={{ w: '10', h: '10', c: 'onPrimary.high' }}>

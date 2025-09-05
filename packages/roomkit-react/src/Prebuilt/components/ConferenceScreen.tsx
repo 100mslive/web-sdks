@@ -163,7 +163,7 @@ export const ConferenceScreen = () => {
               marginBottom: isMwebHLSStream ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
-                bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
+                bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : 'background.dim',
               },
             }}
             data-testid="footer"

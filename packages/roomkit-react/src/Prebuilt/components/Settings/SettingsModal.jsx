@@ -173,7 +173,7 @@ const MobileSettingModal = ({
                         gap: '8',
                         border: 'none',
                       },
-                      borderBottom: '1px solid $border_default',
+                      borderBottom: '1px solid border.default',
                     }}
                   >
                     <Icon />

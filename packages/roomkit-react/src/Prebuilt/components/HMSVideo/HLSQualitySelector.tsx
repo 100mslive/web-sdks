@@ -56,7 +56,7 @@ export function HLSQualitySelector({
               fontSize: 'md',
               px: '10',
               pb: '8',
-              borderBottom: '1px solid $border_bright',
+              borderBottom: '1px solid border.bright',
               alignItems: 'center',
             }}
           >
@@ -83,7 +83,7 @@ export function HLSQualitySelector({
                 key={layer.width}
                 onClick={() => onQualityChange(layer)}
               >
-                <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                <Text variant="caption" css={{ fontWeight: 'semiBold' }}>
                   {getQualityText(layer)}
                 </Text>
                 <Text variant="caption" css={{ flex: '1 1 0', c: 'onSurface.low', pl: '2' }}>
@@ -111,7 +111,7 @@ export function HLSQualitySelector({
             key="auto"
             onClick={() => onQualityChange({ height: 'auto' })}
           >
-            <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+            <Text variant="caption" css={{ fontWeight: 'semiBold', flex: '1 1 0' }}>
               Auto
             </Text>
             {isAuto && <CheckIcon width="16px" height="16px" />}
@@ -160,7 +160,7 @@ export function HLSQualitySelector({
                         mx: '2',
                         w: '2',
                         h: '2',
-                        background: '$on_surface_medium',
+                        background: 'onSurface.medium',
                         r: '1',
                       }}
                     />
@@ -194,8 +194,8 @@ export function HLSQualitySelector({
                 css={{
                   bg:
                     !isAuto && layer.width === selection?.width && layer.height === selection?.height
-                      ? '$surface_default'
-                      : '$surface_bright',
+                      ? 'surface.default'
+                      : 'surface.bright',
                   '&:hover': {
                     bg: 'surface.brighter',
                   },
@@ -204,7 +204,7 @@ export function HLSQualitySelector({
                   gap: '2',
                 }}
               >
-                <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                <Text variant="caption" css={{ fontWeight: 'semiBold' }}>
                   {getQualityText(layer)}
                 </Text>
                 <Text variant="caption" css={{ flex: '1 1 0', c: 'onSurface.low', pl: '2' }}>
@@ -220,7 +220,7 @@ export function HLSQualitySelector({
             onClick={() => onQualityChange({ height: 'auto' })}
             key="auto"
             css={{
-              bg: !isAuto ? '$surface_bright' : '$surface_default',
+              bg: !isAuto ? 'surface.bright' : 'surface.default',
               '&:hover': {
                 bg: 'surface.brighter',
               },
@@ -229,7 +229,7 @@ export function HLSQualitySelector({
               gap: '2',
             }}
           >
-            <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+            <Text variant="caption" css={{ fontWeight: 'semiBold', flex: '1 1 0' }}>
               Auto
             </Text>
             {isAuto && <CheckIcon width="16px" height="16px" />}

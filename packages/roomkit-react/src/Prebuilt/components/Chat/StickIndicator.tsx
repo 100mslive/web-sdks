@@ -15,7 +15,7 @@ export const StickIndicator = ({ total, index }: { total: number; index: number 
           css={{
             borderLeft: '2px solid',
             height: '4',
-            borderColor: i === index ? '$on_surface_high' : '$on_surface_low',
+            borderColor: i === index ? 'onSurface.high' : 'onSurface.low',
           }}
         />
       ))}

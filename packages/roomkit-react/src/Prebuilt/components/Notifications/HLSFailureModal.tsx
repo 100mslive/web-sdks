@@ -45,11 +45,11 @@ export function HLSFailureModal() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              borderBottom: '1px solid $border_default',
+              borderBottom: '1px solid border.default',
               mt: '4',
             }}
           >
-            <Text variant="h6" css={{ fontWeight: '$semiBold' }}>
+            <Text variant="h6" css={{ fontWeight: 'semiBold' }}>
               Failed to Go Live
             </Text>
           </Dialog.Title>

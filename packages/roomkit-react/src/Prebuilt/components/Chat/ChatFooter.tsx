@@ -176,7 +176,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
           <Flex align="center" justify="end" css={{ mb: '4' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
-                <IconButton css={{ border: '1px solid $border_bright' }}>
+                <IconButton css={{ border: '1px solid border.bright' }}>
                   <VerticalMenuIcon height="16" width="16" />
                 </IconButton>
               </Popover.Trigger>
@@ -208,7 +208,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                   }}
                 >
                   <PauseCircleIcon />
-                  <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+                  <Text variant="sm" css={{ fontWeight: 'semiBold' }}>
                     Pause Chat
                   </Text>
                 </Popover.Content>
@@ -222,7 +222,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
           <Flex
             align="end"
             css={{
-              bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
+              bg: isOverlayChat && isMobile ? 'surface.dim' : 'surface.default',
               minHeight: '16',
               position: 'relative',
               py: isOverlayChat && isMobile ? '$2' : '$6',
@@ -286,7 +286,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 ml: 'auto',
                 height: 'max-content',
                 mr: '4',
-                '&:hover': { c: isMobile ? '' : '$on_surface_medium' },
+                '&:hover': { c: isMobile ? '' : 'onSurface.medium' },
               }}
               data-testid="send_msg_btn"
             >
@@ -309,7 +309,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         </Flex>
       )}
       {messageLengthExceeded && (
-        <Text variant="xs" css={{ color: 'alert.error.default', fontWeight: '$semiBold', mt: '1', ml: '7' }}>
+        <Text variant="xs" css={{ color: 'alert.error.default', fontWeight: 'semiBold', mt: '1', ml: '7' }}>
           Message cannot exceed 2000 characters
         </Text>
       )}

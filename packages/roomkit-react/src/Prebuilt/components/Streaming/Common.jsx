@@ -39,7 +39,7 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
 
 export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
   return (
-    <Flex css={{ w: '100%', py: '8', px: '10', cursor: 'pointer', borderBottom: '1px solid $border_bright', mb: '8' }}>
+    <Flex css={{ w: '100%', py: '8', px: '10', cursor: 'pointer', borderBottom: '1px solid border.bright', mb: '8' }}>
       {onBack ? (
         <Flex
           align="center"
@@ -59,7 +59,7 @@ export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
             variant="tiny"
             css={{
               textTransform: 'uppercase',
-              fontWeight: '$semiBold',
+              fontWeight: 'semiBold',
               color: 'onSurface.medium',
             }}
           >
@@ -103,7 +103,7 @@ export const ContentBody = ({ Icon, title, removeVerticalPadding = false, childr
     <Box css={{ p: removeVerticalPadding ? '$0 $10' : '$10' }}>
       <Text css={{ display: 'flex', alignItems: 'center', mb: '4' }}>
         <Icon />
-        <Text as="span" css={{ fontWeight: '$semiBold', ml: '4' }}>
+        <Text as="span" css={{ fontWeight: 'semiBold', ml: '4' }}>
           {title}
         </Text>
       </Text>

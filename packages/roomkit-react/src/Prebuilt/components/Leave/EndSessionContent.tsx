@@ -25,7 +25,7 @@ export const EndSessionContent = ({
         }}
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
-        <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
+        <Text variant="lg" css={{ color: 'inherit', fontWeight: 'semiBold' }}>
           End {isStreamingOn ? 'Stream' : 'Session'}
         </Text>
         {isModal ? null : (

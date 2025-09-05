@@ -28,7 +28,7 @@ const Wrapper = styled('div', {
   h: '100%',
   p: '10',
   flex: '1 1 0',
-  background: '$surface_dim',
+  background: 'surface.dim',
   r: '1',
   position: 'relative',
   '@lg': {
@@ -83,7 +83,7 @@ const Wrapper = styled('div', {
     virtualBackground: {
       true: {
         maxHeight: '100%',
-        background: '$surface_dim',
+        background: 'surface.dim',
       },
     },
   },

@@ -85,7 +85,7 @@ export const LiveStatus = () => {
       align="center"
       gap="1"
       css={{
-        border: '1px solid $border_default',
+        border: '1px solid border.default',
         padding: '$4 $6 $4 $6',
         borderRadius: '1',
       }}

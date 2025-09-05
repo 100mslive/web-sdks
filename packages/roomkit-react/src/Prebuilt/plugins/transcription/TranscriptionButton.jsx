@@ -78,7 +78,7 @@ export function TranscriptionButton() {
       <Box
         css={{
           textAlign: 'left',
-          fontWeight: '$medium',
+          fontWeight: 'medium',
           bottom: '120px',
           position: 'fixed',
           width: '100%',
@@ -93,7 +93,7 @@ export function TranscriptionButton() {
       <Box
         css={{
           textAlign: 'center',
-          fontWeight: '$medium',
+          fontWeight: 'medium',
           bottom: '90px',
           position: 'fixed',
           width: '100%',

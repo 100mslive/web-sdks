@@ -35,7 +35,7 @@ export function EmbedUrlModal({ onOpenChange }) {
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '8', bg: 'surface.dim' }}>
           <Dialog.Title
             css={{
-              borderBottom: '1px solid $border_default',
+              borderBottom: '1px solid border.default',
               color: 'onSurface.high',
               display: 'flex',
               alignItems: 'center',

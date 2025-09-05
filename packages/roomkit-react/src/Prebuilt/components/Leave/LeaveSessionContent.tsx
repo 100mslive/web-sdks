@@ -23,7 +23,7 @@ export const LeaveSessionContent = ({
         }}
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
-        <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
+        <Text variant="lg" css={{ color: 'inherit', fontWeight: 'semiBold' }}>
           Leave
         </Text>
         {isModal ? null : (

@@ -15,7 +15,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$background_default',
+  background: 'background.default',
   variants: {
     transparentBg: {
       true: {
@@ -104,7 +104,7 @@ const FullScreenButton = styled('button', {
   zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$primary_bright',
+    boxShadow: '0 0 0 3px $colorsprimary.bright',
   },
 });
 

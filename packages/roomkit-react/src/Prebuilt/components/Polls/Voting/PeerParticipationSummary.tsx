@@ -49,7 +49,7 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
 
   return (
     <Box>
-      <Text css={{ fontWeight: '$semiBold', my: '8' }}>Participation Summary</Text>
+      <Text css={{ fontWeight: 'semiBold', my: '8' }}>Participation Summary</Text>
       <Box css={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4' }}>
         {boxes.map(box => (
           <StatisticBox key={box.title} title={box.title} value={box.value} />

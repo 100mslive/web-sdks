@@ -25,7 +25,7 @@ export const ScreenshareDisplay = () => {
       </Text>
       <Button
         variant="danger"
-        css={{ fontWeight: '$semiBold' }}
+        css={{ fontWeight: 'semiBold' }}
         onClick={async () => {
           await hmsActions.setScreenShareEnabled(false);
         }}

@@ -50,7 +50,7 @@ export const ConnectionIndicator = ({
   const size = isTile ? 12 : 16;
   return (
     <Tooltip side="left" title={getTooltipText(downlinkQuality)}>
-      <Wrapper isTile={isTile} data-testid="tile_network" css={{ backgroundColor: hideBg ? '' : '$surface_bright' }}>
+      <Wrapper isTile={isTile} data-testid="tile_network" css={{ backgroundColor: hideBg ? '' : 'surface.bright' }}>
         <svg
           width={size}
           height={size}

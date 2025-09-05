@@ -178,7 +178,7 @@ const NewMessageIndicator = ({
           '& > svg': { ml: '4' },
           borderRadius: 'round',
           fontSize: 'xs',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
           c: 'onSecondary.high',
         }}
       >

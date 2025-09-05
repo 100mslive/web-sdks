@@ -34,16 +34,16 @@ export const LeaderboardEntry = ({
             h: '10',
             w: '10',
             borderRadius: 'round',
-            color: position > 3 ? '$on_surface_low' : '#FFF',
+            color: position > 3 ? 'onSurface.low' : '#FFF',
             fontSize: 'xs',
-            fontWeight: '$semiBold',
+            fontWeight: 'semiBold',
           }}
         >
           {position}
         </Flex>
 
         <Box>
-          <Text variant="sm" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
+          <Text variant="sm" css={{ fontWeight: 'semiBold', color: 'onSurface.high' }}>
             {userName}
           </Text>
 

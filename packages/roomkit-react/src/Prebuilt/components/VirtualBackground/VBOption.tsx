@@ -23,10 +23,10 @@ const Root = ({
       p: '5',
       borderRadius: '1',
       bg: 'surface.bright',
-      border: `4px solid ${isActive ? '$primary_default' : '$surface_dim'}`,
+      border: `4px solid ${isActive ? 'primary.default' : 'surface.dim'}`,
       cursor: 'pointer',
       '@media (hover:hover)': {
-        '&:hover': { border: '4px solid $primary_dim' },
+        '&:hover': { border: '4px solid primary.dim' },
       },
       ...(mediaURL ? { height: '20', backgroundImage: `url("${mediaURL}")`, backgroundSize: 'cover' } : {}),
     }}

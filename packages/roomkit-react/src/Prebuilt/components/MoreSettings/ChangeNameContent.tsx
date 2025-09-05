@@ -43,10 +43,10 @@ export const ChangeNameContent = ({
         variant={isMobile ? 'md' : 'lg'}
         css={{
           color: 'onSurface.high',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
           display: 'flex',
           pb: '4',
-          '@md': { px: '8', borderBottom: '1px solid $border_default' },
+          '@md': { px: '8', borderBottom: '1px solid border.default' },
         }}
       >
         {isMobile ? <ChevronLeftIcon onClick={onBackClick} style={{ marginRight: '0.5rem' }} /> : null}

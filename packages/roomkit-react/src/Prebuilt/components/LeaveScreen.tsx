@@ -26,10 +26,10 @@ export const LeaveScreen = () => {
         align="center"
         css={{ bg: 'background.dim', flex: '1 1 0', position: 'relative' }}
       >
-        <Text variant="h2" css={{ fontWeight: '$semiBold' }}>
+        <Text variant="h2" css={{ fontWeight: 'semiBold' }}>
           👋
         </Text>
-        <Text variant="h4" css={{ color: 'onSurface.high', fontWeight: '$semiBold', mt: '12' }}>
+        <Text variant="h4" css={{ color: 'onSurface.high', fontWeight: 'semiBold', mt: '12' }}>
           You left the room
         </Text>
         <Text
@@ -37,7 +37,7 @@ export const LeaveScreen = () => {
           css={{
             color: 'onSurface.medium',
             mt: '8',
-            fontWeight: '$regular',
+            fontWeight: 'regular',
             textAlign: 'center',
           }}
         >
@@ -50,7 +50,7 @@ export const LeaveScreen = () => {
           !
         </Text>
         <Flex css={{ mt: '14', gap: '10', alignItems: 'center' }}>
-          <Text variant="body1" css={{ color: 'onSurface.medium', fontWeight: '$regular' }}>
+          <Text variant="body1" css={{ color: 'onSurface.medium', fontWeight: 'regular' }}>
             Left by mistake?
           </Text>
           <Button
@@ -61,7 +61,7 @@ export const LeaveScreen = () => {
             data-testid="join_again_btn"
           >
             <ExitIcon />
-            <Text css={{ ml: '3', fontWeight: '$semiBold', color: 'inherit' }}>Rejoin</Text>
+            <Text css={{ ml: '3', fontWeight: 'semiBold', color: 'inherit' }}>Rejoin</Text>
           </Button>
         </Flex>
         <Feedback />

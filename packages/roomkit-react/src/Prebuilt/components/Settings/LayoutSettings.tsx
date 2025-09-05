@@ -42,7 +42,7 @@ export const LayoutSettings = () => {
   return (
     <Box className={settingOverflow()}>
       <Flex align="center" css={{ w: '100%', my: '2', py: '8', '@md': { display: 'none' } }}>
-        <Text variant="md" css={{ fontWeight: '$semiBold' }}>
+        <Text variant="md" css={{ fontWeight: 'semiBold' }}>
           Tiles In View({maxTileCount})
         </Text>
         <Flex justify="end" css={{ flex: '1 1 0' }}>

@@ -133,17 +133,17 @@ export const PIPChat = () => {
                   style={{ display: 'flex', justifyContent: 'between', width: '100%', alignItems: 'center' }}
                   css={{
                     color: 'onSurface.high',
-                    fontWeight: '$semiBold',
+                    fontWeight: 'semiBold',
                   }}
                 >
                   <Flex style={{ flexGrow: 1, gap: '2px', alignItems: 'center' }}>
                     {message.senderName === 'You' || !message.senderName ? (
-                      <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+                      <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
                         {message.senderName || 'Anonymous'}
                       </Text>
                     ) : (
                       <Tooltip title={message.senderName} side="top" align="start">
-                        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+                        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
                           {getSenderName(message.senderName, message?.sender)}
                         </Text>
                       </Tooltip>
@@ -278,12 +278,12 @@ const MessageTitle = ({
   return (
     <>
       {recipientRoles ? (
-        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
           to {recipientRoles} (Group)
         </Text>
       ) : null}
       {recipientPeer ? (
-        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+        <Text as="span" variant="sub2" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
           to {recipientPeer === localPeerID ? 'You' : peerName} (DM)
         </Text>
       ) : null}

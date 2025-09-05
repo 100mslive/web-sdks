@@ -4,7 +4,7 @@ import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 
 const FullPageProgress = ({
-  loaderColor = '$primary_default',
+  loaderColor = 'primary.default',
   text = '',
   css = {},
 }: {

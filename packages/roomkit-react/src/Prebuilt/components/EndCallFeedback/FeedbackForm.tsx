@@ -187,7 +187,7 @@ export const FeedbackHeader = ({
             css={{
               c: 'onSurface.medium',
               opacity: 0.9,
-              fontWeight: '$regular',
+              fontWeight: 'regular',
             }}
           >
             {feedback?.sub_title || 'Your answers help us improve the quality.'}
@@ -215,7 +215,7 @@ export const FeedbackHeader = ({
               css={{
                 c:
                   indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
-                    ? '$on_surface_high'
+                    ? 'onSurface.high'
                     : '$on_surface_default',
                 gap: '4',
               }}
@@ -224,7 +224,7 @@ export const FeedbackHeader = ({
             >
               <Text
                 css={{
-                  fontWeight: '$semiBold',
+                  fontWeight: 'semiBold',
                   fontSize: 'h4',
                   pb: '1',
                   cursor: 'pointer',
@@ -241,9 +241,9 @@ export const FeedbackHeader = ({
                 css={{
                   c:
                     indexSelected === index || indexSelected === FEEBACK_INDEX.INIT
-                      ? '$on_surface_medium'
-                      : '$on_surface_low',
-                  fontWeight: '$regular',
+                      ? 'onSurface.medium'
+                      : 'onSurface.low',
+                  fontWeight: 'regular',
                 }}
               >
                 {element.label}
@@ -282,7 +282,7 @@ export const FeedbackForm = ({
             variant="sub2"
             css={{
               c: 'onSurface.high',
-              fontWeight: '$semiBold',
+              fontWeight: 'semiBold',
               fontSize: 'sm',
               px: '2',
             }}
@@ -311,7 +311,7 @@ export const FeedbackForm = ({
                   gap="2"
                   key={index}
                   css={{
-                    border: '1px solid $border_bright',
+                    border: '1px solid border.bright',
                     r: '1',
                     p: '6',
                   }}
@@ -324,7 +324,7 @@ export const FeedbackForm = ({
                       cursor: 'pointer',
                       flexShrink: 0,
                       bg: 'onSecondary.low',
-                      border: '1px solid $border_bright',
+                      border: '1px solid border.bright',
                     }}
                   >
                     <Checkbox.Indicator>
@@ -336,7 +336,7 @@ export const FeedbackForm = ({
                     css={{
                       color: 'onSurface.high',
                       fontSize: 'sm',
-                      fontWeight: '$regular',
+                      fontWeight: 'regular',
                       lineHeight: '20px' /* 142.857% */,
                     }}
                   >
@@ -359,7 +359,7 @@ export const FeedbackForm = ({
             variant="body2"
             css={{
               c: 'onSurface.high',
-              fontWeight: '$regular',
+              fontWeight: 'regular',
               fontSize: 'sm',
             }}
           >
@@ -370,7 +370,7 @@ export const FeedbackForm = ({
             placeholder={feedback?.comment.placeholder || 'Tell us more...'}
             css={{
               backgroundColor: 'surface.bright',
-              border: '1px solid $border_bright',
+              border: '1px solid border.bright',
               resize: 'none',
               height: '36',
               display: 'flex',

@@ -58,7 +58,7 @@ export const ChatSettings = () => {
           }}
         >
           <PauseCircleIcon />
-          <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+          <Text variant="sm" css={{ fontWeight: 'semiBold' }}>
             Pause Chat
           </Text>
         </Popover.Content>

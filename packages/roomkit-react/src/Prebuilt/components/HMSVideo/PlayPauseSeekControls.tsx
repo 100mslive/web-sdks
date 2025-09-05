@@ -76,7 +76,7 @@ export const PlayPauseSeekOverlayControls = ({
           <SeekControl title="backward">
             <BackwardArrowIcon width={52} height={52} />
           </SeekControl>
-          <Text variant="body2" css={{ fontWeight: '$regular' }}>
+          <Text variant="body2" css={{ fontWeight: 'regular' }}>
             10 secs
           </Text>
         </Flex>
@@ -104,7 +104,7 @@ export const PlayPauseSeekOverlayControls = ({
           <SeekControl title="forward">
             <ForwardArrowIcon width={52} height={52} />
           </SeekControl>
-          <Text variant="body2" css={{ fontWeight: '$regular' }}>
+          <Text variant="body2" css={{ fontWeight: 'regular' }}>
             10 secs
           </Text>
         </Flex>

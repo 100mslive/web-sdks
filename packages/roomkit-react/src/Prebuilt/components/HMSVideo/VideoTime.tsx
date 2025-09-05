@@ -43,7 +43,7 @@ export const VideoTime = () => {
         c: 'onSurface.medium',
         display: 'flex',
         justifyContent: 'center',
-        fontWeight: '$regular',
+        fontWeight: 'regular',
       }}
     >
       -{videoTime}

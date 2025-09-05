@@ -58,8 +58,8 @@ export const MwebLeaveRoom = ({
               subtitle={`Others will continue after you leave. You can join the ${
                 showStream ? 'stream' : 'session'
               } again.`}
-              bg="$surface_default"
-              titleColor="$on_surface_high"
+              bg="surface.default"
+              titleColor="onSurface.high"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={async () => await leaveRoom({ sendReason: true })}
               css={{ pt: 0, mt: '10', color: 'onSurface.low', '&:hover': { color: 'onSurface.high' } }}
@@ -70,8 +70,8 @@ export const MwebLeaveRoom = ({
               subtitle={`The will end the ${
                 showStream ? 'stream' : 'session'
               } for everyone. You can't undo this action.`}
-              bg="$alert_error_dim"
-              titleColor="$alert_error_brighter"
+              bg="alert.error.dim"
+              titleColor="alert.error.brighter"
               css={{ color: 'alert.error.bright', '&:hover': { color: 'alert.error.brighter' } }}
               icon={<StopIcon height={24} width={24} />}
               onClick={() => {

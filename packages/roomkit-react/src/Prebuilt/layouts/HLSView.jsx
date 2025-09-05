@@ -207,7 +207,7 @@ const HLSView = () => {
                 variant="standard"
                 css={{
                   backgroundColor: 'surface.bright',
-                  fontWeight: '$semiBold',
+                  fontWeight: 'semiBold',
                   color: 'onSurface.high',
                   p: '$xs $md',
                 }}
@@ -689,15 +689,15 @@ const HLSView = () => {
                               css={{
                                 height: '4',
                                 width: '4',
-                                background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
+                                background: isVideoLive ? 'alert.error.default' : 'onPrimary.medium',
                                 r: '1',
                               }}
                             />
                             <Text
                               variant="$body1"
                               css={{
-                                c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
-                                fontWeight: '$semiBold',
+                                c: isVideoLive ? 'onSurface.high' : 'onSurface.medium',
+                                fontWeight: 'semiBold',
                               }}
                             >
                               {isVideoLive ? 'LIVE' : 'GO LIVE'}

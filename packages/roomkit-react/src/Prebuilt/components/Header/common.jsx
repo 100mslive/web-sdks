@@ -170,7 +170,7 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
         my: '2',
         py: '8',
         w: '100%',
-        borderBottom: '1px solid $border_default',
+        borderBottom: '1px solid border.default',
       }}
       onClick={onChange}
     >
@@ -178,7 +178,7 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
         htmlFor={id}
         css={{
           fontSize: 'md',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
           color: 'onSurface.high',
           cursor: 'pointer',
           display: 'flex',

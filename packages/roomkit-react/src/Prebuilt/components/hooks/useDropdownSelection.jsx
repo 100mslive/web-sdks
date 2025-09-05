@@ -1,3 +1,3 @@
 export const useDropdownSelection = () => {
-  return '$surface_bright';
+  return 'surface.bright';
 };

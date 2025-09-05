@@ -27,7 +27,7 @@ export const VBCollection = ({
   }
   return (
     <Box css={{ mt: '10' }}>
-      <Text variant="sm" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
         {title}
       </Text>
       <Box css={{ py: '4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8' }}>

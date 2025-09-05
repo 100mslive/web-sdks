@@ -33,7 +33,7 @@ export const ChatPaused = () => {
       css={{ borderRadius: '1', bg: 'surface.default', p: '$2 $4 $2 $8', w: '100%' }}
     >
       <Box>
-        <Text variant="sm" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
+        <Text variant="sm" css={{ fontWeight: 'semiBold', color: 'onSurface.high' }}>
           Chat paused
         </Text>
         <Text
@@ -44,7 +44,7 @@ export const ChatPaused = () => {
         </Text>
       </Box>
       {can_disable_chat ? (
-        <Button css={{ fontWeight: '$semiBold', fontSize: 'sm', borderRadius: '2' }} onClick={unPauseChat}>
+        <Button css={{ fontWeight: 'semiBold', fontSize: 'sm', borderRadius: '2' }} onClick={unPauseChat}>
           Resume
         </Button>
       ) : (

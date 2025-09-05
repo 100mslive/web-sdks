@@ -27,7 +27,7 @@ import { getMetadata } from '../../common/utils';
 
 const dropdownItemCSS = { backgroundColor: 'surface.default', gap: '4', p: '8' };
 const optionTextCSS = {
-  fontWeight: '$semiBold',
+  fontWeight: 'semiBold',
   color: 'onSurface.high',
   textTransform: 'none',
   whiteSpace: 'nowrap',
@@ -144,7 +144,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
     <DropdownWrapper>
       {canRemoveRoleFromStage ? (
         <Dropdown.Item
-          css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
+          css={{ ...dropdownItemCSS, borderBottom: '1px solid border.bright' }}
           onClick={removeAllFromStage}
         >
           <PersonRectangleIcon />
@@ -201,7 +201,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
 
       {canRemoveRoleFromRoom ? (
         <Dropdown.Item
-          css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: 'alert.error.default' }}
+          css={{ ...dropdownItemCSS, borderTop: '1px solid border.bright', color: 'alert.error.default' }}
           onClick={removePeersFromRoom}
         >
           <RemoveUserIcon />

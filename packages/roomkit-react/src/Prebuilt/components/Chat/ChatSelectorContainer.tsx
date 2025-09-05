@@ -38,7 +38,7 @@ export const ChatSelectorContainer = () => {
         {isMobile ? (
           <Flex
             align="center"
-            css={{ c: 'onSurface.medium', border: '1px solid $border_bright', r: '0', p: '$1 $2', ml: '6' }}
+            css={{ c: 'onSurface.medium', border: '1px solid border.bright', r: '0', p: '$1 $2', ml: '6' }}
             gap="1"
             onClick={(e: React.MouseEvent) => {
               setOpen(value => !value);
@@ -72,7 +72,7 @@ export const ChatSelectorContainer = () => {
               asChild
               data-testid="participant_list_filter"
               css={{
-                background: '$primary_default',
+                background: 'primary.default',
                 c: 'onPrimary.high',
                 r: '0',
                 p: '$1 $2',
@@ -135,10 +135,10 @@ export const ChatSelectorContainer = () => {
                 px: '10',
                 pb: '4',
                 mb: '8',
-                borderBottom: '1px solid $border_bright',
+                borderBottom: '1px solid border.bright',
               }}
             >
-              <Text css={{ color: 'onSurface.medium', fontWeight: '$semiBold' }}>Chat with</Text>
+              <Text css={{ color: 'onSurface.medium', fontWeight: 'semiBold' }}>Chat with</Text>
               <Sheet.Close css={{ color: 'onSurface.medium' }}>
                 <CrossIcon />
               </Sheet.Close>

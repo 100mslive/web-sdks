@@ -20,9 +20,9 @@ export const RoomDetailsSheet = () => {
         <Flex
           justify="between"
           align="center"
-          css={{ w: '100%', borderBottom: '1px solid $border_bright', pb: '4', mb: '4', px: '8' }}
+          css={{ w: '100%', borderBottom: '1px solid border.bright', pb: '4', mb: '4', px: '8' }}
         >
-          <Text css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>Description</Text>
+          <Text css={{ fontWeight: 'semiBold', color: 'onSurface.high' }}>Description</Text>
           <Sheet.Close css={{ color: 'onSurface.high' }}>
             <CrossIcon />
           </Sheet.Close>
@@ -30,7 +30,7 @@ export const RoomDetailsSheet = () => {
         <Flex align="center" css={{ w: '100%', gap: '4', pb: '8', px: '8' }}>
           <Logo />
           <Box>
-            <Text variant="sm" css={{ c: 'onSecondary.high', fontWeight: '$semiBold' }}>
+            <Text variant="sm" css={{ c: 'onSecondary.high', fontWeight: 'semiBold' }}>
               {title}
             </Text>
             <RoomDetailsRow details={details} />

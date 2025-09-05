@@ -153,7 +153,7 @@ const HMSToast: React.FC<HMSToastProps> = ({
         </ToastTitle>
         {description ? (
           <ToastDescription>
-            <Text variant="body1" css={{ fontWeight: '$regular', c: 'onSurface.medium' }}>
+            <Text variant="body1" css={{ fontWeight: 'regular', c: 'onSurface.medium' }}>
               {description}
             </Text>
           </ToastDescription>

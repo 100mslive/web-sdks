@@ -20,7 +20,7 @@ const StyledTrigger = styled(Popover.Trigger, {
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$primary_bright',
+    boxShadow: '0 0 0 3px $colorsprimary.bright',
   },
 });
 
@@ -83,7 +83,7 @@ export const Flex = styled('div', {
 
 const RemoveMenuItem = styled(StyledItemButton, {
   color: 'alert.error.default',
-  borderTop: '1px solid $border_bright',
+  borderTop: '1px solid border.bright',
 });
 
 interface MenuTileType {

@@ -61,7 +61,7 @@ export const MwebLandscapePrompt = () => {
               }}
             >
               <RefreshIcon style={{ marginRight: '0.5rem' }} />
-              <Text variant="lg" css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+              <Text variant="lg" css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
                 Please rotate your device
               </Text>
             </Flex>

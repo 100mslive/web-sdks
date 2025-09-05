@@ -93,7 +93,7 @@ const DetailedInfo = ({
 }) => {
   return (
     <Box css={{ flex: '50%', mt: '6' }}>
-      <Text variant="caption" css={{ fontWeight: '$semiBold', c: 'onPrimary.medium' }}>
+      <Text variant="caption" css={{ fontWeight: 'semiBold', c: 'onPrimary.medium' }}>
         {title}
       </Text>
       <Flex css={{ mt: 'xs', alignItems: 'flex-start' }}>
@@ -287,7 +287,7 @@ const RegionSelector = ({
   setRegion: (region: string) => void;
 }) => {
   return (
-    <TestContainer css={{ borderBottom: '1px solid $border_default' }}>
+    <TestContainer css={{ borderBottom: '1px solid border.default' }}>
       <Text variant="body1">Select a region</Text>
       <Text variant="body2" css={{ c: 'onSecondary.low' }}>
         Select the closest region for best results

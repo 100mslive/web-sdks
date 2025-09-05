@@ -28,7 +28,7 @@ export const DeleteQuestionModal = ({
               }}
             >
               <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
-              <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
+              <Text variant="lg" css={{ color: 'inherit', fontWeight: 'semiBold' }}>
                 Delete Question?
               </Text>
 
@@ -51,12 +51,12 @@ export const DeleteQuestionModal = ({
                 variant="standard"
                 outlined
                 onClick={() => setOpen(false)}
-                css={{ w: '100%', fontSize: 'md', fontWeight: '$semiBold' }}
+                css={{ w: '100%', fontSize: 'md', fontWeight: 'semiBold' }}
               >
                 Cancel
               </Button>
               <Button
-                css={{ w: '100%', fontSize: 'md', fontWeight: '$semiBold' }}
+                css={{ w: '100%', fontSize: 'md', fontWeight: 'semiBold' }}
                 variant="danger"
                 onClick={() => {
                   removeQuestion();

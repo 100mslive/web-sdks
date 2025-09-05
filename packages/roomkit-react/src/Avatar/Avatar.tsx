@@ -6,7 +6,7 @@ import { getAvatarBg } from './getAvatarBg';
 import { flexCenter } from '../utils/styles';
 
 const getAvatarShape = (radii: string) => ({
-  borderRadius: radii === '$round' ? 'round' : '1',
+  borderRadius: radii === 'round' ? 'round' : '1',
 });
 
 const avatarVariants = cva({
@@ -20,7 +20,7 @@ const avatarVariants = cva({
   },
   variants: {
     shape: {
-      circle: getAvatarShape('$round'),
+      circle: getAvatarShape('round'),
       square: getAvatarShape('$1'),
     },
     size: {

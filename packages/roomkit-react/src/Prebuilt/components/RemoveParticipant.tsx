@@ -27,7 +27,7 @@ export const RemoveParticipant = ({ peerId }: { peerId: HMSPeerID }) => {
       }}
     >
       <PeopleRemoveIcon />
-      <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: 'semiBold' }}>
         Remove Participant
       </Text>
     </Dropdown.Item>

@@ -108,11 +108,11 @@ const TileMenu = ({
                   alignItems: 'center',
                   px: '10',
                   pb: '8',
-                  borderBottom: '1px solid $border_default',
+                  borderBottom: '1px solid border.default',
                 }}
               >
                 <Box>
-                  <Text css={{ color: 'onSurface.high', fontWeight: '$semiBold' }}>
+                  <Text css={{ color: 'onSurface.high', fontWeight: 'semiBold' }}>
                     {getVideoTileLabel({ peerName: peer?.name, isLocal, audioTrack, videoTrack: track })}
                   </Text>
                   {peer?.roleName ? (

@@ -90,7 +90,7 @@ const DiagnosticsStepTest = () => {
 const DiagnosticsStepHeader = () => {
   const { activeStepIndex, activeStep } = useDiagnostics();
   return (
-    <Flex css={{ py: '8', px: '10', alignItems: 'center', borderBottom: '1px solid $border_default' }}>
+    <Flex css={{ py: '8', px: '10', alignItems: 'center', borderBottom: '1px solid border.default' }}>
       <Text css={{ c: 'primary.bright', mt: 'xs' }}>{DiagnosticsStepIcon[activeStepIndex]}</Text>
       <Text css={{ fontSize: 'h6', ml: '9' }}>{activeStep.name}</Text>
     </Flex>
@@ -99,7 +99,7 @@ const DiagnosticsStepHeader = () => {
 
 const DiagnosticsStepContainer = () => {
   return (
-    <Box css={{ border: '1px solid $border_default', r: '1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
+    <Box css={{ border: '1px solid border.default', r: '1', w: '75%', maxWidth: '65rem', '@lg': { w: '100%' } }}>
       <DiagnosticsStepHeader />
       <DiagnosticsStepTest />
     </Box>
@@ -118,19 +118,19 @@ const DiagnosticsStepsList = () => {
           const step = steps[keyIndex as DiagnosticsStep];
           const isStepCompleted = activeStepIndex > keyIndex || activeStep.isCompleted;
 
-          let color = '$on_primary_low';
+          let color = 'onPrimary.low';
           let icon = <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>;
 
           if (activeStepIndex === keyIndex) {
-            color = '$on_primary_high';
+            color = 'onPrimary.high';
             icon = <Text css={{ c: color, fontSize: '1.75rem' }}>&bull;</Text>;
           }
           if (isStepCompleted) {
-            color = '$primary_bright';
+            color = 'primary.bright';
             icon = <CheckCircleIcon width="1rem" height="1rem" />;
           }
           if (step.hasFailed) {
-            color = '$alert_error_default';
+            color = 'alert.error.default';
             icon = <CrossCircleIcon width="1rem" height="1rem" />;
           }
 

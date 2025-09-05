@@ -124,7 +124,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
             }}
             width={width}
             height={height}
-            containerCSS={{ background: '$surface_default' }}
+            containerCSS={{ background: 'surface.default' }}
             canMinimise
             isDragabble
             {...videoTileProps}

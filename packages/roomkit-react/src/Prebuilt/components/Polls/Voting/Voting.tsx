@@ -84,7 +84,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           my: '4',
           w: '100%',
           color: 'onSurface.high',
-          borderBottom: '1px solid $border_default',
+          borderBottom: '1px solid border.default',
         }}
       >
         <Flex
@@ -109,7 +109,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
       <Flex direction="column" css={{ p: '$8 $10', flex: '1 1 0', overflowY: 'auto' }}>
         {poll.state === 'started' ? (
-          <Text css={{ color: 'onSurface.medium', fontWeight: '$semiBold' }}>
+          <Text css={{ color: 'onSurface.medium', fontWeight: 'semiBold' }}>
             {pollCreatorName || 'Participant'} started a {poll.type}
           </Text>
         ) : null}
@@ -121,19 +121,19 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         )}
       </Flex>
       <Flex
-        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '8', borderTop: '1px solid $border_bright' }}
+        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '8', borderTop: '1px solid border.bright' }}
       >
         {poll.state === 'started' && canEndActivity && (
           <Button
             variant="danger"
-            css={{ fontWeight: '$semiBold', w: 'max-content' }}
+            css={{ fontWeight: 'semiBold', w: 'max-content' }}
             onClick={() => actions.interactivityCenter.stopPoll(id)}
           >
             End {poll.type}
           </Button>
         )}
         {canViewLeaderboard ? (
-          <Button css={{ fontWeight: '$semiBold', w: 'max-content' }} onClick={() => setPollView(POLL_VIEWS.RESULTS)}>
+          <Button css={{ fontWeight: 'semiBold', w: 'max-content' }} onClick={() => setPollView(POLL_VIEWS.RESULTS)}>
             View Leaderboard
           </Button>
         ) : null}

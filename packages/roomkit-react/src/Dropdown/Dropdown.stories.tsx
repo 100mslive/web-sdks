@@ -29,7 +29,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
           css={{
             color: 'onSurface.high',
             borderRadius: '1',
-            border: '1px solid $border_default',
+            border: '1px solid border.default',
             padding: '$4 $4',
             width: '80',
           }}
@@ -73,7 +73,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
                     />
                   </Box>
                   <Flex direction="column">
-                    <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
+                    <Text variant="md" css={{ ...textEllipsis(150), fontWeight: 'semiBold' }}>
                       {peer.name}
                     </Text>
                     <Text variant="sub2" css={{ color: 'onSurface.medium' }}>

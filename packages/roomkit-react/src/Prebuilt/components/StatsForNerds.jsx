@@ -81,7 +81,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         >
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
             <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
-            <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
+            <Text variant="body2" css={{ fontWeight: 'semiBold' }}>
               Show Stats on Tiles
             </Text>
           </Flex>
@@ -166,7 +166,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
           {/* Switch */}
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
             <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
-            <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
+            <Text variant="body2" css={{ fontWeight: 'semiBold' }}>
               Show Stats on Tiles
             </Text>
           </Flex>
@@ -359,14 +359,14 @@ const StatsRow = React.memo(({ label, value, css }) => (
     <Text
       variant="overline"
       css={{
-        fontWeight: '$semiBold',
+        fontWeight: 'semiBold',
         color: 'onSurface.medium',
         textTransform: 'uppercase',
       }}
     >
       {label}
     </Text>
-    <Text variant="sub1" css={{ fontWeight: '$semiBold', color: 'onSurface.high' }}>
+    <Text variant="sub1" css={{ fontWeight: 'semiBold', color: 'onSurface.high' }}>
       {value || '-'}
     </Text>
   </Box>

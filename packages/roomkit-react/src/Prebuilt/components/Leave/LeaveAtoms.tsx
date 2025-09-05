@@ -19,7 +19,7 @@ export const LeaveIconButton = styled(IconButton, {
 });
 
 export const MenuTriggerButton = styled(LeaveIconButton, {
-  borderLeft: '1px solid $alert_error_dim',
+  borderLeft: '1px solid alert.error.dim',
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
   px: '2',

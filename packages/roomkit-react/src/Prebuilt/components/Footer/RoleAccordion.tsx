@@ -99,10 +99,10 @@ export const RoleAccordion = ({
           textTransform: 'capitalize',
           p: '$6 $8',
           fontSize: 'sm',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
           c: 'onSurface.medium',
           borderRadius: '1',
-          border: '1px solid $border_default',
+          border: '1px solid border.default',
           '&[data-state="open"]': {
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
@@ -110,13 +110,13 @@ export const RoleAccordion = ({
         }}
       >
         <Flex justify="between" align="center" css={{ flexGrow: 1, pr: '6' }}>
-          <Text variant="sm" css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: 'onSurface.medium' }}>
+          <Text variant="sm" css={{ fontWeight: 'semiBold', textTransform: 'capitalize', color: 'onSurface.medium' }}>
             {roleName} {`(${getFormattedCount(isLargeRoom && isOffStageRole ? total : peerList.length)})`}
           </Text>
           <RoleOptions roleName={roleName} peerList={peersInAccordion} />
         </Flex>
       </Accordion.Header>
-      <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
+      <Accordion.Content contentStyles={{ border: '1px solid border.default', borderTop: 'none' }}>
         {/* @ts-expect-error React 19 type incompatibility with react-window */}
         <FixedSizeList
           itemSize={ROW_HEIGHT}
@@ -151,7 +151,7 @@ export const RoleAccordion = ({
               cursor: 'pointer',
               color: 'onSurface.high',
               p: '6',
-              borderTop: '1px solid $border_default',
+              borderTop: '1px solid border.default',
             }}
             onClick={() => onActive?.(roleName)}
           >

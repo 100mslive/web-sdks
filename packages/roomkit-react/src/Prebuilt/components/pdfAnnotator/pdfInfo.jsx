@@ -12,7 +12,7 @@ export const PDFInfo = () => {
         bg: 'surface.default',
         r: '1',
         outline: 'none',
-        border: '1px solid $border_bright',
+        border: '1px solid border.bright',
         minHeight: '11',
       }}
     >

@@ -64,7 +64,7 @@ export const PermissionErrorModal = ({ error }: { error?: HMSException }) => {
         >
           <Dialog.Title
             css={{
-              borderBottom: '1px solid $border_default',
+              borderBottom: '1px solid border.default',
             }}
           >
             {isMobile && isIOS ? (

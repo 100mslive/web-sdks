@@ -49,7 +49,7 @@ export const Feedback = () => {
         <Flex
           css={{
             p: isMobile ? '$10' : '$12',
-            border: '1px solid $border_default',
+            border: '1px solid border.default',
             bg: 'surface.dim',
             borderRadius: !isMobile ? '$3' : '$3 $3 0 0',
             gap: '10',

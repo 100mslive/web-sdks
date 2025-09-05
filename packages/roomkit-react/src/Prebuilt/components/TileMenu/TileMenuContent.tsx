@@ -53,7 +53,7 @@ export const isSameTile = ({
   audioTrackID?: string;
 }) => !!trackId && ((!!videoTrackID && videoTrackID === trackId) || (!!audioTrackID && audioTrackID === trackId));
 
-const spacingCSS = { '@md': { my: '8', fontWeight: '$semiBold', fontSize: 'sm' } };
+const spacingCSS = { '@md': { my: '8', fontWeight: 'semiBold', fontSize: 'sm' } };
 
 const SpotlightActions = ({
   peerId,
@@ -166,8 +166,8 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
               css={{
                 textTransform: 'capitalize',
                 mr: '2',
-                fontWeight: track.preferredLayer === layer.layer ? '$semiBold' : '$regular',
-                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
+                fontWeight: track.preferredLayer === layer.layer ? 'semiBold' : 'regular',
+                color: track.preferredLayer === layer.layer ? 'onPrimary.high' : 'onSurface.high',
               }}
             >
               {layer.layer}
@@ -176,7 +176,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
               as="span"
               variant="xs"
               css={{
-                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
+                color: track.preferredLayer === layer.layer ? 'onPrimary.high' : 'onSurface.high',
               }}
             >
               {layer.resolution.width}x{layer.resolution.height}
@@ -191,7 +191,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
             as="span"
             variant="xs"
             css={{
-              fontWeight: '$semiBold',
+              fontWeight: 'semiBold',
               textTransform: 'capitalize',
               color: 'onSurface.medium',
               ml: '2',
@@ -276,7 +276,7 @@ export const TileMenuContent = ({
             }}
           >
             <PencilIcon height={20} width={20} />
-            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: 'onSurface.high' }}>
+            <Text variant="sm" css={{ '@md': { fontWeight: 'semiBold' }, c: 'onSurface.high' }}>
               Change Name
             </Text>
           </StyledMenuTile.ItemButton>

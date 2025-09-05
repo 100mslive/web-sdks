@@ -88,7 +88,7 @@ export const DesktopLeaveRoom = ({
                       showStream ? 'stream' : 'session'
                     } again.`}
                     bg=""
-                    titleColor="$on_surface_high"
+                    titleColor="onSurface.high"
                     icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                     onClick={async () => await leaveRoom({ sendReason: true })}
                     css={{ p: '$8 $4' }}
@@ -110,7 +110,7 @@ export const DesktopLeaveRoom = ({
                       showStream ? 'stream' : 'session'
                     } will end for everyone. You can't undo this action.`}
                     bg=""
-                    titleColor="$alert_error_brighter"
+                    titleColor="alert.error.brighter"
                     icon={<StopIcon height={24} width={24} />}
                     onClick={() => {
                       setOpen(false);

@@ -46,7 +46,7 @@ function InteractionSelectionCard({
   active: boolean;
   onClick: () => void;
 }) {
-  const activeBorderStyle = active ? '$space$px solid $primary_default' : '$space$px solid $border_bright';
+  const activeBorderStyle = active ? '$space$px solid primary.default' : '$space$px solid border.bright';
   return (
     <Flex
       onClick={onClick}
@@ -143,7 +143,7 @@ const AddMenu = () => {
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value.trimStart())}
           css={{
             backgroundColor: 'surface.bright',
-            border: '1px solid $border_default',
+            border: '1px solid border.default',
           }}
         />
         <Flex align="center" css={{ mt: '10' }}>
@@ -204,7 +204,7 @@ const PrevMenu = () => {
       direction="column"
       css={{
         width: '100%',
-        ...(permissions?.pollWrite ? { borderTop: '$space$px solid $border_bright', paddingTop: '10' } : {}),
+        ...(permissions?.pollWrite ? { borderTop: '$space$px solid border.bright', paddingTop: '10' } : {}),
       }}
     >
       <Text variant="h6" css={{ c: 'onSurface.high' }}>
@@ -225,7 +225,7 @@ const InteractionCard = ({ id, title, status }: { id: string; title: string; sta
   return (
     <Flex direction="column" css={{ backgroundColor: 'surface.bright', borderRadius: '1', p: '8' }}>
       <Flex css={{ w: '100%', justifyContent: 'space-between', mb: 'sm' }}>
-        <Text variant="sub1" css={{ c: 'onSurface.high', fontWeight: '$semiBold' }}>
+        <Text variant="sub1" css={{ c: 'onSurface.high', fontWeight: 'semiBold' }}>
           {title}
         </Text>
         <StatusIndicator status={status} />

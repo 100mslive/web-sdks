@@ -53,7 +53,7 @@ const getMessageBackgroundColor = (
   isOverlay: boolean,
 ) => {
   if (messageType && !(selectedPeerID || selectedRole)) {
-    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
+    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : 'surface.default';
   }
   return '';
 };
@@ -76,7 +76,7 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
           css={{
             color: 'onSurface.medium',
             textTransform: 'capitalize',
-            fontWeight: '$regular',
+            fontWeight: 'regular',
             whiteSpace: 'nowrap',
           }}
         >
@@ -89,7 +89,7 @@ const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }
           variant="overline"
           css={{
             color: 'onSurface.medium',
-            fontWeight: '$regular',
+            fontWeight: 'regular',
             whiteSpace: 'nowrap',
           }}
         >
@@ -171,7 +171,7 @@ export const SenderName = styled(Text, {
   width: '100%',
   minWidth: 0,
   color: 'onSurface.high',
-  fontWeight: '$semiBold',
+  fontWeight: 'semiBold',
 });
 
 const ChatMessage = React.memo(
@@ -228,7 +228,7 @@ const ChatMessage = React.memo(
               cursor: 'pointer',
             },
             '&:hover': {
-              background: 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)',
+              background: 'linear-gradient(277deg, surface.default 0%, surface.dim 60.87%)',
             },
           }}
           data-testid="chat_msg"
@@ -241,8 +241,8 @@ const ChatMessage = React.memo(
           <PinnedBy messageId={message.id} index={index} rowRef={rowRef} />
           <Text
             css={{
-              color: isOverlay ? '#FFF' : '$on_surface_high',
-              fontWeight: '$semiBold',
+              color: isOverlay ? '#FFF' : 'onSurface.high',
+              fontWeight: 'semiBold',
               display: 'flex',
               alignItems: 'center',
               alignSelf: 'stretch',
@@ -263,7 +263,7 @@ const ChatMessage = React.memo(
                 <SenderName
                   as="span"
                   variant="sub2"
-                  css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                  css={{ color: isOverlay ? '#FFF' : 'onSurface.high', fontWeight: 'semiBold' }}
                 >
                   {message.senderName || 'Anonymous'}
                 </SenderName>
@@ -272,7 +272,7 @@ const ChatMessage = React.memo(
                   <SenderName
                     as="span"
                     variant="sub2"
-                    css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                    css={{ color: isOverlay ? '#FFF' : 'onSurface.high', fontWeight: 'semiBold' }}
                   >
                     {message.sender === localPeerId ? `${message.senderName} (You)` : message.senderName}
                   </SenderName>
@@ -330,7 +330,7 @@ const ChatMessage = React.memo(
               wordBreak: 'break-word',
               whiteSpace: 'pre-wrap',
               userSelect: 'all',
-              color: isOverlay ? '#FFF' : '$on_surface_high',
+              color: isOverlay ? '#FFF' : 'onSurface.high',
             }}
             onClick={(e: React.MouseEvent<HTMLElement>) => {
               setOpenSheet(true, e as any);

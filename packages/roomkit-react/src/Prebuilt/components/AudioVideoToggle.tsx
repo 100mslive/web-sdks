@@ -48,7 +48,7 @@ import { useAudioOutputTest } from './hooks/useAudioOutputTest';
 import { isAndroid, isIOS, isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 const krispPlugin = new HMSKrispPlugin();
-// const optionsCSS = { fontWeight: '$semiBold', color: 'onSurface.high', w: '100%' };
+// const optionsCSS = { fontWeight: 'semiBold', color: 'onSurface.high', w: '100%' };
 
 export const Options = ({
   options,
@@ -70,7 +70,7 @@ export const Options = ({
             h: '15',
             fontSize: 'xs',
             justifyContent: 'space-between',
-            color: selectedDeviceId === option.deviceId ? '$primary_bright' : '',
+            color: selectedDeviceId === option.deviceId ? 'primary.bright' : '',
           }}
           onClick={() => {
             onClick(option.deviceId);
@@ -176,8 +176,8 @@ export const NoiseCancellation = ({
           }}
           disabled={inProgress}
           css={{
-            bg: isNoiseCancellationEnabled && isKrispPluginAdded ? '$surface_brighter' : '$background_dim',
-            borderColor: isNoiseCancellationEnabled && isKrispPluginAdded ? '$border_brighter' : '$border_bright',
+            bg: isNoiseCancellationEnabled && isKrispPluginAdded ? 'surface.brighter' : 'background.dim',
+            borderColor: isNoiseCancellationEnabled && isKrispPluginAdded ? 'border.brighter' : 'border.bright',
           }}
         >
           <AudioLevelIcon />

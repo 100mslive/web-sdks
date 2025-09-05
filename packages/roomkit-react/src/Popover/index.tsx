@@ -20,7 +20,7 @@ const StyledTrigger = styled(Trigger, {
     cursor: 'pointer',
   },
   '&:focus-visible': {
-    boxShadow: '0 0 0 3px $colors$primary_default',
+    boxShadow: '0 0 0 3px $colorsprimary.default',
   },
 });
 

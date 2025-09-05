@@ -23,7 +23,7 @@ export const RoomDetailsHeader = () => {
 
   return (
     <Flex direction={isMobile ? 'row' : 'column'} css={{ ml: '8', alignItems: isMobile ? 'center' : 'start' }}>
-      <Text variant="sm" css={{ c: 'onSurface.high', fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ c: 'onSurface.high', fontWeight: 'semiBold' }}>
         {title}
       </Text>
       {!isMobile && (

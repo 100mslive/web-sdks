@@ -25,7 +25,7 @@ export const RoomDetailsPane = () => {
         <ShowRoomDetailHeader />
       )}
       <Box css={{ mt: '10' }}>
-        <Text css={{ color: 'onSurface.high', fontWeight: '$semiBold', display: isMwebHLSStream ? 'none' : '' }}>
+        <Text css={{ color: 'onSurface.high', fontWeight: 'semiBold', display: isMwebHLSStream ? 'none' : '' }}>
           Description
         </Text>
         <Text variant="sm" css={{ c: 'onSurface.medium' }}>

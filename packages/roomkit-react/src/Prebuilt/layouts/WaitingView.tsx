@@ -39,7 +39,7 @@ export const WaitingView = React.memo(
           <Text variant="h4" css={{ '@md': { fontSize: 'lg', color: 'onSurface.high' } }}>
             {title}
           </Text>
-          <Text variant="body1" css={{ fontWeight: '$regular', color: 'onSurface.medium', '@md': { fontSize: 'md' } }}>
+          <Text variant="body1" css={{ fontWeight: 'regular', color: 'onSurface.medium', '@md': { fontSize: 'md' } }}>
             {subtitle}
           </Text>
         </Flex>

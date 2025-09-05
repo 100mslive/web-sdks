@@ -53,7 +53,7 @@ const SelectorItem = ({
     >
       <Text
         variant="sm"
-        css={{ display: 'flex', alignItems: 'center', gap: '4', fontWeight: '$semiBold', color: 'onSurface.high' }}
+        css={{ display: 'flex', alignItems: 'center', gap: '4', fontWeight: 'semiBold', color: 'onSurface.high' }}
       >
         {icon}
         {value}
@@ -79,7 +79,7 @@ const SelectorHeader = React.memo(
         {isHorizontalDivider && <HorizontalDivider space={4} />}
         <Text
           variant="overline"
-          css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase', color: 'onSurface.medium' }}
+          css={{ p: '$4 $10', fontWeight: 'semiBold', textTransform: 'uppercase', color: 'onSurface.medium' }}
         >
           {children}
         </Text>

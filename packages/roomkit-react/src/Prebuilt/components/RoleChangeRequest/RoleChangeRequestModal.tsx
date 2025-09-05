@@ -48,7 +48,7 @@ export const RoleChangeRequestModal = () => {
         css={{
           c: 'onSurface.medium',
           textAlign: 'center',
-          '@md': { textAlign: 'left', borderBottom: '1px solid $border_bright', pb: '4', px: '8' },
+          '@md': { textAlign: 'left', borderBottom: '1px solid border.bright', pb: '4', px: '8' },
         }}
       >
         Setup your audio and video before joining

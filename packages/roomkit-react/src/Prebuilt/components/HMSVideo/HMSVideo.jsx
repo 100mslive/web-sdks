@@ -42,7 +42,7 @@ export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoR
           whiteSpace: 'pre-line',
           fontSize: 'sm',
           fontStyle: 'normal',
-          fontWeight: '$regular',
+          fontWeight: 'regular',
           lineHeight: '$sm',
           letterSpacing: '0.25px',
         },

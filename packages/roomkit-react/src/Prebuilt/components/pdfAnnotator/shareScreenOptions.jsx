@@ -97,7 +97,7 @@ export function ShareScreenOptions() {
                   p: '6',
                   display: 'flex',
                   justifyContent: 'center',
-                  border: '1px solid $border_bright',
+                  border: '1px solid border.bright',
                   r: '2',
                   bg: 'surface.brighter',
                   pb: '0',
@@ -143,7 +143,7 @@ export function ShareScreenOptions() {
                   p: '6',
                   display: 'flex',
                   justifyContent: 'center',
-                  border: '$border_bright 1px solid',
+                  border: 'border.bright 1px solid',
                   r: '2',
                   bg: 'surface.bright',
                   pb: '0',
@@ -178,7 +178,7 @@ export function ShareScreenOptions() {
                   <Text
                     variant="xs"
                     css={{
-                      fontWeight: '$semiBold',
+                      fontWeight: 'semiBold',
                       c: 'onPrimary.high',
                       pr: '4',
                     }}

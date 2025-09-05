@@ -30,7 +30,7 @@ const tooltipBoxCSS = {
   fontSize: 'xs',
   backgroundColor: 'surface.default',
   p: '$1 $5',
-  fontWeight: '$regular',
+  fontWeight: 'regular',
   borderRadius: '3',
 };
 
@@ -188,7 +188,7 @@ export const ChatActions = ({
               fontSize: 'md',
               px: '10',
               pb: '8',
-              borderBottom: '1px solid $border_bright',
+              borderBottom: '1px solid border.bright',
               alignItems: 'center',
             }}
           >
@@ -223,7 +223,7 @@ export const ChatActions = ({
       <Flex
         className="chat_actions"
         css={{
-          background: '$surface_bright',
+          background: 'surface.bright',
           borderRadius: '1',
           p: '2',
           opacity: open ? 1 : 0,
@@ -278,12 +278,12 @@ export const ChatActions = ({
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ width: '48', backgroundColor: 'surface.bright', py: '0', border: '1px solid $border_bright' }}
+          css={{ width: '48', backgroundColor: 'surface.bright', py: '0', border: '1px solid border.bright' }}
         >
           {options.hide.show ? (
             <Dropdown.Item data-testid="hide_message_btn" onClick={options.hide.onClick}>
               {options.hide.icon}
-              <Text variant="sm" css={{ ml: '4', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', fontWeight: 'semiBold' }}>
                 {options.hide.text}
               </Text>
             </Dropdown.Item>
@@ -296,7 +296,7 @@ export const ChatActions = ({
               css={{ color: options.block.color }}
             >
               {options.block.icon}
-              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: 'semiBold' }}>
                 {options.block.text}
               </Text>
             </Dropdown.Item>
@@ -308,7 +308,7 @@ export const ChatActions = ({
               css={{ color: options.remove.color }}
             >
               {options.remove.icon}
-              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: '$semiBold' }}>
+              <Text variant="sm" css={{ ml: '4', color: 'inherit', fontWeight: 'semiBold' }}>
                 {options.remove.text}
               </Text>
             </Dropdown.Item>

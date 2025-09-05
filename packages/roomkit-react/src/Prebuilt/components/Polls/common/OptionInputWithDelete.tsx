@@ -23,7 +23,7 @@ export const OptionInputWithDelete = ({
         css={{
           w: '100%',
           backgroundColor: 'surface.bright',
-          border: '1px solid $border_bright',
+          border: '1px solid border.bright',
         }}
         value={option?.text || ''}
         key={index}

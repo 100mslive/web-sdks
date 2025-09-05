@@ -25,7 +25,7 @@ export const CaptionContent = ({ isMobile, onExit }: { isMobile: boolean; onExit
         variant={isMobile ? 'md' : 'lg'}
         css={{
           color: 'onSurface.high',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
           display: 'flex',
           '@md': { px: '8' },
         }}

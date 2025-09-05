@@ -141,7 +141,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
 
   return (
     <Flex css={{ pr: '6', size: '100%' }} direction="column">
-      <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '4' }}>
+      <Flex align="center" justify="between" css={{ w: '100%', background: 'surface.dim', pb: '4' }}>
         <Text variant="h6" css={{ color: 'onSurface.high', display: 'flex', alignItems: 'center' }}>
           Virtual Background {isMobile && loadingEffects ? <Loading size={18} style={{ marginLeft: '0.5rem' }} /> : ''}
         </Text>
@@ -204,11 +204,11 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         <Flex direction="column" css={{ w: '100%', gap: '8', mt: '8' }}>
           {background === HMSVirtualBackgroundTypes.BLUR && isBlurSupported ? (
             <Box>
-              <Text variant="sm" css={{ color: 'onSurface.high', fontWeight: '$semiBold', mb: '4' }}>
+              <Text variant="sm" css={{ color: 'onSurface.high', fontWeight: 'semiBold', mb: '4' }}>
                 Blur intensity
               </Text>
               <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '4' }}>
-                <Text variant="caption" css={{ fontWeight: '$medium', color: 'onSurface.medium' }}>
+                <Text variant="caption" css={{ fontWeight: 'medium', color: 'onSurface.medium' }}>
                   Low
                 </Text>
                 <Slider
@@ -222,7 +222,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                   min={0.1}
                   max={1}
                 />
-                <Text variant="caption" css={{ fontWeight: '$medium', color: 'onSurface.medium' }}>
+                <Text variant="caption" css={{ fontWeight: 'medium', color: 'onSurface.medium' }}>
                   High
                 </Text>
               </Flex>

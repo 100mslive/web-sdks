@@ -19,7 +19,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
         asChild
         data-testid="participant_list_filter"
         css={{
-          border: '1px solid $on_surface_low',
+          border: '1px solid onSurface.low',
           r: '0',
           p: '$2 $4',
         }}

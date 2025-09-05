@@ -36,7 +36,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
   return (
     <Container rounded>
       <Flex direction="column" css={{ size: '100%', p: '8' }}>
-        <Flex justify="between" align="center" css={{ pb: '6', borderBottom: '1px solid $border_bright', mb: '8' }}>
+        <Flex justify="between" align="center" css={{ pb: '6', borderBottom: '1px solid border.bright', mb: '8' }}>
           <Flex align="center" css={{ gap: '4' }}>
             <Flex
               css={{ color: 'onSurface.medium', '&:hover': { color: 'onSurface.high', cursor: 'pointer' } }}
@@ -44,7 +44,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
             >
               <ChevronLeftIcon />
             </Flex>
-            <Text variant="lg" css={{ fontWeight: '$semiBold' }}>
+            <Text variant="lg" css={{ fontWeight: 'semiBold' }}>
               {quiz.title}
             </Text>
             <StatusIndicator status={quiz.state} />
@@ -59,7 +59,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
         <Box css={{ overflowY: 'auto', mr: '-$4', pr: '4' }}>
           {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
 
-          <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '4' }}>
+          <Text variant="sm" css={{ fontWeight: 'semiBold', mt: '4' }}>
             Leaderboard
           </Text>
           <Text variant="xs" css={{ color: 'onSurface.medium' }}>
@@ -73,7 +73,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
               mr: viewAllEntries ? '-$6' : 'unset',
               px: viewAllEntries ? '0' : '$4',
               pr: viewAllEntries ? '$6' : '$4',
-              backgroundColor: viewAllEntries ? '' : '$surface_default',
+              backgroundColor: viewAllEntries ? '' : 'surface.default',
               borderRadius: '1',
             }}
           >
@@ -98,7 +98,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
                 justify="end"
                 css={{
                   w: '100%',
-                  borderTop: '1px solid $border_bright',
+                  borderTop: '1px solid border.bright',
                   cursor: 'pointer',
                   color: 'onSurface.high',
                   p: '$6 $2',

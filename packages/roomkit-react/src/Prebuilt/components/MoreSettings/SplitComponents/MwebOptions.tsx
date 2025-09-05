@@ -138,7 +138,7 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton css={{ bg: isMobileHLSStream || isLandscapeHLSStream ? '$surface_default' : '' }}>
+            <IconButton css={{ bg: isMobileHLSStream || isLandscapeHLSStream ? 'surface.default' : '' }}>
               <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
@@ -154,7 +154,7 @@ export const MwebOptions = ({
               mt: '8',
               px: '10',
               pb: '8',
-              borderBottom: '1px solid $border_default',
+              borderBottom: '1px solid border.default',
               mb: '8',
               alignItems: 'center',
             }}

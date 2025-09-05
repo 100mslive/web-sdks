@@ -27,7 +27,7 @@ export const PollsToggle = () => {
           togglePollView();
           setUnreadPollQuiz(false);
         }}
-        css={{ bg: isPollsOpen ? '$surface_brighter' : '' }}
+        css={{ bg: isPollsOpen ? 'surface.brighter' : '' }}
         data-testid="polls_btn"
       >
         {unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}

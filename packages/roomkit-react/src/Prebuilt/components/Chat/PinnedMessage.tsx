@@ -72,13 +72,13 @@ export const PinnedMessage = () => {
         css={{
           p: '4',
           color: 'onSurface.high',
-          bg: isMobile && elements?.chat?.is_overlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_brighter',
+          bg: isMobile && elements?.chat?.is_overlay ? 'rgba(0, 0, 0, 0.64)' : 'surface.brighter',
           r: '1',
           gap: '4',
           mb: '8',
           mt: '8',
           flexGrow: 1,
-          border: '1px solid $border_bright',
+          border: '1px solid border.bright',
         }}
         align="center"
         justify="between"

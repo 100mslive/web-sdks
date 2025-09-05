@@ -11,7 +11,7 @@ export const StyledVideo = styled('video', {
   alignItems: 'center',
   borderRadius: '2',
   objectFit: 'cover',
-  background: '$background_default',
+  background: 'background.default',
   variants: {
     mirror: {
       true: {

@@ -31,12 +31,12 @@ export const HLSViewTitle = () => {
           position: 'relative',
           h: 'fit-content',
           w: '100%',
-          borderBottom: '1px solid $border_bright',
+          borderBottom: '1px solid border.bright',
           p: '8',
           backgroundColor: 'surface.dim',
         }}
       >
-        <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
+        <Text variant="sub2" css={{ fontWeight: 'semiBold' }}>
           About Session
         </Text>
         <Flex
@@ -60,7 +60,7 @@ export const HLSViewTitle = () => {
         position: 'relative',
         h: 'fit-content',
         w: '100%',
-        borderBottom: '1px solid $border_bright',
+        borderBottom: '1px solid border.bright',
         p: '8',
         backgroundColor: 'surface.dim',
       }}
@@ -68,7 +68,7 @@ export const HLSViewTitle = () => {
       <Logo />
       <Flex direction="column">
         {title ? (
-          <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
+          <Text variant="sub2" css={{ fontWeight: 'semiBold' }}>
             {title}
           </Text>
         ) : null}

@@ -18,7 +18,7 @@ const HighlightTerm = ({ value }: { value: string | undefined }) => {
         variant="body2"
         css={{
           color: 'onSurface.medium',
-          fontWeight: '$semiBold',
+          fontWeight: 'semiBold',
         }}
       >
         '{value.slice(0, 100)}
@@ -168,7 +168,7 @@ export const RoleChangeModal = ({
   if (isMobile) {
     return (
       <Sheet.Root open={true} onOpenChange={onOpenChange} css={{ borderRadius: '$0 $0 0 0' }}>
-        <Sheet.Content style={{ p: '$10 $8', background: '$surface_dim', border: '1px solid $border_default' }}>
+        <Sheet.Content style={{ p: '$10 $8', background: 'surface.dim', border: '1px solid border.default' }}>
           <RoleChangeContent peer={peer} onOpenChange={onOpenChange} isMobile />
         </Sheet.Content>
       </Sheet.Root>

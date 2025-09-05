@@ -25,7 +25,7 @@ export const LayoutModeSelector = () => {
           align="center"
           css={{
             gap: '4',
-            color: open ? '$on_surface_low' : '$on_surface_medium',
+            color: open ? 'onSurface.low' : 'onSurface.medium',
             r: '1',
             p: '$2 $4',
             height: '100%',
@@ -75,7 +75,7 @@ export const LayoutModeSelector = () => {
               align="center"
               css={{
                 gap: '4',
-                borderBottom: '1px solid $border_bright',
+                borderBottom: '1px solid border.bright',
                 p: '8',
                 '&:hover': {
                   cursor: 'pointer',

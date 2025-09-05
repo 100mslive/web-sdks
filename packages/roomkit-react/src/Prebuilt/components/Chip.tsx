@@ -5,8 +5,8 @@ import { Text } from '../../Text';
 const Chip = ({
   icon = <></>,
   content = '',
-  backgroundColor = '$surface_default',
-  textColor = '$on_surface_high',
+  backgroundColor = 'surface.default',
+  textColor = 'onSurface.high',
   hideIfNoContent = false,
   onClick,
   css = {},
@@ -29,7 +29,7 @@ const Chip = ({
       onClick={() => onClick?.()}
     >
       {icon}
-      <Text variant="sm" css={{ fontWeight: '$semiBold', color: textColor }}>
+      <Text variant="sm" css={{ fontWeight: 'semiBold', color: textColor }}>
         {content}
       </Text>
     </Flex>

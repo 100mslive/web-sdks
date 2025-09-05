@@ -119,7 +119,7 @@ export function FlyingEmoji() {
                 css={{
                   width: 'fit-content',
                   padding: '$2 $4',
-                  background: '$surface_bright',
+                  background: 'surface.bright',
                   borderRadius: '1',
                 }}
               >
