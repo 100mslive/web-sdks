@@ -558,7 +558,9 @@ export class DeviceManager implements HMSDeviceManager {
       return matchingLabel;
     }
 
-    const matchingGroupId = this.audioOutput.find(device => device.groupId === inputDevice.groupId);
+    const matchingGroupId = this.audioOutput.find(
+      device => device.groupId === inputDevice.groupId && device.deviceId !== 'default',
+    );
 
     // Select the device with matching group only when it is the default device
     // if a earphone without mic is connected, the above would pick system speakers instead of the earphone
