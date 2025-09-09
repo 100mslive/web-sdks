@@ -373,6 +373,7 @@ export class LocalTrackManager {
    */
   private async getAVTracks(settings: HMSTrackSettings): Promise<Array<MediaStreamTrack>> {
     try {
+      console.trace(settings.audio?.toConstraints(), settings.video?.toConstraints());
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: settings.audio ? settings.audio.toConstraints() : false,
         video: settings.video ? settings.video.toConstraints() : false,

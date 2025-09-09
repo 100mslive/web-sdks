@@ -290,7 +290,9 @@ export class DeviceManager implements HMSDeviceManager {
   async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
+    console.log('new inpuit device', { inputDevice, prevSelection });
     this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
+
     if (!this.outputDevice) {
       // there is no matching device, let's revert back to the prev selected device
       this.outputDevice = this.audioOutput.find(device => this.createIdentifier(device) === prevSelection);
@@ -540,6 +542,7 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
 
+    console.log({ inputDevice });
     const inputLabel = inputDevice.label.toLowerCase() || '';
     if (blacklist.some(label => inputLabel.includes(label.toLowerCase()))) {
       return;
@@ -549,6 +552,8 @@ export class DeviceManager implements HMSDeviceManager {
       device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
     );
 
+    console.log({ matchingLabel });
+
     if (matchingLabel) {
       return matchingLabel;
     }
@@ -557,11 +562,7 @@ export class DeviceManager implements HMSDeviceManager {
 
     // Select the device with matching group only when it is the default device
     // if a earphone without mic is connected, the above would pick system speakers instead of the earphone
-    if (
-      matchingGroupId &&
-      this.audioOutput[0].deviceId === 'default' &&
-      matchingGroupId.groupId === this.audioOutput[0].groupId
-    ) {
+    if (matchingGroupId) {
       return matchingGroupId;
     }
 
