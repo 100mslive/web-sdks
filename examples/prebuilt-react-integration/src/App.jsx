@@ -1,10 +1,10 @@
-import { HMSPrebuilt, Diagnostics } from '@100mslive/roomkit-react';
+// import { HMSPrebuilt, Diagnostics } from '@100mslive/roomkit-react';
 import { useEffect, useRef } from 'react';
-import { getRoomCodeFromUrl } from './utils';
+// import { getRoomCodeFromUrl } from './utils';
 
 export default function App() {
-  const roomCode = getRoomCodeFromUrl();
-  const isDiagnostics = location.pathname.startsWith('/diagnostics');
+  // const roomCode = getRoomCodeFromUrl();
+  // const isDiagnostics = location.pathname.startsWith('/diagnostics');
   const prebuiltRef = useRef();
 
   useEffect(() => {
@@ -16,9 +16,17 @@ export default function App() {
     }
   }, []);
 
-  if (isDiagnostics) {
-    return <Diagnostics />;
-  }
+  // if (isDiagnostics) {
+  //   return <Diagnostics />;
+  // }
 
-  return <HMSPrebuilt roomCode={roomCode} ref={prebuiltRef} screens={{ preview: null }} />;
+  return (
+    <iframe
+      title="<title>"
+      allow="camera *;microphone *;display-capture *"
+      id="100ms-iframe"
+      src="https://dashboard-app-git-update-example-with-ref-100mslive.vercel.app/thirsty-malachite-quail"
+      style={{ border: 'none', width: '640px', height: '100vh' }}
+    ></iframe>
+  );
 }
