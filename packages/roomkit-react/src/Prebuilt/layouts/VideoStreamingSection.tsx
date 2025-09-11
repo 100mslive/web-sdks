@@ -150,6 +150,9 @@ export const VideoStreamingSection = ({
           maxHeight: '100%',
           '&:empty': { display: 'none' },
           overflowY: 'clip',
+          containerLg: {
+            width: '100%',
+          },
         }}
       >
         <SidePane
