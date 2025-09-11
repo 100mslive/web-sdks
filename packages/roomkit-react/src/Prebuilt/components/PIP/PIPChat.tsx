@@ -87,9 +87,10 @@ export const PIPChat = () => {
           <Box
             id="new-message-notif"
             style={{
-              position: 'fixed',
+              position: 'absolute',
               bottom: '76px',
               right: '4px',
+              zIndex: 10,
             }}
           >
             <Text

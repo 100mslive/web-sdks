@@ -173,7 +173,20 @@ const PreviewJoin = ({
           />
         </Box>
       </Container>
-      <Box css={{ position: 'absolute', right: '0', top: 0, height: '100%', overflow: 'hidden' }}>
+      <Box
+        css={{
+          position: 'absolute',
+          right: '0',
+          top: 0,
+          height: '100%',
+          overflow: 'hidden',
+          '&:not(:empty)': {
+            containerLg: {
+              width: '100%',
+            },
+          },
+        }}
+      >
         <SidePane />
       </Box>
     </Flex>

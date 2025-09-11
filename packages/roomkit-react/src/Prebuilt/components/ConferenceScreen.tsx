@@ -106,7 +106,7 @@ export const ConferenceScreen = () => {
   return (
     <>
       {isHLSStarted ? (
-        <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
+        <Box css={{ position: 'absolute', zIndex: 100, size: '100%', left: 0, top: 0 }}>
           <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
         </Box>
       ) : null}

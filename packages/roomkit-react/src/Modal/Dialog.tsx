@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
 import {
@@ -28,17 +28,17 @@ const DialogRoot = <T extends React.ComponentProps<typeof StyledDialog>>(props: 
 
 const CustomDialogPortal = ({ children, container }: { children: ReactNode; container?: HTMLElement | null }) => {
   const dialogContainerSelector = useDialogContainerSelector();
-  const containerRef = useRef<HTMLElement | null>(null);
+  let containerElement;
 
   if (container) {
-    containerRef.current = container;
-  } else if (dialogContainerSelector && !containerRef.current) {
-    containerRef.current = document.querySelector(dialogContainerSelector) as HTMLElement;
-  } else if (!containerRef.current) {
-    containerRef.current = document.body;
+    containerElement = container;
+  } else if (dialogContainerSelector && !containerElement) {
+    containerElement = document.querySelector(dialogContainerSelector) as HTMLElement;
+  } else if (!containerElement) {
+    containerElement = document.body;
   }
   return (
-    <StyledDialogPortal container={containerRef.current}>
+    <StyledDialogPortal container={containerElement}>
       <>{children}</>
     </StyledDialogPortal>
   );

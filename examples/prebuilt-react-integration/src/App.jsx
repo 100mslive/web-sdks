@@ -11,7 +11,7 @@ export default function App() {
 
   return (
     <div className="example-prebuilt-container">
-      <HMSPrebuilt roomCode={roomCode} containerSelector=".example-prebuilt-container" />;
+      <HMSPrebuilt roomCode={roomCode} />
     </div>
   );
 }

@@ -36,7 +36,7 @@ const Wrapper = styled('div', {
     h: '100%',
     ml: 0,
     right: 0,
-    position: 'fixed',
+    position: 'absolute',
     bottom: 0,
     borderRadius: 0,
     zIndex: 10,
@@ -66,7 +66,7 @@ const Wrapper = styled('div', {
         containerLg: {
           maxHeight: '300px',
           background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
-          position: 'fixed',
+          position: 'absolute',
           zIndex: 12,
           bottom: 0,
         },
@@ -217,9 +217,10 @@ const SidePane = ({
         gap: '$4',
         position: 'relative',
         '&:empty': { display: 'none' },
-        containerMd: {
+        containerLg: {
           position: 'absolute',
           zIndex: 12,
+          w: '100%',
         },
       }}
     >
