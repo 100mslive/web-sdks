@@ -72,6 +72,7 @@ export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => 
         forceCurrentTab: isChromiumBased,
         cropElement: iframeRef.current,
         preferCurrentTab: isChromiumBased,
+        selfBrowserSurface: 'include',
       });
     },
     [amIScreenSharing, toggleScreenShare],
