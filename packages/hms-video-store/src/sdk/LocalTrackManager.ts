@@ -201,6 +201,7 @@ export class LocalTrackManager {
   async getLocalScreen(partialConfig?: HMSScreenShareConfig, optimise = false) {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const screenSettings = this.getScreenshareSettings(config.videoOnly);
+    console.log('screenSettings', screenSettings, config);
     const constraints = {
       video: { ...screenSettings?.video.toConstraints(true), displaySurface: config.displaySurface },
       preferCurrentTab: config.preferCurrentTab,
