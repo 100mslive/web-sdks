@@ -20,5 +20,5 @@ export default function App() {
     return <Diagnostics />;
   }
 
-  return <HMSPrebuilt roomCode={roomCode} ref={prebuiltRef} />;
+  return <HMSPrebuilt roomCode={roomCode} ref={prebuiltRef} screens={{ preview: null }} />;
 }
