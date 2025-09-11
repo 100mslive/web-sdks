@@ -13,6 +13,9 @@ export default function App() {
       console.log('HMSPrebuilt instance:', prebuiltRef.current);
       const { hmsActions } = prebuiltRef.current;
       hmsActions.enableBeamSpeakerLabelsLogging();
+
+      // Send data to parent
+      window.parent.postMessage({ type: 'hms', data: window.__hms }, '*');
     }
   }, []);
 
