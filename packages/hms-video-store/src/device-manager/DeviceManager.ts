@@ -290,7 +290,6 @@ export class DeviceManager implements HMSDeviceManager {
   async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
-    console.log('new inpuit device', { inputDevice, prevSelection });
     this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
 
     if (!this.outputDevice) {
@@ -542,7 +541,6 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
 
-    console.log({ inputDevice });
     const inputLabel = inputDevice.label.toLowerCase() || '';
     if (blacklist.some(label => inputLabel.includes(label.toLowerCase()))) {
       return;
@@ -551,8 +549,6 @@ export class DeviceManager implements HMSDeviceManager {
     const matchingLabel = this.audioOutput.find(
       device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
     );
-
-    console.log({ matchingLabel });
 
     if (matchingLabel) {
       return matchingLabel;
