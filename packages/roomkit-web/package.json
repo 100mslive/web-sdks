@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/roomkit-web",
-  "version": "0.2.38",
+  "version": "0.2.39",
   "description": "A web component implementation of 100ms Prebuilt component",
   "keywords": [
     "web-components",
@@ -33,7 +33,7 @@
     "build": "rm -rf dist && node ../../scripts/build-webapp"
   },
   "dependencies": {
-    "@100mslive/roomkit-react": "0.3.38",
+    "@100mslive/roomkit-react": "0.3.39",
     "@r2wc/react-to-web-component": "2.0.2"
   }
 }
