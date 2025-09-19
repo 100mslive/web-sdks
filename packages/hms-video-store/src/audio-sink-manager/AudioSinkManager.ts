@@ -10,7 +10,6 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
-import { isSafari } from '../utils/support';
 import { sleep } from '../utils/timer-utils';
 
 /**
@@ -193,7 +192,7 @@ export class AudioSinkManager {
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    if (isSafari) {
+    /*  if (isSafari) {
       const tracks = this.store.getRemotePeers().map(p => p.audioTrack);
       for (const track of tracks) {
         await this.removeAudioElement(track?.getAudioElement() as HTMLAudioElement, track as HMSRemoteAudioTrack);
@@ -203,7 +202,7 @@ export class AudioSinkManager {
           callListener: false,
         });
       }
-    }
+    } */
     await this.unpauseAudioTracks();
   };
 
