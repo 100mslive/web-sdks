@@ -16,6 +16,35 @@ class DeviceStorage {
 
   setDevices(devices: DeviceMap) {
     this.devices = devices;
+
+    // Remove stored devices that are no longer present
+    if (!this.remember) {
+      return;
+    }
+
+    const storedDevices = this.storage.get();
+    if (!storedDevices) {
+      return;
+    }
+
+    // Check each stored device type
+    const deviceTypes: Array<'audioInput' | 'videoInput' | 'audioOutput'> = ['audioInput', 'videoInput', 'audioOutput'];
+
+    for (const type of deviceTypes) {
+      const storedDevice = storedDevices[type];
+      if (storedDevice) {
+        // Check if the stored device still exists in the current devices list
+        const stillExists = devices[type]?.some(device => this.isSame(storedDevice, device));
+
+        if (!stillExists) {
+          HMSLogger.w(
+            this.TAG,
+            `Removing ${type} device from storage as it's no longer available: ${storedDevice.deviceId}`,
+          );
+          this.removeSelection(type);
+        }
+      }
+    }
   }
 
   rememberDevices(value: boolean) {
@@ -44,6 +73,14 @@ class DeviceStorage {
       selectedDevices[type] = newSelection as MediaDeviceInfo;
     }
     this.storage.set(selectedDevices);
+  }
+
+  removeSelection(type: 'audioInput' | 'videoInput' | 'audioOutput') {
+    const selectedDevices = this.storage.get() || {};
+    if (selectedDevices[type]) {
+      delete selectedDevices[type];
+      this.storage.set(selectedDevices);
+    }
   }
 
   getSelection() {
