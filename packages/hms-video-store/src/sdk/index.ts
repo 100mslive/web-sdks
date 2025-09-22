@@ -634,6 +634,8 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
+    // @ts-ignore
+    window.hmsAudioContext = HMSAudioContextHandler.getAudioContext();
     HMSAudioContextHandler.resumeContext();
     // acquire screen lock to stay awake while in call
     const storeConfig = this.store.getConfig();
