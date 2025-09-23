@@ -1,7 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSLogger from '../../utils/logger';
-import { isFirefox } from '../../utils/support';
+import { isChromiumBased } from '../../utils/support';
 import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export class HMSAudioTrack extends HMSTrack {
@@ -70,20 +70,9 @@ export class HMSAudioTrack extends HMSTrack {
     }
     try {
       // @ts-ignore
-      if (typeof this.audioElement.setSinkId === 'function') {
-        if (isFirefox) {
-          // using setSinkId in firefox disables echo cancellation (introduced in Firefox 116)
-          // todo: GoogleMeet doesn't set sinkId for all 3 audio elements, how do they redirect audio then?
-          //
-          // refer: https://100ms.atlassian.net/browse/LIVE-1992
-          // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1849108
-          // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
-          // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
-        } else {
-          // @ts-ignore
-          await this.audioElement?.setSinkId(device.deviceId);
-        }
-
+      if (typeof this.audioElement.setSinkId === 'function' && isChromiumBased) {
+        // @ts-ignore
+        await this.audioElement?.setSinkId(device.deviceId);
         this.outputDevice = device;
       }
     } catch (error) {
