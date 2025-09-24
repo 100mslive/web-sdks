@@ -2,7 +2,7 @@
   "name": "@100mslive/hms-whiteboard",
   "author": "100ms",
   "license": "MIT",
-  "version": "0.0.29-alpha.0",
+  "version": "0.0.29-alpha.1",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
