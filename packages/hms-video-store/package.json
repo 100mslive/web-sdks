@@ -54,6 +54,7 @@
     "ua-parser-js": "^1.0.1",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0",
+    "xstate": "^5.22.0",
     "zustand": "3.5.7"
   },
   "devDependencies": {
