@@ -112,6 +112,8 @@ const INITIAL_STATE = {
   deviceManagersInitialised: false,
 };
 
+export { HMSXStateConfig } from './HMSXStateConfig';
+
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport;
   private readonly TAG = '[HMSSdk]:';

@@ -5,38 +5,47 @@ import { DeviceManager } from '../../device-manager';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
-import { HMSTrackSource, HMSTrackUpdate } from '../../interfaces';
+import { 
+  HMSTrackSource, 
+  HMSTrackUpdate,
+  HMSSimulcastLayerDefinition,
+  HMSLocalVideoTrackStats,
+  HMSSimulcastLayer,
+} from '../../interfaces';
 import { HMSTrackType } from './HMSTrackType';
-import { HMSAudioPluginsManager } from '../../plugins/audio';
+import { HMSVideoPluginsManager } from '../../plugins/video';
 import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { getAudioTrack } from '../../utils/track';
-import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
-import { HMSAudioTrackSettings } from '../settings';
+import { getVideoTrack } from '../../utils/track';
+import { HMSVideoTrackSettings } from '../settings';
+import { isIOS } from '../../utils/support';
+import { HMSRoom } from '../../sdk/models/HMSRoom';
 
 /**
- * Refactored HMSLocalAudioTrack using XState for cleaner state management
+ * Refactored HMSLocalVideoTrack using XState for cleaner state management
  */
-export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter<
+export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter<
   LocalTrackContext,
   LocalTrackEvent,
   typeof localTrackStateMachine
 > {
-  readonly type = HMSTrackType.AUDIO;
-  private audioLevelMonitor?: TrackAudioLevelMonitor;
-  private pluginsManager: HMSAudioPluginsManager;
+  readonly type = HMSTrackType.VIDEO;
+  private pluginsManager: HMSVideoPluginsManager;
   private tracksCreated = new Set<MediaStreamTrack>();
   private _transceiver?: RTCRtpTransceiver;
-  private _volume = 100;
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
+  private enabledStateBeforeBackground = true;
+  private isCurrentTab = false;
+  private room?: HMSRoom;
 
   constructor(
     private stream: MediaStream,
     track: MediaStreamTrack,
     source: HMSTrackSource,
-    private settings: HMSAudioTrackSettings,
+    private settings: HMSVideoTrackSettings,
     private eventBus: EventBus,
-    private deviceManager: DeviceManager,
-    private store: Store,
+    private deviceManager?: DeviceManager,
+    room?: HMSRoom,
   ) {
     const initialContext: Partial<LocalTrackContext> = {
       trackId: track.id,
@@ -48,13 +57,14 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
       isPublished: false,
     };
 
-    super(localTrackStateMachine, eventBus, '[LocalAudioTrack]', initialContext);
-
-    this.pluginsManager = new HMSAudioPluginsManager(store, eventBus);
-
+    super(localTrackStateMachine, eventBus, '[LocalVideoTrack]', initialContext);
+    
+    this.room = room;
+    this.pluginsManager = new HMSVideoPluginsManager(eventBus);
+    
     // Configure state machine services
     this.configureServices();
-
+    
     // Initialize track
     this.initializeTrack(track);
   }
@@ -64,7 +74,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     // Add service implementations
     const services = {
       enableTrack: async () => {
-        const track = await this.acquireAudioTrack();
+        const track = this.context.nativeTrack || await this.acquireVideoTrack();
         this.handleTrackEnabled(track);
         return track;
       },
@@ -99,7 +109,6 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
   private initializeTrack(track: MediaStreamTrack): void {
     this.tracksCreated.add(track);
     this.setupTrackListeners(track);
-    this.startAudioLevelMonitor();
     this.listenToVisibilityChange();
     this.trackPermissions();
   }
@@ -125,13 +134,8 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     return this.context.deviceId;
   }
 
-  get volume(): number {
-    return this._volume;
-  }
-
-  async setVolume(value: number): Promise<void> {
-    this._volume = Math.max(0, Math.min(100, value));
-    this.audioLevelMonitor?.setVolume(this._volume);
+  get facingMode(): string | undefined {
+    return this.settings.facingMode;
   }
 
   get transceiver(): RTCRtpTransceiver | undefined {
@@ -142,20 +146,34 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     this._transceiver = transceiver;
   }
 
+  get layerDefinitions(): HMSSimulcastLayerDefinition[] {
+    return this._layerDefinitions;
+  }
+
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) {
       return;
     }
 
     HMSLogger.d(this.TAG, `Setting enabled to ${value}`);
+    
+    if (value) {
+      // When enabling, might need to acquire a new track
+      if (!this.context.nativeTrack || this.context.nativeTrack.readyState === 'ended') {
+        const track = await this.acquireVideoTrack();
+        this.send({ type: 'SET_NATIVE_TRACK', track });
+      }
+    }
+    
     this.send({ type: value ? 'ENABLE' : 'DISABLE' });
   }
 
-  async setSettings(settings: HMSAudioTrackSettings): Promise<void> {
+  async setSettings(settings: HMSVideoTrackSettings): Promise<void> {
     HMSLogger.d(this.TAG, 'Updating settings', settings);
-
+    
+    this.settings = settings;
     this.send({ type: 'UPDATE_SETTINGS', settings });
-
+    
     // If device changed, trigger track replacement
     if (settings.deviceId && settings.deviceId !== this.context.deviceId) {
       await this.replaceTrackWithDevice(settings.deviceId);
@@ -167,10 +185,67 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     this.send({ type: 'REPLACE_TRACK', track, deviceId });
   }
 
+  async switchCamera(): Promise<void> {
+    if (!this.settings.facingMode) {
+      HMSLogger.w(this.TAG, 'Cannot switch camera, no facing mode set');
+      return;
+    }
+    
+    const newFacingMode = this.settings.facingMode === 'user' ? 'environment' : 'user';
+    const newSettings = new HMSVideoTrackSettings({
+      ...this.settings,
+      facingMode: newFacingMode,
+    });
+    
+    await this.setSettings(newSettings);
+  }
+
+  async cropTo(cropTarget?: unknown): Promise<void> {
+    if (!cropTarget) {
+      return;
+    }
+    
+    try {
+      // @ts-ignore
+      await this.nativeTrack.cropTo(cropTarget);
+    } catch (error) {
+      HMSLogger.e(this.TAG, 'Failed to crop video', error);
+      throw error;
+    }
+  }
+
+  getCaptureHandle(): any {
+    // @ts-ignore
+    return this.nativeTrack.getCaptureHandle?.();
+  }
+
+  setSimulcastDefinitons(definitions?: HMSSimulcastLayerDefinition[]): void {
+    this._layerDefinitions = definitions || [];
+  }
+
+  async setDegradation(enable: boolean): Promise<void> {
+    if (!this._transceiver?.sender) {
+      return;
+    }
+    
+    const parameters = this._transceiver.sender.getParameters();
+    parameters.degradationPreference = enable ? 'maintain-framerate' : 'balanced';
+    await this._transceiver.sender.setParameters(parameters);
+  }
+
+  getStats(): Promise<HMSLocalVideoTrackStats | undefined> {
+    // Implementation would go here
+    return Promise.resolve(undefined);
+  }
+
+  getSimulcastDefinition(layer: HMSSimulcastLayer): HMSSimulcastLayerDefinition | undefined {
+    return this._layerDefinitions.find(def => def.layer === layer);
+  }
+
   private async replaceTrackWithDevice(deviceId: string): Promise<void> {
     try {
-      const newSettings = new HMSAudioTrackSettings({ ...this.settings, deviceId });
-      const track = await getAudioTrack(newSettings);
+      const newSettings = new HMSVideoTrackSettings({ ...this.settings, deviceId });
+      const track = await getVideoTrack(newSettings);
       await this.replaceTrackWith(track, deviceId);
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed to replace track with device', error);
@@ -180,23 +255,31 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
 
   private async performTrackReplacement(newTrack: MediaStreamTrack, _deviceId?: string): Promise<void> {
     const oldTrack = this.context.nativeTrack;
-
+    
     // Remove old track
     if (oldTrack) {
       this.removeTrackListeners(oldTrack);
       oldTrack.stop();
       this.tracksCreated.delete(oldTrack);
     }
-
+    
     // Add new track
     this.tracksCreated.add(newTrack);
     this.setupTrackListeners(newTrack);
-
+    
+    // Update stream
+    if (this.stream) {
+      if (oldTrack) {
+        this.stream.removeTrack(oldTrack);
+      }
+      this.stream.addTrack(newTrack);
+    }
+    
     // Update transceiver if published
     if (this.context.isPublished && this._transceiver?.sender) {
       await this._transceiver.sender.replaceTrack(this.context.processedTrack || newTrack);
     }
-
+    
     // Reprocess plugins if needed
     if (this.pluginsManager.getPlugins().length > 0) {
       await this.reprocessPlugins(newTrack);
@@ -205,31 +288,52 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
 
   private async reprocessPlugins(track: MediaStreamTrack): Promise<void> {
     try {
-      const processedTrack = await this.pluginsManager.processAudioTrack(track);
+      const processedTrack = await this.pluginsManager.processVideoTrack(track, this);
       this.send({ type: 'SET_PROCESSED_TRACK', track: processedTrack });
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed to reprocess plugins', error);
     }
   }
 
-  private async acquireAudioTrack(): Promise<MediaStreamTrack> {
+  private async acquireVideoTrack(): Promise<MediaStreamTrack> {
     try {
-      return await getAudioTrack(this.settings);
+      return await getVideoTrack(this.settings);
     } catch (error) {
-      throw ErrorFactory.TracksErrors.AudioTrackSettingsError(HMSAction.TRACK, 'Failed to acquire audio track');
+      throw ErrorFactory.TracksErrors.VideoTrackSettingsError(HMSAction.TRACK, 'Failed to acquire video track');
     }
   }
 
   private handleTrackEnabled(track: MediaStreamTrack): void {
     track.enabled = true;
-    this.eventBus.localAudioEnabled.publish({ enabled: true, track: this });
+    this.eventBus.localVideoEnabled.publish({ enabled: true, track: this });
   }
 
   private handleTrackDisabled(): void {
     if (this.context.nativeTrack) {
-      this.context.nativeTrack.enabled = false;
+      // Replace with blank track for iOS
+      if (isIOS() && this.context.isPublished && this._transceiver?.sender) {
+        const blankTrack = this.createBlankVideoTrack();
+        this._transceiver.sender.replaceTrack(blankTrack).then(() => {
+          blankTrack.stop();
+        });
+      } else {
+        this.context.nativeTrack.enabled = false;
+      }
     }
-    this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
+    this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+  }
+
+  private createBlankVideoTrack(): MediaStreamTrack {
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    const stream = canvas.captureStream(1);
+    return stream.getVideoTracks()[0];
   }
 
   private setupTrackListeners(track: MediaStreamTrack): void {
@@ -256,28 +360,30 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     this.send({ type: 'TRACK_ENDED' });
   };
 
-  private startAudioLevelMonitor(): void {
-    this.audioLevelMonitor = new TrackAudioLevelMonitor(this.context.nativeTrack!, this.eventBus);
-    this.audioLevelMonitor.start();
-    this.audioLevelMonitor.detectSilence();
-  }
-
   private listenToVisibilityChange(): void {
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   private handleVisibilityChange = (): void => {
     if (document.hidden) {
+      this.enabledStateBeforeBackground = this.enabled;
       this.send({ type: 'VISIBILITY_HIDDEN' });
+      // Disable track on background for iOS
+      if (isIOS() && this.enabled) {
+        this.setEnabled(false);
+      }
     } else {
       this.send({ type: 'VISIBILITY_VISIBLE' });
+      // Restore state on foreground for iOS
+      if (isIOS() && this.enabledStateBeforeBackground) {
+        this.setEnabled(true);
+      }
     }
   };
 
   private trackPermissions(): void {
     // Simplified permission tracking
-    navigator.permissions
-      ?.query({ name: 'microphone' as PermissionName })
+    navigator.permissions?.query({ name: 'camera' as PermissionName })
       .then(permission => {
         permission.addEventListener('change', () => {
           const eventType =
@@ -288,7 +394,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
               : 'PERMISSION_PROMPT';
           this.send({ type: eventType });
         });
-
+        
         // Set initial state
         const eventType =
           permission.state === 'granted'
@@ -305,20 +411,20 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
 
   protected onStateChange(state: any): void {
     HMSLogger.d(this.TAG, 'State changed:', JSON.stringify(state.value));
-
+    
     // Publish track updates based on state changes
     if (state.changed) {
       // Check for enable/disable changes
       const prevEnabled = state.history?.context.enabled;
       const currEnabled = state.context.enabled;
-
+      
       if (prevEnabled !== undefined && prevEnabled !== currEnabled) {
-        this.eventBus.localAudioEnabled.publish({
+        this.eventBus.localVideoEnabled.publish({
           enabled: currEnabled,
           track: this,
         });
       }
-
+      
       // Check for track replacement completion
       if (!state.context.isReplacing && state.history?.context.isReplacing) {
         this.eventBus.localTrackUpdate.publish({
@@ -338,21 +444,16 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
   }
 
   async cleanup(): Promise<void> {
-    // Stop audio level monitor
-    this.audioLevelMonitor?.stop();
-    this.audioLevelMonitor = undefined;
-
     // Cleanup plugins
     await this.pluginsManager.cleanup();
-    await this.pluginsManager.closeContext();
-
+    
     // Stop all created tracks
     this.tracksCreated.forEach(track => track.stop());
     this.tracksCreated.clear();
-
+    
     // Remove listeners
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-
+    
     // Stop state machine
     super.cleanup();
   }
@@ -364,6 +465,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
       type: this.type,
       source: this.context.source,
       deviceId: this.context.deviceId,
+      facingMode: this.facingMode,
       state: this.state,
     });
   }
