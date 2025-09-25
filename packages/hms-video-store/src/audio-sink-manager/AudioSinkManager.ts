@@ -192,17 +192,6 @@ export class AudioSinkManager {
     if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
-    /*  if (isSafari) {
-      const tracks = this.store.getRemotePeers().map(p => p.audioTrack);
-      for (const track of tracks) {
-        await this.removeAudioElement(track?.getAudioElement() as HTMLAudioElement, track as HMSRemoteAudioTrack);
-        await this.handleTrackAdd({
-          track: track as HMSRemoteAudioTrack,
-          peer: this.store.getPeerById(track?.peerId || '') as HMSRemotePeer,
-          callListener: false,
-        });
-      }
-    } */
     await this.unpauseAudioTracks();
   };
 

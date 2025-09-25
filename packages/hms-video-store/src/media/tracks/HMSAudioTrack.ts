@@ -69,10 +69,8 @@ export class HMSAudioTrack extends HMSTrack {
       return;
     }
     try {
-      // @ts-ignore
-      if (typeof this.audioElement.setSinkId === 'function' && isChromiumBased) {
-        // @ts-ignore
-        await this.audioElement?.setSinkId(device.deviceId);
+      if (typeof (this.audioElement as any).setSinkId === 'function' && isChromiumBased) {
+        await (this.audioElement as any)?.setSinkId(device.deviceId);
         this.outputDevice = device;
       }
     } catch (error) {
