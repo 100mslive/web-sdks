@@ -18,7 +18,6 @@ import {
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
-import { TrackImplementationFactory } from '../media/tracks/TrackImplementationFactory';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -29,6 +28,7 @@ import {
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrackExceptionTrackType } from '../media/tracks/HMSTrackExceptionTrackType';
+import { TrackImplementationProvider } from '../media/tracks/TrackImplementationProvider';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -252,7 +252,7 @@ export class LocalTrackManager {
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = TrackImplementationFactory.createLocalVideoTrack(
+    const videoTrack = TrackImplementationProvider.createLocalVideoTrack(
       local,
       nativeVideoTrack,
       'screen',
@@ -274,7 +274,7 @@ export class LocalTrackManager {
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
-      const audioTrack = TrackImplementationFactory.createLocalAudioTrack(
+      const audioTrack = TrackImplementationProvider.createLocalAudioTrack(
         local,
         nativeAudioTrack,
         'screen',
@@ -642,7 +642,7 @@ export class LocalTrackManager {
 
     const tracks: Array<HMSLocalTrack> = [];
     if (nativeAudioTrack && settings?.audio) {
-      const audioTrack = TrackImplementationFactory.createLocalAudioTrack(
+      const audioTrack = TrackImplementationProvider.createLocalAudioTrack(
         localStream,
         nativeAudioTrack,
         'regular',
@@ -654,7 +654,7 @@ export class LocalTrackManager {
     }
 
     if (nativeVideoTrack && settings?.video) {
-      const videoTrack = TrackImplementationFactory.createLocalVideoTrack(
+      const videoTrack = TrackImplementationProvider.createLocalVideoTrack(
         localStream,
         nativeVideoTrack,
         'regular',

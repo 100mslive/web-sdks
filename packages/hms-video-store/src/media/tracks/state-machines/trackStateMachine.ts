@@ -1,5 +1,5 @@
 import { assign, createMachine } from 'xstate';
-import { HMSTrackSource } from '../../../interfaces';
+import { HMSTrackSource } from '../../tracks/HMSTrack';
 
 export interface TrackContext {
   enabled: boolean;
@@ -100,10 +100,10 @@ export const trackStateMachine = createMachine<TrackContext, TrackEvent>({
         SET_NATIVE_TRACK: {
           target: 'ready',
           actions: assign({
-            nativeTrack: (_, event) => event.track,
-            trackId: (_, event) => event.track.id,
+            nativeTrack: (_: any, event: any) => event.track,
+            trackId: (_: any, event: any) => event.track.id,
             error: undefined,
-          }),
+          } as any),
         },
       },
     },

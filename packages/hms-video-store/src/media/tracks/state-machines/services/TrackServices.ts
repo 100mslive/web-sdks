@@ -135,21 +135,21 @@ export class TrackServices {
         return null;
       }
 
-      if (type === 'audio') {
-        if (context.settings instanceof HMSAudioTrackSettings) {
-          return await TrackServices.acquireAudioTrack(context.settings);
-        }
-      } else if (type === 'video') {
-        if (context.settings instanceof HMSVideoTrackSettings) {
-          return await TrackServices.acquireVideoTrack(context.settings);
-        }
-      }
-
-      return null;
+      return await TrackServices.acquireTrackForType(type, context.settings);
     } catch (error) {
       HMSLogger.e(TrackServices.TAG, 'Failed to recover from interruption', error);
       return null;
     }
+  }
+
+  private static async acquireTrackForType(type: 'audio' | 'video', settings: any): Promise<MediaStreamTrack | null> {
+    if (type === 'audio' && settings instanceof HMSAudioTrackSettings) {
+      return await TrackServices.acquireAudioTrack(settings);
+    }
+    if (type === 'video' && settings instanceof HMSVideoTrackSettings) {
+      return await TrackServices.acquireVideoTrack(settings);
+    }
+    return null;
   }
 
   /**

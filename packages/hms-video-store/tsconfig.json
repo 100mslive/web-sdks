@@ -6,7 +6,8 @@
     "incremental": false,
     "declarationMap": false,
     "sourceMap": false,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*", "types"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "internal-docs", "docs", "images"]

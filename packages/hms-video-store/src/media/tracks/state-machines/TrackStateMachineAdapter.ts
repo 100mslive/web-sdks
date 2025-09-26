@@ -1,13 +1,13 @@
-import { interpret, InterpreterFrom, StateMachine } from 'xstate';
+import { interpret, StateMachine } from 'xstate';
 import { EventBus } from '../../../events/EventBus';
 import HMSLogger from '../../../utils/logger';
 
 export abstract class TrackStateMachineAdapter<
   TContext extends Record<string, any>,
   TEvent extends { type: string },
-  TStateMachine extends StateMachine<TContext, any, TEvent>,
+  TStateMachine extends StateMachine<TContext, any, TEvent, any>,
 > {
-  protected service: InterpreterFrom<TStateMachine>;
+  protected service: any; // InterpreterFrom has type issues with xstate versions
   protected readonly TAG: string;
 
   constructor(
@@ -44,7 +44,7 @@ export abstract class TrackStateMachineAdapter<
   }
 
   protected get context(): TContext {
-    return this.service.getSnapshot().context;
+    return this.service.getSnapshot().context as TContext;
   }
 
   protected get state(): any {
@@ -52,7 +52,7 @@ export abstract class TrackStateMachineAdapter<
   }
 
   protected isInState(state: string): boolean {
-    return this.service.getSnapshot().matches(state);
+    return this.service.getSnapshot().matches(state) as boolean;
   }
 
   public cleanup(): void {

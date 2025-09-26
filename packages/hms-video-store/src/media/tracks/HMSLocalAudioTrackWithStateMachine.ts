@@ -1,18 +1,19 @@
 import { interpret } from 'xstate';
 import { LocalTrackContext, LocalTrackEvent, localTrackStateMachine } from './state-machines/localTrackStateMachine';
 import { TrackStateMachineAdapter } from './state-machines/TrackStateMachineAdapter';
+import { HMSTrackType } from './HMSTrackType';
 import { DeviceManager } from '../../device-manager';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
-import { HMSTrackSource, HMSTrackUpdate } from '../../interfaces';
-import { HMSTrackType } from './HMSTrackType';
+import { HMSTrackUpdate } from '../../interfaces';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { getAudioTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings } from '../settings';
+import { HMSTrackSource } from '../tracks/HMSTrack';
 
 /**
  * Refactored HMSLocalAudioTrack using XState for cleaner state management
@@ -34,7 +35,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
     track: MediaStreamTrack,
     source: HMSTrackSource,
     private settings: HMSAudioTrackSettings,
-    private eventBus: EventBus,
+    protected eventBus: EventBus,
     private deviceManager: DeviceManager,
     private store: Store,
   ) {
@@ -50,7 +51,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
 
     super(localTrackStateMachine, eventBus, '[LocalAudioTrack]', initialContext);
 
-    this.pluginsManager = new HMSAudioPluginsManager(store, eventBus);
+    this.pluginsManager = new HMSAudioPluginsManager(this as any, eventBus);
 
     // Configure state machine services
     this.configureServices();
@@ -71,7 +72,7 @@ export class HMSLocalAudioTrackWithStateMachine extends TrackStateMachineAdapter
       disableTrack: async () => {
         this.handleTrackDisabled();
       },
-      replaceTrack: async (context: LocalTrackContext, event: any) => {
+      replaceTrack: async (_context: LocalTrackContext, event: any) => {
         const { track, deviceId } = event;
         await this.performTrackReplacement(track, deviceId);
         return { track, deviceId };

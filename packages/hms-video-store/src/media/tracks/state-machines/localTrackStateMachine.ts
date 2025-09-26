@@ -1,5 +1,5 @@
 import { assign, createMachine } from 'xstate';
-import { HMSTrackSource } from '../../../interfaces';
+import { HMSTrackSource } from '../../tracks/HMSTrack';
 
 export interface LocalTrackContext {
   enabled: boolean;

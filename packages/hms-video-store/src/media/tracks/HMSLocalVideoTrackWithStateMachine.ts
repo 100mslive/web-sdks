@@ -1,25 +1,24 @@
 import { interpret } from 'xstate';
 import { LocalTrackContext, LocalTrackEvent, localTrackStateMachine } from './state-machines/localTrackStateMachine';
 import { TrackStateMachineAdapter } from './state-machines/TrackStateMachineAdapter';
+import { HMSTrackType } from './HMSTrackType';
 import { DeviceManager } from '../../device-manager';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
-import { 
-  HMSTrackSource, 
-  HMSTrackUpdate,
-  HMSSimulcastLayerDefinition,
+import {
   HMSLocalVideoTrackStats,
   HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
+  HMSTrackUpdate,
 } from '../../interfaces';
-import { HMSTrackType } from './HMSTrackType';
 import { HMSVideoPluginsManager } from '../../plugins/video';
-import { Store } from '../../sdk/store';
+import { HMSRoom } from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
+import { isIOS } from '../../utils/support';
 import { getVideoTrack } from '../../utils/track';
 import { HMSVideoTrackSettings } from '../settings';
-import { isIOS } from '../../utils/support';
-import { HMSRoom } from '../../sdk/models/HMSRoom';
+import { HMSTrackSource } from '../tracks/HMSTrack';
 
 /**
  * Refactored HMSLocalVideoTrack using XState for cleaner state management
@@ -43,7 +42,7 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     track: MediaStreamTrack,
     source: HMSTrackSource,
     private settings: HMSVideoTrackSettings,
-    private eventBus: EventBus,
+    protected eventBus: EventBus,
     private deviceManager?: DeviceManager,
     room?: HMSRoom,
   ) {
@@ -58,13 +57,13 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     };
 
     super(localTrackStateMachine, eventBus, '[LocalVideoTrack]', initialContext);
-    
+
     this.room = room;
     this.pluginsManager = new HMSVideoPluginsManager(eventBus);
-    
+
     // Configure state machine services
     this.configureServices();
-    
+
     // Initialize track
     this.initializeTrack(track);
   }
@@ -74,14 +73,14 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     // Add service implementations
     const services = {
       enableTrack: async () => {
-        const track = this.context.nativeTrack || await this.acquireVideoTrack();
+        const track = this.context.nativeTrack || (await this.acquireVideoTrack());
         this.handleTrackEnabled(track);
         return track;
       },
       disableTrack: async () => {
         this.handleTrackDisabled();
       },
-      replaceTrack: async (context: LocalTrackContext, event: any) => {
+      replaceTrack: async (_context: LocalTrackContext, event: any) => {
         const { track, deviceId } = event;
         await this.performTrackReplacement(track, deviceId);
         return { track, deviceId };
@@ -156,7 +155,7 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     }
 
     HMSLogger.d(this.TAG, `Setting enabled to ${value}`);
-    
+
     if (value) {
       // When enabling, might need to acquire a new track
       if (!this.context.nativeTrack || this.context.nativeTrack.readyState === 'ended') {
@@ -164,16 +163,16 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
         this.send({ type: 'SET_NATIVE_TRACK', track });
       }
     }
-    
+
     this.send({ type: value ? 'ENABLE' : 'DISABLE' });
   }
 
   async setSettings(settings: HMSVideoTrackSettings): Promise<void> {
     HMSLogger.d(this.TAG, 'Updating settings', settings);
-    
+
     this.settings = settings;
     this.send({ type: 'UPDATE_SETTINGS', settings });
-    
+
     // If device changed, trigger track replacement
     if (settings.deviceId && settings.deviceId !== this.context.deviceId) {
       await this.replaceTrackWithDevice(settings.deviceId);
@@ -190,13 +189,13 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
       HMSLogger.w(this.TAG, 'Cannot switch camera, no facing mode set');
       return;
     }
-    
+
     const newFacingMode = this.settings.facingMode === 'user' ? 'environment' : 'user';
     const newSettings = new HMSVideoTrackSettings({
       ...this.settings,
       facingMode: newFacingMode,
     });
-    
+
     await this.setSettings(newSettings);
   }
 
@@ -204,7 +203,7 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     if (!cropTarget) {
       return;
     }
-    
+
     try {
       // @ts-ignore
       await this.nativeTrack.cropTo(cropTarget);
@@ -227,7 +226,7 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
     if (!this._transceiver?.sender) {
       return;
     }
-    
+
     const parameters = this._transceiver.sender.getParameters();
     parameters.degradationPreference = enable ? 'maintain-framerate' : 'balanced';
     await this._transceiver.sender.setParameters(parameters);
@@ -255,34 +254,46 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
 
   private async performTrackReplacement(newTrack: MediaStreamTrack, _deviceId?: string): Promise<void> {
     const oldTrack = this.context.nativeTrack;
-    
-    // Remove old track
+
+    // Clean up old track
+    this.cleanupOldTrack(oldTrack);
+
+    // Set up new track
+    this.setupNewTrack(newTrack);
+
+    // Update stream
+    this.updateStream(oldTrack, newTrack);
+
+    // Update transceiver if published
+    if (this.context.isPublished && this._transceiver?.sender) {
+      await this._transceiver.sender.replaceTrack(this.context.processedTrack || newTrack);
+    }
+
+    // Reprocess plugins if needed
+    if (this.pluginsManager.getPlugins().length > 0) {
+      await this.reprocessPlugins(newTrack);
+    }
+  }
+
+  private cleanupOldTrack(oldTrack?: MediaStreamTrack): void {
     if (oldTrack) {
       this.removeTrackListeners(oldTrack);
       oldTrack.stop();
       this.tracksCreated.delete(oldTrack);
     }
-    
-    // Add new track
+  }
+
+  private setupNewTrack(newTrack: MediaStreamTrack): void {
     this.tracksCreated.add(newTrack);
     this.setupTrackListeners(newTrack);
-    
-    // Update stream
+  }
+
+  private updateStream(oldTrack: MediaStreamTrack | undefined, newTrack: MediaStreamTrack): void {
     if (this.stream) {
       if (oldTrack) {
         this.stream.removeTrack(oldTrack);
       }
       this.stream.addTrack(newTrack);
-    }
-    
-    // Update transceiver if published
-    if (this.context.isPublished && this._transceiver?.sender) {
-      await this._transceiver.sender.replaceTrack(this.context.processedTrack || newTrack);
-    }
-    
-    // Reprocess plugins if needed
-    if (this.pluginsManager.getPlugins().length > 0) {
-      await this.reprocessPlugins(newTrack);
     }
   }
 
@@ -383,7 +394,8 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
 
   private trackPermissions(): void {
     // Simplified permission tracking
-    navigator.permissions?.query({ name: 'camera' as PermissionName })
+    navigator.permissions
+      ?.query({ name: 'camera' as PermissionName })
       .then(permission => {
         permission.addEventListener('change', () => {
           const eventType =
@@ -394,7 +406,7 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
               : 'PERMISSION_PROMPT';
           this.send({ type: eventType });
         });
-        
+
         // Set initial state
         const eventType =
           permission.state === 'granted'
@@ -411,20 +423,20 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
 
   protected onStateChange(state: any): void {
     HMSLogger.d(this.TAG, 'State changed:', JSON.stringify(state.value));
-    
+
     // Publish track updates based on state changes
     if (state.changed) {
       // Check for enable/disable changes
       const prevEnabled = state.history?.context.enabled;
       const currEnabled = state.context.enabled;
-      
+
       if (prevEnabled !== undefined && prevEnabled !== currEnabled) {
         this.eventBus.localVideoEnabled.publish({
           enabled: currEnabled,
           track: this,
         });
       }
-      
+
       // Check for track replacement completion
       if (!state.context.isReplacing && state.history?.context.isReplacing) {
         this.eventBus.localTrackUpdate.publish({
@@ -446,14 +458,14 @@ export class HMSLocalVideoTrackWithStateMachine extends TrackStateMachineAdapter
   async cleanup(): Promise<void> {
     // Cleanup plugins
     await this.pluginsManager.cleanup();
-    
+
     // Stop all created tracks
     this.tracksCreated.forEach(track => track.stop());
     this.tracksCreated.clear();
-    
+
     // Remove listeners
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    
+
     // Stop state machine
     super.cleanup();
   }
