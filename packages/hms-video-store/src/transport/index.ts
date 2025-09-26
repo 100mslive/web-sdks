@@ -50,6 +50,7 @@ import {
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
+import { removeRecvOnlyAudioMid } from '../utils/session-description';
 
 const TAG = '[HMSTransport]:';
 
@@ -152,7 +153,7 @@ export default class HMSTransport {
           HMSLogger.d(TAG, 'ignoring old offer');
           return;
         }
-        await this.subscribeConnection.setRemoteDescription(jsep);
+        await this.subscribeConnection.setRemoteDescription(removeRecvOnlyAudioMid(jsep));
         HMSLogger.d(
           TAG,
           `[SUBSCRIBE] Adding ${this.subscribeConnection.candidates.length} ice-candidates`,
