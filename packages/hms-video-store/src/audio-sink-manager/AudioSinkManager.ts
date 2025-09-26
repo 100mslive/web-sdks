@@ -5,7 +5,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
-import { HMSAudioContextHandler } from '../internal';
+import { HMSAudioContextHandler, isSafari } from '../internal';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -115,8 +115,15 @@ export class AudioSinkManager {
     }
   };
 
-  private handleTrackUpdate = ({ track }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
+  private handleTrackUpdate = async ({ track }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
     HMSLogger.d(this.TAG, 'Track updated', `${track}`);
+
+    const audioEl = track.getAudioElement();
+    if (isSafari && track.enabled && audioEl) {
+      console.log('Reassigning srcObject to avoid audio drop in safari');
+      audioEl.srcObject = new MediaStream([track.nativeTrack]);
+      await this.playAudioFor(track);
+    }
   };
 
   private handleTrackAdd = async ({

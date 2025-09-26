@@ -1,5 +1,4 @@
 import * as sdpTransform from 'sdp-transform';
-import { isSafari } from './support';
 import { isPresent } from './validations';
 import { TrackState } from '../notification-manager';
 
@@ -53,13 +52,4 @@ export function enableOpusDtx(desc: RTCSessionDescriptionInit): RTCSessionDescri
   }
 
   return { type: desc.type, sdp: desc.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
-}
-
-export function removeRecvOnlyAudioMid(desc: RTCSessionDescriptionInit): RTCSessionDescriptionInit {
-  if (!isSafari) {
-    return desc;
-  }
-  const parsedSdp = sdpTransform.parse(desc.sdp!);
-  parsedSdp.media = parsedSdp.media.filter(m => !(m.type === 'audio' && m.direction === 'recvonly'));
-  return { type: desc.type, sdp: sdpTransform.write(parsedSdp) };
 }
