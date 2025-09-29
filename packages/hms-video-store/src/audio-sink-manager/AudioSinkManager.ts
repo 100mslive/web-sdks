@@ -10,6 +10,7 @@ import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { RemoteTrackAudioLevelMonitor } from '../utils/remote-track-audio-level-monitor';
 import { sleep } from '../utils/timer-utils';
 
 /**
@@ -40,6 +41,8 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
+  private audioMonitors: Map<string, RemoteTrackAudioLevelMonitor> = new Map();
+  private silenceRetryCount: Map<string, number> = new Map();
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -102,6 +105,12 @@ export class AudioSinkManager {
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseAudioTracks);
+
+    // Cleanup all audio monitors
+    this.audioMonitors.forEach(monitor => monitor.cleanup());
+    this.audioMonitors.clear();
+    this.silenceRetryCount.clear();
+
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -160,6 +169,52 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
+
+    // Add silence detection for remote track
+    // Only create monitor if it doesn't already exist (to prevent duplicates on re-add)
+    if (!this.audioMonitors.has(track.trackId)) {
+      const MAX_SILENCE_RETRIES = 3;
+      const monitor = new RemoteTrackAudioLevelMonitor(track, async silentTrack => {
+        // Check retry count to prevent infinite loops
+        const retryCount = this.silenceRetryCount.get(track.trackId) || 0;
+        if (retryCount >= MAX_SILENCE_RETRIES) {
+          HMSLogger.w(this.TAG, `Max silence retries (${MAX_SILENCE_RETRIES}) reached for track`, `${silentTrack}`);
+          return;
+        }
+
+        HMSLogger.d(
+          this.TAG,
+          `Silence detected on remote track, retry ${retryCount + 1}/${MAX_SILENCE_RETRIES}`,
+          `${silentTrack}`,
+        );
+        this.silenceRetryCount.set(track.trackId, retryCount + 1);
+
+        // Clean up existing audio element and monitor before re-adding
+        const existingMonitor = this.audioMonitors.get(track.trackId);
+        if (existingMonitor) {
+          existingMonitor.cleanup();
+          this.audioMonitors.delete(track.trackId);
+        }
+        const existingAudioEl = document.getElementById(track.trackId) as HTMLAudioElement;
+        if (existingAudioEl) {
+          this.removeAudioElement(existingAudioEl, track);
+        }
+        // Wait briefly before re-adding to allow cleanup
+        await sleep(500);
+        // Re-add the track with callListener false to try recovering
+        await this.handleTrackAdd({ track: silentTrack, peer, callListener: false });
+      });
+
+      this.audioMonitors.set(track.trackId, monitor);
+      monitor.start();
+      monitor.detectSilence();
+    } else {
+      // Reset retry count on successful re-add (track has audio)
+      if (this.silenceRetryCount.has(track.trackId)) {
+        HMSLogger.d(this.TAG, 'Audio recovered for track after silence', `${track}`);
+        this.silenceRetryCount.delete(track.trackId);
+      }
+    }
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
@@ -231,6 +286,17 @@ export class AudioSinkManager {
     if (audioEl) {
       this.removeAudioElement(audioEl, track);
     }
+
+    // Cleanup audio monitor
+    const monitor = this.audioMonitors.get(track.trackId);
+    if (monitor) {
+      monitor.cleanup();
+      this.audioMonitors.delete(track.trackId);
+    }
+
+    // Cleanup retry count
+    this.silenceRetryCount.delete(track.trackId);
+
     // Reset autoplay error thrown because if all tracks are removed and a new track is added
     // Autoplay error is thrown in safari
     if (this.audioSink && this.audioSink.childElementCount === 0) {
