@@ -69,6 +69,14 @@ export class HMSAudioTrack extends HMSTrack {
       return;
     }
     try {
+      // using setSinkId in firefox disables echo cancellation (introduced in Firefox 116)
+      // todo: GoogleMeet doesn't set sinkId for all 3 audio elements, how do they redirect audio then?
+      //
+      // refer: https://100ms.atlassian.net/browse/LIVE-1992
+      // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1849108
+      // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
+      // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
+      // Setting sinkId in safari(support started from 18.4) causes "robotic voice" on bluetooth device changes or setting sinkId
       if (typeof (this.audioElement as any).setSinkId === 'function' && isChromiumBased) {
         await (this.audioElement as any)?.setSinkId(device.deviceId);
         this.outputDevice = device;
