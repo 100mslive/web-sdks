@@ -8,6 +8,7 @@ import { useFetchRoomLayout, useFetchRoomLayoutResponse } from './hooks/useFetch
 export type RoomLayoutProviderProps = {
   roomLayoutEndpoint?: string;
   overrideLayout?: Partial<Layout>;
+  children?: React.ReactNode;
 };
 
 export const RoomLayoutContext = React.createContext<
@@ -30,11 +31,7 @@ function customizer(objValue: unknown, srcValue: unknown) {
   return undefined;
 }
 
-export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProviderProps>> = ({
-  children,
-  roomLayoutEndpoint,
-  overrideLayout,
-}) => {
+export const RoomLayoutProvider = ({ children, roomLayoutEndpoint, overrideLayout }: RoomLayoutProviderProps) => {
   const authToken: string = useAuthToken();
   const { layout, updateRoomLayoutForRole, setOriginalLayout } = useFetchRoomLayout({
     authToken,

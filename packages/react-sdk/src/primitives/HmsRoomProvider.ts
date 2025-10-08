@@ -25,6 +25,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
    */
   isHMSStatsOn?: boolean;
   leaveOnUnload?: boolean;
+  children?: React.ReactNode;
 }
 
 /**
