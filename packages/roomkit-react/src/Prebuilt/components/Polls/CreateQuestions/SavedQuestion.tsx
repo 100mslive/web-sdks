@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { HMSPollQuestion } from '@100mslive/react-sdk';
 import { CheckCircleIcon } from '@100mslive/react-icons';
 import { Button, Flex, Text } from '../../../../';

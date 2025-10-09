@@ -27,7 +27,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
-  const prevTrackId = useRef<HMSTrackID | undefined>();
+  const prevTrackId = useRef<HMSTrackID | undefined>(undefined);
 
   const setRefs = useCallback((node: HTMLVideoElement) => {
     if (node) {

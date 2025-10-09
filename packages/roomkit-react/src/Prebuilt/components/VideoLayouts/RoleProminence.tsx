@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';

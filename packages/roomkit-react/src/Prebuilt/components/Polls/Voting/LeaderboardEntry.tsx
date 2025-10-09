@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircleIcon, ClockIcon, TrophyFilledIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Text } from '../../../../Text';

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';

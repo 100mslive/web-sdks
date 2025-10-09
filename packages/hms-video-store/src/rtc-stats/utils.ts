@@ -67,7 +67,7 @@ export const getLocalTrackStats = async (
         peerID: track.peerId,
         enabled: track.enabled,
         codec,
-      };
+      } as HMSTrackStats;
     });
   } catch (err: any) {
     eventBus.analytics.publish(
@@ -116,7 +116,8 @@ export const getTrackStats = async (
   }
 
   return (
-    trackStats && {
+    trackStats &&
+    ({
       ...trackStats,
       bitrate,
       packetsLostRate,
@@ -124,7 +125,7 @@ export const getTrackStats = async (
       enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
-    }
+    } as HMSTrackStats)
   );
 };
 

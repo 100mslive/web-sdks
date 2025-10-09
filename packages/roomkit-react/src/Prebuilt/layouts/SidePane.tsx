@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';

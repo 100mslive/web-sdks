@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { selectLocalPeer, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';

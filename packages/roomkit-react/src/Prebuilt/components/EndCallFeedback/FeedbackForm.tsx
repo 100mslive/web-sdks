@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMedia } from 'react-use';
 import { Rating } from '@100mslive/types-prebuilt/elements/feedback';
 import { useHMSActions } from '@100mslive/react-sdk';

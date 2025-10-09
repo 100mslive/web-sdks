@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { BackwardArrowIcon, ForwardArrowIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';

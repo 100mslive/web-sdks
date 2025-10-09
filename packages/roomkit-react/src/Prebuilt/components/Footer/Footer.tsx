@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';

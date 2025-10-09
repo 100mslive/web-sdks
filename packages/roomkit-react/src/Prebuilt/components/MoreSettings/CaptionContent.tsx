@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSTranscriptionMode, selectIsTranscriptionEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';

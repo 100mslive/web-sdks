@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { selectPollByID, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';

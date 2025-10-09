@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSPollQuestionOption } from '@100mslive/react-sdk';
 import { TrashIcon } from '@100mslive/react-icons';
 import { Input } from '../../../../Input';

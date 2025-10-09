@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ControlPosition } from 'react-draggable';
 import { useMedia } from 'react-use';
 import {

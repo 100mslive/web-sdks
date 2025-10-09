@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { LayoutMode, LayoutModeIconMapping, LayoutModeKeys } from './Settings/LayoutSettings';
 import { Flex } from '../../Layout';

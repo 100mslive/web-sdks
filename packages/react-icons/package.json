@@ -25,7 +25,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
+    "svg-build": "svgr --icon --typescript --jsx-runtime automatic --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
     "build": "yarn svg-build && rm -rf dist && NODE_ENV=production rollup -c",
     "format": "prettier -w src/**",
     "lint": "eslint",

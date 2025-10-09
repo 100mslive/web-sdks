@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMedia } from 'react-use';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSPollState } from '@100mslive/react-sdk';
 import { Flex, Text } from '../../../../';
 import { PollStage } from './constants';

@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useCallback, useRef } from 'react';
+import { MutableRefObject, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';

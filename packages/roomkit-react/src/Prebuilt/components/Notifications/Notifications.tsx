@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { HMSRoleChangeRequest, HMSRoomState, selectRoomState, useCustomEvent, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';

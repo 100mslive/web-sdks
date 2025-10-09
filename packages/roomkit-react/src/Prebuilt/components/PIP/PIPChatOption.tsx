@@ -1,4 +1,3 @@
-import React from 'react';
 import { ExternalLinkIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Text } from '../../../Text';

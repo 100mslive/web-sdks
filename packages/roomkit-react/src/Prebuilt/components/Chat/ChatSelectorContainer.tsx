@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMedia } from 'react-use';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, GroupIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';

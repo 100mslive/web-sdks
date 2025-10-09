@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
 import {

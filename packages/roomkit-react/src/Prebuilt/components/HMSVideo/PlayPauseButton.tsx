@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react';
+import { MouseEvent } from 'react';
 import { PauseIcon, PlayIcon } from '@100mslive/react-icons';
 import { IconButton, Tooltip } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';

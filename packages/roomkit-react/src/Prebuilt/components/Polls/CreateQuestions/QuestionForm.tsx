@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   HMSPollQuestionCreateParams,
   HMSPollQuestionOptionCreateParams,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectSessionStore, selectTrackByID, useHMSStore } from '@100mslive/react-sdk';
 import { LayoutProps } from './VideoLayouts/interface';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Input } from '../../../Input';

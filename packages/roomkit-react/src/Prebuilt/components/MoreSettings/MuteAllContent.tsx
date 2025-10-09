@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSRoleName, HMSTrackSource, HMSTrackType, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Label } from '../../../Label';

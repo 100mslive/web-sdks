@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import {

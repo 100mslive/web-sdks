@@ -196,7 +196,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             stats={reactiveStore.current?.hmsStats}
             leaveOnUnload={leaveOnUnload}
           >
+            {/* @ts-expect-error - React 19 JSX namespace mismatch */}
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
+              {/* @ts-ignore - React 19 namespace mismatch */}
               <RoomLayoutContext.Consumer>
                 {data => {
                   const layout = data?.layout;

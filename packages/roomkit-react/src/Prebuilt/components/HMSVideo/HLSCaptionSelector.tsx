@@ -1,4 +1,3 @@
-import React from 'react';
 import { ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 import { IconButton, Tooltip } from '../../../';
 import { useHMSPlayerContext } from './PlayerContext';

@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import Picker from '@emoji-mart/react';

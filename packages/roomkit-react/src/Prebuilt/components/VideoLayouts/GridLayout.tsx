@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
 import {
   selectLocalPeerID,

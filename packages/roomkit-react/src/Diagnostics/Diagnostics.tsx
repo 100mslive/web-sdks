@@ -182,6 +182,7 @@ const DiagnosticsProvider = () => {
 export const Diagnostics = () => {
   return (
     <HMSRoomProvider>
+      {/* @ts-ignore - React 19 namespace mismatch */}
       <HMSThemeProvider themeType="default">
         <DiagnosticsProvider />
       </HMSThemeProvider>

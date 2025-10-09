@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { match } from 'ts-pattern';
 import { HMSNotificationTypes, HMSTranscriptionState, useHMSNotifications } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';

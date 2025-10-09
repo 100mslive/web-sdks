@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { selectLocalPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';

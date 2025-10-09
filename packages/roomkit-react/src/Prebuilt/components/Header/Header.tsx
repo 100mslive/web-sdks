@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Flex } from '../../..';

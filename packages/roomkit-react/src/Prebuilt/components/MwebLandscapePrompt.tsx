@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import { RefreshIcon } from '@100mslive/react-icons';

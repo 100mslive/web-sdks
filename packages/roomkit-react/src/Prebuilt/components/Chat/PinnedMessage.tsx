@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';

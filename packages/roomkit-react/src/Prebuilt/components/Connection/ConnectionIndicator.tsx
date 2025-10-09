@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSPeerType, selectConnectionQualityByPeerID, selectPeerTypeByID, useHMSStore } from '@100mslive/react-sdk';
 import { PoorConnectivityIcon } from '@100mslive/react-icons';
 import { styled, Tooltip, useTheme } from '../../..';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { v4 as uuid } from 'uuid';
 import {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { selectLocalPeer, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { PauseCircleIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Flex } from '../../Layout';

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
 import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
