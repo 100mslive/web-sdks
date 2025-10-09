@@ -1,4 +1,4 @@
-import React from 'react';
+import { Children, PropsWithChildren } from 'react';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../Layout';
 import { CSS } from '../../../Theme';
@@ -10,7 +10,7 @@ const Root = ({
   children,
   edgeToEdge,
   hasSidebar,
-}: React.PropsWithChildren<{ edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
+}: PropsWithChildren<{ edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   return (
     <Flex
       direction={hasSidebar ? 'row' : 'column'}
@@ -21,7 +21,7 @@ const Root = ({
   );
 };
 
-const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
+const ProminentSection = ({ children, css = {} }: PropsWithChildren<{ css?: CSS }>) => {
   return (
     <Flex direction="column" css={{ flex: '1 1 0', gap: '$2', minHeight: 0, ...css }}>
       {children}
@@ -34,7 +34,7 @@ const SecondarySection = ({
   children,
   edgeToEdge,
   hasSidebar,
-}: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
+}: PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
   if (!tiles?.length) {
     return null;
@@ -47,7 +47,7 @@ const SecondarySection = ({
         width: 240,
       }
     : {
-        gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
+        gridTemplateRows: Children.count(children) > 0 ? '136px auto' : '154px',
         gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))`,
       };
   return (

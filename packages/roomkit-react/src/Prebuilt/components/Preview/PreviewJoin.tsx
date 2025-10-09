@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
@@ -276,7 +276,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
   );
 };
 
-export const PreviewSettings = React.memo(() => {
+export const PreviewSettings = memo(() => {
   const [open, setOpen] = useState(false);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { RefObject, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
@@ -65,7 +65,7 @@ export interface useVideoResult {
    * add the ref to the element going to render the video list, this is used to measure the available
    * space/dimensions in order to calculate the best fit
    */
-  ref: React.MutableRefObject<any>;
+  ref: RefObject<any>;
 }
 
 const DEFAULTS = {

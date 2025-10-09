@@ -1,4 +1,4 @@
-import React from 'react';
+import { createContext, ReactNode, useContext } from 'react';
 import type { Layout } from '@100mslive/types-prebuilt';
 import { isArray, mergeWith } from 'lodash';
 // @ts-ignore: fix types
@@ -8,10 +8,10 @@ import { useFetchRoomLayout, useFetchRoomLayoutResponse } from './hooks/useFetch
 export type RoomLayoutProviderProps = {
   roomLayoutEndpoint?: string;
   overrideLayout?: Partial<Layout>;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
-export const RoomLayoutContext = React.createContext<
+export const RoomLayoutContext = createContext<
   | {
       layout: Layout | undefined;
       updateRoomLayoutForRole: useFetchRoomLayoutResponse['updateRoomLayoutForRole'] | undefined;
@@ -45,6 +45,6 @@ export const RoomLayoutProvider = ({ children, roomLayoutEndpoint, overrideLayou
   );
 };
 
-export const useRoomLayout = () => React.useContext(RoomLayoutContext)?.layout;
-export const useUpdateRoomLayout = () => React.useContext(RoomLayoutContext)?.updateRoomLayoutForRole;
-export const useSetOriginalLayout = () => React.useContext(RoomLayoutContext)?.setOriginalLayout;
+export const useRoomLayout = () => useContext(RoomLayoutContext)?.layout;
+export const useUpdateRoomLayout = () => useContext(RoomLayoutContext)?.updateRoomLayoutForRole;
+export const useSetOriginalLayout = () => useContext(RoomLayoutContext)?.setOriginalLayout;

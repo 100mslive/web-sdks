@@ -1,7 +1,19 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  forwardRef,
+  Fragment,
+  memo,
+  MouseEvent,
+  RefObject,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { VariableSizeList } from 'react-window';
+import { type DynamicRowHeight, type ListImperativeAPI, type RowComponentProps, List } from 'react-window';
 import {
   HMSMessage,
   HMSPeerID,
@@ -32,18 +44,34 @@ import { formatTime } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const rowHeights: Record<number, { size: number; id: string }> = {};
-let listInstance: VariableSizeList | null = null; //eslint-disable-line
-function getRowHeight(index: number) {
-  // 72 will be default row height for any message length
-  return rowHeights[index]?.size || 72;
-}
 
-const setRowHeight = (index: number, id: string, size: number) => {
-  if (rowHeights[index]?.id === id && rowHeights[index]?.size === size) {
-    return;
-  }
-  listInstance?.resetAfterIndex(Math.max(index - 1, 0));
-  Object.assign(rowHeights, { [index]: { size, id } });
+const dynamicRowHeight: DynamicRowHeight = {
+  getAverageRowHeight: () => 72,
+  getRowHeight: (index: number) => {
+    return rowHeights[index]?.size || 72;
+  },
+  setRowHeight: (index: number, size: number) => {
+    const currentHeight = rowHeights[index];
+    if (currentHeight && currentHeight.size === size) {
+      return;
+    }
+    Object.assign(rowHeights, { [index]: { size, id: `${index}` } });
+  },
+  observeRowElements: (elements: Element[] | NodeListOf<Element>) => {
+    const observer = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        const index = parseInt(entry.target.getAttribute('data-index') || '0', 10);
+        if (!isNaN(index)) {
+          const height = entry.contentRect.height;
+          dynamicRowHeight.setRowHeight(index, height);
+        }
+      });
+    });
+
+    elements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  },
 };
 
 const getMessageBackgroundColor = (
@@ -174,8 +202,8 @@ export const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(
-  ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
+const ChatMessage = memo(
+  ({ index, style = {}, message }: { message: HMSMessage; index: number; style: CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
@@ -193,11 +221,11 @@ const ChatMessage = React.memo(
     const showReply = message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled;
     useLayoutEffect(() => {
       if (rowRef.current) {
-        setRowHeight(index, message.id, rowRef.current.clientHeight);
+        dynamicRowHeight.setRowHeight(index, rowRef.current.clientHeight);
       }
     }, [index, message.id]);
 
-    const setOpenSheet = (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    const setOpenSheet = (value: boolean, e?: MouseEvent<HTMLElement>) => {
       e?.stopPropagation();
       setOpenSheetBare(value);
     };
@@ -344,20 +372,15 @@ const ChatMessage = React.memo(
   },
 );
 
-const MessageWrapper = React.memo(
-  ({ index, style, data }: { index: number; style: React.CSSProperties; data: HMSMessage[] }) => {
-    return <ChatMessage style={style} index={index} key={data[index].id} message={data[index]} />;
-  },
-);
+const MessageWrapper = memo(({ index, messages, style }: RowComponentProps<{ messages: HMSMessage[] }>) => {
+  return <ChatMessage style={style} index={index} key={messages[index].id} message={messages[index]} />;
+});
 
-const VirtualizedChatMessages = React.forwardRef<
-  VariableSizeList,
+const VirtualizedChatMessages = forwardRef<
+  ListImperativeAPI,
   { messages: HMSMessage[]; scrollToBottom: (count: number) => void }
 >(({ messages, scrollToBottom }, listRef) => {
   const hmsActions = useHMSActions();
-  const itemKey = useCallback((index: number, data: HMSMessage[]) => {
-    return data[index].id;
-  }, []);
   useEffect(() => {
     requestAnimationFrame(() => scrollToBottom(1));
   }, [scrollToBottom]);
@@ -374,40 +397,40 @@ const VirtualizedChatMessages = React.forwardRef<
         }}
       >
         {({ height, width }: { height: number; width: number }) => (
-          <VariableSizeList
-            ref={node => {
+          <List
+            listRef={node => {
               if (node) {
-                // @ts-ignore
-                listRef.current = node;
-                listInstance = node;
+                if (typeof listRef === 'function') {
+                  listRef(node);
+                } else if (listRef) {
+                  listRef.current = node;
+                }
               }
             }}
-            itemCount={messages.length}
-            itemSize={getRowHeight}
-            itemData={messages}
-            width={width}
-            height={height}
+            rowCount={messages.length}
+            rowHeight={dynamicRowHeight}
+            rowProps={{ messages }}
             style={{
+              width,
+              height,
               overflowX: 'hidden',
             }}
-            itemKey={itemKey}
-            onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
-              for (let i = visibleStartIndex; i <= visibleStopIndex; i++) {
+            rowComponent={MessageWrapper}
+            onRowsRendered={({ startIndex, stopIndex }) => {
+              for (let i = startIndex; i <= stopIndex; i++) {
                 if (!messages[i].read) {
                   hmsActions.setMessageRead(true, messages[i].id);
                 }
               }
             }}
-          >
-            {MessageWrapper}
-          </VariableSizeList>
+          />
         )}
       </AutoSizer>
     </Box>
   );
 });
 
-export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (count: number) => void }>(
+export const ChatBody = forwardRef<ListImperativeAPI, { scrollToBottom: (count: number) => void }>(
   ({ scrollToBottom }: { scrollToBottom: (count: number) => void }, listRef) => {
     const messages = useHMSStore(selectHMSMessages);
     const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST));
@@ -461,7 +484,7 @@ const PinnedBy = ({
 }: {
   messageId: string;
   index: number;
-  rowRef?: React.MutableRefObject<HTMLDivElement | null>;
+  rowRef?: RefObject<HTMLDivElement | null>;
 }) => {
   const pinnedBy = usePinnedBy(messageId);
   const localPeerName = useHMSStore(selectLocalPeerName);
@@ -474,7 +497,7 @@ const PinnedBy = ({
       } else {
         rowRef.current.style.background = '';
       }
-      setRowHeight(index, messageId, rowRef?.current.clientHeight);
+      dynamicRowHeight.setRowHeight(index, rowRef?.current.clientHeight);
     }
   }, [index, messageId, pinnedBy, rowRef]);
 

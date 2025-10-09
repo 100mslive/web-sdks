@@ -1,4 +1,4 @@
-import React from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../../Button';
 import { Box, Flex } from '../../../../Layout';
@@ -11,7 +11,7 @@ export const DeleteQuestionModal = ({
   removeQuestion,
 }: {
   open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   removeQuestion: () => void;
 }) => {
   return (

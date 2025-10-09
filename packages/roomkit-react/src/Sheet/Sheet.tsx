@@ -1,4 +1,4 @@
-import React from 'react';
+import { ComponentProps, ElementRef, forwardRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CSS, VariantProps } from '@stitches/react';
 import { Dialog } from '../Modal';
@@ -91,10 +91,10 @@ const StyledContent = styled(DialogPrimitive.Content, {
 });
 
 type SheetContentVariants = VariantProps<typeof StyledContent>;
-type DialogContentPrimitiveProps = React.ComponentProps<typeof DialogPrimitive.Content>;
+type DialogContentPrimitiveProps = ComponentProps<typeof DialogPrimitive.Content>;
 type SheetContentProps = DialogContentPrimitiveProps & SheetContentVariants & { css?: CSS; container?: HTMLElement };
 
-const SheetContent = React.forwardRef<React.ElementRef<typeof StyledContent>, SheetContentProps>(
+const SheetContent = forwardRef<ElementRef<typeof StyledContent>, SheetContentProps>(
   ({ children, container, ...props }, forwardedRef) => (
     <Dialog.Portal container={container}>
       <StyledOverlay />

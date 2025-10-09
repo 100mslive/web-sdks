@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { memo, ReactNode, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSPeer,
@@ -34,13 +34,13 @@ const SelectorItem = ({
   active: boolean;
   onClick: () => void;
   unreadCount: number;
-  icon?: React.JSX.Element;
+  icon?: ReactNode;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
 
   const Root = !isMobile
     ? Dropdown.Item
-    : ({ children, ...rest }: { children: React.ReactNode; css: CSS }) => (
+    : ({ children, ...rest }: { children: ReactNode; css: CSS }) => (
         <Flex {...rest} css={{ p: '$6 $8', ...rest.css }}>
           {children}
         </Flex>
@@ -72,8 +72,8 @@ const SelectorItem = ({
   );
 };
 
-const SelectorHeader = React.memo(
-  ({ isHorizontalDivider = true, children }: { isHorizontalDivider?: boolean; children: React.ReactNode }) => {
+const SelectorHeader = memo(
+  ({ isHorizontalDivider = true, children }: { isHorizontalDivider?: boolean; children: ReactNode }) => {
     return (
       <Box css={{ flexShrink: 0 }}>
         {isHorizontalDivider && <HorizontalDivider space={4} />}
@@ -88,7 +88,7 @@ const SelectorHeader = React.memo(
   },
 );
 
-const Everyone = React.memo(({ active }: { active: boolean }) => {
+const Everyone = memo(({ active }: { active: boolean }) => {
   const unreadCount: number = useHMSStore(selectUnreadHMSMessagesCount);
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -106,7 +106,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
   );
 });
 
-const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }) => {
+const RoleItem = memo(({ role, active }: { role: string; active: boolean }) => {
   const unreadCount: number = useHMSStore(selectMessagesUnreadCountByRole(role));
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -167,7 +167,7 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    let selectItems: React.ReactNode[] = [];
+    let selectItems: ReactNode[] = [];
     if (isPublicChatEnabled && !searchValue) {
       selectItems = [<Everyone active={!selectedRole && !selectedPeerId} />];
     }

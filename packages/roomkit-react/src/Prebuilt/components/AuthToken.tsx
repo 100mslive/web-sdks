@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useSessionStorage } from 'react-use';
 import { match } from 'ts-pattern';
 import { v4 as uuid } from 'uuid';
@@ -24,7 +24,7 @@ import { APP_DATA } from '../common/constants';
  * auth_token=123 => uses the passed in token to join instead of fetching from token endpoint
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
-const AuthToken = React.memo<{
+const AuthToken = memo<{
   authTokenByRoomCodeEndpoint?: string;
   defaultAuthToken?: string;
   activeState?: PrebuiltStates;

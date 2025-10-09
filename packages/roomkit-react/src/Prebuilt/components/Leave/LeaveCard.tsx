@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { CSS } from '../../../Theme';
@@ -12,7 +12,7 @@ export const LeaveCard = ({
   titleColor,
   css = {},
 }: {
-  icon: React.JSX.Element;
+  icon: ReactNode;
   title: string;
   subtitle: string;
   onClick: () => void;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CheckIcon } from '@100mslive/react-icons';
 import { Label } from '../Label';
@@ -23,7 +23,7 @@ export default {
 type CheckboxWithLabelComponentProps = {
   label?: string;
   checked?: boolean;
-} & React.ComponentProps<typeof Checkbox.Root>;
+} & ComponentProps<typeof Checkbox.Root>;
 
 function CheckboxWithLabelComponent({ label, checked = true, css, onCheckedChange }: CheckboxWithLabelComponentProps) {
   const [internalChecked, setInternalChecked] = useState(checked);

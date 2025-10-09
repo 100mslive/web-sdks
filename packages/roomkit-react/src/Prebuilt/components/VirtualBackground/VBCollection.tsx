@@ -1,10 +1,10 @@
-import React from 'react';
 // Open issue with eslint-plugin-import https://github.com/import-js/eslint-plugin-import/issues/1810
 // eslint-disable-next-line
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { Box } from '../../../Layout';
 import { Text } from '../../../Text';
 import { VBOption } from './VBOption';
+import { ReactNode } from 'react';
 
 export const VBCollection = ({
   options,
@@ -13,7 +13,7 @@ export const VBCollection = ({
 }: {
   options: {
     title?: string;
-    icon?: React.JSX.Element;
+    icon?: ReactNode;
     onClick?: () => Promise<void>;
     mediaURL?: string;
     value: string | HMSVirtualBackgroundTypes;

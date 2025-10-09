@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { CheckIcon, CloudUploadIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Checkbox } from '../../Checkbox';

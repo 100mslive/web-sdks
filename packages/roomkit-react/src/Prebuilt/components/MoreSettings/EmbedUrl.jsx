@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LinkIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Flex, Input, Text } from '../../../';
 import { useSetAppDataByKey } from '../AppData/useUISettings';

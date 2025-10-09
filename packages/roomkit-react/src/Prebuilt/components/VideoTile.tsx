@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { memo, MouseEvent as ReactMouseEvent, useCallback, useMemo, useState } from 'react';
 import { useMeasure } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -104,7 +104,7 @@ const Tile = ({
     videoTrack: track,
     audioTrack,
   });
-  const onHoverHandler = useCallback((event: React.MouseEvent) => {
+  const onHoverHandler = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
     setIsMouseHovered(event.type === 'mouseenter');
   }, []);
 
@@ -198,6 +198,6 @@ const Tile = ({
   );
 };
 
-const VideoTile = React.memo(Tile);
+const VideoTile = memo(Tile);
 
 export default VideoTile;

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { CSSProperties, memo, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useMeasure } from 'react-use';
-import { VariableSizeList } from 'react-window';
+import { type RowComponentProps, List } from 'react-window';
 import { selectIsConnectedToRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
@@ -9,7 +9,7 @@ import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 import { Participant, ParticipantSearch } from './ParticipantList';
-import { ItemData, itemKey, ROW_HEIGHT } from './RoleAccordion';
+import { ItemData, ROW_HEIGHT } from './RoleAccordion';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -22,7 +22,7 @@ const LoadMoreParticipants = ({
 }: {
   hasNext: boolean;
   loadMore: () => Promise<void>;
-  style: React.CSSProperties;
+  style: CSSProperties;
 }) => {
   const { ref, inView } = useInView();
   const [inProgress, setInProgress] = useState(false);
@@ -42,29 +42,9 @@ const LoadMoreParticipants = ({
   );
 };
 
-const VirtualizedParticipantItem = React.memo(
-  ({
-    index,
-    data,
-    style,
-  }: {
-    index: number;
-    data: ItemData & { hasNext: boolean; loadMorePeers: () => Promise<void> };
-    style: React.CSSProperties;
-  }) => {
-    if (!data.peerList[index]) {
-      return <LoadMoreParticipants hasNext={data.hasNext} loadMore={data.loadMorePeers} style={style} />;
-    }
-    return (
-      <Participant
-        key={data.peerList[index].id}
-        peer={data.peerList[index]}
-        isConnected={data.isConnected}
-        style={style}
-      />
-    );
-  },
-);
+const VirtualizedParticipantItem = memo(({ index, peerList, isConnected, style }: RowComponentProps<ItemData>) => {
+  return <Participant key={peerList[index].id} peer={peerList[index]} isConnected={isConnected} style={style} />;
+});
 
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
   const { peers, total, hasNext, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
@@ -72,7 +52,6 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search?.toLowerCase()));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-  const height = ROW_HEIGHT * (filteredPeers.length + 1);
   const resetSidePane = useSidepaneReset();
 
   useEffect(() => {
@@ -81,7 +60,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
   }, []);
 
   return (
-    <Flex ref={ref} direction="column" css={{ size: '100%', gap: '$4' }}>
+    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
       <Flex align="center">
         <Flex align="center" css={{ flex: '1 1 0', cursor: 'pointer' }} onClick={onBack}>
           <ChevronLeftIcon />
@@ -106,17 +85,24 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
             {roleName}({getFormattedCount(peers.length)}/{getFormattedCount(total)})
           </Text>
         </Flex>
-        <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
-          <VariableSizeList
-            itemSize={index => (index === filteredPeers.length + 1 ? 16 : ROW_HEIGHT)}
-            itemData={{ peerList: filteredPeers, hasNext: hasNext(), loadMorePeers, isConnected: isConnected === true }}
-            itemKey={itemKey}
-            itemCount={filteredPeers.length + 1}
-            width={width}
-            height={height}
-          >
-            {VirtualizedParticipantItem}
-          </VariableSizeList>
+        <Box ref={ref} css={{ flex: '1 1 0' }}>
+          <List
+            rowHeight={ROW_HEIGHT}
+            rowProps={{
+              peerList: filteredPeers,
+              isConnected: isConnected === true,
+            }}
+            rowCount={filteredPeers.length}
+            style={{ width, height: ROW_HEIGHT * filteredPeers.length }}
+            rowComponent={VirtualizedParticipantItem}
+          />
+          {hasNext() && !search ? (
+            <LoadMoreParticipants
+              hasNext={hasNext()}
+              loadMore={loadMorePeers}
+              style={{ height: ROW_HEIGHT, width: '100%' }}
+            />
+          ) : null}
         </Box>
       </Flex>
     </Flex>

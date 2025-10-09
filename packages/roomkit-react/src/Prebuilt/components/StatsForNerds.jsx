@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { match, P } from 'ts-pattern';
 import {
@@ -354,7 +354,7 @@ const DebugInfo = ({ details }) => {
   );
 };
 
-const StatsRow = React.memo(({ label, value, css }) => (
+const StatsRow = memo(({ label, value, css }) => (
   <Box css={{ bg: '$surface_bright', w: 'calc(50% - $6)', p: '$8', r: '$3', ...css }}>
     <Text
       variant="overline"

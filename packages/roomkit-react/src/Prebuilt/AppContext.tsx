@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { createContext, useContext } from 'react';
 // @ts-ignore
 import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
@@ -12,7 +12,7 @@ type HMSPrebuiltContextType = {
   onJoin?: () => void;
 };
 
-export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
+export const HMSPrebuiltContext = createContext<HMSPrebuiltContextType>({
   roomCode: '',
   userName: '',
   userId: '',

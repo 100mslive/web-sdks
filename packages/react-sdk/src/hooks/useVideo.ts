@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { RefCallback, useCallback, useEffect, useRef } from 'react';
 import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
@@ -15,7 +15,7 @@ export interface useVideoInput {
   attach?: boolean;
 }
 export interface useVideoOutput {
-  videoRef: React.RefCallback<HTMLVideoElement>;
+  videoRef: RefCallback<HTMLVideoElement>;
 }
 /**
  * This hooks can be used to implement a video tile component. Given a track id it will return a ref.

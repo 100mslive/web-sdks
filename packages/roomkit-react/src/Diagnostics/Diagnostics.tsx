@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { ReactNode, useCallback, useRef, useState } from 'react';
 import { HMSRoomProvider, useHMSActions } from '@100mslive/react-sdk';
 import {
   CheckCircleIcon,
@@ -23,14 +23,14 @@ import {
 } from './DiagnosticsContext';
 import { VideoTest } from './VideoTest';
 
-const DiagnosticsStepIcon: Record<DiagnosticsStep, React.ReactNode> = {
+const DiagnosticsStepIcon: Record<DiagnosticsStep, ReactNode> = {
   [DiagnosticsStep.VIDEO]: <VideoOnIcon width="2rem" height="2rem" />,
   [DiagnosticsStep.AUDIO]: <MicOnIcon width="2rem" height="2rem" />,
   [DiagnosticsStep.BROWSER]: <GlobeIcon width="2rem" height="2rem" />,
   [DiagnosticsStep.CONNECTIVITY]: <ConnectivityIcon width="2rem" height="2rem" />,
 };
 
-const Container = ({ children }: { children: React.ReactNode }) => (
+const Container = ({ children }: { children: ReactNode }) => (
   <Box
     css={{
       px: '120px',

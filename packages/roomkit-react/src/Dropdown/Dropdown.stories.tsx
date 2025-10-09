@@ -15,7 +15,7 @@ const participants = [
 ];
 
 const Template: ComponentStory<typeof Dropdown.Content> = () => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   return (
     <Dropdown.Root

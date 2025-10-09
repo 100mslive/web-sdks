@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import { ComponentProps, ReactNode, useEffect, useRef } from 'react';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
 import {
@@ -17,7 +17,7 @@ const StyledDialog = styled(Root, {});
 
 // Handles race conditions when multiple elements with dismissable layer are present
 // https://github.com/radix-ui/primitives/issues/2122
-const DialogRoot = <T extends React.ComponentProps<typeof StyledDialog>>(props: T) => {
+const DialogRoot = <T extends ComponentProps<typeof StyledDialog>>(props: T) => {
   useEffect(() => {
     return () => {
       if (document) setTimeout(() => (document.body.style.pointerEvents = 'auto'), 0);

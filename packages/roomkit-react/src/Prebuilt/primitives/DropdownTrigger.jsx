@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Dropdown, Flex, Text, textEllipsis } from '../../index';
 
-const DialogDropdownTrigger = React.forwardRef(({ title, css, open, icon, titleCSS = {} }, ref) => {
+const DialogDropdownTrigger = forwardRef(({ title, css, open, icon, titleCSS = {} }, ref) => {
   return (
     <Dropdown.Trigger
       asChild

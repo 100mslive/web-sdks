@@ -1,6 +1,6 @@
-import { MutableRefObject, useCallback, useRef } from 'react';
+import { RefObject, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
-import { VariableSizeList } from 'react-window';
+import { ListImperativeAPI } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
 import { match } from 'ts-pattern';
 import { selectHMSMessagesCount, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
@@ -24,7 +24,7 @@ import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const Chat = () => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
-  const listRef = useRef<VariableSizeList | null>(null);
+  const listRef = useRef<ListImperativeAPI>(null);
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
@@ -36,11 +36,11 @@ export const Chat = () => {
 
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
-      if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
+      if (listRef.current && typeof listRef.current.scrollToRow === 'function' && unreadCount > 0) {
         const messagesCount = vanillaStore.getState(selectHMSMessagesCount);
-        listRef.current?.scrollToItem(messagesCount, 'end');
+        listRef.current.scrollToRow({ index: messagesCount, align: 'end', behavior: 'smooth' });
         requestAnimationFrame(() => {
-          listRef.current?.scrollToItem(messagesCount, 'end');
+          listRef.current?.scrollToRow({ index: messagesCount, align: 'end', behavior: 'smooth' });
         });
         hmsActions.setMessageRead(true);
       }
@@ -141,14 +141,13 @@ const NewMessageIndicator = ({
   listRef,
 }: {
   scrollToBottom: (count: number) => void;
-  listRef: MutableRefObject<VariableSizeList | null>;
+  listRef: RefObject<ListImperativeAPI | null>;
 }) => {
   const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
   if (!unreadCount || !listRef.current) {
     return null;
   }
-  // @ts-ignore
-  const outerElement = listRef.current._outerRef;
+  const outerElement = listRef.current.element as HTMLElement | null;
   if (
     outerElement &&
     outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 import { HMSMessage, selectLocalPeerName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import {
   CopyIcon,
@@ -53,7 +53,7 @@ export const ChatActions = ({
   sentByLocalPeer: boolean;
   isMobile: boolean;
   openSheet: boolean;
-  setOpenSheet: (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  setOpenSheet: (value: boolean, e?: MouseEvent<HTMLElement>) => void;
 }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message = false, can_block_user = false } = elements?.chat?.real_time_controls || {};
@@ -99,7 +99,7 @@ export const ChatActions = ({
     {
       text: string;
       tooltipText?: string;
-      icon: React.ReactNode;
+      icon: ReactNode;
       onClick: () => void | Promise<void>;
       show: boolean;
       color?: string;

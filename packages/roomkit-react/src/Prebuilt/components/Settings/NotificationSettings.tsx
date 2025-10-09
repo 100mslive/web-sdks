@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { AlertOctagonIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@100mslive/react-icons';
 import { Box } from '../../..';
 import SwitchWithLabel from './SwitchWithLabel';
@@ -15,7 +15,7 @@ const NotificationItem = ({
 }: {
   type: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   checked: boolean;
 }) => {
   const [, setSubscribedNotifications] = useSetSubscribedNotifications(type);

@@ -21,11 +21,11 @@ export default {
 
 const TooltipStoryWithString = (
   args: JSX.IntrinsicAttributes & {
-    title?: React.ReactNode;
+    title?: ReactNode;
     outlined?: boolean | undefined;
     side?: sideTooltip;
     align?: alignTooltip;
-  } & { children?: React.ReactNode },
+  } & { children?: ReactNode },
 ) => {
   return (
     <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
@@ -44,11 +44,11 @@ const ExampleTitle = () => {
 
 const TooltipStorywithReactNode = (
   args: JSX.IntrinsicAttributes & {
-    title?: React.ReactNode;
+    title?: ReactNode;
     outlined?: boolean | undefined;
     side?: sideTooltip;
     align?: alignTooltip;
-  } & { children?: React.ReactNode },
+  } & { children?: ReactNode },
 ) => {
   return (
     <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>

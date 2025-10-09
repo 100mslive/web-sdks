@@ -1,4 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { Theme } from './stitches.config';
 import { createTheme, theme } from './stitches.config';
 import useSSR from './useSSR';
@@ -40,7 +50,7 @@ const defaultContext = {
     return;
   },
 };
-export const ThemeContext = React.createContext<ThemeContextValue>(defaultContext);
+export const ThemeContext = createContext<ThemeContextValue>(defaultContext);
 
 /**
  * Wrap this around your root component to get access to theme
@@ -49,7 +59,7 @@ export const ThemeContext = React.createContext<ThemeContextValue>(defaultContex
  *  <App />
  * </ThemeProvider>
  */
-export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>> = ({
+export const HMSThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   themeType,
   theme: userTheme,
   aspectRatio = defaultAspectRatio,
@@ -95,4 +105,4 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   );
 };
 
-export const useTheme = () => React.useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext);

@@ -1,4 +1,4 @@
-import React, { ComponentProps, PropsWithChildren, PropsWithRef } from 'react';
+import { ComponentProps, FC, forwardRef, PropsWithChildren, PropsWithRef } from 'react';
 import { CSS } from '@stitches/react';
 import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
 import { Flex } from '../Layout';
@@ -42,7 +42,7 @@ const PasswordRoot = styled('div', {
   display: 'flex',
 });
 
-const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: boolean; css?: CSS }> = ({
+const PasswordShowIcon: FC<ComponentProps<typeof Flex> & { showPassword?: boolean; css?: CSS }> = ({
   showPassword,
   css,
   ...props
@@ -54,7 +54,7 @@ const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: 
   );
 };
 
-const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex & { css?: CSS }>> = ({ css, ...props }) => {
+const PasswordCopyIcon: FC<ComponentProps<typeof Flex & { css?: CSS }>> = ({ css, ...props }) => {
   return (
     <Flex css={{ ...css }} {...props}>
       <CopyIcon />
@@ -62,7 +62,7 @@ const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex & { css?: CSS }>> = 
   );
 };
 
-const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<ComponentProps<typeof Flex & { css?: CSS }>>>(
+const PasswordIcons = forwardRef<HTMLDivElement, PropsWithChildren<ComponentProps<typeof Flex & { css?: CSS }>>>(
   ({ css, ...props }, ref) => {
     return (
       <Flex
@@ -85,20 +85,19 @@ const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<Compone
   },
 );
 
-const ReactInput: React.FC<PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>> =
-  React.forwardRef<
-    HTMLInputElement,
-    PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>
-  >(({ showPassword = false, css, ...props }, ref) => {
-    return (
-      <Input
-        css={{ flexGrow: 1, width: '100%', ...css }}
-        type={showPassword ? 'text' : 'password'}
-        {...props}
-        ref={ref}
-      />
-    );
-  });
+const ReactInput: FC<PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>> = forwardRef<
+  HTMLInputElement,
+  PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>
+>(({ showPassword = false, css, ...props }, ref) => {
+  return (
+    <Input
+      css={{ flexGrow: 1, width: '100%', ...css }}
+      type={showPassword ? 'text' : 'password'}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 export const PasswordInput = {
   Root: PasswordRoot,

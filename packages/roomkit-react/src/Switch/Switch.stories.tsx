@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Flex } from '../Layout';
 import { Switch } from './Switch';
@@ -24,7 +24,7 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Switch> = ({ checked: initialChecked, ...args }) => {
-  const [checked, onCheckedChange] = React.useState(false);
+  const [checked, onCheckedChange] = useState(false);
   useEffect(() => {
     onCheckedChange(!!initialChecked);
   }, [initialChecked]);

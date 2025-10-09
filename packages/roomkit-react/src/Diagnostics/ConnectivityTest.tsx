@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ComponentType, ReactNode, SVGProps, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, EyeCloseIcon, EyeOpenIcon, LinkIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
@@ -33,7 +33,7 @@ export const ConnectivityTestStepResult = ({
   title: string;
   status?: string;
   success?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const [hideDetails, setHideDetails] = useState(true);
 
@@ -89,7 +89,7 @@ const DetailedInfo = ({
 }: {
   title: string;
   value: string;
-  Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  Icon?: ComponentType<SVGProps<SVGSVGElement>>;
 }) => {
   return (
     <Box css={{ flex: '50%', mt: '$6' }}>

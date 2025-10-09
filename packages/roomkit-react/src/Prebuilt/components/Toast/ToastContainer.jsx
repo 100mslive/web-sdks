@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { Toast as ToastPrimitive } from '../../../Toast';
 import { Toast } from './Toast';

@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
@@ -102,8 +102,8 @@ export const IconButtonWithOptions = ({
 }: {
   onClick: () => void;
   onDisabledClick: () => void;
-  icon: React.ReactNode;
-  children: React.ReactNode;
+  icon: ReactNode;
+  children: ReactNode;
   testid?: string;
   hideOptions?: boolean;
   active: boolean;

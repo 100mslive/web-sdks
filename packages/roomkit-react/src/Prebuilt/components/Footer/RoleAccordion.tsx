@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { useMeasure } from 'react-use';
-import { FixedSizeList } from 'react-window';
+import { type RowComponentProps, List } from 'react-window';
 import { HMSPeer, selectIsLargeRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { AddIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
@@ -23,18 +23,14 @@ export interface ItemData {
   isConnected: boolean;
 }
 
-export function itemKey(index: number, data: ItemData) {
-  return data.peerList[index]?.id;
-}
-
-export const VirtualizedParticipantItem = React.memo(
-  ({ index, data, style }: { index: number; data: ItemData; style: React.CSSProperties }) => {
+export const VirtualizedParticipantItem = memo(
+  ({ index, peerList, isHandRaisedAccordion, isConnected, style }: RowComponentProps<ItemData>) => {
     return (
       <Participant
-        key={data.peerList[index].id}
-        peer={data.peerList[index]}
-        isHandRaisedAccordion={data.isHandRaisedAccordion}
-        isConnected={data.isConnected}
+        key={peerList[index].id}
+        peer={peerList[index]}
+        isHandRaisedAccordion={isHandRaisedAccordion}
+        isConnected={isConnected}
         style={style}
       />
     );
@@ -120,9 +116,9 @@ export const RoleAccordion = ({
         </Flex>
       </Accordion.Header>
       <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
-        <FixedSizeList
-          itemSize={ROW_HEIGHT}
-          itemData={{
+        <List
+          rowHeight={ROW_HEIGHT}
+          rowProps={{
             peerList: isHandRaisedAccordion
               ? peersInAccordion.sort((a, b) => {
                   try {
@@ -137,13 +133,10 @@ export const RoleAccordion = ({
             isConnected,
             isHandRaisedAccordion,
           }}
-          itemKey={itemKey}
-          itemCount={peersInAccordion.length}
-          width={width}
-          height={height}
-        >
-          {VirtualizedParticipantItem}
-        </FixedSizeList>
+          rowCount={peersInAccordion.length}
+          style={{ width, height }}
+          rowComponent={VirtualizedParticipantItem}
+        />
         {offStageRoles?.includes(roleName) && hasNext ? (
           <Flex
             align="center"

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { usePDFShare } from '@100mslive/react-sdk';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Box } from '../../Layout';

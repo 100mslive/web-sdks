@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dialog, Flex } from '../../../';
 import { DialogInputFile } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';

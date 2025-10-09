@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import  { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState, version } from 'react';
 import create from 'zustand';
 import {
   HMSActions,
@@ -25,7 +25,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
    */
   isHMSStatsOn?: boolean;
   leaveOnUnload?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 /**
@@ -104,7 +104,7 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
     if ('setFrameworkInfo' in providerProps.actions && typeof providerProps.actions.setFrameworkInfo === 'function') {
       providerProps.actions.setFrameworkInfo({
         type: 'react-web',
-        version: React.version,
+        version: version,
         sdkVersion: process.env.REACT_SDK_VERSION,
       });
     }

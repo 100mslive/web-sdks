@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import {
   HMSPeerID,
   HMSTrack,
@@ -25,7 +25,7 @@ export interface TileMenuProps {
   peerId: HMSPeerID;
 }
 
-export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
+export const TileMenu: FC<TileMenuProps> = ({ peerId }) => {
   const actions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   // TODO: selectTrackByID vs selectVideoTrackByPeerID

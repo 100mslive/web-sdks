@@ -93,7 +93,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
   }
 
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
+    <Draggable bounds="parent" nodeRef={nodeRef as React.RefObject<HTMLElement>} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
         css={{

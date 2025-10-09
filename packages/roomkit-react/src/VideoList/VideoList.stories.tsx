@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ComponentStory } from '@storybook/react';
 import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
@@ -13,7 +13,7 @@ const VideoListMeta = {
 
 export default VideoListMeta;
 
-const VideoTile: React.FC<{ width: number; height: number; trackId: string; name: string }> = ({
+const VideoTile: FC<{ width: number; height: number; trackId: string; name: string }> = ({
   width,
   height,
   trackId,
@@ -40,7 +40,7 @@ interface VideoListProps {
   };
 }
 
-const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio }) => {
+const VideoListStory: FC<VideoListProps> = ({ maxTileCount, aspectRatio }) => {
   const peers = useHMSStore(selectPeers);
   const [page] = useState(0);
   const { ref, pagesWithTiles } = useVideoList({

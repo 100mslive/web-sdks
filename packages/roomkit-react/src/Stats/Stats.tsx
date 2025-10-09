@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import {
   HMSPeerID,
   HMSTrackID,
@@ -228,7 +228,7 @@ const RawStatsRow = ({
 };
 
 // memoize so only the rows which change rerender
-const StatsRow = React.memo(RawStatsRow);
+const StatsRow = memo(RawStatsRow);
 
 export function isNotNullishAndNot0(value: number | undefined | null) {
   return isNotNullish(value) && value !== 0;

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import { CSSProperties, Fragment, memo, ReactNode, useCallback, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
   HMSPeer,
@@ -166,7 +166,7 @@ export const Participant = ({
   peer: HMSPeer;
   isConnected: boolean;
   isHandRaisedAccordion?: boolean;
-  style: React.CSSProperties;
+  style: CSSProperties;
 }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
@@ -219,7 +219,7 @@ const VirtualizedParticipants = ({
   offStageRoles: HMSRoleName[];
   isLargeRoom: boolean;
   onActive: (role: string) => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   return (
     <Flex
@@ -267,7 +267,7 @@ const VirtualizedParticipants = ({
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(
+const ParticipantActions = memo(
   ({
     peerId,
     peerType,
@@ -435,7 +435,7 @@ export const ParticipantSearch = ({
   placeholder?: string;
   onSearch: (val: string) => void;
 }) => {
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = useState('');
   const isMobile = useMedia(cssConfig.media.md);
 
   useDebounce(

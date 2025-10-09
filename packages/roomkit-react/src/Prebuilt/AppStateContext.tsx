@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { usePreviousDistinct } from 'react-use';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { match, P } from 'ts-pattern';
@@ -22,7 +22,7 @@ type AppStateContextType = {
   rejoin: () => void;
 };
 
-export const AppStateContext = React.createContext<AppStateContextType>({
+export const AppStateContext = createContext<AppStateContextType>({
   rejoin: () => {
     console.log('Rejoin');
   },
@@ -41,7 +41,7 @@ export const useHMSAppStateContext = () => {
 export const useAppStateManager = () => {
   const roomLayout = useRoomLayout();
   const setOriginalLayout = useSetOriginalLayout();
-  const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
+  const [activeState, setActiveState] = useState<PrebuiltStates | undefined>();
   const roomState = useHMSStore(selectRoomState);
   const prevRoomState = usePreviousDistinct(roomState);
   const hmsActions = useHMSActions();

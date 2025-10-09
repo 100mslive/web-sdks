@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   HMSException,
   selectDevices,
@@ -22,7 +22,7 @@ import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 import { useAudioOutputTest } from '../Prebuilt/components/hooks/useAudioOutputTest';
 import { TEST_AUDIO_URL } from '../Prebuilt/common/constants';
 
-const SelectContainer = ({ children }: { children: React.ReactNode }) => (
+const SelectContainer = ({ children }: { children: ReactNode }) => (
   <Box css={{ w: 'calc(50% - 0.75rem)', '@lg': { w: '100%' } }}>{children}</Box>
 );
 

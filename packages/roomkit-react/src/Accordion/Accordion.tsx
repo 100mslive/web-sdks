@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import { FC, forwardRef, PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { CSS } from '@stitches/react';
 import { ChevronUpIcon } from '@100mslive/react-icons';
@@ -63,9 +63,9 @@ const StyledChevron = styled(ChevronUpIcon, {
 export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
-export const AccordionHeader: React.FC<
+export const AccordionHeader: FC<
   PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
-> = React.forwardRef<
+> = forwardRef<
   HTMLButtonElement,
   PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS; css?: CSS; chevronID?: string }>
 >(({ children, iconStyles, css, chevronID, ...props }, forwardedRef) => (
@@ -77,12 +77,11 @@ export const AccordionHeader: React.FC<
   </StyledHeader>
 ));
 
-export const AccordionContent: React.FC<
-  PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>
-> = React.forwardRef<HTMLDivElement, PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>>(
-  ({ children, contentStyles, ...props }, forwardedRef) => (
-    <StyledContent {...props} ref={forwardedRef}>
-      <Box css={contentStyles}>{children}</Box>
-    </StyledContent>
-  ),
-);
+export const AccordionContent: FC<PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>> =
+  forwardRef<HTMLDivElement, PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>>(
+    ({ children, contentStyles, ...props }, forwardedRef) => (
+      <StyledContent {...props} ref={forwardedRef}>
+        <Box css={contentStyles}>{children}</Box>
+      </StyledContent>
+    ),
+  );

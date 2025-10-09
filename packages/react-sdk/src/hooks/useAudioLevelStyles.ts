@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { RefObject, useEffect } from 'react';
 import { selectTrackAudioByID } from '@100mslive/hms-video-store';
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 
@@ -18,7 +18,7 @@ export function useAudioLevelStyles({
 }: {
   trackId?: string;
   getStyle: (level: number) => Record<string, string>;
-  ref: React.RefObject<any>;
+  ref: RefObject<any>;
 }) {
   const store = useHMSVanillaStore();
   useEffect(

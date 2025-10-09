@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
@@ -12,7 +12,7 @@ const Root = ({
   onClick?: () => Promise<void>;
   mediaURL?: string;
   isActive: boolean;
-  children?: React.JSX.Element[];
+  children?: ReactNode[];
   testid: string;
 }) => (
   <Flex
@@ -46,7 +46,7 @@ const Title = ({ children }: { children?: string }) => {
   ) : null;
 };
 
-const Icon = ({ children }: { children?: React.JSX.Element }) => {
+const Icon = ({ children }: { children?: ReactNode }) => {
   return children ? <Box css={{ color: '$on_surface_high' }}>{children}</Box> : null;
 };
 

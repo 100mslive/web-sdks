@@ -1,4 +1,4 @@
-import React, { ComponentProps } from 'react';
+import { ComponentProps, FC, ReactNode } from 'react';
 import type { ToastProps } from '@radix-ui/react-toast';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
@@ -113,12 +113,12 @@ interface HMSToastProps extends ToastProps {
   title: string;
   description?: string;
   isClosable?: boolean;
-  icon?: React.ReactNode;
-  action?: React.ReactNode;
+  icon?: ReactNode;
+  action?: ReactNode;
   inlineAction?: boolean;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({
+const HMSToast: FC<HMSToastProps> = ({
   title,
   description,
   isClosable = true,

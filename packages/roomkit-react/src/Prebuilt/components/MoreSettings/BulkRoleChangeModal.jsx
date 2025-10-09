@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ChangeRoleIcon, CheckIcon } from '@100mslive/react-icons';
 import { Button, Checkbox, Dialog, Dropdown, Flex, Loading, Text } from '../../../';

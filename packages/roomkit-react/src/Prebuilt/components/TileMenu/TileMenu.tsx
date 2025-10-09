@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ComponentPropsWithoutRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSAudioTrack,
@@ -71,7 +71,7 @@ const TileMenu = ({
   const openNameChangeModal = () => setShowNameChangeModal(true);
   const openRoleChangeModal = () => setShowRoleChangeModal(true);
 
-  const props: React.ComponentPropsWithoutRef<typeof TileMenuContent> = {
+  const props: ComponentPropsWithoutRef<typeof TileMenuContent> = {
     isLocal,
     isScreenshare,
     audioTrackID,

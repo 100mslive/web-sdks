@@ -133,7 +133,9 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
-      inputRef.current.value = '';
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
       resetInputHeight();
       setTimeout(() => {
         onSend(1);
@@ -144,7 +146,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
         title: err.message.startsWith('Invalid peer') ? `${selectedPeer.name} is not in this room` : err.message,
       });
     }
-  }, [selectedRole, selectedPeer, hmsActions, onSend]);
+  }, [selectedRole, selectedPeer, hmsActions, onSend, resetInputHeight]);
 
   useEffect(() => {
     const messageElement = inputRef.current;
@@ -153,7 +155,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       updateInputHeight();
       setMessageLengthExceeded(draftMessage.length > CHAT_MESSAGE_LIMIT);
     }
-  }, [draftMessage]);
+  }, [draftMessage, updateInputHeight]);
 
   useEffect(() => {
     const messageElement = inputRef.current;

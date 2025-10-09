@@ -45,7 +45,7 @@ const RoleChangeContent = ({
   const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement | undefined>();
+  const triggerRef = useRef<HTMLButtonElement | undefined>(undefined);
 
   return (
     <>
