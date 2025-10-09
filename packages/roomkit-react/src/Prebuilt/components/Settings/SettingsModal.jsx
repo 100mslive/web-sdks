@@ -35,7 +35,7 @@ const settingsList = [
   },
 ];
 
-const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
+const SettingsModal = ({ open, onOpenChange, screenType, children }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
 
