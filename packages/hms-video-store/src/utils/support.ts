@@ -45,7 +45,6 @@ const getParserResult = (): IResult => {
   return enhancedResult || uaParser.getResult();
 };
 
-// Export a parser interface that uses enhanced result when available
 export const parsedUserAgent = {
   getBrowser: () => getParserResult().browser,
   getOS: () => getParserResult().os,
@@ -54,7 +53,6 @@ export const parsedUserAgent = {
   getEngine: () => getParserResult().engine,
   getUA: () => getParserResult().ua,
   getResult: getParserResult,
-  // Export the promise for consumers who want to wait for clientHints
   withClientHints: () => clientHintsPromise || Promise.resolve(getParserResult()),
 };
 
