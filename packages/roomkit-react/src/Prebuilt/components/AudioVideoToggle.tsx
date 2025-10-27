@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
 import {
   DeviceType,
+  HMSNotificationTypes,
   HMSRoomState,
   selectIsLocalAudioPluginPresent,
   selectLocalAudioTrackID,
@@ -13,6 +14,7 @@ import {
   useAVToggle,
   useDevices,
   useHMSActions,
+  useHMSNotifications,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
@@ -292,6 +294,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   const isNoiseCancellationEnabled = useIsNoiseCancellationEnabled();
   const { setNoiseCancellationWithPlugin, inProgress } = useNoiseCancellationWithPlugin();
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
+  const speakingWhileMutedNotification = useHMSNotifications(HMSNotificationTypes.SPEAKING_WHILE_MUTED);
 
   useEffect(() => {
     (async () => {
@@ -318,6 +321,17 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNoiseCancellationEnabled, localPeer?.audioTrack, inProgress]);
+
+  useEffect(() => {
+    if (speakingWhileMutedNotification) {
+      ToastManager.addToast({
+        title: 'You appear to be speaking while muted',
+        variant: 'warning',
+        duration: 3000,
+        icon: <MicOffIcon />,
+      });
+    }
+  }, [speakingWhileMutedNotification]);
 
   if (!toggleAudio && !toggleVideo) {
     return null;
