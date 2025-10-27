@@ -1,11 +1,11 @@
 import { DeviceChangeListener } from './devices';
 import { HMSPeer } from './peer';
 import { HMSRoom } from './room';
-import { HMSPeerUpdate, HMSRoomUpdate, HMSTrackUpdate } from './update-listener';
+import { HMSPeerUpdate, HMSRoomUpdate, HMSSpeakingWhileMutedListener, HMSTrackUpdate } from './update-listener';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
 
-export interface HMSPreviewListener extends DeviceChangeListener {
+export interface HMSPreviewListener extends DeviceChangeListener, HMSSpeakingWhileMutedListener {
   onPreview(room: HMSRoom, localTracks: HMSTrack[]): void;
   onError(exception: HMSException): void;
   onReconnecting(error: HMSException): void;

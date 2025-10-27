@@ -62,7 +62,7 @@ export interface HMSAudioListener {
 }
 
 export interface HMSSpeakingWhileMutedListener {
-  onSpeakingWhileMuted(track: HMSTrack): void;
+  onSpeakingWhileMuted?(track: HMSTrack): void;
 }
 
 export interface HMSConnectionQualityListener {
@@ -78,7 +78,11 @@ export interface InteractivityListener {
   onWhiteboardUpdate(whiteboard: HMSWhiteboard): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener, InteractivityListener {
+export interface HMSUpdateListener
+  extends DeviceChangeListener,
+    SessionStoreListener,
+    InteractivityListener,
+    HMSSpeakingWhileMutedListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;

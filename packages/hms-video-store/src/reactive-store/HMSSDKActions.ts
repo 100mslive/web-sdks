@@ -836,9 +836,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
-    this.sdk.addSpeakingWhileMutedListener({
-      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
-    });
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
     });
@@ -879,12 +876,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onPollsUpdate: this.onPollsUpdate.bind(this),
       onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
       onSFUMigration: this.onSFUMigration.bind(this),
+      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
-    });
-    this.sdk.addSpeakingWhileMutedListener({
-      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
@@ -944,12 +939,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onTrackUpdate: this.onTrackUpdate.bind(this),
+      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
-    });
-    this.sdk.addSpeakingWhileMutedListener({
-      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
   }
 

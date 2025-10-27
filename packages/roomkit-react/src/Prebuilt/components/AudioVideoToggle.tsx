@@ -295,6 +295,7 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   const { setNoiseCancellationWithPlugin, inProgress } = useNoiseCancellationWithPlugin();
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
   const speakingWhileMutedNotification = useHMSNotifications(HMSNotificationTypes.SPEAKING_WHILE_MUTED);
+  const [showSpeakingWhileMutedTooltip, setShowSpeakingWhileMutedTooltip] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -323,14 +324,14 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   }, [isNoiseCancellationEnabled, localPeer?.audioTrack, inProgress]);
 
   useEffect(() => {
-    if (speakingWhileMutedNotification) {
-      ToastManager.addToast({
-        title: 'You appear to be speaking while muted',
-        variant: 'warning',
-        duration: 3000,
-        icon: <MicOffIcon />,
-      });
+    if (!speakingWhileMutedNotification) {
+      return;
     }
+    setShowSpeakingWhileMutedTooltip(true);
+    const timeoutId = setTimeout(() => {
+      setShowSpeakingWhileMutedTooltip(false);
+    }, 3000);
+    return () => clearTimeout(timeoutId);
   }, [speakingWhileMutedNotification]);
 
   if (!toggleAudio && !toggleVideo) {
@@ -344,7 +345,11 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
           hideOptions={hideOptions || !hasAudioDevices}
           onDisabledClick={toggleAudio}
           testid="audio_toggle_btn"
-          tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
+          tooltipMessage={
+            showSpeakingWhileMutedTooltip
+              ? 'Speaking while muted!'
+              : `Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`
+          }
           icon={!isLocalAudioEnabled ? <MicOffIcon /> : <MicOnIcon />}
           active={isLocalAudioEnabled}
           onClick={toggleAudio}
