@@ -149,6 +149,16 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     this.emitEvent(notification);
   }
 
+  sendSpeakingWhileMuted() {
+    const notification = this.createNotification(
+      HMSNotificationTypes.SPEAKING_WHILE_MUTED,
+      null,
+      HMSNotificationSeverity.INFO,
+      'You appear to be speaking while muted',
+    );
+    this.emitEvent(notification);
+  }
+
   sendChangeTrackStateRequest(request: HMSChangeTrackStateRequest) {
     const notification = this.createNotification(
       HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,

@@ -836,6 +836,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
+    this.sdk.addSpeakingWhileMutedListener({
+      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
+    });
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
     });
@@ -879,6 +882,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addSpeakingWhileMutedListener({
+      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
     this.sdk.addConnectionQualityListener({
       onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
@@ -941,6 +947,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addSpeakingWhileMutedListener({
+      onSpeakingWhileMuted: this.onSpeakingWhileMuted.bind(this),
     });
   }
 
@@ -1271,6 +1280,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
       }
     }, 'audioLevel');
+  }
+
+  protected onSpeakingWhileMuted(track: SDKHMSTrack) {
+    HMSLogger.w('[HMSSDKActions]', 'Speaking while muted detected', track);
+    // Publish notification to the store
+    this.hmsNotifications.sendSpeakingWhileMuted();
   }
 
   /**

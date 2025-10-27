@@ -153,7 +153,7 @@ export class TrackAudioLevelMonitor {
     if (timeSinceLastEvent >= this.speakingWhileMutedCooldown) {
       this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
       this.lastSpeakingWhileMutedTime = now;
-      HMSLogger.d(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+      HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
     }
     // Reset counter after triggering
     this.speakingWhileMutedCounter = 0;

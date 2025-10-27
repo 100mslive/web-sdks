@@ -82,6 +82,12 @@ export interface HMSTranscriptionNotification extends BaseNotification {
   type: HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED;
   data: HMSTranscriptionInfo[];
 }
+
+export interface HMSSpeakingWhileMutedNotification extends BaseNotification {
+  type: HMSNotificationTypes.SPEAKING_WHILE_MUTED;
+  data: null;
+}
+
 export type HMSNotification =
   | HMSPeerNotification
   | HMSPeerListNotification
@@ -94,6 +100,7 @@ export type HMSNotification =
   | HMSDeviceChangeEventNotification
   | HMSReconnectionNotification
   | HMSTranscriptionNotification
+  | HMSSpeakingWhileMutedNotification
   | HMSPlaylistItemNotification<any>;
 
 export enum HMSNotificationSeverity {
@@ -132,6 +139,7 @@ export enum HMSNotificationTypes {
   POLLS_LIST = 'POLLS_LIST',
   HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
   TRANSCRIPTION_STATE_UPDATED = 'TRANSCRIPTION_STATE_UPDATED',
+  SPEAKING_WHILE_MUTED = 'SPEAKING_WHILE_MUTED',
 }
 
 export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
@@ -166,6 +174,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
   [HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED]: HMSTranscriptionNotification;
+  [HMSNotificationTypes.SPEAKING_WHILE_MUTED]: HMSSpeakingWhileMutedNotification;
 }[T];
 
 export type MappedNotifications<Type extends HMSNotificationTypes[]> = {
