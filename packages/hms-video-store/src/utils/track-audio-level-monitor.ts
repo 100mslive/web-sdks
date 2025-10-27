@@ -2,6 +2,7 @@ import HMSLogger from './logger';
 import { HMSAudioContextHandler } from './media';
 import { Queue } from './queue';
 import { sleep } from './timer-utils';
+import { isEmptyTrack } from './track';
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
 import { HMSLocalAudioTrack } from '../internal';
 
@@ -38,6 +39,8 @@ export class TrackAudioLevelMonitor {
   private lastSpeakingWhileMutedTime = 0;
   /** Cooldown period to avoid spamming the event (in milliseconds) */
   private speakingWhileMutedCooldown = 5000;
+  /** Monitoring track that stays enabled to detect audio even when main track is muted */
+  private monitoringTrack?: MediaStreamTrack;
 
   constructor(
     private track: HMSLocalAudioTrack,
@@ -45,16 +48,36 @@ export class TrackAudioLevelMonitor {
     private silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
     private speakingWhileMutedEvent?: HMSInternalEvent<{ track: HMSLocalAudioTrack; audioLevel: number }>,
   ) {
+    this.initializeMonitoring();
+  }
+
+  private initializeMonitoring() {
     try {
-      // Clone the track to always monitor audio, independent of enabled state
-      const monitoringTrack = this.track.nativeTrack.clone();
-      // Ensure monitoring track is always enabled to capture audio levels
-      monitoringTrack.enabled = true;
-      const stream = new MediaStream([monitoringTrack]);
-      this.analyserNode = this.createAnalyserNodeForStream(stream);
-      const bufferLength = this.analyserNode.frequencyBinCount;
-      this.dataArray = new Uint8Array(bufferLength);
-      HMSLogger.d(this.TAG, 'Audio level monitor initialized with always-enabled monitoring track');
+      // Stop and clean up previous monitoring track if it exists
+      if (this.monitoringTrack) {
+        this.monitoringTrack.stop();
+        this.monitoringTrack = undefined;
+      }
+
+      // Only create monitoring track if the main track is not empty
+      // Empty tracks (created from AudioContext) produce no audio
+      if (!isEmptyTrack(this.track.nativeTrack)) {
+        // Clone the track for monitoring - this stays enabled even when main track is muted
+        this.monitoringTrack = this.track.nativeTrack.clone();
+        this.monitoringTrack.enabled = true;
+        const stream = new MediaStream([this.monitoringTrack]);
+        this.analyserNode = this.createAnalyserNodeForStream(stream);
+        const bufferLength = this.analyserNode.frequencyBinCount;
+        this.dataArray = new Uint8Array(bufferLength);
+        HMSLogger.d(this.TAG, 'Monitor initialized with cloned track for always-on monitoring');
+      } else {
+        // For empty tracks, use the original track (won't produce audio anyway)
+        const stream = new MediaStream([this.track.nativeTrack]);
+        this.analyserNode = this.createAnalyserNodeForStream(stream);
+        const bufferLength = this.analyserNode.frequencyBinCount;
+        this.dataArray = new Uint8Array(bufferLength);
+        HMSLogger.d(this.TAG, 'Monitor initialized with empty track - will reinitialize when real track available');
+      }
     } catch (ex) {
       HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
     }
@@ -90,6 +113,8 @@ export class TrackAudioLevelMonitor {
 
   start() {
     this.stop();
+    // Reinitialize monitoring in case the track has changed (e.g., from empty to real track)
+    this.initializeMonitoring();
     this.isMonitored = true;
     HMSLogger.d(this.TAG, 'Starting track Monitor', `${this.track}`);
     this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', `${this.track}`));
@@ -103,6 +128,13 @@ export class TrackAudioLevelMonitor {
 
     this.sendAudioLevel(0);
     this.isMonitored = false;
+
+    // Clean up monitoring track
+    if (this.monitoringTrack) {
+      this.monitoringTrack.stop();
+      this.monitoringTrack = undefined;
+      HMSLogger.d(this.TAG, 'Stopped and cleaned up monitoring track');
+    }
   }
 
   private async loop() {
