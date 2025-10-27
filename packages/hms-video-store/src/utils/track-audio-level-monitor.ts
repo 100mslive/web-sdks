@@ -85,7 +85,7 @@ export class TrackAudioLevelMonitor {
         HMSLogger.d(this.TAG, 'Monitor initialized with empty track - will reinitialize when real track available');
       }
     } catch (ex) {
-      HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
+      HMSLogger.w(this.TAG, 'Unable to initialize monitoring', ex);
     }
   }
 
@@ -223,11 +223,12 @@ export class TrackAudioLevelMonitor {
 
     // Only emit if throttle period has passed (grace period after muting or cooldown between events)
     if (timeSinceLastEvent >= this.speakingWhileMutedThrottlePeriod) {
-      // Set flag immediately so silence counter works
-      this.isSpeakingWhileMuted = true;
-      this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
-      this.lastSpeakingWhileMutedTime = now;
-      HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+      if (!this.isSpeakingWhileMuted) {
+        this.isSpeakingWhileMuted = true;
+        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
+        this.lastSpeakingWhileMutedTime = now;
+        HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+      }
     }
     // Reset counter after triggering
     this.speakingWhileMutedCounter = 0;
