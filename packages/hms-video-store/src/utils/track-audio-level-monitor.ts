@@ -46,10 +46,15 @@ export class TrackAudioLevelMonitor {
     private speakingWhileMutedEvent?: HMSInternalEvent<{ track: HMSLocalAudioTrack; audioLevel: number }>,
   ) {
     try {
-      const stream = new MediaStream([this.track.nativeTrack]);
+      // Clone the track to always monitor audio, independent of enabled state
+      const monitoringTrack = this.track.nativeTrack.clone();
+      // Ensure monitoring track is always enabled to capture audio levels
+      monitoringTrack.enabled = true;
+      const stream = new MediaStream([monitoringTrack]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
       const bufferLength = this.analyserNode.frequencyBinCount;
       this.dataArray = new Uint8Array(bufferLength);
+      HMSLogger.d(this.TAG, 'Audio level monitor initialized with always-enabled monitoring track');
     } catch (ex) {
       HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
     }
