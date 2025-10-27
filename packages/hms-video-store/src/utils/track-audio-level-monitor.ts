@@ -39,6 +39,8 @@ export class TrackAudioLevelMonitor {
   private lastSpeakingWhileMutedTime = 0;
   /** Combined grace period and cooldown - prevents detection immediately after muting and between events (in milliseconds) */
   private speakingWhileMutedThrottlePeriod = 3000;
+  /** Tracks if user is currently speaking while muted */
+  private isSpeakingWhileMuted = false;
   /** Monitoring track that stays enabled to detect audio even when main track is muted */
   private monitoringTrack?: MediaStreamTrack;
 
@@ -170,6 +172,11 @@ export class TrackAudioLevelMonitor {
       // Reset counter and timestamp when track is enabled
       this.speakingWhileMutedCounter = 0;
       this.lastSpeakingWhileMutedTime = Date.now();
+      // If was speaking while muted, emit stopped event
+      if (this.isSpeakingWhileMuted) {
+        this.isSpeakingWhileMuted = false;
+        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel: 0 });
+      }
     }
   }
 
@@ -184,6 +191,11 @@ export class TrackAudioLevelMonitor {
     } else {
       // Reset counter if audio level drops
       this.speakingWhileMutedCounter = 0;
+      // If was speaking while muted, emit stopped event
+      if (this.isSpeakingWhileMuted) {
+        this.isSpeakingWhileMuted = false;
+        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel: 0 });
+      }
     }
   }
 
@@ -197,9 +209,12 @@ export class TrackAudioLevelMonitor {
 
     // Only emit if throttle period has passed (grace period after muting or cooldown between events)
     if (timeSinceLastEvent >= this.speakingWhileMutedThrottlePeriod) {
-      this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
-      this.lastSpeakingWhileMutedTime = now;
-      HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+      if (!this.isSpeakingWhileMuted) {
+        this.isSpeakingWhileMuted = true;
+        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
+        this.lastSpeakingWhileMutedTime = now;
+        HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+      }
     }
     // Reset counter after triggering
     this.speakingWhileMutedCounter = 0;

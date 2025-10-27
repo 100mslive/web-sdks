@@ -613,8 +613,8 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  private handleSpeakingWhileMuted = ({ track }: { track: HMSLocalAudioTrack; audioLevel: number }) => {
-    this.listener?.onSpeakingWhileMuted?.(track);
+  private handleSpeakingWhileMuted = ({ track, audioLevel }: { track: HMSLocalAudioTrack; audioLevel: number }) => {
+    this.listener?.onSpeakingWhileMuted?.(track, audioLevel);
   };
 
   // eslint-disable-next-line complexity

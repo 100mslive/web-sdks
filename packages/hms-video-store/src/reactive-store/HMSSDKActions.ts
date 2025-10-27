@@ -1275,8 +1275,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, 'audioLevel');
   }
 
-  protected onSpeakingWhileMuted() {
-    this.hmsNotifications.sendSpeakingWhileMuted();
+  protected onSpeakingWhileMuted(_track: SDKHMSTrack, audioLevel: number) {
+    this.hmsNotifications.sendSpeakingWhileMuted(audioLevel);
   }
 
   /**

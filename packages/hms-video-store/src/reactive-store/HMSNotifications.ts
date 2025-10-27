@@ -149,12 +149,12 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     this.emitEvent(notification);
   }
 
-  sendSpeakingWhileMuted() {
+  sendSpeakingWhileMuted(audioLevel: number) {
     const notification = this.createNotification(
       HMSNotificationTypes.SPEAKING_WHILE_MUTED,
-      null,
+      { audioLevel },
       HMSNotificationSeverity.INFO,
-      'You appear to be speaking while muted',
+      audioLevel > 0 ? 'You appear to be speaking while muted' : '',
     );
     this.emitEvent(notification);
   }
@@ -214,6 +214,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
       | HMSPlaylistItem<T>
       | sdkTypes.HMSPoll
       | sdkTypes.HMSTranscriptionInfo[]
+      | { audioLevel: number }
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

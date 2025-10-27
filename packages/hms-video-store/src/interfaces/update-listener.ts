@@ -62,7 +62,7 @@ export interface HMSAudioListener {
 }
 
 export interface HMSSpeakingWhileMutedListener {
-  onSpeakingWhileMuted?(track: HMSTrack): void;
+  onSpeakingWhileMuted?(track: HMSTrack, audioLevel: number): void;
 }
 
 export interface HMSConnectionQualityListener {

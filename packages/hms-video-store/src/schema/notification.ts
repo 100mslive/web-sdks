@@ -85,7 +85,9 @@ export interface HMSTranscriptionNotification extends BaseNotification {
 
 export interface HMSSpeakingWhileMutedNotification extends BaseNotification {
   type: HMSNotificationTypes.SPEAKING_WHILE_MUTED;
-  data: null;
+  data: {
+    audioLevel: number;
+  };
 }
 
 export type HMSNotification =
