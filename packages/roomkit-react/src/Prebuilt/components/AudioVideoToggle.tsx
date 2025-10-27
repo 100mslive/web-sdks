@@ -324,7 +324,8 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
 
   useEffect(() => {
     if (speakingWhileMutedNotification) {
-      ToastManager.addToast({
+      ToastManager.replaceToast('speaking-while-muted', {
+        id: 'speaking-while-muted',
         title: 'You appear to be speaking while muted',
         variant: 'warning',
         duration: 3000,
