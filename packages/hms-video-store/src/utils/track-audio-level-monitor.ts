@@ -12,12 +12,6 @@ const THRESHOLD = 35;
 /** Send update only if audio level is changed by UPDATE_THRESHOLD */
 const UPDATE_THRESHOLD = 5;
 
-/** Threshold for detecting speaking while muted */
-const SPEAKING_WHILE_MUTED_THRESHOLD = 30;
-
-/** Number of consecutive times audio level must be above threshold to trigger event */
-const SPEAKING_WHILE_MUTED_TICK_THRESHOLD = 3;
-
 export interface ITrackAudioLevelUpdate {
   track: HMSLocalAudioTrack;
   audioLevel: number;
@@ -201,7 +195,7 @@ export class TrackAudioLevelMonitor {
   }
 
   private handleMutedSpeaking(audioLevel: number) {
-    if (audioLevel > SPEAKING_WHILE_MUTED_THRESHOLD) {
+    if (audioLevel > THRESHOLD) {
       // User is speaking - reset silent counter
       this.silentWhileMutedCounter = 0;
       this.speakingWhileMutedCounter++;
@@ -225,7 +219,8 @@ export class TrackAudioLevelMonitor {
   }
 
   private maybeEmitSpeakingWhileMutedEvent(audioLevel: number) {
-    if (this.speakingWhileMutedCounter < SPEAKING_WHILE_MUTED_TICK_THRESHOLD) {
+    // Require 3 consecutive ticks (300ms) above threshold before emitting
+    if (this.speakingWhileMutedCounter < 3) {
       return;
     }
 
