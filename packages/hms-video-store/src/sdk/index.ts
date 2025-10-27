@@ -614,7 +614,6 @@ export class HMSSdk implements HMSInterface {
   };
 
   private handleSpeakingWhileMuted = ({ track }: { track: HMSLocalAudioTrack; audioLevel: number }) => {
-    HMSLogger.d(this.TAG, 'Speaking while muted detected', track);
     this.listener?.onSpeakingWhileMuted?.(track);
   };
 

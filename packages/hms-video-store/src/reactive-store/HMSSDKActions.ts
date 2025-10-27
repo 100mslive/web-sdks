@@ -1275,9 +1275,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, 'audioLevel');
   }
 
-  protected onSpeakingWhileMuted(track: SDKHMSTrack) {
-    HMSLogger.w('[HMSSDKActions]', 'Speaking while muted detected', track);
-    // Publish notification to the store
+  protected onSpeakingWhileMuted() {
     this.hmsNotifications.sendSpeakingWhileMuted();
   }
 

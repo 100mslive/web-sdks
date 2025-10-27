@@ -165,16 +165,6 @@ export class TrackAudioLevelMonitor {
 
     // Only detect when track is disabled (muted)
     if (!this.track.enabled) {
-      // Debug: log when we're checking for speaking while muted
-      if (audioLevel && audioLevel > 10) {
-        HMSLogger.d(
-          this.TAG,
-          'Checking speaking while muted - audio level:',
-          audioLevel,
-          'counter:',
-          this.speakingWhileMutedCounter,
-        );
-      }
       this.handleMutedSpeaking(audioLevel!);
     } else {
       // Reset counter when track is enabled
