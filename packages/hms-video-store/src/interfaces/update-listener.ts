@@ -61,6 +61,10 @@ export interface HMSAudioListener {
   onAudioLevelUpdate(speakers: HMSSpeaker[]): void;
 }
 
+export interface HMSSpeakingWhileMutedListener {
+  onSpeakingWhileMuted(track: HMSTrack): void;
+}
+
 export interface HMSConnectionQualityListener {
   onConnectionQualityUpdate(qualityUpdates: HMSConnectionQuality[]): void;
 }

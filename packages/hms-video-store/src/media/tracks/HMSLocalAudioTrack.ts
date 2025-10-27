@@ -286,6 +286,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this,
       this.eventBus.trackAudioLevelUpdate,
       this.eventBus.localAudioSilence,
+      this.eventBus.speakingWhileMuted,
     );
     this.audioLevelMonitor.start();
     this.audioLevelMonitor.detectSilence();

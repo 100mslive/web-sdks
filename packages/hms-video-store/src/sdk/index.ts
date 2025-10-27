@@ -51,7 +51,13 @@ import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
-import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import {
+  HMSAudioListener,
+  HMSPeerUpdate,
+  HMSSpeakingWhileMutedListener,
+  HMSTrackUpdate,
+  HMSUpdateListener,
+} from '../interfaces/update-listener';
 import { PlaylistManager, TranscriptionConfig } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
@@ -119,6 +125,7 @@ export class HMSSdk implements HMSInterface {
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
+  private speakingWhileMutedListener?: HMSSpeakingWhileMutedListener;
   public store!: Store;
   private notificationManager?: NotificationManager;
   /** @internal */
@@ -261,6 +268,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
     this.eventBus.error.subscribe(this.handleError);
+    this.eventBus.speakingWhileMuted.subscribe(this.handleSpeakingWhileMuted);
   }
 
   private validateJoined(name: string) {
@@ -610,6 +618,11 @@ export class HMSSdk implements HMSInterface {
   private handleError = (error: HMSException) => {
     HMSLogger.e(this.TAG, error);
     this.errorListener?.onError(error);
+  };
+
+  private handleSpeakingWhileMuted = ({ track }: { track: HMSLocalAudioTrack; audioLevel: number }) => {
+    HMSLogger.d(this.TAG, 'Speaking while muted detected', track);
+    this.speakingWhileMutedListener?.onSpeakingWhileMuted(track);
   };
 
   // eslint-disable-next-line complexity
@@ -1049,6 +1062,10 @@ export class HMSSdk implements HMSInterface {
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
     this.notificationManager?.setAudioListener(audioListener);
+  }
+
+  addSpeakingWhileMutedListener(listener: HMSSpeakingWhileMutedListener) {
+    this.speakingWhileMutedListener = listener;
   }
 
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {

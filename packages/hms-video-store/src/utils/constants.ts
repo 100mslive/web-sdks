@@ -47,6 +47,7 @@ export const HMSEvents = {
   TRACK_RESTORED: 'track-restored',
   TRACK_AUDIO_LEVEL_UPDATE: 'track-audio-level-update',
   LOCAL_AUDIO_SILENCE: 'local-audio-silence',
+  SPEAKING_WHILE_MUTED: 'speaking-while-muted',
   ANALYTICS: 'analytics',
   AUDIO_PLUGIN_FAILED: 'audio-plugin-failed',
   POLICY_CHANGE: 'policy-change',

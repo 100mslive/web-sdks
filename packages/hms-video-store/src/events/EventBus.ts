@@ -56,6 +56,11 @@ export class EventBus {
     this.eventEmitter,
   );
 
+  readonly speakingWhileMuted = new HMSInternalEvent<{ track: HMSLocalAudioTrack; audioLevel: number }>(
+    HMSEvents.SPEAKING_WHILE_MUTED,
+    this.eventEmitter,
+  );
+
   readonly policyChange = new HMSInternalEvent<PolicyParams>(HMSEvents.POLICY_CHANGE, this.eventEmitter);
 
   readonly localRoleUpdate = new HMSInternalEvent<{ oldRole: HMSRole; newRole: HMSRole }>(

@@ -11,6 +11,12 @@ const THRESHOLD = 35;
 /** Send update only if audio level is changed by UPDATE_THRESHOLD */
 const UPDATE_THRESHOLD = 5;
 
+/** Threshold for detecting speaking while muted */
+const SPEAKING_WHILE_MUTED_THRESHOLD = 30;
+
+/** Number of consecutive times audio level must be above threshold to trigger event */
+const SPEAKING_WHILE_MUTED_TICK_THRESHOLD = 3;
+
 export interface ITrackAudioLevelUpdate {
   track: HMSLocalAudioTrack;
   audioLevel: number;
@@ -28,11 +34,16 @@ export class TrackAudioLevelMonitor {
   /** Store past audio levels for this duration */
   private historyInterval = 700;
   private history = new Queue<number>(this.historyInterval / this.interval);
+  private speakingWhileMutedCounter = 0;
+  private lastSpeakingWhileMutedTime = 0;
+  /** Cooldown period to avoid spamming the event (in milliseconds) */
+  private speakingWhileMutedCooldown = 5000;
 
   constructor(
     private track: HMSLocalAudioTrack,
     private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>,
     private silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
+    private speakingWhileMutedEvent?: HMSInternalEvent<{ track: HMSLocalAudioTrack; audioLevel: number }>,
   ) {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
@@ -91,9 +102,61 @@ export class TrackAudioLevelMonitor {
 
   private async loop() {
     while (this.isMonitored) {
-      this.sendAudioLevel(this.getMaxAudioLevelOverPeriod());
+      const audioLevel = this.getMaxAudioLevelOverPeriod();
+      this.sendAudioLevel(audioLevel);
+      this.detectSpeakingWhileMuted(audioLevel);
       await sleep(this.interval);
     }
+  }
+
+  /**
+   * Detects if the user is speaking while their microphone is muted (disabled).
+   * Only triggers the event if the track is disabled and audio level is consistently above threshold.
+   */
+  private detectSpeakingWhileMuted(audioLevel?: number) {
+    if (!this.shouldDetectSpeakingWhileMuted(audioLevel)) {
+      return;
+    }
+
+    // Only detect when track is disabled (muted)
+    if (!this.track.enabled) {
+      this.handleMutedSpeaking(audioLevel!);
+    } else {
+      // Reset counter when track is enabled
+      this.speakingWhileMutedCounter = 0;
+    }
+  }
+
+  private shouldDetectSpeakingWhileMuted(audioLevel?: number): boolean {
+    return Boolean(this.speakingWhileMutedEvent && audioLevel);
+  }
+
+  private handleMutedSpeaking(audioLevel: number) {
+    if (audioLevel > SPEAKING_WHILE_MUTED_THRESHOLD) {
+      this.speakingWhileMutedCounter++;
+      this.maybeEmitSpeakingWhileMutedEvent(audioLevel);
+    } else {
+      // Reset counter if audio level drops
+      this.speakingWhileMutedCounter = 0;
+    }
+  }
+
+  private maybeEmitSpeakingWhileMutedEvent(audioLevel: number) {
+    if (this.speakingWhileMutedCounter < SPEAKING_WHILE_MUTED_TICK_THRESHOLD) {
+      return;
+    }
+
+    const now = Date.now();
+    const timeSinceLastEvent = now - this.lastSpeakingWhileMutedTime;
+
+    // Only emit if cooldown period has passed to avoid spamming
+    if (timeSinceLastEvent >= this.speakingWhileMutedCooldown) {
+      this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
+      this.lastSpeakingWhileMutedTime = now;
+      HMSLogger.d(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
+    }
+    // Reset counter after triggering
+    this.speakingWhileMutedCounter = 0;
   }
 
   private sendAudioLevel(audioLevel = 0) {
