@@ -325,18 +325,20 @@ export const AudioVideoToggle = ({ hideOptions = false }: { hideOptions?: boolea
   useEffect(() => {
     if (speakingWhileMutedNotification) {
       const audioLevel = speakingWhileMutedNotification.data?.audioLevel || 0;
-      if (audioLevel > 0) {
+      const toastId = 'speaking-while-muted';
+
+      if (audioLevel > 0 && !ToastManager.isActive(toastId)) {
         // User started speaking while muted - show persistent toast
-        ToastManager.replaceToast('speaking-while-muted', {
-          id: 'speaking-while-muted',
+        ToastManager.addToast({
+          id: toastId,
           title: 'You appear to be speaking while muted',
           variant: 'warning',
           duration: Infinity,
           icon: <MicOffIcon />,
         });
-      } else {
-        // User stopped speaking while muted - dismiss toast
-        ToastManager.removeToast('speaking-while-muted');
+      } else if (audioLevel === 0 && ToastManager.isActive(toastId)) {
+        // User stopped speaking while muted - dismiss toast only if it's currently showing
+        ToastManager.removeToast(toastId);
       }
     }
   }, [speakingWhileMutedNotification]);
