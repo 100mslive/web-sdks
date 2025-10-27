@@ -223,12 +223,11 @@ export class TrackAudioLevelMonitor {
 
     // Only emit if throttle period has passed (grace period after muting or cooldown between events)
     if (timeSinceLastEvent >= this.speakingWhileMutedThrottlePeriod) {
-      if (!this.isSpeakingWhileMuted) {
-        this.isSpeakingWhileMuted = true;
-        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
-        this.lastSpeakingWhileMutedTime = now;
-        HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
-      }
+      // Set flag immediately so silence counter works
+      this.isSpeakingWhileMuted = true;
+      this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
+      this.lastSpeakingWhileMutedTime = now;
+      HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
     }
     // Reset counter after triggering
     this.speakingWhileMutedCounter = 0;
