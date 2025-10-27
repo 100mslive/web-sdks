@@ -37,8 +37,8 @@ export class TrackAudioLevelMonitor {
   private history = new Queue<number>(this.historyInterval / this.interval);
   private speakingWhileMutedCounter = 0;
   private lastSpeakingWhileMutedTime = 0;
-  /** Cooldown period to avoid spamming the event (in milliseconds) */
-  private speakingWhileMutedCooldown = 5000;
+  /** Combined grace period and cooldown - prevents detection immediately after muting and between events (in milliseconds) */
+  private speakingWhileMutedThrottlePeriod = 3000;
   /** Monitoring track that stays enabled to detect audio even when main track is muted */
   private monitoringTrack?: MediaStreamTrack;
 
@@ -167,8 +167,9 @@ export class TrackAudioLevelMonitor {
     if (!this.track.enabled) {
       this.handleMutedSpeaking(audioLevel!);
     } else {
-      // Reset counter when track is enabled
+      // Reset counter and timestamp when track is enabled
       this.speakingWhileMutedCounter = 0;
+      this.lastSpeakingWhileMutedTime = Date.now();
     }
   }
 
@@ -194,8 +195,8 @@ export class TrackAudioLevelMonitor {
     const now = Date.now();
     const timeSinceLastEvent = now - this.lastSpeakingWhileMutedTime;
 
-    // Only emit if cooldown period has passed to avoid spamming
-    if (timeSinceLastEvent >= this.speakingWhileMutedCooldown) {
+    // Only emit if throttle period has passed (grace period after muting or cooldown between events)
+    if (timeSinceLastEvent >= this.speakingWhileMutedThrottlePeriod) {
       this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel });
       this.lastSpeakingWhileMutedTime = now;
       HMSLogger.w(this.TAG, 'Speaking while muted detected', `${this.track}`, 'audio level:', audioLevel);
