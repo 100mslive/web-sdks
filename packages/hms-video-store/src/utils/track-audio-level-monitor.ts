@@ -38,7 +38,7 @@ export class TrackAudioLevelMonitor {
   private speakingWhileMutedCounter = 0;
   private lastSpeakingWhileMutedTime = 0;
   /** Combined grace period and cooldown - prevents detection immediately after muting and between events (in milliseconds) */
-  private speakingWhileMutedThrottlePeriod = 3000;
+  private speakingWhileMutedThrottlePeriod = 5000;
   /** Tracks if user is currently speaking while muted */
   private isSpeakingWhileMuted = false;
   /** Counter for consecutive silent ticks while previously speaking */
