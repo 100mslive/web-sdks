@@ -101,10 +101,18 @@ export class TrackAudioLevelMonitor {
   }
 
   private async loop() {
+    let loopCount = 0;
     while (this.isMonitored) {
       const audioLevel = this.getMaxAudioLevelOverPeriod();
       this.sendAudioLevel(audioLevel);
       this.detectSpeakingWhileMuted(audioLevel);
+
+      // Debug: Log every 10 iterations to show monitor is running
+      if (loopCount % 10 === 0 && !this.track.enabled) {
+        HMSLogger.d(this.TAG, 'Monitor loop running while muted, audio level:', audioLevel);
+      }
+      loopCount++;
+
       await sleep(this.interval);
     }
   }
@@ -120,6 +128,16 @@ export class TrackAudioLevelMonitor {
 
     // Only detect when track is disabled (muted)
     if (!this.track.enabled) {
+      // Debug: log when we're checking for speaking while muted
+      if (audioLevel && audioLevel > 10) {
+        HMSLogger.d(
+          this.TAG,
+          'Checking speaking while muted - audio level:',
+          audioLevel,
+          'counter:',
+          this.speakingWhileMutedCounter,
+        );
+      }
       this.handleMutedSpeaking(audioLevel!);
     } else {
       // Reset counter when track is enabled
