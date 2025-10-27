@@ -45,6 +45,8 @@ export class TrackAudioLevelMonitor {
   private silentWhileMutedCounter = 0;
   /** Number of silent ticks (5 seconds) required before stopping detection */
   private readonly SILENT_TICKS_THRESHOLD = 50; // 50 ticks * 100ms = 5 seconds
+  /** Track previous enabled state to detect transitions */
+  private wasTrackEnabled = true;
   /** Monitoring track that stays enabled to detect audio even when main track is muted */
   private monitoringTrack?: MediaStreamTrack;
 
@@ -169,20 +171,29 @@ export class TrackAudioLevelMonitor {
       return;
     }
 
+    // Track state transitions
+    const trackEnabledStateChanged = this.track.enabled !== this.wasTrackEnabled;
+
     // Only detect when track is disabled (muted)
     if (!this.track.enabled) {
+      // Update timestamp only when transitioning from enabled to disabled (when user mutes)
+      if (trackEnabledStateChanged && this.wasTrackEnabled) {
+        this.lastSpeakingWhileMutedTime = Date.now();
+      }
       this.handleMutedSpeaking(audioLevel!);
     } else {
-      // Reset counters and timestamp when track is enabled
+      // Reset counters when track is enabled
       this.speakingWhileMutedCounter = 0;
       this.silentWhileMutedCounter = 0;
-      this.lastSpeakingWhileMutedTime = Date.now();
       // If was speaking while muted, emit stopped event
       if (this.isSpeakingWhileMuted) {
         this.isSpeakingWhileMuted = false;
         this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel: 0 });
       }
     }
+
+    // Update previous state
+    this.wasTrackEnabled = this.track.enabled;
   }
 
   private shouldDetectSpeakingWhileMuted(audioLevel?: number): boolean {
