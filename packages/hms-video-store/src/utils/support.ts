@@ -1,4 +1,5 @@
 import { type IResult, UAParser } from 'ua-parser-js';
+import HMSLogger from './logger';
 
 // Initialize the parser
 const uaParser = new UAParser();
@@ -31,6 +32,7 @@ if (isBrowser) {
           enhancedResult = initialResult;
         });
     } else {
+      HMSLogger.d('UAParser', 'Client Hints not supported, using standard UA parsing');
       // Synchronous result (non-browser or no clientHints support)
       enhancedResult = result as IResult;
     }
