@@ -709,6 +709,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.error.unsubscribe(this.handleError);
+    this.eventBus.speakingWhileMuted.unsubscribe(this.handleSpeakingWhileMuted);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
