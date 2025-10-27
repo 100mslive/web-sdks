@@ -41,6 +41,10 @@ export class TrackAudioLevelMonitor {
   private speakingWhileMutedThrottlePeriod = 3000;
   /** Tracks if user is currently speaking while muted */
   private isSpeakingWhileMuted = false;
+  /** Counter for consecutive silent ticks while previously speaking */
+  private silentWhileMutedCounter = 0;
+  /** Number of silent ticks (5 seconds) required before stopping detection */
+  private readonly SILENT_TICKS_THRESHOLD = 50; // 50 ticks * 100ms = 5 seconds
   /** Monitoring track that stays enabled to detect audio even when main track is muted */
   private monitoringTrack?: MediaStreamTrack;
 
@@ -169,8 +173,9 @@ export class TrackAudioLevelMonitor {
     if (!this.track.enabled) {
       this.handleMutedSpeaking(audioLevel!);
     } else {
-      // Reset counter and timestamp when track is enabled
+      // Reset counters and timestamp when track is enabled
       this.speakingWhileMutedCounter = 0;
+      this.silentWhileMutedCounter = 0;
       this.lastSpeakingWhileMutedTime = Date.now();
       // If was speaking while muted, emit stopped event
       if (this.isSpeakingWhileMuted) {
@@ -186,15 +191,24 @@ export class TrackAudioLevelMonitor {
 
   private handleMutedSpeaking(audioLevel: number) {
     if (audioLevel > SPEAKING_WHILE_MUTED_THRESHOLD) {
+      // User is speaking - reset silent counter
+      this.silentWhileMutedCounter = 0;
       this.speakingWhileMutedCounter++;
       this.maybeEmitSpeakingWhileMutedEvent(audioLevel);
     } else {
-      // Reset counter if audio level drops
+      // Audio level dropped
       this.speakingWhileMutedCounter = 0;
-      // If was speaking while muted, emit stopped event
+
+      // If was speaking while muted, count silent ticks before stopping
       if (this.isSpeakingWhileMuted) {
-        this.isSpeakingWhileMuted = false;
-        this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel: 0 });
+        this.silentWhileMutedCounter++;
+
+        // Only emit stopped event after 5 seconds of silence
+        if (this.silentWhileMutedCounter >= this.SILENT_TICKS_THRESHOLD) {
+          this.isSpeakingWhileMuted = false;
+          this.silentWhileMutedCounter = 0;
+          this.speakingWhileMutedEvent?.publish({ track: this.track, audioLevel: 0 });
+        }
       }
     }
   }
