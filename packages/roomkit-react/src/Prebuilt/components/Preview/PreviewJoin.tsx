@@ -108,8 +108,11 @@ const PreviewJoin = ({
     setPreviewPreference({
       name,
     });
-    join();
-  }, [join, name, setPreviewPreference]);
+    join().then(() => {
+      console.log('Joined from preview');
+      requestPermission();
+    });
+  }, [join, name, setPreviewPreference, requestPermission]);
   const { elements = {} } = useRoomLayoutPreviewScreen();
   const { preview_header: previewHeader = {}, virtual_background } = elements || {};
   const aspectRatio = useLocalTileAspectRatio();
@@ -119,7 +122,7 @@ const PreviewJoin = ({
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
-        preview().then(() => requestPermission());
+        preview();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

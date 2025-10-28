@@ -27,6 +27,7 @@ const PreviewForm = ({
 }) => {
   const formSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    onJoin();
   };
   const isMobile = useMedia(cssConfig.media.md);
   const { isHLSRunning, isRTMPRunning, isHLSRecordingOn, isBrowserRecordingOn } = useRecordingStreaming();
@@ -70,7 +71,7 @@ const PreviewForm = ({
         {cannotPublishAudio && cannotPublishVideo && !isMobile ? <PreviewSettings /> : null}
       </Flex>
 
-      <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
+      <Button type="submit" icon disabled={!name || !enableJoin}>
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
         {showGoLive ? <GoLiveIcon height={18} width={18} /> : null}
         {showGoLive ? joinForm.go_live_btn_label : joinForm.join_btn_label}
