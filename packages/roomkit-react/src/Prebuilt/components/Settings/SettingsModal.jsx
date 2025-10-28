@@ -237,7 +237,9 @@ const DesktopSettingModal = ({
                 borderBottomLeftRadius: '$4',
               }}
             >
-              <Text variant="h5">Settings </Text>
+              <Dialog.Title>
+                <Text variant="h5">Settings </Text>
+              </Dialog.Title>
               <Flex direction="column" css={{ mx: 0, overflowY: 'auto', pt: '$10' }}>
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
