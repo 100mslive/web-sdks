@@ -51,7 +51,7 @@
     "lodash.isequal": "^4.5.0",
     "reselect": "4.0.0",
     "sdp-transform": "^2.14.1",
-    "ua-parser-js": "^1.0.1",
+    "ua-parser-js": "^2.0.6",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0",
     "zustand": "3.5.7"
@@ -60,7 +60,7 @@
     "@types/dom-screen-wake-lock": "^1.0.1",
     "@types/lodash.isequal": "^4.5.8",
     "@types/sdp-transform": "^2.4.4",
-    "@types/ua-parser-js": "^0.7.36",
+    "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^8.3.0",
     "jest-canvas-mock": "^2.3.1",
     "jsdom-worker": "^0.3.0",
