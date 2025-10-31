@@ -22,15 +22,26 @@ describe('DeviceManager', () => {
 
   it('should select default output device when headphones with no mic connected', () => {
     deviceManager.setOutputDevice();
-    expect(deviceManager.outputDevice?.deviceId).toBe(deviceManager.audioOutput[0].deviceId);
+    // Should select MacBook Pro Speakers since it has matching groupId with the selected input device
+    const expectedDevice = deviceManager.audioOutput.find(
+      device => device.groupId === deviceManager.audioInput[1].groupId && device.deviceId !== 'default',
+    );
+    expect(deviceManager.outputDevice?.deviceId).toBe(expectedDevice?.deviceId);
   });
 
   it('should select default output when headphones with mic is connected', () => {
+    // Store the previous device id before changing devices
+    const previousDeviceId = deviceManager.outputDevice?.deviceId;
+
     deviceManager.audioInput = DevicesWiredHeadphonesWithMic.audioInput;
     deviceManager.audioOutput = DevicesWiredHeadphonesWithMic.audioOutput;
     expect(deviceManager.getNewAudioInputDevice()?.deviceId).toBe(deviceManager.audioInput[1].deviceId);
     deviceManager.setOutputDevice();
-    expect(deviceManager.outputDevice?.deviceId).toBe(deviceManager.audioOutput[0].deviceId);
+
+    // When no matching groupId is found, should keep the previous device if it still exists
+    // The previous device should still exist in the new audioOutput list
+    const previousDevice = deviceManager.audioOutput.find(device => device.deviceId === previousDeviceId);
+    expect(deviceManager.outputDevice?.deviceId).toBe(previousDevice?.deviceId);
   });
 
   it('should select no default output device when headphones with stereo is connected', () => {

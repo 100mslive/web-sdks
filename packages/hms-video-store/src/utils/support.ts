@@ -87,3 +87,5 @@ export const isIOS = () => parsedUserAgent.getOS().name?.toLowerCase() === 'ios'
 export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('safari');
 
 export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'firefox';
+
+export const isChromiumBased = parsedUserAgent.getEngine()?.name?.toLowerCase() === 'blink';
