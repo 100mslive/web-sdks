@@ -1,5 +1,6 @@
-import { Indicator, Root } from '@radix-ui/react-progress';
+import { Progress as ProgressPrimitive } from 'radix-ui';
 import { styled } from '../Theme';
+const { Indicator, Root } = ProgressPrimitive;
 
 const StyledIndicator = styled(Indicator, { h: '$4', backgroundColor: '$primary_default' });
 

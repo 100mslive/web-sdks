@@ -1,6 +1,6 @@
 import { ComponentProps, ReactNode, useEffect, useRef } from 'react';
-import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
+import { Dialog as DialogPrimitive } from 'radix-ui';
 import {
   CustomDialogContent,
   CustomDialogOverlay,
@@ -12,6 +12,7 @@ import {
   StyledDialogTrigger,
 } from './DialogContent';
 import { useDialogContainerSelector } from '../hooks/useDialogContainerSelector';
+const { Root } = DialogPrimitive;
 
 const StyledDialog = styled(Root, {});
 

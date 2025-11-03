@@ -1,6 +1,6 @@
 import { ComponentProps, FC } from 'react';
-import * as BaseSlider from '@radix-ui/react-slider';
 import { CSS } from '@stitches/react';
+import { Slider as BaseSlider } from 'radix-ui';
 import { styled } from '../Theme';
 import { Tooltip } from '../Tooltip';
 

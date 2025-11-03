@@ -1,4 +1,4 @@
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { Checkbox as CheckboxPrimitive } from 'radix-ui';
 import { styled } from '../Theme';
 
 const CheckboxRoot = styled(CheckboxPrimitive.Root, {

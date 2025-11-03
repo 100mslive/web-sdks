@@ -206,7 +206,7 @@ const DesktopSettingModal = ({
   showSetting,
   hideSettingByTabName,
   resetSelection,
-  children = <></>,
+  children = null,
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>

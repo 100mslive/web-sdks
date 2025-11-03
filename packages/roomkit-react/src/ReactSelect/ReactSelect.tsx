@@ -1,4 +1,4 @@
-import * as SelectPrimitive from '@radix-ui/react-select';
+import { Select as SelectPrimitive } from 'radix-ui';
 import { styled } from '../Theme';
 
 const StyledRoot = styled(SelectPrimitive.Root, {});

@@ -1,5 +1,5 @@
 import { ComponentProps, FC } from 'react';
-import * as BaseSwitch from '@radix-ui/react-switch';
+import { Switch as BaseSwitch } from 'radix-ui';
 import { styled } from '../Theme';
 
 const SwitchRoot = styled(BaseSwitch.Root, {

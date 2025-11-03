@@ -1,6 +1,7 @@
-import { Arrow, Close, Content, Popover as Root, Portal, Trigger } from '@radix-ui/react-popover';
+import { Popover as PopoverPrimitive } from 'radix-ui';
 import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
+const { Arrow, Close, Content, Root, Portal, Trigger } = PopoverPrimitive;
 
 const StyledContent = styled(Content, {
   padding: '$6',

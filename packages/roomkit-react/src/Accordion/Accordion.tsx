@@ -1,6 +1,6 @@
 import { FC, forwardRef, PropsWithChildren } from 'react';
-import * as BaseAccordion from '@radix-ui/react-accordion';
 import { CSS } from '@stitches/react';
+import { Accordion as BaseAccordion } from 'radix-ui';
 import { ChevronUpIcon } from '@100mslive/react-icons';
 import { Box } from '../Layout';
 import { styled } from '../Theme';

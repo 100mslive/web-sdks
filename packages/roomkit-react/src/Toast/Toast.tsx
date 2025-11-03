@@ -1,12 +1,12 @@
 import { ComponentProps, FC, ReactNode } from 'react';
-import type { ToastProps } from '@radix-ui/react-toast';
-import * as ToastPrimitives from '@radix-ui/react-toast';
+import { Toast as ToastPrimitives } from 'radix-ui';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
+type ToastProps = ComponentProps<typeof ToastPrimitives.Root>;
 
 const getToastVariant = (base: string) => {
   return {

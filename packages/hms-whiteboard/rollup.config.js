@@ -11,9 +11,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 const deps = Object.keys(pkg.dependencies || {});
 const peerDeps = Object.keys(pkg.peerDependencies || {});
 
+const external = [...deps, ...peerDeps];
+
 const config = {
   input: 'src/index.ts',
-  external: [...deps, ...peerDeps],
+  external,
   output: [
     { file: pkg.main, format: 'cjs', sourcemap: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
@@ -21,7 +23,9 @@ const config = {
   plugins: [
     commonjs(),
     css({ output: 'index.css' }),
-    esbuild({ format: 'esm' }),
+    esbuild({
+      format: 'esm',
+    }),
     resolve(),
     isProduction && terser(),
     typescript({ sourceMap: true }),

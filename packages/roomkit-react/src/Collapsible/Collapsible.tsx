@@ -1,6 +1,7 @@
-import { Content, Root, Trigger } from '@radix-ui/react-collapsible';
+import { Collapsible as CollapsiblePrimitive } from 'radix-ui';
 import { styled } from '../Theme';
 import { slideDown, slideUp } from '../utils';
+const { Content, Root, Trigger } = CollapsiblePrimitive;
 
 const CollapsibleRoot = styled(Root, {});
 

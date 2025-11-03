@@ -1,6 +1,6 @@
 import { ComponentProps, ElementRef, forwardRef } from 'react';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CSS, VariantProps } from '@stitches/react';
+import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Dialog } from '../Modal';
 import { styled } from '../Theme';
 import { sheetFadeIn, sheetFadeOut, sheetSlideIn, sheetSlideOut } from '../utils';

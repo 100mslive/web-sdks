@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren, ReactNode, useState } from 'react';
-import * as BaseTooltip from '@radix-ui/react-tooltip';
+import { Tooltip as BaseTooltip } from 'radix-ui';
 import { CSS, styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
 

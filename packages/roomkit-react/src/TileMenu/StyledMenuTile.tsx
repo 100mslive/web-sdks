@@ -1,4 +1,4 @@
-import * as Popover from '@radix-ui/react-popover';
+import { Popover } from 'radix-ui';
 import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
