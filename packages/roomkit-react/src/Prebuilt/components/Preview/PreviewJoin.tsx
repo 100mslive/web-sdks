@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
+import type { DefaultPreviewScreen_Elements } from '@100mslive/types-prebuilt';
 import {
   HMSRoomState,
   selectAppData,
@@ -116,6 +117,7 @@ const PreviewJoin = ({
   const { elements = {} } = useRoomLayoutPreviewScreen();
   const { preview_header: previewHeader = {}, virtual_background } = elements || {};
   const aspectRatio = useLocalTileAspectRatio();
+  const customOptions = elements?.settings?.customOptions;
 
   useEffect(() => {
     if (authToken) {
@@ -163,7 +165,11 @@ const PreviewJoin = ({
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
         <Box css={{ w: '100%', maxWidth: `${Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
-          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
+          <PreviewControls
+            hideSettings={!toggleVideo && !toggleAudio}
+            vbEnabled={!!virtual_background}
+            customOptions={customOptions}
+          />
           <PreviewForm
             name={name}
             disabled={!!initialName}
@@ -257,7 +263,14 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   );
 };
 
-export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
+export const PreviewControls = ({
+  hideSettings,
+  vbEnabled,
+  customOptions,
+}: DefaultPreviewScreen_Elements['settings'] & {
+  hideSettings: boolean;
+  vbEnabled: boolean;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
   const isVBEnabledForUser = useHMSStore(selectIsVBEnabled);
   return (
@@ -275,6 +288,11 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
       <Flex align="center" gap="1">
         {isMobile && <NoiseCancellation iconOnly />}
         {!hideSettings ? <PreviewSettings /> : null}
+        {customOptions?.map(({ label, icon, onClick }) => (
+          <IconButton key={label} css={{ flexShrink: 0 }} onClick={onClick} aria-label={label} title={label}>
+            {icon}
+          </IconButton>
+        ))}
       </Flex>
     </Flex>
   );

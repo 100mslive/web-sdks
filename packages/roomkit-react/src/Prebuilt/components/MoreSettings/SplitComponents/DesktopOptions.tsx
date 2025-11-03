@@ -91,6 +91,7 @@ export const DesktopOptions = ({
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   // Hide if pip chat is already open
   const showPipChatOption = !!elements?.chat && isSupported && !pipWindow;
+  const customOptions = elements?.settings?.customOptions;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -243,6 +244,14 @@ export const DesktopOptions = ({
                 </Text>
               </Dropdown.Item>
             ))}
+          {customOptions?.map(({ label, icon, onClick }) => (
+            <Dropdown.Item key={label} onClick={onClick}>
+              {icon}
+              <Text variant="sm" css={{ ml: '$4' }}>
+                {label}
+              </Text>
+            </Dropdown.Item>
+          ))}
         </Dropdown.Content>
       </Dropdown.Root>
       {openModals.has(MODALS.BULK_ROLE_CHANGE) && (

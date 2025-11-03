@@ -115,6 +115,7 @@ export const MwebOptions = ({
   const { startRecording, isRecordingLoading } = useRecordingHandler();
   const isTranscriptionAllowed = useHMSStore(selectIsTranscriptionAllowedByMode(HMSTranscriptionMode.CAPTION));
   const isTranscriptionEnabled = useHMSStore(selectIsTranscriptionEnabled);
+  const customOptions = elements?.settings?.customOptions;
 
   const [isCaptionEnabled] = useSetIsCaptionEnabled();
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -312,7 +313,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {title || description ? (
+            {(title || description) && !customOptions?.length ? (
               <ActionTile.Root
                 onClick={() => {
                   setOpenOptionsSheet(false);
@@ -323,6 +324,18 @@ export const MwebOptions = ({
                 <ActionTile.Title>About Session</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
+            {customOptions?.map(({ label, icon, onClick }) => (
+              <ActionTile.Root
+                key={label}
+                onClick={() => {
+                  onClick();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                {icon}
+                <ActionTile.Title>{label}</ActionTile.Title>
+              </ActionTile.Root>
+            ))}
           </Box>
         </Sheet.Content>
       </Sheet.Root>
