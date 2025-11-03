@@ -12,8 +12,6 @@ import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';
-// eslint-disable-next-line import/no-unresolved
-import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);
