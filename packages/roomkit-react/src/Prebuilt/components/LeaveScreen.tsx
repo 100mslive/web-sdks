@@ -1,4 +1,3 @@
-import React from 'react';
 import { ExitIcon } from '@100mslive/react-icons';
 import { Feedback } from './EndCallFeedback/Feedback';
 // @ts-ignore: No implicit Any

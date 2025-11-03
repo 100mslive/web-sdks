@@ -48,7 +48,7 @@ import { HMSStats } from './webrtc-stats';
  * It talks to our 100ms backend and handles error reconnections, state managements
  * and lots of other things so you don't have to. You can use this gateway with any
  * sort of UI to make connecting to our backend easier.
- * In case you use React, we also provide a HMSProvider class with very powerful hooks
+ * In case you use  we also provide a HMSProvider class with very powerful hooks
  * and out of box components which you can use to set up your website in minutes. Our
  * components have in built integration with this interface, and you won't have to worry
  * about passing props if you use them.

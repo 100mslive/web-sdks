@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { createContext, useContext } from 'react';
 
 type TileContextType = {
   enableSpotlightingPeer: boolean;
@@ -10,7 +10,7 @@ type TileContextType = {
   hideMetadataOnTile?: boolean;
 };
 
-export const VideoTileContext = React.createContext<TileContextType>({
+export const VideoTileContext = createContext<TileContextType>({
   enableSpotlightingPeer: true,
   hideParticipantNameOnTile: false,
   roundedVideoTile: true,

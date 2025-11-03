@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { HMSHLSLayer } from '@100mslive/hls-player';
 import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';

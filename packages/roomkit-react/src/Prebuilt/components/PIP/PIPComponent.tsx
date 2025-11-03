@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { selectPeers, selectTracksMap, useHMSActions, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';

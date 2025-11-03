@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ComponentType, ReactNode, SVGProps, useState } from 'react';
 import { ConnectivityCheckResult, ConnectivityState, DiagnosticsRTCStats } from '@100mslive/react-sdk';
 import { CheckCircleIcon, CrossCircleIcon, EyeCloseIcon, EyeOpenIcon, LinkIcon } from '@100mslive/react-icons';
 import { TestContainer, TestFooter } from './components';
@@ -33,7 +33,7 @@ export const ConnectivityTestStepResult = ({
   title: string;
   status?: string;
   success?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const [hideDetails, setHideDetails] = useState(true);
 
@@ -89,7 +89,7 @@ const DetailedInfo = ({
 }: {
   title: string;
   value: string;
-  Icon?: (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element;
+  Icon?: ComponentType<SVGProps<SVGSVGElement>>;
 }) => {
   return (
     <Box css={{ flex: '50%', mt: '$6' }}>
@@ -118,12 +118,12 @@ const MediaServerResult = ({ result }: { result?: ConnectivityCheckResult['media
         <DetailedInfo
           title="Media Captured"
           value={result?.stats?.audio.bytesSent ? 'Yes' : 'No'}
-          Icon={result?.stats?.audio.bytesSent ? CheckCircleIcon : CrossCircleIcon}
+          Icon={(result?.stats?.audio.bytesSent ? CheckCircleIcon : CrossCircleIcon) as any}
         />
         <DetailedInfo
           title="Media Published"
           value={result?.stats?.audio.bitrateSent ? 'Yes' : 'No'}
-          Icon={result?.stats?.audio.bytesSent ? CheckCircleIcon : CrossCircleIcon}
+          Icon={(result?.stats?.audio.bytesSent ? CheckCircleIcon : CrossCircleIcon) as any}
         />
         {result?.connectionQualityScore ? (
           <DetailedInfo
@@ -143,9 +143,9 @@ const SignallingResult = ({ result }: { result?: ConnectivityCheckResult['signal
         <DetailedInfo
           title="Signalling Gateway"
           value={result?.isConnected ? 'Reachable' : 'Unreachable'}
-          Icon={result?.isConnected ? CheckCircleIcon : CrossCircleIcon}
+          Icon={(result?.isConnected ? CheckCircleIcon : CrossCircleIcon) as any}
         />
-        <DetailedInfo title="Websocket URL" value={result?.websocketUrl || 'N/A'} Icon={LinkIcon} />
+        <DetailedInfo title="Websocket URL" value={result?.websocketUrl || 'N/A'} Icon={LinkIcon as any} />
       </Flex>
     </ConnectivityTestStepResult>
   );

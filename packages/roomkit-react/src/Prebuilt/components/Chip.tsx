@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { CSS } from '../../Theme';
@@ -12,7 +12,7 @@ const Chip = ({
   onClick,
   css = {},
 }: {
-  icon?: React.JSX.Element;
+  icon?: ReactNode;
   content: string;
   backgroundColor?: string;
   textColor?: string;

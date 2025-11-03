@@ -1,4 +1,4 @@
-import React from 'react';
+import { ComponentProps, FC } from 'react';
 import { VariantProps } from '@stitches/react';
 import { PersonIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
@@ -42,11 +42,11 @@ export const StyledAvatar = styled('div', {
 });
 
 type Props = VariantProps<typeof StyledAvatar> &
-  React.ComponentProps<typeof StyledAvatar> & {
+  ComponentProps<typeof StyledAvatar> & {
     name: string;
   };
 
-export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
+export const Avatar: FC<Props> = ({ name, css, ...props }) => {
   const info = getAvatarBg(name);
   let { color } = info;
   if (!name) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useScreenShare } from './useScreenShare';
 import usePrevious, { isChromiumBased, pdfIframeURL } from '../utils/commons';
 
@@ -24,7 +24,7 @@ export interface usePDFShareResult {
   /**
    * Reference to attach to the iframe that is responsible for rendering the PDF.
    */
-  iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  iframeRef: RefObject<HTMLIFrameElement | null>;
 }
 
 /**

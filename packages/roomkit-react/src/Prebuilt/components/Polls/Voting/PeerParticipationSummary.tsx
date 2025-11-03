@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Box } from '../../../../Layout';
 import { Text } from '../../../../Text';

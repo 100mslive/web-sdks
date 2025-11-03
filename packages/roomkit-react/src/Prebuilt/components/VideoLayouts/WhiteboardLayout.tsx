@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useMedia } from 'react-use';
 import { Whiteboard } from '@100mslive/hms-whiteboard';
 import { selectPeerByCondition, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
@@ -12,8 +12,6 @@ import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';
-// eslint-disable-next-line import/no-unresolved
-import '@100mslive/hms-whiteboard/index.css';
 
 const WhiteboardEmbed = () => {
   const isMobile = useMedia(cssConfig.media.md);

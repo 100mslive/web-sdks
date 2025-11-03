@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { selectDominantSpeaker, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
 import { Flex, styled, Text, textEllipsis } from '../../../';

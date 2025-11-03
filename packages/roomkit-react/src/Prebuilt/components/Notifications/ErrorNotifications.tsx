@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { GroupIcon } from '@100mslive/react-icons';
 import { Box } from '../../../Layout';

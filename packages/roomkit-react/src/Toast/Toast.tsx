@@ -1,12 +1,12 @@
-import React, { ComponentProps } from 'react';
-import type { ToastProps } from '@radix-ui/react-toast';
-import * as ToastPrimitives from '@radix-ui/react-toast';
+import { ComponentProps, FC, ReactNode } from 'react';
+import { Toast as ToastPrimitives } from 'radix-ui';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
+type ToastProps = ComponentProps<typeof ToastPrimitives.Root>;
 
 const getToastVariant = (base: string) => {
   return {
@@ -113,12 +113,12 @@ interface HMSToastProps extends ToastProps {
   title: string;
   description?: string;
   isClosable?: boolean;
-  icon?: React.ReactNode;
-  action?: React.ReactNode;
+  icon?: ReactNode;
+  action?: ReactNode;
   inlineAction?: boolean;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({
+const HMSToast: FC<HMSToastProps> = ({
   title,
   description,
   isClosable = true,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { Children, ReactNode, useState } from 'react';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -33,9 +33,9 @@ const optionTextCSS = {
   whiteSpace: 'nowrap',
 };
 
-const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
+const DropdownWrapper = ({ children }: { children: ReactNode }) => {
   const [openOptions, setOpenOptions] = useState(false);
-  if (React.Children.toArray(children).length === 0) {
+  if (Children.toArray(children).length === 0) {
     return null;
   }
   return (

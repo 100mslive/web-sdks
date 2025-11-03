@@ -1,4 +1,4 @@
-import React, { ComponentPropsWithRef, PropsWithChildren } from 'react';
+import { ComponentPropsWithRef, forwardRef, PropsWithChildren } from 'react';
 import { Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { styled } from '../Theme';
@@ -181,7 +181,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export const Button = React.forwardRef<
+export const Button = forwardRef<
   HTMLButtonElement,
   PropsWithChildren<{ loading?: boolean } & ComponentPropsWithRef<typeof StyledButton>>
 >(({ children, loading = false, icon, ...buttonProps }, ref) => {

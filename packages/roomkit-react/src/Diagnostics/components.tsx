@@ -1,23 +1,15 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
 import { DiagnosticsStep, useDiagnostics } from './DiagnosticsContext';
 
-export const TestContainer = ({ css, children }: { css?: CSS; children: React.ReactNode }) => {
+export const TestContainer = ({ css, children }: { css?: CSS; children: ReactNode }) => {
   return <Box css={{ p: '$10', ...css }}>{children}</Box>;
 };
 
-export const TestFooter = ({
-  error,
-  ctaText,
-  children,
-}: {
-  ctaText?: string;
-  error?: Error;
-  children?: React.ReactNode;
-}) => {
+export const TestFooter = ({ error, ctaText, children }: { ctaText?: string; error?: Error; children?: ReactNode }) => {
   const { hmsDiagnostics, activeStepIndex: activeStep, setActiveStep } = useDiagnostics();
 
   const onNextStep = () => {

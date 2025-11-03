@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMedia } from 'react-use';
 import { CrossIcon, UserMusicIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';

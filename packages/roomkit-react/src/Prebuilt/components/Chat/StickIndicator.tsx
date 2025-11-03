@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Flex } from '../../../Layout';
 
 export const StickIndicator = ({ total, index }: { total: number; index: number }) => {

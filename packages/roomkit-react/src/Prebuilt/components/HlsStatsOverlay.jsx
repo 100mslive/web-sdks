@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { CrossIcon } from '@100mslive/react-icons';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';

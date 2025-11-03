@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import  { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState, version } from 'react';
 import create from 'zustand';
 import {
   HMSActions,
@@ -25,6 +25,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
    */
   isHMSStatsOn?: boolean;
   leaveOnUnload?: boolean;
+  children?: ReactNode;
 }
 
 /**
@@ -40,7 +41,7 @@ const HMSContext = createContext<HMSContextProviderProps | null>(null);
  * @constructor
  */
 // eslint-disable-next-line complexity
-export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Record<string, any> }>({
+export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Record<string, unknown> }>({
   children,
   actions,
   store,
@@ -99,12 +100,14 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
       }
     }
 
-    // @ts-ignore
-    providerProps.actions.setFrameworkInfo({
-      type: 'react-web',
-      version: React.version,
-      sdkVersion: process.env.REACT_SDK_VERSION,
-    });
+    // setFrameworkInfo is an internal function not exposed via interface intentionally
+    if ('setFrameworkInfo' in providerProps.actions && typeof providerProps.actions.setFrameworkInfo === 'function') {
+      providerProps.actions.setFrameworkInfo({
+        type: 'react-web',
+        version: version,
+        sdkVersion: process.env.REACT_SDK_VERSION,
+      });
+    }
 
     return providerProps;
   }, [actions, store, notifications, stats, isHMSStatsOn]);
@@ -117,11 +120,10 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
         window.removeEventListener('unload', unloadCallback);
       };
     }
-
-    return () => {};
+    return undefined;
   }, [leaveOnUnload, providerProps]);
 
-  return React.createElement(HMSContext.Provider, { value: providerProps }, children);
+  return <HMSContext.Provider value={providerProps}>{children}</HMSContext.Provider>;
 };
 
 /**

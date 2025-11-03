@@ -1,4 +1,3 @@
-import React from 'react';
 import { HandIcon, HandRaiseSlashedIcon } from '@100mslive/react-icons';
 import { CSS } from '../../Theme';
 import { Tooltip } from '../../Tooltip';

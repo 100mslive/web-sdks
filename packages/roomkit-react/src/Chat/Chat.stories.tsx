@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { selectHMSMessages, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import ChatDocs from './Chat.mdx';
 
@@ -18,7 +18,7 @@ const ChatExample = () => {
   const chats = useHMSStore(selectHMSMessages);
   const actions = useHMSActions();
   const [input, setInput] = useState('');
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = (e: FormEvent) => {
     e.preventDefault();
     actions.sendBroadcastMessage(input);
     setInput('');

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Editor, Tldraw } from '@tldraw/tldraw';
+import { ComponentType, useState } from 'react';
+import { Editor, Tldraw, TldrawProps } from '@tldraw/tldraw';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
 import './index.css';
+
+// Cast Tldraw to ComponentType for React 19 compatibility
+const TldrawComponent = Tldraw as unknown as ComponentType<TldrawProps>;
 
 export interface WhiteboardProps {
   endpoint?: string;
@@ -45,7 +48,7 @@ function CollaborativeEditor({
   }
 
   return (
-    <Tldraw
+    <TldrawComponent
       className={transparentCanvas ? 'transparent-canvas' : ''}
       autoFocus
       store={store}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
@@ -74,7 +74,7 @@ const initialAppData = {
   [APP_DATA.noiseCancellation]: false,
 };
 
-export const AppData = React.memo(() => {
+export const AppData = memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const appData = useHMSStore(selectFullAppData);
@@ -110,7 +110,7 @@ export const AppData = React.memo(() => {
     hmsActions.setFrameworkInfo({
       type: 'react-web',
       isPrebuilt: true,
-      version: React.version,
+      version: '0.3.39',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hmsActions]);

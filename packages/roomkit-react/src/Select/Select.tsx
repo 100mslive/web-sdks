@@ -1,4 +1,3 @@
-import React from 'react';
 import { ChevronDownIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 

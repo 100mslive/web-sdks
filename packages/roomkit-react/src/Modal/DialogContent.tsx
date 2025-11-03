@@ -1,5 +1,5 @@
-import React, { ComponentProps } from 'react';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { ComponentProps } from 'react';
+import { Dialog as DialogPrimitive } from 'radix-ui';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { styled } from '../Theme';

@@ -1,4 +1,4 @@
-import React from 'react';
+import { ComponentProps, ElementType, Fragment } from 'react';
 import * as icons from '@100mslive/react-icons';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
@@ -27,15 +27,15 @@ const LinkComponent = styled('a', {
   },
 });
 
-export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
-  as?: React.ElementType;
+export interface LinkProps extends ComponentProps<typeof LinkComponent> {
+  as?: ElementType;
   iconSide?: 'left' | 'right' | 'none';
   icon?: keyof typeof icons;
   color?: 'highEmp' | 'primary';
 }
 
 export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...rest }: LinkProps) => {
-  const Icon = icon ? icons[icon] : React.Fragment;
+  const Icon = icon ? icons[icon] : Fragment;
   const renderedIcon = icon ? (
     <Flex as="span">
       <Icon height={13.33} width={13.33} />{' '}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 

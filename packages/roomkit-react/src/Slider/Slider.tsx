@@ -1,6 +1,6 @@
-import React from 'react';
-import * as BaseSlider from '@radix-ui/react-slider';
+import { ComponentProps, FC } from 'react';
 import { CSS } from '@stitches/react';
+import { Slider as BaseSlider } from 'radix-ui';
 import { styled } from '../Theme';
 import { Tooltip } from '../Tooltip';
 
@@ -45,16 +45,12 @@ const Thumb = styled(BaseSlider.Thumb, {
   '&:focus': { boxShadow: 'none' },
 });
 
-type SliderProps = React.ComponentProps<typeof Root> & {
+type SliderProps = ComponentProps<typeof Root> & {
   thumbStyles?: CSS;
   showTooltip?: boolean;
 };
 
-export const Slider: React.FC<SliderProps & { showTooltip?: boolean }> = ({
-  showTooltip = true,
-  thumbStyles,
-  ...props
-}) => (
+export const Slider: FC<SliderProps & { showTooltip?: boolean }> = ({ showTooltip = true, thumbStyles, ...props }) => (
   <Root {...props}>
     <Track>
       <Range />

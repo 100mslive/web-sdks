@@ -1,4 +1,3 @@
-import React from 'react';
 import { Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';

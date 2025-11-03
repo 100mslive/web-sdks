@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getDuration, getPercentage } from './utils';

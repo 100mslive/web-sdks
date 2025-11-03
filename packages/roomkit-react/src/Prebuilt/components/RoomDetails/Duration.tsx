@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { getFormattedTime } from '../Polls/common/utils';

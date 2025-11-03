@@ -1,4 +1,3 @@
-import React from 'react';
 import { Flex, Text } from '../../../../';
 
 export const VoteCount = ({ voteCount }: { voteCount: number }) => {

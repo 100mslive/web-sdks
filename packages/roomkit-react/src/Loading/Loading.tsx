@@ -1,4 +1,4 @@
-import React from 'react';
+import { SVGProps } from 'react';
 
 type Props = {
   /**
@@ -11,7 +11,7 @@ type Props = {
   color?: string;
 };
 
-type LoadingProps = Props & React.SVGProps<SVGSVGElement>;
+type LoadingProps = Props & SVGProps<SVGSVGElement>;
 
 export const Loading = ({ size = 24, color = 'white', ...props }: LoadingProps) => (
   <svg width={size} height={size} viewBox="0 0 50 50" fill={color} xmlns="http://www.w3.org/2000/svg" {...props}>

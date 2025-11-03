@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { PIPContext } from './context';
 
 type PIPProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const PIPProvider = ({ children }: PIPProviderProps) => {

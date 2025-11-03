@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useState } from 'react';
-import * as BaseTooltip from '@radix-ui/react-tooltip';
+import { FC, PropsWithChildren, ReactNode, useState } from 'react';
+import { Tooltip as BaseTooltip } from 'radix-ui';
 import { CSS, styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
 
@@ -40,9 +40,9 @@ const TooltipRoot = BaseTooltip.Root;
 export type alignTooltip = 'end' | 'center' | 'start' | undefined;
 export type sideTooltip = 'bottom' | 'left' | 'right' | 'top' | undefined;
 
-export const Tooltip: React.FC<
+export const Tooltip: FC<
   PropsWithChildren<{
-    title: React.ReactNode | string;
+    title: ReactNode | string;
     outlined?: boolean;
     side?: sideTooltip;
     align?: alignTooltip;

@@ -16,7 +16,7 @@ export const throwErrorHandler: hooksErrHandler = (err: Error) => {
 };
 
 export default function usePrevious<T>(state: T): T | undefined {
-  const ref = useRef<T>();
+  const ref = useRef<T>(undefined);
 
   useEffect(() => {
     ref.current = state;

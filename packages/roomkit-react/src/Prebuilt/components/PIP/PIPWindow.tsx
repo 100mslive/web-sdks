@@ -1,9 +1,9 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 type PIPWindowProps = {
   pipWindow: Window;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const PIPWindow = ({ pipWindow, children }: PIPWindowProps) => {

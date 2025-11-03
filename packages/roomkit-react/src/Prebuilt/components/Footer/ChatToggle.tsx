@@ -1,4 +1,3 @@
-import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon } from '@100mslive/react-icons';
 import { Box, Flex, Text, Tooltip } from '../../..';

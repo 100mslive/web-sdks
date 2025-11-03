@@ -1,4 +1,3 @@
-import React from 'react';
 // @ts-ignore: No implicit Any
 import { PollsQuizMenu } from './CreatePollQuiz/PollsQuizMenu';
 // @ts-ignore: No implicit Any

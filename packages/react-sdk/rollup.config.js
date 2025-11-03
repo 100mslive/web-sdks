@@ -13,16 +13,22 @@ const peerDeps = Object.keys(pkg.peerDependencies || {});
 
 const config = {
   input: 'src/index.ts',
-  external: [...deps, ...peerDeps],
+  external: [...deps, ...peerDeps, 'react/jsx-runtime'],
   output: [
     { file: pkg.main, format: 'cjs', sourcemap: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
   plugins: [
     replace({ preventAssignment: true, 'process.env.REACT_SDK_VERSION': JSON.stringify(pkg.version) }),
-    commonjs(),
-    esbuild({ format: 'esm' }),
     resolve(),
+    esbuild({
+      format: 'esm',
+      jsx: 'automatic',
+      jsxImportSource: 'react',
+    }),
+    commonjs({
+      ignore: ['react/jsx-runtime'],
+    }),
     isProduction && terser(),
     typescript({ sourceMap: true }),
   ],

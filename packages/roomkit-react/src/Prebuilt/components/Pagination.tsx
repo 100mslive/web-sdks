@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { SyntheticEvent, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '../../Pagination';
 
@@ -13,11 +13,11 @@ export const Pagination = ({
 }) => {
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
-  const nextPage = (e: React.SyntheticEvent) => {
+  const nextPage = (e: SyntheticEvent) => {
     e.stopPropagation();
     onPageChange(Math.min(page + 1, numPages - 1));
   };
-  const prevPage = (e: React.SyntheticEvent) => {
+  const prevPage = (e: SyntheticEvent) => {
     e.stopPropagation();
     onPageChange(Math.max(page - 1, 0));
   };

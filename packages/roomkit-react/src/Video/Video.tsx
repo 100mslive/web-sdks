@@ -1,4 +1,4 @@
-import React from 'react';
+import { ComponentProps, FC } from 'react';
 import type { VariantProps } from '@stitches/react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
 import { styled } from '../Theme';
@@ -41,7 +41,7 @@ export const StyledVideo = styled('video', {
   },
 });
 
-type StyledProps = VariantProps<typeof StyledVideo> & React.ComponentProps<typeof StyledVideo>;
+type StyledProps = VariantProps<typeof StyledVideo> & ComponentProps<typeof StyledVideo>;
 
 interface Props {
   /**
@@ -55,7 +55,7 @@ interface Props {
   attach?: boolean;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
+export const Video: FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
   const { videoRef } = useVideo({ trackId, attach });
   return <StyledVideo ref={videoRef} {...props} />;
 };

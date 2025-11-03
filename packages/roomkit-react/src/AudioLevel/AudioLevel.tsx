@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { selectTrackAudioByID, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../Layout';
 import { keyframes } from '../Theme';

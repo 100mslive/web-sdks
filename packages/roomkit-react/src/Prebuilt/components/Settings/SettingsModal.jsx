@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
@@ -35,7 +35,7 @@ const settingsList = [
   },
 ];
 
-const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
+const SettingsModal = ({ open, onOpenChange, screenType, children }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
 
@@ -206,7 +206,7 @@ const DesktopSettingModal = ({
   showSetting,
   hideSettingByTabName,
   resetSelection,
-  children = <></>,
+  children = null,
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -237,7 +237,9 @@ const DesktopSettingModal = ({
                 borderBottomLeftRadius: '$4',
               }}
             >
-              <Text variant="h5">Settings </Text>
+              <Dialog.Title>
+                <Text variant="h5">Settings </Text>
+              </Dialog.Title>
               <Flex direction="column" css={{ mx: 0, overflowY: 'auto', pt: '$10' }}>
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSPeer, selectAvailableRoleNames, selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
@@ -45,7 +45,7 @@ const RoleChangeContent = ({
   const [selectedRole, setRole] = useState(roles.filter(role => role !== peer?.roleName)?.[0] || peer?.roleName);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement | undefined>();
+  const triggerRef = useRef<HTMLButtonElement | undefined>(undefined);
 
   return (
     <>

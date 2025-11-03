@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ComponentStory } from '@storybook/react';
 import { Button } from '../Button';
 import { Flex } from '../Layout';

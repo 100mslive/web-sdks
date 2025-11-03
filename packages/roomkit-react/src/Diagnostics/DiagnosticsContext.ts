@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { HMSDiagnosticsInterface } from '@100mslive/react-sdk';
 
 export enum DiagnosticsStep {
@@ -21,10 +21,10 @@ export interface DiagnosticsStepInfo {
   isCompleted?: boolean;
 }
 
-export const DiagnosticsContext = React.createContext<{
+export const DiagnosticsContext = createContext<{
   hmsDiagnostics?: HMSDiagnosticsInterface;
   activeStepIndex: DiagnosticsStep;
-  setActiveStep: React.Dispatch<React.SetStateAction<DiagnosticsStep>>;
+  setActiveStep: Dispatch<SetStateAction<DiagnosticsStep>>;
   steps: Record<DiagnosticsStep, DiagnosticsStepInfo>;
   updateStep: (step: DiagnosticsStep, value: Omit<DiagnosticsStepInfo, 'name'>) => void;
 }>({

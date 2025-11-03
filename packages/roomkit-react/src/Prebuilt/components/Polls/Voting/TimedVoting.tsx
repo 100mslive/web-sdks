@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { HMSPoll } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';

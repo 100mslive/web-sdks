@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
 import {
   DeviceType,
@@ -84,7 +84,7 @@ export const Options = ({
   );
 };
 
-const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: React.ReactNode }) => {
+const OptionLabel = ({ children, icon }: { children: ReactNode; icon: ReactNode }) => {
   return (
     <Dropdown.Label
       css={{

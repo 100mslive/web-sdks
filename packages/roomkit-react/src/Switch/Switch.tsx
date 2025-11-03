@@ -1,5 +1,5 @@
-import React from 'react';
-import * as BaseSwitch from '@radix-ui/react-switch';
+import { ComponentProps, FC } from 'react';
+import { Switch as BaseSwitch } from 'radix-ui';
 import { styled } from '../Theme';
 
 const SwitchRoot = styled(BaseSwitch.Root, {
@@ -41,9 +41,9 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   },
 });
 
-type SwitchProps = React.ComponentProps<typeof SwitchRoot>;
+type SwitchProps = ComponentProps<typeof SwitchRoot>;
 
-export const Switch: React.FC<SwitchProps> = props => (
+export const Switch: FC<SwitchProps> = props => (
   <SwitchRoot {...props}>
     <SwitchThumb />
   </SwitchRoot>

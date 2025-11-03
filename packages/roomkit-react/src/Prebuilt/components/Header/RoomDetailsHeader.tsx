@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMedia } from 'react-use';
 import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';

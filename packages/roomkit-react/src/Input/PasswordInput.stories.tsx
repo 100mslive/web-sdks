@@ -14,8 +14,8 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof PasswordInput.Root> = args => {
-  const [text, setText] = React.useState('');
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [text, setText] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   return (
     <Box css={{ w: '240px' }}>

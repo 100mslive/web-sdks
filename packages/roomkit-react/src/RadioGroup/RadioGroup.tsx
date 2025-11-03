@@ -1,4 +1,4 @@
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui';
 import { styled } from '../Theme';
 
 const RadioGroupRoot = styled(RadioGroupPrimitive.Root, {

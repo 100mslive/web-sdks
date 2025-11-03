@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { selectAppData, selectPeers, selectPeerScreenSharing, useEmbedShare, useHMSStore } from '@100mslive/react-sdk';
 import { SecondaryTiles } from '../components/SecondaryTiles';
 import { ToastManager } from '../components/Toast/ToastManager';

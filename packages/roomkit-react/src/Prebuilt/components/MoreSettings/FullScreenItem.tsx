@@ -1,4 +1,3 @@
-import React from 'react';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { Dropdown, Text } from '../../..';
 import { useFullscreen } from '../hooks/useFullscreen';

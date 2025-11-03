@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
@@ -39,7 +39,7 @@ const ParticipantCount = ({ count }: { count: number }) => {
   );
 };
 
-export const SidePaneTabs = React.memo<{
+export const SidePaneTabs = memo<{
   active: 'Participants | Chat';
   hideTab?: boolean;
 }>(({ active = SIDE_PANE_OPTIONS.CHAT, hideTab = false }) => {

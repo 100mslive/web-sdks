@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { parsedUserAgent } from '@100mslive/react-sdk';
 import { TestContainer, TestFooter } from './components';
 import { Box, Flex } from '../Layout';

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
 
 export const HMSVideo = forwardRef(({ children, isFullScreen, ...props }, videoRef) => {

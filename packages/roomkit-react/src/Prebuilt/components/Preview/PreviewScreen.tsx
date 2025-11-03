@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSearchParam } from 'react-use';
 import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';

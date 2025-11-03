@@ -1,4 +1,3 @@
-import React from 'react';
 import { HMSPeerID, selectLocalPeerID, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { PeopleRemoveIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any

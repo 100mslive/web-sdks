@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   HMSPollState,
   selectLocalPeerRoleName,
@@ -42,7 +42,7 @@ function InteractionSelectionCard({
   onClick,
 }: {
   title: string;
-  icon: React.JSX.Element;
+  icon: ReactNode;
   active: boolean;
   onClick: () => void;
 }) {

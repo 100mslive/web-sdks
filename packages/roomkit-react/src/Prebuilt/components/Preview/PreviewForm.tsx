@@ -1,4 +1,4 @@
-import React from 'react';
+import { SyntheticEvent } from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
@@ -25,7 +25,7 @@ const PreviewForm = ({
   cannotPublishVideo: boolean;
   cannotPublishAudio: boolean;
 }) => {
-  const formSubmit = (e: React.SyntheticEvent) => {
+  const formSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
   };
   const isMobile = useMedia(cssConfig.media.md);

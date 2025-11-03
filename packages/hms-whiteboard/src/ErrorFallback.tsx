@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useValue } from '@tldraw/state';
 import { Editor, hardResetEditor } from '@tldraw/tldraw';
 import classNames from 'classnames';

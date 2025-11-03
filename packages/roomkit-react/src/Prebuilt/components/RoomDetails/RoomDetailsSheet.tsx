@@ -1,4 +1,3 @@
-import React from 'react';
 import { CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import { Text } from '../../../Text';
 import { useHMSPlayerContext } from './PlayerContext';

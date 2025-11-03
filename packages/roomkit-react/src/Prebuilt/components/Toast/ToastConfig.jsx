@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import {
   ChatUnreadIcon,
@@ -13,7 +13,7 @@ import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-const ChatAction = React.forwardRef((_, ref) => {
+const ChatAction = forwardRef((_, ref) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
@@ -28,7 +28,7 @@ const ChatAction = React.forwardRef((_, ref) => {
   );
 });
 
-const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true }, ref) => {
+const HandRaiseAction = forwardRef(({ id = '', isSingleHandRaise = true }, ref) => {
   const hmsActions = useHMSActions();
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);

@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
@@ -8,7 +8,7 @@ export const MwebChatOption = ({
   onClick,
   color = '$on_surface_high',
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   text: string;
   onClick: () => void | Promise<void>;
   color?: string;

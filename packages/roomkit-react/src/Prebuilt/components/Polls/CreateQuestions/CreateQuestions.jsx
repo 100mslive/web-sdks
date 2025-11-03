@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { selectPollByID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';

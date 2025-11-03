@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useScreenShare } from './useScreenShare';
 import usePrevious, { isChromiumBased } from '../utils/commons';
 
@@ -25,7 +25,7 @@ export interface useEmbedShareResult {
   /**
    * Reference to attach to the iframe that is responsible for rendering the URL passed.
    */
-  iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  iframeRef: RefObject<HTMLIFrameElement | null>;
 }
 
 /**

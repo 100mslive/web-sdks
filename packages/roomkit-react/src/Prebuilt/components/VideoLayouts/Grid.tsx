@@ -1,11 +1,11 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
-export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>(
+export const Grid = forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>(
   ({ tiles, edgeToEdge }, ref) => {
     const videoTileProps = useVideoTileContext();
     return (

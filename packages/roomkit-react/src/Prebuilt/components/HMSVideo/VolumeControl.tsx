@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { VolumeOneIcon, VolumeTwoIcon, VolumeZeroIcon } from '@100mslive/react-icons';
 import { Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';

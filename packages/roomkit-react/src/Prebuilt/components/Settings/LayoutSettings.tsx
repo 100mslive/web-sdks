@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { GalleryIcon, PersonRectangleIcon, SidebarIcon } from '@100mslive/react-icons';
 import { Box, Flex, Slider, Text } from '../../..';

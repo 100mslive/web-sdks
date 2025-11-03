@@ -1,4 +1,6 @@
-import {
+import { DropdownMenu } from 'radix-ui';
+import { styled } from '../Theme';
+const {
   CheckboxItem,
   Content,
   Group,
@@ -12,8 +14,7 @@ import {
   SubContent,
   SubTrigger,
   Trigger,
-} from '@radix-ui/react-dropdown-menu';
-import { styled } from '../Theme';
+} = DropdownMenu;
 
 const DropdownRoot = styled(Root, {});
 

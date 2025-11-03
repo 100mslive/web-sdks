@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { QuizActiveIcon, QuizIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
 // @ts-ignore: No implicit Any

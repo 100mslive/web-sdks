@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef } from 'react';
+import { forwardRef, MutableRefObject, useEffect, useRef, useState } from 'react';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
 import {
@@ -84,7 +84,7 @@ export type HMSPrebuiltRefType = {
   hmsNotifications: IHMSNotifications;
 };
 
-export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
+export const HMSPrebuilt = forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
   (
     {
       roomCode = '',
@@ -101,8 +101,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const reactiveStore = useRef<HMSPrebuiltRefType>();
-    const [hydrated, setHydrated] = React.useState(false);
+    const reactiveStore = useRef<HMSPrebuiltRefType>({} as HMSPrebuiltRefType);
+    const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
       setHydrated(true);

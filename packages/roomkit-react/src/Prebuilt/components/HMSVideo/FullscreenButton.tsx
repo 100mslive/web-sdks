@@ -1,4 +1,3 @@
-import React from 'react';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { Flex, IconButton, Tooltip } from '../../..';
 

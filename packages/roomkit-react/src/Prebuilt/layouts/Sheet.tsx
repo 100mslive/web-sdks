@@ -1,4 +1,3 @@
-import React from 'react';
 import { selectAppData, useHMSStore } from '@100mslive/react-sdk';
 import { RoomDetailsSheet } from '../components/RoomDetails/RoomDetailsSheet';
 import { Box } from '../../Layout';

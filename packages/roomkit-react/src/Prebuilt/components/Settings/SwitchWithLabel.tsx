@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Label } from '../../../Label';
 import { Flex } from '../../../Layout';
 import { Switch } from '../../../Switch';
@@ -12,7 +12,7 @@ const SwitchWithLabel = ({
   hide = false,
 }: {
   label: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   id: string;
   onChange: (value: boolean) => void;
   checked: boolean;
