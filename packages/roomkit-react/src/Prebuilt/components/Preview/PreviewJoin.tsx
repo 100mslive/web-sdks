@@ -136,12 +136,22 @@ const PreviewJoin = ({
     }
   }, [initialName]);
 
+  // content should match <video> width, which is dynamic based on aspect ratio
+  const maxWidth = `${Math.max(parseFloat(aspectRatio), 1) * 340}px`;
+
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
       <Container css={{ h: '100%', pt: '$6', '@md': { justifyContent: 'space-between', pt: '$10' } }}>
         {toggleVideo ? null : <Box />}
         <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '600px', gap: '$8' }}>
-          <Logo />
+          {previewHeader.logoAdornment ? (
+            <Flex justify="center" css={{ w: '100%', maxWidth, position: 'relative', alignSelf: 'center' }}>
+              <Logo />
+              <Box css={{ position: 'absolute', right: 0 }}>{previewHeader.logoAdornment}</Box>
+            </Flex>
+          ) : (
+            <Logo />
+          )}
           <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
             {previewHeader.title}
           </Text>
@@ -164,7 +174,7 @@ const PreviewJoin = ({
           </Flex>
         </Flex>
         {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
-        <Box css={{ w: '100%', maxWidth: `${Math.max(parseFloat(aspectRatio), 1) * 340}px` }}>
+        <Box css={{ w: '100%', maxWidth }}>
           <PreviewControls
             hideSettings={!toggleVideo && !toggleAudio}
             vbEnabled={!!virtual_background}

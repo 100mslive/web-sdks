@@ -7,6 +7,12 @@ declare module '@100mslive/types-prebuilt/elements/participant_list' {
   }
 }
 
+declare module '@100mslive/types-prebuilt/elements/preview_header' {
+  export interface PreviewHeader {
+    logoAdornment?: ReactNode;
+  }
+}
+
 interface CustomSettingOption {
   icon: ReactNode;
   label: string;
