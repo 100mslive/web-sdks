@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           registry-url: https://registry.npmjs.org/
 
       - name: Check for main branch if latest
@@ -58,7 +58,7 @@ jobs:
           message_id: ${{ steps.slack.outputs.message_id }}
           channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
           status: Publishing
-          color: "#bada55"
+          color: '#bada55'
 
         # from-package will publish whatever version is present in each package's package.json
         # it will not publish if the version is already published in npm
@@ -101,9 +101,9 @@ jobs:
       DOCKER_GIT_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN}}
 
   notify_100ms_links:
-   runs-on: ubuntu-latest
-   needs: publish_packages
-   steps:
+    runs-on: ubuntu-latest
+    needs: publish_packages
+    steps:
       - name: Repository Dispatch
         if: success()
         uses: peter-evans/repository-dispatch@v3
@@ -112,4 +112,3 @@ jobs:
           repository: 100mslive/100ms-links
           event-type: alpha-publish
           client-payload: '{"bump": "${{ github.event.inputs.publishFlag }}"}'
-
