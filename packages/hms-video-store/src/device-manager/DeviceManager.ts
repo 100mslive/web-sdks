@@ -340,6 +340,12 @@ export class DeviceManager implements HMSDeviceManager {
       );
 
       HMSLogger.e(this.TAG, 'Audio device not found');
+      this.eventBus.deviceChange.publish({
+        error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.AUDIO),
+        selection: newSelection,
+        type: 'audioInput',
+        devices: this.getDevices(),
+      } as HMSDeviceChangeEvent);
       return;
     }
     const { settings } = audioTrack;
@@ -397,6 +403,12 @@ export class DeviceManager implements HMSDeviceManager {
         }),
       );
       HMSLogger.e(this.TAG, 'Video device not found');
+      this.eventBus.deviceChange.publish({
+        error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.VIDEO),
+        selection: newSelection,
+        type: 'video',
+        devices: this.getDevices(),
+      } as HMSDeviceChangeEvent);
       return;
     }
     const { settings } = videoTrack;
