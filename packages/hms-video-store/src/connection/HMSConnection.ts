@@ -190,6 +190,8 @@ export default abstract class HMSConnection {
           // @ts-ignore
           params.encodings[0].maxFramerate = maxFramerate;
         }
+      } else {
+        params.degradationPreference = 'maintain-framerate';
       }
       await sender.setParameters(params);
     } else {
