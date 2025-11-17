@@ -19,6 +19,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
   private bizTrackId!: string;
   private disableNoneLayerRequest = false;
+  private enabledBeforeDegradation = true;
 
   constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string, disableNoneLayerRequest?: boolean) {
     super(stream, track, source);
@@ -47,7 +48,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    super.setEnabled(value);
+    // Always update the stored state so we apply the latest user update when degradation ends
+    this.enabledBeforeDegradation = value;
+
+    // Only apply the state change if not degraded (degradation keeps track disabled)
+    if (!this._degraded) {
+      super.setEnabled(value);
+    }
     this.videoHandler.updateSinks(true);
   }
 
@@ -148,12 +155,24 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
+    const wasDegraded = this._degraded;
     this._degraded = this.getDegradationValue(layerUpdate);
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
+
+    // Handle enabled state based on degradation
+    if (this._degraded && !wasDegraded) {
+      // Track is now degraded, save current enabled state and disable
+      this.enabledBeforeDegradation = this.enabled;
+      this.setEnabled(false);
+    } else if (!this._degraded && wasDegraded) {
+      // Track is no longer degraded, restore previous enabled state
+      this.setEnabled(this.enabledBeforeDegradation);
+    }
+
     HMSLogger.d(
-      `[Remote Track] ${this.logIdentifier} 
-      streamId=${this.stream.id} 
+      `[Remote Track] ${this.logIdentifier}
+      streamId=${this.stream.id}
       trackId=${this.trackId}
       layer update from sfu
       currLayer=${layerUpdate.current_layer}
