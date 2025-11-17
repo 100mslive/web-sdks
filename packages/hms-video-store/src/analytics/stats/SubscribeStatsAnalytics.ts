@@ -70,8 +70,8 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
 
       const avSync = this.calculateAvSyncForStat(trackStats, hmsStats);
       const newTempStat: TempStats = { ...trackStats, calculatedJitterBufferDelay, avSync };
-      if (trackStats.kind === 'video') {
-        const definition = (track as HMSRemoteVideoTrack).getPreferredLayerDefinition();
+      if (trackStats.kind === 'video' && track instanceof HMSRemoteVideoTrack) {
+        const definition = track.getPreferredLayerDefinition();
         newTempStat.expectedFrameHeight = definition?.resolution.height;
         newTempStat.expectedFrameWidth = definition?.resolution.width;
       }
