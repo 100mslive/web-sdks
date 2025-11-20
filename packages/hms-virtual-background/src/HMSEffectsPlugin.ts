@@ -57,6 +57,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
+  isSupported(): boolean {
+    return this.effects.isSupported();
+  }
+
   private executeAfterInit(callback: () => void) {
     if (this.initialised) {
       callback();
