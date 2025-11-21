@@ -28,9 +28,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         facedetector: '',
         lowlighter: '',
       },
+      test_inference: true,
       wasmPaths: {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
+        'ort-wasm-simd.jsep.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.jsep.wasm`,
       },
     });
     this.canvas = document.createElement('canvas');
@@ -53,6 +55,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   getName(): string {
     return 'HMSEffects';
+  }
+
+  isSupported(): boolean {
+    return this.effects.isSupported();
   }
 
   private executeAfterInit(callback: () => void) {
