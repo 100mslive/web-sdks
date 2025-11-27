@@ -126,6 +126,7 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
     return {
       peerId: peer.id,
       peerName: peer.name,
+      userID: peer.customerUserId,
       level,
     };
   }
