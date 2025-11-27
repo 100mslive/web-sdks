@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.10.39",
+  "version": "0.10.40-alpha.0",
   "author": "100ms",
   "license": "MIT",
   "repository": {
