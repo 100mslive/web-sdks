@@ -13,10 +13,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
   private preset: 'balanced' | 'quality' = 'balanced';
   private initialised = false;
-  private intervalId: NodeJS.Timer | null = null;
+  private intervalId: NodeJS.Timer | undefined = undefined;
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
+  private cpuObserver: any;
+  private TAG = '[HMSEffectsPlugin]';
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
@@ -39,7 +41,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.onError(err => {
       // currently logging info type messages as well
       if (!err.type || err.type === 'error') {
-        console.error('[HMSEffectsPlugin]', err);
+        console.error(this.TAG, err);
       }
     });
     this.effects.cache();
@@ -49,6 +51,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.onInit?.();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
+        this.trackCPUUsageAndAdapt();
       }
     };
   }
@@ -64,14 +67,17 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private executeAfterInit(callback: () => void) {
     if (this.initialised) {
       callback();
+      return;
     }
 
     if (this.intervalId !== null) {
       clearInterval(this.intervalId);
+      this.intervalId = undefined;
     }
     this.intervalId = setInterval(() => {
       if (this.initialised) {
-        clearInterval(this.intervalId!);
+        clearInterval(this.intervalId);
+        this.intervalId = undefined;
         callback();
       }
     }, 100);
@@ -95,7 +101,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
    * @param blur ranges between 0 and 1
    */
   setBlur(blur: number) {
-    this.blurAmount = blur;
+    if (blur < 0 || blur > 1) {
+      throw new Error('Blur amount should be between 0 and 1');
+    }
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
     this.executeAfterInit(() => {
@@ -130,10 +138,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.removeBlur();
     this.executeAfterInit(() => {
       this.effects.stop();
+      this.cpuObserver?.disconnect();
     });
   }
 
   setBackground(url: HMSEffectsBackground) {
+    if (!url) {
+      throw new Error('Background url cannot be empty');
+    }
     this.background = url;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.removeBlur();
@@ -180,6 +192,41 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       this.setBlur(this.blurAmount);
     } else if (this.background) {
       this.setBackground(this.background);
+    }
+  }
+
+  private pressureCallback = (records: any[]) => {
+    const lastRecord = records[records.length - 1];
+    console.debug(`Current pressure ${lastRecord.state}`);
+    if (lastRecord.state === 'critical' || lastRecord.state === 'serious') {
+      this.executeAfterInit(() => {
+        this.effects.clearBlur();
+        this.effects.clearBackground();
+      });
+    } else {
+      // enable all video feeds and filter effects
+      this.executeAfterInit(() => {
+        if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
+          this.setBlur(this.blurAmount);
+        } else {
+          this.setBackground(this.background);
+        }
+      });
+    }
+  };
+
+  private async trackCPUUsageAndAdapt() {
+    if ('PressureObserver' in window) {
+      try {
+        // @ts-ignore
+        this.cpuObserver = new PressureObserver(this.pressureCallback);
+        await this.cpuObserver?.observe('cpu', {
+          sampleInterval: 1000, // 1000ms
+        });
+      } catch (error) {
+        // report error setting up the observer
+        console.error('Error setting up CPU Usage tracker:', error);
+      }
     }
   }
 }
