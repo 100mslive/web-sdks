@@ -12,8 +12,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
   private preset: 'balanced' | 'quality' = 'balanced';
-  private initialised = false;
-  private intervalId: NodeJS.Timer | undefined = undefined;
+  private initPromise: Promise<void>;
+  private resolveInit!: () => void;
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
@@ -23,6 +23,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
+    this.initPromise = new Promise(resolve => {
+      this.resolveInit = resolve;
+    });
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -47,7 +50,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.cache();
     this.effects.onReady = () => {
       if (this.effects) {
-        this.initialised = true;
+        this.resolveInit();
         this.onInit?.();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
@@ -64,23 +67,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.effects.isSupported();
   }
 
-  private executeAfterInit(callback: () => void) {
-    if (this.initialised) {
-      callback();
-      return;
-    }
-
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-      this.intervalId = undefined;
-    }
-    this.intervalId = setInterval(() => {
-      if (this.initialised) {
-        clearInterval(this.intervalId);
-        this.intervalId = undefined;
-        callback();
-      }
-    }, 100);
+  private async executeAfterInit(callback: () => void) {
+    await this.initPromise;
+    callback();
   }
 
   removeBlur() {
