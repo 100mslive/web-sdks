@@ -194,13 +194,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       });
     } else {
       // enable all video feeds and filter effects
-      this.executeAfterInit(() => {
-        if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
-          this.setBlur(this.blurAmount);
-        } else {
-          this.setBackground(this.background);
-        }
-      });
+      if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
+        this.setBlur(this.blurAmount);
+      } else if (this.backgroundType === HMSVirtualBackgroundTypes.IMAGE && this.background) {
+        this.setBackground(this.background);
+      }
     }
   };
 
