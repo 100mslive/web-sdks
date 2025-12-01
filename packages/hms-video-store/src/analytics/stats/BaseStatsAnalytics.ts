@@ -42,13 +42,13 @@ export abstract class BaseStatsAnalytics {
     this.startLoop().catch(e => HMSLogger.e('[StatsAnalytics]', e.message));
   }
 
-  stop = () => {
+  stop() {
     if (this.shouldSendEvent) {
       this.sendEvent();
     }
     this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate.bind(this));
     this.shouldSendEvent = false;
-  };
+  }
 
   private async startLoop() {
     while (this.shouldSendEvent) {
