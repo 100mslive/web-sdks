@@ -43,9 +43,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
-      // currently logging info type messages as well
-      if (!err.type || err.type === 'error') {
-        console.error(this.TAG, 'Effects SDK error:', err.message || err);
+      // The SDK fires various messages through onError:
+      // - Info messages with type='info' (we ignore these)
+      // - Error messages with type='error' and a message property
+      // - Raw Event objects with no message (we ignore these as they're not actionable)
+      if (err.type === 'error' && err.message) {
+        console.error(this.TAG, 'Effects SDK error:', err.message);
       }
     });
     this.effects.cache();
