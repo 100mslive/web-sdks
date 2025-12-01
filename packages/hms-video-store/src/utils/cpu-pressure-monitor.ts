@@ -9,10 +9,11 @@ interface PressureRecord {
 
 /**
  * Monitors CPU pressure using the Compute Pressure API (PressureObserver)
- * and provides the current pressure state on demand using takeRecords().
+ * and provides the current pressure state on demand.
  */
 export class CPUPressureMonitor {
   private observer: any;
+  private currentState: CPUPressureState = 'nominal';
   private TAG = '[CPUPressureMonitor]';
 
   constructor() {
@@ -27,7 +28,11 @@ export class CPUPressureMonitor {
 
     try {
       // @ts-ignore - PressureObserver is not yet in TypeScript definitions
-      this.observer = new PressureObserver(() => {});
+      this.observer = new PressureObserver((records: PressureRecord[]) => {
+        if (records.length > 0) {
+          this.currentState = records[records.length - 1].state;
+        }
+      });
 
       await this.observer.observe('cpu', {
         sampleInterval: 1000, // 1 second
@@ -40,23 +45,10 @@ export class CPUPressureMonitor {
   }
 
   /**
-   * Get the current CPU pressure state by taking records from the observer
+   * Get the current CPU pressure state
    */
   getCurrentState(): CPUPressureState {
-    if (!this.observer) {
-      return 'nominal';
-    }
-
-    try {
-      const records: PressureRecord[] = this.observer.takeRecords();
-      if (records.length > 0) {
-        return records[records.length - 1].state;
-      }
-    } catch (error) {
-      HMSLogger.e(this.TAG, 'Error taking CPU pressure records', error);
-    }
-
-    return 'nominal';
+    return this.currentState;
   }
 
   /**
