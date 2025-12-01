@@ -45,7 +45,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.onError(err => {
       // currently logging info type messages as well
       if (!err.type || err.type === 'error') {
-        console.error(this.TAG, err);
+        console.error(this.TAG, 'Effects SDK error:', err.message || err);
       }
     });
     this.effects.cache();
