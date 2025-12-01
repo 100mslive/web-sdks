@@ -64,7 +64,6 @@
     "@octokit/request-error": "^5.1.1",
     "@octokit/request": "^8.4.1",
     "on-headers": "^1.1.0",
-    "glob": "^10.4.5",
     "js-yaml": "^4.1.1",
     "tmp": "^0.2.3"
   },

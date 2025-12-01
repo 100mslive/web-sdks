@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.10.40-alpha.1",
+  "version": "0.10.40-alpha.2",
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -48,7 +48,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.12.40-alpha.1",
+    "@100mslive/hms-video-store": "0.12.40-alpha.2",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }
