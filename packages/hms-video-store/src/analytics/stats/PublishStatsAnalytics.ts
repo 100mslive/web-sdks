@@ -53,10 +53,10 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
     super.sendEvent();
   }
 
-  stop = () => {
+  stop() {
     super.stop();
     this.cpuPressureMonitor?.stop();
-  };
+  }
 
   protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     let shouldCreateSample = false;
