@@ -9,12 +9,10 @@ interface PressureRecord {
 
 /**
  * Monitors CPU pressure using the Compute Pressure API (PressureObserver)
- * and provides the current pressure state.
+ * and provides the current pressure state on demand using takeRecords().
  */
 export class CPUPressureMonitor {
   private observer: any;
-  private currentState: CPUPressureState = 'nominal';
-  private listeners: Set<(state: CPUPressureState) => void> = new Set();
   private TAG = '[CPUPressureMonitor]';
 
   constructor() {
@@ -29,14 +27,7 @@ export class CPUPressureMonitor {
 
     try {
       // @ts-ignore - PressureObserver is not yet in TypeScript definitions
-      this.observer = new PressureObserver((records: PressureRecord[]) => {
-        const latestRecord = records[records.length - 1];
-        if (latestRecord && latestRecord.state !== this.currentState) {
-          this.currentState = latestRecord.state;
-          HMSLogger.d(this.TAG, `CPU pressure state changed to: ${this.currentState}`);
-          this.notifyListeners(this.currentState);
-        }
-      });
+      this.observer = new PressureObserver(() => {});
 
       await this.observer.observe('cpu', {
         sampleInterval: 1000, // 1 second
@@ -49,34 +40,23 @@ export class CPUPressureMonitor {
   }
 
   /**
-   * Get the current CPU pressure state
+   * Get the current CPU pressure state by taking records from the observer
    */
   getCurrentState(): CPUPressureState {
-    return this.currentState;
-  }
+    if (!this.observer) {
+      return 'nominal';
+    }
 
-  /**
-   * Subscribe to CPU pressure state changes
-   */
-  subscribe(listener: (state: CPUPressureState) => void): () => void {
-    this.listeners.add(listener);
-    // Return unsubscribe function
-    return () => {
-      this.listeners.delete(listener);
-    };
-  }
-
-  /**
-   * Notify all listeners of state change
-   */
-  private notifyListeners(state: CPUPressureState) {
-    this.listeners.forEach(listener => {
-      try {
-        listener(state);
-      } catch (error) {
-        HMSLogger.e(this.TAG, 'Error in CPU pressure listener', error);
+    try {
+      const records: PressureRecord[] = this.observer.takeRecords();
+      if (records.length > 0) {
+        return records[records.length - 1].state;
       }
-    });
+    } catch (error) {
+      HMSLogger.e(this.TAG, 'Error taking CPU pressure records', error);
+    }
+
+    return 'nominal';
   }
 
   /**
@@ -91,6 +71,5 @@ export class CPUPressureMonitor {
         HMSLogger.e(this.TAG, 'Error stopping CPU pressure monitoring', error);
       }
     }
-    this.listeners.clear();
   }
 }
