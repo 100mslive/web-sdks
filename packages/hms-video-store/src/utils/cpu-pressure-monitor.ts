@@ -31,7 +31,6 @@ export class CPUPressureMonitor {
       this.observer = new PressureObserver((records: PressureRecord[]) => {
         if (records.length > 0) {
           this.currentState = records[records.length - 1].state;
-          HMSLogger.d(this.TAG, `CPU pressure state updated: ${this.currentState}`);
         }
       });
 
