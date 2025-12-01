@@ -9,7 +9,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1, inclusive
   private blurAmount = 0;
-  private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
+  private background?: HMSEffectsBackground;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
   private preset: 'balanced' | 'quality' = 'balanced';
   private initPromise: Promise<void>;
@@ -17,8 +17,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
-  private cpuObserver: any;
-  private lastPressureState = 'nominal';
   private TAG = '[HMSEffectsPlugin]';
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
@@ -58,7 +56,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.onInit?.();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
-        this.trackCPUUsageAndAdapt();
       }
     };
   }
@@ -132,7 +129,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.removeBlur();
     this.executeAfterInit(() => {
       this.effects.stop();
-      this.cpuObserver?.disconnect();
     });
   }
 
@@ -186,47 +182,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       this.setBlur(this.blurAmount);
     } else if (this.background) {
       this.setBackground(this.background);
-    }
-  }
-
-  private restoreEffects() {
-    if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
-      this.setBlur(this.blurAmount);
-    } else if (this.backgroundType === HMSVirtualBackgroundTypes.IMAGE && this.background) {
-      this.setBackground(this.background);
-    }
-  }
-
-  private pressureCallback = (records: any[]) => {
-    const lastRecord = records[records.length - 1];
-    if (lastRecord.state === this.lastPressureState) {
-      return;
-    }
-    console.debug(this.TAG, `CPU pressure changed: ${this.lastPressureState} -> ${lastRecord.state}`);
-    this.lastPressureState = lastRecord.state;
-
-    if (lastRecord.state === 'critical' || lastRecord.state === 'serious') {
-      this.executeAfterInit(() => {
-        this.effects.clearBlur();
-        this.effects.clearBackground();
-      });
-    } else {
-      this.restoreEffects();
-    }
-  };
-
-  private async trackCPUUsageAndAdapt() {
-    if ('PressureObserver' in window) {
-      try {
-        // @ts-ignore
-        this.cpuObserver = new PressureObserver(this.pressureCallback);
-        await this.cpuObserver?.observe('cpu', {
-          sampleInterval: 1000, // 1000ms
-        });
-      } catch (error) {
-        // report error setting up the observer
-        console.error('Error setting up CPU Usage tracker:', error);
-      }
     }
   }
 }
