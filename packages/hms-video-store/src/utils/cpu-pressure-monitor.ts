@@ -15,15 +15,15 @@ export class CPUPressureMonitor {
   private observer: any;
   private currentState: CPUPressureState = 'nominal';
   private listeners: Set<(state: CPUPressureState) => void> = new Set();
-  private logger = new HMSLogger('CPUPressureMonitor');
+  private TAG = '[CPUPressureMonitor]';
 
   constructor() {
     this.init();
   }
 
   private async init() {
-    if (!('PressureObserver' in globalThis)) {
-      this.logger.info('PressureObserver API not available');
+    if (!('PressureObserver' in window)) {
+      HMSLogger.d(this.TAG, 'PressureObserver API not available');
       return;
     }
 
@@ -33,7 +33,7 @@ export class CPUPressureMonitor {
         const latestRecord = records[records.length - 1];
         if (latestRecord && latestRecord.state !== this.currentState) {
           this.currentState = latestRecord.state;
-          this.logger.debug(`CPU pressure state changed to: ${this.currentState}`);
+          HMSLogger.d(this.TAG, `CPU pressure state changed to: ${this.currentState}`);
           this.notifyListeners(this.currentState);
         }
       });
@@ -42,9 +42,9 @@ export class CPUPressureMonitor {
         sampleInterval: 1000, // 1 second
       });
 
-      this.logger.info('CPU pressure monitoring started');
+      HMSLogger.d(this.TAG, 'CPU pressure monitoring started');
     } catch (error) {
-      this.logger.error('Failed to initialize CPU pressure monitoring', error);
+      HMSLogger.e(this.TAG, 'Failed to initialize CPU pressure monitoring', error);
     }
   }
 
@@ -74,7 +74,7 @@ export class CPUPressureMonitor {
       try {
         listener(state);
       } catch (error) {
-        this.logger.error('Error in CPU pressure listener', error);
+        HMSLogger.e(this.TAG, 'Error in CPU pressure listener', error);
       }
     });
   }
@@ -86,9 +86,9 @@ export class CPUPressureMonitor {
     if (this.observer) {
       try {
         this.observer.disconnect();
-        this.logger.info('CPU pressure monitoring stopped');
+        HMSLogger.d(this.TAG, 'CPU pressure monitoring stopped');
       } catch (error) {
-        this.logger.error('Error stopping CPU pressure monitoring', error);
+        HMSLogger.e(this.TAG, 'Error stopping CPU pressure monitoring', error);
       }
     }
     this.listeners.clear();
