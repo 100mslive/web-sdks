@@ -18,6 +18,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
   private cpuObserver: any;
+  private lastPressureState = 'nominal';
   private TAG = '[HMSEffectsPlugin]';
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
@@ -93,6 +94,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     if (blur < 0 || blur > 1) {
       throw new Error('Blur amount should be between 0 and 1');
     }
+    this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
     this.executeAfterInit(() => {
@@ -184,21 +186,29 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     }
   }
 
+  private restoreEffects() {
+    if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
+      this.setBlur(this.blurAmount);
+    } else if (this.backgroundType === HMSVirtualBackgroundTypes.IMAGE && this.background) {
+      this.setBackground(this.background);
+    }
+  }
+
   private pressureCallback = (records: any[]) => {
     const lastRecord = records[records.length - 1];
-    console.debug(`Current pressure ${lastRecord.state}`);
+    if (lastRecord.state === this.lastPressureState) {
+      return;
+    }
+    console.debug(this.TAG, `CPU pressure changed: ${this.lastPressureState} -> ${lastRecord.state}`);
+    this.lastPressureState = lastRecord.state;
+
     if (lastRecord.state === 'critical' || lastRecord.state === 'serious') {
       this.executeAfterInit(() => {
         this.effects.clearBlur();
         this.effects.clearBackground();
       });
     } else {
-      // enable all video feeds and filter effects
-      if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
-        this.setBlur(this.blurAmount);
-      } else if (this.backgroundType === HMSVirtualBackgroundTypes.IMAGE && this.background) {
-        this.setBackground(this.background);
-      }
+      this.restoreEffects();
     }
   };
 
