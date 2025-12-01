@@ -2,6 +2,7 @@ interface BaseStatsPayload {
   sequence_num: number; // An increasing seq number starting from 1
   max_window_sec: number; // Take this value from the INIT response
   joined_at: number; // Local peer's joinedAt time in milliseconds
+  cpu_pressure_state?: string; // Current CPU pressure state from PressureObserver API (nominal, fair, serious, critical)
 }
 
 export interface PublishAnalyticPayload extends BaseStatsPayload {

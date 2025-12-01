@@ -9,18 +9,22 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1, inclusive
   private blurAmount = 0;
-  private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
+  private background?: HMSEffectsBackground;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset: 'balanced' | 'quality' = 'balanced';
-  private initialised = false;
-  private intervalId: NodeJS.Timer | null = null;
+  private preset: 'balanced' | 'quality' | 'lightning' = 'balanced';
+  private initPromise: Promise<void>;
+  private resolveInit!: () => void;
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
   private canvas: HTMLCanvasElement;
+  private TAG = '[HMSEffectsPlugin]';
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
     this.onInit = onInit;
+    this.initPromise = new Promise(resolve => {
+      this.resolveInit = resolve;
+    });
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {
@@ -37,15 +41,18 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     });
     this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
-      // currently logging info type messages as well
-      if (!err.type || err.type === 'error') {
-        console.error('[HMSEffectsPlugin]', err);
+      // The SDK fires various messages through onError:
+      // - Info messages with type='info' (we ignore these)
+      // - Error messages with type='error' and a message property
+      // - Raw Event objects with no message (we ignore these as they're not actionable)
+      if (err.type === 'error' && err.message) {
+        console.error(this.TAG, 'Effects SDK error:', err.message);
       }
     });
     this.effects.cache();
     this.effects.onReady = () => {
       if (this.effects) {
-        this.initialised = true;
+        this.resolveInit();
         this.onInit?.();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
@@ -61,20 +68,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.effects.isSupported();
   }
 
-  private executeAfterInit(callback: () => void) {
-    if (this.initialised) {
-      callback();
-    }
-
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-    }
-    this.intervalId = setInterval(() => {
-      if (this.initialised) {
-        clearInterval(this.intervalId!);
-        callback();
-      }
-    }, 100);
+  private async executeAfterInit(callback: () => void) {
+    await this.initPromise;
+    callback();
   }
 
   removeBlur() {
@@ -95,6 +91,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
    * @param blur ranges between 0 and 1
    */
   setBlur(blur: number) {
+    if (blur < 0 || blur > 1) {
+      throw new Error('Blur amount should be between 0 and 1');
+    }
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.removeBackground();
@@ -134,6 +133,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBackground(url: HMSEffectsBackground) {
+    if (!url) {
+      throw new Error('Background url cannot be empty');
+    }
     this.background = url;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.removeBlur();

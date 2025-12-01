@@ -15,10 +15,18 @@ import {
 import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { CPUPressureMonitor } from '../../utils/cpu-pressure-monitor';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class PublishStatsAnalytics extends BaseStatsAnalytics {
   protected trackAnalytics: Map<string, RunningLocalTrackAnalytics> = new Map();
+  private cpuPressureMonitor?: CPUPressureMonitor;
+
+  constructor(store: any, eventBus: any, sampleWindowSize: number, pushInterval: number) {
+    super(store, eventBus, sampleWindowSize, pushInterval);
+    // Initialize CPU pressure monitoring
+    this.cpuPressureMonitor = new CPUPressureMonitor();
+  }
 
   protected toAnalytics(): PublishAnalyticPayload {
     const audio: LocalAudioTrackAnalytics[] = [];
@@ -36,6 +44,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
       joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
       max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
+      cpu_pressure_state: this.cpuPressureMonitor?.getCurrentState(),
     };
   }
 
@@ -43,6 +52,11 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
     super.sendEvent();
   }
+
+  stop = () => {
+    super.stop();
+    this.cpuPressureMonitor?.stop();
+  };
 
   protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     let shouldCreateSample = false;
