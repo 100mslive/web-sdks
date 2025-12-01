@@ -11,7 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background?: HMSEffectsBackground;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  private preset: 'balanced' | 'quality' = 'balanced';
+  private preset: 'balanced' | 'quality' | 'lightning' = 'balanced';
   private initPromise: Promise<void>;
   private resolveInit!: () => void;
   private onInit;
