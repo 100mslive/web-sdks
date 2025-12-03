@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd ../.. && bun install --ignore-scripts",
+  "buildCommand": "cd ../.. && bun run build --no-private && cd packages/roomkit-react && bun run build-storybook",
+  "outputDirectory": "storybook-static"
+}
