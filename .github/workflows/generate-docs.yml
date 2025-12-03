@@ -19,7 +19,7 @@ jobs:
           bun-version: latest
 
       - name: Install packages
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Build
         run: bun run build

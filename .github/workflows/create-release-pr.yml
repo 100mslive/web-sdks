@@ -34,7 +34,7 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Install packages
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Update versions
         env:

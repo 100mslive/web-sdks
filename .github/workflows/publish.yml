@@ -45,7 +45,10 @@ jobs:
           color: warning
 
       - name: Install packages
-        run: bun install
+        run: bun install --ignore-scripts
+
+      - name: Build packages
+        run: bun run build
 
       - name: Test
         run: bun run test

@@ -25,6 +25,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install packages
+        run: bun install --ignore-scripts
+
       - name: Cypress
         uses: cypress-io/github-action@v2
         if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true' || steps.filter.outputs.cypress == 'true'
