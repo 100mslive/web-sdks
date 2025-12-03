@@ -138,6 +138,8 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       avg_fps: this.calculateAverage('framesPerSecond'),
       total_packets_lost: this.getLatestStat().packetsLost,
       total_packets_sent: this.getLatestStat().packetsSent,
+      delta_packets_sent: this.calculateDifferenceForSample('packetsSent'),
+      delta_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       total_packet_sent_delay_sec: parseFloat(this.calculateDifferenceForSample('totalPacketSendDelay').toFixed(4)),
       total_fir_count: this.calculateDifferenceForSample('firCount'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
