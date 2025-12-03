@@ -34,8 +34,8 @@
   "scripts": {
     "prestart": "rm -rf dist && bun run types:build",
     "start": "concurrently \"bun run dev\" \"bun run types\"",
-    "dev": "node ../../scripts/dev",
-    "build:only": "rm -rf dist && node ../../scripts/build-webapp",
+    "dev": "bun ../../scripts/dev.js",
+    "build:only": "rm -rf dist && bun ../../scripts/build-webapp.js",
     "build": "bun run build:only && bun run types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.json",

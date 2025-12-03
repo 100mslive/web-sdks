@@ -40,11 +40,8 @@ jobs:
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
         run: |
-          bun add -g lerna@5
-          lerna -v
-          echo $(lerna version $BUMP --no-git-tag-version --exact --yes --no-private)
-          lerna add @100mslive/hms-video-store --peer --scope=@100mslive/hms-virtual-background --exact
-          lerna add @100mslive/roomkit-react --scope=prebuilt-react-integration --exact
+          lerna version $BUMP --no-git-tag-version --exact --yes --no-private
+          bun scripts/sync-versions.js
 
       - name: Get current version
         id: version

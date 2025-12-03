@@ -30,7 +30,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "rm -rf dist && node ../../scripts/build-webapp"
+    "build": "rm -rf dist && bun ../../scripts/build-webapp.js"
   },
   "dependencies": {
     "@100mslive/roomkit-react": "0.3.39",

@@ -1,7 +1,5 @@
 {
-  "packages": ["packages/*", "examples/*"],
-  "useWorkspaces": true,
-  "useNx": true,
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
   "npmClient": "npm",
   "command": {
@@ -12,6 +10,5 @@
       "access": "public",
       "registry": "https://registry.npmjs.org/"
     }
-  },
-  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
+  }
 }

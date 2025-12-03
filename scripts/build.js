@@ -1,5 +1,5 @@
+/* global Bun */
 const fs = require('fs');
-const esbuild = require('esbuild');
 const { gzip } = require('zlib');
 
 const getSourceForPackage = packageName => {
@@ -28,52 +28,62 @@ async function main() {
   external.push(...Object.keys(pkg.peerDependencies || {}));
 
   const commonOptions = {
-    entryPoints: source,
-    bundle: true,
-    target: 'es6',
+    entrypoints: source,
+    target: 'browser',
     external,
-    tsconfig: 'tsconfig.json',
     minify: true,
-    sourcemap: true,
+    sourcemap: 'external',
   };
+
   try {
     let esmResult;
     // outfile (single output) and outdir (multiple output files) cannot be used together
     if (pkg.name !== '@100mslive/hms-virtual-background') {
-      await esbuild.build({
+      await Bun.build({
         ...commonOptions,
-        outfile: 'dist/index.cjs.js',
+        outdir: './dist',
+        naming: 'index.cjs.js',
         format: 'cjs',
       });
 
-      esmResult = await esbuild.build({
+      esmResult = await Bun.build({
         ...commonOptions,
-        outfile: 'dist/index.js',
+        outdir: './dist',
+        naming: 'index.js',
         format: 'esm',
-        metafile: true,
       });
     } else {
       console.log('here');
-      await esbuild.build({
+      await Bun.build({
         ...commonOptions,
         outdir: 'dist/cjs',
         format: 'cjs',
       });
 
-      esmResult = await esbuild.build({
+      esmResult = await Bun.build({
         ...commonOptions,
         outdir: 'dist/esm',
         format: 'esm',
-        metafile: true,
       });
     }
 
+    if (!esmResult.success) {
+      console.log(`× ${pkg.name}: Build failed due to an error.`);
+      console.log(esmResult.logs);
+      process.exit(1);
+    }
+
     let esmSize = 0;
-    Object.values(esmResult.metafile.outputs).forEach(output => {
-      esmSize += output.bytes;
-    });
+    for (const output of esmResult.outputs) {
+      const text = await output.text();
+      esmSize += text.length;
+    }
 
     fs.readFile('./dist/index.js', (_err, data) => {
+      if (_err || !data) {
+        console.log(`✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb`);
+        return;
+      }
       gzip(data, (_err, result) => {
         console.log(
           `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(
@@ -85,6 +95,7 @@ async function main() {
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);
+    process.exit(1);
   }
 }
 

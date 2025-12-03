@@ -1,7 +1,35 @@
+/* global Bun */
 const fs = require('fs');
-const esbuild = require('esbuild');
-const PostCssPlugin = require('esbuild-plugin-postcss2');
-const autoprefixer = require('autoprefixer');
+
+async function rebuild(pkg, commonOptions) {
+  // Rebuild CJS
+  const cjsRebuild = await Bun.build({
+    ...commonOptions,
+    outdir: './dist',
+    naming: 'index.cjs.js',
+    format: 'cjs',
+  });
+
+  // Rebuild ESM
+  const esmRebuild = await Bun.build({
+    ...commonOptions,
+    outdir: './dist',
+    naming: 'index.js',
+    format: 'esm',
+  });
+
+  if (cjsRebuild.success && esmRebuild.success) {
+    console.log(`✔ ${pkg.name}: Rebuilt.`);
+  } else {
+    console.log(`× ${pkg.name}: Rebuild failed.`);
+    if (!cjsRebuild.success) {
+      console.log(cjsRebuild.logs);
+    }
+    if (!esmRebuild.success) {
+      console.log(esmRebuild.logs);
+    }
+  }
+}
 
 async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -10,53 +38,60 @@ async function main() {
   external.push(...Object.keys(pkg.peerDependencies || {}));
 
   const commonOptions = {
-    entryPoints: [source],
+    entrypoints: [source],
     minify: false,
-    bundle: true,
-    sourcemap: true,
-    target: 'esnext',
-    tsconfig: 'tsconfig.json',
+    target: 'browser',
+    sourcemap: 'external',
     external,
-    loader: {
-      '.png': 'binary',
-      '.svg': 'text',
-    },
-    plugins: [
-      PostCssPlugin.default({
-        plugins: [autoprefixer],
-      }),
-      {
-        name: 'on-rebuild-plugin',
-        setup(build) {
-          build.onEnd(result => {
-            if (result.errors.length > 0) {
-              console.log(`× ${pkg.name}: An error prevented the ${build.initialOptions.format} rebuild.`);
-              return;
-            }
-            console.log(`✔ ${pkg.name}: Rebuilt.`);
-          });
-        },
-      },
-    ],
   };
 
-  const cjsContext = await esbuild.context({
-    outfile: 'dist/index.cjs.js',
+  // Initial CJS build
+  const cjsResult = await Bun.build({
+    ...commonOptions,
+    outdir: './dist',
+    naming: 'index.cjs.js',
     format: 'cjs',
-    ...commonOptions,
   });
 
-  const esmContext = await esbuild.context({
-    outfile: 'dist/index.js',
+  if (!cjsResult.success) {
+    console.log(`× ${pkg.name}: CJS build failed.`);
+    console.log(cjsResult.logs);
+  } else {
+    console.log(`✔ ${pkg.name}: CJS built.`);
+  }
+
+  // Initial ESM build
+  const esmResult = await Bun.build({
+    ...commonOptions,
+    outdir: './dist',
+    naming: 'index.js',
     format: 'esm',
-    ...commonOptions,
   });
 
-  await cjsContext.rebuild();
-  await cjsContext.watch();
+  if (!esmResult.success) {
+    console.log(`× ${pkg.name}: ESM build failed.`);
+    console.log(esmResult.logs);
+  } else {
+    console.log(`✔ ${pkg.name}: ESM built.`);
+  }
 
-  await esmContext.rebuild();
-  await esmContext.watch();
+  // Watch for changes using Bun's file watcher
+  const srcDir = './src';
+  console.log(`Watching ${srcDir} for changes...`);
+
+  const watcher = fs.watch(srcDir, { recursive: true }, async (eventType, filename) => {
+    if (!filename || (!filename.endsWith('.ts') && !filename.endsWith('.tsx'))) {
+      return;
+    }
+    console.log(`File changed: ${filename}`);
+    await rebuild(pkg, commonOptions);
+  });
+
+  // Keep the process running
+  process.on('SIGINT', () => {
+    watcher.close();
+    process.exit(0);
+  });
 }
 
 main();

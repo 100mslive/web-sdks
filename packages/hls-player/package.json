@@ -24,8 +24,8 @@
   "scripts": {
     "prestart": "rm -rf dist && bun run types:build",
     "start": "concurrently \"bun run dev\" \"bun run types\"",
-    "dev": "node ../../scripts/dev",
-    "build:only": "node ../../scripts/build",
+    "dev": "bun ../../scripts/dev.js",
+    "build:only": "bun ../../scripts/build.js",
     "prebuild": "rm -rf dist",
     "build": "bun run build:only && bun run types:build",
     "types": "tsc -w",
