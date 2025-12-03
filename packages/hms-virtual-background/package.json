@@ -47,16 +47,16 @@
     "src/models"
   ],
   "scripts": {
-    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "start": "concurrently \"bun run dev\" \"bun run types\"",
     "dev": "node ../../scripts/dev",
     "build:only": "node ../../scripts/build",
-    "build": "yarn build:only && yarn types:build",
+    "build": "bun run build:only && bun run types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.json",
     "test": "jest --maxWorkers=1 --passWithNoTests",
     "lint": "eslint -c ../../.eslintrc .",
-    "lint:fix": "yarn lint --fix",
-    "prepare": "yarn build",
+    "lint:fix": "bun run lint --fix",
+    "prepare": "bun run build",
     "size": "size-limit",
     "analyze": "size-limit --why",
     "format": "prettier --write src/**/*.ts"

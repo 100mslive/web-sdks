@@ -11,20 +11,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: 'yarn'
+          bun-version: latest
 
       - name: Install packages
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Test
-        run: yarn test
+        run: bun run test
 
       - name: Lint
-        run: yarn lint
+        run: bun run lint
 
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v1

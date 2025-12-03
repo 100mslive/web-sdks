@@ -135,7 +135,9 @@ export abstract class RunningTrackAnalytics {
       return;
     }
 
-    this.samples.push(this.collateSample());
+    const sample = this.collateSample();
+    console.log({ sample });
+    this.samples.push();
     this.prevLatestStat = this.getLatestStat();
     this.tempStats.length = 0;
   }

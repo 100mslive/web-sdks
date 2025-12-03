@@ -13,17 +13,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - name: Configure Git user
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
       - name: Install packages
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Update versions
         run: |
-          yarn global add lerna@5
+          bun add -g lerna@5
           lerna -v
           echo $(lerna version prerelease --no-git-tag-version --exact --yes --no-private)
           lerna add @100mslive/hms-video-store --peer --scope=@100mslive/hms-virtual-background --exact

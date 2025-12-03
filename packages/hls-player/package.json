@@ -22,16 +22,16 @@
     }
   },
   "scripts": {
-    "prestart": "rm -rf dist && yarn types:build",
-    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "prestart": "rm -rf dist && bun run types:build",
+    "start": "concurrently \"bun run dev\" \"bun run types\"",
     "dev": "node ../../scripts/dev",
     "build:only": "node ../../scripts/build",
     "prebuild": "rm -rf dist",
-    "build": "yarn build:only && yarn types:build",
+    "build": "bun run build:only && bun run types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.json",
     "lint": "eslint -c ../../.eslintrc .",
-    "lint:fix": "yarn lint --fix"
+    "lint:fix": "bun run lint --fix"
   },
   "author": "100ms",
   "license": "MIT",

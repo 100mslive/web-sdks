@@ -23,5 +23,6 @@ test-results/
 playwright-report/
 slackMessage.json
 package-lock.json
+yarn.lock
 slackMessage.txt
 .DS_Store

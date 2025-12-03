@@ -20,12 +20,17 @@ jobs:
             cypress:
               - 'cypress/**/*.(ts|js)'
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - name: Cypress
         uses: cypress-io/github-action@v2
         if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true' || steps.filter.outputs.cypress == 'true'
         with:
           browser: chrome
-          build: yarn build --no-private
+          build: bun run build --no-private
           headless: false
         env:
           CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}

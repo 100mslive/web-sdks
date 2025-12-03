@@ -41,22 +41,34 @@
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run format",
-    "test": "yarn build --no-private && lerna run test",
+    "test": "bun run build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
     "lerna:publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes --no-verify-access",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install",
-    "store": "cd packages/hms-video-store && yarn start",
-    "reactsdk": "cd packages/react-sdk && yarn start",
-    "prebuilt": "cd packages/roomkit-react && yarn start",
-    "controller": "cd packages/hls-controller && yarn start",
-    "storybook": "cd packages/roomkit-react && yarn storybook",
-    "build-storybook": "cd packages/roomkit-react && yarn build-storybook",
-    "ybys": "yarn && yarn build --no-private && yarn storybook"
+    "store": "cd packages/hms-video-store && bun run start",
+    "reactsdk": "cd packages/react-sdk && bun run start",
+    "prebuilt": "cd packages/roomkit-react && bun run start",
+    "hlsplayer": "cd packages/hls-player && bun run start",
+    "storybook": "cd packages/roomkit-react && bun run storybook",
+    "build-storybook": "cd packages/roomkit-react && bun run build-storybook",
+    "ybys": "bun install && bun run build --no-private && bun run storybook"
   },
   "resolutions": {
+    "loader-utils": "^2.0.4",
+    "axios": "^1.7.4",
+    "form-data": "^4.0.4",
+    "semver": "^7.5.2",
+    "@octokit/request-error": "^5.1.1",
+    "@octokit/request": "^8.4.1",
+    "on-headers": "^1.1.0",
+    "glob": "^10.4.5",
+    "js-yaml": "^4.1.1",
+    "tmp": "^0.2.3"
+  },
+  "overrides": {
     "loader-utils": "^2.0.4",
     "axios": "^1.7.4",
     "form-data": "^4.0.4",
@@ -75,6 +87,7 @@
   "engines": {
     "node": ">=16"
   },
+  "packageManager": "bun@1.1.38",
   "lint-staged": {
     "*.(js|ts|jsx|tsx)": "eslint"
   },

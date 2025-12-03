@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -39,10 +45,10 @@ jobs:
           color: warning
 
       - name: Install packages
-        run: yarn install
+        run: bun install
 
       - name: Test
-        run: yarn test
+        run: bun run test
 
       - name: Configure Git user
         run: |
@@ -63,7 +69,7 @@ jobs:
         # from-package will publish whatever version is present in each package's package.json
         # it will not publish if the version is already published in npm
       - name: Publish
-        run: yarn lerna:publish
+        run: bun run lerna:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
