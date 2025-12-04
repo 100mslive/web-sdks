@@ -10,6 +10,8 @@ on:
         options:
           - prerelease
           - patch
+          - minor
+          - major
 
 jobs:
   create_pr:
