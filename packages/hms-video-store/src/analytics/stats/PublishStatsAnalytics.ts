@@ -85,6 +85,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
               rid: layerStats.rid,
               ssrc: layerStats.ssrc.toString(),
               kind: layerStats.kind,
+              cpuPressureMonitor: this.cpuPressureMonitor,
             });
             trackAnalytics.pushTempStat(newTempStats);
             this.trackAnalytics.set(this.getTrackIdentifier(track.trackId, layerStats), trackAnalytics);
@@ -108,6 +109,19 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
 
 class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   samples: (LocalBaseSample | LocalVideoSample)[] = [];
+  private cpuPressureMonitor?: CPUPressureMonitor;
+
+  constructor(params: {
+    track: any;
+    sampleWindowSize: number;
+    rid?: string;
+    ssrc: string;
+    kind: string;
+    cpuPressureMonitor?: CPUPressureMonitor;
+  }) {
+    super(params);
+    this.cpuPressureMonitor = params.cpuPressureMonitor;
+  }
 
   protected collateSample = (): LocalBaseSample | LocalVideoSample => {
     const latestStat = this.getLatestStat();
@@ -146,6 +160,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       avg_round_trip_time_ms,
       total_quality_limitation,
       resolution,
+      cpu_pressure_state: this.cpuPressureMonitor?.getCurrentState(),
     });
   };
 

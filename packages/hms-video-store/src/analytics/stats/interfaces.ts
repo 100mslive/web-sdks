@@ -44,6 +44,7 @@ export interface LocalBaseSample {
   total_nack_count?: number;
   total_fir_count?: number;
   total_pli_count?: number;
+  cpu_pressure_state?: string; // CPU pressure state at the time of sample creation (nominal, fair, serious, critical)
 }
 
 export interface LocalVideoSample extends LocalBaseSample {
