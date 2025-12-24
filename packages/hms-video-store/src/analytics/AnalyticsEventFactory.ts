@@ -282,11 +282,18 @@ export default class AnalyticsEventFactory {
     type,
     reason,
     deviceInfo,
+    trackInfo,
   }: {
     started: boolean;
     type: string;
     reason: string;
     deviceInfo: Partial<MediaDeviceInfo>;
+    trackInfo?: {
+      enabled: boolean;
+      muted: boolean;
+      readyState: string;
+      settings: MediaTrackSettings;
+    };
   }) {
     return new AnalyticsEvent({
       name: `${started ? 'interruption.start' : 'interruption.stop'}`,
@@ -294,7 +301,9 @@ export default class AnalyticsEventFactory {
       properties: {
         reason,
         type,
+        pageHidden: document.visibilityState === 'hidden',
         ...deviceInfo,
+        trackInfo,
       },
     });
   }

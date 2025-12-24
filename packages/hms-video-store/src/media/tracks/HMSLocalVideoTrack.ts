@@ -553,11 +553,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);
-    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: true,
-        reason: reason,
+        reason: 'track-muted-natively',
       }),
     );
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
@@ -566,12 +565,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /** @internal */
   handleTrackUnmuteNatively = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
-    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
-
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
-        reason: reason,
+        reason: 'track-unmuted-natively',
       }),
     );
     this.handleTrackUnmute();

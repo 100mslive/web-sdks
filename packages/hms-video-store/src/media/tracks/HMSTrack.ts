@@ -95,13 +95,20 @@ export abstract class HMSTrack {
    * It will send event to analytics when interruption start/stop
    */
   sendInterruptionEvent({ started, reason }: { started: boolean; reason: string }) {
+    const track = this.nativeTrack;
     return AnalyticsEventFactory.interruption({
       started,
       type: this.type,
       reason,
       deviceInfo: {
-        deviceId: this.nativeTrack.getSettings().deviceId,
-        groupId: this.nativeTrack.getSettings().groupId,
+        deviceId: track.getSettings().deviceId,
+        groupId: track.getSettings().groupId,
+      },
+      trackInfo: {
+        enabled: track.enabled,
+        muted: track.muted,
+        readyState: track.readyState,
+        settings: track.getSettings(),
       },
     });
   }
