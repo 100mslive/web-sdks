@@ -3,13 +3,14 @@
   "useWorkspaces": true,
   "useNx": true,
   "version": "independent",
-  "npmClient": "npm",
+  "npmClient": "yarn",
   "command": {
     "version": {
       "message": "build: update version"
     },
     "publish": {
-      "access": "public"
+      "access": "public",
+      "registry": "https://registry.npmjs.org/"
     }
   },
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
