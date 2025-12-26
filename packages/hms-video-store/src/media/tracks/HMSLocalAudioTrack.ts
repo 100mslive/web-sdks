@@ -433,6 +433,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           selection: {
             deviceId: settings.deviceId,
             groupId: groupId,
+            label: this.nativeTrack.label,
           },
         });
       }

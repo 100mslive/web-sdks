@@ -526,6 +526,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           selection: {
             deviceId: settings.deviceId,
             groupId: groupId,
+            label: this.nativeTrack.label,
           },
         });
       }

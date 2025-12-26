@@ -105,6 +105,7 @@ export abstract class HMSTrack {
         groupId: track.getSettings().groupId,
       },
       trackInfo: {
+        label: track.label,
         enabled: track.enabled,
         muted: track.muted,
         readyState: track.readyState,

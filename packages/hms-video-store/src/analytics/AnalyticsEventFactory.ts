@@ -289,6 +289,7 @@ export default class AnalyticsEventFactory {
     reason: string;
     deviceInfo: Partial<MediaDeviceInfo>;
     trackInfo?: {
+      label: string;
       enabled: boolean;
       muted: boolean;
       readyState: string;
