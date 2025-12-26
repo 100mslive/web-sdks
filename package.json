@@ -44,7 +44,7 @@
     "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
-    "lerna:publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes",
+    "lerna:publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes -- --provenance",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install",
