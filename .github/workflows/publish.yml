@@ -64,6 +64,11 @@ jobs:
           status: Publishing
           color: '#bada55'
 
+      - name: Debug
+        run: |
+          npm --version
+          npm config list
+          npm whoami --registry https://registry.npmjs.org/ || echo "Not authenticated"
         # from-package will publish whatever version is present in each package's package.json
         # it will not publish if the version is already published in npm
       - name: Publish
