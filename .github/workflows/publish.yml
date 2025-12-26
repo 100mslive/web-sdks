@@ -70,6 +70,7 @@ jobs:
         run: yarn lerna:publish
         env:
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Delay for 15s
         run: sleep 15
