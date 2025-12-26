@@ -9,9 +9,7 @@
       "message": "build: update version"
     },
     "publish": {
-      "access": "public",
-      "registry": "https://registry.npmjs.org/",
-      "provenance": true
+      "access": "public"
     }
   },
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
