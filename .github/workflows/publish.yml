@@ -64,17 +64,13 @@ jobs:
           status: Publishing
           color: '#bada55'
 
-      - name: Debug
-        run: |
-          npm --version
-          npm config list
-          npm whoami --registry https://registry.npmjs.org/ || echo "Not authenticated"
         # from-package will publish whatever version is present in each package's package.json
         # it will not publish if the version is already published in npm
       - name: Publish
         run: yarn lerna:publish
         env:
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Delay for 15s
         run: sleep 15
