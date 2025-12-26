@@ -13,6 +13,10 @@ on:
   repository_dispatch:
     types: [publish-command]
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   publish_packages:
     runs-on: ubuntu-latest
