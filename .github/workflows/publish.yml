@@ -14,7 +14,7 @@ on:
     types: [publish-command]
 
 permissions:
-  id-token: write  # Required for OIDC
+  id-token: write # Required for OIDC
   contents: read
 
 jobs:
@@ -69,7 +69,6 @@ jobs:
       - name: Publish
         run: yarn lerna:publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
 
       - name: Delay for 15s
