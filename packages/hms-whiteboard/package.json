@@ -2,7 +2,12 @@
   "name": "@100mslive/hms-whiteboard",
   "author": "100ms",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/hms-whiteboard"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",

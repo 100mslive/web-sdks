@@ -23,11 +23,12 @@ jobs:
 
       - name: Update versions
         run: |
-          yarn global add lerna@5
-          lerna -v
-          echo $(lerna version prerelease --no-git-tag-version --exact --yes --no-private)
-          lerna add @100mslive/hms-video-store --peer --scope=@100mslive/hms-virtual-background --exact
-          lerna add @100mslive/roomkit-react --scope=prebuilt-react-integration --exact
+          yarn lerna version prerelease --no-git-tag-version --exact --yes --no-private
+          # Update internal dependency versions in package.json without modifying lockfile
+          STORE_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
+          ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
+          cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
+          cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
 
       - name: Commit and push changes
         run: |
