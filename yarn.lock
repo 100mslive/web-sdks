@@ -8798,10 +8798,10 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-effects-sdk@3.4.3:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.4.3.tgz#55e716286e16c6f7aa8ed230f69860a53dd42866"
-  integrity sha512-Fs9PbgsRWod0d+OjWUb1tek7HtjHJEsR53cqU1rrF4nCQHyJ3DI80uErc+9dJVvBG0YOyCKzfTjrW24UtMJ/tA==
+effects-sdk@3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.6.2.tgz#1ea629cb6cdf555a5b3bdf33b2a5bfa813ffd26b"
+  integrity sha512-OzBtjnRNXZjabFKFMoUmC7vLMlfXhJ7daRV4WyZ6hdhuaVJl/vhD5x/hjl60zNGp/zVFQMx+V7TEJ3l1d97gUw==
 
 ejs@^3.1.7, ejs@^3.1.8:
   version "3.1.9"
