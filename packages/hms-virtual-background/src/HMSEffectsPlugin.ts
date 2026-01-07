@@ -64,9 +64,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
-  isSupported(): boolean {
-    return this.effects.isSupported();
-  }
+  // isSupported(): boolean {
+  //   return this.effects.isSupported();
+  // }
 
   private async executeAfterInit(callback: () => void) {
     await this.initPromise;

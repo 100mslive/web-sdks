@@ -9113,10 +9113,10 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-effects-sdk@3.5.9:
-  version "3.5.9"
-  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.5.9.tgz#9776bd48c0ba668fbf514ab64311a1f6ac5883c7"
-  integrity sha512-upyUORZte3mzEmndkHF1JABNn1uq/AQ+gtwNG4Kn0SFhJgxHiMD7z0zFPohPXHtd3/wl+xsP0bEkXKep0eVihA==
+effects-sdk@3.4.3:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-3.4.3.tgz#55e716286e16c6f7aa8ed230f69860a53dd42866"
+  integrity sha512-Fs9PbgsRWod0d+OjWUb1tek7HtjHJEsR53cqU1rrF4nCQHyJ3DI80uErc+9dJVvBG0YOyCKzfTjrW24UtMJ/tA==
 
 ejs@^3.1.7, ejs@^3.1.8:
   version "3.1.9"
