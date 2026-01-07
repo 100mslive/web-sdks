@@ -44,7 +44,6 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
       joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
       max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
-      cpu_pressure_state: this.cpuPressureMonitor?.getCurrentState(),
     };
   }
 
@@ -85,6 +84,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
               rid: layerStats.rid,
               ssrc: layerStats.ssrc.toString(),
               kind: layerStats.kind,
+              cpuPressureMonitor: this.cpuPressureMonitor,
             });
             trackAnalytics.pushTempStat(newTempStats);
             this.trackAnalytics.set(this.getTrackIdentifier(track.trackId, layerStats), trackAnalytics);
@@ -108,6 +108,19 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
 
 class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   samples: (LocalBaseSample | LocalVideoSample)[] = [];
+  private cpuPressureMonitor?: CPUPressureMonitor;
+
+  constructor(params: {
+    track: any;
+    sampleWindowSize: number;
+    rid?: string;
+    ssrc: string;
+    kind: string;
+    cpuPressureMonitor?: CPUPressureMonitor;
+  }) {
+    super(params);
+    this.cpuPressureMonitor = params.cpuPressureMonitor;
+  }
 
   protected collateSample = (): LocalBaseSample | LocalVideoSample => {
     const latestStat = this.getLatestStat();
@@ -131,6 +144,10 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const avg_round_trip_time = this.calculateAverage('roundTripTime', false);
     const avg_round_trip_time_ms = avg_round_trip_time ? Math.round(avg_round_trip_time * 1000) : undefined;
 
+    // Capture worst CPU state for this sample window, then reset for next window
+    const cpu_pressure_state = this.cpuPressureMonitor?.getWorstState();
+    this.cpuPressureMonitor?.resetWorstState();
+
     return removeUndefinedFromObject({
       timestamp: Date.now(),
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
@@ -146,6 +163,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       avg_round_trip_time_ms,
       total_quality_limitation,
       resolution,
+      cpu_pressure_state,
     });
   };
 
