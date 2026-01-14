@@ -197,28 +197,18 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
-  private updateCanvas(stream: MediaStream) {
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
-    this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
-  }
-
   apply(stream: MediaStream): MediaStream {
     this.effects.clear();
     this.applyEffect();
     this.effects.onChangeInputResolution(() => {
-      // Clear the ONNX model state and re-apply effects when resolution changes
-      // This is necessary because the ONNX runtime pre-allocates buffers for specific dimensions
-      this.effects.clear();
-      this.updateCanvas(stream);
-      this.applyEffect();
-      const { height, width } = stream.getVideoTracks()[0].getSettings();
-      this.onResolutionChangeCallback?.(width!, height!);
+      const effectsStream = this.effects.getStream();
+      if (effectsStream) {
+        const { height, width } = effectsStream.getVideoTracks()[0].getSettings();
+        this.onResolutionChangeCallback?.(width!, height!);
+      }
     });
-    this.updateCanvas(stream);
-    return this.canvas.captureStream(30) || stream;
+    this.effects.useStream(stream);
+    return this.effects.getStream() || stream;
   }
 
   stop() {
