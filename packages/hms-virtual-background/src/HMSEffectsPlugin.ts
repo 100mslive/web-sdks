@@ -16,7 +16,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private resolveInit!: () => void;
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
-  private canvas: HTMLCanvasElement;
   private TAG = '[HMSEffectsPlugin]';
   // Queue to serialize effect operations and prevent race conditions
   private operationQueue: Promise<void> = Promise.resolve();
@@ -43,7 +42,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.jsep.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.jsep.wasm`,
       },
     });
-    this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // The SDK fires various messages through onError:
       // - Info messages with type='info' (we ignore these)
@@ -197,24 +195,18 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
-  private updateCanvas(stream: MediaStream) {
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
-    this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
-  }
-
   apply(stream: MediaStream): MediaStream {
     this.effects.clear();
     this.applyEffect();
     this.effects.onChangeInputResolution(() => {
-      this.updateCanvas(stream);
-      const { height, width } = stream.getVideoTracks()[0].getSettings();
-      this.onResolutionChangeCallback?.(width!, height!);
+      const effectsStream = this.effects.getStream();
+      if (effectsStream) {
+        const { height, width } = effectsStream.getVideoTracks()[0].getSettings();
+        this.onResolutionChangeCallback?.(width!, height!);
+      }
     });
-    this.updateCanvas(stream);
-    return this.canvas.captureStream(30) || stream;
+    this.effects.useStream(stream);
+    return this.effects.getStream() || stream;
   }
 
   stop() {
