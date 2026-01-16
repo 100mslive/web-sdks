@@ -140,11 +140,16 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const source_resolution = latestStat.sourceFrameHeight
       ? { height_px: latestStat.sourceFrameHeight, width_px: latestStat.sourceFrameWidth }
       : undefined;
+    const source_total_frames = this.calculateDifferenceForSample('sourceFrames');
+    const frames_encoded = this.calculateDifferenceForSample('framesEncoded');
+    // Compute frames dropped as difference between captured and encoded frames
+    const source_total_frames_dropped =
+      source_total_frames && frames_encoded ? Math.max(0, source_total_frames - frames_encoded) : undefined;
     return {
       source_resolution,
       source_avg_fps: this.calculateAverage('sourceFramesPerSecond'),
-      source_total_frames: this.calculateDifferenceForSample('sourceFrames'),
-      source_total_frames_dropped: this.calculateDifferenceForSample('sourceFramesDropped'),
+      source_total_frames,
+      source_total_frames_dropped,
     };
   };
 
