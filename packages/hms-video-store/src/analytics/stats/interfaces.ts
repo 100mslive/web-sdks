@@ -51,6 +51,13 @@ export interface LocalVideoSample extends LocalBaseSample {
   total_quality_limitation?: QualityLimitation;
   avg_fps?: number;
   resolution?: Resolution;
+  /**
+   * Source/capture stats from media-source (pre-encoding).
+   */
+  source_resolution?: Resolution;
+  source_avg_fps?: number;
+  source_total_frames?: number;
+  source_total_frames_dropped?: number;
 }
 
 export interface QualityLimitation {
