@@ -122,27 +122,45 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     this.cpuPressureMonitor = params.cpuPressureMonitor;
   }
 
+  private getQualityLimitation = (latestStat: HMSTrackStats) => {
+    const qualityLimitationDurations = latestStat.qualityLimitationDurations;
+    return (
+      qualityLimitationDurations && {
+        bandwidth_sec: qualityLimitationDurations.bandwidth,
+        cpu_sec: qualityLimitationDurations.cpu,
+        other_sec: qualityLimitationDurations.other,
+      }
+    );
+  };
+
+  private getSourceStats = (latestStat: HMSTrackStats) => {
+    if (!latestStat.sourceStatsAvailable) {
+      return {};
+    }
+    const source_resolution = latestStat.sourceFrameHeight
+      ? { height_px: latestStat.sourceFrameHeight, width_px: latestStat.sourceFrameWidth }
+      : undefined;
+    const source_total_frames = this.calculateDifferenceForSample('sourceFrames');
+    const frames_encoded = this.calculateDifferenceForSample('framesEncoded');
+    // Compute frames dropped as difference between captured and encoded frames
+    const source_total_frames_dropped =
+      source_total_frames && frames_encoded ? Math.max(0, source_total_frames - frames_encoded) : undefined;
+    return {
+      source_resolution,
+      source_avg_fps: this.calculateAverage('sourceFramesPerSecond'),
+      source_total_frames,
+      source_total_frames_dropped,
+    };
+  };
+
   protected collateSample = (): LocalBaseSample | LocalVideoSample => {
     const latestStat = this.getLatestStat();
 
-    const qualityLimitationDurations = latestStat.qualityLimitationDurations;
-    const total_quality_limitation = qualityLimitationDurations && {
-      bandwidth_sec: qualityLimitationDurations.bandwidth,
-      cpu_sec: qualityLimitationDurations.cpu,
-      other_sec: qualityLimitationDurations.other,
-    };
-
     const resolution = latestStat.frameHeight
-      ? {
-          height_px: this.getLatestStat().frameHeight,
-          width_px: this.getLatestStat().frameWidth,
-        }
+      ? { height_px: latestStat.frameHeight, width_px: latestStat.frameWidth }
       : undefined;
     const avg_jitter = this.calculateAverage('jitter', false);
-    const avg_jitter_ms = avg_jitter ? Math.round(avg_jitter * 1000) : undefined;
-
     const avg_round_trip_time = this.calculateAverage('roundTripTime', false);
-    const avg_round_trip_time_ms = avg_round_trip_time ? Math.round(avg_round_trip_time * 1000) : undefined;
 
     // Capture worst CPU state for this sample window, then reset for next window
     const cpu_pressure_state = this.cpuPressureMonitor?.getWorstState();
@@ -153,17 +171,18 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
-      total_packets_lost: this.getLatestStat().packetsLost,
-      total_packets_sent: this.getLatestStat().packetsSent,
+      total_packets_lost: latestStat.packetsLost,
+      total_packets_sent: latestStat.packetsSent,
       total_packet_sent_delay_sec: parseFloat(this.calculateDifferenceForSample('totalPacketSendDelay').toFixed(4)),
       total_fir_count: this.calculateDifferenceForSample('firCount'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
-      avg_jitter_ms,
-      avg_round_trip_time_ms,
-      total_quality_limitation,
+      avg_jitter_ms: avg_jitter ? Math.round(avg_jitter * 1000) : undefined,
+      avg_round_trip_time_ms: avg_round_trip_time ? Math.round(avg_round_trip_time * 1000) : undefined,
+      total_quality_limitation: this.getQualityLimitation(latestStat),
       resolution,
       cpu_pressure_state,
+      ...this.getSourceStats(latestStat),
     });
   };
 
