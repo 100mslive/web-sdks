@@ -11,9 +11,118 @@ import {
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
-import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSRemoteTrack, HMSTrackType } from '../media/tracks';
 import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
+
+interface MediaSourceStats {
+  frames?: number;
+  framesPerSecond?: number;
+  framesDropped?: number;
+  width?: number;
+  height?: number;
+  timestamp?: DOMHighResTimeStamp;
+}
+
+const isVideoMediaSourceStat = (stat: any): boolean => {
+  const kind = stat.kind || stat.mediaType;
+  return !kind || kind === 'video';
+};
+
+const matchesSenderTrack = (stat: any, senderTrackId?: string): boolean => {
+  if (!senderTrackId || !stat.trackIdentifier) {
+    return true;
+  }
+  return stat.trackIdentifier === senderTrackId;
+};
+
+const extractMediaSourceStats = (stat: any): MediaSourceStats => {
+  return {
+    frames: stat.frames,
+    framesPerSecond: stat.framesPerSecond,
+    framesDropped: stat.framesDropped,
+    width: stat.width ?? stat.frameWidth,
+    height: stat.height ?? stat.frameHeight,
+    timestamp: stat.timestamp,
+  };
+};
+
+const computeSourceFrameRateFromFrames = (
+  mediaSourceStats: MediaSourceStats,
+  prevTrackStats?: HMSTrackStats,
+): number | undefined => {
+  if (
+    !isPresent(mediaSourceStats.frames) ||
+    !isPresent(prevTrackStats?.sourceFrames) ||
+    !isPresent(mediaSourceStats.timestamp) ||
+    !isPresent(prevTrackStats?.sourceTimestamp)
+  ) {
+    return undefined;
+  }
+  return (
+    computeNumberRate(
+      mediaSourceStats.frames,
+      prevTrackStats?.sourceFrames,
+      mediaSourceStats.timestamp,
+      prevTrackStats?.sourceTimestamp,
+    ) * 1000
+  );
+};
+
+const resolveSourceFramesPerSecond = (
+  mediaSourceStats: MediaSourceStats,
+  prevTrackStats?: HMSTrackStats,
+): number | undefined => {
+  if (isPresent(mediaSourceStats.framesPerSecond)) {
+    return mediaSourceStats.framesPerSecond;
+  }
+  return computeSourceFrameRateFromFrames(mediaSourceStats, prevTrackStats);
+};
+
+const normalizeQualityLimitationDurations = (
+  value?: Record<string, number>,
+): { none: number; cpu: number; bandwidth: number; other: number } | undefined => {
+  if (!value) {
+    return undefined;
+  }
+  return {
+    none: value.none || 0,
+    cpu: value.cpu || 0,
+    bandwidth: value.bandwidth || 0,
+    other: value.other || 0,
+  };
+};
+
+const getTrackSourceStats = (
+  trackReport: RTCStatsReport | undefined,
+  track: HMSLocalTrack,
+): MediaSourceStats | undefined => {
+  if (!trackReport) {
+    return undefined;
+  }
+  const senderTrackId = track.transceiver?.sender?.track?.id;
+  for (const stat of trackReport.values()) {
+    if (stat.type !== 'track') {
+      continue;
+    }
+    const trackStat = stat as any;
+    if (!isVideoMediaSourceStat(trackStat)) {
+      continue;
+    }
+    if (!matchesSenderTrack(trackStat, senderTrackId)) {
+      continue;
+    }
+    return extractMediaSourceStats(trackStat);
+  }
+  return undefined;
+};
+
+const resolveSourceStats = (
+  trackReport: RTCStatsReport | undefined,
+  track: HMSLocalTrack,
+): MediaSourceStats | undefined => {
+  return getMediaSourceStats(trackReport, track) || getTrackSourceStats(trackReport, track);
+};
 
 export const getLocalTrackStats = async (
   eventBus: EventBus,
@@ -31,6 +140,7 @@ export const getLocalTrackStats = async (
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
     const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
+    const mediaSourceStats = track.type === HMSTrackType.VIDEO ? resolveSourceStats(trackReport, track) : undefined;
     trackReport?.forEach(stat => {
       switch (stat.type) {
         case 'outbound-rtp':
@@ -55,10 +165,19 @@ export const getLocalTrackStats = async (
         codec = mimeType.substring(mimeType.indexOf('/') + 1);
       }
       const out = { ...outbound[stat], rid: (outbound[stat] as HMSLocalTrackStats)?.rid as RID | undefined };
+      const qualityLimitationDurations = normalizeQualityLimitationDurations((out as any).qualityLimitationDurations);
+      const outStats = { ...out, qualityLimitationDurations };
+      const outboundStats = outStats as Partial<HMSTrackStats>;
+      const trackIdentifier =
+        (outStats as any).trackIdentifier ?? track.transceiver?.sender?.track?.id ?? track.trackId;
       const inStats = inbound[out.ssrc];
+      const sourceStats =
+        track.type === HMSTrackType.VIDEO ? buildMediaSourceStats(mediaSourceStats, prevTrackStats?.[stat]) : {};
       trackStats[stat] = {
-        ...out,
-        bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
+        ...outStats,
+        ...sourceStats,
+        trackIdentifier,
+        bitrate: computeBitrate('bytesSent', outboundStats, prevTrackStats?.[stat]),
         packetsLost: inStats?.packetsLost,
         jitter: inStats?.jitter,
         roundTripTime: inStats?.roundTripTime,
@@ -104,10 +223,11 @@ export const getTrackStats = async (
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
+  const reportStats = trackStats as Partial<HMSTrackStats> | undefined;
 
-  const bitrate = computeBitrate('bytesReceived', trackStats, prevTrackStats);
+  const bitrate = computeBitrate('bytesReceived', reportStats, prevTrackStats);
 
-  const packetsLostRate = computeStatRate('packetsLost', trackStats, prevTrackStats);
+  const packetsLostRate = computeStatRate('packetsLost', reportStats, prevTrackStats);
 
   if (trackStats?.remote) {
     Object.assign(trackStats.remote, {
@@ -118,6 +238,7 @@ export const getTrackStats = async (
   return (
     trackStats && {
       ...trackStats,
+      trackIdentifier: (trackStats as any).trackIdentifier ?? track.transceiver?.receiver?.track?.id ?? track.trackId,
       bitrate,
       packetsLostRate,
       peerID: track.peerId,
@@ -160,13 +281,58 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
     codec = mimeType.substring(mimeType.indexOf('/') + 1);
   }
 
-  return (
-    streamStats &&
-    Object.assign(streamStats, {
-      remote: remoteStreamStats,
-      codec: codec,
-    })
+  if (!streamStats) {
+    return undefined;
+  }
+  const qualityLimitationDurations = normalizeQualityLimitationDurations(
+    (streamStats as any).qualityLimitationDurations,
   );
+  return Object.assign(streamStats, {
+    remote: remoteStreamStats,
+    codec: codec,
+    ...(qualityLimitationDurations ? { qualityLimitationDurations } : {}),
+  });
+};
+
+const getMediaSourceStats = (
+  trackReport: RTCStatsReport | undefined,
+  track: HMSLocalTrack,
+): MediaSourceStats | undefined => {
+  if (!trackReport) {
+    return undefined;
+  }
+  const senderTrackId = track.transceiver?.sender?.track?.id;
+  for (const stat of trackReport.values()) {
+    if (stat.type !== 'media-source') {
+      continue;
+    }
+    const mediaStat = stat as any;
+    if (!isVideoMediaSourceStat(mediaStat)) {
+      continue;
+    }
+    if (!matchesSenderTrack(mediaStat, senderTrackId)) {
+      continue;
+    }
+    return extractMediaSourceStats(mediaStat);
+  }
+  return undefined;
+};
+
+const buildMediaSourceStats = (
+  mediaSourceStats: MediaSourceStats | undefined,
+  prevTrackStats?: HMSTrackStats,
+): Partial<HMSLocalTrackStats> => {
+  return {
+    sourceFrameWidth: mediaSourceStats?.width,
+    sourceFrameHeight: mediaSourceStats?.height,
+    sourceFrames: mediaSourceStats?.frames,
+    sourceFramesDropped: mediaSourceStats?.framesDropped,
+    sourceFramesPerSecond: mediaSourceStats
+      ? resolveSourceFramesPerSecond(mediaSourceStats, prevTrackStats)
+      : undefined,
+    sourceTimestamp: mediaSourceStats?.timestamp,
+    sourceStatsAvailable: Boolean(mediaSourceStats),
+  };
 };
 
 export const getLocalPeerStatsFromReport = (
