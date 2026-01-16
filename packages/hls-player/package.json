@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hls-player",
-  "version": "0.4.1-alpha.3",
+  "version": "0.4.1-alpha.4",
   "description": "HLS client library which uses HTML5 Video element and Media Source Extension for playback",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -36,7 +36,7 @@
   "author": "100ms",
   "license": "MIT",
   "dependencies": {
-    "@100mslive/hls-stats": "0.5.1-alpha.3",
+    "@100mslive/hls-stats": "0.5.1-alpha.4",
     "eventemitter2": "^6.4.9",
     "hls.js": "1.4.12"
   },
