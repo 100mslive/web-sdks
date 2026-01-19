@@ -16,8 +16,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private resolveInit!: () => void;
   private onInit;
   private onResolutionChangeCallback?: (width: number, height: number) => void;
-  private canvas: HTMLCanvasElement;
   private TAG = '[HMSEffectsPlugin]';
+  // Queue to serialize effect operations and prevent race conditions
+  private operationQueue: Promise<void> = Promise.resolve();
+  // Counter to track the latest effect request and skip stale operations
+  private effectRequestId = 0;
 
   constructor(effectsSDKKey: string, onInit?: () => void) {
     this.effects = new tsvb(effectsSDKKey);
@@ -39,7 +42,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         'ort-wasm-simd.jsep.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.jsep.wasm`,
       },
     });
-    this.canvas = document.createElement('canvas');
     this.effects.onError(err => {
       // The SDK fires various messages through onError:
       // - Info messages with type='info' (we ignore these)
@@ -68,21 +70,42 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.effects.isSupported();
   }
 
-  private async executeAfterInit(callback: () => void) {
-    await this.initPromise;
-    callback();
+  private enqueueOperation(callback: () => void): Promise<void> {
+    this.operationQueue = this.operationQueue
+      .then(() => this.initPromise)
+      .then(() => callback())
+      .catch(err => {
+        console.error(this.TAG, 'Operation failed:', err);
+      });
+    return this.operationQueue;
   }
 
   removeBlur() {
     this.blurAmount = 0;
-    this.executeAfterInit(() => {
+    if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
+      this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+    }
+    const requestId = ++this.effectRequestId;
+    this.enqueueOperation(() => {
+      // Skip if a newer effect request was made
+      if (requestId !== this.effectRequestId) {
+        return;
+      }
       this.effects.clearBlur();
     });
   }
 
   removeBackground() {
     this.background = '';
-    this.executeAfterInit(() => {
+    if (this.backgroundType === HMSVirtualBackgroundTypes.IMAGE) {
+      this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+    }
+    const requestId = ++this.effectRequestId;
+    this.enqueueOperation(() => {
+      // Skip if a newer effect request was made
+      if (requestId !== this.effectRequestId) {
+        return;
+      }
       this.effects.clearBackground();
     });
   }
@@ -95,9 +118,15 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       throw new Error('Blur amount should be between 0 and 1');
     }
     this.blurAmount = blur;
+    this.background = '';
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.removeBackground();
-    this.executeAfterInit(() => {
+    const requestId = ++this.effectRequestId;
+    this.enqueueOperation(() => {
+      // Skip if a newer effect request was made
+      if (requestId !== this.effectRequestId) {
+        return;
+      }
+      this.effects.clearBackground();
       this.effects.setBlur(this.blurAmount);
       this.effects.run();
     });
@@ -109,7 +138,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   async setPreset(preset: 'quality' | 'balanced') {
     this.preset = preset;
     return new Promise((resolve, reject) => {
-      this.executeAfterInit(() => {
+      this.enqueueOperation(() => {
         this.effects.setSegmentationPreset(this.preset).then(resolve).catch(reject);
       });
     });
@@ -125,9 +154,16 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   removeEffects() {
     this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-    this.removeBackground();
-    this.removeBlur();
-    this.executeAfterInit(() => {
+    this.background = '';
+    this.blurAmount = 0;
+    const requestId = ++this.effectRequestId;
+    this.enqueueOperation(() => {
+      // Skip if a newer effect request was made
+      if (requestId !== this.effectRequestId) {
+        return;
+      }
+      this.effects.clearBackground();
+      this.effects.clearBlur();
       this.effects.stop();
     });
   }
@@ -137,9 +173,15 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       throw new Error('Background url cannot be empty');
     }
     this.background = url;
+    this.blurAmount = 0;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-    this.removeBlur();
-    this.executeAfterInit(() => {
+    const requestId = ++this.effectRequestId;
+    this.enqueueOperation(() => {
+      // Skip if a newer effect request was made
+      if (requestId !== this.effectRequestId) {
+        return;
+      }
+      this.effects.clearBlur();
       this.effects.setBackground(this.background);
       this.effects.run();
     });
@@ -153,24 +195,18 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
-  private updateCanvas(stream: MediaStream) {
-    const { height, width } = stream.getVideoTracks()[0].getSettings();
-    this.canvas.width = width!;
-    this.canvas.height = height!;
-    this.effects.useStream(stream);
-    this.effects.toCanvas(this.canvas);
-  }
-
   apply(stream: MediaStream): MediaStream {
     this.effects.clear();
     this.applyEffect();
     this.effects.onChangeInputResolution(() => {
-      this.updateCanvas(stream);
-      const { height, width } = stream.getVideoTracks()[0].getSettings();
-      this.onResolutionChangeCallback?.(width!, height!);
+      const effectsStream = this.effects.getStream();
+      if (effectsStream) {
+        const { height, width } = effectsStream.getVideoTracks()[0].getSettings();
+        this.onResolutionChangeCallback?.(width!, height!);
+      }
     });
-    this.updateCanvas(stream);
-    return this.canvas.captureStream(30) || stream;
+    this.effects.useStream(stream);
+    return this.effects.getStream() || stream;
   }
 
   stop() {
