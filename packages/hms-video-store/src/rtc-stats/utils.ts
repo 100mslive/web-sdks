@@ -172,7 +172,9 @@ export const getLocalTrackStats = async (
         (outStats as any).trackIdentifier ?? track.transceiver?.sender?.track?.id ?? track.trackId;
       const inStats = inbound[out.ssrc];
       const sourceStats =
-        track.type === HMSTrackType.VIDEO ? buildMediaSourceStats(mediaSourceStats, prevTrackStats?.[stat]) : {};
+        track.type === HMSTrackType.VIDEO
+          ? buildMediaSourceStats(mediaSourceStats, (outStats as any).framesEncoded, prevTrackStats?.[stat])
+          : {};
       trackStats[stat] = {
         ...outStats,
         ...sourceStats,
@@ -318,15 +320,41 @@ const getMediaSourceStats = (
   return undefined;
 };
 
+const computeSourceFramesDropped = (
+  sourceFrames: number | undefined,
+  framesEncoded: number | undefined,
+  prevSourceFrames: number | undefined,
+  prevFramesEncoded: number | undefined,
+): number | undefined => {
+  if (
+    !isPresent(sourceFrames) ||
+    !isPresent(framesEncoded) ||
+    !isPresent(prevSourceFrames) ||
+    !isPresent(prevFramesEncoded)
+  ) {
+    return undefined;
+  }
+  const framesCapturedDiff = (sourceFrames as number) - (prevSourceFrames as number);
+  const framesEncodedDiff = (framesEncoded as number) - (prevFramesEncoded as number);
+  return Math.max(0, framesCapturedDiff - framesEncodedDiff);
+};
+
 const buildMediaSourceStats = (
   mediaSourceStats: MediaSourceStats | undefined,
+  framesEncoded: number | undefined,
   prevTrackStats?: HMSTrackStats,
 ): Partial<HMSLocalTrackStats> => {
+  const sourceFramesDropped = computeSourceFramesDropped(
+    mediaSourceStats?.frames,
+    framesEncoded,
+    prevTrackStats?.sourceFrames,
+    prevTrackStats?.framesEncoded,
+  );
   return {
     sourceFrameWidth: mediaSourceStats?.width,
     sourceFrameHeight: mediaSourceStats?.height,
     sourceFrames: mediaSourceStats?.frames,
-    sourceFramesDropped: mediaSourceStats?.framesDropped,
+    sourceFramesDropped,
     sourceFramesPerSecond: mediaSourceStats
       ? resolveSourceFramesPerSecond(mediaSourceStats, prevTrackStats)
       : undefined,
