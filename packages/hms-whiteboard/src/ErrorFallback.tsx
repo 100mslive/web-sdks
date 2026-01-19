@@ -20,6 +20,10 @@ export const ErrorFallback: TLErrorFallbackComponent = ({ error, editor, refresh
   const errorMessage = error instanceof Error ? error.message : String(error);
   const errorStack = error instanceof Error ? error.stack : null;
 
+  useEffect(() => {
+    console.error('Whiteboard ErrorFallback:', errorMessage, errorStack);
+  }, [errorMessage, errorStack]);
+
   const isDarkModeFromApp = useValue(
     'isDarkMode',
     () => {
