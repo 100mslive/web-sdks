@@ -13,7 +13,12 @@ const peerDeps = Object.keys(pkg.peerDependencies || {});
 
 const config = {
   input: 'src/index.ts',
-  external: [...deps, ...peerDeps],
+  external: id => {
+    // Externalize all @tldraw/* packages to avoid bundling duplicates
+    if (id.startsWith('@tldraw/')) return true;
+    // Externalize direct deps and peer deps
+    return [...deps, ...peerDeps].some(dep => id === dep || id.startsWith(dep + '/'));
+  },
   output: [
     { file: pkg.main, format: 'cjs', sourcemap: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
