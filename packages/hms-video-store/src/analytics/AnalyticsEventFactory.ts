@@ -309,6 +309,23 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static mediaConstraints({
+    constraints,
+    trackSettings,
+  }: {
+    constraints: MediaStreamConstraints;
+    trackSettings: { video?: MediaTrackSettings; audio?: MediaTrackSettings };
+  }) {
+    return new AnalyticsEvent({
+      name: 'media.constraints',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        constraints,
+        track_settings: trackSettings,
+      },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
