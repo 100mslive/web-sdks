@@ -168,7 +168,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
-          constraints: { audio: settings.toConstraints() },
+          requestedConstraints: { audio: settings.toConstraints() },
+          appliedConstraints: { audio: newTrack.getConstraints() },
           trackSettings: { audio: newTrack.getSettings() },
         }),
       );
@@ -194,7 +195,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
-          constraints: { audio: this.settings.toConstraints() },
+          requestedConstraints: { audio: this.settings.toConstraints() },
+          appliedConstraints: { audio: newTrack.getConstraints() },
           trackSettings: { audio: newTrack.getSettings() },
         }),
       );

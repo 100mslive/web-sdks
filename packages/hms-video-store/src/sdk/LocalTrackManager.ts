@@ -384,7 +384,11 @@ export class LocalTrackManager {
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
-          constraints,
+          requestedConstraints: constraints,
+          appliedConstraints: {
+            video: videoTracks[0]?.getConstraints(),
+            audio: audioTracks[0]?.getConstraints(),
+          },
           trackSettings: {
             video: videoTracks[0]?.getSettings(),
             audio: audioTracks[0]?.getSettings(),

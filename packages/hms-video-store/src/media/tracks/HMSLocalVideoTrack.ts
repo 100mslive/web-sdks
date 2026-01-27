@@ -391,7 +391,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
-          constraints: { video: settings.toConstraints() },
+          requestedConstraints: { video: settings.toConstraints() },
+          appliedConstraints: { video: newTrack.getConstraints() },
           trackSettings: { video: newTrack.getSettings() },
         }),
       );
@@ -421,7 +422,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
-          constraints: { video: this.settings.toConstraints() },
+          requestedConstraints: { video: this.settings.toConstraints() },
+          appliedConstraints: { video: track.getConstraints() },
           trackSettings: { video: track.getSettings() },
         }),
       );

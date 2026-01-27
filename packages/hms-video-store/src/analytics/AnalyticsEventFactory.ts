@@ -310,17 +310,20 @@ export default class AnalyticsEventFactory {
   }
 
   static mediaConstraints({
-    constraints,
+    requestedConstraints,
+    appliedConstraints,
     trackSettings,
   }: {
-    constraints: MediaStreamConstraints;
+    requestedConstraints: MediaStreamConstraints;
+    appliedConstraints: { video?: MediaTrackConstraints; audio?: MediaTrackConstraints };
     trackSettings: { video?: MediaTrackSettings; audio?: MediaTrackSettings };
   }) {
     return new AnalyticsEvent({
       name: 'media.constraints',
       level: AnalyticsEventLevel.INFO,
       properties: {
-        constraints,
+        requested_constraints: requestedConstraints,
+        applied_constraints: appliedConstraints,
         track_settings: trackSettings,
       },
     });
