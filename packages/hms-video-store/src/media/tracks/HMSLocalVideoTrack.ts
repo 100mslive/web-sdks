@@ -388,6 +388,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const newTrack = await getVideoTrack(settings);
       this.addTrackEventListeners(newTrack);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          constraints: { video: settings.toConstraints() },
+          trackSettings: { video: newTrack.getSettings() },
+        }),
+      );
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
@@ -411,6 +418,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          constraints: { video: this.settings.toConstraints() },
+          trackSettings: { video: track.getSettings() },
+        }),
+      );
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();
