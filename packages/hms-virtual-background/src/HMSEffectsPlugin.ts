@@ -35,6 +35,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         facedetector: '',
         lowlighter: '',
       },
+      provider: 'auto',
       test_inference: true,
       wasmPaths: {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
