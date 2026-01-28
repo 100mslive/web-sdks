@@ -57,6 +57,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       if (this.effects) {
         this.resolveInit();
         this.onInit?.();
+        this.effects.showFps();
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset(this.preset);
       }
