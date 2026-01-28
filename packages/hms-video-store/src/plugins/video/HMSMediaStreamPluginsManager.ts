@@ -55,6 +55,7 @@ export class HMSMediaStreamPluginsManager {
           const videoTrack = processedStream.getVideoTracks()[0];
           // @ts-ignore
           const metrics = plugin.effects.getMetrics();
+          console.log('Effects Plugin applied with metrics:', metrics);
           this.analytics.added(pluginName, videoTrack.getSettings().frameRate, metrics?.fps);
         }
       } catch (e) {
