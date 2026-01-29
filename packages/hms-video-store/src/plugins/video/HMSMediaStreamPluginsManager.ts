@@ -51,12 +51,7 @@ export class HMSMediaStreamPluginsManager {
       const pluginName = plugin.getName();
       try {
         processedStream = plugin.apply(processedStream);
-        if (plugin.getName() === 'HMSEffectsPlugin') {
-          const videoTrack = processedStream.getVideoTracks()[0];
-          // @ts-ignore
-          const metrics = plugin.effects.getMetrics();
-          this.analytics.added(pluginName, videoTrack.getSettings().frameRate, metrics?.fps);
-        }
+        this.analytics.added(pluginName);
       } catch (e) {
         this.analytics.failure(pluginName, e as HMSException);
         HMSLogger.e('Could not apply plugin', e, pluginName);

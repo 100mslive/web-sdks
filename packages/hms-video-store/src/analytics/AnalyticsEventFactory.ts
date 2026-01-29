@@ -325,6 +325,8 @@ export default class AnalyticsEventFactory {
         requested_constraints: requestedConstraints,
         applied_constraints: appliedConstraints,
         track_settings: trackSettings,
+        webgpu_supported: typeof navigator !== 'undefined' && 'gpu' in navigator,
+        media_stream_track_processor_supported: typeof window !== 'undefined' && 'MediaStreamTrackProcessor' in window,
       },
     });
   }

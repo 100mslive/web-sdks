@@ -35,6 +35,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         facedetector: '',
         lowlighter: '',
       },
+      // provider: 'auto',
       test_inference: true,
       wasmPaths: {
         'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
@@ -193,6 +194,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   getBackground() {
     return this.background || this.backgroundType;
+  }
+
+  /**
+   * Get performance metrics from the effects SDK
+   * @returns metrics object with fps, processing time, etc.
+   */
+  getMetrics() {
+    return this.effects.getMetrics?.();
   }
 
   apply(stream: MediaStream): MediaStream {

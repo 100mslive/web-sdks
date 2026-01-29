@@ -199,12 +199,20 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   };
 
   toAnalytics = (): LocalAudioTrackAnalytics | LocalVideoTrackAnalytics => {
-    return {
+    // Get track settings from native track
+    const track_settings = this.track.getMediaTrackSettings?.();
+
+    // Get effects metrics if available (video tracks only)
+    const effects_metrics = this.track.getPluginsMetrics?.();
+
+    return removeUndefinedFromObject({
       track_id: this.track_id,
       ssrc: this.ssrc,
       source: this.source,
       rid: this.rid,
       samples: this.samples,
-    };
+      track_settings,
+      effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
+    });
   };
 }
