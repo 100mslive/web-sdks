@@ -165,7 +165,11 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     // Capture worst CPU state for this sample window, then reset for next window
     const cpu_pressure_state = this.cpuPressureMonitor?.getWorstState();
     this.cpuPressureMonitor?.resetWorstState();
+    // Get track settings from native track
+    const track_settings = this.track.getMediaTrackSettings?.();
 
+    // Get effects metrics if available (video tracks only)
+    const effects_metrics = this.track.getPluginsMetrics?.();
     return removeUndefinedFromObject({
       timestamp: Date.now(),
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
@@ -182,6 +186,8 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       total_quality_limitation: this.getQualityLimitation(latestStat),
       resolution,
       cpu_pressure_state,
+      track_settings,
+      effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
       ...this.getSourceStats(latestStat),
     });
   };
@@ -199,20 +205,12 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   };
 
   toAnalytics = (): LocalAudioTrackAnalytics | LocalVideoTrackAnalytics => {
-    // Get track settings from native track
-    const track_settings = this.track.getMediaTrackSettings?.();
-
-    // Get effects metrics if available (video tracks only)
-    const effects_metrics = this.track.getPluginsMetrics?.();
-
-    return removeUndefinedFromObject({
+    return {
       track_id: this.track_id,
       ssrc: this.ssrc,
       source: this.source,
       rid: this.rid,
       samples: this.samples,
-      track_settings,
-      effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
-    });
+    };
   };
 }
