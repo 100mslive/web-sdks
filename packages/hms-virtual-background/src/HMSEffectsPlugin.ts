@@ -197,6 +197,14 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
+  /**
+   * Get performance metrics from the effects SDK
+   * @returns metrics object with fps, processing time, etc.
+   */
+  getMetrics() {
+    return this.effects.getMetrics?.();
+  }
+
   apply(stream: MediaStream): MediaStream {
     this.effects.clear();
     this.applyEffect();

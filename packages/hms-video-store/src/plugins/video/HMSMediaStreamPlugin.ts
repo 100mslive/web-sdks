@@ -8,4 +8,10 @@ export interface HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream;
 
   stop(): void;
+
+  /**
+   * Optional method to get performance metrics from the plugin.
+   * @returns metrics object with fps, processing time, etc. or undefined if not supported
+   */
+  getMetrics?(): Record<string, unknown> | undefined;
 }

@@ -23,9 +23,14 @@ interface TrackAnalytics<Sample> {
   samples: Array<Sample>;
 }
 
-export type LocalAudioTrackAnalytics = TrackAnalytics<LocalBaseSample>;
+interface LocalTrackAnalytics<Sample> extends TrackAnalytics<Sample> {
+  track_settings?: MediaTrackSettings; // Native track settings from getSettings()
+  effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
+}
 
-export type LocalVideoTrackAnalytics = TrackAnalytics<LocalVideoSample>;
+export type LocalAudioTrackAnalytics = LocalTrackAnalytics<LocalBaseSample>;
+
+export type LocalVideoTrackAnalytics = LocalTrackAnalytics<LocalVideoSample>;
 
 export type RemoteAudioTrackAnalytics = TrackAnalytics<RemoteAudioSample>;
 
