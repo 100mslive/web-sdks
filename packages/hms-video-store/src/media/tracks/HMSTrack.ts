@@ -62,6 +62,15 @@ export abstract class HMSTrack {
     return this.nativeTrack.getSettings();
   }
 
+  /**
+   * Get performance metrics from attached plugins (e.g., effects SDK).
+   * Override in subclasses that support plugins.
+   * @returns Object with plugin names as keys and their metrics as values, or undefined
+   */
+  getPluginsMetrics(): Record<string, Record<string, unknown> | undefined> | undefined {
+    return undefined;
+  }
+
   async setEnabled(value: boolean): Promise<void> {
     this.nativeTrack.enabled = value;
   }

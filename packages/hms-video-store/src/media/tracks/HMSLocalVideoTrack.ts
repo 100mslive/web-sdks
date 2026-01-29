@@ -238,6 +238,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * Get performance metrics from attached plugins (e.g., effects SDK)
+   * @returns Object with plugin names as keys and their metrics as values
+   */
+  getPluginsMetrics(): Record<string, Record<string, unknown> | undefined> {
+    const metrics: Record<string, Record<string, unknown> | undefined> = {};
+    for (const plugin of this.mediaStreamPluginsManager.plugins) {
+      if (plugin.getMetrics) {
+        metrics[plugin.getName()] = plugin.getMetrics();
+      }
+    }
+    return metrics;
+  }
+
+  /**
    * @see HMSVideoPlugin
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
