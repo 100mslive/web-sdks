@@ -23,14 +23,8 @@ interface TrackAnalytics<Sample> {
   samples: Array<Sample>;
 }
 
-interface LocalTrackAnalytics<Sample> extends TrackAnalytics<Sample> {
-  track_settings?: MediaTrackSettings; // Native track settings from getSettings()
-  effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
-}
-
-export type LocalAudioTrackAnalytics = LocalTrackAnalytics<LocalBaseSample>;
-
-export type LocalVideoTrackAnalytics = LocalTrackAnalytics<LocalVideoSample>;
+export type LocalAudioTrackAnalytics = TrackAnalytics<LocalBaseSample>;
+export type LocalVideoTrackAnalytics = TrackAnalytics<LocalVideoSample>;
 
 export type RemoteAudioTrackAnalytics = TrackAnalytics<RemoteAudioSample>;
 
@@ -50,6 +44,8 @@ export interface LocalBaseSample {
   total_fir_count?: number;
   total_pli_count?: number;
   cpu_pressure_state?: string; // CPU pressure state at the time of sample creation (nominal, fair, serious, critical)
+  track_settings?: MediaTrackSettings; // Native track settings from getSettings()
+  effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
 }
 
 export interface LocalVideoSample extends LocalBaseSample {
