@@ -11,6 +11,23 @@ interface OpenCallbacks<T> {
 const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
 const RETRY_ERROR_MESSAGES = ['network error', 'failed to fetch'];
 
+// Exponential backoff configuration
+const INITIAL_BACKOFF_MS = 1000;
+const MAX_BACKOFF_MS = 30000;
+const BACKOFF_MULTIPLIER = 2;
+
+interface BackoffState {
+  attempt: number;
+  currentDelay: number;
+}
+
+const calculateBackoff = (state: BackoffState): number => {
+  const delay = Math.min(state.currentDelay * BACKOFF_MULTIPLIER, MAX_BACKOFF_MS);
+  // Add jitter (±20%) to prevent thundering herd
+  const jitter = delay * 0.2 * (Math.random() * 2 - 1);
+  return Math.floor(delay + jitter);
+};
+
 export class SessionStore<T> {
   private storeClient: StoreClient;
 
@@ -23,7 +40,10 @@ export class SessionStore<T> {
     this.storeClient = new StoreClient(transport);
   }
 
-  async open({ handleOpen, handleChange, handleError }: OpenCallbacks<T>) {
+  async open(
+    { handleOpen, handleChange, handleError }: OpenCallbacks<T>,
+    backoffState: BackoffState = { attempt: 0, currentDelay: INITIAL_BACKOFF_MS },
+  ) {
     const abortController = new AbortController();
     const call = this.storeClient.open(
       {
@@ -34,8 +54,15 @@ export class SessionStore<T> {
     );
     let count: number | undefined = undefined;
     const initialValues: T[] = [];
+    let isConnected = false;
 
     call.responses.onMessage(message => {
+      // Reset backoff state on successful message (connection is working)
+      if (!isConnected) {
+        isConnected = true;
+        backoffState = { attempt: 0, currentDelay: INITIAL_BACKOFF_MS };
+      }
+
       if (message.value) {
         if (message.value?.data.oneofKind === 'str') {
           const record = JSON.parse(message.value.data.str) as T;
@@ -54,23 +81,35 @@ export class SessionStore<T> {
     });
 
     call.responses.onError(error => {
-      const canRecover = RETRY_ERROR_MESSAGES.includes(error.message.toLowerCase());
-      const shouldRetryInstantly = error.message.toLowerCase() === 'network error';
+      // Don't retry if this was an abort - either intentional close or already reconnecting
+      if (error.message.includes('abort')) {
+        return;
+      }
+
+      handleError(error);
+
+      const nextDelay = calculateBackoff(backoffState);
+      const nextState: BackoffState = {
+        attempt: backoffState.attempt + 1,
+        currentDelay: nextDelay,
+      };
 
       const openCallback = () => {
         abortController.abort(`closing to open new conn`);
-        this.open({ handleOpen, handleChange, handleError });
-        window.removeEventListener('online', openCallback);
+        this.open({ handleOpen, handleChange, handleError }, nextState);
       };
-      if (canRecover) {
-        shouldRetryInstantly && openCallback();
-        window.addEventListener('online', openCallback);
-      }
 
-      if (!error.message.includes('abort')) {
-        handleError(error, !canRecover);
-      }
+      // Apply exponential backoff before reconnecting
+      setTimeout(openCallback, backoffState.currentDelay);
     });
+
+    // Reconnect immediately when the browser comes back online
+    const handleOnline = () => {
+      abortController.abort('reconnecting due to online event');
+      this.open({ handleOpen, handleChange, handleError }); // reset backoff
+    };
+
+    window.addEventListener('online', handleOnline);
 
     try {
       count = await this.getKeysCountWithDelay();
@@ -81,6 +120,7 @@ export class SessionStore<T> {
     }
 
     return () => {
+      window.removeEventListener('online', handleOnline);
       abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
     };
   }
