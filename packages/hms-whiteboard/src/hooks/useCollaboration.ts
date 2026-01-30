@@ -17,7 +17,7 @@ import {
 import { DEFAULT_STORE } from './default_store';
 import { useSessionStore } from './useSessionStore';
 import { useSetEditorPermissions } from './useSetEditorPermissions';
-import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
+import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../constants';
 
 // mandatory record types required for initialisation of the whiteboard and for a full remote sync
 const FULL_SYNC_REQUIRED_RECORD_TYPES: TLRecord['typeName'][] = [

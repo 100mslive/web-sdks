@@ -1,33 +1,13 @@
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
-
+import { BackoffState, calculateBackoff } from '../utils';
+import { INITIAL_BACKOFF_MS, RETRY_ERROR_MESSAGES, WHITEBOARD_CLOSE_MESSAGE } from '../constants';
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
   handleChange: (key: string, value?: T) => void;
   handleError: (error: Error, isTerminal?: boolean) => void;
 }
-
-const WHITEBOARD_CLOSE_MESSAGE = 'client whiteboard abort';
-const RETRY_ERROR_MESSAGES = ['network error', 'failed to fetch'];
-
-// Exponential backoff configuration
-const INITIAL_BACKOFF_MS = 1000;
-const MAX_BACKOFF_MS = 30000;
-const BACKOFF_MULTIPLIER = 2;
-
-interface BackoffState {
-  attempt: number;
-  currentDelay: number;
-}
-
-const calculateBackoff = (state: BackoffState): number => {
-  const delay = Math.min(state.currentDelay * BACKOFF_MULTIPLIER, MAX_BACKOFF_MS);
-  // Add jitter (±20%) to prevent thundering herd
-  const jitter = delay * 0.2 * (Math.random() * 2 - 1);
-  return Math.floor(delay + jitter);
-};
-
 export class SessionStore<T> {
   private storeClient: StoreClient;
 
@@ -80,6 +60,15 @@ export class SessionStore<T> {
       }
     });
 
+    // Reconnect immediately when the browser comes back online
+    const handleOnline = () => {
+      window.removeEventListener('online', handleOnline);
+      abortController.abort('reconnecting due to online event');
+      this.open({ handleOpen, handleChange, handleError }); // reset backoff
+    };
+
+    window.addEventListener('online', handleOnline);
+
     call.responses.onError(error => {
       // Don't retry if this was an abort - either intentional close or already reconnecting
       if (error.message.includes('abort')) {
@@ -95,6 +84,7 @@ export class SessionStore<T> {
       };
 
       const openCallback = () => {
+        window.removeEventListener('online', handleOnline);
         abortController.abort(`closing to open new conn`);
         this.open({ handleOpen, handleChange, handleError }, nextState);
       };
@@ -102,14 +92,6 @@ export class SessionStore<T> {
       // Apply exponential backoff before reconnecting
       setTimeout(openCallback, backoffState.currentDelay);
     });
-
-    // Reconnect immediately when the browser comes back online
-    const handleOnline = () => {
-      abortController.abort('reconnecting due to online event');
-      this.open({ handleOpen, handleChange, handleError }); // reset backoff
-    };
-
-    window.addEventListener('online', handleOnline);
 
     try {
       count = await this.getKeysCountWithDelay();
