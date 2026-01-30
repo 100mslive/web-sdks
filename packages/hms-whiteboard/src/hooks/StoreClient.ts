@@ -93,6 +93,14 @@ export class SessionStore<T> {
       setTimeout(openCallback, backoffState.currentDelay);
     });
 
+    // Reconnect immediately when the browser comes back online
+    const handleOnline = () => {
+      abortController.abort('reconnecting due to online event');
+      this.open({ handleOpen, handleChange, handleError }); // reset backoff
+    };
+
+    window.addEventListener('online', handleOnline);
+
     try {
       count = await this.getKeysCountWithDelay();
       handleOpen(count ? initialValues : []);
