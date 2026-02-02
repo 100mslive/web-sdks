@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Editor, Tldraw } from '@tldraw/tldraw';
+import { ConnectionStatusToast } from './ConnectionStatusToast';
 import { ErrorFallback } from './ErrorFallback';
 import { useCollaboration } from './hooks/useCollaboration';
 import './index.css';
@@ -40,10 +41,6 @@ function CollaborativeEditor({
     onMount?.({ store: store.store, editor });
   };
 
-  if (store.status === 'synced-remote' && store.connectionStatus === 'offline') {
-    return <ErrorFallback error={Error('Network connection lost')} editor={editor} refresh={refresh} />;
-  }
-
   return (
     <Tldraw
       className={transparentCanvas ? 'transparent-canvas' : ''}
@@ -55,6 +52,8 @@ function CollaborativeEditor({
       }}
       hideUi={editor?.getInstanceState()?.isReadonly}
       initialState={editor?.getInstanceState()?.isReadonly ? 'hand' : 'select'}
-    />
+    >
+      <ConnectionStatusToast store={store} />
+    </Tldraw>
   );
 }
