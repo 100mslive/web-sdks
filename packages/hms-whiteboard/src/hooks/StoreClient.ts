@@ -70,6 +70,7 @@ export class SessionStore<T> {
     window.addEventListener('online', handleOnline);
 
     call.responses.onError(error => {
+      console.error('GRPCOpenStreamError: ', error);
       // Don't retry if this was an abort - either intentional close or already reconnecting
       if (error.message.includes('abort')) {
         return;
@@ -97,6 +98,7 @@ export class SessionStore<T> {
       count = await this.getKeysCountWithDelay();
       handleOpen(count ? initialValues : []);
     } catch (error) {
+      console.error('GRPCCountError: ', error);
       const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
       handleError(error as unknown as Error, canRecover);
     }
