@@ -175,7 +175,7 @@ export abstract class RunningTrackAnalytics {
   protected calculateAverage(key: keyof TempStats, round = true) {
     const sum = this.calculateSum(key);
     const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
-    return avg ? (round ? Math.round(avg) : avg) : undefined;
+    return avg !== undefined ? (round ? Math.round(avg) : avg) : undefined;
   }
 
   protected calculateDifferenceForSample(key: keyof TempStats) {
