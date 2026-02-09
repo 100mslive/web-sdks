@@ -176,7 +176,6 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       sample_start_ts: firstStat.timestamp,
       sample_end_ts: latestStat.timestamp,
       sample_duration_ms: latestStat.timestamp - firstStat.timestamp,
-      enabled: latestStat.enabled,
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),

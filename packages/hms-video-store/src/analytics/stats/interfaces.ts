@@ -36,7 +36,6 @@ export interface LocalBaseSample {
   sample_start_ts?: number; // WebRTC timestamp of the first stat in the sample window
   sample_end_ts?: number; // WebRTC timestamp of the last stat in the sample window
   sample_duration_ms?: number; // Duration of the sample window in milliseconds
-  enabled?: boolean;
   avg_round_trip_time_ms?: number;
   avg_jitter_ms?: number;
   total_packets_lost?: number;
@@ -81,7 +80,6 @@ interface RemoteBaseSample {
   sample_start_ts?: number; // WebRTC timestamp of the first stat in the sample window
   sample_end_ts?: number; // WebRTC timestamp of the last stat in the sample window
   sample_duration_ms?: number; // Duration of the sample window in milliseconds
-  enabled?: boolean;
   estimated_playout_timestamp?: number;
   avg_jitter_buffer_delay?: number;
   avg_bitrate_bps?: number;

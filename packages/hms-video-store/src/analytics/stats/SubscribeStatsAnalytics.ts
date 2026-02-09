@@ -139,7 +139,6 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       sample_start_ts: firstStat.timestamp,
       sample_end_ts: latestStat.timestamp,
       sample_duration_ms: latestStat.timestamp - firstStat.timestamp,
-      enabled: latestStat.enabled,
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
       avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay', false),
