@@ -154,6 +154,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   };
 
   protected collateSample = (): LocalBaseSample | LocalVideoSample => {
+    const firstStat = this.getFirstStat();
     const latestStat = this.getLatestStat();
 
     const resolution = latestStat.frameHeight
@@ -172,6 +173,9 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const effects_metrics = this.track.getPluginsMetrics?.();
     return removeUndefinedFromObject({
       timestamp: Date.now(),
+      sample_start_ts: firstStat.timestamp,
+      sample_end_ts: latestStat.timestamp,
+      sample_duration_ms: latestStat.timestamp - firstStat.timestamp,
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
