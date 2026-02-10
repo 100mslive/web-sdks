@@ -165,6 +165,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const newTrack = await getAudioTrack(settings);
       this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { audio: settings.toConstraints() },
+          appliedConstraints: { audio: newTrack.getConstraints() },
+          trackSettings: { audio: newTrack.getSettings() },
+        }),
+      );
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       await this.updateTrack(newTrack);
     } catch (e) {
@@ -184,6 +192,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const newTrack = await getAudioTrack(this.settings);
       this.addTrackEventListeners(newTrack);
       this.tracksCreated.add(newTrack);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { audio: this.settings.toConstraints() },
+          appliedConstraints: { audio: newTrack.getConstraints() },
+          trackSettings: { audio: newTrack.getSettings() },
+        }),
+      );
       await this.updateTrack(newTrack);
       if (this.isPublished) {
         this.eventBus.analytics.publish(

@@ -154,6 +154,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   };
 
   protected collateSample = (): LocalBaseSample | LocalVideoSample => {
+    const firstStat = this.getFirstStat();
     const latestStat = this.getLatestStat();
 
     const resolution = latestStat.frameHeight
@@ -165,9 +166,16 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     // Capture worst CPU state for this sample window, then reset for next window
     const cpu_pressure_state = this.cpuPressureMonitor?.getWorstState();
     this.cpuPressureMonitor?.resetWorstState();
+    // Get track settings from native track
+    const track_settings = this.track.getMediaTrackSettings?.();
 
+    // Get effects metrics if available (video tracks only)
+    const effects_metrics = this.track.getPluginsMetrics?.();
     return removeUndefinedFromObject({
       timestamp: Date.now(),
+      sample_start_ts: firstStat.timestamp,
+      sample_end_ts: latestStat.timestamp,
+      sample_duration_ms: latestStat.timestamp - firstStat.timestamp,
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
@@ -182,6 +190,8 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       total_quality_limitation: this.getQualityLimitation(latestStat),
       resolution,
       cpu_pressure_state,
+      track_settings,
+      effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
       ...this.getSourceStats(latestStat),
     });
   };

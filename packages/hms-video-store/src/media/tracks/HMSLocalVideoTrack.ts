@@ -238,6 +238,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * Get performance metrics from attached plugins (e.g., effects SDK)
+   * @returns Object with plugin names as keys and their metrics as values
+   */
+  getPluginsMetrics(): Record<string, Record<string, unknown> | undefined> {
+    const metrics: Record<string, Record<string, unknown> | undefined> = {};
+    for (const plugin of this.mediaStreamPluginsManager.plugins) {
+      if (plugin.getMetrics) {
+        metrics[plugin.getName()] = plugin.getMetrics();
+      }
+    }
+    return metrics;
+  }
+
+  /**
    * @see HMSVideoPlugin
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
@@ -388,6 +402,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const newTrack = await getVideoTrack(settings);
       this.addTrackEventListeners(newTrack);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { video: settings.toConstraints() },
+          appliedConstraints: { video: newTrack.getConstraints() },
+          trackSettings: { video: newTrack.getSettings() },
+        }),
+      );
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
@@ -411,6 +433,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { video: this.settings.toConstraints() },
+          appliedConstraints: { video: track.getConstraints() },
+          trackSettings: { video: track.getSettings() },
+        }),
+      );
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();

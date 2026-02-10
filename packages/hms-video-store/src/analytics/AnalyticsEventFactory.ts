@@ -309,6 +309,28 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static mediaConstraints({
+    requestedConstraints,
+    appliedConstraints,
+    trackSettings,
+  }: {
+    requestedConstraints: MediaStreamConstraints;
+    appliedConstraints: { video?: MediaTrackConstraints; audio?: MediaTrackConstraints };
+    trackSettings: { video?: MediaTrackSettings; audio?: MediaTrackSettings };
+  }) {
+    return new AnalyticsEvent({
+      name: 'media.constraints',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        requested_constraints: requestedConstraints,
+        applied_constraints: appliedConstraints,
+        track_settings: trackSettings,
+        webgpu_supported: typeof navigator !== 'undefined' && 'gpu' in navigator,
+        media_stream_track_processor_supported: typeof window !== 'undefined' && 'MediaStreamTrackProcessor' in window,
+      },
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
