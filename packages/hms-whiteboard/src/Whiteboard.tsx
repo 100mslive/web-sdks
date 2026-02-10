@@ -34,6 +34,8 @@ function CollaborativeEditor({
     zoomToContent,
   });
 
+  const connectionStatus = store.status === 'synced-remote' ? store.connectionStatus : undefined;
+
   const handleMount = (editor: Editor) => {
     setEditor(editor);
     // @ts-expect-error - for debugging
@@ -50,7 +52,7 @@ function CollaborativeEditor({
       components={{
         ErrorFallback: ({ error, editor }) => <ErrorFallback editor={editor} error={error} refresh={refresh} />,
       }}
-      hideUi={editor?.getInstanceState()?.isReadonly}
+      hideUi={editor?.getInstanceState()?.isReadonly && connectionStatus == 'online'}
       initialState={editor?.getInstanceState()?.isReadonly ? 'hand' : 'select'}
     >
       <ConnectionStatusToast store={store} />
