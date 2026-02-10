@@ -17,7 +17,7 @@ import {
 import { DEFAULT_STORE } from './default_store';
 import { useSessionStore } from './useSessionStore';
 import { useSetEditorPermissions } from './useSetEditorPermissions';
-import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../utils';
+import { CURRENT_PAGE_KEY, PAGES_DEBOUNCE_TIME, SHAPES_THROTTLE_TIME } from '../constants';
 
 // mandatory record types required for initialisation of the whiteboard and for a full remote sync
 const FULL_SYNC_REQUIRED_RECORD_TYPES: TLRecord['typeName'][] = [
@@ -88,12 +88,23 @@ export function useCollaboration({
         type => initialRecords.filter(record => record.typeName === type).length > 0,
       );
       if (shouldUseServerRecords) {
+        // Save local shape records before syncing with server (for offline change preservation)
+        const localShapeRecords = store.allRecords().filter(record => record.typeName === 'shape');
+        const serverRecordIds = new Set(initialRecords.map(r => r.id));
+
         // Replace the tldraw store records with session store
         store.mergeRemoteChanges(() => {
-          // The records here should be compatible with what's in the store
           store.clear();
           store.put(initialRecords);
         });
+
+        // Sync local-only shapes back to server (offline changes preservation)
+        for (const record of localShapeRecords) {
+          if (!serverRecordIds.has(record.id)) {
+            store.put([record]); // Add back to local store
+            sessionStore.set(record.id, record); // Sync to server
+          }
+        }
       } else {
         // Create the initial store records
         // Sync the local tldraw store records to session store
