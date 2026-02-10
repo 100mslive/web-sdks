@@ -1,3 +1,5 @@
+import { BACKOFF_MULTIPLIER, MAX_BACKOFF_MS } from './constants';
+
 export default function decodeJWT(token?: string) {
   if (!token || token.length === 0) {
     throw Error('Token cannot be an empty string or undefined or null');
@@ -15,8 +17,14 @@ export default function decodeJWT(token?: string) {
     throw Error(`couldn't parse to json - ${(err as Error).message}`);
   }
 }
+export interface BackoffState {
+  attempt: number;
+  currentDelay: number;
+}
 
-export const CURRENT_PAGE_KEY = 'currentPage';
-export const SHAPES_THROTTLE_TIME = 11;
-export const PAGES_DEBOUNCE_TIME = 200;
-export const OPEN_WAIT_TIMEOUT = 1000;
+export const calculateBackoff = (state: BackoffState): number => {
+  const delay = Math.min(state.currentDelay * BACKOFF_MULTIPLIER, MAX_BACKOFF_MS);
+  // Add jitter (±20%) to prevent thundering herd
+  const jitter = delay * 0.2 * (Math.random() * 2 - 1);
+  return Math.floor(delay + jitter);
+};
