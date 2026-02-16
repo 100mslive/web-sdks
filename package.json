@@ -12,7 +12,7 @@
     "@typescript-eslint/parser": "^5.4.0",
     "babel-jest": "^29.7.0",
     "babel-plugin-istanbul": "^6.1.1",
-    "concurrently": "^6.4.0",
+    "concurrently": "^9.2.1",
     "dotenv": "^14.2.0",
     "esbuild": "^0.18.13",
     "esbuild-plugin-postcss2": "0.1.1",
@@ -51,9 +51,7 @@
     "reactsdk": "cd packages/react-sdk && yarn start",
     "prebuilt": "cd packages/roomkit-react && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
-    "storybook": "cd packages/roomkit-react && yarn storybook",
-    "build-storybook": "cd packages/roomkit-react && yarn build-storybook",
-    "ybys": "yarn && yarn build --no-private && yarn storybook"
+    "ybys": "yarn && yarn build --no-private"
   },
   "resolutions": {
     "loader-utils": "^2.0.4",
