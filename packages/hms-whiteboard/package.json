@@ -55,7 +55,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "grpc-tools": "^1.12.4",
+    "grpc-tools": "^1.13.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "rollup": "^2.79.2",
