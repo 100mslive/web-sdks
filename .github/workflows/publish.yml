@@ -43,6 +43,9 @@ jobs:
           status: Start
           color: warning
 
+      - name: Configure git for private repos
+        run: git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
+
       - name: Install packages
         run: yarn install
 

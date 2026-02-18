@@ -20,6 +20,9 @@ jobs:
             cypress:
               - 'cypress/**/*.(ts|js)'
 
+      - name: Configure git for private repos
+        run: git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
+
       - name: Cypress
         uses: cypress-io/github-action@v2
         if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true' || steps.filter.outputs.cypress == 'true'

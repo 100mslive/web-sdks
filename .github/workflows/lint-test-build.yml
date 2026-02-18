@@ -17,6 +17,9 @@ jobs:
           node-version: 20
           cache: 'yarn'
 
+      - name: Configure git for private repos
+        run: git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
+
       - name: Install packages
         run: yarn install --frozen-lockfile
 
