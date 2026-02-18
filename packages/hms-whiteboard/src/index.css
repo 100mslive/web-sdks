@@ -1,26 +1,122 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
-@import url('@tldraw/tldraw/tldraw.css');
+/**
+ * @100mslive/hms-whiteboard styles
+ * Styles from whiteboard-core for canvas-based whiteboard
+ */
 
-.tlui-navigation-zone,
-.tlui-navigation-panel {
-  display: none;
+.whiteboard-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.transparent-canvas {
-  --color-background: rgba(0, 0, 0, 0);
+.whiteboard-canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 
-.tl-container {
-  --layer-background: 4; /* 100 */
-  --layer-grid: 5; /* 150 */
-  --layer-canvas: 6; /* 200 */
-  --layer-shapes: 7; /* 300 */
-  --layer-overlays: 8; /* 400 */
-  --layer-following-indicator: 12; /* 1000 */
+.whiteboard-canvas {
+  display: block;
+  touch-action: none;
+  user-select: none;
+}
 
-  --layer-panels: 7;
-  --layer-menus: 8;
-  --layer-overlays: 9;
-  --layer-toasts: 10;
-  --layer-cursor: 11;
+.whiteboard-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.whiteboard-toolbar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whiteboard-toolbar-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.whiteboard-toolbar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.whiteboard-tool-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: #fff;
+  color: #333;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.whiteboard-tool-button:hover {
+  background-color: #e8e8e8;
+}
+
+.whiteboard-tool-button.active {
+  background-color: #0066ff;
+  color: #fff;
+}
+
+.whiteboard-color-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  padding: 0;
+}
+
+.whiteboard-color-button.active {
+  border: 2px solid #0066ff;
+}
+
+.whiteboard-action-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #fff;
+  color: #333;
+}
+
+.whiteboard-action-button:hover {
+  background-color: #e8e8e8;
+}
+
+.whiteboard-action-button:disabled {
+  background-color: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.whiteboard-action-button.danger {
+  background-color: #ff4444;
+  color: #fff;
+}
+
+.whiteboard-action-button.danger:hover {
+  background-color: #ff2222;
 }
