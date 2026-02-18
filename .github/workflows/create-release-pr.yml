@@ -31,7 +31,10 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Configure git for private repos
-        run: git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
+        run: |
+          git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "git@github.com:"
+          git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Install packages
         run: yarn install --frozen-lockfile

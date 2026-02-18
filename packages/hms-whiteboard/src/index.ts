@@ -1,5 +1,6 @@
 /**
  * @100mslive/hms-whiteboard
+ * @version 0.2.0
  *
  * This package re-exports the whiteboard components from @100mslive/whiteboard-core
  * and provides integration with 100ms session store using proper gRPC-web protocol.
