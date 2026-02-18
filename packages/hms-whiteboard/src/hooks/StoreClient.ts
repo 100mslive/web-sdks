@@ -1,7 +1,7 @@
+import { type BackoffState, calculateBackoff } from '@100mslive/whiteboard-core';
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
-import { BackoffState, calculateBackoff } from '../utils';
 import { INITIAL_BACKOFF_MS, RETRY_ERROR_MESSAGES, WHITEBOARD_CLOSE_MESSAGE } from '../constants';
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
