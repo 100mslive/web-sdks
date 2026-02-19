@@ -39,6 +39,7 @@ import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
+import { useHMSPrebuiltContext } from '../AppContext';
 
 let hlsPlayer;
 const toastMap = {};
@@ -79,6 +80,8 @@ const HLSView = () => {
   const [streamEnded, setStreamEnded] = useState(false);
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const hlsUrl = hlsState.variants[0]?.url;
+  const { endpoints, managementToken } = useHMSPrebuiltContext();
+  const [resolvedHlsUrl, setResolvedHlsUrl] = useState(null);
   const [availableLayers, setAvailableLayers] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isCaptionEnabled, setIsCaptionEnabled] = useState(true);
@@ -92,7 +95,7 @@ const HLSView = () => {
   });
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
-  const lastHlsUrl = usePrevious(hlsUrl);
+  const lastHlsUrl = usePrevious(resolvedHlsUrl);
   const vanillaStore = useHMSVanillaStore();
   const [controlsVisible, setControlsVisible] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
@@ -132,6 +135,50 @@ const HLSView = () => {
       setStreamEnded(false);
     }
   }, [hlsUrl, streamEnded, lastHlsUrl]);
+
+  // Fetch signed URL from passport-api for authenticated CDN streams
+  useEffect(() => {
+    if (!hlsUrl) {
+      setResolvedHlsUrl(null);
+      return;
+    }
+    if (!hlsUrl.includes('/s/')) {
+      setResolvedHlsUrl(hlsUrl);
+      return;
+    }
+    const passportEndpoint = endpoints?.passport;
+    if (!passportEndpoint || !managementToken) {
+      setResolvedHlsUrl(hlsUrl);
+      return;
+    }
+    let cancelled = false;
+    const fetchSignedUrl = async () => {
+      try {
+        const resp = await fetch(`${passportEndpoint}/token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${managementToken}`,
+          },
+          body: JSON.stringify({ url: hlsUrl }),
+        });
+        if (!resp.ok) throw new Error(`passport-api returned ${resp.status}`);
+        const data = await resp.json();
+        if (!cancelled) {
+          setResolvedHlsUrl(data.tokenized_url || hlsUrl);
+        }
+      } catch (err) {
+        console.error('[HLSView] Failed to fetch signed URL from passport-api:', err);
+        if (!cancelled) {
+          setResolvedHlsUrl(hlsUrl);
+        }
+      }
+    };
+    fetchSignedUrl();
+    return () => {
+      cancelled = true;
+    };
+  }, [hlsUrl, endpoints?.passport, managementToken]);
 
   useEffect(() => {
     if (!notification) return;
@@ -261,8 +308,8 @@ const HLSView = () => {
     };
 
     const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
-    if (videoEl && hlsUrl) {
-      hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
+    if (videoEl && resolvedHlsUrl) {
+      hlsPlayer = new HMSHLSPlayer(resolvedHlsUrl, videoEl);
       hlsPlayer.on(HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE, handleNoLongerLive);
       hlsPlayer.on(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
@@ -286,7 +333,7 @@ const HLSView = () => {
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hlsUrl, vanillaStore, hmsActions]);
+  }, [resolvedHlsUrl, vanillaStore, hmsActions]);
 
   /**
    * initialize and subscribe to hlsState
