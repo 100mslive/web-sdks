@@ -27,11 +27,15 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { CaptionsViewer } from '../plugins/CaptionsViewer';
+import { CaptionsViewerJSWrapper } from '../plugins/CaptionsViewerJSWrapper';
 // @ts-ignore: No implicit Any
 import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
+
+// Toggle to use the plain JS captions viewer instead of the React one
+const USE_JS_CAPTIONS_VIEWER = true;
 
 export const VideoStreamingSection = ({
   screenType,
@@ -138,7 +142,11 @@ export const VideoStreamingSection = ({
           // @ts-ignore
           return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
         })}
-      <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
+      {USE_JS_CAPTIONS_VIEWER ? (
+        <CaptionsViewerJSWrapper />
+      ) : (
+        <CaptionsViewer setDefaultPosition={setCaptionPosition} defaultPosition={captionPosition} />
+      )}
       <Box
         css={{
           flex: match({ isLandscapeHLSStream, isMobileHLSStream })
