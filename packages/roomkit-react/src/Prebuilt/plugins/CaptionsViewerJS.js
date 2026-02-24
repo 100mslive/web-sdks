@@ -1,5 +1,13 @@
 import { HMSNotificationTypes, selectPeerNameByID } from '@100mslive/hms-video-store';
 
+/**
+ * Manages transcript segments for a single speaker.
+ *
+ * Holds up to `capacity` transcript entries. Interim (non-final) results
+ * update the most recent entry in place. Once a result is marked `final`,
+ * subsequent transcripts are pushed as new entries. Final entries auto-expire
+ * after `maxStorageTime` ms so stale captions disappear.
+ */
 class SimpleQueue {
   constructor(capacity = 3, maxStorageTime = 5000) {
     this.capacity = capacity;
@@ -7,29 +15,41 @@ class SimpleQueue {
     this.storage = [];
   }
 
+  /**
+   * Add or update a transcript segment.
+   * - Empty transcripts are ignored.
+   * - If the queue is full and the last entry is final, evict it.
+   * - If the last entry is still interim, update it in place.
+   * - If the last entry is final, push a new entry.
+   */
   enqueue(data) {
     if (!data.transcript.trim()) {
       return;
     }
+    // Evict oldest final entry when at capacity
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue(this.storage[this.size() - 1]);
     }
+    // First entry — just push
     if (this.size() === 0) {
       this.storage.push(data);
       this._addTimeout(this.storage[this.size() - 1], data.final);
       return;
     }
+    // Previous entry was final — start a new segment
     if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
       this.storage.push(data);
       this._addTimeout(this.storage[this.size() - 1], data.final);
       return;
     }
+    // Previous entry is still interim — update it in place
     this.storage[this.size() - 1].transcript = data.transcript;
     this.storage[this.size() - 1].final = data.final;
     this.storage[this.size() - 1].end = data.end;
     this._addTimeout(this.storage[this.size() - 1], data.final);
   }
 
+  /** Schedule auto-removal for final entries after MAX_STORAGE_TIME. */
   _addTimeout(item, isFinal) {
     if (!isFinal) return;
     item.timeout = setTimeout(() => {
@@ -37,6 +57,7 @@ class SimpleQueue {
     }, this.MAX_STORAGE_TIME);
   }
 
+  /** Remove a specific entry and clear its expiry timer. */
   dequeue(item) {
     const index = this.storage.indexOf(item);
     if (index === -1) return undefined;
@@ -50,6 +71,7 @@ class SimpleQueue {
     if (item?.timeout) clearTimeout(item.timeout);
   }
 
+  /** Concatenate all stored transcript segments into a single string. */
   getTranscription() {
     let script = '';
     this.storage.forEach(value => (script += value.transcript + ' '));
@@ -65,12 +87,20 @@ class SimpleQueue {
   }
 }
 
+/**
+ * Top-level queue that maps peer_id → SimpleQueue.
+ *
+ * Each speaking peer gets their own SimpleQueue for managing transcript
+ * segments. Limited to `capacity` concurrent speakers — when exceeded,
+ * the oldest speaker's data is evicted.
+ */
 class Queue {
   constructor(capacity = 3) {
     this.capacity = capacity;
     this.storage = {};
   }
 
+  /** Route a transcript entry to the correct per-speaker SimpleQueue. */
   enqueue(data) {
     if (this.size() === this.capacity) {
       this.dequeue();
@@ -90,6 +120,7 @@ class Queue {
     this.storage[data.peer_id].transcriptQueue.enqueue(data);
   }
 
+  /** Evict the oldest speaker (FIFO order based on insertion). */
   dequeue() {
     const key = Object.keys(this.storage).shift() || '';
     const captionData = this.storage[key];
@@ -98,6 +129,10 @@ class Queue {
     return captionData;
   }
 
+  /**
+   * Return an array of { peer_id: concatenated_transcript } objects
+   * for all currently tracked speakers.
+   */
   findPeerData() {
     const keys = Object.keys(this.storage);
     return keys.map(key => {
@@ -114,6 +149,9 @@ class Queue {
 /**
  * Plain JS captions viewer — no React dependency.
  *
+ * Subscribes to HMS transcript notifications, queues them per speaker,
+ * and renders caption text into a draggable overlay using vanilla DOM.
+ *
  * Usage:
  *   const viewer = new CaptionsViewerJS({
  *     notifications, // HMSNotifications from hmsReactiveStore.getNotifications()
@@ -121,8 +159,9 @@ class Queue {
  *     containerEl,   // DOM element to mount into (should be position:relative)
  *   });
  *
- *   // later:
- *   viewer.destroy();
+ *   viewer.show();    // make visible (called when CC is toggled on)
+ *   viewer.hide();    // hide (called when CC is toggled off)
+ *   viewer.destroy(); // clean up listeners, timers, and DOM
  */
 export class CaptionsViewerJS {
   constructor({ notifications, store, containerEl }) {
@@ -133,8 +172,6 @@ export class CaptionsViewerJS {
     this.unsubscribe = null;
     this.pollInterval = null;
     this.el = null;
-
-    // drag state
     this._dragState = null;
 
     this._createDOM();
@@ -142,6 +179,11 @@ export class CaptionsViewerJS {
     this._startPolling();
   }
 
+  /**
+   * Create the caption overlay element and append it to the container.
+   * Styled as a semi-transparent black box at the bottom-center,
+   * 40% width on desktop, 100% on mobile.
+   */
   _createDOM() {
     this.el = document.createElement('div');
     Object.assign(this.el.style, {
@@ -166,6 +208,7 @@ export class CaptionsViewerJS {
     });
     this.el.setAttribute('data-testid', 'captions_viewer_js');
 
+    // Bind drag handlers
     this._onPointerDown = this._onPointerDown.bind(this);
     this._onPointerMove = this._onPointerMove.bind(this);
     this._onPointerUp = this._onPointerUp.bind(this);
@@ -174,7 +217,7 @@ export class CaptionsViewerJS {
     this.containerEl.appendChild(this.el);
   }
 
-  // -- drag via pointer events --
+  /** Drag start — capture pointer and record initial position. */
   _onPointerDown(e) {
     this._dragState = {
       startX: e.clientX,
@@ -188,6 +231,7 @@ export class CaptionsViewerJS {
     this.el.addEventListener('pointerup', this._onPointerUp);
   }
 
+  /** Drag move — reposition element based on pointer delta. */
   _onPointerMove(e) {
     if (!this._dragState) return;
     const dx = e.clientX - this._dragState.startX;
@@ -199,6 +243,7 @@ export class CaptionsViewerJS {
     this.el.style.bottom = 'auto';
   }
 
+  /** Drag end — release pointer capture and clean up move/up listeners. */
   _onPointerUp(e) {
     this._dragState = null;
     this.el.style.cursor = 'grab';
@@ -207,6 +252,12 @@ export class CaptionsViewerJS {
     this.el.removeEventListener('pointerup', this._onPointerUp);
   }
 
+  /**
+   * Subscribe to HMS NEW_MESSAGE notifications.
+   * Filters for messages of type 'hms_transcript', parses the JSON payload,
+   * and enqueues each transcript result (which contains peer_id, transcript
+   * text, and whether it's a final or interim result).
+   */
   _subscribe() {
     this.unsubscribe = this.notifications.onNotification(notification => {
       const msg = notification.data;
@@ -224,12 +275,14 @@ export class CaptionsViewerJS {
     }, HMSNotificationTypes.NEW_MESSAGE);
   }
 
+  /** Poll the queue every second and update the DOM with current captions. */
   _startPolling() {
     this.pollInterval = setInterval(() => {
       this._render();
     }, 1000);
   }
 
+  /** Resolve a peer_id to a display name via the HMS store. */
   _getPeerName(peerId) {
     try {
       return this.store.getState(selectPeerNameByID(peerId)) || 'Participant';
@@ -238,6 +291,11 @@ export class CaptionsViewerJS {
     }
   }
 
+  /**
+   * Re-render caption lines into the overlay element.
+   * Hides the element when there's nothing to show.
+   * Each line displays: "PeerName: transcript text"
+   */
   _render() {
     const peerData = this.captionQueue.findPeerData();
     const filtered = peerData.filter(entry => {
@@ -272,15 +330,18 @@ export class CaptionsViewerJS {
     });
   }
 
+  /** Make the caption overlay visible and trigger a render. */
   show() {
     this.el.style.display = '';
     this._render();
   }
 
+  /** Hide the caption overlay. */
   hide() {
     this.el.style.display = 'none';
   }
 
+  /** Clean up: unsubscribe from notifications, clear polling, remove DOM element. */
   destroy() {
     if (this.unsubscribe) {
       this.unsubscribe();
