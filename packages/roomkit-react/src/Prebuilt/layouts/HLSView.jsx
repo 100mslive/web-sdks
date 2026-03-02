@@ -34,12 +34,12 @@ import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+import { useHMSPrebuiltContext } from '../AppContext';
 import { WaitingView } from './WaitingView';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
-import { useHMSPrebuiltContext } from '../AppContext';
 
 let hlsPlayer;
 const toastMap = {};
