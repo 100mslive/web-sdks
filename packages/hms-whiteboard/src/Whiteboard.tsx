@@ -1,18 +1,33 @@
 /**
  * Whiteboard component with backward-compatible API
- * Wraps whiteboard-core with session store integration
+ * Wraps whiteboard-core with session store integration via protobuf-ts gRPC-web
+ *
+ * Follows the tldraw onChange pattern:
+ * - Core fires state change events via stateManager.subscribe()
+ * - This component handles all sync externally using SessionStore (protobuf-ts)
+ * - No gRPC code needed in core for this integration path
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
   type ElementId,
   type WhiteboardElement,
   type WhiteboardHandle,
+  type WhiteboardStateData,
   decodeJWT,
-  useHMSWhiteboard,
-  useHMSWhiteboardSync,
   useWhiteboardState,
   Whiteboard as WhiteboardCore,
 } from '@100mslive/whiteboard-core';
+import { SessionStore } from './hooks/StoreClient';
+
+/** Element record stored in session store */
+interface ElementRecord {
+  element: WhiteboardElement;
+  version: number;
+  updatedBy: string;
+  updatedAt: number;
+}
+
+const KEY_PREFIX = 'wb:el:';
 
 export interface WhiteboardProps {
   /** JWT authentication token for session store */
@@ -28,10 +43,133 @@ export interface WhiteboardProps {
 }
 
 /**
+ * Custom hook that syncs local whiteboard state with remote session store.
+ *
+ * Local → Remote: subscribes to stateManager changes, diffs elements, pushes to SessionStore
+ * Remote → Local: listens to SessionStore stream, applies remote changes to stateManager
+ */
+function useSessionStoreSync(
+  stateManager: ReturnType<typeof useWhiteboardState>['stateManager'],
+  sessionStore: SessionStore<ElementRecord> | null,
+  userId: string,
+) {
+  const lastSyncRef = useRef<Map<ElementId, WhiteboardElement>>(new Map());
+  const isConnectedRef = useRef(false);
+  // Track whether we're applying remote changes to avoid echo loops
+  const applyingRemoteRef = useRef(false);
+
+  // Remote → Local: listen for session store changes
+  useEffect(() => {
+    if (!sessionStore) return;
+
+    const closePromise = sessionStore.open({
+      handleOpen: (values: ElementRecord[]) => {
+        isConnectedRef.current = true;
+        applyingRemoteRef.current = true;
+
+        for (const record of values) {
+          if (!record.element) continue;
+          const el = record.element;
+          lastSyncRef.current.set(el.id, el);
+
+          const existing = stateManager.getState().elements.get(el.id);
+          if (existing) {
+            stateManager.updateElement(el.id, el);
+          } else {
+            stateManager.addElement(el);
+          }
+        }
+
+        applyingRemoteRef.current = false;
+      },
+      handleChange: (key: string, value?: ElementRecord) => {
+        if (!key.startsWith(KEY_PREFIX)) return;
+
+        // Skip self-updates
+        if (value && value.updatedBy === userId) return;
+
+        applyingRemoteRef.current = true;
+
+        if (value && value.element) {
+          const el = value.element;
+          lastSyncRef.current.set(el.id, el);
+
+          const existing = stateManager.getState().elements.get(el.id);
+          if (existing) {
+            stateManager.updateElement(el.id, el);
+          } else {
+            stateManager.addElement(el);
+          }
+        } else {
+          // Deletion
+          const elementId = key.slice(KEY_PREFIX.length);
+          lastSyncRef.current.delete(elementId);
+          stateManager.removeElements([elementId]);
+        }
+
+        applyingRemoteRef.current = false;
+      },
+      handleError: (error: Error) => {
+        console.error('Whiteboard sync error:', error);
+      },
+    });
+
+    let closeFn: (() => void) | undefined;
+    closePromise.then(fn => {
+      closeFn = fn;
+    });
+
+    return () => {
+      isConnectedRef.current = false;
+      closeFn?.();
+    };
+  }, [sessionStore, stateManager, userId]);
+
+  // Local → Remote: subscribe to state changes and push diffs
+  useEffect(() => {
+    if (!sessionStore) return;
+
+    const unsubscribe = stateManager.subscribe((state: WhiteboardStateData) => {
+      // Don't sync back changes we just applied from remote
+      if (applyingRemoteRef.current) return;
+      if (!isConnectedRef.current) return;
+
+      const currentElements = state.elements;
+      const prevElements = lastSyncRef.current;
+
+      // Find adds and updates
+      currentElements.forEach((element, id) => {
+        const prev = prevElements.get(id);
+        if (!prev || prev !== element) {
+          const record: ElementRecord = {
+            element,
+            version: prev ? 2 : 1,
+            updatedBy: userId,
+            updatedAt: Date.now(),
+          };
+          lastSyncRef.current.set(id, element);
+          sessionStore.set(`${KEY_PREFIX}${id}`, record);
+        }
+      });
+
+      // Find deletes
+      prevElements.forEach((_element, id) => {
+        if (!currentElements.has(id)) {
+          lastSyncRef.current.delete(id);
+          sessionStore.delete(`${KEY_PREFIX}${id}`);
+        }
+      });
+    });
+
+    return unsubscribe;
+  }, [sessionStore, stateManager, userId]);
+}
+
+/**
  * Whiteboard component with 100ms session store integration
  *
- * This component provides a backward-compatible API for the whiteboard,
- * wrapping the whiteboard-core with automatic session store synchronization.
+ * Uses the tldraw onChange pattern: core handles local state,
+ * this component handles all sync externally via protobuf-ts gRPC-web.
  */
 export function Whiteboard({
   token,
@@ -44,20 +182,12 @@ export function Whiteboard({
   const whiteboardState = useWhiteboardState();
 
   // Parse user info from JWT token
-  const user = useMemo(() => {
+  const userId = useMemo(() => {
     try {
       const payload = decodeJWT(token);
-      return {
-        id: (payload.user_id as string) || 'anonymous',
-        name: (payload.name as string) || 'Anonymous',
-        color: '#' + Math.floor(Math.random() * 16777215).toString(16),
-      };
+      return (payload.user_id as string) || 'anonymous';
     } catch {
-      return {
-        id: 'anonymous',
-        name: 'Anonymous',
-        color: '#999999',
-      };
+      return 'anonymous';
     }
   }, [token]);
 
@@ -72,40 +202,26 @@ export function Whiteboard({
     }
   }, [token]);
 
-  // Connect to HMS session store
-  const hmsWhiteboard = useHMSWhiteboard({
-    endpoint,
-    token,
-    user,
-    autoConnect: true,
-  });
+  // Create session store (protobuf-ts gRPC-web client)
+  const sessionStore = useMemo(() => {
+    if (!token || !endpoint) return null;
+    return new SessionStore<ElementRecord>(endpoint, token);
+  }, [endpoint, token]);
 
-  // Sync whiteboard state with HMS session store
-  useHMSWhiteboardSync(
-    {
-      elements: Array.from(whiteboardState.state.elements.values()),
-      addElement: whiteboardState.addElement,
-      updateElement: (id: ElementId, updates: Partial<WhiteboardElement>) => {
-        whiteboardState.updateElement(id, updates);
-      },
-      deleteElement: (id: ElementId) => {
-        whiteboardState.removeElements([id]);
-      },
-    },
-    hmsWhiteboard,
-    { direction: 'bidirectional' },
-  );
+  // Sync local ↔ remote via session store
+  useSessionStoreSync(whiteboardState.stateManager, sessionStore, userId);
 
   // Call onMount callback when ready
+  const onMountCalled = useRef(false);
   useEffect(() => {
-    if (hmsWhiteboard.isConnected && whiteboardRef.current) {
+    if (!onMountCalled.current && whiteboardRef.current && sessionStore) {
+      onMountCalled.current = true;
       onMount?.({
-        store: hmsWhiteboard,
+        store: sessionStore,
         editor: whiteboardRef.current,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hmsWhiteboard.isConnected, onMount]);
+  }, [onMount, sessionStore]);
 
   // Auto-set tool based on permissions
   useEffect(() => {

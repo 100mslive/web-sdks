@@ -4,6 +4,10 @@
  *
  * This package re-exports the whiteboard components from @100mslive/whiteboard-core
  * and provides integration with 100ms session store using proper gRPC-web protocol.
+ *
+ * Sync is handled externally in Whiteboard.tsx (tldraw onChange pattern):
+ * - Core fires state change events via stateManager.subscribe()
+ * - Whiteboard.tsx handles all sync via protobuf-ts SessionStore
  */
 
 // Import CSS for rollup to bundle
@@ -28,7 +32,7 @@ export {
   type PdfControlsProps,
   type RemoteCursorsProps,
   type CollaborationIndicatorProps,
-  // Hooks
+  // Hooks (local state only — sync hooks removed, handled in Whiteboard.tsx)
   useWhiteboardState,
   useCanvasSize,
   usePdf,
@@ -39,8 +43,6 @@ export {
   useImage,
   useClipboard,
   useExport,
-  useHMSWhiteboard,
-  useHMSWhiteboardSync,
   type UseWhiteboardStateReturn,
   type CanvasSize,
   type UseCanvasSizeOptions,
@@ -63,8 +65,6 @@ export {
   type ExportState,
   type UseExportOptions,
   type UseExportReturn,
-  type UseHMSWhiteboardConfig,
-  type UseHMSWhiteboardResult,
   // State
   WhiteboardState,
   History,
@@ -142,13 +142,10 @@ export {
   isPointInElementBounds,
   // Tool defaults
   DEFAULT_TOOL_OPTIONS,
-  // Sync / Collaboration
+  // Sync / Collaboration (core types only — sync implementation in Whiteboard.tsx)
   LocalSyncProvider,
   WebSocketProvider,
   BroadcastProvider,
-  HMSSessionStoreProvider,
-  createHMSSessionStoreProvider,
-  HMSSessionStore,
   calculateBackoff,
   decodeJWT,
   YjsDocument,
@@ -167,10 +164,7 @@ export {
   type CollaborationState,
   type CollaborationStateListener,
   type YjsElementObserver,
-  type HMSSessionStoreProviderConfig,
   type BackoffState,
-  type SessionStoreCallbacks,
-  type HMSSessionStoreConfig,
   // PDF
   PdfLoader,
   pdfLoader,
