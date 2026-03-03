@@ -1,5 +1,5 @@
 {
-  "installCommand": "git config --global url.\"https://x-access-token:${WHITEBOARD_PAT}@github.com/\".insteadOf \"https://github.com/\" && yarn install",
+  "installCommand": "echo \"https://x-access-token:${WHITEBOARD_PAT}@github.com\" >> ~/.git-credentials && git config --global credential.helper store && yarn install",
   "rewrites": [
     {
       "source": "/(.*)",
