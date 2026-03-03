@@ -12,9 +12,9 @@
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.12.tgz#ead4edeed8e77e42154ac15cb36f32814ddaddd1"
   integrity sha512-teywGXsHxuOFaA2pS/z0+wHZfaDzSJSp0hppwtAhW9LW1W+tvz2tJBp5NAZiB7l+iHUR88FnwRhD5WG7G64Rnw==
 
-"@100mslive/whiteboard-core@github:100mslive/hms-whiteboard#main":
+"@100mslive/whiteboard-core@https://github.com/100mslive/hms-whiteboard.git#main":
   version "0.1.0"
-  resolved "git+ssh://git@github.com/100mslive/hms-whiteboard.git#8bd18140e61cc6bdc7d4ccc333d94f953d1604a1"
+  resolved "https://github.com/100mslive/hms-whiteboard.git#8bd18140e61cc6bdc7d4ccc333d94f953d1604a1"
   dependencies:
     jspdf "^4.1.0"
     lib0 "^0.2.117"

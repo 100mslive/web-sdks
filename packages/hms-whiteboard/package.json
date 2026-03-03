@@ -34,7 +34,7 @@
     "format": "prettier -w src/**"
   },
   "dependencies": {
-    "@100mslive/whiteboard-core": "github:100mslive/hms-whiteboard#main",
+    "@100mslive/whiteboard-core": "https://github.com/100mslive/hms-whiteboard.git#main",
     "@protobuf-ts/grpcweb-transport": "^2.9.1",
     "@protobuf-ts/runtime": "^2.9.1",
     "@protobuf-ts/runtime-rpc": "^2.9.1"
