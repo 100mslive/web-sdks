@@ -21,6 +21,7 @@ jobs:
 
       - name: Configure git for private repos
         run: |
+          git config --local --unset-all http.https://github.com/.extraheader || true
           git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "https://github.com/"
           git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "git@github.com:"
           git config --global url."https://${{ secrets.WHITEBOARD_PAT }}@github.com/".insteadOf "ssh://git@github.com/"
