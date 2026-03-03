@@ -11,13 +11,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.WHITEBOARD_PAT }}
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
+
+      - name: Configure git for private repos
+        run: |
+          git config --local --unset-all http.https://github.com/.extraheader || true
+          echo "https://x-access-token:${{ secrets.WHITEBOARD_PAT }}@github.com" >> ~/.git-credentials
+          git config --global credential.helper store
 
       - name: Install packages
         run: yarn install --frozen-lockfile

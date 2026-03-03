@@ -14,7 +14,7 @@
 
 "@100mslive/whiteboard-core@https://github.com/100mslive/hms-whiteboard.git#main":
   version "0.1.0"
-  resolved "https://github.com/100mslive/hms-whiteboard.git#8bd18140e61cc6bdc7d4ccc333d94f953d1604a1"
+  resolved "https://github.com/100mslive/hms-whiteboard.git#26cd531114212b3bb37df4ff29f9f810f7b5e2de"
   dependencies:
     jspdf "^4.1.0"
     lib0 "^0.2.117"

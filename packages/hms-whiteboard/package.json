@@ -25,6 +25,7 @@
   },
   "sideEffects": false,
   "scripts": {
+    "postinstall": "cd ../../node_modules/@100mslive/whiteboard-core && test -d dist || (npm install --ignore-scripts && npm run build)",
     "prestart": "rm -rf dist",
     "start": "rollup -c -w",
     "build": "rm -rf dist && NODE_ENV=production rollup -c",
