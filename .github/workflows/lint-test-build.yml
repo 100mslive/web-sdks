@@ -19,6 +19,11 @@ jobs:
           node-version: 20
           cache: 'yarn'
 
+      - name: Configure git for private repos
+        run: |
+          echo "https://x-access-token:${{ secrets.WHITEBOARD_PAT }}@github.com" >> ~/.git-credentials
+          git config --global credential.helper store
+
       - name: Install packages
         run: yarn install --frozen-lockfile
 
