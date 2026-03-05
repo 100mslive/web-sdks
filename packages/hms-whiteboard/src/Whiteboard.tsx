@@ -233,6 +233,7 @@ export function Whiteboard({
   return (
     <WhiteboardCore
       ref={whiteboardRef}
+      stateManager={whiteboardState.stateManager}
       showToolbar={!isReadonly}
       className={transparentCanvas ? 'transparent-canvas' : undefined}
       style={{ width: '100%', height: '100%' }}
