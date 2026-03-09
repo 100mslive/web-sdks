@@ -68,9 +68,7 @@
     "tar": "^7.5.10",
     "immutable": "^4.3.8",
     "svgo": "^2.8.1",
-    "serialize-javascript": "^7.0.3",
-    "**/vite/rollup": "^4.59.0",
-    "rollup": "^2.80.0"
+    "**/vite/rollup": "^4.59.0"
   },
   "workspaces": [
     "packages/*",
