@@ -57,6 +57,7 @@ export type HMSPrebuiltOptions = {
   userId?: string;
   endpoints?: object;
   effectsSDKKey?: string;
+  managementToken?: string;
 };
 
 export type HMSPrebuiltProps = {
@@ -93,7 +94,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints } = {},
+      options: { userName = '', userId = '', endpoints, managementToken } = {},
       screens,
       leaveOnUnload = true,
       onLeave,
@@ -141,12 +142,14 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           tokenByRoomCode: string;
           roomLayout: string;
           event: string;
+          passport: string;
         }
       | undefined;
     const tokenByRoomCodeEndpoint = endpointsObj?.tokenByRoomCode;
     const initEndpoint = endpointsObj?.init;
     const eventEndpoint = endpointsObj?.event;
     const roomLayoutEndpoint = endpointsObj?.roomLayout;
+    const passportEndpoint = endpointsObj?.passport;
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -180,11 +183,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             onJoin,
             userName,
             userId,
+            managementToken,
             endpoints: {
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
               event: eventEndpoint,
+              passport: passportEndpoint,
             },
           }}
         >
