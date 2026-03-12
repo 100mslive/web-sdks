@@ -65,7 +65,10 @@
     "tmp": "^0.2.3",
     "@tldraw/tldraw/@radix-ui/react-dialog": "1.0.5",
     "qs": "^6.14.2",
-    "tar": "^7.5.7"
+    "tar": "^7.5.10",
+    "svgo": "^2.8.1",
+    "sass": "^1.83.0",
+    "**/vite/rollup": "^4.59.0"
   },
   "workspaces": [
     "packages/*",

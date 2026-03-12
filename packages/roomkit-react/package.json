@@ -19,8 +19,7 @@
     "directory": "packages/roomkit-react"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "exports": {
     ".": {
