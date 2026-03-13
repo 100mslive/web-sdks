@@ -1,10 +1,12 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
+const PostCssPlugin = require('esbuild-plugin-postcss2');
+const autoprefixer = require('autoprefixer');
 
 const getSourceForPackage = packageName => {
   if (packageName === '@100mslive/react-icons') {
-    return ['./src/index.tsx'];
+    return ['./src/index.ts'];
   }
   // Separate both vb packages for browser compatibility - effects plugin is not supported on Safari versions <= 16.5.1
   if (packageName === '@100mslive/hms-virtual-background') {
@@ -27,6 +29,15 @@ async function main() {
   const external = Object.keys(pkg.dependencies || {});
   external.push(...Object.keys(pkg.peerDependencies || {}));
 
+  const plugins = [];
+  if (fs.existsSync('./src/index.css')) {
+    plugins.push(
+      PostCssPlugin.default({
+        plugins: [autoprefixer],
+      }),
+    );
+  }
+
   const commonOptions = {
     entryPoints: source,
     bundle: true,
@@ -35,6 +46,7 @@ async function main() {
     tsconfig: 'tsconfig.json',
     minify: true,
     sourcemap: true,
+    plugins,
   };
   try {
     let esmResult;
