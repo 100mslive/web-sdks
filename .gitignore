@@ -13,6 +13,7 @@ cy-coverage
 tsconfig.tsbuildinfo
 docs
 .cache
+.nx
 .dccache*
 storybook-static
 ConfigurationsTest/allure-report

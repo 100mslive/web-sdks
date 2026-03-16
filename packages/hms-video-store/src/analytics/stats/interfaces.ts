@@ -2,6 +2,7 @@ interface BaseStatsPayload {
   sequence_num: number; // An increasing seq number starting from 1
   max_window_sec: number; // Take this value from the INIT response
   joined_at: number; // Local peer's joinedAt time in milliseconds
+  cpu_pressure_state?: string; // Current CPU pressure state from PressureObserver API (nominal, fair, serious, critical)
 }
 
 export interface PublishAnalyticPayload extends BaseStatsPayload {
@@ -23,7 +24,6 @@ interface TrackAnalytics<Sample> {
 }
 
 export type LocalAudioTrackAnalytics = TrackAnalytics<LocalBaseSample>;
-
 export type LocalVideoTrackAnalytics = TrackAnalytics<LocalVideoSample>;
 
 export type RemoteAudioTrackAnalytics = TrackAnalytics<RemoteAudioSample>;
@@ -33,6 +33,9 @@ export type RemoteVideoTrackAnalytics = TrackAnalytics<RemoteVideoSample>;
 // One sample would contain the data of the last 30 seconds window
 export interface LocalBaseSample {
   timestamp: number; // the ts at the end of the 30s window
+  sample_start_ts?: number; // WebRTC timestamp of the first stat in the sample window
+  sample_end_ts?: number; // WebRTC timestamp of the last stat in the sample window
+  sample_duration_ms?: number; // Duration of the sample window in milliseconds
   avg_round_trip_time_ms?: number;
   avg_jitter_ms?: number;
   total_packets_lost?: number;
@@ -43,12 +46,22 @@ export interface LocalBaseSample {
   total_nack_count?: number;
   total_fir_count?: number;
   total_pli_count?: number;
+  cpu_pressure_state?: string; // CPU pressure state at the time of sample creation (nominal, fair, serious, critical)
+  track_settings?: MediaTrackSettings; // Native track settings from getSettings()
+  effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
 }
 
 export interface LocalVideoSample extends LocalBaseSample {
   total_quality_limitation?: QualityLimitation;
   avg_fps?: number;
   resolution?: Resolution;
+  /**
+   * Source/capture stats from media-source (pre-encoding).
+   */
+  source_resolution?: Resolution;
+  source_avg_fps?: number;
+  source_total_frames?: number;
+  source_total_frames_dropped?: number;
 }
 
 export interface QualityLimitation {
@@ -64,8 +77,12 @@ export interface Resolution {
 
 interface RemoteBaseSample {
   timestamp: number;
+  sample_start_ts?: number; // WebRTC timestamp of the first stat in the sample window
+  sample_end_ts?: number; // WebRTC timestamp of the last stat in the sample window
+  sample_duration_ms?: number; // Duration of the sample window in milliseconds
   estimated_playout_timestamp?: number;
   avg_jitter_buffer_delay?: number;
+  avg_bitrate_bps?: number;
 }
 
 export interface RemoteAudioSample extends RemoteBaseSample {

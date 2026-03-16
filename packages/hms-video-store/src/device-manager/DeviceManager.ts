@@ -291,6 +291,7 @@ export class DeviceManager implements HMSDeviceManager {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
     this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
+
     if (!this.outputDevice) {
       // there is no matching device, let's revert back to the prev selected device
       this.outputDevice = this.audioOutput.find(device => this.createIdentifier(device) === prevSelection);
@@ -339,6 +340,12 @@ export class DeviceManager implements HMSDeviceManager {
       );
 
       HMSLogger.e(this.TAG, 'Audio device not found');
+      this.eventBus.deviceChange.publish({
+        error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.AUDIO),
+        selection: newSelection,
+        type: 'audioInput',
+        devices: this.getDevices(),
+      } as HMSDeviceChangeEvent);
       return;
     }
     const { settings } = audioTrack;
@@ -396,6 +403,12 @@ export class DeviceManager implements HMSDeviceManager {
         }),
       );
       HMSLogger.e(this.TAG, 'Video device not found');
+      this.eventBus.deviceChange.publish({
+        error: ErrorFactory.TracksErrors.SelectedDeviceMissing(HMSTrackExceptionTrackType.VIDEO),
+        selection: newSelection,
+        type: 'video',
+        devices: this.getDevices(),
+      } as HMSDeviceChangeEvent);
       return;
     }
     const { settings } = videoTrack;
@@ -553,15 +566,13 @@ export class DeviceManager implements HMSDeviceManager {
       return matchingLabel;
     }
 
-    const matchingGroupId = this.audioOutput.find(device => device.groupId === inputDevice.groupId);
+    const matchingGroupId = this.audioOutput.find(
+      device => device.groupId === inputDevice.groupId && device.deviceId !== 'default',
+    );
 
     // Select the device with matching group only when it is the default device
     // if a earphone without mic is connected, the above would pick system speakers instead of the earphone
-    if (
-      matchingGroupId &&
-      this.audioOutput[0].deviceId === 'default' &&
-      matchingGroupId.groupId === this.audioOutput[0].groupId
-    ) {
+    if (matchingGroupId) {
       return matchingGroupId;
     }
 

@@ -5,6 +5,24 @@
 
 import { RID } from './simulcast-layers';
 
+type QualityLimitationReason = RTCOutboundRtpStreamStats extends {
+  qualityLimitationReason?: infer Reason;
+}
+  ? Reason
+  : string;
+
+type QualityLimitationDurations = RTCOutboundRtpStreamStats extends {
+  qualityLimitationDurations?: infer Durations;
+}
+  ? Durations
+  : { none: number; cpu: number; bandwidth: number; other: number };
+
+type TrackIdentifierField = RTCInboundRtpStreamStats extends { trackIdentifier: infer Identifier }
+  ? { trackIdentifier: Identifier }
+  : RTCInboundRtpStreamStats extends { trackIdentifier?: infer Identifier }
+  ? { trackIdentifier?: Identifier }
+  : { trackIdentifier?: string };
+
 /**
  * @internal
  * Ref: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
@@ -18,19 +36,19 @@ export interface RTCRemoteInboundRtpStreamStats extends RTCReceivedRtpStreamStat
   roundTripTimeMeasurements?: number;
 }
 
-interface MissingCommonStats {
+type MissingCommonStats = TrackIdentifierField & {
   frameHeight?: number;
   frameWidth?: number;
   framesPerSecond?: number;
   roundTripTime?: number;
   totalRoundTripTime?: number;
-}
+};
 
 interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonStats {
   bytesSent?: number;
   packetsSent?: number;
-  qualityLimitationReason?: string;
-  qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
+  qualityLimitationReason?: QualityLimitationReason;
+  qualityLimitationDurations?: QualityLimitationDurations;
   totalPacketSendDelay?: number;
   rid?: RID;
 }
@@ -82,6 +100,16 @@ export interface HMSLocalTrackStats extends BaseTrackStats, MissingOutboundStats
    * https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
    */
   remote?: RTCRemoteInboundRtpStreamStats & { packetsLostRate?: number };
+  /**
+   * Capture/source stats from `media-source` (camera or screen).
+   */
+  sourceFrameWidth?: number;
+  sourceFrameHeight?: number;
+  sourceFramesPerSecond?: number;
+  sourceFrames?: number;
+  sourceFramesDropped?: number;
+  sourceTimestamp?: DOMHighResTimeStamp;
+  sourceStatsAvailable?: boolean;
 }
 
 /**

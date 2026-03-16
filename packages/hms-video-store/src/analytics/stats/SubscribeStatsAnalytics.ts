@@ -136,9 +136,13 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
 
     const baseSample = {
       timestamp: Date.now(),
+      sample_start_ts: firstStat.timestamp,
+      sample_end_ts: latestStat.timestamp,
+      sample_duration_ms: latestStat.timestamp - firstStat.timestamp,
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
       avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay', false),
+      avg_bitrate_bps: this.calculateAverage('bitrate'),
     };
 
     if (latestStat.kind === 'video') {

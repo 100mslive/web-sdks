@@ -31,13 +31,21 @@ export class AnalyticsTimer {
   private eventPerformanceMeasures: Partial<Record<TimedEvent, PerformanceMeasure>> = {};
 
   start(eventName: TimedEvent) {
-    performance.mark(eventName);
+    try {
+      if (typeof performance !== 'undefined' && performance.mark) {
+        performance.mark(eventName);
+      }
+    } catch (error) {
+      HMSLogger.w('[AnalyticsTimer]', `Error marking performance for event ${eventName}`, { error });
+    }
   }
 
   end(eventName: TimedEvent) {
     try {
-      this.eventPerformanceMeasures[eventName] = performance.measure(eventName, eventName);
-      HMSLogger.d('[HMSPerformanceTiming]', eventName, this.eventPerformanceMeasures[eventName]?.duration);
+      if (typeof performance !== 'undefined' && performance.measure) {
+        this.eventPerformanceMeasures[eventName] = performance.measure(eventName, eventName);
+        HMSLogger.d('[HMSPerformanceTiming]', eventName, this.eventPerformanceMeasures[eventName]?.duration);
+      }
     } catch (error) {
       HMSLogger.w('[AnalyticsTimer]', `Error in measuring performance for event ${eventName}`, { error });
     }

@@ -2,12 +2,16 @@
   "name": "@100mslive/hms-whiteboard",
   "author": "100ms",
   "license": "MIT",
-  "version": "0.0.26-alpha.0",
+  "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/hms-whiteboard"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "src",
     "dist"
   ],
   "exports": {
@@ -21,8 +25,9 @@
   "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist",
-    "start": "rollup -c -w",
-    "build": "rm -rf dist && NODE_ENV=production rollup -c",
+    "start": "node ../../scripts/dev.js",
+    "build": "node ../../scripts/build.js && yarn types:build",
+    "types:build": "tsc -p tsconfig.json",
     "build:proto": "protoc --ts_opt long_type_string  --ts_out ./src/grpc -I=./proto proto/*proto",
     "lint": "eslint -c .eslintrc src",
     "lint:fix": "eslint -c .eslintrc src --fix",
@@ -40,23 +45,15 @@
   },
   "devDependencies": {
     "@protobuf-ts/plugin": "^2.9.1",
-    "@rollup/plugin-commonjs": "^21.0.3",
-    "@rollup/plugin-node-resolve": "^13.1.3",
-    "@rollup/plugin-replace": "^5.0.1",
-    "@rollup/plugin-typescript": "^8.3.1",
     "@types/node": "^20.12.5",
     "@types/react": "^18.1.0",
     "@types/react-dom": "^18.1.0",
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "grpc-tools": "^1.12.4",
+    "grpc-tools": "^1.13.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "rollup": "^2.79.2",
-    "rollup-plugin-esbuild": "^4.9.3",
-    "rollup-plugin-import-css": "^3.5.0",
-    "rollup-plugin-terser": "^7.0.2",
     "typescript": "^5.2.2"
   },
   "keywords": [

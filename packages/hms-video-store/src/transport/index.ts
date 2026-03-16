@@ -308,6 +308,7 @@ export default class HMSTransport {
     this.observer.onStateChange(this.state);
   }
 
+  // eslint-disable-next-line complexity
   async connect(
     token: string,
     endpoint: string,
@@ -330,16 +331,18 @@ export default class HMSTransport {
       const response = await this.internalConnect(token, endpoint, peerId, iceServers);
       return response;
     } catch (error) {
+      if (!(error instanceof HMSException)) {
+        throw error;
+      }
       const shouldRetry =
-        error instanceof HMSException &&
-        ([
+        [
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
           ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
           ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
-          ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         ].includes(error.code) ||
-          error.code.toString().startsWith('5') ||
-          error.code.toString().startsWith('429'));
+        error.code.toString().startsWith('5') ||
+        error.code.toString().startsWith('429') ||
+        (error.code === ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE && !navigator.onLine);
 
       if (shouldRetry) {
         const task = async () => {

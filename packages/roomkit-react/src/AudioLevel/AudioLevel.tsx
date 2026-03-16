@@ -56,10 +56,11 @@ export const AudioLevel = ({ trackId, size }: { trackId?: string; size?: 'small'
         let index = 0;
         //@ts-ignore
         for (const child of ref.current.children) {
+          const element = child as HTMLElement;
           const positionX = `-${positionValues[audioLevel] * (index === 1 ? 2.5 : 1.25)}em`;
-          child.style['-webkit-mask-position-x'] = positionX;
-          child.style['mask-position'] = `${positionX} 0`;
-          child.style['animation'] =
+          (element.style as any)['-webkit-mask-position-x'] = positionX;
+          (element.style as any)['mask-position'] = `${positionX} 0`;
+          element.style.animation =
             positionValues[audioLevel] > 0 ? `${barAnimation} 0.6s steps(3,jump-none) 0s infinite` : 'none';
           index++;
         }

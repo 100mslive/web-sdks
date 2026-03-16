@@ -3,6 +3,7 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
@@ -40,6 +41,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
+  private permissionState?: PermissionState;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -236,6 +238,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * Get performance metrics from attached plugins (e.g., effects SDK)
+   * @returns Object with plugin names as keys and their metrics as values
+   */
+  getPluginsMetrics(): Record<string, Record<string, unknown> | undefined> {
+    const metrics: Record<string, Record<string, unknown> | undefined> = {};
+    for (const plugin of this.mediaStreamPluginsManager.plugins) {
+      if (plugin.getMetrics) {
+        metrics[plugin.getName()] = plugin.getMetrics();
+      }
+    }
+    return metrics;
+  }
+
+  /**
    * @see HMSVideoPlugin
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
@@ -386,16 +402,45 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const newTrack = await getVideoTrack(settings);
       // this.addTrackEventListeners(newTrack);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { video: settings.toConstraints() },
+          appliedConstraints: { video: newTrack.getConstraints() },
+          trackSettings: { video: newTrack.getSettings() },
+        }),
+      );
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
       // Replace deviceId with actual deviceId when it is default
       if (this.settings.deviceId === 'default') {
         this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
       }
       return newTrack;
-    } catch (error) {
+    } catch (e) {
+      const error = e as HMSException;
+
+      if (
+        error.code === ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE ||
+        error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
+      ) {
+        const track = await this.replaceTrackWithBlank();
+        this.addTrackEventListeners(track);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        this.videoHandler.updateSinks();
+        throw error;
+      }
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       // this.addTrackEventListeners(track);
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: { video: this.settings.toConstraints() },
+          appliedConstraints: { video: track.getConstraints() },
+          trackSettings: { video: track.getSettings() },
+        }),
+      );
       await this.replaceSender(track, this.enabled);
       this.nativeTrack = track;
       await this.processPlugins();
@@ -511,6 +556,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           selection: {
             deviceId: settings.deviceId,
             groupId: groupId,
+            label: this.nativeTrack.label,
           },
         });
       }
@@ -540,11 +586,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);
-    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: true,
-        reason: reason,
+        reason: 'track-muted-natively',
       }),
     );
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
@@ -553,12 +598,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /** @internal */
   handleTrackUnmuteNatively = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
-    const reason = document.visibilityState === 'hidden' ? 'visibility-change' : 'incoming-call';
-
     this.eventBus.analytics.publish(
       this.sendInterruptionEvent({
         started: false,
-        reason: reason,
+        reason: 'track-unmuted-natively',
       }),
     );
     this.handleTrackUnmute();
@@ -597,6 +640,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         }),
       );
     } else {
+      // ended interruption event
+      this.eventBus.analytics.publish(
+        this.sendInterruptionEvent({
+          started: false,
+          reason: 'visibility-change',
+        }),
+      );
+      if (this.permissionState && this.permissionState !== 'granted') {
+        HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+        return;
+      }
       HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
       if (this.enabledStateBeforeBackground) {
         try {
@@ -605,13 +659,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           this.eventBus.error.publish(error as HMSException);
         }
       }
-      // ended interruption event
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
     }
   };
 }

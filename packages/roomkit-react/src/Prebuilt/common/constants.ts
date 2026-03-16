@@ -108,7 +108,7 @@ export const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'c
 export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'firefox';
 export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'safari';
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'ios';
-export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'mac os';
+export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'macos';
 export const isAndroid = parsedUserAgent.getOS()?.name?.toLowerCase() === 'android';
 export const isIPadOS = false;
 // typeof navigator !== "undefined" &&

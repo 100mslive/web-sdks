@@ -282,11 +282,19 @@ export default class AnalyticsEventFactory {
     type,
     reason,
     deviceInfo,
+    trackInfo,
   }: {
     started: boolean;
     type: string;
     reason: string;
     deviceInfo: Partial<MediaDeviceInfo>;
+    trackInfo?: {
+      label: string;
+      enabled: boolean;
+      muted: boolean;
+      readyState: string;
+      settings: MediaTrackSettings;
+    };
   }) {
     return new AnalyticsEvent({
       name: `${started ? 'interruption.start' : 'interruption.stop'}`,
@@ -294,7 +302,31 @@ export default class AnalyticsEventFactory {
       properties: {
         reason,
         type,
+        pageHidden: document.visibilityState === 'hidden',
         ...deviceInfo,
+        trackInfo,
+      },
+    });
+  }
+
+  static mediaConstraints({
+    requestedConstraints,
+    appliedConstraints,
+    trackSettings,
+  }: {
+    requestedConstraints: MediaStreamConstraints;
+    appliedConstraints: { video?: MediaTrackConstraints; audio?: MediaTrackConstraints };
+    trackSettings: { video?: MediaTrackSettings; audio?: MediaTrackSettings };
+  }) {
+    return new AnalyticsEvent({
+      name: 'media.constraints',
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        requested_constraints: requestedConstraints,
+        applied_constraints: appliedConstraints,
+        track_settings: trackSettings,
+        webgpu_supported: typeof navigator !== 'undefined' && 'gpu' in navigator,
+        media_stream_track_processor_supported: typeof window !== 'undefined' && 'MediaStreamTrackProcessor' in window,
       },
     });
   }

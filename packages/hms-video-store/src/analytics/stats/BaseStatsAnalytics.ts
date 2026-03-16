@@ -42,13 +42,13 @@ export abstract class BaseStatsAnalytics {
     this.startLoop().catch(e => HMSLogger.e('[StatsAnalytics]', e.message));
   }
 
-  stop = () => {
+  stop() {
     if (this.shouldSendEvent) {
       this.sendEvent();
     }
     this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate.bind(this));
     this.shouldSendEvent = false;
-  };
+  }
 
   private async startLoop() {
     while (this.shouldSendEvent) {
@@ -175,7 +175,7 @@ export abstract class RunningTrackAnalytics {
   protected calculateAverage(key: keyof TempStats, round = true) {
     const sum = this.calculateSum(key);
     const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
-    return avg ? (round ? Math.round(avg) : avg) : undefined;
+    return avg !== undefined ? (round ? Math.round(avg) : avg) : undefined;
   }
 
   protected calculateDifferenceForSample(key: keyof TempStats) {

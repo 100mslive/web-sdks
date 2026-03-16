@@ -24,7 +24,7 @@ export const useQuizSummary = (quizID: string) => {
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (!quizLeaderboard && quiz && !quiz?.anonymous && quiz.state === 'stopped') {
-        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 50);
+        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 200);
 
         const { maxPossibleScore, totalResponses } =
           quiz?.questions?.reduce((accumulator, question) => {

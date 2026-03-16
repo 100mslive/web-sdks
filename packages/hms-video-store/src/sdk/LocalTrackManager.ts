@@ -372,13 +372,31 @@ export class LocalTrackManager {
    * @throws {HMSException}
    */
   private async getAVTracks(settings: HMSTrackSettings): Promise<Array<MediaStreamTrack>> {
+    const constraints: MediaStreamConstraints = {
+      audio: settings.audio ? settings.audio.toConstraints() : false,
+      video: settings.video ? settings.video.toConstraints() : false,
+    };
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: settings.audio ? settings.audio.toConstraints() : false,
-        video: settings.video ? settings.video.toConstraints() : false,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const videoTracks = stream.getVideoTracks();
+      const audioTracks = stream.getAudioTracks();
 
-      return stream.getVideoTracks().concat(stream.getAudioTracks());
+      // Send analytics event with constraints and resulting track settings
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.mediaConstraints({
+          requestedConstraints: constraints,
+          appliedConstraints: {
+            video: videoTracks[0]?.getConstraints(),
+            audio: audioTracks[0]?.getConstraints(),
+          },
+          trackSettings: {
+            video: videoTracks[0]?.getSettings(),
+            audio: audioTracks[0]?.getSettings(),
+          },
+        }),
+      );
+
+      return videoTracks.concat(audioTracks);
     } catch (error) {
       await this.deviceManager.init();
       const videoError = !!(!this.deviceManager.hasWebcamPermission && settings.video);
