@@ -424,7 +424,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         error.code === ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION
       ) {
         const track = await this.replaceTrackWithBlank();
-        this.addTrackEventListeners(track);
+        // this.addTrackEventListeners(track);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
         this.videoHandler.updateSinks();
