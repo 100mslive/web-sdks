@@ -16,14 +16,13 @@ permissions:
 jobs:
   fix-vulnerabilities:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
+          token: ${{ secrets.DOCKER_GIT_TOKEN || github.token }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,6 +32,8 @@ jobs:
 
       - name: Fetch open dependabot alerts
         id: alerts
+        env:
+          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
         run: |
           alerts=$(gh api repos/${{ github.repository }}/dependabot/alerts \
             --jq '[.[] | select(.state == "open") | {
@@ -116,6 +117,8 @@ jobs:
 
       - name: Create or update PR
         if: steps.fix.outputs.has_fixes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
         run: |
           BRANCH="fix/dependabot-auto-$(date +%Y%m%d)"
           FIXES=$(cat /tmp/fixes.txt)
