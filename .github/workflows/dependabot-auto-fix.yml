@@ -65,14 +65,22 @@ jobs:
             latest=$(npm view "$pkg" version 2>/dev/null || true)
             [ -z "$latest" ] && { echo "  skip: not on npm"; continue; }
 
-            # Skip major bumps on direct deps
+            # Check for major version bumps (direct AND transitive deps)
+            # First check direct deps, then fall back to installed version
             current=$(jq -r --arg p "$pkg" '(.dependencies[$p] // .devDependencies[$p]) // empty' package.json)
+            if [ -z "$current" ]; then
+              # Transitive dep — check installed version from node_modules
+              current=$(node -p "try{require('$pkg/package.json').version}catch(e){''}" 2>/dev/null || true)
+            else
+              # Strip semver range prefix for direct deps
+              current=$(echo "$current" | sed 's/[^0-9]*//')
+            fi
             if [ -n "$current" ]; then
-              cur_major=$(echo "$current" | sed 's/[^0-9]*//' | cut -d. -f1)
+              cur_major=$(echo "$current" | cut -d. -f1)
               new_major=$(echo "$latest" | cut -d. -f1)
-              if [ "$cur_major" != "$new_major" ] && [ -n "$cur_major" ]; then
+              if [ "$cur_major" != "$new_major" ]; then
                 MAJOR="${MAJOR}- \`$pkg\`: $current → $latest ($title)\n"
-                echo "  ⚠️ major bump, skipping"
+                echo "  ⚠️ major bump ($cur_major → $new_major), skipping"
                 continue
               fi
             fi
