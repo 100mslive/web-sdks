@@ -2,24 +2,25 @@ name: Auto-fix Dependabot Alerts
 
 on:
   schedule:
-    # Every Monday at 9:07 AM IST (3:37 UTC)
-    - cron: '37 3 * * 1'
+    - cron: '37 3 * * 1' # Monday 9:07 AM IST (3:37 UTC)
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
+  security-events: read
 
 jobs:
   fix-vulnerabilities:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.DOCKER_GIT_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,167 +30,152 @@ jobs:
 
       - name: Fetch open dependabot alerts
         id: alerts
-        env:
-          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
         run: |
-          # Get open alerts with severity and package info
           alerts=$(gh api repos/${{ github.repository }}/dependabot/alerts \
             --jq '[.[] | select(.state == "open") | {
               number: .number,
               severity: .security_advisory.severity,
               package: .dependency.package.name,
-              summary: .security_advisory.summary,
-              ecosystem: .dependency.package.ecosystem
-            }]')
+              summary: .security_advisory.summary
+            }] | unique_by(.package)')
 
-          echo "All open alerts:"
-          echo "$alerts" | jq -r '.[] | "\(.severity) | \(.package) | \(.summary)"'
-
-          # Split into major (critical with no resolution path) vs patch/minor
           count=$(echo "$alerts" | jq 'length')
-          echo "total_alerts=$count" >> "$GITHUB_OUTPUT"
-          echo "$alerts" > /tmp/alerts.json
+          echo "total=$count" >> "$GITHUB_OUTPUT"
 
           if [ "$count" -eq 0 ]; then
-            echo "No open alerts. Nothing to do."
+            echo "No open alerts."
             exit 0
           fi
 
+          echo "Open alerts ($count):"
+          echo "$alerts" | jq -r '.[] | "  \(.severity) | \(.package) | \(.summary)"'
+          echo "$alerts" > /tmp/alerts.json
+
       - name: Install packages
-        if: steps.alerts.outputs.total_alerts != '0'
+        if: steps.alerts.outputs.total != '0'
         run: yarn install --frozen-lockfile || yarn install
 
-      - name: Fix vulnerabilities via resolutions
-        if: steps.alerts.outputs.total_alerts != '0'
+      - name: Apply fixes
+        if: steps.alerts.outputs.total != '0'
         id: fix
         run: |
-          set -euo pipefail
-
-          BRANCH_NAME="fix/dependabot-auto-$(date +%Y%m%d)"
           FIXES=""
-          MAJOR_PACKAGES=""
+          MAJOR=""
 
-          # Process each alert
           while IFS= read -r alert; do
             pkg=$(echo "$alert" | jq -r '.package')
             severity=$(echo "$alert" | jq -r '.severity')
             summary=$(echo "$alert" | jq -r '.summary')
 
-            echo "Processing: $pkg ($severity) - $summary"
+            echo "→ $pkg ($severity)"
 
-            # Check if the package is a direct dependency
-            is_direct=$(cat package.json | jq --arg pkg "$pkg" '
-              (.dependencies[$pkg] // .devDependencies[$pkg]) != null
-            ')
+            # Get latest version from npm
+            latest=$(npm view "$pkg" version 2>/dev/null || true)
+            [ -z "$latest" ] && { echo "  skip: not on npm"; continue; }
 
-            # Try npm audit fix approach — get the recommended version
-            recommended=$(npm audit --json 2>/dev/null | jq -r --arg pkg "$pkg" '
-              .vulnerabilities[$pkg].fixAvailable.version // empty
-            ' 2>/dev/null || true)
-
-            if [ -n "$recommended" ] && [ "$is_direct" = "true" ]; then
-              # Check if this is a major version bump
-              current=$(cat package.json | jq -r --arg pkg "$pkg" '
-                (.dependencies[$pkg] // .devDependencies[$pkg]) // empty
-              ')
-              current_major=$(echo "$current" | sed 's/[^0-9]*//' | cut -d. -f1)
-              recommended_major=$(echo "$recommended" | cut -d. -f1)
-
-              if [ "$current_major" != "$recommended_major" ] && [ -n "$current_major" ]; then
-                MAJOR_PACKAGES="$MAJOR_PACKAGES\n- $pkg: $current → $recommended ($summary)"
-                echo "⚠️  Major update needed for $pkg: $current → $recommended — skipping for separate PR"
+            # Check if it's a direct dependency with a major bump
+            current=$(jq -r --arg p "$pkg" '(.dependencies[$p] // .devDependencies[$p]) // empty' package.json)
+            if [ -n "$current" ]; then
+              cur_major=$(echo "$current" | sed 's/[^0-9]*//' | cut -d. -f1)
+              new_major=$(echo "$latest" | cut -d. -f1)
+              if [ "$cur_major" != "$new_major" ] && [ -n "$cur_major" ]; then
+                MAJOR="${MAJOR}- \`$pkg\`: $current → $latest ($summary)\n"
+                echo "  ⚠️ major bump, skipping"
                 continue
               fi
             fi
 
-            # Try resolution override (handles transitive deps)
-            # Get latest patched version for the package
-            latest=$(npm view "$pkg" version 2>/dev/null || true)
-            if [ -n "$latest" ]; then
-              # Check if resolution already exists
-              existing=$(cat package.json | jq -r --arg pkg "$pkg" '.resolutions[$pkg] // empty')
-              if [ "$existing" != "^$latest" ] && [ "$existing" != "$latest" ]; then
-                # Add or update resolution
-                jq --arg pkg "$pkg" --arg ver "^$latest" '.resolutions[$pkg] = $ver' package.json > package.json.tmp
-                mv package.json.tmp package.json
-                FIXES="$FIXES\n- $pkg: resolved to ^$latest ($severity — $summary)"
-                echo "✅ Added resolution for $pkg → ^$latest"
-              else
-                echo "ℹ️  Resolution already exists for $pkg: $existing"
-              fi
+            # Add/update resolution
+            existing=$(jq -r --arg p "$pkg" '.resolutions[$p] // empty' package.json)
+            if [ "$existing" = "^$latest" ]; then
+              echo "  already resolved to ^$latest"
+              continue
             fi
+
+            jq --arg p "$pkg" --arg v "^$latest" '.resolutions[$p] = $v' package.json > package.json.tmp
+            mv package.json.tmp package.json
+            FIXES="${FIXES}- \`$pkg\`: → ^$latest ($severity — $summary)\n"
+            echo "  ✅ resolved to ^$latest"
           done < <(jq -c '.[]' /tmp/alerts.json)
 
           if [ -z "$FIXES" ]; then
-            echo "No new fixes applied."
+            echo "No new fixes to apply."
             echo "has_fixes=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Reinstall with new resolutions
-          echo "Reinstalling with updated resolutions..."
+          # Reinstall
           yarn install
 
-          # Verify build still works
-          echo "Running build check..."
-          yarn test || true
-          yarn lint || true
-
           echo "has_fixes=true" >> "$GITHUB_OUTPUT"
-          echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
-          echo -e "$FIXES" > /tmp/fixes.txt
-          echo -e "$MAJOR_PACKAGES" > /tmp/major.txt
+          printf '%b' "$FIXES" > /tmp/fixes.txt
+          printf '%b' "$MAJOR" > /tmp/major.txt
 
-      - name: Create PR for batch fixes
+      - name: Create or update PR
         if: steps.fix.outputs.has_fixes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
         run: |
-          BRANCH="${{ steps.fix.outputs.branch }}"
+          BRANCH="fix/dependabot-auto-$(date +%Y%m%d)"
+          FIXES=$(cat /tmp/fixes.txt)
+          MAJOR=$(cat /tmp/major.txt)
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+
+          # Check if branch already exists (re-run scenario)
+          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
+            git fetch origin "$BRANCH"
+            git checkout "$BRANCH"
+            git reset --hard origin/main
+          else
+            git checkout -b "$BRANCH"
+          fi
+
           git add package.json yarn.lock
+          git diff --cached --quiet && { echo "No changes to commit"; exit 0; }
 
           git commit -m "fix: resolve dependabot security vulnerabilities
 
-          Auto-generated by dependabot-auto-fix workflow.
-
           Fixes:
-          $(cat /tmp/fixes.txt)"
+          $FIXES"
 
-          git push -u origin "$BRANCH"
+          git push -f origin "$BRANCH"
 
-          MAJOR_NOTES=""
-          if [ -s /tmp/major.txt ] && [ "$(cat /tmp/major.txt | tr -d '[:space:]')" != "" ]; then
-            MAJOR_NOTES="
+          MAJOR_SECTION=""
+          if [ -n "$MAJOR" ]; then
+            MAJOR_SECTION="
           ## Major updates (separate PRs needed)
-          $(cat /tmp/major.txt)
-
+          $MAJOR
           These require manual review due to breaking changes."
           fi
 
-          gh pr create \
-            --title "fix: resolve dependabot security vulnerabilities" \
-            --body "$(cat <<EOF
-          ## Summary
+          # Create PR if it doesn't exist, update if it does
+          existing_pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' || true)
+          if [ -n "$existing_pr" ]; then
+            gh pr edit "$existing_pr" --body "## Summary
           Auto-fix for open Dependabot security alerts via yarn resolutions.
 
-          ### Fixed in this PR
-          $(cat /tmp/fixes.txt)
-          $MAJOR_NOTES
-
-          ## How it works
-          - Adds \`resolutions\` overrides in root \`package.json\` to force patched versions
-          - Handles transitive dependencies that can't be directly upgraded
-          - Runs \`yarn install\` to regenerate lockfile with patched versions
+          ### Fixed
+          $FIXES
+          $MAJOR_SECTION
 
           ## Test plan
           - [ ] CI passes (lint, test, build)
-          - [ ] Verify no runtime regressions in prebuilt app
 
-          🤖 Auto-generated by [dependabot-auto-fix](.github/workflows/dependabot-auto-fix.yml)
-          EOF
-          )" \
-            --base main
+          🤖 Auto-generated by dependabot-auto-fix workflow"
+            echo "Updated PR #$existing_pr"
+          else
+            gh pr create \
+              --title "fix: resolve dependabot security vulnerabilities" \
+              --body "## Summary
+          Auto-fix for open Dependabot security alerts via yarn resolutions.
+
+          ### Fixed
+          $FIXES
+          $MAJOR_SECTION
+
+          ## Test plan
+          - [ ] CI passes (lint, test, build)
+
+          🤖 Auto-generated by dependabot-auto-fix workflow" \
+              --base main
+          fi
