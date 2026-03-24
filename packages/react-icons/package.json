@@ -32,7 +32,7 @@
     "lint:fix": "eslint src/** --fix"
   },
   "devDependencies": {
-    "@svgr/cli": "^6.3.1",
+    "@svgr/cli": "^8.1.0",
     "@types/react": "^18.1.0",
     "react": "^18.1.0"
   },
