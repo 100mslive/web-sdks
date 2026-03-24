@@ -4,9 +4,6 @@ on:
   schedule:
     - cron: '37 3 * * 1' # Monday 9:07 AM IST (3:37 UTC)
   workflow_dispatch:
-  push:
-    branches:
-      - ci/dependabot-auto-fix # TEMP: remove before merging to main
 
 permissions:
   contents: write
@@ -18,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          ref: main
           fetch-depth: 0
 
       - name: Setup Node
