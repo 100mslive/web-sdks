@@ -11,7 +11,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  security-events: read
 
 jobs:
   fix-vulnerabilities:
@@ -22,7 +21,6 @@ jobs:
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
-          token: ${{ secrets.DOCKER_GIT_TOKEN || github.token }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,60 +28,51 @@ jobs:
           node-version: 20
           cache: 'yarn'
 
-      - name: Fetch open dependabot alerts
-        id: alerts
-        env:
-          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
+      - name: Install packages
+        run: yarn install --frozen-lockfile || yarn install
+
+      - name: Audit and fix vulnerabilities
+        id: fix
         run: |
-          alerts=$(gh api repos/${{ github.repository }}/dependabot/alerts \
-            --jq '[.[] | select(.state == "open") | {
-              number: .number,
-              severity: .security_advisory.severity,
-              package: .dependency.package.name,
-              summary: .security_advisory.summary
-            }] | unique_by(.package)')
+          set -uo pipefail
 
-          count=$(echo "$alerts" | jq 'length')
-          echo "total=$count" >> "$GITHUB_OUTPUT"
+          # Use yarn/npm audit to find vulnerabilities — no GitHub API needed
+          echo "Running npm audit..."
+          audit_json=$(npm audit --json 2>/dev/null || true)
+          vuln_count=$(echo "$audit_json" | jq '.metadata.vulnerabilities | to_entries | map(select(.key != "info" and .value > 0)) | length' 2>/dev/null || echo "0")
 
-          if [ "$count" -eq 0 ]; then
-            echo "No open alerts."
+          if [ "$vuln_count" -eq 0 ]; then
+            echo "No vulnerabilities found."
+            echo "has_fixes=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Open alerts ($count):"
-          echo "$alerts" | jq -r '.[] | "  \(.severity) | \(.package) | \(.summary)"'
-          echo "$alerts" > /tmp/alerts.json
+          echo "Found vulnerabilities, processing..."
 
-      - name: Install packages
-        if: steps.alerts.outputs.total != '0'
-        run: yarn install --frozen-lockfile || yarn install
-
-      - name: Apply fixes
-        if: steps.alerts.outputs.total != '0'
-        id: fix
-        run: |
           FIXES=""
           MAJOR=""
 
-          while IFS= read -r alert; do
-            pkg=$(echo "$alert" | jq -r '.package')
-            severity=$(echo "$alert" | jq -r '.severity')
-            summary=$(echo "$alert" | jq -r '.summary')
+          # Get list of vulnerable packages
+          packages=$(echo "$audit_json" | jq -r '.vulnerabilities | to_entries[] | select(.value.severity != "info") | .key' 2>/dev/null || true)
 
-            echo "→ $pkg ($severity)"
+          for pkg in $packages; do
+            severity=$(echo "$audit_json" | jq -r --arg p "$pkg" '.vulnerabilities[$p].severity' 2>/dev/null || echo "unknown")
+            title=$(echo "$audit_json" | jq -r --arg p "$pkg" '.vulnerabilities[$p].via[0] | if type == "object" then .title else . end' 2>/dev/null || echo "")
+            fix_available=$(echo "$audit_json" | jq -r --arg p "$pkg" '.vulnerabilities[$p].fixAvailable' 2>/dev/null || echo "false")
 
-            # Get latest version from npm
+            echo "→ $pkg ($severity) — $title"
+
+            # Get latest version
             latest=$(npm view "$pkg" version 2>/dev/null || true)
             [ -z "$latest" ] && { echo "  skip: not on npm"; continue; }
 
-            # Check if it's a direct dependency with a major bump
+            # Check for major version bump on direct deps
             current=$(jq -r --arg p "$pkg" '(.dependencies[$p] // .devDependencies[$p]) // empty' package.json)
             if [ -n "$current" ]; then
               cur_major=$(echo "$current" | sed 's/[^0-9]*//' | cut -d. -f1)
               new_major=$(echo "$latest" | cut -d. -f1)
               if [ "$cur_major" != "$new_major" ] && [ -n "$cur_major" ]; then
-                MAJOR="${MAJOR}- \`$pkg\`: $current → $latest ($summary)\n"
+                MAJOR="${MAJOR}- \`$pkg\`: $current → $latest ($title)\n"
                 echo "  ⚠️ major bump, skipping"
                 continue
               fi
@@ -92,15 +81,15 @@ jobs:
             # Add/update resolution
             existing=$(jq -r --arg p "$pkg" '.resolutions[$p] // empty' package.json)
             if [ "$existing" = "^$latest" ]; then
-              echo "  already resolved to ^$latest"
+              echo "  already resolved"
               continue
             fi
 
             jq --arg p "$pkg" --arg v "^$latest" '.resolutions[$p] = $v' package.json > package.json.tmp
             mv package.json.tmp package.json
-            FIXES="${FIXES}- \`$pkg\`: → ^$latest ($severity — $summary)\n"
+            FIXES="${FIXES}- \`$pkg\`: → ^$latest ($severity — $title)\n"
             echo "  ✅ resolved to ^$latest"
-          done < <(jq -c '.[]' /tmp/alerts.json)
+          done
 
           if [ -z "$FIXES" ]; then
             echo "No new fixes to apply."
@@ -108,8 +97,12 @@ jobs:
             exit 0
           fi
 
-          # Reinstall
+          # Reinstall with updated resolutions
           yarn install
+
+          # Quick sanity check
+          yarn test || echo "⚠️ Tests had failures — check manually"
+          yarn lint || echo "⚠️ Lint had failures — check manually"
 
           echo "has_fixes=true" >> "$GITHUB_OUTPUT"
           printf '%b' "$FIXES" > /tmp/fixes.txt
@@ -118,7 +111,7 @@ jobs:
       - name: Create or update PR
         if: steps.fix.outputs.has_fixes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN }}
+          GH_TOKEN: ${{ secrets.DOCKER_GIT_TOKEN || github.token }}
         run: |
           BRANCH="fix/dependabot-auto-$(date +%Y%m%d)"
           FIXES=$(cat /tmp/fixes.txt)
@@ -127,11 +120,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Check if branch already exists (re-run scenario)
+          # Handle re-runs: reset existing branch
           if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
             git fetch origin "$BRANCH"
             git checkout "$BRANCH"
-            git reset --hard origin/main
+            git reset --hard "${{ github.ref }}"
           else
             git checkout -b "$BRANCH"
           fi
@@ -141,7 +134,6 @@ jobs:
 
           git commit -m "fix: resolve dependabot security vulnerabilities
 
-          Fixes:
           $FIXES"
 
           git push -f origin "$BRANCH"
@@ -154,11 +146,8 @@ jobs:
           These require manual review due to breaking changes."
           fi
 
-          # Create PR if it doesn't exist, update if it does
-          existing_pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' || true)
-          if [ -n "$existing_pr" ]; then
-            gh pr edit "$existing_pr" --body "## Summary
-          Auto-fix for open Dependabot security alerts via yarn resolutions.
+          BODY="## Summary
+          Auto-fix for security vulnerabilities via yarn resolutions.
 
           ### Fixed
           $FIXES
@@ -168,20 +157,12 @@ jobs:
           - [ ] CI passes (lint, test, build)
 
           🤖 Auto-generated by dependabot-auto-fix workflow"
+
+          # Create or update
+          existing_pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$existing_pr" ] && [ "$existing_pr" != "null" ]; then
+            gh pr edit "$existing_pr" --body "$BODY"
             echo "Updated PR #$existing_pr"
           else
-            gh pr create \
-              --title "fix: resolve dependabot security vulnerabilities" \
-              --body "## Summary
-          Auto-fix for open Dependabot security alerts via yarn resolutions.
-
-          ### Fixed
-          $FIXES
-          $MAJOR_SECTION
-
-          ## Test plan
-          - [ ] CI passes (lint, test, build)
-
-          🤖 Auto-generated by dependabot-auto-fix workflow" \
-              --base main
+            gh pr create --title "fix: resolve dependabot security vulnerabilities" --body "$BODY" --base main
           fi
