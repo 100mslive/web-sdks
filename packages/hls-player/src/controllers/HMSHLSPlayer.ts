@@ -27,7 +27,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @param videoEl optional field - HTML video element
    */
   constructor(hlsUrl: string, videoEl?: HTMLVideoElement) {
-    this._hls = new Hls(this.getPlayerConfig());
+    this._hls = new Hls(this.getPlayerConfig(hlsUrl));
     this._emitter = new HMSHLSPlayerEventEmitter();
     this._hlsUrl = hlsUrl;
     this._videoEl = videoEl || this.createVideoElement();
@@ -355,8 +355,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * Retries logic will run exponential like (1, 2, 4, 8, 8, 8, 8, 8, 8, 8secs)
    * there will be total 10 retries
    */
-  private getPlayerConfig(): Partial<HlsConfig> {
-    return {
+  private getPlayerConfig(hlsUrl: string): Partial<HlsConfig> {
+    const config: Partial<HlsConfig> = {
       enableWorker: true,
       maxBufferLength: 20,
       backBufferLength: 10,
@@ -380,6 +380,25 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         },
       },
     };
+
+    // Enable credentials for authenticated HLS streams (paths containing /s/)
+    // so the long-token cookie set by Media CDN is sent on subsequent requests
+    try {
+      const url = new URL(hlsUrl);
+      if (url.pathname.includes('/s/')) {
+        config.fetchSetup = function (context, initParams) {
+          initParams.credentials = 'include';
+          return new Request(context.url, initParams);
+        };
+        config.xhrSetup = function (xhr, _url: string) {
+          xhr.withCredentials = true;
+        };
+      }
+    } catch {
+      // invalid URL, skip credentials setup
+    }
+
+    return config;
   }
 
   /**
