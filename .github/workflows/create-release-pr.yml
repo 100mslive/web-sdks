@@ -33,6 +33,24 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
+      - name: Sync prerelease base with npm
+        if: github.event.inputs.versionBump == 'prerelease'
+        run: |
+          # Figure out what alpha base lerna would produce (e.g. 0.13.2 -> 0.13.3-alpha)
+          LOCAL_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
+          BASE=$(node -p "const v='${LOCAL_VERSION}'.split('.'); v[2]=parseInt(v[2])+1; v.join('.') + '-alpha'")
+          # Find the latest matching alpha on npm
+          LATEST_NPM=$(npm view @100mslive/hms-video-store versions --json 2>/dev/null | node -p "
+            const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+            const matching = versions.filter(v => v.startsWith('${BASE}.'));
+            matching.length ? matching[matching.length - 1] : ''
+          ") || true
+          if [ -n "$LATEST_NPM" ]; then
+            echo "npm latest alpha: ${LATEST_NPM}"
+            # Set hms-video-store to the npm version so lerna increments from it
+            cd packages/hms-video-store && npm pkg set version="${LATEST_NPM}" && cd ../..
+          fi
+
       - name: Update versions
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
@@ -43,58 +61,6 @@ jobs:
           ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
           cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
           cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
-
-      - name: Sync prerelease version with npm
-        if: github.event.inputs.versionBump == 'prerelease'
-        run: |
-          # Get the version lerna set (e.g. 0.13.3-alpha.0)
-          LOCAL_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
-          # Extract base version without prerelease number (e.g. 0.13.3-alpha)
-          BASE_VERSION=$(echo "$LOCAL_VERSION" | sed 's/\.[0-9]*$//')
-          # Get the latest matching alpha version from npm
-          LATEST_NPM=$(npm view @100mslive/hms-video-store versions --json 2>/dev/null | node -p "
-            const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
-            const matching = versions.filter(v => v.startsWith('${BASE_VERSION}.'));
-            matching.length ? matching[matching.length - 1] : ''
-          ") || true
-          if [ -n "$LATEST_NPM" ]; then
-            # Extract the prerelease number and increment
-            NPM_NUM=$(echo "$LATEST_NPM" | grep -o '[0-9]*$')
-            NEXT_NUM=$((NPM_NUM + 1))
-            echo "npm has ${LATEST_NPM}, bumping prerelease to ${NEXT_NUM}"
-            # Update all package versions and internal cross-references
-            node -e "
-              const fs = require('fs');
-              const glob = require('glob');
-              const pkgs = glob.sync('packages/*/package.json').concat('examples/prebuilt-react-integration/package.json');
-              // First pass: collect old->new version mappings
-              const versionMap = {};
-              for (const p of pkgs) {
-                const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-                if (pkg.version && pkg.version.includes('-alpha.')) {
-                  const newVersion = pkg.version.replace(/-alpha\.\d+$/, '-alpha.${NEXT_NUM}');
-                  versionMap[pkg.name] = { old: pkg.version, new: newVersion };
-                }
-              }
-              // Second pass: update versions and all internal dependency references
-              for (const p of pkgs) {
-                const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-                if (versionMap[pkg.name]) {
-                  pkg.version = versionMap[pkg.name].new;
-                }
-                for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
-                  if (!pkg[depType]) continue;
-                  for (const [dep, ver] of Object.entries(pkg[depType])) {
-                    if (versionMap[dep] && ver === versionMap[dep].old) {
-                      pkg[depType][dep] = versionMap[dep].new;
-                    }
-                  }
-                }
-                fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
-              }
-              console.log('Updated versions:', JSON.stringify(versionMap, null, 2));
-            "
-          fi
 
       - name: Get current version
         id: version
