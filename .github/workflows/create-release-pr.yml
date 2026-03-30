@@ -61,26 +61,39 @@ jobs:
             # Extract the prerelease number and increment
             NPM_NUM=$(echo "$LATEST_NPM" | grep -o '[0-9]*$')
             NEXT_NUM=$((NPM_NUM + 1))
-            NEW_VERSION="${BASE_VERSION}.${NEXT_NUM}"
-            echo "npm has ${LATEST_NPM}, bumping to ${NEW_VERSION}"
-            # Update all packages to use the synced prerelease number
+            echo "npm has ${LATEST_NPM}, bumping prerelease to ${NEXT_NUM}"
+            # Update all package versions and internal cross-references
             node -e "
               const fs = require('fs');
               const glob = require('glob');
               const pkgs = glob.sync('packages/*/package.json').concat('examples/prebuilt-react-integration/package.json');
+              // First pass: collect old->new version mappings
+              const versionMap = {};
               for (const p of pkgs) {
                 const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-                if (pkg.version && pkg.version.startsWith('${BASE_VERSION}.')) {
-                  pkg.version = pkg.version.replace(/\.[0-9]+$/, '.${NEXT_NUM}');
-                  fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+                if (pkg.version && pkg.version.includes('-alpha.')) {
+                  const newVersion = pkg.version.replace(/-alpha\.\d+$/, '-alpha.${NEXT_NUM}');
+                  versionMap[pkg.name] = { old: pkg.version, new: newVersion };
                 }
               }
+              // Second pass: update versions and all internal dependency references
+              for (const p of pkgs) {
+                const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+                if (versionMap[pkg.name]) {
+                  pkg.version = versionMap[pkg.name].new;
+                }
+                for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
+                  if (!pkg[depType]) continue;
+                  for (const [dep, ver] of Object.entries(pkg[depType])) {
+                    if (versionMap[dep] && ver === versionMap[dep].old) {
+                      pkg[depType][dep] = versionMap[dep].new;
+                    }
+                  }
+                }
+                fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+              }
+              console.log('Updated versions:', JSON.stringify(versionMap, null, 2));
             "
-            # Re-sync internal dependency versions
-            STORE_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
-            ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
-            cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
-            cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
           fi
 
       - name: Get current version
