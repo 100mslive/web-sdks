@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@100mslive/hls-player": "0.4.2",
-    "@100mslive/hms-noise-cancellation": "0.0.2",
+    "@100mslive/hms-noise-cancellation": "0.0.3",
     "@100mslive/hms-virtual-background": "1.14.2",
     "@100mslive/hms-whiteboard": "0.1.2",
     "@100mslive/react-icons": "0.11.2",
