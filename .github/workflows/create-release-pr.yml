@@ -44,12 +44,57 @@ jobs:
           cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
           cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
 
+      - name: Sync prerelease version with npm
+        if: github.event.inputs.versionBump == 'prerelease'
+        run: |
+          # Get the version lerna set (e.g. 0.13.3-alpha.0)
+          LOCAL_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
+          # Extract base version without prerelease number (e.g. 0.13.3-alpha)
+          BASE_VERSION=$(echo "$LOCAL_VERSION" | sed 's/\.[0-9]*$//')
+          # Get the latest matching alpha version from npm
+          LATEST_NPM=$(npm view @100mslive/hms-video-store versions --json 2>/dev/null | node -p "
+            const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+            const matching = versions.filter(v => v.startsWith('${BASE_VERSION}.'));
+            matching.length ? matching[matching.length - 1] : ''
+          ") || true
+          if [ -n "$LATEST_NPM" ]; then
+            # Extract the prerelease number and increment
+            NPM_NUM=$(echo "$LATEST_NPM" | grep -o '[0-9]*$')
+            NEXT_NUM=$((NPM_NUM + 1))
+            NEW_VERSION="${BASE_VERSION}.${NEXT_NUM}"
+            echo "npm has ${LATEST_NPM}, bumping to ${NEW_VERSION}"
+            # Update all packages to use the synced prerelease number
+            node -e "
+              const fs = require('fs');
+              const glob = require('glob');
+              const pkgs = glob.sync('packages/*/package.json').concat('examples/prebuilt-react-integration/package.json');
+              for (const p of pkgs) {
+                const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+                if (pkg.version && pkg.version.startsWith('${BASE_VERSION}.')) {
+                  pkg.version = pkg.version.replace(/\.[0-9]+$/, '.${NEXT_NUM}');
+                  fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+                }
+              }
+            "
+            # Re-sync internal dependency versions
+            STORE_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
+            ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
+            cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
+            cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
+          fi
+
       - name: Get current version
         id: version
         run: |
           STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
           echo $STORE_VERSION
-          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
+          echo "store_version=$STORE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: '8.30.1'
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
 
       - uses: peter-evans/create-pull-request@v7
         with:
