@@ -36,20 +36,25 @@ jobs:
       - name: Sync prerelease base with npm
         if: github.event.inputs.versionBump == 'prerelease'
         run: |
-          # Figure out what alpha base lerna would produce (e.g. 0.13.2 -> 0.13.3-alpha)
-          LOCAL_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
-          BASE=$(node -p "const v='${LOCAL_VERSION}'.split('.'); v[2]=parseInt(v[2])+1; v.join('.') + '-alpha'")
-          # Find the latest matching alpha on npm
-          LATEST_NPM=$(npm view @100mslive/hms-video-store versions --json 2>/dev/null | node -p "
-            const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
-            const matching = versions.filter(v => v.startsWith('${BASE}.'));
-            matching.length ? matching[matching.length - 1] : ''
-          ") || true
-          if [ -n "$LATEST_NPM" ]; then
-            echo "npm latest alpha: ${LATEST_NPM}"
-            # Set hms-video-store to the npm version so lerna increments from it
-            cd packages/hms-video-store && npm pkg set version="${LATEST_NPM}" && cd ../..
-          fi
+          # Set all package versions to their latest npm alpha so lerna increments from there
+          node -e "
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const glob = require('glob');
+            const pkgs = glob.sync('packages/*/package.json');
+            for (const p of pkgs) {
+              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+              if (pkg.private) continue;
+              try {
+                const alpha = execSync('npm view ' + pkg.name + ' dist-tags.alpha 2>/dev/null', { encoding: 'utf8' }).trim();
+                if (alpha) {
+                  console.log(pkg.name + ': ' + pkg.version + ' -> ' + alpha);
+                  pkg.version = alpha;
+                  fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+                }
+              } catch(e) {}
+            }
+          "
 
       - name: Update versions
         env:
