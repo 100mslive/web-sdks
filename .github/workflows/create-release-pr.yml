@@ -33,6 +33,29 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
+      - name: Sync prerelease base with npm
+        if: github.event.inputs.versionBump == 'prerelease'
+        run: |
+          # Set all package versions to their latest npm alpha so lerna increments from there
+          node -e "
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const glob = require('glob');
+            const pkgs = glob.sync('packages/*/package.json');
+            for (const p of pkgs) {
+              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+              if (pkg.private) continue;
+              try {
+                const alpha = execSync('npm view ' + pkg.name + ' dist-tags.alpha 2>/dev/null', { encoding: 'utf8' }).trim();
+                if (alpha) {
+                  console.log(pkg.name + ': ' + pkg.version + ' -> ' + alpha);
+                  pkg.version = alpha;
+                  fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+                }
+              } catch(e) {}
+            }
+          "
+
       - name: Update versions
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
@@ -49,7 +72,13 @@ jobs:
         run: |
           STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
           echo $STORE_VERSION
-          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
+          echo "store_version=$STORE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: '8.30.1'
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
 
       - uses: peter-evans/create-pull-request@v7
         with:
