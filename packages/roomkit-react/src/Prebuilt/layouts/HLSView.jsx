@@ -137,6 +137,33 @@ const HLSView = () => {
   }, [hlsUrl, streamEnded, lastHlsUrl]);
 
   // Fetch signed URL from passport-api for authenticated CDN streams
+  // Management token: read from URL query param ?mgmt_token=... or browser cookie
+  const PASSPORT_ENDPOINT = 'https://api.100ms.live/v1/passport';
+  const getMgmtToken = useCallback(() => {
+    // 1. Check URL query param
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paramToken = params.get('mgmt_token');
+      if (paramToken) return paramToken;
+    } catch (e) {
+      // ignore
+    }
+    // 2. Check browser cookie (authUser for prod, authUser-qa for QA)
+    try {
+      for (const cookieName of ['authUser', 'authUser-qa']) {
+        const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${cookieName}=([^;]*)`));
+        if (match) {
+          const authUser = JSON.parse(decodeURIComponent(match[1]));
+          if (authUser?.token) return authUser.token;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    // 3. Fall back to context values from parent app
+    return managementToken || null;
+  }, [managementToken]);
+
   useEffect(() => {
     if (!hlsUrl) {
       setResolvedHlsUrl(null);
@@ -146,11 +173,13 @@ const HLSView = () => {
       setResolvedHlsUrl(hlsUrl);
       return;
     }
-    const passportEndpoint = endpoints?.passport;
-    if (!passportEndpoint || !managementToken) {
+    const token = getMgmtToken();
+    if (!token) {
+      console.warn('[HLSView] No management token available for passport-api, using unsigned URL');
       setResolvedHlsUrl(hlsUrl);
       return;
     }
+    const passportEndpoint = endpoints?.passport || PASSPORT_ENDPOINT;
     let cancelled = false;
     const fetchSignedUrl = async () => {
       try {
@@ -158,7 +187,7 @@ const HLSView = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${managementToken}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ url: hlsUrl }),
         });
@@ -178,7 +207,7 @@ const HLSView = () => {
     return () => {
       cancelled = true;
     };
-  }, [hlsUrl, endpoints?.passport, managementToken]);
+  }, [hlsUrl, endpoints?.passport, getMgmtToken]);
 
   useEffect(() => {
     if (!notification) return;
