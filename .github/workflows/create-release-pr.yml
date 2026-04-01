@@ -66,7 +66,6 @@ jobs:
             const fs = require('fs');
             const glob = require('glob');
             const pkgs = glob.sync('packages/*/package.json').concat('examples/prebuilt-react-integration/package.json');
-            // Build a map of package name -> new version
             const versionMap = {};
             for (const p of pkgs) {
               const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -75,7 +74,6 @@ jobs:
               }
             }
             console.log('Version map:', JSON.stringify(versionMap, null, 2));
-            // Update all internal dependency references
             for (const p of pkgs) {
               let changed = false;
               const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -94,6 +92,9 @@ jobs:
               }
             }
           "
+
+      - name: Update lockfile
+        run: yarn install --no-immutable
 
       - name: Get current version
         id: version
