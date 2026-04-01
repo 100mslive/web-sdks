@@ -35,7 +35,7 @@
   "author": "100ms",
   "license": "MIT",
   "dependencies": {
-    "@100mslive/hls-stats": "0.5.2",
+    "@100mslive/hls-stats": "0.5.3-alpha.9",
     "eventemitter2": "^6.4.9",
     "hls.js": "1.4.12"
   },
