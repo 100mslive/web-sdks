@@ -61,11 +61,39 @@ jobs:
           BUMP: ${{ github.event.inputs.versionBump }}
         run: |
           yarn lerna version $BUMP --no-git-tag-version --exact --yes --no-private
-          # Update internal dependency versions in package.json without modifying lockfile
-          STORE_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
-          ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
-          cd packages/hms-virtual-background && npm pkg set peerDependencies.@100mslive/hms-video-store=$STORE_VERSION && npm pkg set devDependencies.@100mslive/hms-video-store=$STORE_VERSION && cd ../..
-          cd examples/prebuilt-react-integration && npm pkg set dependencies.@100mslive/roomkit-react=$ROOMKIT_VERSION && cd ../..
+          # Sync all internal cross-references to match bumped versions
+          node -e "
+            const fs = require('fs');
+            const glob = require('glob');
+            const pkgs = glob.sync('packages/*/package.json').concat('examples/prebuilt-react-integration/package.json');
+            // Build a map of package name -> new version
+            const versionMap = {};
+            for (const p of pkgs) {
+              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+              if (pkg.name && pkg.name.startsWith('@100mslive/')) {
+                versionMap[pkg.name] = pkg.version;
+              }
+            }
+            console.log('Version map:', JSON.stringify(versionMap, null, 2));
+            // Update all internal dependency references
+            for (const p of pkgs) {
+              let changed = false;
+              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+              for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
+                if (!pkg[depType]) continue;
+                for (const [dep, ver] of Object.entries(pkg[depType])) {
+                  if (versionMap[dep] && ver !== versionMap[dep]) {
+                    console.log(p + ': ' + dep + ' ' + ver + ' -> ' + versionMap[dep]);
+                    pkg[depType][dep] = versionMap[dep];
+                    changed = true;
+                  }
+                }
+              }
+              if (changed) {
+                fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+              }
+            }
+          "
 
       - name: Get current version
         id: version
