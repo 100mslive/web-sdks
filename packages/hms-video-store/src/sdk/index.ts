@@ -1204,8 +1204,8 @@ export class HMSSdk implements HMSInterface {
     }
     const transcriptionParams: StartTranscriptionRequestParams = {
       mode: params.mode,
-      language: params.language,
-      translation: params.translation,
+      ...(params.language && { language: params.language }),
+      ...(params.translation && { translation: params.translation }),
     };
     await this.transport?.signal.startTranscription(transcriptionParams);
   }
