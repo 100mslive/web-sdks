@@ -132,4 +132,14 @@ export interface HMSTranscriptionInfo {
   updated_at?: Date;
   stopped_at?: Date;
   error?: HMSException;
+  /** Translation state — populated when biz broadcasts translation info in room state */
+  translation?: {
+    /** Whether translation is currently active */
+    enabled: boolean;
+    /**
+     * Map of role → target language (ISO 639-1/BCP 47).
+     * Roles not in this map receive original (untranslated) captions.
+     */
+    roleLanguages?: Record<string, string>;
+  };
 }
