@@ -29,6 +29,7 @@ export enum HMSNotificationMethod {
   RECORDING_UPDATE = 'on-record-update',
   HLS_UPDATE = 'on-hls-update',
   TRANSCRIPTION_UPDATE = 'on-transcription-update',
+  TRANSCRIPTION_CONFIG_UPDATE = 'on-transcription-config-update',
   METADATA_CHANGE = 'on-metadata-change',
   POLL_START = 'on-poll-start',
   POLL_STOP = 'on-poll-stop',

@@ -62,6 +62,11 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.TRANSCRIPTION_UPDATE:
         this.handleTranscriptionStatus([notification as TranscriptionNotification]);
         break;
+      case HMSNotificationMethod.TRANSCRIPTION_CONFIG_UPDATE:
+        this.handleTranscriptionConfigUpdate(
+          notification as { translation?: { enabled: boolean; roleLanguages?: Record<string, string> } },
+        );
+        break;
       default:
         break;
     }
@@ -216,6 +221,23 @@ export class RoomUpdateManager {
       return;
     }
     room.transcriptions = this.addTranscriptionDetail(notification) || [];
+    this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
+  }
+
+  private handleTranscriptionConfigUpdate(notification: {
+    translation?: { enabled: boolean; roleLanguages?: Record<string, string> };
+  }) {
+    const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on transcription config update - room not present');
+      return;
+    }
+    // Update translation state on existing transcriptions
+    if (room.transcriptions && notification.translation) {
+      for (const transcription of room.transcriptions) {
+        transcription.translation = notification.translation;
+      }
+    }
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
   }
   private convertHls(hlsNotification?: HLSNotification) {
