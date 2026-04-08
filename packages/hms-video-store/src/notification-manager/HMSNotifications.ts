@@ -166,6 +166,10 @@ export interface TranscriptionNotification {
   stopped_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
+  translation?: {
+    enabled: boolean;
+    roleLanguages?: Record<string, string>;
+  };
 }
 
 export interface RoomState {

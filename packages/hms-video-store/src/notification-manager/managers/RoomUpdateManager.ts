@@ -137,6 +137,7 @@ export class RoomUpdateManager {
         stopped_at: convertDateNumToDate(transcription.stopped_at),
         updated_at: convertDateNumToDate(transcription.updated_at),
         error: this.toSdkError(transcription?.error),
+        translation: transcription.translation,
       };
     });
   }
