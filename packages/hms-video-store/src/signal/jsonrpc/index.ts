@@ -66,6 +66,7 @@ import {
   StartTranscriptionRequestParams,
   Track,
   TrackUpdateRequestParams,
+  TranscriptionConfigUpdateRequestParams,
   UpdatePeerRequestParams,
 } from '../interfaces';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
@@ -383,6 +384,10 @@ export default class JsonRpcSignal {
 
   async stopTranscription(params: StartTranscriptionRequestParams) {
     await this.call(HMSSignalMethod.STOP_TRANSCRIPTION, { ...params });
+  }
+
+  async updateTranscriptionConfig(params: TranscriptionConfigUpdateRequestParams) {
+    await this.call(HMSSignalMethod.UPDATE_TRANSCRIPTION_CONFIG, { ...params });
   }
 
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {

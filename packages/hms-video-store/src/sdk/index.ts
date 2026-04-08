@@ -52,7 +52,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import { PlaylistManager, TranscriptionConfig } from '../internal';
+import { PlaylistManager, TranscriptionConfig, TranscriptionConfigUpdate } from '../internal';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
@@ -1204,6 +1204,8 @@ export class HMSSdk implements HMSInterface {
     }
     const transcriptionParams: StartTranscriptionRequestParams = {
       mode: params.mode,
+      language: params.language,
+      translation: params.translation,
     };
     await this.transport?.signal.startTranscription(transcriptionParams);
   }
@@ -1222,6 +1224,16 @@ export class HMSSdk implements HMSInterface {
       mode: params.mode,
     };
     await this.transport?.signal.stopTranscription(transcriptionParams);
+  }
+
+  async updateTranscriptionConfig(params: TranscriptionConfigUpdate) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot update transcription config',
+      );
+    }
+    await this.transport?.signal.updateTranscriptionConfig(params);
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
