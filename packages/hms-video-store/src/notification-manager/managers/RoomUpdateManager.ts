@@ -232,11 +232,12 @@ export class RoomUpdateManager {
       HMSLogger.w(this.TAG, 'on transcription config update - room not present');
       return;
     }
-    // Update translation state on existing transcriptions
+    // Create new transcription objects with updated translation (store objects are frozen)
     if (room.transcriptions && notification.translation) {
-      for (const transcription of room.transcriptions) {
-        transcription.translation = notification.translation;
-      }
+      room.transcriptions = room.transcriptions.map(transcription => ({
+        ...transcription,
+        translation: notification.translation,
+      }));
     }
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
   }
