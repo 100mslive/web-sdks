@@ -1154,11 +1154,21 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
+    const prevTranscriptions =
+      type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED
+        ? this.store.getState()?.room?.transcriptions
+        : undefined;
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
     if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED) {
-      this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
+      // Only send notification if transcription state actually changed (not config-only updates)
+      const prevState = prevTranscriptions?.[0]?.state;
+      const newState = room.transcriptions?.[0]?.state;
+      const hasError = room.transcriptions?.[0]?.error;
+      if (prevState !== newState || hasError) {
+        this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
+      }
     }
   }
 
