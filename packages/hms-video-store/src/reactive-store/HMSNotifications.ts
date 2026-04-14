@@ -186,14 +186,6 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     this.emitEvent(notification);
   }
 
-  sendTranscriptionConfigUpdate(configUpdate: sdkTypes.TranscriptionConfigUpdate) {
-    const notification = this.createNotification(
-      TRANSCRIPTION_NOTIFICATION_TYPES[sdkTypes.HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED],
-      configUpdate,
-      HMSNotificationSeverity.INFO,
-    );
-    this.emitEvent(notification);
-  }
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
@@ -213,7 +205,6 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
       | HMSPlaylistItem<T>
       | sdkTypes.HMSPoll
       | sdkTypes.HMSTranscriptionInfo[]
-      | sdkTypes.TranscriptionConfigUpdate
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

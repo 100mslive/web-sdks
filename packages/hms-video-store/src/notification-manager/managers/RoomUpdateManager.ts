@@ -62,11 +62,6 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.TRANSCRIPTION_UPDATE:
         this.handleTranscriptionStatus([notification as TranscriptionNotification]);
         break;
-      case HMSNotificationMethod.TRANSCRIPTION_CONFIG_UPDATE:
-        this.handleTranscriptionConfigUpdate(
-          notification as { translation?: { enabled: boolean; roleLanguages?: Record<string, string> } },
-        );
-        break;
       default:
         break;
     }
@@ -224,35 +219,6 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
   }
 
-  private handleTranscriptionConfigUpdate(notification: {
-    translation?: { enabled: boolean; roleLanguages?: Record<string, string> };
-    language?: string;
-  }) {
-    const room = this.store.getRoom();
-    if (!room) {
-      HMSLogger.w(this.TAG, 'on transcription config update - room not present');
-      return;
-    }
-    // Merge config update into transcription objects (store objects are frozen).
-    // For translation: update enabled, carry forward existing roleLanguages when not provided.
-    if (room.transcriptions) {
-      room.transcriptions = room.transcriptions.map(transcription => {
-        const updated = { ...transcription };
-        if (notification.translation) {
-          updated.translation = {
-            ...transcription.translation,
-            ...notification.translation,
-            roleLanguages: notification.translation.roleLanguages ?? transcription.translation?.roleLanguages,
-          };
-        }
-        if (notification.language) {
-          updated.language = notification.language;
-        }
-        return updated;
-      });
-    }
-    this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED, room);
-  }
   private convertHls(hlsNotification?: HLSNotification) {
     // only checking for zeroth variant intialized
     const isInitialised =

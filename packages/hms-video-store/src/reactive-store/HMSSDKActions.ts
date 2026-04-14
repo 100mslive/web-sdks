@@ -1160,13 +1160,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED) {
       this.hmsNotifications.sendTranscriptionUpdate(room.transcriptions);
     }
-    if (type === sdkTypes.HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED) {
-      const transcription = room.transcriptions?.[0];
-      this.hmsNotifications.sendTranscriptionConfigUpdate({
-        translation: transcription?.translation,
-        language: transcription?.language,
-      });
-    }
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {

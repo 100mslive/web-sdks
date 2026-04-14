@@ -1,6 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { match } from 'ts-pattern';
-import { HMSNotificationTypes, HMSTranscriptionState, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSNotificationTypes,
+  HMSTranscriptionState,
+  selectTranslationState,
+  useHMSNotifications,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ClosedCaptionIcon, GlobeIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
@@ -9,11 +15,29 @@ import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { CAPTION_TOAST } from '../../common/constants';
 
 export const TranscriptionNotifications = () => {
-  const notification = useHMSNotifications([
-    HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED,
-    HMSNotificationTypes.TRANSCRIPTION_CONFIG_UPDATED,
-  ]);
+  const notification = useHMSNotifications(HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED);
   const [toastId, setToastId] = useSetAppDataByKey(CAPTION_TOAST.captionToast);
+  const translationState = useHMSStore(selectTranslationState);
+  const prevTranslationEnabled = useRef<boolean | undefined>(undefined);
+
+  // Track translation enabled changes separately
+  useEffect(() => {
+    if (prevTranslationEnabled.current === undefined) {
+      prevTranslationEnabled.current = translationState.enabled;
+      return;
+    }
+    if (prevTranslationEnabled.current !== translationState.enabled) {
+      prevTranslationEnabled.current = translationState.enabled;
+      const id = ToastManager.replaceToast(toastId, {
+        title: translationState.enabled ? `Translation enabled for everyone` : `Translation disabled for everyone`,
+        variant: 'standard',
+        duration: 2000,
+        icon: <GlobeIcon style={{ marginRight: '0.5rem' }} />,
+      });
+      setToastId(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [translationState.enabled, setToastId]);
 
   useEffect(() => {
     if (!notification?.data) {
@@ -21,31 +45,9 @@ export const TranscriptionNotifications = () => {
     }
 
     console.debug(`[${notification.type}]`, notification);
-    let id = '';
-
-    if (notification.type === HMSNotificationTypes.TRANSCRIPTION_CONFIG_UPDATED) {
-      const { translation } = notification.data;
-      if (translation) {
-        id = ToastManager.replaceToast(toastId, {
-          title: translation.enabled ? `Translation enabled for everyone` : `Translation disabled for everyone`,
-          variant: 'standard',
-          duration: 2000,
-          icon: <GlobeIcon style={{ marginRight: '0.5rem' }} />,
-        });
-      } else {
-        id = ToastManager.replaceToast(toastId, {
-          title: `Transcription config updated`,
-          variant: 'standard',
-          duration: 2000,
-          icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
-        });
-      }
-      setToastId(id);
-      return;
-    }
-
     const transcriptionStates = notification.data;
     if (transcriptionStates.length > 0) {
+      let id = '';
       match({ state: transcriptionStates[0].state, error: transcriptionStates[0].error })
         .when(
           ({ error }) => !!error,
