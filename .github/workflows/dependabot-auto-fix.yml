@@ -130,6 +130,13 @@ jobs:
           printf '%b' "$FIXES" > /tmp/commit-msg.txt
           echo "has_fixes=true" >> "$GITHUB_OUTPUT"
 
+      - name: Install gitleaks
+        if: steps.fix.outputs.has_fixes == 'true'
+        env:
+          GITLEAKS_VERSION: '8.30.1'
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
+
       - name: Create or update PR
         if: steps.fix.outputs.has_fixes == 'true'
         uses: peter-evans/create-pull-request@v7
