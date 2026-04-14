@@ -92,6 +92,10 @@ export interface TranscriptionPluginPermissions {
     admin?: Array<string>;
   };
   mode: HMSTranscriptionMode;
+  translation?: {
+    enabled: boolean;
+    roleLanguages?: Record<string, string>;
+  };
 }
 
 export interface NoiseCancellationPlugin {

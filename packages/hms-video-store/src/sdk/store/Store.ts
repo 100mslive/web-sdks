@@ -499,6 +499,13 @@ class Store {
       transcription.permissions?.admin?.forEach(role =>
         this.addPermissionToRole(role, Plugins.TRANSCRIPTIONS, 'admin', transcription.mode),
       );
+      // Store translation config on room so it's accessible as a single object
+      if (transcription.translation && this.room) {
+        if (!this.room.translationConfig) {
+          this.room.translationConfig = {} as any;
+        }
+        this.room.translationConfig![transcription.mode] = transcription.translation;
+      }
     }
   };
   private handleNoiseCancellationPlugin = (plugin?: NoiseCancellationPlugin) => {
