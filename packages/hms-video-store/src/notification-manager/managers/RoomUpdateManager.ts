@@ -233,13 +233,23 @@ export class RoomUpdateManager {
       HMSLogger.w(this.TAG, 'on transcription config update - room not present');
       return;
     }
-    // Create new transcription objects with updated config (store objects are frozen)
+    // Merge config update into transcription objects (store objects are frozen).
+    // For translation: update enabled, carry forward existing roleLanguages when not provided.
     if (room.transcriptions) {
-      room.transcriptions = room.transcriptions.map(transcription => ({
-        ...transcription,
-        ...(notification.translation && { translation: notification.translation }),
-        ...(notification.language && { language: notification.language }),
-      }));
+      room.transcriptions = room.transcriptions.map(transcription => {
+        const updated = { ...transcription };
+        if (notification.translation) {
+          updated.translation = {
+            ...transcription.translation,
+            ...notification.translation,
+            roleLanguages: notification.translation.roleLanguages ?? transcription.translation?.roleLanguages,
+          };
+        }
+        if (notification.language) {
+          updated.language = notification.language;
+        }
+        return updated;
+      });
     }
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED, room);
   }
