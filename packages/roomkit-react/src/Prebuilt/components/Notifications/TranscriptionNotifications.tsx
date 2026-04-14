@@ -19,7 +19,7 @@ export const TranscriptionNotifications = () => {
   const translationState = useHMSStore(selectTranslationState);
   const prevTranslationEnabled = useRef<boolean | undefined>(undefined);
 
-  // Translation enabled/disabled toast
+  // Translation mid-call toggle toast (only when captions are already running)
   useEffect(() => {
     if (prevTranslationEnabled.current === undefined) {
       prevTranslationEnabled.current = translationState.enabled;
@@ -38,7 +38,7 @@ export const TranscriptionNotifications = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translationState.enabled, setToastId]);
 
-  // Caption state change toast — SDK only sends this when state actually changes
+  // Caption state change toast
   useEffect(() => {
     if (!notification?.data) {
       return;
@@ -50,7 +50,7 @@ export const TranscriptionNotifications = () => {
     }
 
     let id = '';
-    const { state, error } = transcriptionStates[0];
+    const { state, error, translation } = transcriptionStates[0];
 
     if (error) {
       id = ToastManager.replaceToast(toastId, {
@@ -59,12 +59,21 @@ export const TranscriptionNotifications = () => {
         icon: <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />,
       });
     } else if (state === HMSTranscriptionState.STARTED) {
+      const withTranslation = translation?.enabled;
       id = ToastManager.replaceToast(toastId, {
-        title: `Closed Captioning enabled for everyone`,
+        title: withTranslation
+          ? `Closed Captioning enabled with Translation`
+          : `Closed Captioning enabled for everyone`,
         variant: 'standard',
         duration: 2000,
-        icon: <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />,
+        icon: withTranslation ? (
+          <GlobeIcon style={{ marginRight: '0.5rem' }} />
+        ) : (
+          <ClosedCaptionIcon style={{ marginRight: '0.5rem' }} />
+        ),
       });
+      // Sync translation ref so mid-call toggle doesn't re-fire
+      prevTranslationEnabled.current = !!withTranslation;
     } else if (state === HMSTranscriptionState.STOPPED) {
       id = ToastManager.replaceToast(toastId, {
         title: `Closed Captioning disabled for everyone`,
