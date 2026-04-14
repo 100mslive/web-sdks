@@ -127,6 +127,8 @@ export enum HMSTranscriptionMode {
 export interface HMSTranscriptionInfo {
   state?: HMSTranscriptionState;
   mode?: HMSTranscriptionMode;
+  /** Transcription input language (ISO 639-1/BCP 47, e.g. "en", "hi", "auto") */
+  language?: string;
   initialised_at?: Date;
   started_at?: Date;
   updated_at?: Date;

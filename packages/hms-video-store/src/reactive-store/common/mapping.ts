@@ -34,9 +34,12 @@ export const POLL_NOTIFICATION_TYPES: PollNotificationMap = {
 };
 
 type TranscriptionNotificationMap = {
-  [key in sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED]: HMSNotificationTypes;
+  [key in
+    | sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED
+    | sdkTypes.HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED]: HMSNotificationTypes;
 };
 
 export const TRANSCRIPTION_NOTIFICATION_TYPES: TranscriptionNotificationMap = {
   [sdkTypes.HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED]: HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED,
+  [sdkTypes.HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED]: HMSNotificationTypes.TRANSCRIPTION_CONFIG_UPDATED,
 };

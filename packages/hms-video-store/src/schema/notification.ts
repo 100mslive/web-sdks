@@ -4,7 +4,7 @@ import { HMSMessage } from './message';
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSPlaylistItem } from './playlist';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
-import { HMSPoll, HMSTranscriptionInfo } from '../internal';
+import { HMSPoll, HMSTranscriptionInfo, TranscriptionConfigUpdate } from '../internal';
 
 interface BaseNotification {
   id: number;
@@ -82,6 +82,11 @@ export interface HMSTranscriptionNotification extends BaseNotification {
   type: HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED;
   data: HMSTranscriptionInfo[];
 }
+
+export interface HMSTranscriptionConfigNotification extends BaseNotification {
+  type: HMSNotificationTypes.TRANSCRIPTION_CONFIG_UPDATED;
+  data: TranscriptionConfigUpdate;
+}
 export type HMSNotification =
   | HMSPeerNotification
   | HMSPeerListNotification
@@ -94,6 +99,7 @@ export type HMSNotification =
   | HMSDeviceChangeEventNotification
   | HMSReconnectionNotification
   | HMSTranscriptionNotification
+  | HMSTranscriptionConfigNotification
   | HMSPlaylistItemNotification<any>;
 
 export enum HMSNotificationSeverity {
@@ -132,6 +138,7 @@ export enum HMSNotificationTypes {
   POLLS_LIST = 'POLLS_LIST',
   HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
   TRANSCRIPTION_STATE_UPDATED = 'TRANSCRIPTION_STATE_UPDATED',
+  TRANSCRIPTION_CONFIG_UPDATED = 'TRANSCRIPTION_CONFIG_UPDATED',
 }
 
 export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
@@ -166,6 +173,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
   [HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED]: HMSTranscriptionNotification;
+  [HMSNotificationTypes.TRANSCRIPTION_CONFIG_UPDATED]: HMSTranscriptionConfigNotification;
 }[T];
 
 export type MappedNotifications<Type extends HMSNotificationTypes[]> = {

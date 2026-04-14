@@ -226,20 +226,22 @@ export class RoomUpdateManager {
 
   private handleTranscriptionConfigUpdate(notification: {
     translation?: { enabled: boolean; roleLanguages?: Record<string, string> };
+    language?: string;
   }) {
     const room = this.store.getRoom();
     if (!room) {
       HMSLogger.w(this.TAG, 'on transcription config update - room not present');
       return;
     }
-    // Create new transcription objects with updated translation (store objects are frozen)
-    if (room.transcriptions && notification.translation) {
+    // Create new transcription objects with updated config (store objects are frozen)
+    if (room.transcriptions) {
       room.transcriptions = room.transcriptions.map(transcription => ({
         ...transcription,
-        translation: notification.translation,
+        ...(notification.translation && { translation: notification.translation }),
+        ...(notification.language && { language: notification.language }),
       }));
     }
-    this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
+    this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_CONFIG_UPDATED, room);
   }
   private convertHls(hlsNotification?: HLSNotification) {
     // only checking for zeroth variant intialized
