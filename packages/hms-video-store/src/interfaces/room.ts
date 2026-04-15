@@ -127,9 +127,21 @@ export enum HMSTranscriptionMode {
 export interface HMSTranscriptionInfo {
   state?: HMSTranscriptionState;
   mode?: HMSTranscriptionMode;
+  /** Transcription input language (ISO 639-1/BCP 47, e.g. "en", "hi", "auto") */
+  language?: string;
   initialised_at?: Date;
   started_at?: Date;
   updated_at?: Date;
   stopped_at?: Date;
   error?: HMSException;
+  /** Translation state — populated when biz broadcasts translation info in room state */
+  translation?: {
+    /** Whether translation is currently active */
+    enabled: boolean;
+    /**
+     * Map of role → target language (ISO 639-1/BCP 47).
+     * Roles not in this map receive original (untranslated) captions.
+     */
+    roleLanguages?: Record<string, string>;
+  };
 }

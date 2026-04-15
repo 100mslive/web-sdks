@@ -12,7 +12,7 @@ import { HMSHLS, HMSRecording, HMSRTMP, HMSTranscriptionInfo } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSInteractivityCenter, HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
-import { TranscriptionConfig } from './transcription-config';
+import { TranscriptionConfig, TranscriptionConfigUpdate } from './transcription-config';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
@@ -65,6 +65,7 @@ export interface HMSInterface {
   stopHLSStreaming(params?: StopHLSConfig): Promise<void>;
   startTranscription(params: TranscriptionConfig): Promise<void>;
   stopTranscription(params: TranscriptionConfig): Promise<void>;
+  updateTranscriptionConfig(params: TranscriptionConfigUpdate): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
   getHLSState(): HMSHLS | undefined;

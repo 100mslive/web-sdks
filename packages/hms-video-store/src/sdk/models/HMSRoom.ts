@@ -1,4 +1,11 @@
-import { HMSHLS, HMSRecording, HMSRoom, HMSRTMP, HMSTranscriptionInfo } from '../../interfaces/room';
+import {
+  HMSHLS,
+  HMSRecording,
+  HMSRoom,
+  HMSRTMP,
+  HMSTranscriptionInfo,
+  HMSTranscriptionMode,
+} from '../../interfaces/room';
 
 export default class Room implements HMSRoom {
   id: string;
@@ -21,6 +28,7 @@ export default class Room implements HMSRoom {
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
+  translationConfig?: Record<HMSTranscriptionMode, { enabled: boolean; roleLanguages?: Record<string, string> }>;
 
   constructor(id: string) {
     this.id = id;

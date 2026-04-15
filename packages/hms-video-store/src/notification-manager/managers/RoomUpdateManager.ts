@@ -137,6 +137,7 @@ export class RoomUpdateManager {
         stopped_at: convertDateNumToDate(transcription.stopped_at),
         updated_at: convertDateNumToDate(transcription.updated_at),
         error: this.toSdkError(transcription?.error),
+        translation: transcription.translation,
       };
     });
   }
@@ -217,6 +218,7 @@ export class RoomUpdateManager {
     room.transcriptions = this.addTranscriptionDetail(notification) || [];
     this.listener?.onRoomUpdate(HMSRoomUpdate.TRANSCRIPTION_STATE_UPDATED, room);
   }
+
   private convertHls(hlsNotification?: HLSNotification) {
     // only checking for zeroth variant intialized
     const isInitialised =

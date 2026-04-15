@@ -1,5 +1,5 @@
 import { HMSPeerID } from './peer';
-import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP, HMSTranscriptionInfo } from '../interfaces';
+import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP, HMSTranscriptionInfo, HMSTranscriptionMode } from '../interfaces';
 
 export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };
 export type HMSRoomID = string;
@@ -45,4 +45,6 @@ export interface HMSRoom {
   effectsKey?: string;
   isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
+  /** Translation config from template policy. Presence means translation is available. */
+  translationConfig?: Record<HMSTranscriptionMode, { enabled: boolean; roleLanguages?: Record<string, string> }>;
 }
