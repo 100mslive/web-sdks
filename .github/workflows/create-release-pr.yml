@@ -35,26 +35,7 @@ jobs:
 
       - name: Sync prerelease base with npm
         if: github.event.inputs.versionBump == 'prerelease'
-        run: |
-          # Set all package versions to their latest npm alpha so lerna increments from there
-          node -e "
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const glob = require('glob');
-            const pkgs = glob.sync('packages/*/package.json');
-            for (const p of pkgs) {
-              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-              if (pkg.private) continue;
-              try {
-                const alpha = execSync('npm view ' + pkg.name + ' dist-tags.alpha 2>/dev/null', { encoding: 'utf8' }).trim();
-                if (alpha) {
-                  console.log(pkg.name + ': ' + pkg.version + ' -> ' + alpha);
-                  pkg.version = alpha;
-                  fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
-                }
-              } catch(e) {}
-            }
-          "
+        run: node scripts/sync-prerelease-versions.js
 
       - name: Update versions
         env:
