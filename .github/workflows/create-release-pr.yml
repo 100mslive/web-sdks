@@ -35,36 +35,7 @@ jobs:
 
       - name: Sync prerelease base with npm
         if: github.event.inputs.versionBump == 'prerelease'
-        run: |
-          # Set all package versions to their latest npm alpha so lerna increments from there.
-          # If stable >= alpha base (e.g. 0.13.3 stable, 0.13.3-alpha.16), skip the alpha
-          # so lerna bumps from stable to the next prerelease (0.13.4-alpha.0).
-          node -e "
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const glob = require('glob');
-            const semver = require('semver');
-            const pkgs = glob.sync('packages/*/package.json');
-            for (const p of pkgs) {
-              const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-              if (pkg.private) continue;
-              try {
-                const alpha = execSync('npm view ' + pkg.name + ' dist-tags.alpha 2>/dev/null', { encoding: 'utf8' }).trim();
-                const latest = execSync('npm view ' + pkg.name + ' dist-tags.latest 2>/dev/null', { encoding: 'utf8' }).trim();
-                if (!alpha) continue;
-                // Compare the base version of the alpha (without prerelease tag) against latest stable
-                const alphaBase = semver.coerce(alpha)?.version;
-                if (latest && alphaBase && semver.gte(latest, alphaBase)) {
-                  // Stable already released at or beyond the alpha base, let lerna bump from stable
-                  console.log(pkg.name + ': skipping alpha ' + alpha + ' (stable ' + latest + ' already released)');
-                  continue;
-                }
-                console.log(pkg.name + ': ' + pkg.version + ' -> ' + alpha);
-                pkg.version = alpha;
-                fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
-              } catch(e) {}
-            }
-          "
+        run: node scripts/sync-prerelease-versions.js
 
       - name: Update versions
         env:
