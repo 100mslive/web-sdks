@@ -37,6 +37,7 @@ import { ToastManager } from './Toast/ToastManager';
 import { AudioLevel } from '../../AudioLevel';
 import { Dropdown } from '../../Dropdown';
 import { Box, Flex } from '../../Layout';
+import { Slider } from '../../Slider';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
@@ -214,8 +215,43 @@ export const NoiseCancellation = ({
           }}
         />
       </Dropdown.Item>
+      {isNoiseCancellationEnabled && isKrispPluginAdded ? <NoiseCancellationLevelSlider /> : null}
       <Dropdown.ItemSeparator css={{ mx: 0 }} />
     </>
+  );
+};
+
+const NoiseCancellationLevelSlider = () => {
+  const [level, setLevel] = useState(100);
+
+  return (
+    <Dropdown.Item
+      css={{
+        p: '$4 $8',
+        fontSize: '$xs',
+        flexDirection: 'column',
+        gap: '$4',
+        '&:hover': { bg: 'transparent' },
+      }}
+      onClick={e => e.preventDefault()}
+    >
+      <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Text css={{ fontSize: '$xs', color: '$on_surface_medium' }}>Suppression Level</Text>
+        <Text css={{ fontSize: '$xs', color: '$on_surface_medium' }}>{level}%</Text>
+      </Flex>
+      <Slider
+        css={{ w: '100%', cursor: 'pointer' }}
+        min={0}
+        max={100}
+        step={1}
+        value={[level]}
+        onValueChange={value => {
+          setLevel(value[0]);
+          krispPlugin.setNoiseSuppressionLevel(value[0]);
+        }}
+        thumbStyles={{ w: '$6', h: '$6' }}
+      />
+    </Dropdown.Item>
   );
 };
 
