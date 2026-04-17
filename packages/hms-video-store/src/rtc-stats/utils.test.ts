@@ -1,5 +1,5 @@
-import { HMSPeerStats } from '../../interfaces';
-import { getLocalPeerStatsFromReport } from '../../rtc-stats/utils';
+import { getLocalPeerStatsFromReport } from './utils';
+import { HMSPeerStats } from '../interfaces';
 
 type StatEntry = Record<string, any>;
 
