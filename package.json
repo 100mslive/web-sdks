@@ -86,7 +86,8 @@
     "**/@nx/devkit/minimatch": "^9.0.7",
     "picomatch": "^2.3.2",
     "**/tinyglobby/picomatch": "^4.0.4",
-    "@tootallnate/once": "^3.0.1"
+    "@tootallnate/once": "^3.0.1",
+    "follow-redirects": "^1.16.0"
   },
   "workspaces": [
     "packages/*",
