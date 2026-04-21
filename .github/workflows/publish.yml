@@ -112,7 +112,7 @@ jobs:
         if: success()
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           repository: 100mslive/100ms-links
           event-type: alpha-publish
           client-payload: '{"bump": "${{ github.event.inputs.publishFlag }}"}'
