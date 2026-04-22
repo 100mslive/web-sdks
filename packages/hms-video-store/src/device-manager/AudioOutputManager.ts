@@ -1,5 +1,6 @@
 import { DeviceManager } from './DeviceManager';
 import { AudioSinkManager } from '../audio-sink-manager';
+import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 
 export interface IAudioOutputManager {
@@ -36,7 +37,17 @@ export class AudioOutputManager implements IAudioOutputManager {
       // the unpause path explicitly — the eventBus.deviceChange subscription
       // guards `isUserSelection` out, so unpauseAudioTracks never fires here
       // otherwise. See LIV-254.
-      await this.audioSinkManager.recoverAutoPausedTracks();
+      //
+      // Best-effort: the device selection itself has already succeeded, so
+      // don't reject setDevice if recovery fails (e.g. autoplay still blocked).
+      // The consumer's API contract is "did we switch sinks?" — not "are all
+      // paused tracks playing?" — and existing consumers before this change
+      // never saw recovery-path rejections.
+      try {
+        await this.audioSinkManager.recoverAutoPausedTracks();
+      } catch (err) {
+        HMSLogger.w('[AudioOutputManager]', 'recoverAutoPausedTracks failed after setDevice', err);
+      }
     }
     return newDevice;
   }
