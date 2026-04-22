@@ -321,7 +321,17 @@ class Store {
         promises.push(track.setOutputDevice(device));
       }
     });
-    await Promise.all(promises);
+    // Don't short-circuit on the first rejection — we want to attempt the sink
+    // change on every remote track. If any fail, surface an aggregated error
+    // so the caller (DeviceManager.updateOutputDevice) can avoid persisting a
+    // selection that didn't actually route. See LIV-254.
+    const results = await Promise.all(promises.map(p => p.catch(err => err)));
+    const rejected = results.filter((r): r is Error => r instanceof Error);
+    if (rejected.length > 0) {
+      throw new Error(
+        `updateAudioOutputDevice: ${rejected.length}/${promises.length} track(s) failed to switch sink: ${rejected[0].message}`,
+      );
+    }
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {

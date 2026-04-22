@@ -248,6 +248,19 @@ export class AudioSinkManager {
     await Promise.all(promises);
   };
 
+  /**
+   * Public entry point for re-driving any tracks that got auto-paused by an OS
+   * audio-session interruption (headset removal, incoming call, Bluetooth swap).
+   *
+   * Needed because the user-initiated output-device-change path (AudioOutputManager.setDevice)
+   * does not publish to eventBus.deviceChange, and even if it did, handleAudioDeviceChange
+   * short-circuits on isUserSelection — leaving autoPausedTracks stuck until an
+   * automatic devicechange event happens to fire. See LIV-254.
+   */
+  recoverAutoPausedTracks = async () => {
+    await this.unpauseAudioTracks();
+  };
+
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
       HMSLogger.d(this.TAG, 'removing audio element', `${track}`);

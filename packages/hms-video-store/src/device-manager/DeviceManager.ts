@@ -80,19 +80,29 @@ export class DeviceManager implements HMSDeviceManager {
 
   updateOutputDevice = async (deviceId?: string, isUserSelection?: boolean) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
-    if (newDevice) {
-      this.outputDevice = newDevice;
-      await this.store.updateAudioOutputDevice(newDevice);
-      this.eventBus.analytics.publish(
-        AnalyticsEventFactory.deviceChange({
-          isUserSelection,
-          selection: { audioOutput: newDevice },
-          devices: this.getDevices(),
-          type: 'audioOutput',
-        }),
-      );
-      DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
+    if (!newDevice) {
+      return undefined;
     }
+    // Only commit outputDevice + analytics + persisted selection AFTER the
+    // downstream setSinkId calls actually succeed. Previously the state was
+    // updated optimistically — which left the UI reporting the new sink as
+    // selected while audio kept routing to the old one (LIV-254).
+    try {
+      await this.store.updateAudioOutputDevice(newDevice);
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'updateOutputDevice failed; keeping previous selection', newDevice.label, error);
+      return undefined;
+    }
+    this.outputDevice = newDevice;
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.deviceChange({
+        isUserSelection,
+        selection: { audioOutput: newDevice },
+        devices: this.getDevices(),
+        type: 'audioOutput',
+      }),
+    );
+    DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     return newDevice;
   };
 

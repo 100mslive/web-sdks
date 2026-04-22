@@ -27,8 +27,18 @@ export class AudioOutputManager implements IAudioOutputManager {
     return this.deviceManager.outputDevice;
   }
 
-  setDevice(deviceId?: string) {
-    return this.deviceManager.updateOutputDevice(deviceId, true);
+  async setDevice(deviceId?: string) {
+    const newDevice = await this.deviceManager.updateOutputDevice(deviceId, true);
+    if (newDevice) {
+      // If any remote audio tracks were auto-paused by an OS audio-session
+      // interruption (headset pull / incoming call / Bluetooth swap), the user
+      // is almost certainly picking a new speaker to recover playback. Kick
+      // the unpause path explicitly — the eventBus.deviceChange subscription
+      // guards `isUserSelection` out, so unpauseAudioTracks never fires here
+      // otherwise. See LIV-254.
+      await this.audioSinkManager.recoverAutoPausedTracks();
+    }
+    return newDevice;
   }
 
   async unblockAutoplay() {
