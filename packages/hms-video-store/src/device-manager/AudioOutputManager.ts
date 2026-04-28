@@ -1,5 +1,6 @@
 import { DeviceManager } from './DeviceManager';
 import { AudioSinkManager } from '../audio-sink-manager';
+import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 
 export interface IAudioOutputManager {
@@ -27,8 +28,24 @@ export class AudioOutputManager implements IAudioOutputManager {
     return this.deviceManager.outputDevice;
   }
 
-  setDevice(deviceId?: string) {
-    return this.deviceManager.updateOutputDevice(deviceId, true);
+  async setDevice(deviceId?: string) {
+    const newDevice = await this.deviceManager.updateOutputDevice(deviceId, true);
+    if (newDevice) {
+      // If any remote audio tracks were auto-paused by an OS audio-session
+      // interruption (headset pull / incoming call / Bluetooth swap), the user
+      // is almost certainly picking a new speaker to recover playback. The
+      // eventBus.deviceChange subscription guards `isUserSelection` out, so
+      // unpauseAudioTracks never fires from this path otherwise. See LIV-254.
+      //
+      // Best-effort: the device selection itself has already succeeded, so
+      // don't reject setDevice if recovery fails (e.g. autoplay still blocked).
+      try {
+        await this.unblockAutoplay();
+      } catch (err) {
+        HMSLogger.w('[AudioOutputManager]', 'unblockAutoplay failed after setDevice', err);
+      }
+    }
+    return newDevice;
   }
 
   async unblockAutoplay() {
