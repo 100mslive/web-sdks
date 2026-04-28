@@ -68,21 +68,26 @@ export class HMSAudioTrack extends HMSTrack {
       this.outputDevice = device;
       return;
     }
+    // using setSinkId in firefox disables echo cancellation (introduced in Firefox 116)
+    // todo: GoogleMeet doesn't set sinkId for all 3 audio elements, how do they redirect audio then?
+    //
+    // refer: https://100ms.atlassian.net/browse/LIVE-1992
+    // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1849108
+    // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
+    // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
+    // Setting sinkId in safari(support started from 18.4) causes "robotic voice" on bluetooth device changes or setting sinkId
+    if (typeof (this.audioElement as any).setSinkId !== 'function' || !isChromiumBased) {
+      return;
+    }
     try {
-      // using setSinkId in firefox disables echo cancellation (introduced in Firefox 116)
-      // todo: GoogleMeet doesn't set sinkId for all 3 audio elements, how do they redirect audio then?
-      //
-      // refer: https://100ms.atlassian.net/browse/LIVE-1992
-      // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1849108
-      // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
-      // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
-      // Setting sinkId in safari(support started from 18.4) causes "robotic voice" on bluetooth device changes or setting sinkId
-      if (typeof (this.audioElement as any).setSinkId === 'function' && isChromiumBased) {
-        await (this.audioElement as any)?.setSinkId(device.deviceId);
-        this.outputDevice = device;
-      }
+      await (this.audioElement as any).setSinkId(device.deviceId);
+      this.outputDevice = device;
     } catch (error) {
-      HMSLogger.d('[HMSAudioTrack]', 'error in setSinkId', error);
+      // setSinkId rejects (NotFoundError / NotAllowedError / AbortError). Don't silently
+      // swallow — the caller needs to know the UI says "device X selected" but audio
+      // is still routing to the previous sink. See LIV-254.
+      HMSLogger.w('[HMSAudioTrack]', this.logIdentifier, 'setSinkId failed', `${this}`, error);
+      throw error;
     }
   }
 
