@@ -222,7 +222,11 @@ export const NoiseCancellation = ({
 };
 
 const NoiseCancellationLevelSlider = () => {
-  const [level, setLevel] = useState(100);
+  // Initialise from the plugin so the slider reflects the active level when
+  // the dropdown remounts. Krisp retains the level on its filter node;
+  // re-mounting the slider used to reset the UI to 100% even though audio
+  // was still being suppressed at the user's last picked level.
+  const [level, setLevel] = useState(() => krispPlugin.getNoiseSuppressionLevel());
 
   return (
     <Dropdown.Item
