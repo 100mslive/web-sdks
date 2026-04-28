@@ -33,20 +33,16 @@ export class AudioOutputManager implements IAudioOutputManager {
     if (newDevice) {
       // If any remote audio tracks were auto-paused by an OS audio-session
       // interruption (headset pull / incoming call / Bluetooth swap), the user
-      // is almost certainly picking a new speaker to recover playback. Kick
-      // the unpause path explicitly — the eventBus.deviceChange subscription
-      // guards `isUserSelection` out, so unpauseAudioTracks never fires here
-      // otherwise. See LIV-254.
+      // is almost certainly picking a new speaker to recover playback. The
+      // eventBus.deviceChange subscription guards `isUserSelection` out, so
+      // unpauseAudioTracks never fires from this path otherwise. See LIV-254.
       //
       // Best-effort: the device selection itself has already succeeded, so
       // don't reject setDevice if recovery fails (e.g. autoplay still blocked).
-      // The consumer's API contract is "did we switch sinks?" — not "are all
-      // paused tracks playing?" — and existing consumers before this change
-      // never saw recovery-path rejections.
       try {
-        await this.audioSinkManager.recoverAutoPausedTracks();
+        await this.unblockAutoplay();
       } catch (err) {
-        HMSLogger.w('[AudioOutputManager]', 'recoverAutoPausedTracks failed after setDevice', err);
+        HMSLogger.w('[AudioOutputManager]', 'unblockAutoplay failed after setDevice', err);
       }
     }
     return newDevice;
