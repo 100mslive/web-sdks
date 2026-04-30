@@ -1275,6 +1275,15 @@ export default class HMSTransport {
   };
 
   private retrySignalDisconnectTask = async () => {
+    // The retryScheduler can fire this task body asynchronously, and leave()
+    // clears `joinParameters` synchronously. If leave() races with a queued
+    // task, dereferencing `this.joinParameters!.authToken` below would throw
+    // a TypeError. Bail out cleanly in that case — leave() also resets the
+    // scheduler, so further work here is moot.
+    if (!this.joinParameters || this.state === TransportState.Leaving) {
+      return false;
+    }
+
     HMSLogger.d(TAG, 'retrySignalDisconnectTask', { signalConnected: this.signal.isConnected });
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
