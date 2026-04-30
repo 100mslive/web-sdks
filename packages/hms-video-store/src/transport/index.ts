@@ -1067,7 +1067,7 @@ export default class HMSTransport {
     // ice retry is already in progress(from disconnect state)
     if (
       this.retryScheduler.isTaskInProgress(
-        HMSConnectionRole.Publish
+        role === HMSConnectionRole.Publish
           ? TransportFailureCategory.PublishIceConnectionFailed
           : TransportFailureCategory.SubscribeIceConnectionFailed,
       )
