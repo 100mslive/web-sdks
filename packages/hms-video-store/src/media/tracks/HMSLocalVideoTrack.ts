@@ -537,8 +537,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
-        delete settings.facingMode;
-        const track = await this.replaceTrackWith(settings);
+        // Don't mutate the caller's settings object — copy and strip facingMode
+        // for replaceTrackWith so the caller's reference isn't surprise-modified.
+        const settingsForReplace = { ...settings, facingMode: undefined };
+        const track = await this.replaceTrackWith(settingsForReplace as HMSVideoTrackSettings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
         await this.processPlugins();
@@ -616,8 +618,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
     // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
+      this.processedTrack?.stop();
       this.processedTrack = undefined;
     } else if (processedTrack !== this.processedTrack) {
+      // Stop the previous processed track (a canvas captureStream) before
+      // overwriting — otherwise the old canvas stream stays alive consuming
+      // GPU resources until GC.
+      this.processedTrack?.stop();
       this.processedTrack = processedTrack;
     }
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
