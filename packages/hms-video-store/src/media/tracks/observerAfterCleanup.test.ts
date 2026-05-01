@@ -1,7 +1,7 @@
-import { VideoElementManager } from '../../../media/tracks/VideoElementManager';
-import { HMSRemoteVideoTrack } from '../../../media/tracks/HMSRemoteVideoTrack';
-import { HMSRemoteStream } from '../../../media/streams/HMSRemoteStream';
-import HMSSubscribeConnection from '../../../connection/subscribe/subscribeConnection';
+import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
+import { VideoElementManager } from './VideoElementManager';
+import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
+import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const makeRemoteVideoTrack = () => {
   const sendOverApiDataChannelWithResponse = jest.fn();
