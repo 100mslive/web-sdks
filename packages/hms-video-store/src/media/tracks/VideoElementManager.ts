@@ -14,6 +14,7 @@ import { isBrowser } from '../../utils/support';
  */
 export class VideoElementManager {
   private readonly TAG = '[VideoElementManager]';
+  private isDestroyed = false;
   private resizeObserver?: typeof HMSResizeObserver;
   private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
@@ -90,6 +91,7 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
+    if (this.isDestroyed) return;
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
@@ -104,6 +106,7 @@ export class VideoElementManager {
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
+    if (this.isDestroyed) return;
     if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
@@ -170,6 +173,7 @@ export class VideoElementManager {
   }
 
   cleanup = () => {
+    this.isDestroyed = true;
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
       this.resizeObserver?.unobserve(videoElement);
