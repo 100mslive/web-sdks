@@ -16,7 +16,7 @@
  * the task null-guards `joinParameters` / state at entry.
  */
 
-import { makeTransport, TransportState } from '../../helpers/makeTransport';
+import { makeTransport, TransportState } from '../test/helpers/makeTransport';
 
 describe('Bug 4 — retrySignalDisconnectTask vs leave() race', () => {
   it('does NOT call internalConnect or signal.trackUpdate when joinParameters is undefined (post-leave)', async () => {
