@@ -197,9 +197,11 @@ export class LocalTrackManager {
           await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
         }
       } finally {
-        // Release the temporary video element's reference to the stream so
-        // the element can be GC'd promptly instead of holding the
-        // screenshare stream alive longer than necessary.
+        /*
+         * Release the temporary video element's reference to the stream so
+         * the element can be GC'd promptly instead of holding the
+         * screenshare stream alive longer than necessary.
+         */
         videoElement.srcObject = null;
       }
     });

@@ -92,10 +92,12 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
     this.deviceId = deviceId;
     this.advanced = advanced;
     this.audioMode = audioMode;
-    // Honor an explicit caller-provided maxBitrate; only fall back to the
-    // audioMode default when none was passed. Previously the constructor
-    // unconditionally overwrote the argument with the audioMode default,
-    // making the parameter dead code.
+    /*
+     * Honor an explicit caller-provided maxBitrate; only fall back to the
+     * audioMode default when none was passed. Previously the constructor
+     * unconditionally overwrote the argument with the audioMode default,
+     * making the parameter dead code.
+     */
     if (maxBitrate !== undefined) {
       this.maxBitrate = maxBitrate;
     } else if (this.audioMode === HMSAudioMode.MUSIC) {
