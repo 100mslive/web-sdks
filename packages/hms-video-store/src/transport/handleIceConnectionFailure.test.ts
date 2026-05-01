@@ -1,27 +1,26 @@
 /**
- * Bug 1 — handleIceConnectionFailure ternary uses HMSConnectionRole.Publish
- * (numeric 0, falsy) as a conditional, so the in-progress check always
- * inspects SubscribeIceConnectionFailed regardless of the role argument.
+ * `handleIceConnectionFailure` previously used the bare `role` value as a
+ * conditional, but `HMSConnectionRole.Publish === 0` (falsy) — so the
+ * in-progress check always inspected `SubscribeIceConnectionFailed`
+ * regardless of which role had just failed.
  *
  * Real-world consequence:
  *   - Subscribe-side ICE failure is recovered by a passive wait (server
  *     re-sends an offer; client just answers).
  *   - Publish-side ICE failure must be recovered by the client itself
  *     issuing an iceRestart renegotiation.
- *   - When BOTH sides fail at the same time (typical of network blips),
- *     the bug suppresses the publish restart because a subscribe
- *     passive-wait task is "in progress."
+ *   - When both sides fail at the same time (typical of network blips),
+ *     the bug suppressed the publish restart because a subscribe
+ *     passive-wait task was "in progress."
  *
- * This test exercises that exact race using a real HMSTransport instance
- * with mocked dependencies. It must FAIL on the current `main` branch
- * and PASS once the ternary is fixed to `role === HMSConnectionRole.Publish`.
+ * Fixed by comparing `role === HMSConnectionRole.Publish` explicitly.
  */
 
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import HMSTransport from '.';
 import { HMSConnectionRole } from '../connection/model';
 
-describe('Bug 1 — handleIceConnectionFailure', () => {
+describe('handleIceConnectionFailure', () => {
   // Build a minimal `this`-shaped object that has just what
   // `handleIceConnectionFailure` reads (retryScheduler). We bypass the
   // HMSTransport constructor to avoid wiring the full dependency graph;
@@ -81,8 +80,7 @@ describe('Bug 1 — handleIceConnectionFailure', () => {
     expect(scheduleSpy).not.toHaveBeenCalled();
   });
 
-  // The bug case. THIS is the test that fails on `main`.
-  it('does NOT skip publish retry when only a Subscribe wait is in progress (Bug 1)', async () => {
+  it('does NOT skip publish retry when only a Subscribe wait is in progress', async () => {
     const inProgress = (cat: TransportFailureCategory) => cat === TransportFailureCategory.SubscribeIceConnectionFailed;
     const { promise, scheduleSpy } = callHandler(HMSConnectionRole.Publish, inProgress);
     await promise;
