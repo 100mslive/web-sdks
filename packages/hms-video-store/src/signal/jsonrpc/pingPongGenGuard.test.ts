@@ -1,4 +1,4 @@
-import JsonRpcSignal from '../../../signal/jsonrpc';
+import JsonRpcSignal from '.';
 
 describe('pingPongLoop generation guard on reschedule', () => {
   beforeEach(() => jest.useFakeTimers());
