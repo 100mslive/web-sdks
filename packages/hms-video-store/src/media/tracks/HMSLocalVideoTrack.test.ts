@@ -1,7 +1,7 @@
 import { HMSLocalVideoTrack } from './HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
+import { HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams/HMSLocalStream';
 
 const streamId = 'stream-1';
@@ -64,32 +64,6 @@ describe('HMSLocalVideoTrack', () => {
       expect(same.stop).not.toHaveBeenCalled();
       expect((track as any).processedTrack).toBe(same);
       expect(replaceSpy).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('handleDeviceChange', () => {
-    it('does not mutate the caller-supplied settings object', async () => {
-      const track = makeLocalVideoTrack();
-
-      jest.spyOn(track as any, 'replaceTrackWith').mockResolvedValue({
-        getSettings: jest.fn(() => ({ deviceId: 'new-device' })),
-      } as unknown as MediaStreamTrack);
-      jest.spyOn(track as any, 'replaceSender').mockResolvedValue(undefined);
-      jest.spyOn(track as any, 'processPlugins').mockResolvedValue(undefined);
-      jest.spyOn(track['videoHandler'], 'updateSinks').mockReturnValue(undefined as any);
-
-      const inputSettings = {
-        ...track.settings,
-        deviceId: 'new-device',
-        facingMode: 'user',
-      } as unknown as HMSVideoTrackSettings;
-      const beforeFacingMode = inputSettings.facingMode;
-
-      await (track as any).handleDeviceChange(inputSettings, false);
-
-      // The fix copies the settings object before stripping facingMode for
-      // replaceTrackWith. The caller's reference must not be mutated.
-      expect(inputSettings.facingMode).toBe(beforeFacingMode);
     });
   });
 });

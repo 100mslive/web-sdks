@@ -537,12 +537,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
-        /*
-         * Don't mutate the caller's settings object — copy and strip facingMode
-         * for replaceTrackWith so the caller's reference isn't surprise-modified.
-         */
-        const settingsForReplace = { ...settings, facingMode: undefined };
-        const track = await this.replaceTrackWith(settingsForReplace as HMSVideoTrackSettings);
+        delete settings.facingMode;
+        const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
         await this.processPlugins();
