@@ -1274,12 +1274,16 @@ export default class HMSTransport {
     return true;
   };
 
+  /**
+   * Retry path that reconnects the signal WebSocket after a disconnect.
+   *
+   * The retryScheduler can fire this body asynchronously, and `leave()`
+   * clears `joinParameters` synchronously. If leave() races with a queued
+   * task, dereferencing `this.joinParameters!.authToken` would throw a
+   * TypeError. Bail out cleanly in that case — leave() also resets the
+   * scheduler, so further work here is moot.
+   */
   private retrySignalDisconnectTask = async () => {
-    // The retryScheduler can fire this task body asynchronously, and leave()
-    // clears `joinParameters` synchronously. If leave() races with a queued
-    // task, dereferencing `this.joinParameters!.authToken` below would throw
-    // a TypeError. Bail out cleanly in that case — leave() also resets the
-    // scheduler, so further work here is moot.
     if (!this.joinParameters || this.state === TransportState.Leaving) {
       return false;
     }
