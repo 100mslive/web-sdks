@@ -174,10 +174,12 @@ export default class HMSTransport {
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.SUBSCRIBE, (err as Error).message);
         }
-        // Don't write `this.state = TransportState.Failed` directly here —
-        // observer.onFailure routes through HMSSdk.onFailure -> internalLeave
-        // which drives the proper state transition with retryScheduler.reset.
-        // The direct write was redundant and skipped the cleanup chain.
+        /*
+         * Don't write `this.state = TransportState.Failed` directly here —
+         * observer.onFailure routes through HMSSdk.onFailure -> internalLeave
+         * which drives the proper state transition with retryScheduler.reset.
+         * The direct write was redundant and skipped the cleanup chain.
+         */
         this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
       }
