@@ -17,9 +17,9 @@
  * and PASS once the ternary is fixed to `role === HMSConnectionRole.Publish`.
  */
 
-import { HMSConnectionRole } from '../../../connection/model';
-import HMSTransport from '../../../transport';
-import { TransportFailureCategory } from '../../../transport/models/TransportFailureCategory';
+import { TransportFailureCategory } from './models/TransportFailureCategory';
+import HMSTransport from '.';
+import { HMSConnectionRole } from '../connection/model';
 
 describe('Bug 1 — handleIceConnectionFailure', () => {
   // Build a minimal `this`-shaped object that has just what
