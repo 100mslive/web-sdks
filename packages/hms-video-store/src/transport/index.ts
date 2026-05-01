@@ -168,13 +168,16 @@ export default class HMSTransport {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
-        this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.SUBSCRIBE, (err as Error).message);
         }
+        // Don't write `this.state = TransportState.Failed` directly here —
+        // observer.onFailure routes through HMSSdk.onFailure -> internalLeave
+        // which drives the proper state transition with retryScheduler.reset.
+        // The direct write was redundant and skipped the cleanup chain.
         this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
       }
