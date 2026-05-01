@@ -1,5 +1,5 @@
 /**
- * Bug 4 — `retrySignalDisconnectTask` accesses `this.joinParameters!.X`
+ * `retrySignalDisconnectTask` accesses `this.joinParameters!.X`
  * synchronously when building the args to `internalConnect`. If `leave()`
  * runs while the retry task's setTimeout is queued (or while the task is
  * paused on an await), `joinParameters` becomes `undefined`, and the next
@@ -11,14 +11,14 @@
  * stale data.
  *
  * This test calls `retrySignalDisconnectTask` directly with
- * `joinParameters = undefined` (the post-leave state). It must FAIL on
- * `main` (TypeError or unexpected internalConnect call) and PASS once
- * the task null-guards `joinParameters` / state at entry.
+ * `joinParameters = undefined` (the post-leave state). Without the
+ * null-guard at task entry, it throws TypeError or makes unexpected
+ * internalConnect calls.
  */
 
 import { makeTransport, TransportState } from '../test/helpers/makeTransport';
 
-describe('Bug 4 — retrySignalDisconnectTask vs leave() race', () => {
+describe('retrySignalDisconnectTask vs leave() race', () => {
   it('does NOT call internalConnect or signal.trackUpdate when joinParameters is undefined (post-leave)', async () => {
     const { transport } = makeTransport();
     const t = transport as any;
@@ -47,9 +47,9 @@ describe('Bug 4 — retrySignalDisconnectTask vs leave() race', () => {
       caught = e;
     }
 
-    // On `main` this throws TypeError ("Cannot read properties of undefined (reading 'authToken')")
+    // Without the guard this throws TypeError ("Cannot read properties of undefined (reading 'authToken')")
     // because `this.joinParameters!.authToken` dereferences undefined.
-    // After the fix the task early-returns; no throw, no internalConnect, no trackUpdate.
+    // With the guard the task early-returns; no throw, no internalConnect, no trackUpdate.
     expect(caught).toBeUndefined();
     expect(internalConnectSpy).not.toHaveBeenCalled();
     expect(trackUpdateSpy).not.toHaveBeenCalled();
