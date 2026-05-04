@@ -87,7 +87,8 @@
     "picomatch": "^2.3.2",
     "**/tinyglobby/picomatch": "^4.0.4",
     "@tootallnate/once": "^3.0.1",
-    "follow-redirects": "^1.16.0"
+    "follow-redirects": "^1.16.0",
+    "postcss": "^8.5.13"
   },
   "workspaces": [
     "packages/*",
