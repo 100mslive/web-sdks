@@ -177,23 +177,32 @@ export class LocalTrackManager {
     const videoElement = document.createElement('video');
     videoElement.srcObject = stream;
     videoElement.addEventListener('loadedmetadata', async () => {
-      const { videoWidth, videoHeight } = videoElement;
-      const screen = publishParams.screen;
-      const pixels = screen.width * screen.height;
-      const actualAspectRatio = videoWidth / videoHeight;
-      const currentAspectRatio = screen.width / screen.height;
-      if (actualAspectRatio > currentAspectRatio) {
-        const videoConstraint = constraints.video as MediaTrackConstraints;
-        const ratio = actualAspectRatio / currentAspectRatio;
-        const sqrt_ratio = Math.sqrt(ratio);
-        if (videoWidth * videoHeight > pixels) {
-          videoConstraint.width = videoWidth / sqrt_ratio;
-          videoConstraint.height = videoHeight / sqrt_ratio;
-        } else {
-          videoConstraint.height = videoHeight * sqrt_ratio;
-          videoConstraint.width = videoWidth * sqrt_ratio;
+      try {
+        const { videoWidth, videoHeight } = videoElement;
+        const screen = publishParams.screen;
+        const pixels = screen.width * screen.height;
+        const actualAspectRatio = videoWidth / videoHeight;
+        const currentAspectRatio = screen.width / screen.height;
+        if (actualAspectRatio > currentAspectRatio) {
+          const videoConstraint = constraints.video as MediaTrackConstraints;
+          const ratio = actualAspectRatio / currentAspectRatio;
+          const sqrt_ratio = Math.sqrt(ratio);
+          if (videoWidth * videoHeight > pixels) {
+            videoConstraint.width = videoWidth / sqrt_ratio;
+            videoConstraint.height = videoHeight / sqrt_ratio;
+          } else {
+            videoConstraint.height = videoHeight * sqrt_ratio;
+            videoConstraint.width = videoWidth * sqrt_ratio;
+          }
+          await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
         }
-        await stream.getVideoTracks()[0].applyConstraints(videoConstraint);
+      } finally {
+        /*
+         * Release the temporary video element's reference to the stream so
+         * the element can be GC'd promptly instead of holding the
+         * screenshare stream alive longer than necessary.
+         */
+        videoElement.srcObject = null;
       }
     });
   }

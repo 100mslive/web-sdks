@@ -616,8 +616,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
     // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
+      this.processedTrack?.stop();
       this.processedTrack = undefined;
     } else if (processedTrack !== this.processedTrack) {
+      /*
+       * Stop the previous processed track (a canvas captureStream) before
+       * overwriting — otherwise the old canvas stream stays alive consuming
+       * GPU resources until GC.
+       */
+      this.processedTrack?.stop();
       this.processedTrack = processedTrack;
     }
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
