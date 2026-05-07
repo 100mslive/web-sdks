@@ -614,20 +614,24 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param {MediaStreamTrack|undefined}processedTrack
    */
   private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
-    // if all plugins are removed reset everything back to native track
+    /*
+     * Capture the previous processedTrack BEFORE swapping the field, then
+     * stop it AFTER the sender has been pointed at the new track. Stopping
+     * before sender.replaceTrack would leave the RTCRtpSender briefly wired
+     * to an ended track — its encoder stops producing, and the remote side
+     * sees a frame stutter while replaceTrack lands. Doing the swap first,
+     * then stop, means the encoder never sees an ended source.
+     */
+    const prevProcessedTrack = this.processedTrack;
     if (!processedTrack) {
-      this.processedTrack?.stop();
       this.processedTrack = undefined;
     } else if (processedTrack !== this.processedTrack) {
-      /*
-       * Stop the previous processed track (a canvas captureStream) before
-       * overwriting — otherwise the old canvas stream stays alive consuming
-       * GPU resources until GC.
-       */
-      this.processedTrack?.stop();
       this.processedTrack = processedTrack;
     }
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+    if (prevProcessedTrack && prevProcessedTrack !== this.processedTrack) {
+      prevProcessedTrack.stop();
+    }
   };
 
   // eslint-disable-next-line complexity

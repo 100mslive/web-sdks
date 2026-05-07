@@ -617,7 +617,11 @@ export default class JsonRpcSignal {
           this.setIsConnected(false, 'ping pong failure');
         }
       } else {
-        setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
+        setTimeout(() => {
+          if (this.id === id) {
+            this.pingPongLoop(id);
+          }
+        }, window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
       }
     }
   }
