@@ -23,7 +23,7 @@ jobs:
 
       - name: Update versions
         run: |
-          yarn lerna version prerelease --no-git-tag-version --exact --yes --no-private --force-publish
+          yarn lerna version prerelease --no-git-tag-version --exact --yes --no-private
           # Update internal dependency versions in package.json without modifying lockfile
           STORE_VERSION=$(node -p "require('./packages/hms-video-store/package.json').version")
           ROOMKIT_VERSION=$(node -p "require('./packages/roomkit-react/package.json').version")
