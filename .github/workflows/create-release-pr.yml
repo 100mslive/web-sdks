@@ -41,7 +41,7 @@ jobs:
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
         run: |
-          yarn lerna version $BUMP --no-git-tag-version --exact --yes --no-private
+          yarn lerna version $BUMP --no-git-tag-version --exact --yes --no-private --force-publish
           # Sync all internal cross-references to match bumped versions
           node -e "
             const fs = require('fs');
