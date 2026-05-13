@@ -168,14 +168,13 @@ export default class HMSTransport {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
-        this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.SUBSCRIBE, (err as Error).message);
         }
-        this.observer.onFailure(ex);
+        await this.observer.onStateChange(TransportState.Failed, ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
       }
     },
