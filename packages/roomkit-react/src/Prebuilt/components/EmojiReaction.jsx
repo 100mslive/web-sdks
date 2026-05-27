@@ -80,9 +80,10 @@ export const EmojiReaction = ({ showCard = false }) => {
           css={
             isMobile || isLandscape ? { bg: '$surface_default', r: '$round', border: '1px solid $border_bright' } : {}
           }
+          aria-label="Emoji reaction"
         >
           <Tooltip title="Emoji reaction">
-            <Box>
+            <Box aria-hidden>
               <EmojiIcon />
             </Box>
           </Tooltip>

@@ -51,9 +51,10 @@ export const DesktopLeaveRoom = ({
               borderBottomRightRadius: 0,
             }}
             onClick={() => setShowLeaveRoomAlert(true)}
+            aria-label="Leave meeting"
           >
-            <Tooltip title="Leave Room">
-              <Box>
+            <Tooltip title="Leave meeting">
+              <Box aria-hidden>
                 <ExitIcon style={{ transform: 'rotate(180deg)' }} />
               </Box>
             </Tooltip>
@@ -66,9 +67,10 @@ export const DesktopLeaveRoom = ({
                   bg: '$alert_error_dim',
                 },
               }}
+              aria-label="Options for ending meeting"
             >
               <MenuTriggerButton data-testid="leave_end_dropdown_trigger">
-                <VerticalMenuIcon />
+                <Box aria-hidden><VerticalMenuIcon /></Box>
               </MenuTriggerButton>
             </Dropdown.Trigger>
             <Dropdown.Portal container={container}>

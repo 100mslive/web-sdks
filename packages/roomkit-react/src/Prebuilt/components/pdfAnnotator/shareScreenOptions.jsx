@@ -35,7 +35,7 @@ export function ShareScreenOptions() {
         onOpenChange={value => updateState(MODALS.SHARE, value)}
         modal={false}
       >
-        <Dropdown.Trigger asChild data-testid="sharing_btn" disabled={amIScreenSharing}>
+        <Dropdown.Trigger asChild data-testid="sharing_btn" disabled={amIScreenSharing} aria-label="Screen sharing options">
           <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
               <Box>

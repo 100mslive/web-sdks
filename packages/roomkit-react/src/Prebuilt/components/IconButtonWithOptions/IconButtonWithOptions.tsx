@@ -99,6 +99,8 @@ export const IconButtonWithOptions = ({
   onClick = () => {
     return;
   },
+  moreOptionsButtonLabel,
+  'aria-label': ariaLabel,
 }: {
   onClick: () => void;
   onDisabledClick: () => void;
@@ -109,6 +111,8 @@ export const IconButtonWithOptions = ({
   active: boolean;
   disabled?: boolean;
   tooltipMessage?: string;
+  moreOptionsButtonLabel?: string;
+  'aria-label'?: string;
 }) => {
   const commonProps = { disabled, active };
   return (
@@ -119,6 +123,7 @@ export const IconButtonWithOptions = ({
         onClick={onClick}
         hideOptions={hideOptions}
         className="__cancel-drag-event"
+        aria-label={ariaLabel}
       >
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Icon {...commonProps}>{icon}</Icon>
@@ -135,6 +140,7 @@ export const IconButtonWithOptions = ({
                 onDisabledClick();
               }
             }}
+            aria-label={moreOptionsButtonLabel}
           >
             <OptionsSection {...commonProps}>
               <Tooltip title="View Options">

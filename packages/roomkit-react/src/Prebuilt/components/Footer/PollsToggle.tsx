@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { QuizActiveIcon, QuizIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../..';
+import { Box, Tooltip } from '../../..';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 // @ts-ignore: No implicit Any
@@ -30,7 +30,9 @@ export const PollsToggle = () => {
         css={{ bg: isPollsOpen ? '$surface_brighter' : '' }}
         data-testid="polls_btn"
       >
-        {unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}
+        <Box aria-hidden>
+          {unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}
+        </Box>
       </IconButton>
     </Tooltip>
   );

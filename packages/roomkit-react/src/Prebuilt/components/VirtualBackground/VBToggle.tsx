@@ -18,6 +18,7 @@ import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { APP_DATA, isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { Box } from '../../../Layout';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -43,7 +44,7 @@ export const VBToggle = () => {
   return (
     <Tooltip side="top" disabled={isVBOpen} title="Configure Virtual Background">
       <IconButton active={!isVBOpen} onClick={toggleVB} data-testid="virtual_bg_btn">
-        {loadingEffects ? <Loading size={18} /> : <VirtualBackgroundIcon />}
+        {loadingEffects ? <Loading size={18} /> : <Box aria-hidden><VirtualBackgroundIcon /></Box>}
       </IconButton>
     </Tooltip>
   );

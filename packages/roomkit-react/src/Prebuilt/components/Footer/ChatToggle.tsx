@@ -26,7 +26,9 @@ export const ChatToggle = ({ onClick }: { onClick?: () => void }) => {
           css={{ bg: isChatOpen ? '$surface_brighter' : '' }}
           data-testid="chat_btn"
         >
-          <ChatIcon />
+          <Box aria-hidden>
+            <ChatIcon />
+          </Box>
         </IconButton>
       </Tooltip>
       {countUnreadMessages > 0 && (

@@ -24,7 +24,7 @@ import {
   PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
+import { Box, Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -124,7 +124,9 @@ export const DesktopOptions = ({
         <Tooltip title="More options">
           <Dropdown.Trigger asChild data-testid="more_settings_btn">
             <IconButton>
-              <HamburgerMenuIcon />
+              <Box aria-hidden>
+                <HamburgerMenuIcon />
+              </Box>
             </IconButton>
           </Dropdown.Trigger>
         </Tooltip>

@@ -48,9 +48,10 @@ export const ScreenshareToggle = ({ css = {} }) => {
             await toggleScreenShare();
             await requestPermission();
           }}
+          aria-label={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}
         >
           <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>
-            <Box>
+            <Box aria-hidden>
               <ShareScreenIcon />
             </Box>
           </Tooltip>
