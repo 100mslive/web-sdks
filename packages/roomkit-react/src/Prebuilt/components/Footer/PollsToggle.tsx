@@ -30,9 +30,7 @@ export const PollsToggle = () => {
         css={{ bg: isPollsOpen ? '$surface_brighter' : '' }}
         data-testid="polls_btn"
       >
-        <Box aria-hidden>
-          {unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}
-        </Box>
+        <Box aria-hidden>{unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}</Box>
       </IconButton>
     </Tooltip>
   );

@@ -70,7 +70,9 @@ export const DesktopLeaveRoom = ({
               aria-label="Options for ending meeting"
             >
               <MenuTriggerButton data-testid="leave_end_dropdown_trigger">
-                <Box aria-hidden><VerticalMenuIcon /></Box>
+                <Box aria-hidden>
+                  <VerticalMenuIcon />
+                </Box>
               </MenuTriggerButton>
             </Dropdown.Trigger>
             <Dropdown.Portal container={container}>

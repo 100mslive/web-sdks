@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
 // eslint-disable-next-line
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
+import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import {
   selectAppData,
   selectIsEffectsEnabled,
@@ -10,15 +10,15 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { VirtualBackgroundIcon } from '@100mslive/react-icons';
+import React, { useEffect } from 'react';
+import { Box } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Tooltip } from '../../../Tooltip';
+import { APP_DATA, isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
 import IconButton from '../../IconButton';
-import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { APP_DATA, isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
-import { Box } from '../../../Layout';
+import { VBHandler } from './VBHandler';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -44,7 +44,13 @@ export const VBToggle = () => {
   return (
     <Tooltip side="top" disabled={isVBOpen} title="Configure Virtual Background">
       <IconButton active={!isVBOpen} onClick={toggleVB} data-testid="virtual_bg_btn">
-        {loadingEffects ? <Loading size={18} /> : <Box aria-hidden><VirtualBackgroundIcon /></Box>}
+        {loadingEffects ? (
+          <Loading size={18} />
+        ) : (
+          <Box aria-hidden>
+            <VirtualBackgroundIcon />
+          </Box>
+        )}
       </IconButton>
     </Tooltip>
   );
