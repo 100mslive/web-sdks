@@ -2,7 +2,7 @@ import * as workerTimers from 'worker-timers';
 import { HMSActions, HMSPeer, HMSTrack, HMSVideoTrack } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit any
 import { drawVideoElementsOnCanvas, dummyChangeInCanvas, resetPIPCanvasColors } from './pipUtils';
-import { isIOS, isMacOS, isSafari } from '../../common/constants';
+import { isIOS } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const DEFAULT_CANVAS_WIDTH = 480;
@@ -64,7 +64,11 @@ class PipManager {
    * check if PIP is supported in this browser env
    */
   isSupported() {
-    return !!document.pictureInPictureEnabled && !isIOS && !(isMacOS && isSafari);
+    // Gate on the native Picture-in-Picture feature check. macOS Safari supports
+    // the standard API and is no longer excluded; iOS is kept out because it does
+    // not implement the standard document PiP API (it only has the non-standard
+    // video presentation-mode API, which this canvas-capture flow can't use).
+    return !!document.pictureInPictureEnabled && !isIOS;
   }
 
   /**
