@@ -11,6 +11,7 @@ import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
+import { pickIncomingMessage } from './pipMessageUtils';
 // @ts-ignore: No implicit Any
 import { MediaSession } from './SetupMediaSession';
 // @ts-ignore: No implicit Any
@@ -79,19 +80,10 @@ export const ActivatedPIP = () => {
       // that arrive after PIP starts trigger a bubble.
       let lastShownMessageId = store.getState(selectHMSMessages)?.slice(-1)[0]?.id;
       const unsubscribeMessages = store.subscribe(messages => {
-        if (!messages?.length) {
-          return;
-        }
-        const localPeerId = store.getState(selectLocalPeerID);
-        const latest = messages[messages.length - 1];
-        const isIncoming = latest.sender && latest.sender !== localPeerId;
-        const isText = typeof latest.message === 'string' && latest.message.trim().length > 0;
-        if (latest.id !== lastShownMessageId && isIncoming && isText) {
-          lastShownMessageId = latest.id;
-          PictureInPicture.setLatestMessage({
-            senderName: latest.senderName || 'Anonymous',
-            text: latest.message,
-          });
+        const result = pickIncomingMessage(messages, lastShownMessageId, store.getState(selectLocalPeerID));
+        lastShownMessageId = result.lastShownMessageId;
+        if (result.message) {
+          PictureInPicture.setLatestMessage(result.message);
         }
       }, selectHMSMessages);
 

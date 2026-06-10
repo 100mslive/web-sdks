@@ -1,4 +1,5 @@
 import { PictureInPicture } from './PIPManager';
+import { pickIncomingMessage } from './pipMessageUtils';
 
 describe('pip manager tests', () => {
   /**
@@ -100,6 +101,71 @@ describe('pip manager tests', () => {
     test('no active message by default', () => {
       PictureInPicture.reset();
       expect(PictureInPicture.getActiveMessage()).toBeNull();
+    });
+  });
+
+  /**
+   * Messages can arrive in batches (the store debounces 'newMessage'), so a
+   * single subscription fire may carry several new messages. pickIncomingMessage
+   * must surface the newest incoming text message in the batch, not just the tail.
+   */
+  describe('pickIncomingMessage', () => {
+    const LOCAL = 'local-peer';
+    const msg = (id, sender, message, senderName) => ({ id, sender, message, senderName });
+
+    test('returns the latest incoming text message after lastShownMessageId', () => {
+      const messages = [msg('m1', 'p1', 'first', 'Alice'), msg('m2', 'p2', 'second', 'Bob')];
+      const result = pickIncomingMessage(messages, 'm1', LOCAL);
+      expect(result.message).toEqual({ senderName: 'Bob', text: 'second' });
+      expect(result.lastShownMessageId).toBe('m2');
+    });
+
+    test('surfaces an incoming message even when the batch tail is our own message', () => {
+      // Bug regression: batch ends with the local peer's own message. The earlier
+      // incoming peer message must still be shown.
+      const messages = [msg('m1', 'p1', 'hi from peer', 'Alice'), msg('m2', LOCAL, 'my reply', 'Me')];
+      const result = pickIncomingMessage(messages, undefined, LOCAL);
+      expect(result.message).toEqual({ senderName: 'Alice', text: 'hi from peer' });
+      // advances past the whole batch so these are not re-scanned
+      expect(result.lastShownMessageId).toBe('m2');
+    });
+
+    test('ignores own messages and advances past the batch', () => {
+      const messages = [msg('m1', LOCAL, 'only mine', 'Me')];
+      const result = pickIncomingMessage(messages, undefined, LOCAL);
+      expect(result.message).toBeNull();
+      expect(result.lastShownMessageId).toBe('m1');
+    });
+
+    test('ignores non-text and empty/whitespace messages', () => {
+      const messages = [
+        msg('m1', 'p1', { fileUrl: 'x' }, 'Alice'), // non-text payload
+        msg('m2', 'p2', '   ', 'Bob'), // whitespace only
+      ];
+      const result = pickIncomingMessage(messages, undefined, LOCAL);
+      expect(result.message).toBeNull();
+      expect(result.lastShownMessageId).toBe('m2');
+    });
+
+    test('returns nothing new when there are no fresh messages', () => {
+      const messages = [msg('m1', 'p1', 'seen', 'Alice')];
+      const result = pickIncomingMessage(messages, 'm1', LOCAL);
+      expect(result.message).toBeNull();
+      expect(result.lastShownMessageId).toBe('m1');
+    });
+
+    test('handles empty/undefined message lists', () => {
+      expect(pickIncomingMessage([], 'm1', LOCAL)).toEqual({ message: null, lastShownMessageId: 'm1' });
+      expect(pickIncomingMessage(undefined, undefined, LOCAL)).toEqual({
+        message: null,
+        lastShownMessageId: undefined,
+      });
+    });
+
+    test('falls back to Anonymous when senderName is missing', () => {
+      const messages = [msg('m1', 'p1', 'hello', undefined)];
+      const result = pickIncomingMessage(messages, undefined, LOCAL);
+      expect(result.message).toEqual({ senderName: 'Anonymous', text: 'hello' });
     });
   });
 });
