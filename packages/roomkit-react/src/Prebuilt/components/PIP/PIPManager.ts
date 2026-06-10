@@ -6,8 +6,17 @@ import { isIOS, isMacOS, isSafari } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const DEFAULT_CANVAS_WIDTH = 480;
-const DEFAULT_CANVAS_HEIGHT = 320;
+// Keep in sync with PIP_CANVAS_HEIGHT in pipUtils. A bit taller than the video-only
+// size so the incoming-chat bubble overlays the bottom band without hiding much video.
+const DEFAULT_CANVAS_HEIGHT = 360;
 const LEAVE_EVENT_NAME = 'leavepictureinpicture';
+// how long an incoming chat bubble stays on the PIP canvas before it is removed
+const MESSAGE_TTL_MS = 4000;
+
+export interface PIPChatMessage {
+  senderName: string;
+  text: string;
+}
 
 enum PIPStates {
   starting = 'starting',
@@ -35,6 +44,8 @@ class PipManager {
   private onStateChange: ((value: boolean) => void) | null = null;
   private tracksToShow: Array<string> = [];
   private state: PIPStates = PIPStates.stopped;
+  private latestMessage: PIPChatMessage | null = null;
+  private messageShownAt = 0;
 
   constructor() {
     this.reset();
@@ -42,6 +53,27 @@ class PipManager {
 
   listenToStateChange(cb: (value: boolean) => void) {
     this.listeners.add(cb);
+  }
+
+  /**
+   * Show an incoming chat message as a transient bubble on the PIP canvas.
+   * The bubble auto-dismisses after MESSAGE_TTL_MS (handled in the render loop).
+   */
+  setLatestMessage(message: PIPChatMessage) {
+    this.latestMessage = message;
+    this.messageShownAt = Date.now();
+  }
+
+  /**
+   * @private returns the current message if it is still within its display
+   * window, clearing it once expired.
+   */
+  private getActiveMessage(): PIPChatMessage | null {
+    if (this.latestMessage && Date.now() - this.messageShownAt < MESSAGE_TTL_MS) {
+      return this.latestMessage;
+    }
+    this.latestMessage = null;
+    return null;
   }
 
   /**
@@ -58,6 +90,8 @@ class PipManager {
     this.tracksToShow = [];
     this.onStateChange = null; // for user of this class to listen to changes
     this.state = PIPStates.stopped;
+    this.latestMessage = null;
+    this.messageShownAt = 0;
   }
 
   /**
@@ -212,7 +246,7 @@ class PipManager {
         return;
       }
       if (this.state === PIPStates.started) {
-        drawVideoElementsOnCanvas(this.videoElements, this.canvas);
+        drawVideoElementsOnCanvas(this.videoElements, this.canvas, this.getActiveMessage());
       }
       this.renderLoop();
     }, delay);

@@ -69,4 +69,37 @@ describe('pip manager tests', () => {
       expect(detachCalledFor).toEqual(example.detachFor);
     }
   });
+
+  /**
+   * The incoming chat bubble should be returned by the render loop while it is
+   * within its display window and then cleared, so it auto-dismisses.
+   */
+  describe('incoming chat message bubble', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+      PictureInPicture.reset();
+    });
+
+    test('latest incoming message is shown then expires after TTL', () => {
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1000);
+
+      PictureInPicture.setLatestMessage({ senderName: 'Alice', text: 'hello there' });
+      expect(PictureInPicture.getActiveMessage()).toEqual({ senderName: 'Alice', text: 'hello there' });
+
+      // still within the display window
+      nowSpy.mockReturnValue(1000 + 3999);
+      expect(PictureInPicture.getActiveMessage()).toEqual({ senderName: 'Alice', text: 'hello there' });
+
+      // past the display window -> bubble is cleared
+      nowSpy.mockReturnValue(1000 + 4000);
+      expect(PictureInPicture.getActiveMessage()).toBeNull();
+      // once cleared it stays cleared
+      expect(PictureInPicture.getActiveMessage()).toBeNull();
+    });
+
+    test('no active message by default', () => {
+      PictureInPicture.reset();
+      expect(PictureInPicture.getActiveMessage()).toBeNull();
+    });
+  });
 });
