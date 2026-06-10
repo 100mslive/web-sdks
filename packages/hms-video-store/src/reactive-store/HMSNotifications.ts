@@ -185,6 +185,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     );
     this.emitEvent(notification);
   }
+
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }

@@ -121,6 +121,28 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
     return () => {};
   }, [leaveOnUnload, providerProps]);
 
+  /*
+   * When the provider owns the store (no external actions/store passed in)
+   * and leaveOnUnload is on, also leave on React unmount or providerProps
+   * identity change. Without this, consumers that toggle key={roomId} or
+   * conditionally render the provider leak the SDK instance: the previous
+   * signal WebSocket, RTCPeerConnections, ping-pong loop, and any local
+   * media tracks remain alive until tab close. leave() is safe when not
+   * connected (logs a warning, no network call).
+   *
+   * External-store branch (consumer passed actions/store) is intentionally
+   * not touched: ownsStore evaluates false and the effect returns early.
+   */
+  const ownsStore = !actions && !store;
+  useEffect(() => {
+    if (!ownsStore || !isBrowser || !leaveOnUnload) {
+      return;
+    }
+    return () => {
+      providerProps.actions.leave();
+    };
+  }, [ownsStore, leaveOnUnload, providerProps]);
+
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
 };
 

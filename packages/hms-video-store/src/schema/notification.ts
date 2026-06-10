@@ -82,6 +82,7 @@ export interface HMSTranscriptionNotification extends BaseNotification {
   type: HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED;
   data: HMSTranscriptionInfo[];
 }
+
 export type HMSNotification =
   | HMSPeerNotification
   | HMSPeerListNotification

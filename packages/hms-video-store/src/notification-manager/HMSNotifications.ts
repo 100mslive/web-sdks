@@ -92,6 +92,10 @@ export interface TranscriptionPluginPermissions {
     admin?: Array<string>;
   };
   mode: HMSTranscriptionMode;
+  translation?: {
+    enabled: boolean;
+    roleLanguages?: Record<string, string>;
+  };
 }
 
 export interface NoiseCancellationPlugin {
@@ -166,6 +170,10 @@ export interface TranscriptionNotification {
   stopped_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
+  translation?: {
+    enabled: boolean;
+    roleLanguages?: Record<string, string>;
+  };
 }
 
 export interface RoomState {

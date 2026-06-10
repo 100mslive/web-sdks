@@ -1,4 +1,5 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
+import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
 import { HMSRemoteStream } from '../streams/HMSRemoteStream';
@@ -214,5 +215,33 @@ describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
 
     await track.removeSink(videoElement);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
+  });
+
+  test('setEnabled awaits super.setEnabled before calling videoHandler.updateSinks', async () => {
+    let resolveSuper!: () => void;
+    const superSpy = jest.spyOn(HMSVideoTrack.prototype, 'setEnabled').mockImplementation(
+      () =>
+        new Promise<void>(resolve => {
+          resolveSuper = resolve;
+        }),
+    );
+    const updateSinksSpy = jest.spyOn(track['videoHandler'], 'updateSinks').mockImplementation(() => {});
+
+    const setEnabledPromise = track.setEnabled(false);
+
+    // Yield once for the microtask after super starts
+    await Promise.resolve();
+
+    expect(superSpy).toHaveBeenCalledWith(false);
+    // updateSinks must NOT have run yet — we're still awaiting super
+    expect(updateSinksSpy).not.toHaveBeenCalled();
+
+    resolveSuper();
+    await setEnabledPromise;
+
+    // After super resolves, updateSinks runs
+    expect(updateSinksSpy).toHaveBeenCalledWith(true);
+
+    superSpy.mockRestore();
   });
 });

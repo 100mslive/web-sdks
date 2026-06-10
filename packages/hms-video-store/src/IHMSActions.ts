@@ -1,5 +1,5 @@
 import { HMSDiagnosticsInterface } from './diagnostics/interfaces';
-import { TranscriptionConfig } from './interfaces/transcription-config';
+import { TranscriptionConfig, TranscriptionConfigUpdate } from './interfaces/transcription-config';
 import { FindPeerByNameRequestParams } from './signal/interfaces';
 import { HMSSessionFeedback } from './end-call-feedback';
 import {
@@ -440,6 +440,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param params.mode This is the mode which represent the type of transcription you want to stop. Currently we have Caption mode only
    */
   stopTranscription(params: TranscriptionConfig): Promise<void>;
+
+  /**
+   * Update transcription config for a running session.
+   * Use this to enable/disable translation or change the transcription language mid-session.
+   * @param params.translation - Toggle translation on/off and optionally update roleLanguages
+   * @param params.language - Change transcription input language (e.g., "en", "hi", "auto")
+   */
+  updateTranscriptionConfig(params: TranscriptionConfigUpdate): Promise<void>;
 
   /**
    * Used to define date range metadata in a media playlist.

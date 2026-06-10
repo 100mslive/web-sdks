@@ -66,6 +66,7 @@ import {
   StartTranscriptionRequestParams,
   Track,
   TrackUpdateRequestParams,
+  TranscriptionConfigUpdateRequestParams,
   UpdatePeerRequestParams,
 } from '../interfaces';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
@@ -385,6 +386,10 @@ export default class JsonRpcSignal {
     await this.call(HMSSignalMethod.STOP_TRANSCRIPTION, { ...params });
   }
 
+  async updateTranscriptionConfig(params: TranscriptionConfigUpdateRequestParams) {
+    await this.call(HMSSignalMethod.UPDATE_TRANSCRIPTION_CONFIG, { ...params });
+  }
+
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
     await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { ...params });
   }
@@ -612,7 +617,11 @@ export default class JsonRpcSignal {
           this.setIsConnected(false, 'ping pong failure');
         }
       } else {
-        setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
+        setTimeout(() => {
+          if (this.id === id) {
+            this.pingPongLoop(id);
+          }
+        }, window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
       }
     }
   }

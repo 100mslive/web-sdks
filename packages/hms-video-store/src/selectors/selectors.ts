@@ -453,6 +453,35 @@ export const selectRecordingState = createSelector(selectRoom, room => room.reco
 export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectTranscriptionsState = createSelector(selectRoom, room => room.transcriptions);
+
+/**
+ * Select the current translation state for captions.
+ * Reads runtime state from transcriptions if captions are running,
+ * otherwise falls back to template config from translationConfig.
+ *
+ * @returns `{ available, enabled, roleLanguages }` or `{ available: false }` if not configured
+ */
+export const selectTranslationState = createSelector(selectRoom, room => {
+  // Check runtime state first (from room-state transcriptions)
+  const captionTranscription = room.transcriptions?.find(t => t.mode === HMSTranscriptionMode.CAPTION);
+  if (captionTranscription?.translation) {
+    return {
+      available: true,
+      enabled: captionTranscription.translation.enabled,
+      roleLanguages: captionTranscription.translation.roleLanguages,
+    };
+  }
+  // Fall back to template config (from plugin, available before captions start)
+  const templateConfig = room.translationConfig?.[HMSTranscriptionMode.CAPTION];
+  if (templateConfig) {
+    return {
+      available: true,
+      enabled: false,
+      roleLanguages: templateConfig.roleLanguages,
+    };
+  }
+  return { available: false, enabled: false, roleLanguages: undefined };
+});
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
 export const selectIsLargeRoom = createSelector(selectRoom, room => !!room.isLargeRoom);

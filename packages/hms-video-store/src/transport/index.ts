@@ -168,14 +168,13 @@ export default class HMSTransport {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
-        this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.SUBSCRIBE, (err as Error).message);
         }
-        this.observer.onFailure(ex);
+        await this.observer.onStateChange(TransportState.Failed, ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
       }
     },
@@ -1067,7 +1066,7 @@ export default class HMSTransport {
     // ice retry is already in progress(from disconnect state)
     if (
       this.retryScheduler.isTaskInProgress(
-        HMSConnectionRole.Publish
+        role === HMSConnectionRole.Publish
           ? TransportFailureCategory.PublishIceConnectionFailed
           : TransportFailureCategory.SubscribeIceConnectionFailed,
       )
@@ -1274,7 +1273,20 @@ export default class HMSTransport {
     return true;
   };
 
+  /**
+   * Retry path that reconnects the signal WebSocket after a disconnect.
+   *
+   * The retryScheduler can fire this body asynchronously, and `leave()`
+   * clears `joinParameters` synchronously. If leave() races with a queued
+   * task, dereferencing `this.joinParameters!.authToken` would throw a
+   * TypeError. Bail out cleanly in that case — leave() also resets the
+   * scheduler, so further work here is moot.
+   */
   private retrySignalDisconnectTask = async () => {
+    if (!this.joinParameters || this.state === TransportState.Leaving) {
+      return false;
+    }
+
     HMSLogger.d(TAG, 'retrySignalDisconnectTask', { signalConnected: this.signal.isConnected });
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket

@@ -123,6 +123,12 @@ export interface HMSTrackStats extends HMSLocalTrackStats, HMSRemoteTrackStats {
 export interface HMSPeerStats {
   publish?: RTCIceCandidatePairStats & {
     bitrate: number;
+    /**
+     * Sum of `bytesSent` across active outbound-rtp streams at the time the stat was taken.
+     * Used internally to derive `bitrate` on the next sample so the value only reflects
+     * actual media traffic, not ICE/RTCP/BWE probe padding (LIV-243).
+     */
+    outboundRtpBytesSent?: number;
   };
   subscribe?: RTCIceCandidatePairStats & {
     bitrate: number;

@@ -47,7 +47,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    super.setEnabled(value);
+    await super.setEnabled(value);
     this.videoHandler.updateSinks(true);
   }
 

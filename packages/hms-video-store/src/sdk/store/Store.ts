@@ -321,7 +321,17 @@ class Store {
         promises.push(track.setOutputDevice(device));
       }
     });
-    await Promise.all(promises);
+    // Don't short-circuit on the first rejection — we want to attempt the sink
+    // change on every remote track. If any fail, surface an aggregated error
+    // so the caller (DeviceManager.updateOutputDevice) can avoid persisting a
+    // selection that didn't actually route. See LIV-254.
+    const results = await Promise.allSettled(promises);
+    const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+    if (rejected.length > 0) {
+      throw new Error(
+        `updateAudioOutputDevice: ${rejected.length}/${promises.length} track(s) failed to switch sink: ${rejected[0].reason}`,
+      );
+    }
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
@@ -499,6 +509,13 @@ class Store {
       transcription.permissions?.admin?.forEach(role =>
         this.addPermissionToRole(role, Plugins.TRANSCRIPTIONS, 'admin', transcription.mode),
       );
+      // Store translation config on room so it's accessible as a single object
+      if (transcription.translation && this.room) {
+        if (!this.room.translationConfig) {
+          this.room.translationConfig = {} as any;
+        }
+        this.room.translationConfig![transcription.mode] = transcription.translation;
+      }
     }
   };
   private handleNoiseCancellationPlugin = (plugin?: NoiseCancellationPlugin) => {

@@ -727,6 +727,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.stopTranscription(params);
   }
 
+  async updateTranscriptionConfig(params: sdkTypes.TranscriptionConfigUpdate): Promise<void> {
+    await this.sdk.updateTranscriptionConfig(params);
+  }
+
   async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
     await this.sdk.sendHLSTimedMetadata(metadataList);
   }

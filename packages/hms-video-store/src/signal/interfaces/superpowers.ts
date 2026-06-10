@@ -59,6 +59,13 @@ export interface UpdatePeerRequestParams {
 
 export interface StartTranscriptionRequestParams {
   mode: HMSTranscriptionMode;
+  language?: string;
+  translation?: { enabled: boolean; roleLanguages?: Record<string, string> };
+}
+
+export interface TranscriptionConfigUpdateRequestParams {
+  language?: string;
+  translation?: { enabled: boolean; roleLanguages?: Record<string, string> };
 }
 export interface SetSessionMetadataParams {
   key?: string;

@@ -90,6 +90,10 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
+    // cleanup() nulls the observer fields; treat that as the destroyed signal.
+    if (!this.intersectionObserver) {
+      return;
+    }
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
@@ -104,6 +108,9 @@ export class VideoElementManager {
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
+    if (!this.resizeObserver) {
+      return;
+    }
     if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }

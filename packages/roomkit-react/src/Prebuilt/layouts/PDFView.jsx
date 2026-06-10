@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { usePDFShare } from '@100mslive/react-sdk';
+import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Box } from '../../Layout';
 import { EmbedScreenShareView } from './EmbedView';
-import { usePDFConfig, useResetPDFConfig } from '../components/AppData/useUISettings';
+import { usePDFConfig, useResetPDFConfig, useSetUiSettings } from '../components/AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 /**
  * PDFView is responsible for rendering the PDF iframe and managing the screen sharing functionality.
@@ -13,6 +15,21 @@ export const PDFView = () => {
   const resetConfig = useResetPDFConfig();
   // need to send resetConfig to clear configuration, if stop screenshare occurs.
   const { iframeRef, startPDFShare, isPDFShareInProgress } = usePDFShare(resetConfig);
+  const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
+
+  useEffect(() => {
+    // PDF view should render in gallery mode. Peer layouts (Screenshare/Whiteboard) force
+    // SIDEBAR but PDFView never mounts inside GridLayout, so nothing else reconciles it.
+    if (layoutMode === LayoutMode.GALLERY) {
+      return;
+    }
+    setLayoutMode(LayoutMode.GALLERY);
+    return () => {
+      // restore previous layout mode once PDF view closes
+      setLayoutMode(layoutMode);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // no working in other useEffect, as return is called multiple time on state change

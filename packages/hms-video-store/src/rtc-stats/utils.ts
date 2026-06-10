@@ -363,19 +363,48 @@ const buildMediaSourceStats = (
   };
 };
 
+export const sumOutboundRtpBytesSent = (report?: RTCStatsReport): number => {
+  let total = 0;
+  report?.forEach(stat => {
+    if (stat.type === 'outbound-rtp') {
+      total += stat.bytesSent || 0;
+    }
+  });
+  return total;
+};
+
 export const getLocalPeerStatsFromReport = (
   type: PeerConnectionType,
   report?: RTCStatsReport,
   prevStats?: HMSPeerStats,
-): (RTCIceCandidatePairStats & { bitrate: number }) | undefined => {
+): (RTCIceCandidatePairStats & { bitrate: number; outboundRtpBytesSent?: number }) | undefined => {
   const activeCandidatePair = getActiveCandidatePairFromReport(report);
-  const bitrate = computeBitrate(
-    (type === 'publish' ? 'bytesSent' : 'bytesReceived') as any,
-    activeCandidatePair,
-    prevStats && prevStats[type],
-  );
+  if (!activeCandidatePair) {
+    return undefined;
+  }
 
-  return activeCandidatePair && Object.assign(activeCandidatePair, { bitrate });
+  if (type === 'publish') {
+    // Compute publish bitrate from the sum of `bytesSent` across active outbound-rtp streams,
+    // not from the ICE candidate pair. The candidate pair's `bytesSent` also counts RTCP,
+    // STUN keepalives, and BWE probe padding — on Chrome and Firefox that's ~1 Mbps of
+    // phantom traffic even when nothing is being published, which surfaced as a wrong
+    // "Publish Bitrate" in Stats for Nerds (LIV-243). Candidate-pair `bytesSent` is kept
+    // on the returned object so "Total Bytes Sent" still reflects transport totals.
+    const outboundRtpBytesSent = sumOutboundRtpBytesSent(report);
+    const prevOutboundRtpBytesSent = prevStats?.publish?.outboundRtpBytesSent;
+    const bitrate =
+      prevOutboundRtpBytesSent !== undefined
+        ? computeBitrate(
+            'bytesSent' as any,
+            { bytesSent: outboundRtpBytesSent, timestamp: activeCandidatePair.timestamp } as any,
+            { bytesSent: prevOutboundRtpBytesSent, timestamp: prevStats?.publish?.timestamp } as any,
+          )
+        : 0;
+    return Object.assign(activeCandidatePair, { bitrate, outboundRtpBytesSent });
+  }
+
+  const bitrate = computeBitrate('bytesReceived' as any, activeCandidatePair, prevStats && prevStats[type]);
+  return Object.assign(activeCandidatePair, { bitrate });
 };
 
 export const getActiveCandidatePairFromReport = (report?: RTCStatsReport): RTCIceCandidatePairStats | undefined => {
