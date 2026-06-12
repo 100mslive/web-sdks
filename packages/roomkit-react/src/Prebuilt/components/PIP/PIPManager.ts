@@ -50,6 +50,7 @@ class PipManager {
   reset() {
     console.debug('resetting PIP state');
     resetPIPCanvasColors();
+    this.pipVideo?.remove(); // unmount the hidden video element
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
     this.timeoutRef = 0; // setTimeout reference so it can be cancelled
@@ -213,7 +214,13 @@ class PipManager {
     pipVideo.width = DEFAULT_CANVAS_WIDTH;
     pipVideo.height = DEFAULT_CANVAS_HEIGHT;
     pipVideo.muted = true;
+    pipVideo.playsInline = true;
     pipVideo.srcObject = canvas.captureStream();
+    // Safari only enters PiP for video elements attached to the document -
+    // keep the pip source video mounted but visually hidden (not display:none,
+    // which would skip painting). Chrome works either way.
+    pipVideo.style.cssText = 'position:fixed;bottom:0;right:0;width:2px;height:2px;opacity:0;pointer-events:none;';
+    document.body.appendChild(pipVideo);
     return { canvas, pipVideo };
   }
 
