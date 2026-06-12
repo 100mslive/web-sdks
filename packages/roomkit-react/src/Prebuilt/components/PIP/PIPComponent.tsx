@@ -3,6 +3,7 @@ import { selectPeers, selectTracksMap, useHMSActions, useHMSVanillaStore } from 
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
+// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { PictureInPicture } from './PIPManager';
 // @ts-ignore: No implicit Any
