@@ -130,8 +130,9 @@ class PipManager {
       this.onStateChange?.(true);
       this.callListeners(true);
     } catch (err) {
-      console.error('error in request pip', err);
       this.state = PIPStates.stopped;
+      // let the caller handle the failure (e.g. surface a toast)
+      throw err;
     }
   }
 
