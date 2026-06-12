@@ -27,6 +27,14 @@ const PIPComponent = ({ content = null }) => {
     }
   }, [hmsActions, isPipOn, store]);
 
+  useEffect(() => {
+    if (!isPipOn) {
+      // pre-warm the pip media elements so the request on click stays within
+      // Safari's user-activation window (see PipManager.warmup)
+      PictureInPicture.warmup().catch(err => console.error('error in pip warmup', err));
+    }
+  }, [isPipOn]);
+
   if (!PictureInPicture.isSupported()) {
     return null;
   }

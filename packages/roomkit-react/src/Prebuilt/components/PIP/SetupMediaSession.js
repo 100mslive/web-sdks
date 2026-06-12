@@ -45,15 +45,24 @@ class SetupMediaSession {
   };
 
   setUpHandlers = () => {
-    if (navigator.mediaSession) {
-      try {
-        navigator.mediaSession.setActionHandler('togglemicrophone', this.toggleMic);
-        navigator.mediaSession.setActionHandler('togglecamera', this.toggleCam);
-        navigator.mediaSession.setActionHandler('hangup', this.leave);
-      } catch (err) {
-        console.error('error in setting media session handlers', err);
-      }
+    if (!navigator.mediaSession) {
+      return;
     }
+    const handlers = {
+      togglemicrophone: this.toggleMic,
+      togglecamera: this.toggleCam,
+      hangup: this.leave,
+    };
+    // set each handler separately - browsers throw a TypeError on actions they
+    // don't recognise (Safari doesn't support 'hangup'), and one unsupported
+    // action shouldn't drop the remaining handlers
+    Object.entries(handlers).forEach(([action, handler]) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch (err) {
+        console.warn(`media session action '${action}' is not supported`, err);
+      }
+    });
   };
 }
 

@@ -79,6 +79,23 @@ class PipManager {
   }
 
   /**
+   * Pre-create the canvas and pip video element and start playing the canvas
+   * stream. Call this ahead of the actual PiP request (e.g. when the menu
+   * holding the PiP option opens) - Safari only honours
+   * requestPictureInPicture() while the click's user activation is alive, and
+   * awaiting a cold video.play() inside the click handler loses it
+   * (NotAllowedError). Chrome needs the video metadata loaded before the
+   * request, which warming up also guarantees.
+   * Safe to call repeatedly; no-op when unsupported or PiP is already active.
+   */
+  async warmup() {
+    if (!this.isSupported() || this.state !== PIPStates.stopped) {
+      return;
+    }
+    await this.initMediaElements();
+  }
+
+  /**
    * request browser to start pip and start the render loop updating the pip
    * video element with peer tracks.
    * @param hmsActions
@@ -97,6 +114,11 @@ class PipManager {
     this.state = PIPStates.starting;
     try {
       await this.init(hmsActions, onStateChangeFn);
+      if (this.pipVideo?.paused) {
+        // warmup's muted autoplay can be blocked by browser policy - retry
+        // within this click's user activation
+        await this.pipVideo.play();
+      }
       // when user closes pip, call internal stop
       this.pipVideo?.addEventListener(LEAVE_EVENT_NAME, this.stop);
       this.renderLoop();
