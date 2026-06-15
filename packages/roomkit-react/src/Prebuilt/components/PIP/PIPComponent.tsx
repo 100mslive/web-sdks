@@ -78,7 +78,7 @@ export const ActivatedPIP = () => {
       // Show incoming chat messages (from other peers) as a transient bubble on
       // the PIP canvas. Seed with the latest existing message id so only messages
       // that arrive after PIP starts trigger a bubble.
-      let lastShownMessageId = store.getState(selectHMSMessages)?.slice(-1)[0]?.id;
+      let lastShownMessageId: string | undefined = store.getState(selectHMSMessages)?.slice(-1)[0]?.id;
       const unsubscribeMessages = store.subscribe(messages => {
         const result = pickIncomingMessage(messages, lastShownMessageId, store.getState(selectLocalPeerID));
         lastShownMessageId = result.lastShownMessageId;
