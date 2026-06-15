@@ -51,7 +51,7 @@
     "reselect": "4.0.0",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^2.0.6",
-    "uuid": "^8.3.2",
+    "uuid": "^11.1.1",
     "webrtc-adapter": "^8.0.0",
     "zustand": "3.5.7"
   },
