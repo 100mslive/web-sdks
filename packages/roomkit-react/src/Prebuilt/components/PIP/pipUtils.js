@@ -47,9 +47,12 @@ export function resetPIPCanvasColors() {
  * All videos will respect their aspect ratios.
  */
 export function drawVideoElementsOnCanvas(videoElements, canvas, message) {
+  const ctx = canvas?.getContext('2d');
+  if (!ctx) {
+    return;
+  }
   let videoTiles = videoElements.filter(videoElement => videoElement.srcObject !== null);
 
-  const ctx = canvas.getContext('2d');
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -254,10 +257,13 @@ function drawMessageBubble(ctx, canvas, message) {
   ctx.textBaseline = 'top';
   ctx.fillStyle = textColor;
 
+  // measure with the font currently set on the context
+  const measure = str => ctx.measureText(str).width;
+
   // sender name
   ctx.font = BUBBLE_SENDER_FONT;
   ctx.fillText(
-    truncateToWidth(ctx, message.senderName || 'Anonymous', innerWidth),
+    truncateToWidth(measure, message.senderName || 'Anonymous', innerWidth),
     x + BUBBLE_PADDING_X,
     y + BUBBLE_PADDING_Y,
   );
@@ -266,7 +272,7 @@ function drawMessageBubble(ctx, canvas, message) {
   ctx.font = BUBBLE_TEXT_FONT;
   ctx.globalAlpha = 0.9;
   ctx.fillText(
-    truncateToWidth(ctx, message.text || '', innerWidth),
+    truncateToWidth(measure, message.text || '', innerWidth),
     x + BUBBLE_PADDING_X,
     y + BUBBLE_PADDING_Y + BUBBLE_SENDER_LINE_HEIGHT + BUBBLE_LINE_GAP,
   );
@@ -289,20 +295,36 @@ function traceRoundedRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
+const ELLIPSIS = '…';
+
 /**
- * Truncate text with an ellipsis so it fits within maxWidth for the current ctx font.
+ * Truncate `text` with an ellipsis so it fits within `maxWidth`, using the
+ * supplied `measure(str) => number` to size candidates. Pure and injectable so
+ * it can be unit-tested without a real canvas. Binary-searches the kept prefix
+ * length instead of trimming one char at a time, so cost is O(log n) measures
+ * rather than O(n) per frame.
+ * @param {(text: string) => number} measure returns rendered width of a string
+ * @param {string} text
+ * @param {number} maxWidth
+ * @returns {string}
  */
-function truncateToWidth(ctx, text, maxWidth) {
+export function truncateToWidth(measure, text, maxWidth) {
   if (!text) {
     return '';
   }
-  if (ctx.measureText(text).width <= maxWidth) {
+  if (measure(text) <= maxWidth) {
     return text;
   }
-  const ellipsis = '…';
-  let truncated = text;
-  while (truncated.length > 0 && ctx.measureText(truncated + ellipsis).width > maxWidth) {
-    truncated = truncated.slice(0, -1);
+  // Largest prefix length whose prefix + ellipsis still fits.
+  let lo = 0;
+  let hi = text.length;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (measure(text.slice(0, mid) + ELLIPSIS) <= maxWidth) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
   }
-  return truncated + ellipsis;
+  return text.slice(0, lo) + ELLIPSIS;
 }

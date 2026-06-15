@@ -1,22 +1,15 @@
 import * as workerTimers from 'worker-timers';
 import { HMSActions, HMSPeer, HMSTrack, HMSVideoTrack } from '@100mslive/react-sdk';
+// prettier-ignore
 // @ts-ignore: No implicit any
-import { drawVideoElementsOnCanvas, dummyChangeInCanvas, resetPIPCanvasColors } from './pipUtils';
+import { drawVideoElementsOnCanvas, dummyChangeInCanvas, PIP_CANVAS_HEIGHT, PIP_CANVAS_WIDTH, resetPIPCanvasColors } from './pipUtils';
+import { PIPIncomingMessage } from './pipMessageUtils';
 import { isIOS, isMacOS, isSafari } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
-const DEFAULT_CANVAS_WIDTH = 480;
-// Keep in sync with PIP_CANVAS_HEIGHT in pipUtils. A bit taller than the video-only
-// size so the incoming-chat bubble overlays the bottom band without hiding much video.
-const DEFAULT_CANVAS_HEIGHT = 360;
 const LEAVE_EVENT_NAME = 'leavepictureinpicture';
 // how long an incoming chat bubble stays on the PIP canvas before it is removed
 const MESSAGE_TTL_MS = 4000;
-
-export interface PIPChatMessage {
-  senderName: string;
-  text: string;
-}
 
 enum PIPStates {
   starting = 'starting',
@@ -44,7 +37,7 @@ class PipManager {
   private onStateChange: ((value: boolean) => void) | null = null;
   private tracksToShow: Array<string> = [];
   private state: PIPStates = PIPStates.stopped;
-  private latestMessage: PIPChatMessage | null = null;
+  private latestMessage: PIPIncomingMessage | null = null;
   private messageShownAt = 0;
 
   constructor() {
@@ -59,7 +52,7 @@ class PipManager {
    * Show an incoming chat message as a transient bubble on the PIP canvas.
    * The bubble auto-dismisses after MESSAGE_TTL_MS (handled in the render loop).
    */
-  setLatestMessage(message: PIPChatMessage) {
+  setLatestMessage(message: PIPIncomingMessage) {
     this.latestMessage = message;
     this.messageShownAt = Date.now();
   }
@@ -68,7 +61,7 @@ class PipManager {
    * @private returns the current message if it is still within its display
    * window, clearing it once expired.
    */
-  private getActiveMessage(): PIPChatMessage | null {
+  private getActiveMessage(): PIPIncomingMessage | null {
     if (this.latestMessage && Date.now() - this.messageShownAt < MESSAGE_TTL_MS) {
       return this.latestMessage;
     }
@@ -214,11 +207,11 @@ class PipManager {
 
   initializeCanvasAndVideoElement() {
     const canvas = document.createElement('canvas');
-    canvas.width = DEFAULT_CANVAS_WIDTH;
-    canvas.height = DEFAULT_CANVAS_HEIGHT;
+    canvas.width = PIP_CANVAS_WIDTH;
+    canvas.height = PIP_CANVAS_HEIGHT;
     const pipVideo = document.createElement('video');
-    pipVideo.width = DEFAULT_CANVAS_WIDTH;
-    pipVideo.height = DEFAULT_CANVAS_HEIGHT;
+    pipVideo.width = PIP_CANVAS_WIDTH;
+    pipVideo.height = PIP_CANVAS_HEIGHT;
     pipVideo.muted = true;
     pipVideo.srcObject = canvas.captureStream();
     return { canvas, pipVideo };
@@ -245,10 +238,18 @@ class PipManager {
       if (this.state === PIPStates.stopping || this.state === PIPStates.stopped) {
         return;
       }
-      if (this.state === PIPStates.started) {
-        drawVideoElementsOnCanvas(this.videoElements, this.canvas, this.getActiveMessage());
+      try {
+        if (this.state === PIPStates.started) {
+          drawVideoElementsOnCanvas(this.videoElements, this.canvas, this.getActiveMessage());
+        }
+      } catch (error) {
+        // A draw failure (e.g. an unexpected canvas op throwing) must never kill
+        // the loop — that would freeze the PIP video on its last frame forever.
+        // Log and keep going; the next frame will try again.
+        console.error('error drawing pip canvas', error);
+      } finally {
+        this.renderLoop();
       }
-      this.renderLoop();
     }, delay);
   }
 

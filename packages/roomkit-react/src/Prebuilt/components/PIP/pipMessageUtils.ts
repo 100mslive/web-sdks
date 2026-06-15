@@ -15,11 +15,11 @@ export interface PickIncomingMessageResult {
 /**
  * Pick the newest incoming text message that arrived after `lastShownMessageId`.
  *
- * Chat messages are appended to the store in batches (the store debounces the
- * 'newMessage' action by ~150ms), so a single subscription fire can carry
- * several new messages. We therefore scan every message appended since we last
- * looked rather than just the tail — inspecting only the last entry would drop
- * incoming messages whenever a batch ends with our own or a non-text message.
+ * Chat messages are appended to the store in batches (the 'newMessage' action is
+ * throttled through `ActionBatcher`, ~150ms), so a single subscription fire can
+ * carry several new messages. We therefore scan every message appended since we
+ * last looked rather than just the tail — inspecting only the last entry would
+ * drop incoming messages whenever a batch ends with our own or a non-text one.
  *
  * Always returns the id to advance to (past every message scanned this fire) so
  * the caller never re-inspects the same messages, regardless of whether one is
@@ -37,25 +37,27 @@ export function pickIncomingMessage(
   if (!messages?.length) {
     return { message: null, lastShownMessageId };
   }
+  const newLastShownMessageId = messages[messages.length - 1].id;
   const lastShownIndex = messages.findIndex(message => message.id === lastShownMessageId);
+  // If the cursor isn't found (undefined seed, or the seeded id was pruned from
+  // the store in a long session), don't rescan all history — that would resurface
+  // a stale message as a new bubble. Advance to the tail and show nothing.
+  if (lastShownMessageId !== undefined && lastShownIndex === -1) {
+    return { message: null, lastShownMessageId: newLastShownMessageId };
+  }
   const freshMessages = messages.slice(lastShownIndex + 1);
   if (!freshMessages.length) {
     return { message: null, lastShownMessageId };
   }
-  const newLastShownMessageId = messages[messages.length - 1].id;
-  const latestIncoming = [...freshMessages]
-    .reverse()
-    .find(
-      message =>
-        message.sender &&
-        message.sender !== localPeerId &&
-        typeof message.message === 'string' &&
-        message.message.trim().length > 0,
-    );
-  return {
-    message: latestIncoming
-      ? { senderName: latestIncoming.senderName || 'Anonymous', text: latestIncoming.message }
-      : null,
-    lastShownMessageId: newLastShownMessageId,
-  };
+  for (let i = freshMessages.length - 1; i >= 0; i--) {
+    const candidate = freshMessages[i];
+    const text = candidate.message;
+    if (candidate.sender && candidate.sender !== localPeerId && typeof text === 'string' && text.trim().length > 0) {
+      return {
+        message: { senderName: candidate.senderName ?? 'Anonymous', text },
+        lastShownMessageId: newLastShownMessageId,
+      };
+    }
+  }
+  return { message: null, lastShownMessageId: newLastShownMessageId };
 }

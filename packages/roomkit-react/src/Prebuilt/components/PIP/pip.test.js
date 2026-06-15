@@ -1,5 +1,6 @@
 import { PictureInPicture } from './PIPManager';
 import { pickIncomingMessage } from './pipMessageUtils';
+import { truncateToWidth } from './pipUtils';
 
 describe('pip manager tests', () => {
   /**
@@ -166,6 +167,46 @@ describe('pip manager tests', () => {
       const messages = [msg('m1', 'p1', 'hello', undefined)];
       const result = pickIncomingMessage(messages, undefined, LOCAL);
       expect(result.message).toEqual({ senderName: 'Anonymous', text: 'hello' });
+    });
+
+    test('when lastShownMessageId is pruned (not found), does not rescan history', () => {
+      // Regression: a stale/pruned cursor must not resurface old messages. We
+      // advance to the tail and show nothing, rather than slice(0) the whole list.
+      const messages = [msg('m1', 'p1', 'old', 'Alice'), msg('m2', 'p2', 'older still', 'Bob')];
+      const result = pickIncomingMessage(messages, 'pruned-id', LOCAL);
+      expect(result.message).toBeNull();
+      expect(result.lastShownMessageId).toBe('m2');
+    });
+  });
+
+  /**
+   * truncateToWidth is pure and injectable (takes a measure fn), so we can test
+   * it with a simple 1-unit-per-char stub — no real canvas needed.
+   */
+  describe('truncateToWidth', () => {
+    // each char = 1 unit, ellipsis '…' = 1 unit
+    const measure = str => str.length;
+
+    test('returns text unchanged when it fits', () => {
+      expect(truncateToWidth(measure, 'hello', 10)).toBe('hello');
+      expect(truncateToWidth(measure, 'hello', 5)).toBe('hello');
+    });
+
+    test('returns empty string for empty/falsy input', () => {
+      expect(truncateToWidth(measure, '', 10)).toBe('');
+      expect(truncateToWidth(measure, undefined, 10)).toBe('');
+    });
+
+    test('truncates with an ellipsis to fit maxWidth', () => {
+      // 'hello world' = 11; maxWidth 6 -> keep 5 chars + '…' = 6
+      expect(truncateToWidth(measure, 'hello world', 6)).toBe('hello…');
+    });
+
+    test('keeps as many chars as fit (binary search boundary)', () => {
+      // maxWidth 4 -> 3 chars + '…' = 4
+      expect(truncateToWidth(measure, 'abcdef', 4)).toBe('abc…');
+      // maxWidth 1 -> 0 chars + '…' = 1
+      expect(truncateToWidth(measure, 'abcdef', 1)).toBe('…');
     });
   });
 });

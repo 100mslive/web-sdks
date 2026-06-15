@@ -80,10 +80,14 @@ export const ActivatedPIP = () => {
       // that arrive after PIP starts trigger a bubble.
       let lastShownMessageId: string | undefined = store.getState(selectHMSMessages)?.slice(-1)[0]?.id;
       const unsubscribeMessages = store.subscribe(messages => {
-        const result = pickIncomingMessage(messages, lastShownMessageId, store.getState(selectLocalPeerID));
-        lastShownMessageId = result.lastShownMessageId;
-        if (result.message) {
-          PictureInPicture.setLatestMessage(result.message);
+        try {
+          const result = pickIncomingMessage(messages, lastShownMessageId, store.getState(selectLocalPeerID));
+          lastShownMessageId = result.lastShownMessageId;
+          if (result.message) {
+            PictureInPicture.setLatestMessage(result.message);
+          }
+        } catch (err) {
+          console.error('error surfacing pip chat message', err);
         }
       }, selectHMSMessages);
 
