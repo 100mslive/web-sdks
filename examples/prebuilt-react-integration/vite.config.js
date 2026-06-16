@@ -23,5 +23,11 @@ export default defineConfig({
   plugins: [react(), mediapipe_workaround()],
   define: {
     'process.env': {},
-  }
+  },
+  // esbuild 0.28 (pinned for GHSA-gv7w-rqvm-qjhr) refuses to downlevel some
+  // destructuring in prebundled deps for the default browser target; this is a
+  // demo app, so target modern browsers and skip downleveling.
+  build: {
+    target: 'esnext',
+  },
 });
