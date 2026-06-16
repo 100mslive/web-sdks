@@ -1,9 +1,9 @@
 import * as workerTimers from 'worker-timers';
 import { HMSActions, HMSPeer, HMSTrack, HMSVideoTrack } from '@100mslive/react-sdk';
+import { PIPIncomingMessage } from './pipMessageUtils';
 // prettier-ignore
 // @ts-ignore: No implicit any
 import { drawVideoElementsOnCanvas, dummyChangeInCanvas, PIP_CANVAS_HEIGHT, PIP_CANVAS_WIDTH, resetPIPCanvasColors } from './pipUtils';
-import { PIPIncomingMessage } from './pipMessageUtils';
 import { isIOS, isMacOS, isSafari } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
