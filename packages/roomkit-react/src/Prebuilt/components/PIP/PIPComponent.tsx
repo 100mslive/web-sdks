@@ -1,9 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { selectPeers, selectTracksMap, useHMSActions, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectPeers,
+  selectTracksMap,
+  useHMSActions,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
+import { pickIncomingMessage } from './pipMessageUtils';
 // @ts-ignore: No implicit Any
 import { MediaSession } from './SetupMediaSession';
 // @ts-ignore: No implicit Any
@@ -57,7 +65,7 @@ export const ActivatedPIP = () => {
 
   useEffect(() => {
     function subscribeToStore() {
-      return store.subscribe(tracksMap => {
+      const unsubscribeTracks = store.subscribe(tracksMap => {
         let pipPeers = store.getState(selectPeers);
         if (pinnedTrack) {
           pipPeers = pipPeers.filter(peer => pinnedTrack.peerId === peer.id);
@@ -66,6 +74,27 @@ export const ActivatedPIP = () => {
           console.error('error in updating pip', err);
         });
       }, selectTracksMap);
+
+      // Show incoming chat messages (from other peers) as a transient bubble on
+      // the PIP canvas. Seed with the latest existing message id so only messages
+      // that arrive after PIP starts trigger a bubble.
+      let lastShownMessageId: string | undefined = store.getState(selectHMSMessages)?.slice(-1)[0]?.id;
+      const unsubscribeMessages = store.subscribe(messages => {
+        try {
+          const result = pickIncomingMessage(messages, lastShownMessageId, store.getState(selectLocalPeerID));
+          lastShownMessageId = result.lastShownMessageId;
+          if (result.message) {
+            PictureInPicture.setLatestMessage(result.message);
+          }
+        } catch (err) {
+          console.error('error surfacing pip chat message', err);
+        }
+      }, selectHMSMessages);
+
+      return () => {
+        unsubscribeTracks();
+        unsubscribeMessages();
+      };
     }
     let unsubscribe: (() => void) | undefined = PictureInPicture.isOn() ? subscribeToStore() : undefined;
     PictureInPicture.listenToStateChange(isOn => {

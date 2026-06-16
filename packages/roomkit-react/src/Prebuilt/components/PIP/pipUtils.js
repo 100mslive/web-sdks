@@ -1,5 +1,13 @@
+// Static PIP canvas dimensions. Kept a little larger than the older video-only
+// size (480x320) so an incoming chat bubble can overlay the bottom band without
+// covering much of the (now bigger) video. The canvas is never resized at runtime.
+export const PIP_CANVAS_WIDTH = 480;
+export const PIP_CANVAS_HEIGHT = 360;
+
 let CANVAS_FILL_COLOR;
 let CANVAS_STROKE_COLOR;
+let BUBBLE_FILL_COLOR;
+let BUBBLE_TEXT_COLOR;
 
 function setPIPCanvasColors() {
   if (!CANVAS_FILL_COLOR) {
@@ -12,11 +20,23 @@ function setPIPCanvasColors() {
       .getComputedStyle(document.documentElement)
       .getPropertyValue('--hms-ui-colors-border_bright');
   }
+  if (!BUBBLE_FILL_COLOR) {
+    BUBBLE_FILL_COLOR = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--hms-ui-colors-surface_default');
+  }
+  if (!BUBBLE_TEXT_COLOR) {
+    BUBBLE_TEXT_COLOR = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--hms-ui-colors-on_surface_high');
+  }
 }
 
 export function resetPIPCanvasColors() {
   CANVAS_FILL_COLOR = '';
   CANVAS_STROKE_COLOR = '';
+  BUBBLE_FILL_COLOR = '';
+  BUBBLE_TEXT_COLOR = '';
 }
 /**
  * no tile - blank canvas, black image
@@ -26,10 +46,13 @@ export function resetPIPCanvasColors() {
  * 4 tiles - two rows two columns - all equal size
  * All videos will respect their aspect ratios.
  */
-export function drawVideoElementsOnCanvas(videoElements, canvas) {
+export function drawVideoElementsOnCanvas(videoElements, canvas, message) {
+  const ctx = canvas?.getContext('2d');
+  if (!ctx) {
+    return;
+  }
   let videoTiles = videoElements.filter(videoElement => videoElement.srcObject !== null);
 
-  const ctx = canvas.getContext('2d');
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -37,10 +60,16 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
   if (videoTiles.length === 0) {
     // no tile to render, render black image
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    return;
+  } else {
+    fillGridTiles(videoTiles.slice(0, 4), ctx, canvas);
   }
 
-  fillGridTiles(videoTiles.slice(0, 4), ctx, canvas);
+  // Overlay the latest incoming chat message as a transient bubble. Drawn on top
+  // of the video (the canvas is not resized) and sized to occupy only the bottom
+  // band so it never covers much of the video.
+  if (message && (message.senderName || message.text)) {
+    drawMessageBubble(ctx, canvas, message);
+  }
 }
 
 // this is to send some data for stream and resolve video element's play for a
@@ -58,8 +87,8 @@ export function dummyChangeInCanvas(canvas) {
  */
 function fillGridTiles(videoElements, ctx, canvas) {
   const offset = 8;
-  canvas.width = 480;
-  canvas.height = 320;
+  canvas.width = PIP_CANVAS_WIDTH;
+  canvas.height = PIP_CANVAS_HEIGHT;
 
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -180,4 +209,122 @@ function getRenderDimensions(video, width, height) {
     finalHeight = (video.videoHeight / video.videoWidth) * width;
   }
   return { width: finalWidth, height: finalHeight };
+}
+
+// Sizes are in canvas pixels (canvas is 480x360). The browser upscales the PIP
+// window well beyond that, so these are kept generous to stay legible after
+// upscaling rather than rendering as a tiny strip.
+const BUBBLE_MARGIN = 14;
+const BUBBLE_PADDING_X = 16;
+const BUBBLE_PADDING_Y = 14;
+const BUBBLE_SENDER_LINE_HEIGHT = 22;
+const BUBBLE_TEXT_LINE_HEIGHT = 24;
+const BUBBLE_LINE_GAP = 4;
+const BUBBLE_RADIUS = 12;
+const BUBBLE_SENDER_FONT = '600 18px Inter, Arial, sans-serif';
+const BUBBLE_TEXT_FONT = '400 19px Inter, Arial, sans-serif';
+
+/**
+ * Draw a translucent, bottom-anchored chat bubble showing the latest incoming
+ * message (sender name + single, ellipsised line of text). Styled like the
+ * in-app chat row but as a caption-style overlay so it reads over video.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {HTMLCanvasElement} canvas
+ * @param {{ senderName?: string, text?: string }} message
+ */
+function drawMessageBubble(ctx, canvas, message) {
+  const bubbleWidth = canvas.width - BUBBLE_MARGIN * 2;
+  // sender line + gap + one message line
+  const bubbleHeight = BUBBLE_PADDING_Y * 2 + BUBBLE_SENDER_LINE_HEIGHT + BUBBLE_LINE_GAP + BUBBLE_TEXT_LINE_HEIGHT;
+  const x = BUBBLE_MARGIN;
+  const y = canvas.height - bubbleHeight - BUBBLE_MARGIN;
+  const innerWidth = bubbleWidth - BUBBLE_PADDING_X * 2;
+
+  ctx.save();
+
+  // translucent rounded background so the video remains partially visible
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = BUBBLE_FILL_COLOR || CANVAS_FILL_COLOR;
+  traceRoundedRect(ctx, x, y, bubbleWidth, bubbleHeight, BUBBLE_RADIUS);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = CANVAS_STROKE_COLOR;
+  traceRoundedRect(ctx, x, y, bubbleWidth, bubbleHeight, BUBBLE_RADIUS);
+  ctx.stroke();
+
+  const textColor = BUBBLE_TEXT_COLOR || '#ffffff';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = textColor;
+
+  // measure with the font currently set on the context
+  const measure = str => ctx.measureText(str).width;
+
+  // sender name
+  ctx.font = BUBBLE_SENDER_FONT;
+  ctx.fillText(
+    truncateToWidth(measure, message.senderName || 'Anonymous', innerWidth),
+    x + BUBBLE_PADDING_X,
+    y + BUBBLE_PADDING_Y,
+  );
+
+  // message text (single line)
+  ctx.font = BUBBLE_TEXT_FONT;
+  ctx.globalAlpha = 0.9;
+  ctx.fillText(
+    truncateToWidth(measure, message.text || '', innerWidth),
+    x + BUBBLE_PADDING_X,
+    y + BUBBLE_PADDING_Y + BUBBLE_SENDER_LINE_HEIGHT + BUBBLE_LINE_GAP,
+  );
+
+  ctx.restore();
+}
+
+/**
+ * Trace a rounded-rectangle path (caller is responsible for fill/stroke).
+ * Avoids relying on the not-universally-supported ctx.roundRect().
+ */
+function traceRoundedRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
+}
+
+const ELLIPSIS = '…';
+
+/**
+ * Truncate `text` with an ellipsis so it fits within `maxWidth`, using the
+ * supplied `measure(str) => number` to size candidates. Pure and injectable so
+ * it can be unit-tested without a real canvas. Binary-searches the kept prefix
+ * length instead of trimming one char at a time, so cost is O(log n) measures
+ * rather than O(n) per frame.
+ * @param {(text: string) => number} measure returns rendered width of a string
+ * @param {string} text
+ * @param {number} maxWidth
+ * @returns {string}
+ */
+export function truncateToWidth(measure, text, maxWidth) {
+  if (!text) {
+    return '';
+  }
+  if (measure(text) <= maxWidth) {
+    return text;
+  }
+  // Largest prefix length whose prefix + ellipsis still fits.
+  let lo = 0;
+  let hi = text.length;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (measure(text.slice(0, mid) + ELLIPSIS) <= maxWidth) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return text.slice(0, lo) + ELLIPSIS;
 }
