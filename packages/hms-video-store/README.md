@@ -1,4 +1,4 @@
-# 100ms Reactive Store
+# 100ms Web SDK
 
 [![NPM](https://badgen.net/npm/v/@100mslive/hms-video-store?color=green)](https://www.npmjs.com/package/@100mslive/hms-video-store)
 [![Lint, Test and Build](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml/badge.svg)](https://github.com/100mslive/web-sdks/actions/workflows/lint-test-build.yml)
@@ -8,7 +8,7 @@
 
 ![Architecture](images/architecture.png)
 
-This is an addon to the core sdk provided by 100ms. It abstracts away the
+This is the core sdk helping you power your live interactions using 100ms. It abstracts away the
 intricacies of data management and provides
 a flux based reactive data store where data flows in only one direction.
 
@@ -20,10 +20,7 @@ participant. Local states and improper handling of actions or missing corner cas
 state duplication etc. have a high potential to make the data mutually inconsistent
 and out of sync with the source of truth.
 
-This is an opinionated reactive layer on top of our core sdk which takes some
-control in order to provide an even easier usability and integration experience.
-Your UI components can forget about local states, and tracking what actions are happening,
-instead focusing only on giving the best possible experience to the end users.
+Check the [SDK Mental Model](https://www.100ms.live/docs/javascript/v2/quickstart/mental-model) to build a mental model of how everything works and what all the SDK abstracts away.
 
 There are two important pieces, store for what you want to show and actions for what
 you want to do -
@@ -72,8 +69,7 @@ hmsStore.subscribe(onSpeakerUpdate, selectDominantSpeaker);
 ## Framework specific wrappers
 
 Most of the popular javascript frameworks are reactive in nature and have some
-kind of associated concept which can simplify development further. We plan to
-provide a few framework specific wrappers as well for smoother integration.
+kind of associated concept which can simplify development further.
 
 ### React
 
@@ -94,6 +90,8 @@ function join() {
     </>
 }
 ```
+
+Check more over at [react-sdk](https://github.com/100mslive/web-sdks/tree/main/packages/react-sdk) and the [docs](https://www.100ms.live/docs/javascript/v2/quickstart/react-quickstart).
 
 
 ## Out of Box Support for [Redux Devtools Extension](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
