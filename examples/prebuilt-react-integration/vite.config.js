@@ -30,4 +30,12 @@ export default defineConfig({
   build: {
     target: 'esnext',
   },
+  // Same esbuild 0.28 limitation as `build.target` above, but for the dev-time
+  // dependency pre-bundle — without this the dev server fails to optimize deps
+  // that ship modern destructuring (effects-sdk, tldraw).
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
 });
