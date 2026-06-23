@@ -40,10 +40,9 @@ import { NoiseCancellation } from '../../AudioVideoToggle';
 import { EmojiReaction } from '../../EmojiReaction';
 // @ts-ignore: No implicit any
 import { StopRecordingInSheet } from '../../Header/StreamActions';
+import { lazyWithSuspense } from '../../LazyLoad';
 // @ts-ignore: No implicit any
 import SettingsModal from '../../Settings/SettingsModal';
-// @ts-ignore: No implicit any
-import { StatsForNerds } from '../../StatsForNerds';
 // @ts-ignore: No implicit any
 import { ToastManager } from '../../Toast/ToastManager';
 // @ts-ignore: No implicit any
@@ -68,6 +67,12 @@ import { useLandscapeHLSStream, useMobileHLSStream, useRecordingHandler } from '
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
 import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
+
+// StatsForNerds is a debug overlay only opened on demand from the More Settings sheet.
+const StatsForNerds = lazyWithSuspense<{ open: boolean; onOpenChange: (value: boolean) => void }>(
+  // @ts-ignore: No implicit Any
+  () => import('../../StatsForNerds').then(m => ({ default: m.StatsForNerds })),
+);
 
 const MODALS = {
   CHANGE_NAME: 'changeName',

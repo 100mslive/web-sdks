@@ -9,6 +9,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import { ensureEmojiData } from '../components/Footer/emojiData';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config as cssConfig, keyframes } from '../../Theme';
@@ -57,6 +58,8 @@ export function FlyingEmoji() {
       if (!emojiId || !senderId || document.hidden) {
         return;
       }
+      // Ensure emoji-mart is initialized before rendering <em-emoji> for incoming reactions.
+      await ensureEmojiData();
       let senderPeerName = vanillaStore.getState(selectPeerNameByID(senderId));
       if (!senderPeerName && isLargeRoom) {
         const sender = await hmsActions.getPeer(senderId);

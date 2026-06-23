@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
+import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
+import FullPageProgress from '../components/FullPageProgress';
+import { lazyWithSuspense } from '../components/LazyLoad';
 import { Polls } from '../components/Polls/Polls';
 import { RoomDetailsPane } from '../components/RoomDetails/RoomDetailsPane';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 import VideoTile from '../components/VideoTile';
-import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Flex } from '../../Layout';
 import { config as cssConfig, styled } from '../../Theme';
 // @ts-ignore: No implicit Any
@@ -22,6 +24,12 @@ import {
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
+
+// VBPicker (virtual-background UI) is only rendered when the VB side pane is opened.
+const VBPicker = lazyWithSuspense<{ backgroundMedia: VirtualBackgroundMedia[] }>(
+  () => import('../components/VirtualBackground/VBPicker').then(m => ({ default: m.VBPicker })),
+  { loading: <FullPageProgress /> },
+);
 
 const Wrapper = styled('div', {
   w: '$100',

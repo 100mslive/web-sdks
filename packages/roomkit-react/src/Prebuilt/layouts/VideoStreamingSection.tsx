@@ -15,13 +15,13 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { PeopleAddIcon, ShareScreenIcon } from '@100mslive/react-icons';
+import FullPageProgress from '../components/FullPageProgress';
+import { lazyWithSuspense } from '../components/LazyLoad';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
 import { config } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
-// @ts-ignore: No implicit Any
-import HLSView from './HLSView';
 // @ts-ignore: No implicit Any
 import { PDFView } from './PDFView';
 import SidePane from './SidePane';
@@ -32,6 +32,14 @@ import { usePDFConfig, useUrlToEmbed } from '../components/AppData/useUISettings
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream, useWaitingRoomInfo } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
+
+// HLSView (and its hls-player/hls.js dependency) is only needed in HLS viewer mode — lazy-load
+// it so it does not weigh down the conference/preview path. See ../components/LazyLoad.
+const HLSView = lazyWithSuspense(
+  // @ts-ignore: No implicit Any
+  () => import('./HLSView'),
+  { loading: <FullPageProgress /> },
+);
 
 export const VideoStreamingSection = ({
   screenType,

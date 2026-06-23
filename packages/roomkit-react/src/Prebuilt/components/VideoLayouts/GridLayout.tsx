@@ -9,15 +9,23 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import FullPageProgress from '../FullPageProgress';
+import { lazyWithSuspense } from '../LazyLoad';
 import { EqualProminence } from './EqualProminence';
+import { LayoutProps } from './interface';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
-import { WhiteboardLayout } from './WhiteboardLayout';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 import { APP_DATA } from '../../common/constants';
+
+// WhiteboardLayout wraps @100mslive/hms-whiteboard and only renders when a whiteboard is open.
+const WhiteboardLayout = lazyWithSuspense<LayoutProps>(
+  () => import('./WhiteboardLayout').then(m => ({ default: m.WhiteboardLayout })),
+  { loading: <FullPageProgress /> },
+);
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;

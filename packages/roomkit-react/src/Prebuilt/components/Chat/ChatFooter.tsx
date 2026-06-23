@@ -1,11 +1,10 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import data from '@emoji-mart/data/sets/14/apple.json';
-import Picker from '@emoji-mart/react';
 import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
+import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Loading, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
+import { lazyWithSuspense } from '../LazyLoad';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit any
@@ -22,6 +21,14 @@ import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_MESSAGE_LIMIT } from './utils';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+
+const EmojiPickerContent = lazyWithSuspense(() => import('./EmojiPickerContent'), {
+  loading: (
+    <Flex align="center" justify="center" css={{ size: '100%' }}>
+      <Loading />
+    </Flex>
+  ),
+});
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -41,7 +48,7 @@ const TextArea = styled('textarea', {
   },
 });
 
-function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
+function EmojiPicker({ onSelect }: { onSelect: (emoji: { native: string }) => void }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const ref = useEmojiPickerStyles(showEmoji);
   return (
@@ -67,7 +74,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
             }}
             ref={ref}
           >
-            <Picker onEmojiSelect={onSelect} data={data} previewPosition="none" skinPosition="search" />
+            <EmojiPickerContent onSelect={onSelect} />
           </Box>
         </Popover.Content>
       </Popover.Portal>

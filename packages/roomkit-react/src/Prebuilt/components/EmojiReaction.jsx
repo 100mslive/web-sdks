@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
-import data from '@emoji-mart/data/sets/14/apple.json';
-import { init } from 'emoji-mart';
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
@@ -22,8 +20,8 @@ import { useDropdownList } from './hooks/useDropdownList';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
-init({ data });
-
+// emoji-mart data + init is loaded lazily by EmojiCard (send path) and FlyingEmoji (receive
+// path) via ./Footer/emojiData, instead of eagerly at module load.
 export const EmojiReaction = ({ showCard = false }) => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);

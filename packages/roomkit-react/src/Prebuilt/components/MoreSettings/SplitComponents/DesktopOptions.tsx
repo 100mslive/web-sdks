@@ -26,6 +26,7 @@ import {
 } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Switch, Text, Tooltip } from '../../../..';
 import IconButton from '../../../IconButton';
+import { lazyWithSuspense } from '../../LazyLoad';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
 import { PIPChat } from '../../PIP/PIPChat';
@@ -39,8 +40,6 @@ import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 // @ts-ignore: No implicit any
 import StartRecording from '../../Settings/StartRecording';
-// @ts-ignore: No implicit any
-import { StatsForNerds } from '../../StatsForNerds';
 // @ts-ignore: No implicit any
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
 import { CaptionModal } from '../CaptionModal';
@@ -56,6 +55,12 @@ import { useMyMetadata } from '../../hooks/useMetadata';
 import { usePIPChat } from '../../PIP/usePIPChat';
 // @ts-ignore: No implicit any
 import { APP_DATA, isMacOS, SIDE_PANE_OPTIONS } from '../../../common/constants';
+
+// StatsForNerds is a debug overlay only opened on demand from the More Settings menu.
+const StatsForNerds = lazyWithSuspense<{ open: boolean; onOpenChange: (value: boolean) => void }>(
+  // @ts-ignore: No implicit Any
+  () => import('../../StatsForNerds').then(m => ({ default: m.StatsForNerds })),
+);
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
