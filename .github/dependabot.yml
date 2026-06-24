@@ -10,6 +10,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "10:00"
+      timezone: "Asia/Kolkata"
     groups:
       npm-minor-and-patch:
         patterns: ["*"]
@@ -20,6 +22,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "10:00"
+      timezone: "Asia/Kolkata"
     groups:
       actions-minor-and-patch:
         patterns: ["*"]
