@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v4
@@ -34,7 +34,7 @@ jobs:
         run: yarn docs
 
       - name: checkout 100ms-docs
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.DOCKER_GIT_TOKEN }}
           repository: 100mslive/100ms-docs
