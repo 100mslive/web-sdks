@@ -126,11 +126,11 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-virtual-background/dist/index.cjs.js",
+      "path": "packages/hms-virtual-background/dist/cjs/index.js",
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-virtual-background/dist/index.js",
+      "path": "packages/hms-virtual-background/dist/esm/index.js",
       "limit": "20 KB"
     },
     {
