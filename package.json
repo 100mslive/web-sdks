@@ -5,7 +5,7 @@
     "@babel/core": "^7.8.0",
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
-    "@size-limit/file": "^5.0.3",
+    "@size-limit/file": "^12.1.0",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.17",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
@@ -28,7 +28,7 @@
     "postcss": "^8.4.5",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.4.1",
-    "size-limit": "^5.0.3",
+    "size-limit": "^12.1.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0",
@@ -126,11 +126,11 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-virtual-background/dist/index.cjs.js",
+      "path": "packages/hms-virtual-background/dist/cjs/index.js",
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-virtual-background/dist/index.js",
+      "path": "packages/hms-virtual-background/dist/esm/index.js",
       "limit": "20 KB"
     },
     {
