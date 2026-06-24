@@ -4,7 +4,7 @@ import { PIPIncomingMessage } from './pipMessageUtils';
 // prettier-ignore
 // @ts-ignore: No implicit any
 import { drawVideoElementsOnCanvas, dummyChangeInCanvas, PIP_CANVAS_HEIGHT, PIP_CANVAS_WIDTH, resetPIPCanvasColors } from './pipUtils';
-import { isIOS, isMacOS, isSafari } from '../../common/constants';
+import { isIOS } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const LEAVE_EVENT_NAME = 'leavepictureinpicture';
@@ -75,6 +75,7 @@ class PipManager {
   reset() {
     console.debug('resetting PIP state');
     resetPIPCanvasColors();
+    this.pipVideo?.remove(); // unmount the hidden video element
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
     this.timeoutRef = 0; // setTimeout reference so it can be cancelled
@@ -91,7 +92,11 @@ class PipManager {
    * check if PIP is supported in this browser env
    */
   isSupported() {
-    return !!document.pictureInPictureEnabled && !isIOS && !(isMacOS && isSafari);
+    // Gate on the native Picture-in-Picture feature check. macOS Safari supports
+    // the standard API and is no longer excluded; iOS is kept out because it does
+    // not implement the standard document PiP API (it only has the non-standard
+    // video presentation-mode API, which this canvas-capture flow can't use).
+    return !!document.pictureInPictureEnabled && !isIOS;
   }
 
   /**
@@ -99,6 +104,23 @@ class PipManager {
    */
   isOn() {
     return !!document.pictureInPictureElement;
+  }
+
+  /**
+   * Pre-create the canvas and pip video element and start playing the canvas
+   * stream. Call this ahead of the actual PiP request (e.g. when the menu
+   * holding the PiP option opens) - Safari only honours
+   * requestPictureInPicture() while the click's user activation is alive, and
+   * awaiting a cold video.play() inside the click handler loses it
+   * (NotAllowedError). Chrome needs the video metadata loaded before the
+   * request, which warming up also guarantees.
+   * Safe to call repeatedly; no-op when unsupported or PiP is already active.
+   */
+  async warmup() {
+    if (!this.isSupported() || this.state !== PIPStates.stopped) {
+      return;
+    }
+    await this.initMediaElements();
   }
 
   /**
@@ -120,6 +142,11 @@ class PipManager {
     this.state = PIPStates.starting;
     try {
       await this.init(hmsActions, onStateChangeFn);
+      if (this.pipVideo?.paused) {
+        // warmup's muted autoplay can be blocked by browser policy - retry
+        // within this click's user activation
+        await this.pipVideo.play();
+      }
       // when user closes pip, call internal stop
       this.pipVideo?.addEventListener(LEAVE_EVENT_NAME, this.stop);
       this.renderLoop();
@@ -131,8 +158,9 @@ class PipManager {
       this.onStateChange?.(true);
       this.callListeners(true);
     } catch (err) {
-      console.error('error in request pip', err);
       this.state = PIPStates.stopped;
+      // let the caller handle the failure (e.g. surface a toast)
+      throw err;
     }
   }
 
@@ -213,7 +241,13 @@ class PipManager {
     pipVideo.width = PIP_CANVAS_WIDTH;
     pipVideo.height = PIP_CANVAS_HEIGHT;
     pipVideo.muted = true;
+    pipVideo.playsInline = true;
     pipVideo.srcObject = canvas.captureStream();
+    // Safari only enters PiP for video elements attached to the document -
+    // keep the pip source video mounted but visually hidden (not display:none,
+    // which would skip painting). Chrome works either way.
+    pipVideo.style.cssText = 'position:fixed;bottom:0;right:0;width:2px;height:2px;opacity:0;pointer-events:none;';
+    document.body.appendChild(pipVideo);
     return { canvas, pipVideo };
   }
 

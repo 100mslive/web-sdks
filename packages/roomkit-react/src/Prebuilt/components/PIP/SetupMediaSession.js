@@ -44,16 +44,31 @@ class SetupMediaSession {
     this.actions.leave();
   };
 
-  setUpHandlers = () => {
-    if (navigator.mediaSession) {
+  /**
+   * register the handler against the first action name the browser supports.
+   * Browsers throw a TypeError on action names they don't recognise, and the
+   * same action can go by different names (Chrome calls the leave action
+   * 'hangup', Safari exposes it as 'stop').
+   */
+  trySetActionHandler = (actionAliases, handler) => {
+    for (const action of actionAliases) {
       try {
-        navigator.mediaSession.setActionHandler('togglemicrophone', this.toggleMic);
-        navigator.mediaSession.setActionHandler('togglecamera', this.toggleCam);
-        navigator.mediaSession.setActionHandler('hangup', this.leave);
+        navigator.mediaSession.setActionHandler(action, handler);
+        return;
       } catch (err) {
-        console.error('error in setting media session handlers', err);
+        // unsupported alias, try the next one
       }
     }
+    console.warn(`media session action '${actionAliases.join("'/'")}' is not supported`);
+  };
+
+  setUpHandlers = () => {
+    if (!navigator.mediaSession) {
+      return;
+    }
+    this.trySetActionHandler(['togglemicrophone'], this.toggleMic);
+    this.trySetActionHandler(['togglecamera'], this.toggleCam);
+    this.trySetActionHandler(['hangup', 'stop'], this.leave);
   };
 }
 

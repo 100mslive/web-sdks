@@ -10,6 +10,8 @@ import {
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
 import { PictureInPicture } from './PIPManager';
 import { pickIncomingMessage } from './pipMessageUtils';
 // @ts-ignore: No implicit Any
@@ -28,12 +30,23 @@ const PIPComponent = ({ content = null }) => {
 
   const onPipToggle = useCallback(() => {
     if (!isPipOn) {
-      PictureInPicture.start(hmsActions, setIsPipOn).catch(err => console.error('error in starting pip', err));
+      PictureInPicture.start(hmsActions, setIsPipOn).catch(err => {
+        console.error('error in starting pip', err);
+        ToastManager.addToast({ title: 'Could not start Picture-in-Picture', variant: 'error' });
+      });
       MediaSession.setup(hmsActions, store);
     } else {
       PictureInPicture.stop().catch(err => console.error('error in stopping pip', err));
     }
   }, [hmsActions, isPipOn, store]);
+
+  useEffect(() => {
+    if (!isPipOn) {
+      // pre-warm the pip media elements so the request on click stays within
+      // Safari's user-activation window (see PipManager.warmup)
+      PictureInPicture.warmup().catch(err => console.error('error in pip warmup', err));
+    }
+  }, [isPipOn]);
 
   if (!PictureInPicture.isSupported()) {
     return null;
