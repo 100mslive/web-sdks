@@ -73,9 +73,9 @@
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
     "@tensorflow/tfjs-converter": "^3.19.0",
     "@tensorflow/tfjs-core": "^3.19.0",
-    "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
-    "@webassemblyjs/wasm-gen": "1.11.1",
-    "effects-sdk": "3.6.2",
+    "@webassemblyjs/helper-wasm-bytecode": "1.14.1",
+    "@webassemblyjs/wasm-gen": "1.14.1",
+    "effects-sdk": "3.9.1",
     "gifuct-js": "^2.1.2",
     "wasm-check": "^2.0.2"
   },
