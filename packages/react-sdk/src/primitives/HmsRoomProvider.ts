@@ -110,15 +110,27 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
   }, [actions, store, notifications, stats, isHMSStatsOn]);
 
   useEffect(() => {
-    if (isBrowser && leaveOnUnload) {
-      const unloadCallback = () => providerProps.actions.leave();
-      window.addEventListener('unload', unloadCallback);
-      return () => {
-        window.removeEventListener('unload', unloadCallback);
-      };
+    if (!isBrowser || !leaveOnUnload) {
+      return () => {};
     }
-
-    return () => {};
+    /*
+     * Chrome is deprecating the 'unload' event (gradually disabled by default through
+     * 2026, https://developer.chrome.com/docs/web-platform/deprecating-unload), and it
+     * never fired reliably on mobile or when a page enters the back/forward cache. Listen
+     * on the broader set of page-lifecycle events so the peer still leaves the room on tab
+     * close, navigation, or bfcache/freeze. 'freeze' is dispatched on document, the others
+     * on window. The leave is best-effort regardless — the server is the source of truth for
+     * a departed peer via signalling disconnect; these handlers just make it prompt.
+     */
+    const leaveCallback = () => providerProps.actions.leave();
+    window.addEventListener('pagehide', leaveCallback);
+    window.addEventListener('beforeunload', leaveCallback);
+    document.addEventListener('freeze', leaveCallback);
+    return () => {
+      window.removeEventListener('pagehide', leaveCallback);
+      window.removeEventListener('beforeunload', leaveCallback);
+      document.removeEventListener('freeze', leaveCallback);
+    };
   }, [leaveOnUnload, providerProps]);
 
   /*
