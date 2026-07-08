@@ -37,7 +37,7 @@
   "dependencies": {
     "@100mslive/hls-stats": "0.6.5",
     "eventemitter2": "^6.4.9",
-    "hls.js": "1.4.12"
+    "hls.js": "1.6.16"
   },
   "keywords": [
     "hls",
