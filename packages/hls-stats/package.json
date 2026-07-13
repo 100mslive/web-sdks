@@ -35,9 +35,9 @@
   "author": "Ragzzy-R",
   "license": "ISC",
   "devDependencies": {
-    "hls.js": "1.4.12"
+    "hls.js": "1.6.16"
   },
   "peerDependencies": {
-    "hls.js": "1.4.12"
+    "hls.js": "1.6.16"
   }
 }
