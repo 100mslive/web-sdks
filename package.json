@@ -92,7 +92,7 @@
     "@tootallnate/once": "^3.0.1",
     "follow-redirects": "^1.16.0",
     "@babel/plugin-transform-modules-systemjs": "^7.29.4",
-    "fast-uri": "^3.1.2",
+    "fast-uri": "^3.1.4",
     "ip-address": "^10.2.0",
     "postcss": "^8.5.14",
     "ua-parser-js": "^2.0.10",
