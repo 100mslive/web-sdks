@@ -1,7 +1,15 @@
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack, HMSLocalStream } from '../../internal';
+import { getAudioTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings';
+
+jest.mock('../../utils/track', () => ({
+  ...jest.requireActual('../../utils/track'),
+  getAudioTrack: jest.fn(),
+}));
+
+const getAudioTrackMock = getAudioTrack as jest.Mock;
 
 // jsdom has no AudioContext, HMSAudioPluginsManager creates one in the constructor
 beforeAll(() => {
@@ -11,31 +19,56 @@ beforeAll(() => {
   }));
 });
 
-const makeLocalAudioTrack = (eventBus: EventBus) => {
-  const nativeStream = { id: 'stream-1', getTracks: () => [] } as unknown as MediaStream;
-  const stream = new HMSLocalStream(nativeStream);
-  stream.setConnection({} as unknown as HMSPublishConnection);
-  const nativeTrack = {
-    id: 'track-1',
+/**
+ * An interrupted track on iOS comes back reporting live and unmuted while its capture unit stays
+ * stopped - which is exactly what this fake reports, so recovery here can only come from the
+ * interruption itself and not from the track flags.
+ */
+const makeNativeTrack = (id: string) =>
+  ({
+    id,
     kind: 'audio',
+    label: 'Fake mic',
     enabled: true,
-    getSettings: jest.fn(() => ({})),
+    muted: false,
+    readyState: 'live',
+    getSettings: jest.fn(() => ({ deviceId: 'mic-1' })),
+    getConstraints: jest.fn(() => ({})),
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-  } as unknown as MediaStreamTrack;
+    stop: jest.fn(),
+  } as unknown as MediaStreamTrack);
+
+const makeLocalAudioTrack = (eventBus: EventBus) => {
+  const nativeStream = {
+    id: 'stream-1',
+    getTracks: () => [],
+    addTrack: jest.fn(),
+    removeTrack: jest.fn(),
+  } as unknown as MediaStream;
+  const stream = new HMSLocalStream(nativeStream);
+  stream.setConnection({} as unknown as HMSPublishConnection);
   const settings = new HMSAudioTrackSettingsBuilder().build();
-  return new HMSLocalAudioTrack(stream, nativeTrack, 'regular', eventBus, settings);
+  return new HMSLocalAudioTrack(stream, makeNativeTrack('track-1'), 'regular', eventBus, settings);
 };
 
-describe('HMSLocalAudioTrack interruption events', () => {
+const setVisibility = (state: 'hidden' | 'visible') => {
+  Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
+};
+
+describe('HMSLocalAudioTrack interruptions', () => {
+  beforeEach(() => {
+    setVisibility('visible');
+    getAudioTrackMock.mockReset();
+    getAudioTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
+  });
+
   it('publishes an interruption on native mute and unmute', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean; reason: string; trackId: string }[] = [];
     eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
 
     const track = makeLocalAudioTrack(eventBus);
-    jest.spyOn(track, 'setEnabled').mockResolvedValue(undefined);
-
     (track as any).handleTrackMute();
     await track.handleTrackUnmute();
 
@@ -45,17 +78,90 @@ describe('HMSLocalAudioTrack interruption events', () => {
     ]);
   });
 
-  it('does not end the interruption when the track fails to recover', async () => {
+  it('reacquires the mic on interruption end even though the track reports live and unmuted', async () => {
+    const track = makeLocalAudioTrack(new EventBus());
+
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
+    expect(track.nativeTrack.id).toBe('track-2');
+  });
+
+  it('re-publishes the enabled state on recovery so remote peers resubscribe', async () => {
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localAudioEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+    const unpaused = jest.fn();
+    eventBus.localAudioUnmutedNatively.subscribe(unpaused);
+
+    const track = makeLocalAudioTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    // mute tells biz the peer is muted, recovery has to take that back
+    expect(enabledUpdates).toEqual([false, true]);
+    expect(unpaused).toHaveBeenCalledTimes(1);
+  });
+
+  // the cohort that never recovers today: the native unmute never arrives, the foreground event is
+  // the only trigger left
+  it('recovers from the foreground event alone when no native unmute arrives', async () => {
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localAudioEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+    const unpaused = jest.fn();
+    eventBus.localAudioUnmutedNatively.subscribe(unpaused);
+
+    const track = makeLocalAudioTrack(eventBus);
+    setVisibility('hidden');
+    (track as any).handleTrackMute();
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
+    expect(enabledUpdates).toEqual([false, true]);
+    expect(unpaused).toHaveBeenCalledTimes(1);
+  });
+
+  it('defers recovery while the page is hidden and recovers on foreground', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
     eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
 
+    const track = makeLocalAudioTrack(eventBus);
+    setVisibility('hidden');
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(getAudioTrackMock).not.toHaveBeenCalled();
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
+    expect(interruptions.map(i => i.started)).toEqual([true, false]);
+  });
+
+  it('recovers once when the native unmute and the foreground event both fire', async () => {
+    const track = makeLocalAudioTrack(new EventBus());
+
+    (track as any).handleTrackMute();
+    await Promise.all([track.handleTrackUnmute(), (track as any).handleVisibilityChange()]);
+
+    expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not end the interruption when the track fails to recover', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
     // eventemitter2 rethrows the reserved 'error' event when nothing is listening
     eventBus.error.subscribe(() => {});
+    getAudioTrackMock.mockRejectedValue(new Error('device in use'));
 
     const track = makeLocalAudioTrack(eventBus);
-    jest.spyOn(track, 'setEnabled').mockRejectedValue(new Error('device in use'));
-
     (track as any).handleTrackMute();
     await track.handleTrackUnmute();
 
