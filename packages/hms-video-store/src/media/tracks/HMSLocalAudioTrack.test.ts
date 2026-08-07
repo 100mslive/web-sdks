@@ -44,4 +44,21 @@ describe('HMSLocalAudioTrack interruption events', () => {
       { started: false, reason: 'track-unmuted-natively', trackId: track.trackId },
     ]);
   });
+
+  it('does not end the interruption when the track fails to recover', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    // eventemitter2 rethrows the reserved 'error' event when nothing is listening
+    eventBus.error.subscribe(() => {});
+
+    const track = makeLocalAudioTrack(eventBus);
+    jest.spyOn(track, 'setEnabled').mockRejectedValue(new Error('device in use'));
+
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
 });

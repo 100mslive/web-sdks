@@ -109,9 +109,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
     if (document.visibilityState === 'hidden') {
+      this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
       this.notifyInterruption({ started: true, reason: 'visibility-change' });
     } else {
-      this.notifyInterruption({ started: false, reason: 'visibility-change' });
+      this.sendInterruptionAnalytics({ started: false, reason: 'visibility-change' });
       if (this.permissionState && this.permissionState !== 'granted') {
         HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
         return;
@@ -119,6 +120,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
       try {
         await this.replaceTrackWith(this.settings);
+        this.notifyInterruption({ started: false, reason: 'visibility-change' });
       } catch (error) {
         this.eventBus.error.publish(error as HMSException);
       }
@@ -350,13 +352,23 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     });
   };
 
-  private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+  private sendInterruptionAnalytics({ started, reason }: { started: boolean; reason: string }) {
     this.eventBus.analytics.publish(this.sendInterruptionEvent({ started, reason }));
+  }
+
+  /**
+   * app facing interruption event. On interruption end this is published only after the track has
+   * actually recovered, so an app showing a "mic interrupted" prompt keeps it up while the mic is
+   * still unusable. The analytics event is not moved along with it - interruption.stop is what
+   * recovery rate is measured against.
+   */
+  private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
     this.eventBus.audioInterruption.publish({ started, reason, trackId: this.trackId });
   }
 
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
+    this.sendInterruptionAnalytics({ started: true, reason: 'track-muted-natively' });
     this.notifyInterruption({ started: true, reason: 'track-muted-natively' });
     this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
   };
@@ -364,9 +376,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   /** @internal */
   handleTrackUnmute = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
-    this.notifyInterruption({ started: false, reason: 'track-unmuted-natively' });
+    this.sendInterruptionAnalytics({ started: false, reason: 'track-unmuted-natively' });
     try {
       await this.setEnabled(this.enabled, true);
+      this.notifyInterruption({ started: false, reason: 'track-unmuted-natively' });
       // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
       this.eventBus.localAudioUnmutedNatively.publish();
     } catch (error) {

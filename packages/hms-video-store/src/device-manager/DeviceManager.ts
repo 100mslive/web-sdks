@@ -81,6 +81,11 @@ export class DeviceManager implements HMSDeviceManager {
   updateOutputDevice = async (deviceId?: string, isUserSelection?: boolean) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (!newDevice) {
+      HMSLogger.d(
+        this.TAG,
+        'updateOutputDevice - requested device not in the enumerated audioOutput list',
+        JSON.stringify({ deviceId, available: this.audioOutput.map(device => device.deviceId) }),
+      );
       return undefined;
     }
     // Only commit outputDevice + analytics + persisted selection AFTER the

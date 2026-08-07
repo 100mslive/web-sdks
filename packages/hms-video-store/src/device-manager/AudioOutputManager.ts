@@ -29,7 +29,13 @@ export class AudioOutputManager implements IAudioOutputManager {
   }
 
   async setDevice(deviceId?: string) {
+    HMSLogger.d('[AudioOutputManager]', 'setDevice requested', deviceId);
     const newDevice = await this.deviceManager.updateOutputDevice(deviceId, true);
+    HMSLogger.d(
+      '[AudioOutputManager]',
+      'setDevice result',
+      JSON.stringify({ requested: deviceId, applied: newDevice?.label, appliedId: newDevice?.deviceId }),
+    );
     if (newDevice) {
       // If any remote audio tracks were auto-paused by an OS audio-session
       // interruption (headset pull / incoming call / Bluetooth swap), the user
