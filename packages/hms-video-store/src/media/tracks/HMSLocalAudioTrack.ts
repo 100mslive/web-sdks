@@ -11,6 +11,7 @@ import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
+import { HMSAudioContextHandler } from '../../utils/media';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -182,6 +183,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private restoreCapture = async (reason: string) => {
+    /**
+     * iOS suspends the shared AudioContext for the duration of the interruption and does not resume
+     * it on its own. Plugins publish the destination node of that context, so with noise
+     * suppression on the published track stays silent until it is running again, and the audio level
+     * monitor reads zero. It is only resumed on join and on unblockAutoplay otherwise.
+     */
+    await HMSAudioContextHandler.resumeContext();
     await this.reacquireStaleTrack(reason);
     await this.setEnabled(this.enabled, true);
     this.notifyInterruption({ started: false, reason });

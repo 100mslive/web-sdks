@@ -11,12 +11,15 @@ jest.mock('../../utils/track', () => ({
 
 const getAudioTrackMock = getAudioTrack as jest.Mock;
 
+const audioContext = {
+  createMediaStreamSource: jest.fn(),
+  createMediaStreamDestination: jest.fn(),
+  resume: jest.fn(async () => {}),
+};
+
 // jsdom has no AudioContext, HMSAudioPluginsManager creates one in the constructor
 beforeAll(() => {
-  (global as any).AudioContext = jest.fn(() => ({
-    createMediaStreamSource: jest.fn(),
-    createMediaStreamDestination: jest.fn(),
-  }));
+  (global as any).AudioContext = jest.fn(() => audioContext);
 });
 
 /**
@@ -59,6 +62,7 @@ const setVisibility = (state: 'hidden' | 'visible') => {
 describe('HMSLocalAudioTrack interruptions', () => {
   beforeEach(() => {
     setVisibility('visible');
+    audioContext.resume.mockClear();
     getAudioTrackMock.mockReset();
     getAudioTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
   });
@@ -86,6 +90,8 @@ describe('HMSLocalAudioTrack interruptions', () => {
 
     expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
     expect(track.nativeTrack.id).toBe('track-2');
+    // plugins publish the destination node of this context, iOS leaves it suspended
+    expect(audioContext.resume).toHaveBeenCalled();
   });
 
   it('re-publishes the enabled state on recovery so remote peers resubscribe', async () => {
