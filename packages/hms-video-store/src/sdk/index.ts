@@ -25,6 +25,7 @@ import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
   HMSAudioCodec,
+  HMSAudioInterruption,
   HMSChangeMultiTrackStateParams,
   HMSConfig,
   HMSConnectionQualityListener,
@@ -257,6 +258,7 @@ export class HMSSdk implements HMSInterface {
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.audioInterruption.subscribe(this.handleAudioInterruption);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
@@ -570,6 +572,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  private handleAudioInterruption = (interruption: HMSAudioInterruption) => {
+    HMSLogger.d(this.TAG, 'Audio interruption', interruption);
+    this.listener?.onAudioInterruption?.(interruption);
+  };
+
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
     if (event.isUserSelection) {
       return;
@@ -704,6 +711,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.error.unsubscribe(this.handleError);
+    this.eventBus.audioInterruption.unsubscribe(this.handleAudioInterruption);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();

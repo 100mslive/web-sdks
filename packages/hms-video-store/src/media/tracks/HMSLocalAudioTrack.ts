@@ -109,19 +109,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
     if (document.visibilityState === 'hidden') {
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: true,
-          reason: 'visibility-change',
-        }),
-      );
+      this.notifyInterruption({ started: true, reason: 'visibility-change' });
     } else {
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
+      this.notifyInterruption({ started: false, reason: 'visibility-change' });
       if (this.permissionState && this.permissionState !== 'granted') {
         HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
         return;
@@ -360,26 +350,21 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     });
   };
 
+  private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+    this.eventBus.analytics.publish(this.sendInterruptionEvent({ started, reason }));
+    this.eventBus.audioInterruption.publish({ started, reason, trackId: this.trackId });
+  }
+
   private handleTrackMute = () => {
     HMSLogger.d(this.TAG, 'muted natively');
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: true,
-        reason: 'track-muted-natively',
-      }),
-    );
+    this.notifyInterruption({ started: true, reason: 'track-muted-natively' });
     this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
   handleTrackUnmute = async () => {
     HMSLogger.d(this.TAG, 'unmuted natively');
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: false,
-        reason: 'track-unmuted-natively',
-      }),
-    );
+    this.notifyInterruption({ started: false, reason: 'track-unmuted-natively' });
     try {
       await this.setEnabled(this.enabled, true);
       // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
