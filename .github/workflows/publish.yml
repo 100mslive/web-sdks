@@ -22,7 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      # Pinned to v6: v7 runs `yarn cache dir` after writing the registry-url .npmrc,
+      # and yarn aborts on the unresolved ${NODE_AUTH_TOKEN} placeholder (auth here is
+      # OIDC, so that variable is never set). Broke every publish since #3717.
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'yarn'
