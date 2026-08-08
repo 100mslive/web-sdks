@@ -1,3 +1,4 @@
+import { AudioInterruptionListener } from './audio-interruption';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
 import { DeviceChangeListener } from './devices';
 import { HMSLeaveRoomRequest } from './leave-room-request';
@@ -74,7 +75,11 @@ export interface InteractivityListener {
   onWhiteboardUpdate(whiteboard: HMSWhiteboard): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener, InteractivityListener {
+export interface HMSUpdateListener
+  extends DeviceChangeListener,
+    SessionStoreListener,
+    InteractivityListener,
+    AudioInterruptionListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;

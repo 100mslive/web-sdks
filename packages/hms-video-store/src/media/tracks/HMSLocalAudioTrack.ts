@@ -11,6 +11,7 @@ import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
+import { HMSAudioContextHandler } from '../../utils/media';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -36,6 +37,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private tracksCreated = new Set<MediaStreamTrack>();
 
   private permissionState?: PermissionState;
+  /**
+   * Set when the OS or another app takes the mic - an incoming call, a native voip app, or safari
+   * being backgrounded on iOS. The native track flags cannot be trusted once that has happened:
+   * iOS hands back a track that reports live and unmuted while its capture unit stays stopped, so
+   * recovery is driven off this instead of shouldReacquireTrack alone.
+   */
+  private interrupted = false;
+  /** in flight interruption recovery, see endInterruption */
+  private recovery?: Promise<void>;
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
   /**
@@ -103,36 +113,88 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private handleVisibilityChange = async () => {
-    // track state is fine do nothing
-    if (!this.shouldReacquireTrack()) {
-      HMSLogger.d(this.TAG, `visibiltiy: ${document.visibilityState}`, `${this}`);
+    if (document.visibilityState === 'hidden') {
+      this.handleBackgrounded();
       return;
     }
-    if (document.visibilityState === 'hidden') {
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: true,
-          reason: 'visibility-change',
-        }),
-      );
-    } else {
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
-      if (this.permissionState && this.permissionState !== 'granted') {
-        HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
-        return;
-      }
-      HMSLogger.d(this.TAG, 'On visibile replacing track as it is not publishing');
-      try {
-        await this.replaceTrackWith(this.settings);
-      } catch (error) {
-        this.eventBus.error.publish(error as HMSException);
-      }
+    await this.handleForegrounded();
+  };
+
+  private handleForegrounded = async () => {
+    HMSLogger.d(this.TAG, `visibility: visible, interrupted: ${this.interrupted}`, `${this}`);
+    // an interruption we know about has to be ended even when the track looks healthy, the flags
+    // lie after an iOS interruption
+    if (!this.interrupted && !this.shouldReacquireTrack()) {
+      return;
     }
+    this.sendInterruptionAnalytics({ started: false, reason: 'visibility-change' });
+    if (this.permissionState && this.permissionState !== 'granted') {
+      HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+      return;
+    }
+    try {
+      await this.endInterruption('visibility-change');
+    } catch (error) {
+      this.eventBus.error.publish(error as HMSException);
+    }
+  };
+
+  private handleBackgrounded() {
+    // track state is fine do nothing
+    if (!this.shouldReacquireTrack()) {
+      HMSLogger.d(this.TAG, 'visibility: hidden', `${this}`);
+      return;
+    }
+    this.interrupted = true;
+    this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
+    this.notifyInterruption({ started: true, reason: 'visibility-change' });
+  }
+
+  /**
+   * Interruption end. Both triggers - the native unmute and coming back to the foreground - have to
+   * do the same three things:
+   * 1. get a track that actually captures. Only a fresh getUserMedia is reliable here, the
+   *    interrupted track can report live and unmuted and still produce nothing.
+   * 2. re-publish the enabled state. On interruption start biz is told mute=true, on which every
+   *    remote peer unsubscribes from this peer's audio - they resubscribe only on the next update.
+   * 3. resume the remote playback the OS paused along with capture.
+   */
+  private endInterruption = async (reason: string) => {
+    if (document.visibilityState === 'hidden') {
+      // iOS does not give capture back to a backgrounded tab, handleVisibilityChange retries
+      HMSLogger.d(this.TAG, 'interruption ended while hidden, deferring recovery', reason, `${this}`);
+      return;
+    }
+    /**
+     * both triggers fire on returning from an iOS interruption, and a second replaceTrackWith would
+     * stop the track the first one just installed. First trigger wins, a failed recovery is retried
+     * by the next foreground.
+     */
+    if (this.recovery) {
+      HMSLogger.d(this.TAG, 'interruption recovery already in progress', reason, `${this}`);
+      return;
+    }
+    this.recovery = this.restoreCapture(reason);
+    try {
+      await this.recovery;
+    } finally {
+      this.recovery = undefined;
+    }
+  };
+
+  private restoreCapture = async (reason: string) => {
+    /**
+     * iOS suspends the shared AudioContext for the duration of the interruption and does not resume
+     * it on its own. Plugins publish the destination node of that context, so with noise
+     * suppression on the published track stays silent until it is running again, and the audio level
+     * monitor reads zero. It is only resumed on join and on unblockAutoplay otherwise.
+     */
+    await HMSAudioContextHandler.resumeContext();
+    await this.reacquireStaleTrack(reason);
+    await this.setEnabled(this.enabled, true);
+    this.notifyInterruption({ started: false, reason });
+    // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
+    this.eventBus.localAudioUnmutedNatively.publish();
   };
 
   /**
@@ -222,8 +284,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       return;
     }
     // Replace silent empty track or muted track(happens when microphone is disabled from address bar in iOS) with an actual audio track, if enabled or ended track or when silence is detected.
-    if (value && this.shouldReacquireTrack()) {
-      await this.replaceTrackWith(this.settings);
+    if (value) {
+      await this.reacquireStaleTrack('set-enabled');
     }
     await super.setEnabled(value);
     if (value) {
@@ -360,33 +422,50 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     });
   };
 
+  private sendInterruptionAnalytics({ started, reason }: { started: boolean; reason: string }) {
+    this.eventBus.analytics.publish(this.sendInterruptionEvent({ started, reason }));
+  }
+
+  /**
+   * app facing interruption event. On interruption end this is published only after the track has
+   * actually recovered, so an app showing a "mic interrupted" prompt keeps it up while the mic is
+   * still unusable. The analytics event is not moved along with it - interruption.stop is what
+   * recovery rate is measured against.
+   */
+  private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+    this.eventBus.audioInterruption.publish({ started, reason, trackId: this.trackId });
+  }
+
   private handleTrackMute = () => {
-    HMSLogger.d(this.TAG, 'muted natively');
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: true,
-        reason: 'track-muted-natively',
-      }),
-    );
+    HMSLogger.d(this.TAG, 'muted natively', `${this}`);
+    this.interrupted = true;
+    this.sendInterruptionAnalytics({ started: true, reason: 'track-muted-natively' });
+    this.notifyInterruption({ started: true, reason: 'track-muted-natively' });
     this.eventBus.localAudioEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
   handleTrackUnmute = async () => {
-    HMSLogger.d(this.TAG, 'unmuted natively');
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: false,
-        reason: 'track-unmuted-natively',
-      }),
-    );
+    HMSLogger.d(this.TAG, 'unmuted natively', `${this}`);
+    this.sendInterruptionAnalytics({ started: false, reason: 'track-unmuted-natively' });
     try {
-      await this.setEnabled(this.enabled, true);
-      // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
-      this.eventBus.localAudioUnmutedNatively.publish();
+      await this.endInterruption('track-unmuted-natively');
     } catch (error) {
       this.eventBus.error.publish(error as HMSException);
     }
+  };
+
+  /**
+   * A track that went through an interruption has to be replaced even when it reports live and
+   * unmuted - see `interrupted`.
+   */
+  private reacquireStaleTrack = async (reason: string) => {
+    if (!this.interrupted && !this.shouldReacquireTrack()) {
+      return;
+    }
+    HMSLogger.d(this.TAG, 'reacquiring track', reason, `${this}`);
+    await this.replaceTrackWith(this.settings);
+    this.interrupted = false;
   };
 
   private replaceSenderTrack = async () => {

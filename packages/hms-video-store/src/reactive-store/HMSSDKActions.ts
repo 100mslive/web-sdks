@@ -829,6 +829,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onAudioInterruption: this.onAudioInterruption.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
@@ -872,6 +873,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onAudioInterruption: this.onAudioInterruption.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
@@ -901,6 +903,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const action = request.roomEnded || !requestedBy ? 'roomEnded' : 'removedFromRoom';
     HMSLogger.i(`resetting state after peer removed ${action}`, request);
     this.resetState(action);
+  }
+
+  private onAudioInterruption(interruption: sdkTypes.HMSAudioInterruption) {
+    this.hmsNotifications.sendAudioInterruption(interruption);
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
@@ -938,6 +944,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onReconnected: this.onReconnected.bind(this),
       onReconnecting: this.onReconnecting.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onAudioInterruption: this.onAudioInterruption.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
