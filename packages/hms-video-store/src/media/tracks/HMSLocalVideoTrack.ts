@@ -640,11 +640,18 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private restoreCapture = async (reason: string, enable: boolean) => {
     const wasInterrupted = this.interrupted;
-    if (enable) {
+    /**
+     * the camera is replaced when it has to be: the background path turned it off, or the track
+     * itself reports it is not publishing. When the OS restarts capture on its own the track is live
+     * again and re-playing the sinks is all that is needed - a getUserMedia here would only add a
+     * few hundred ms of frozen tile.
+     */
+    if (enable && (!this.enabled || this.isTrackNotPublishing())) {
       HMSLogger.d(this.TAG, 'reacquiring camera after interruption', reason, `${this}`);
       // skipcheck, enabled is still true when the interruption did not go through setEnabled
       await this.setEnabled(true, true);
     } else {
+      HMSLogger.d(this.TAG, 'interruption ended, track reports publishing, replaying sinks', reason, `${this}`);
       this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
     }
     this.interrupted = false;

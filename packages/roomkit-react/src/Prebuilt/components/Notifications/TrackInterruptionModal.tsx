@@ -1,29 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { selectIsLocalAudioInterrupted, selectIsLocalVideoInterrupted, useHMSStore } from '@100mslive/react-sdk';
 import { Button, Dialog, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 
+/**
+ * A video call takes both devices, so this reads the interrupted state of each and shows one prompt
+ * naming what is affected, instead of one prompt per track.
+ */
 export const TrackInterruptionModal = () => {
-  const notification = useHMSNotifications([
-    HMSNotificationTypes.TRACK_INTERRUPTION_START,
-    HMSNotificationTypes.TRACK_INTERRUPTION_END,
-  ]);
-  const [interrupted, setInterrupted] = useState<'audio' | 'video' | undefined>(undefined);
+  const audioInterrupted = useHMSStore(selectIsLocalAudioInterrupted);
+  const videoInterrupted = useHMSStore(selectIsLocalVideoInterrupted);
+  const [dismissed, setDismissed] = useState(false);
+  const interrupted = audioInterrupted || videoInterrupted;
 
+  // let the next interruption show a prompt again
   useEffect(() => {
-    if (!notification) {
-      return;
+    if (!interrupted) {
+      setDismissed(false);
     }
-    setInterrupted(
-      notification.type === HMSNotificationTypes.TRACK_INTERRUPTION_START ? notification.data.type : undefined,
-    );
-  }, [notification]);
+  }, [interrupted]);
 
-  const device = interrupted === 'video' ? 'Camera' : 'Microphone';
+  let device = 'Microphone';
+  if (audioInterrupted && videoInterrupted) {
+    device = 'Microphone and camera';
+  } else if (videoInterrupted) {
+    device = 'Camera';
+  }
 
   return (
-    <Dialog.Root open={!!interrupted} onOpenChange={() => setInterrupted(undefined)}>
+    <Dialog.Root open={interrupted && !dismissed} onOpenChange={() => setDismissed(true)}>
       <DialogContent title={`${device} interrupted`} closeable={false}>
         <DialogRow>
           <Text variant="md">
@@ -32,7 +38,7 @@ export const TrackInterruptionModal = () => {
           </Text>
         </DialogRow>
         <DialogRow justify="end">
-          <Button variant="primary" onClick={() => setInterrupted(undefined)}>
+          <Button variant="primary" onClick={() => setDismissed(true)}>
             Dismiss
           </Button>
         </DialogRow>

@@ -70,6 +70,11 @@ interface BaseTrack {
    * false for preview tracks
    */
   isPublished?: boolean;
+  /**
+   * only applicable for local tracks - true while the OS or another app has taken the device, an
+   * incoming call or the tab being backgrounded on mobile. Cleared once capture is back.
+   */
+  interrupted?: boolean;
 }
 
 export interface HMSAudioTrack extends BaseTrack {

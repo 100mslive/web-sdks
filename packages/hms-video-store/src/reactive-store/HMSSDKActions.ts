@@ -906,6 +906,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private onTrackInterruption(interruption: sdkTypes.HMSTrackInterruption) {
+    /**
+     * kept in the store and not only in the notification - a notification is the latest event only,
+     * and audio and video publish theirs from the same visibilitychange, so a subscriber that reads
+     * events can miss one of the two.
+     */
+    this.setState(store => {
+      const track = store.tracks[interruption.trackId];
+      if (track) {
+        track.interrupted = interruption.started;
+      }
+    }, 'trackInterruption');
     this.hmsNotifications.sendTrackInterruption(interruption);
   }
 

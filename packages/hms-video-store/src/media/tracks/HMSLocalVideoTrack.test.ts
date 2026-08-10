@@ -58,14 +58,42 @@ describe('HMSLocalVideoTrack interruptions', () => {
     getVideoTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
   });
 
-  it('reacquires the camera on native unmute, the track still reports live and unmuted', async () => {
+  it('reacquires the camera on native unmute when the track is not publishing', async () => {
     const track = makeLocalVideoTrack();
+    (track.nativeTrack as any).readyState = 'ended';
 
     (track as any).handleTrackMute();
     await track.handleTrackUnmuteNatively();
 
     expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
     expect(track.nativeTrack.id).toBe('track-2');
+  });
+
+  // the OS restarts capture on its own here, a getUserMedia would only freeze the tile for longer
+  it('does not replace a live track on native unmute, only replays the sinks', async () => {
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localVideoEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmuteNatively();
+
+    expect(getVideoTrackMock).not.toHaveBeenCalled();
+    expect(enabledUpdates).toEqual([false, true]);
+  });
+
+  it('reacquires the camera on foreground after the background turned it off', async () => {
+    const track = makeLocalVideoTrack();
+
+    setVisibility('hidden');
+    (track.nativeTrack as any).enabled = false;
+    (track as any).enabledStateBeforeBackground = true;
+    (track as any).interrupted = true;
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
   });
 
   it('publishes a camera interruption to the app and clears the published mute', async () => {
@@ -78,6 +106,7 @@ describe('HMSLocalVideoTrack interruptions', () => {
     eventBus.localVideoUnmutedNatively.subscribe(unpaused);
 
     const track = makeLocalVideoTrack(eventBus);
+    (track.nativeTrack as any).readyState = 'ended';
     (track as any).handleTrackMute();
     await track.handleTrackUnmuteNatively();
 
@@ -92,6 +121,7 @@ describe('HMSLocalVideoTrack interruptions', () => {
 
   it('recovers once when the native unmute and the foreground event both fire', async () => {
     const track = makeLocalVideoTrack();
+    (track.nativeTrack as any).readyState = 'ended';
 
     (track as any).handleTrackMute();
     await Promise.all([track.handleTrackUnmuteNatively(), (track as any).handleVisibilityChange()]);
@@ -108,6 +138,7 @@ describe('HMSLocalVideoTrack interruptions', () => {
     getVideoTrackMock.mockRejectedValue(new Error('device in use'));
 
     const track = makeLocalVideoTrack(eventBus);
+    (track.nativeTrack as any).readyState = 'ended';
     (track as any).handleTrackMute();
     await track.handleTrackUnmuteNatively();
 

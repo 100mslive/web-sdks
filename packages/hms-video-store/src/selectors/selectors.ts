@@ -249,6 +249,24 @@ export const selectIsLocalVideoEnabled = (store: HMSStore) => {
 };
 
 /**
+ * Select a boolean denoting whether the OS or another app has taken your microphone, an incoming
+ * call or the tab being backgrounded on mobile. Cleared once capture is back.
+ */
+export const selectIsLocalAudioInterrupted = (store: HMSStore) => {
+  const trackID = selectLocalPeer(store)?.audioTrack;
+  return Boolean(trackID && store.tracks[trackID]?.interrupted);
+};
+
+/**
+ * Select a boolean denoting whether the OS or another app has taken your camera.
+ * @see selectIsLocalAudioInterrupted
+ */
+export const selectIsLocalVideoInterrupted = (store: HMSStore) => {
+  const trackID = selectLocalPeer(store)?.videoTrack;
+  return Boolean(trackID && store.tracks[trackID]?.interrupted);
+};
+
+/**
  * Select a boolean denoting whether you've chosen to unmute and share your local video.
  *
  * NOTE: Once you call `hmsActions.setLocalVideoEnabled(true)`to unmute your local video,
