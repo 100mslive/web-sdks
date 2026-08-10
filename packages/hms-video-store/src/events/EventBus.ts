@@ -2,7 +2,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSInternalEvent } from './HMSInternalEvent';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { HMSException } from '../error/HMSException';
-import { HMSAudioInterruption, HMSDeviceChangeEvent, HMSRole } from '../interfaces';
+import { HMSDeviceChangeEvent, HMSRole, HMSTrackInterruption } from '../interfaces';
 import {
   HMSLocalAudioTrack,
   HMSLocalVideoTrack,
@@ -56,8 +56,8 @@ export class EventBus {
     this.eventEmitter,
   );
 
-  readonly audioInterruption = new HMSInternalEvent<HMSAudioInterruption>(
-    HMSEvents.AUDIO_INTERRUPTION,
+  readonly trackInterruption = new HMSInternalEvent<HMSTrackInterruption>(
+    HMSEvents.TRACK_INTERRUPTION,
     this.eventEmitter,
   );
 

@@ -12,7 +12,7 @@ export type { HMSSimulcastLayerDefinition, SimulcastLayer, RID, HMSPreferredSimu
 export { HMSSimulcastLayer, simulcastMapping } from './simulcast-layers';
 export * from './track-settings';
 export * from './devices';
-export * from './audio-interruption';
+export * from './track-interruption';
 export * from './playlist';
 export * from './rtmp-recording-config';
 export * from './hls-config';

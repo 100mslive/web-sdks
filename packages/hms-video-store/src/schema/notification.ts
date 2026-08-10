@@ -4,7 +4,7 @@ import { HMSMessage } from './message';
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSPlaylistItem } from './playlist';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
-import { HMSAudioInterruption, HMSPoll, HMSTranscriptionInfo } from '../internal';
+import { HMSPoll, HMSTrackInterruption, HMSTranscriptionInfo } from '../internal';
 
 interface BaseNotification {
   id: number;
@@ -78,9 +78,9 @@ export interface HMSPollNotification extends BaseNotification {
   data: HMSPoll;
 }
 
-export interface HMSAudioInterruptionNotification extends BaseNotification {
-  type: HMSNotificationTypes.AUDIO_INTERRUPTION_START | HMSNotificationTypes.AUDIO_INTERRUPTION_END;
-  data: HMSAudioInterruption;
+export interface HMSTrackInterruptionNotification extends BaseNotification {
+  type: HMSNotificationTypes.TRACK_INTERRUPTION_START | HMSNotificationTypes.TRACK_INTERRUPTION_END;
+  data: HMSTrackInterruption;
 }
 
 export interface HMSTranscriptionNotification extends BaseNotification {
@@ -99,7 +99,7 @@ export type HMSNotification =
   | HMSLeaveRoomRequestNotification
   | HMSDeviceChangeEventNotification
   | HMSReconnectionNotification
-  | HMSAudioInterruptionNotification
+  | HMSTrackInterruptionNotification
   | HMSTranscriptionNotification
   | HMSPlaylistItemNotification<any>;
 
@@ -139,8 +139,8 @@ export enum HMSNotificationTypes {
   POLLS_LIST = 'POLLS_LIST',
   HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
   TRANSCRIPTION_STATE_UPDATED = 'TRANSCRIPTION_STATE_UPDATED',
-  AUDIO_INTERRUPTION_START = 'AUDIO_INTERRUPTION_START',
-  AUDIO_INTERRUPTION_END = 'AUDIO_INTERRUPTION_END',
+  TRACK_INTERRUPTION_START = 'TRACK_INTERRUPTION_START',
+  TRACK_INTERRUPTION_END = 'TRACK_INTERRUPTION_END',
 }
 
 export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
@@ -175,8 +175,8 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
   [HMSNotificationTypes.TRANSCRIPTION_STATE_UPDATED]: HMSTranscriptionNotification;
-  [HMSNotificationTypes.AUDIO_INTERRUPTION_START]: HMSAudioInterruptionNotification;
-  [HMSNotificationTypes.AUDIO_INTERRUPTION_END]: HMSAudioInterruptionNotification;
+  [HMSNotificationTypes.TRACK_INTERRUPTION_START]: HMSTrackInterruptionNotification;
+  [HMSNotificationTypes.TRACK_INTERRUPTION_END]: HMSTrackInterruptionNotification;
 }[T];
 
 export type MappedNotifications<Type extends HMSNotificationTypes[]> = {

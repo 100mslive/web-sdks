@@ -70,15 +70,15 @@ describe('HMSLocalAudioTrack interruptions', () => {
   it('publishes an interruption on native mute and unmute', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean; reason: string; trackId: string }[] = [];
-    eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
 
     const track = makeLocalAudioTrack(eventBus);
     (track as any).handleTrackMute();
     await track.handleTrackUnmute();
 
     expect(interruptions).toEqual([
-      { started: true, reason: 'track-muted-natively', trackId: track.trackId },
-      { started: false, reason: 'track-unmuted-natively', trackId: track.trackId },
+      { started: true, reason: 'track-muted-natively', type: 'audio', trackId: track.trackId },
+      { started: false, reason: 'track-unmuted-natively', type: 'audio', trackId: track.trackId },
     ]);
   });
 
@@ -133,7 +133,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
   it('defers recovery while the page is hidden and recovers on foreground', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
-    eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
 
     const track = makeLocalAudioTrack(eventBus);
     setVisibility('hidden');
@@ -162,7 +162,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
   it('does not end the interruption when the track fails to recover', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
-    eventBus.audioInterruption.subscribe(interruption => interruptions.push(interruption));
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
     // eventemitter2 rethrows the reserved 'error' event when nothing is listening
     eventBus.error.subscribe(() => {});
     getAudioTrackMock.mockRejectedValue(new Error('device in use'));

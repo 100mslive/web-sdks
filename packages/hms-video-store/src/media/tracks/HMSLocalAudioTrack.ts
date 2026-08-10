@@ -433,7 +433,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * recovery rate is measured against.
    */
   private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
-    this.eventBus.audioInterruption.publish({ started, reason, trackId: this.trackId });
+    this.eventBus.trackInterruption.publish({ started, reason, type: this.type, trackId: this.trackId });
   }
 
   private handleTrackMute = () => {

@@ -177,16 +177,17 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     }
   }
 
-  sendAudioInterruption(interruption: sdkTypes.HMSAudioInterruption) {
+  sendTrackInterruption(interruption: sdkTypes.HMSTrackInterruption) {
+    const device = interruption.type === 'audio' ? 'microphone' : 'camera';
     const notification = this.createNotification(
       interruption.started
-        ? HMSNotificationTypes.AUDIO_INTERRUPTION_START
-        : HMSNotificationTypes.AUDIO_INTERRUPTION_END,
+        ? HMSNotificationTypes.TRACK_INTERRUPTION_START
+        : HMSNotificationTypes.TRACK_INTERRUPTION_END,
       interruption,
       interruption.started ? HMSNotificationSeverity.ERROR : HMSNotificationSeverity.INFO,
       interruption.started
-        ? 'Your microphone was interrupted, another app may be using it'
-        : 'Your microphone is available again',
+        ? `Your ${device} was interrupted, another app may be using it`
+        : `Your ${device} is available again`,
     );
     this.emitEvent(notification);
   }
@@ -219,7 +220,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
       | HMSPlaylistItem<T>
       | sdkTypes.HMSPoll
       | sdkTypes.HMSTranscriptionInfo[]
-      | sdkTypes.HMSAudioInterruption
+      | sdkTypes.HMSTrackInterruption
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

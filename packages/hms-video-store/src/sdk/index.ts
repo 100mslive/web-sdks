@@ -25,7 +25,6 @@ import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
   HMSAudioCodec,
-  HMSAudioInterruption,
   HMSChangeMultiTrackStateParams,
   HMSConfig,
   HMSConnectionQualityListener,
@@ -39,6 +38,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  HMSTrackInterruption,
   HMSVideoCodec,
   TokenRequest,
   TokenRequestOptions,
@@ -258,7 +258,7 @@ export class HMSSdk implements HMSInterface {
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
-    this.eventBus.audioInterruption.subscribe(this.handleAudioInterruption);
+    this.eventBus.trackInterruption.subscribe(this.handleTrackInterruption);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
@@ -572,9 +572,9 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private handleAudioInterruption = (interruption: HMSAudioInterruption) => {
-    HMSLogger.d(this.TAG, 'Audio interruption', interruption);
-    this.listener?.onAudioInterruption?.(interruption);
+  private handleTrackInterruption = (interruption: HMSTrackInterruption) => {
+    HMSLogger.d(this.TAG, 'Track interruption', interruption);
+    this.listener?.onTrackInterruption?.(interruption);
   };
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
@@ -711,7 +711,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.error.unsubscribe(this.handleError);
-    this.eventBus.audioInterruption.unsubscribe(this.handleAudioInterruption);
+    this.eventBus.trackInterruption.unsubscribe(this.handleTrackInterruption);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();

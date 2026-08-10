@@ -41,6 +41,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
   private enabledStateBeforeBackground = false;
+  /**
+   * Set when the OS or another app takes the camera - a video call, a native app, or safari being
+   * backgrounded on iOS. The native track flags cannot be trusted once that has happened, the
+   * resumed track can report live and unmuted while producing frozen frames, so recovery is driven
+   * off this.
+   */
+  private interrupted = false;
+  /** in flight interruption recovery, see endInterruption */
+  private recovery?: Promise<void>;
+  /** the visibilitychange handler is only attached on mobile, see the constructor */
+  private recoversOnForeground = false;
   private permissionState?: PermissionState;
 
   /**
@@ -90,7 +101,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.handleTrackUnmute);
-    if (isBrowser && source === 'regular' && isMobile()) {
+    this.recoversOnForeground = isBrowser && source === 'regular' && isMobile();
+    if (this.recoversOnForeground) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -136,8 +148,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   // eslint-disable-next-line complexity
-  async setEnabled(value: boolean): Promise<void> {
-    if (value === this.enabled) {
+  async setEnabled(value: boolean, skipcheck = false): Promise<void> {
+    if (value === this.enabled && !skipcheck) {
       return;
     }
     if (this.source === 'regular') {
@@ -582,30 +594,87 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     });
   };
 
+  private sendInterruptionAnalytics({ started, reason }: { started: boolean; reason: string }) {
+    this.eventBus.analytics.publish(this.sendInterruptionEvent({ started, reason }));
+  }
+
+  /**
+   * app facing interruption event. On interruption end this is published only after the camera has
+   * actually been reacquired, so an app showing a prompt keeps it up while the video is still frozen.
+   * The analytics event is not moved along with it - interruption.stop is what recovery rate is
+   * measured against.
+   */
+  private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+    this.eventBus.trackInterruption.publish({ started, reason, type: this.type, trackId: this.trackId });
+  }
+
+  /**
+   * Interruption end. Both triggers - the native unmute and coming back to the foreground - reacquire
+   * the camera. Nothing else restores it: the interrupted track can report live and unmuted while
+   * producing frozen frames, and the enabled state has to be re-published because interruption start
+   * tells biz mute=true, on which remote peers stop rendering this peer's video.
+   * @param enable the state to restore the camera to
+   */
+  private endInterruption = async (reason: string, enable: boolean) => {
+    if (this.recoversOnForeground && document.visibilityState === 'hidden') {
+      // capture cannot be reacquired while backgrounded on iOS, handleVisibilityChange retries
+      HMSLogger.d(this.TAG, 'interruption ended while hidden, deferring recovery', reason, `${this}`);
+      return;
+    }
+    /**
+     * both triggers fire on returning from an interruption, and a second getUserMedia would stop the
+     * track the first one just installed. First trigger wins, a failed recovery is retried by the
+     * next foreground.
+     */
+    if (this.recovery) {
+      HMSLogger.d(this.TAG, 'interruption recovery already in progress', reason, `${this}`);
+      return;
+    }
+    this.recovery = this.restoreCapture(reason, enable);
+    try {
+      await this.recovery;
+    } finally {
+      this.recovery = undefined;
+    }
+  };
+
+  private restoreCapture = async (reason: string, enable: boolean) => {
+    const wasInterrupted = this.interrupted;
+    if (enable) {
+      HMSLogger.d(this.TAG, 'reacquiring camera after interruption', reason, `${this}`);
+      // skipcheck, enabled is still true when the interruption did not go through setEnabled
+      await this.setEnabled(true, true);
+    } else {
+      this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
+    }
+    this.interrupted = false;
+    this.handleTrackUnmute();
+    // the camera was already off, nothing was reported as interrupted
+    if (wasInterrupted) {
+      this.notifyInterruption({ started: false, reason });
+    }
+    this.eventBus.localVideoUnmutedNatively.publish();
+  };
+
   private handleTrackMute = () => {
-    HMSLogger.d(this.TAG, 'muted natively', document.visibilityState);
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: true,
-        reason: 'track-muted-natively',
-      }),
-    );
+    HMSLogger.d(this.TAG, 'muted natively', document.visibilityState, `${this}`);
+    this.sendInterruptionAnalytics({ started: true, reason: 'track-muted-natively' });
+    if (this.enabled) {
+      this.interrupted = true;
+      this.notifyInterruption({ started: true, reason: 'track-muted-natively' });
+    }
     this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
   };
 
   /** @internal */
   handleTrackUnmuteNatively = async () => {
-    HMSLogger.d(this.TAG, 'unmuted natively');
-    this.eventBus.analytics.publish(
-      this.sendInterruptionEvent({
-        started: false,
-        reason: 'track-unmuted-natively',
-      }),
-    );
-    this.handleTrackUnmute();
-    this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
-    this.eventBus.localVideoUnmutedNatively.publish();
-    await this.setEnabled(this.enabled);
+    HMSLogger.d(this.TAG, 'unmuted natively', `${this}`);
+    this.sendInterruptionAnalytics({ started: false, reason: 'track-unmuted-natively' });
+    try {
+      await this.endInterruption('track-unmuted-natively', this.enabled);
+    } catch (error) {
+      this.eventBus.error.publish(error as HMSException);
+    }
   };
 
   /**
@@ -634,40 +703,42 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
   };
 
-  // eslint-disable-next-line complexity
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden') {
-      this.enabledStateBeforeBackground = this.enabled;
-      if (this.enabled) {
-        await this.setEnabled(false);
-      }
-      // started interruption event
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: true,
-          reason: 'visibility-change',
-        }),
-      );
-    } else {
-      // ended interruption event
-      this.eventBus.analytics.publish(
-        this.sendInterruptionEvent({
-          started: false,
-          reason: 'visibility-change',
-        }),
-      );
-      if (this.permissionState && this.permissionState !== 'granted') {
-        HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
-        return;
-      }
-      HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
-      if (this.enabledStateBeforeBackground) {
-        try {
-          await this.setEnabled(true);
-        } catch (error) {
-          this.eventBus.error.publish(error as HMSException);
-        }
-      }
+      await this.handleBackgrounded();
+      return;
+    }
+    await this.handleForegrounded();
+  };
+
+  private handleForegrounded = async () => {
+    // ended interruption event
+    this.sendInterruptionAnalytics({ started: false, reason: 'visibility-change' });
+    if (this.permissionState && this.permissionState !== 'granted') {
+      HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+      return;
+    }
+    HMSLogger.d(this.TAG, 'visibility visible, restoring track state', this.enabledStateBeforeBackground);
+    if (!this.enabledStateBeforeBackground && !this.interrupted) {
+      return;
+    }
+    try {
+      await this.endInterruption('visibility-change', this.enabledStateBeforeBackground);
+    } catch (error) {
+      this.eventBus.error.publish(error as HMSException);
+    }
+  };
+
+  private handleBackgrounded = async () => {
+    this.enabledStateBeforeBackground = this.enabled;
+    if (this.enabled) {
+      this.interrupted = true;
+      await this.setEnabled(false);
+    }
+    // started interruption event
+    this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
+    if (this.interrupted) {
+      this.notifyInterruption({ started: true, reason: 'visibility-change' });
     }
   };
 }

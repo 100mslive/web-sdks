@@ -3,7 +3,6 @@ import React, { useCallback } from 'react';
 import { HMSRoleChangeRequest, HMSRoomState, selectRoomState, useCustomEvent, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
-import { AudioInterruptionModal } from './AudioInterruptionModal';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
 import { DeviceChangeNotifications } from './DeviceChangeNotifications';
@@ -18,6 +17,7 @@ import { PollNotificationModal } from './PollNotificationModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
 import { RoleChangeNotification } from './RoleChangeNotification';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
+import { TrackInterruptionModal } from './TrackInterruptionModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { TranscriptionNotifications } from './TranscriptionNotifications';
@@ -55,7 +55,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <ErrorNotifications />
       <AutoplayBlockedModal />
-      <AudioInterruptionModal />
+      <TrackInterruptionModal />
       <PermissionErrorNotificationModal />
       <InitErrorModal />
       <ChatNotifications />
