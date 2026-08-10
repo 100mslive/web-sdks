@@ -6,8 +6,8 @@ import {
   RunningTrackAnalytics,
 } from './BaseStatsAnalytics';
 import {
+  LocalAudioSample,
   LocalAudioTrackAnalytics,
-  LocalBaseSample,
   LocalVideoSample,
   LocalVideoTrackAnalytics,
   PublishAnalyticPayload,
@@ -106,8 +106,16 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
   }
 }
 
+const minOf = (values: number[]) => (values.length ? Math.min(...values) : undefined);
+
+const maxOf = (values: number[]) => (values.length ? Math.max(...values) : undefined);
+
+// Rounded before counting so float noise in an otherwise stable reading is not read as adaptation.
+const countDistinctValues = (values: number[]) =>
+  values.length ? new Set(values.map(value => value.toFixed(3))).size : undefined;
+
 class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
-  samples: (LocalBaseSample | LocalVideoSample)[] = [];
+  samples: (LocalAudioSample | LocalVideoSample)[] = [];
   private cpuPressureMonitor?: CPUPressureMonitor;
 
   constructor(params: {
@@ -121,6 +129,23 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     super(params);
     this.cpuPressureMonitor = params.cpuPressureMonitor;
   }
+
+  private getAudioSourceStats = (): Partial<LocalAudioSample> => {
+    const erl = this.collectNumericValues('echoReturnLoss');
+    const erle = this.collectNumericValues('echoReturnLossEnhancement');
+    if (erl.length === 0 && erle.length === 0) {
+      return {};
+    }
+    return {
+      erl_db_min: minOf(erl),
+      erl_db_max: maxOf(erl),
+      erle_db_min: minOf(erle),
+      erle_db_max: maxOf(erle),
+      erle_distinct_count: countDistinctValues(erle),
+      total_audio_energy: this.calculateDifferenceForSample('sourceTotalAudioEnergy'),
+      total_samples_duration_sec: this.calculateDifferenceForSample('sourceTotalSamplesDuration'),
+    };
+  };
 
   private getQualityLimitation = (latestStat: HMSTrackStats) => {
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
@@ -153,7 +178,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     };
   };
 
-  protected collateSample = (): LocalBaseSample | LocalVideoSample => {
+  protected collateSample = (): LocalAudioSample | LocalVideoSample => {
     const firstStat = this.getFirstStat();
     const latestStat = this.getLatestStat();
 
@@ -193,6 +218,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       track_settings,
       effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
       ...this.getSourceStats(latestStat),
+      ...this.getAudioSourceStats(),
     });
   };
 

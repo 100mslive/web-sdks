@@ -110,6 +110,16 @@ export interface HMSLocalTrackStats extends BaseTrackStats, MissingOutboundStats
   sourceFramesDropped?: number;
   sourceTimestamp?: DOMHighResTimeStamp;
   sourceStatsAvailable?: boolean;
+  /**
+   * Capture stats from the audio `media-source`. `echoReturnLoss`/`echoReturnLossEnhancement`
+   * are only reported while the browser's own echo canceller is running, so their absence is
+   * itself a signal that cancellation has been delegated to the OS or the capture device.
+   */
+  sourceAudioLevel?: number;
+  sourceTotalAudioEnergy?: number;
+  sourceTotalSamplesDuration?: number;
+  echoReturnLoss?: number;
+  echoReturnLossEnhancement?: number;
 }
 
 /**

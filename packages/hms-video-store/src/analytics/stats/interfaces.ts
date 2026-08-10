@@ -23,7 +23,7 @@ interface TrackAnalytics<Sample> {
   samples: Array<Sample>;
 }
 
-export type LocalAudioTrackAnalytics = TrackAnalytics<LocalBaseSample>;
+export type LocalAudioTrackAnalytics = TrackAnalytics<LocalAudioSample>;
 export type LocalVideoTrackAnalytics = TrackAnalytics<LocalVideoSample>;
 
 export type RemoteAudioTrackAnalytics = TrackAnalytics<RemoteAudioSample>;
@@ -49,6 +49,23 @@ export interface LocalBaseSample {
   cpu_pressure_state?: string; // CPU pressure state at the time of sample creation (nominal, fair, serious, critical)
   track_settings?: MediaTrackSettings; // Native track settings from getSettings()
   effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
+}
+
+export interface LocalAudioSample extends LocalBaseSample {
+  /**
+   * Echo canceller health, from the audio `media-source` stat.
+   * A window average is not enough on its own: ERLE legitimately drops to 0 during
+   * double-talk and silence, so averaging makes an idle canceller and a working one
+   * look alike. `erle_distinct_count` is 1 when the value never moves across the
+   * window, which is what separates "no software AEC running" from "AEC running".
+   */
+  erl_db_min?: number;
+  erl_db_max?: number;
+  erle_db_min?: number;
+  erle_db_max?: number;
+  erle_distinct_count?: number;
+  total_audio_energy?: number;
+  total_samples_duration_sec?: number;
 }
 
 export interface LocalVideoSample extends LocalBaseSample {

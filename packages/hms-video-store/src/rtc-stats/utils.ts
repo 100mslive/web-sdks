@@ -24,6 +24,20 @@ interface MediaSourceStats {
   timestamp?: DOMHighResTimeStamp;
 }
 
+interface AudioSourceStats {
+  audioLevel?: number;
+  totalAudioEnergy?: number;
+  totalSamplesDuration?: number;
+  echoReturnLoss?: number;
+  echoReturnLossEnhancement?: number;
+}
+
+interface AudioMediaSourceStat extends AudioSourceStats {
+  type?: string;
+  kind?: string;
+  trackIdentifier?: string;
+}
+
 const isVideoMediaSourceStat = (stat: any): boolean => {
   const kind = stat.kind || stat.mediaType;
   return !kind || kind === 'video';
@@ -141,6 +155,7 @@ export const getLocalTrackStats = async (
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
     const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
     const mediaSourceStats = track.type === HMSTrackType.VIDEO ? resolveSourceStats(trackReport, track) : undefined;
+    const audioSourceStats = track.type === HMSTrackType.AUDIO ? getAudioSourceStats(trackReport, track) : undefined;
     trackReport?.forEach(stat => {
       switch (stat.type) {
         case 'outbound-rtp':
@@ -174,7 +189,7 @@ export const getLocalTrackStats = async (
       const sourceStats =
         track.type === HMSTrackType.VIDEO
           ? buildMediaSourceStats(mediaSourceStats, (outStats as any).framesEncoded, prevTrackStats?.[stat])
-          : {};
+          : buildAudioSourceStats(audioSourceStats);
       trackStats[stat] = {
         ...outStats,
         ...sourceStats,
@@ -318,6 +333,47 @@ const getMediaSourceStats = (
     return extractMediaSourceStats(mediaStat);
   }
   return undefined;
+};
+
+const getAudioSourceStats = (
+  trackReport: RTCStatsReport | undefined,
+  track: HMSLocalTrack,
+): AudioSourceStats | undefined => {
+  if (!trackReport) {
+    return undefined;
+  }
+  const senderTrackId = track.transceiver?.sender?.track?.id;
+  for (const stat of trackReport.values()) {
+    const audioStat = stat as AudioMediaSourceStat;
+    if (audioStat.type !== 'media-source' || audioStat.kind !== 'audio') {
+      continue;
+    }
+    if (!matchesSenderTrack(audioStat, senderTrackId)) {
+      continue;
+    }
+    return {
+      audioLevel: audioStat.audioLevel,
+      totalAudioEnergy: audioStat.totalAudioEnergy,
+      totalSamplesDuration: audioStat.totalSamplesDuration,
+      echoReturnLoss: audioStat.echoReturnLoss,
+      echoReturnLossEnhancement: audioStat.echoReturnLossEnhancement,
+    };
+  }
+  return undefined;
+};
+
+const buildAudioSourceStats = (audioSourceStats: AudioSourceStats | undefined): Partial<HMSLocalTrackStats> => {
+  if (!audioSourceStats) {
+    return {};
+  }
+  return {
+    sourceAudioLevel: audioSourceStats.audioLevel,
+    sourceTotalAudioEnergy: audioSourceStats.totalAudioEnergy,
+    sourceTotalSamplesDuration: audioSourceStats.totalSamplesDuration,
+    echoReturnLoss: audioSourceStats.echoReturnLoss,
+    echoReturnLossEnhancement: audioSourceStats.echoReturnLossEnhancement,
+    sourceStatsAvailable: true,
+  };
 };
 
 const computeSourceFramesDropped = (
