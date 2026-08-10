@@ -4,6 +4,7 @@ import {
   hasResolutionChanged,
   removeUndefinedFromObject,
   RunningTrackAnalytics,
+  TempStats,
 } from './BaseStatsAnalytics';
 import {
   LocalAudioSample,
@@ -114,7 +115,7 @@ const maxOf = (values: number[]) => (values.length ? Math.max(...values) : undef
 const countDistinctValues = (values: number[]) =>
   values.length ? new Set(values.map(value => value.toFixed(3))).size : undefined;
 
-class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
+export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   samples: (LocalAudioSample | LocalVideoSample)[] = [];
   private cpuPressureMonitor?: CPUPressureMonitor;
 
@@ -130,20 +131,33 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     this.cpuPressureMonitor = params.cpuPressureMonitor;
   }
 
+  // Counter delta across the window, or undefined when the browser never reported the
+  // counter. calculateDifferenceForSample coerces a missing value to 0, which would ship
+  // an absent metric as a real zero — indistinguishable from genuine silence.
+  private differenceIfReported = (key: keyof TempStats) =>
+    this.collectNumericValues(key).length ? this.calculateDifferenceForSample(key) : undefined;
+
   private getAudioSourceStats = (): Partial<LocalAudioSample> => {
-    const erl = this.collectNumericValues('echoReturnLoss');
-    const erle = this.collectNumericValues('echoReturnLossEnhancement');
-    if (erl.length === 0 && erle.length === 0) {
+    if (this.kind !== 'audio') {
       return {};
     }
+    const audioLevel = this.collectNumericValues('sourceAudioLevel');
+    const erl = this.collectNumericValues('echoReturnLoss');
+    const erle = this.collectNumericValues('echoReturnLossEnhancement');
+    // Energy is reported independently of ERL/ERLE, not gated behind them. ERL/ERLE only
+    // exist while a software canceller is running, so gating would drop the capture-level
+    // evidence for exactly the tracks published with echoCancellation disabled — the case
+    // where "was the mic live at all" is the question being asked.
     return {
+      audio_level_min: minOf(audioLevel),
+      audio_level_max: maxOf(audioLevel),
+      total_audio_energy: this.differenceIfReported('sourceTotalAudioEnergy'),
+      total_samples_duration_sec: this.differenceIfReported('sourceTotalSamplesDuration'),
       erl_db_min: minOf(erl),
       erl_db_max: maxOf(erl),
       erle_db_min: minOf(erle),
       erle_db_max: maxOf(erle),
       erle_distinct_count: countDistinctValues(erle),
-      total_audio_energy: this.calculateDifferenceForSample('sourceTotalAudioEnergy'),
-      total_samples_duration_sec: this.calculateDifferenceForSample('sourceTotalSamplesDuration'),
     };
   };
 
@@ -158,8 +172,12 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     );
   };
 
+  // Frame-counter stats, video only. sourceStatsAvailable alone is not a sufficient gate:
+  // audio tracks now resolve a media-source too, and the frame counters below coerce to 0
+  // rather than undefined, so an ungated call ships source_total_frames: 0 on every audio
+  // sample.
   private getSourceStats = (latestStat: HMSTrackStats) => {
-    if (!latestStat.sourceStatsAvailable) {
+    if (this.kind !== 'video' || !latestStat.sourceStatsAvailable) {
       return {};
     }
     const source_resolution = latestStat.sourceFrameHeight

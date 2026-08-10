@@ -66,6 +66,15 @@ export interface LocalAudioSample extends LocalBaseSample {
   erle_distinct_count?: number;
   total_audio_energy?: number;
   total_samples_duration_sec?: number;
+  /**
+   * Capture level range over the window. No average is reported: RMS level is already
+   * recoverable as sqrt(total_audio_energy / total_samples_duration_sec), and that form is
+   * integrated rather than sampled at poll time. The range is what the energy integral
+   * flattens away — `audio_level_max` near 0 means nothing was captured at all, while an
+   * elevated `audio_level_min` means the floor never fell silent.
+   */
+  audio_level_min?: number;
+  audio_level_max?: number;
 }
 
 export interface LocalVideoSample extends LocalBaseSample {
