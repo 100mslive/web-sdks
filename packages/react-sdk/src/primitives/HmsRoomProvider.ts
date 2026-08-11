@@ -121,17 +121,22 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
      * for safari on desktop, which dispatches neither 'pagehide' nor 'visibilitychange'
      * when a tab is closed.
      *
-     * 'pagehide' also fires with persisted === true for a page entering the back/forward
-     * cache, which can be restored, and safari page-caches a document holding an
-     * RTCPeerConnection — that is how backgrounding the browser on iOS arrives here, so
-     * leaving on it ends a call the user is about to come back to. 'freeze' is not
-     * listened for at all for the same reason: chromium freezes a hidden page some
-     * minutes after the browser is backgrounded on android, and that page resumes.
+     * Never for a page that can come back. A hidden page has been backgrounded, and
+     * persisted === true is a page entering the back/forward cache — safari page-caches a
+     * document holding an RTCPeerConnection, so backgrounding the browser on iOS arrives
+     * here as both. On a real unload the page is still visible at this point: the unload
+     * steps fire pagehide first and flip the visibility state to hidden after. 'freeze' is
+     * not listened for at all, for the same reason — a frozen page resumes.
      *
-     * A page that is cached or frozen and never comes back is the server's to notice:
-     * signalling stops and the peer is removed as offline.
+     * A page that is hidden, cached or frozen and never comes back is the server's to
+     * notice: signalling stops and the peer is removed as offline.
      */
-    const leaveCallback = () => providerProps.actions.leave();
+    const leaveCallback = () => {
+      if (document.visibilityState === 'hidden') {
+        return;
+      }
+      providerProps.actions.leave();
+    };
     const pageHideCallback = (event: PageTransitionEvent) => {
       if (event.persisted) {
         return;
