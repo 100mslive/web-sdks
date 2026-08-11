@@ -573,7 +573,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private handleTrackInterruption = (interruption: HMSTrackInterruption) => {
-    HMSLogger.d(this.TAG, 'Track interruption', interruption);
+    HMSLogger.d(this.TAG, 'Track interruption', JSON.stringify(interruption));
     this.listener?.onTrackInterruption?.(interruption);
   };
 
