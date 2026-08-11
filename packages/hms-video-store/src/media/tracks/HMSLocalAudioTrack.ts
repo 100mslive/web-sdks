@@ -429,7 +429,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   /**
    * app facing interruption event. On interruption end this is published only after the track has
    * actually recovered, so an app showing a "mic interrupted" prompt keeps it up while the mic is
-   * still unusable. The analytics event is not moved along with it - interruption.end marks the
+   * still unusable. The analytics event is not moved along with it - interruption.stop marks the
    * interruption ending, and has to stay paired with interruption.start to be countable.
    */
   private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {

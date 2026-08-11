@@ -82,11 +82,9 @@ describe('HMSLocalAudioTrack interruptions', () => {
     ]);
   });
 
-  /*
-   * The end has to carry the name the native SDKs use. A web-only name is dropped on the way to
-   * insights, which leaves every interruption looking like one that never ended.
-   */
-  it('reports the interruption to analytics as interruption.start and interruption.end', async () => {
+  // the names are read by consumers of the analytics stream, an interruption is only countable
+  // while the pair stays intact
+  it('reports the interruption to analytics as interruption.start and interruption.stop', async () => {
     const eventBus = new EventBus();
     const names: string[] = [];
     eventBus.analytics.subscribe(event => names.push(event.name));
@@ -95,7 +93,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
     (track as any).handleTrackMute();
     await track.handleTrackUnmute();
 
-    expect(names.filter(name => name.startsWith('interruption'))).toEqual(['interruption.start', 'interruption.end']);
+    expect(names.filter(name => name.startsWith('interruption'))).toEqual(['interruption.start', 'interruption.stop']);
   });
 
   it('reacquires the mic on interruption end even though the track reports live and unmuted', async () => {

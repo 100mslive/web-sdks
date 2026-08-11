@@ -601,7 +601,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /**
    * app facing interruption event. On interruption end this is published only after the camera has
    * actually been reacquired, so an app showing a prompt keeps it up while the video is still frozen.
-   * The analytics event is not moved along with it - interruption.end marks the interruption
+   * The analytics event is not moved along with it - interruption.stop marks the interruption
    * ending, and has to stay paired with interruption.start to be countable.
    */
   private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
