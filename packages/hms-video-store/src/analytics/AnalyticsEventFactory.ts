@@ -297,7 +297,13 @@ export default class AnalyticsEventFactory {
     };
   }) {
     return new AnalyticsEvent({
-      name: `${started ? 'interruption.start' : 'interruption.stop'}`,
+      /*
+       * 'interruption.end', not 'interruption.stop': the android and iOS SDKs report the end of an
+       * interruption under that name, and the ingest pipeline and the dashboard session timeline
+       * both key off it. A third name for the same thing was dropped on the way to insights, so
+       * every web interruption looked like one that never ended.
+       */
+      name: `${started ? 'interruption.start' : 'interruption.end'}`,
       level: AnalyticsEventLevel.INFO,
       properties: {
         reason,

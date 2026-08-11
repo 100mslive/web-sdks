@@ -82,6 +82,22 @@ describe('HMSLocalAudioTrack interruptions', () => {
     ]);
   });
 
+  /*
+   * The end has to carry the name the native SDKs use. A web-only name is dropped on the way to
+   * insights, which leaves every interruption looking like one that never ended.
+   */
+  it('reports the interruption to analytics as interruption.start and interruption.end', async () => {
+    const eventBus = new EventBus();
+    const names: string[] = [];
+    eventBus.analytics.subscribe(event => names.push(event.name));
+
+    const track = makeLocalAudioTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(names.filter(name => name.startsWith('interruption'))).toEqual(['interruption.start', 'interruption.end']);
+  });
+
   it('reacquires the mic on interruption end even though the track reports live and unmuted', async () => {
     const track = makeLocalAudioTrack(new EventBus());
 
