@@ -44,6 +44,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * recovery is driven off this instead of shouldReacquireTrack alone.
    */
   private interrupted = false;
+  /** whether the app has been told about an interruption, keeps the start/end pair intact */
+  private interruptionNotified = false;
   /** in flight interruption recovery, see endInterruption */
   private recovery?: Promise<void>;
   audioLevelMonitor?: TrackAudioLevelMonitor;
@@ -137,7 +139,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     } catch (error) {
       this.eventBus.error.publish(error as HMSException);
     }
+    this.notifyIfStillInterrupted('visibility-change');
   };
+
+  /** the mic did not come back, and the user is now here to see it */
+  private notifyIfStillInterrupted(reason: string) {
+    if (this.shouldReacquireTrack()) {
+      this.notifyInterruption({ started: true, reason });
+    }
+  }
 
   private handleBackgrounded() {
     // track state is fine do nothing
@@ -427,12 +437,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   /**
-   * app facing interruption event. On interruption end this is published only after the track has
-   * actually recovered, so an app showing a "mic interrupted" prompt keeps it up while the mic is
-   * still unusable. The analytics event is not moved along with it - interruption.stop marks the
-   * interruption ending, and has to stay paired with interruption.start to be countable.
+   * app facing interruption event, for a mic that is actually not capturing and a user who is there
+   * to see it. Two things it deliberately stays quiet about:
+   *
+   * - a hidden page. Backgrounding is not an interruption to prompt about even when the OS does stop
+   *   the mic, because the mic is reacquired on the way back. If it does not come back,
+   *   handleForegrounded raises it once the page is visible, which is the first moment a prompt is
+   *   worth anything.
+   * - an unpaired event. An end is only published after the mic has actually recovered, so a prompt
+   *   stays up while the mic is still unusable, and never for a start that was never published.
+   *
+   * The analytics events are not gated with it - interruption.start/stop record every interruption,
+   * including the ones the user never had to hear about.
    */
   private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+    if (started === this.interruptionNotified) {
+      return;
+    }
+    if (started && document.visibilityState === 'hidden') {
+      return;
+    }
+    this.interruptionNotified = started;
     this.eventBus.trackInterruption.publish({ started, reason, type: this.type, trackId: this.trackId });
   }
 

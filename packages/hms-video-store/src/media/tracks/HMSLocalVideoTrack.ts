@@ -48,6 +48,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * off this.
    */
   private interrupted = false;
+  /** whether the app has been told about an interruption, keeps the start/end pair intact */
+  private interruptionNotified = false;
   /** in flight interruption recovery, see endInterruption */
   private recovery?: Promise<void>;
   /** the visibilitychange handler is only attached on mobile, see the constructor */
@@ -599,12 +601,28 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
-   * app facing interruption event. On interruption end this is published only after the camera has
-   * actually been reacquired, so an app showing a prompt keeps it up while the video is still frozen.
-   * The analytics event is not moved along with it - interruption.stop marks the interruption
-   * ending, and has to stay paired with interruption.start to be countable.
+   * app facing interruption event, for a camera that is actually not capturing and a user who is
+   * there to see it. Two things it deliberately stays quiet about:
+   *
+   * - a hidden page. The camera is released on the way out - by us, in handleBackgrounded - and
+   *   reacquired on the way back, so backgrounding on its own is nothing to prompt about. If the
+   *   camera does not come back, handleForegrounded raises it once the page is visible, which is the
+   *   first moment a prompt is worth anything.
+   * - an unpaired event. An end is only published after the camera has actually been reacquired, so
+   *   a prompt stays up while the tile is still frozen, and never for a start that was never
+   *   published.
+   *
+   * The analytics events are not gated with it - interruption.start/stop record every interruption,
+   * including the ones the user never had to see.
    */
   private notifyInterruption({ started, reason }: { started: boolean; reason: string }) {
+    if (started === this.interruptionNotified) {
+      return;
+    }
+    if (started && document.visibilityState === 'hidden') {
+      return;
+    }
+    this.interruptionNotified = started;
     this.eventBus.trackInterruption.publish({ started, reason, type: this.type, trackId: this.trackId });
   }
 
@@ -734,7 +752,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } catch (error) {
       this.eventBus.error.publish(error as HMSException);
     }
+    this.notifyIfStillInterrupted('visibility-change');
   };
+
+  /** the camera did not come back, and the user is now here to see it */
+  private notifyIfStillInterrupted(reason: string) {
+    if (this.enabledStateBeforeBackground && this.isTrackNotPublishing()) {
+      this.notifyInterruption({ started: true, reason });
+    }
+  }
 
   private handleBackgrounded = async () => {
     this.enabledStateBeforeBackground = this.enabled;
@@ -744,8 +770,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     // started interruption event
     this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
-    if (this.interrupted) {
-      this.notifyInterruption({ started: true, reason: 'visibility-change' });
-    }
+    this.notifyInterruption({ started: true, reason: 'visibility-change' });
   };
 }

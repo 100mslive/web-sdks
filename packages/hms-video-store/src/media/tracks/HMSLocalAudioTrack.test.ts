@@ -144,7 +144,8 @@ describe('HMSLocalAudioTrack interruptions', () => {
     expect(unpaused).toHaveBeenCalledTimes(1);
   });
 
-  it('defers recovery while the page is hidden and recovers on foreground', async () => {
+  // an interruption the user was never present for and that fixed itself is not worth a prompt
+  it('defers recovery while the page is hidden and recovers on foreground without prompting', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
     eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
@@ -155,13 +156,34 @@ describe('HMSLocalAudioTrack interruptions', () => {
     await track.handleTrackUnmute();
 
     expect(getAudioTrackMock).not.toHaveBeenCalled();
-    expect(interruptions.map(i => i.started)).toEqual([true]);
+    expect(interruptions).toEqual([]);
 
     setVisibility('visible');
     await (track as any).handleVisibilityChange();
 
     expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
-    expect(interruptions.map(i => i.started)).toEqual([true, false]);
+    expect(interruptions).toEqual([]);
+  });
+
+  it('prompts on foreground when the mic did not come back', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean; reason: string }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    // eventemitter2 rethrows the reserved 'error' event when nothing is listening
+    eventBus.error.subscribe(() => {});
+    getAudioTrackMock.mockRejectedValue(new Error('device in use'));
+
+    const track = makeLocalAudioTrack(eventBus);
+    setVisibility('hidden');
+    (track as any).handleTrackMute();
+    (track.nativeTrack as any).readyState = 'ended';
+
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([
+      { started: true, reason: 'visibility-change', type: 'audio', trackId: track.trackId },
+    ]);
   });
 
   it('recovers once when the native unmute and the foreground event both fire', async () => {

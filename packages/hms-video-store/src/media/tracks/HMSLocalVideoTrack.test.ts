@@ -51,6 +51,13 @@ const setVisibility = (state: 'hidden' | 'visible') => {
   Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
 };
 
+// jsdom has no canvas capture, and turning the camera off replaces the track with a blank one
+beforeAll(() => {
+  (HTMLCanvasElement.prototype as any).captureStream = () => ({
+    getVideoTracks: () => [makeNativeTrack('blank')],
+  });
+});
+
 describe('HMSLocalVideoTrack interruptions', () => {
   beforeEach(() => {
     setVisibility('visible');
@@ -94,6 +101,26 @@ describe('HMSLocalVideoTrack interruptions', () => {
     await (track as any).handleVisibilityChange();
 
     expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
+  });
+
+  // backgrounding turns the camera off itself and turns it back on, the app hears nothing about it
+  it('does not prompt for the camera it turned off to background', async () => {
+    const eventBus = new EventBus();
+    const interruptions: unknown[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalVideoTrack(eventBus);
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([]);
+
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([]);
+    // and it is the same flow that reacquires the camera
+    expect(getVideoTrackMock).toHaveBeenCalled();
   });
 
   it('publishes a camera interruption to the app and clears the published mute', async () => {
