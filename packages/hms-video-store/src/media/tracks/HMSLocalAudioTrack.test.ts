@@ -233,6 +233,35 @@ describe('HMSLocalAudioTrack interruptions', () => {
     expect(interruptions).toEqual([]);
   });
 
+  /**
+   * The prompt is gated on the mic actually publishing, the analytics are not. An interruption is
+   * only countable while the pair stays intact, so a start has to be recorded wherever the foreground
+   * will send its stop - including for a peer who is muted and never sees a prompt.
+   */
+  it('keeps the analytics pair intact for a muted peer that gets no prompt', async () => {
+    const eventBus = new EventBus();
+    const names: string[] = [];
+    const interruptions: unknown[] = [];
+    eventBus.analytics.subscribe(event => {
+      if (event.name.startsWith('interruption.')) {
+        names.push(event.name);
+      }
+    });
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalAudioTrack(eventBus);
+    (track.nativeTrack as any).label = 'MediaStreamAudioDestinationNode';
+    (track.nativeTrack as any).enabled = false;
+
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(names).toEqual(['interruption.start', 'interruption.stop']);
+    expect(interruptions).toEqual([]);
+  });
+
   // getUserMedia resolving is not proof of capture - iOS hands back a muted track mid-interruption
   it('does not end the interruption when the reacquired mic is still not capturing', async () => {
     const eventBus = new EventBus();

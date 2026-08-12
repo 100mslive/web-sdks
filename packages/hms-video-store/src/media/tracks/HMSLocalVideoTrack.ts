@@ -780,6 +780,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private notifyIfStillInterrupted(reason: string) {
     if (this.interrupted || (this.enabledStateBeforeBackground && this.isTrackNotPublishing())) {
+      // recorded as well as published, so that the end is driven by the same flag that raised it
+      this.interrupted = true;
       this.notifyInterruption({ started: true, reason });
     }
   }

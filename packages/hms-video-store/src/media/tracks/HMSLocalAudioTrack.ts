@@ -164,22 +164,29 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   private notifyIfStillInterrupted(reason: string) {
     if (this.interrupted || (this.enabled && this.shouldReacquireTrack())) {
+      // recorded as well as published, so that the end is driven by the same flag that raised it
+      this.interrupted = true;
       this.notifyInterruption({ started: true, reason });
     }
   }
 
   private handleBackgrounded() {
+    // track state is fine do nothing
+    if (!this.shouldReacquireTrack()) {
+      HMSLogger.d(this.TAG, 'visibility: hidden', `${this}`);
+      return;
+    }
+    // ungated, so that it stays paired with the stop the foreground sends on the same condition
+    this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
     /**
      * Nothing was taken from a mic that is not publishing. A peer that joined muted holds an empty
      * track, which reports itself as needing reacquisition for the whole session - recording that as
      * an interruption would prompt them on the way back for a mic they never turned on.
      */
-    if (!this.enabled || !this.shouldReacquireTrack()) {
-      HMSLogger.d(this.TAG, 'visibility: hidden', `${this}`);
+    if (!this.enabled) {
       return;
     }
     this.interrupted = true;
-    this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });
     this.notifyInterruption({ started: true, reason: 'visibility-change' });
   }
 
