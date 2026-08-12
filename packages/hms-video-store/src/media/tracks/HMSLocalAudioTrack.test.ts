@@ -1,6 +1,7 @@
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack, HMSLocalStream } from '../../internal';
+import { isMobile } from '../../utils/support';
 import { getAudioTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings';
 
@@ -9,7 +10,13 @@ jest.mock('../../utils/track', () => ({
   getAudioTrack: jest.fn(),
 }));
 
+jest.mock('../../utils/support', () => ({
+  ...jest.requireActual('../../utils/support'),
+  isMobile: jest.fn(() => false),
+}));
+
 const getAudioTrackMock = getAudioTrack as jest.Mock;
+const isMobileMock = isMobile as jest.Mock;
 
 const audioContext = {
   createMediaStreamSource: jest.fn(),
@@ -65,6 +72,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
     audioContext.resume.mockClear();
     getAudioTrackMock.mockReset();
     getAudioTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
+    isMobileMock.mockReturnValue(false);
   });
 
   it('publishes an interruption on native mute and unmute', async () => {
@@ -145,10 +153,11 @@ describe('HMSLocalAudioTrack interruptions', () => {
   });
 
   // an interruption the user was never present for and that fixed itself is not worth a prompt
-  it('defers recovery while the page is hidden and recovers on foreground without prompting', async () => {
+  it('defers recovery on mobile while the page is hidden and recovers on foreground without prompting', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
     eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    isMobileMock.mockReturnValue(true);
 
     const track = makeLocalAudioTrack(eventBus);
     setVisibility('hidden');
@@ -163,6 +172,42 @@ describe('HMSLocalAudioTrack interruptions', () => {
 
     expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
     expect(interruptions).toEqual([]);
+  });
+
+  /**
+   * Only mobile withholds capture from a hidden page. On desktop a backgrounded tab is still a tab
+   * that can call getUserMedia, and waiting for a foreground that may be a long way off would leave
+   * the mic dead - and the peer published as muted - for the whole time.
+   */
+  it('recovers immediately on desktop even though the page is hidden', async () => {
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localAudioEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    const track = makeLocalAudioTrack(eventBus);
+    setVisibility('hidden');
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(getAudioTrackMock).toHaveBeenCalledTimes(1);
+    // and the peer is published as unmuted again, not left muted until the tab is focused
+    expect(enabledUpdates).toEqual([false, true]);
+  });
+
+  // the mic is back, however it got back - the prompt cannot outlive it
+  it('ends the interruption when the user recovers the mic themselves', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalAudioTrack(eventBus);
+    (track as any).handleTrackMute();
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+
+    await track.setEnabled(false);
+    await track.setEnabled(true);
+
+    expect(interruptions.map(i => i.started)).toEqual([true, false]);
   });
 
   it('prompts on foreground when the mic did not come back', async () => {

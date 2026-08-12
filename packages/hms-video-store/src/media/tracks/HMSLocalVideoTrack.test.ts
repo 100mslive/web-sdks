@@ -172,6 +172,46 @@ describe('HMSLocalVideoTrack interruptions', () => {
     expect(interruptions.map(i => i.started)).toEqual([true]);
   });
 
+  /**
+   * Backgrounding swaps in a blank canvas track, and a failed reacquire installs one too, so both
+   * failure paths leave a track reporting live and unmuted. The prompt has to come from the
+   * interruption we recorded, not from the flags.
+   */
+  it('prompts on foreground when the camera did not come back', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean; reason: string }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    eventBus.error.subscribe(() => {});
+
+    const track = makeLocalVideoTrack(eventBus);
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+    // nothing while hidden - nobody is there to act on it
+    expect(interruptions).toEqual([]);
+
+    getVideoTrackMock.mockRejectedValue(new Error('device in use'));
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
+  // the camera is back, however it got back - the prompt cannot outlive it
+  it('ends the interruption when the user turns the camera back on themselves', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+
+    await track.setEnabled(false);
+    await track.setEnabled(true);
+
+    expect(interruptions.map(i => i.started)).toEqual([true, false]);
+  });
+
   it('leaves an already off camera alone on foreground', async () => {
     const eventBus = new EventBus();
     const interruptions: unknown[] = [];

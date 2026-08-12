@@ -12,6 +12,7 @@ import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { HMSAudioContextHandler } from '../../utils/media';
+import { isMobile } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -132,6 +133,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.sendInterruptionAnalytics({ started: false, reason: 'visibility-change' });
     if (this.permissionState && this.permissionState !== 'granted') {
       HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+      // the mic cannot come back without the permission, and the page is visible - prompt now
+      this.interrupted = true;
+      this.notifyInterruption({ started: true, reason: 'permission-not-granted' });
       return;
     }
     try {
@@ -142,9 +146,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.notifyIfStillInterrupted('visibility-change');
   };
 
-  /** the mic did not come back, and the user is now here to see it */
+  /**
+   * The mic did not come back, and the user is now here to see it. `interrupted` is cleared only once
+   * the track has actually been replaced, so it - and not the native flags, which lie after an iOS
+   * interruption - is what says whether recovery worked.
+   */
   private notifyIfStillInterrupted(reason: string) {
-    if (this.shouldReacquireTrack()) {
+    if (this.interrupted) {
       this.notifyInterruption({ started: true, reason });
     }
   }
@@ -170,18 +178,26 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * 3. resume the remote playback the OS paused along with capture.
    */
   private endInterruption = async (reason: string) => {
-    if (document.visibilityState === 'hidden') {
-      // iOS does not give capture back to a backgrounded tab, handleVisibilityChange retries
+    /**
+     * Only mobile defers. iOS does not give capture back to a backgrounded tab, and
+     * handleVisibilityChange retries on return. On desktop a hidden page is just another tab and
+     * getUserMedia works there, so deferring would leave the mic dead - and the peer published as
+     * muted - until the user happens to come back to the tab.
+     */
+    if (isMobile() && document.visibilityState === 'hidden') {
       HMSLogger.d(this.TAG, 'interruption ended while hidden, deferring recovery', reason, `${this}`);
       return;
     }
     /**
      * both triggers fire on returning from an iOS interruption, and a second replaceTrackWith would
-     * stop the track the first one just installed. First trigger wins, a failed recovery is retried
-     * by the next foreground.
+     * stop the track the first one just installed. First trigger wins; the loser waits for it so
+     * that whatever runs after this sees the finished state rather than a half-replaced track.
      */
     if (this.recovery) {
       HMSLogger.d(this.TAG, 'interruption recovery already in progress', reason, `${this}`);
+      await this.recovery.catch(() => {
+        // the trigger that started the recovery reports its own failure
+      });
       return;
     }
     this.recovery = this.restoreCapture(reason);
@@ -491,6 +507,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     HMSLogger.d(this.TAG, 'reacquiring track', reason, `${this}`);
     await this.replaceTrackWith(this.settings);
     this.interrupted = false;
+    /**
+     * Capture is back, so the interruption is over however we got here. Publishing from this point
+     * rather than only from restoreCapture keeps the app in step when the user recovers the mic
+     * themselves - unmuting runs setEnabled, which lands here and nowhere near restoreCapture.
+     */
+    this.notifyInterruption({ started: false, reason });
   };
 
   private replaceSenderTrack = async () => {

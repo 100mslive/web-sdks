@@ -249,8 +249,11 @@ export const selectIsLocalVideoEnabled = (store: HMSStore) => {
 };
 
 /**
- * Select a boolean denoting whether the OS or another app has taken your microphone, an incoming
- * call or the tab being backgrounded on mobile. Cleared once capture is back.
+ * Select a boolean denoting whether the OS or another app has taken your microphone, eg. an
+ * incoming call. Cleared once capture is back, however it came back.
+ *
+ * Backgrounding the tab on mobile does not set this - the mic is handed back on return. It is set
+ * on return if the mic did not come back.
  */
 export const selectIsLocalAudioInterrupted = (store: HMSStore) => {
   const trackID = selectLocalPeer(store)?.audioTrack;

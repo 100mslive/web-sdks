@@ -150,7 +150,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   // eslint-disable-next-line complexity
-  async setEnabled(value: boolean, skipcheck = false): Promise<void> {
+  async setEnabled(value: boolean, skipcheck = false, reason = 'set-enabled'): Promise<void> {
     if (value === this.enabled && !skipcheck) {
       return;
     }
@@ -169,6 +169,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         await this.pluginsManager.waitForRestart();
         await this.processPlugins();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
+        /**
+         * The camera is capturing again, so the interruption is over however we got here. Recovery
+         * is not the only way back: the user turning the camera on again lands here, and on desktop
+         * there is no foreground event afterwards to clear the prompt.
+         */
+        this.interrupted = false;
+        this.notifyInterruption({ started: false, reason });
       }
       this.videoHandler.updateSinks();
     }
@@ -302,7 +309,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.transceiver = undefined;
     this.processedTrack?.stop();
     this.isPublished = false;
-    if (isBrowser && isMobile()) {
+    if (this.recoversOnForeground) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -627,10 +634,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
-   * Interruption end. Both triggers - the native unmute and coming back to the foreground - reacquire
-   * the camera. Nothing else restores it: the interrupted track can report live and unmuted while
-   * producing frozen frames, and the enabled state has to be re-published because interruption start
-   * tells biz mute=true, on which remote peers stop rendering this peer's video.
+   * Interruption end, from either trigger - the native unmute or coming back to the foreground.
+   * The camera is reacquired only when it has to be, ie. the background path turned it off or the
+   * track reports it is not publishing; when the OS restarts capture itself, replaying the sinks is
+   * enough and a getUserMedia would only add a few hundred ms of frozen tile. Either way the enabled
+   * state is re-published, because interruption start published mute=true and remote peers stop
+   * rendering this peer's video until they see an update.
    * @param enable the state to restore the camera to
    */
   private endInterruption = async (reason: string, enable: boolean) => {
@@ -641,11 +650,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     /**
      * both triggers fire on returning from an interruption, and a second getUserMedia would stop the
-     * track the first one just installed. First trigger wins, a failed recovery is retried by the
-     * next foreground.
+     * track the first one just installed. First trigger wins; the loser waits for it so that
+     * whatever runs after this sees the finished state rather than a half-replaced track.
      */
     if (this.recovery) {
       HMSLogger.d(this.TAG, 'interruption recovery already in progress', reason, `${this}`);
+      await this.recovery.catch(() => {
+        // the trigger that started the recovery reports its own failure
+      });
       return;
     }
     this.recovery = this.restoreCapture(reason, enable);
@@ -667,7 +679,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (enable && (!this.enabled || this.isTrackNotPublishing())) {
       HMSLogger.d(this.TAG, 'reacquiring camera after interruption', reason, `${this}`);
       // skipcheck, enabled is still true when the interruption did not go through setEnabled
-      await this.setEnabled(true, true);
+      await this.setEnabled(true, true, reason);
     } else {
       HMSLogger.d(this.TAG, 'interruption ended, track reports publishing, replaying sinks', reason, `${this}`);
       this.eventBus.localVideoEnabled.publish({ enabled: this.enabled, track: this });
@@ -755,9 +767,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.notifyIfStillInterrupted('visibility-change');
   };
 
-  /** the camera did not come back, and the user is now here to see it */
+  /**
+   * The camera did not come back, and the user is now here to see it. This reads `interrupted`,
+   * which restoreCapture clears only once the camera is actually back, rather than the track flags:
+   * both failure paths leave a track that looks healthy - backgrounding swaps in a blank canvas
+   * track, and a failed reacquire installs one too - so isTrackNotPublishing() is false in exactly
+   * the case worth prompting about.
+   */
   private notifyIfStillInterrupted(reason: string) {
-    if (this.enabledStateBeforeBackground && this.isTrackNotPublishing()) {
+    if (this.interrupted) {
       this.notifyInterruption({ started: true, reason });
     }
   }
@@ -766,7 +784,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.enabledStateBeforeBackground = this.enabled;
     if (this.enabled) {
       this.interrupted = true;
-      await this.setEnabled(false);
+      try {
+        await this.setEnabled(false);
+      } catch (error) {
+        // the camera stays on, but the interruption still has to be recorded and paired
+        this.eventBus.error.publish(error as HMSException);
+      }
     }
     // started interruption event
     this.sendInterruptionAnalytics({ started: true, reason: 'visibility-change' });

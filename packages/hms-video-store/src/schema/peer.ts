@@ -71,8 +71,11 @@ interface BaseTrack {
    */
   isPublished?: boolean;
   /**
-   * only applicable for local tracks - true while the OS or another app has taken the device, an
-   * incoming call or the tab being backgrounded on mobile. Cleared once capture is back.
+   * only applicable for local tracks - true while the OS or another app has taken the device, eg.
+   * an incoming call. Cleared once capture is back, however it came back.
+   *
+   * Backgrounding the tab on mobile is not reported here: the device is handed back on return. It
+   * is set on return if the device did not come back.
    */
   interrupted?: boolean;
 }
