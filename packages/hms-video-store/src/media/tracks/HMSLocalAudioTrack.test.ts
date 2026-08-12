@@ -1,7 +1,7 @@
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack, HMSLocalStream } from '../../internal';
-import { isMobile } from '../../utils/support';
+import { isMobileOrTablet } from '../../utils/support';
 import { getAudioTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings';
 
@@ -12,11 +12,11 @@ jest.mock('../../utils/track', () => ({
 
 jest.mock('../../utils/support', () => ({
   ...jest.requireActual('../../utils/support'),
-  isMobile: jest.fn(() => false),
+  isMobileOrTablet: jest.fn(() => false),
 }));
 
 const getAudioTrackMock = getAudioTrack as jest.Mock;
-const isMobileMock = isMobile as jest.Mock;
+const isMobileOrTabletMock = isMobileOrTablet as jest.Mock;
 
 const audioContext = {
   createMediaStreamSource: jest.fn(),
@@ -72,7 +72,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
     audioContext.resume.mockClear();
     getAudioTrackMock.mockReset();
     getAudioTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
-    isMobileMock.mockReturnValue(false);
+    isMobileOrTabletMock.mockReturnValue(false);
   });
 
   it('publishes an interruption on native mute and unmute', async () => {
@@ -157,7 +157,7 @@ describe('HMSLocalAudioTrack interruptions', () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean }[] = [];
     eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
-    isMobileMock.mockReturnValue(true);
+    isMobileOrTabletMock.mockReturnValue(true);
 
     const track = makeLocalAudioTrack(eventBus);
     setVisibility('hidden');

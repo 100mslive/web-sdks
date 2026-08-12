@@ -20,7 +20,7 @@ import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStream
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isMobile } from '../../utils/support';
+import { isBrowser, isMobileOrTablet } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -103,7 +103,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus, room);
     this.setFirstTrackId(this.trackId);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.handleTrackUnmute);
-    this.recoversOnForeground = isBrowser && source === 'regular' && isMobile();
+    this.recoversOnForeground = isBrowser && source === 'regular' && isMobileOrTablet();
     if (this.recoversOnForeground) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }

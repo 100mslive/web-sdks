@@ -12,7 +12,7 @@ import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import Room from '../../sdk/models/HMSRoom';
 import HMSLogger from '../../utils/logger';
 import { HMSAudioContextHandler } from '../../utils/media';
-import { isMobile } from '../../utils/support';
+import { isMobileOrTablet } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack, listenToPermissionChange } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -199,7 +199,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * getUserMedia works there, so deferring would leave the mic dead - and the peer published as
      * muted - until the user happens to come back to the tab.
      */
-    if (isMobile() && document.visibilityState === 'hidden') {
+    if (isMobileOrTablet() && document.visibilityState === 'hidden') {
       HMSLogger.d(this.TAG, 'interruption ended while hidden, deferring recovery', reason, `${this}`);
       return;
     }

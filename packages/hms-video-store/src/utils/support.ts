@@ -79,6 +79,25 @@ export const isSupported = checkIsSupported();
 
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
+/**
+ * iPadOS 13+ safari defaults to a desktop class user agent - it parses as macOS with no device type
+ * and is otherwise indistinguishable from a mac, except that a mac reports no touch points.
+ */
+const isIPadOS = () =>
+  typeof navigator !== 'undefined' &&
+  navigator.maxTouchPoints > 1 &&
+  Boolean(parsedUserAgent.getOS().name?.toLowerCase().includes('mac'));
+
+/**
+ * Handheld platforms do not hand capture back to a backgrounded page, so anything that reacquires a
+ * device has to wait for the foreground there. Tablets behave like phones for this and iPads are the
+ * common case, so neither the tablet device type nor iPadOS can be left out.
+ */
+export const isMobileOrTablet = () => {
+  const deviceType = parsedUserAgent.getDevice().type;
+  return deviceType === 'mobile' || deviceType === 'tablet' || isIPadOS();
+};
+
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;
 
 export const isIOS = () => parsedUserAgent.getOS().name?.toLowerCase() === 'ios';
