@@ -246,6 +246,13 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer,
       this.pluginUsageTracker,
     );
+    /**
+     * Unlike the other managers, transport takes no listener in its constructor, so it has to be
+     * set explicitly here too. Without this it stays unset on the first init (a join with no
+     * preview, or a rejoin after leave since cleanup resets sdkState) and transport-emitted
+     * updates - onSFUMigration in particular - are silently dropped.
+     */
+    this.transport.setListener(this.listener);
     // add diagnostics callbacks if present
     if ('onInitSuccess' in listener) {
       this.transport.setConnectivityListener(listener);
