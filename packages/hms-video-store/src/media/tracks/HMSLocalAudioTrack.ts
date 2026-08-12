@@ -147,12 +147,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   /**
-   * The mic did not come back, and the user is now here to see it. `interrupted` is cleared only once
-   * the track has actually been replaced, so it - and not the native flags, which lie after an iOS
-   * interruption - is what says whether recovery worked.
+   * The mic did not come back, and the user is now here to see it. Either signal is enough: the
+   * flags lie after an iOS interruption, where only `interrupted` - cleared once the track has
+   * actually been replaced - says whether recovery worked, and a mic that died without ever firing
+   * mute was never recorded as interrupted but does report it.
    */
   private notifyIfStillInterrupted(reason: string) {
-    if (this.interrupted) {
+    if (this.interrupted || this.shouldReacquireTrack()) {
       this.notifyInterruption({ started: true, reason });
     }
   }

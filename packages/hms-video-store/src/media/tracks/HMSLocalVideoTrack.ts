@@ -768,14 +768,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   /**
-   * The camera did not come back, and the user is now here to see it. This reads `interrupted`,
-   * which restoreCapture clears only once the camera is actually back, rather than the track flags:
-   * both failure paths leave a track that looks healthy - backgrounding swaps in a blank canvas
-   * track, and a failed reacquire installs one too - so isTrackNotPublishing() is false in exactly
-   * the case worth prompting about.
+   * The camera did not come back, and the user is now here to see it. Either signal is enough.
+   * `interrupted` - cleared only once the camera is actually back - carries what the flags cannot:
+   * both failure paths leave a track that looks healthy, backgrounding swaps in a blank canvas track
+   * and a failed reacquire installs one too, so isTrackNotPublishing() is false in exactly the case
+   * worth prompting about. The flags carry the rest, a reacquire that handed back a muted camera.
    */
   private notifyIfStillInterrupted(reason: string) {
-    if (this.interrupted) {
+    if (this.interrupted || (this.enabledStateBeforeBackground && this.isTrackNotPublishing())) {
       this.notifyInterruption({ started: true, reason });
     }
   }
