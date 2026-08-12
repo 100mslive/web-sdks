@@ -162,7 +162,20 @@ describe('getLocalTrackStats — audio echo-cancellation stats', () => {
     expect(stats?.O1.sourceTotalAudioEnergy).toBe(12.5);
     expect(stats?.O1.sourceTotalSamplesDuration).toBe(60);
     expect(stats?.O1.sourceAudioLevel).toBe(0.05);
-    expect(stats?.O1.sourceStatsAvailable).toBe(true);
+    // sourceStatsAvailable gates the video frame counters; audio must not set it, otherwise
+    // getSourceStats ships source_total_frames: 0 on every audio sample.
+    expect(stats?.O1.sourceStatsAvailable).toBeUndefined();
+  });
+
+  test('reads a media-source that reports mediaType instead of kind', async () => {
+    const stat = audioMediaSource();
+    delete (stat as Record<string, unknown>).kind;
+    (stat as Record<string, unknown>).mediaType = 'audio';
+    const report = makeReport([outboundRtp(1000, 5_000_000), stat]);
+
+    const stats = await getLocalTrackStats(eventBus, audioTrack(report));
+
+    expect(stats?.O1.echoReturnLossEnhancement).toBe(0.1755);
   });
 
   test('ignores a media-source belonging to a different sender track', async () => {
@@ -171,7 +184,7 @@ describe('getLocalTrackStats — audio echo-cancellation stats', () => {
     const stats = await getLocalTrackStats(eventBus, audioTrack(report));
 
     expect(stats?.O1.echoReturnLossEnhancement).toBeUndefined();
-    expect(stats?.O1.sourceStatsAvailable).toBeUndefined();
+    expect(stats?.O1.sourceAudioLevel).toBeUndefined();
   });
 
   test('leaves echo fields unset when the browser reports no audio media-source', async () => {

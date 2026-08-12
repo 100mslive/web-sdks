@@ -34,7 +34,8 @@ interface AudioSourceStats {
 
 interface AudioMediaSourceStat extends AudioSourceStats {
   type?: string;
-  kind?: string;
+  kind?: 'audio' | 'video';
+  mediaType?: 'audio' | 'video';
   trackIdentifier?: string;
 }
 
@@ -43,7 +44,7 @@ const isVideoMediaSourceStat = (stat: any): boolean => {
   return !kind || kind === 'video';
 };
 
-const matchesSenderTrack = (stat: any, senderTrackId?: string): boolean => {
+const matchesSenderTrack = (stat: { trackIdentifier?: string }, senderTrackId?: string): boolean => {
   if (!senderTrackId || !stat.trackIdentifier) {
     return true;
   }
@@ -335,6 +336,12 @@ const getMediaSourceStats = (
   return undefined;
 };
 
+// kind || mediaType: the video helper above already tolerates both spellings, and an engine
+// reporting only mediaType would otherwise lose every audio metric silently —
+// indistinguishable from "this browser applies no echo cancellation".
+const isAudioMediaSourceStat = (stat: AudioMediaSourceStat): boolean =>
+  stat.type === 'media-source' && (stat.kind || stat.mediaType) === 'audio';
+
 const getAudioSourceStats = (
   trackReport: RTCStatsReport | undefined,
   track: HMSLocalTrack,
@@ -345,10 +352,7 @@ const getAudioSourceStats = (
   const senderTrackId = track.transceiver?.sender?.track?.id;
   for (const stat of trackReport.values()) {
     const audioStat = stat as AudioMediaSourceStat;
-    if (audioStat.type !== 'media-source' || audioStat.kind !== 'audio') {
-      continue;
-    }
-    if (!matchesSenderTrack(audioStat, senderTrackId)) {
+    if (!isAudioMediaSourceStat(audioStat) || !matchesSenderTrack(audioStat, senderTrackId)) {
       continue;
     }
     return {
@@ -372,7 +376,6 @@ const buildAudioSourceStats = (audioSourceStats: AudioSourceStats | undefined): 
     sourceTotalSamplesDuration: audioSourceStats.totalSamplesDuration,
     echoReturnLoss: audioSourceStats.echoReturnLoss,
     echoReturnLossEnhancement: audioSourceStats.echoReturnLossEnhancement,
-    sourceStatsAvailable: true,
   };
 };
 

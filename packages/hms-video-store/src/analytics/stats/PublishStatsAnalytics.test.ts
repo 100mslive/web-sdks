@@ -64,15 +64,66 @@ describe('RunningLocalTrackAnalytics — audio source stats', () => {
     expect(first.total_samples_duration_sec).toBe(40);
     expect(second.total_audio_energy).toBe(7);
     expect(second.total_samples_duration_sec).toBe(30);
-    expect(first.erle_db_min).toBeUndefined();
-    expect(first.erle_distinct_count).toBeUndefined();
+    expect(first).not.toHaveProperty('erle_db_min');
+    expect(first).not.toHaveProperty('erle_distinct_count');
   });
 
-  test('aggregates capture level as a range', () => {
+  test('omits the energy delta when the media-source is replaced mid-call', () => {
+    // A device switch or audio-plugin toggle swaps the sender track, so the browser's
+    // cumulative counters restart at 0 while this analytics object survives (trackId is
+    // pinned to firstTrackId). The delta would go large-negative, and two negatives divide
+    // to a positive RMS — a confident "loud healthy mic" reading during silence.
+    const analytics = makeAnalytics('audio');
+    analytics.pushTempStat({ timestamp: 1000, sourceTotalAudioEnergy: 8, sourceTotalSamplesDuration: 30 } as TempStats);
+    analytics.createSample();
+
+    analytics.pushTempStat({
+      timestamp: 2000,
+      sourceTotalAudioEnergy: 0.02,
+      sourceTotalSamplesDuration: 2,
+    } as TempStats);
+    analytics.createSample();
+
+    const [, second] = analytics.samples as LocalAudioSample[];
+    expect(second).not.toHaveProperty('total_audio_energy');
+    expect(second).not.toHaveProperty('total_samples_duration_sec');
+  });
+
+  test('omits the energy delta when the counter stops being reported mid-window', () => {
+    // The window's last poll carries no media-source (replaceTrack teardown). Guarding the
+    // whole window instead of the two values the subtraction reads would emit 0 - 40 = -40.
+    const analytics = makeAnalytics('audio');
+    analytics.pushTempStat({ timestamp: 1000, sourceTotalAudioEnergy: 40 } as TempStats);
+    analytics.createSample();
+
+    analytics.pushTempStat({ timestamp: 2000, sourceTotalAudioEnergy: 41 } as TempStats);
+    analytics.pushTempStat({ timestamp: 3000 } as TempStats);
+    analytics.createSample();
+
+    const [, second] = analytics.samples as LocalAudioSample[];
+    expect(second).not.toHaveProperty('total_audio_energy');
+  });
+
+  test('aggregates capture level as a range with an observation count', () => {
     const sample = collate('audio', [{ sourceAudioLevel: 0.4 }, { sourceAudioLevel: 0.05 }, { sourceAudioLevel: 0.9 }]);
 
     expect(sample.audio_level_min).toBe(0.05);
     expect(sample.audio_level_max).toBe(0.9);
+    expect(sample.audio_level_observed_count).toBe(3);
+  });
+
+  test('preserves a measured zero, which is not the same as an absent metric', () => {
+    // Silent capture is the diagnosis these metrics exist to support, so a genuine 0 must
+    // survive. A `filter(Boolean)` style cleanup would erase it with every other test green.
+    const analytics = makeAnalytics('audio');
+    analytics.pushTempStat({ timestamp: 1000, sourceAudioLevel: 0, sourceTotalAudioEnergy: 5 } as TempStats);
+    analytics.createSample();
+    analytics.pushTempStat({ timestamp: 2000, sourceAudioLevel: 0, sourceTotalAudioEnergy: 5 } as TempStats);
+    analytics.createSample();
+
+    const [, second] = analytics.samples as LocalAudioSample[];
+    expect(second).toHaveProperty('audio_level_max', 0);
+    expect(second).toHaveProperty('total_audio_energy', 0);
   });
 
   test('omits energy entirely when the browser never reported it, rather than sending 0', () => {
@@ -94,12 +145,39 @@ describe('RunningLocalTrackAnalytics — audio source stats', () => {
     ]);
 
     expect(pinned.erle_distinct_count).toBe(1);
+    expect(pinned.erle_observed_count).toBe(2);
     expect(pinned.erl_db_min).toBe(-30);
     expect(pinned.erl_db_max).toBe(-30);
 
     expect(adapting.erle_distinct_count).toBe(2);
+    expect(adapting.erle_observed_count).toBe(2);
     expect(adapting.erle_db_min).toBe(4.2);
     expect(adapting.erle_db_max).toBe(11.6);
+  });
+
+  test('a single ERLE observation is distinguishable from a pinned canceller', () => {
+    // Both score erle_distinct_count: 1. Only the observation count separates "the canceller
+    // held steady across the window" from "we saw it once and cannot say".
+    const single = collate('audio', [{ echoReturnLossEnhancement: 0.1755 }, {}, {}]);
+
+    expect(single.erle_distinct_count).toBe(1);
+    expect(single.erle_observed_count).toBe(1);
+  });
+
+  test('resets the ERLE range per window rather than accumulating across samples', () => {
+    const analytics = makeAnalytics('audio');
+    analytics.pushTempStat({ timestamp: 1000, echoReturnLossEnhancement: 4.2 } as TempStats);
+    analytics.pushTempStat({ timestamp: 2000, echoReturnLossEnhancement: 11.6 } as TempStats);
+    analytics.createSample();
+
+    analytics.pushTempStat({ timestamp: 3000, echoReturnLossEnhancement: 0.1755 } as TempStats);
+    analytics.pushTempStat({ timestamp: 4000, echoReturnLossEnhancement: 0.1755 } as TempStats);
+    analytics.createSample();
+
+    const [first, second] = analytics.samples as LocalAudioSample[];
+    expect(first.erle_distinct_count).toBe(2);
+    expect(second.erle_distinct_count).toBe(1);
+    expect(second.erle_db_max).toBe(0.1755);
   });
 
   test('does not emit audio fields on video samples, and keeps frame counters there', () => {

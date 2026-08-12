@@ -15,7 +15,6 @@ import {
 } from './interfaces';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import { CPUPressureMonitor } from '../../utils/cpu-pressure-monitor';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
@@ -44,7 +43,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
       video,
       joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
-      max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
+      max_window_sec: this.sampleWindowSize,
     };
   }
 
@@ -111,9 +110,10 @@ const minOf = (values: number[]) => (values.length ? Math.min(...values) : undef
 
 const maxOf = (values: number[]) => (values.length ? Math.max(...values) : undefined);
 
-// Rounded before counting so float noise in an otherwise stable reading is not read as adaptation.
-const countDistinctValues = (values: number[]) =>
-  values.length ? new Set(values.map(value => value.toFixed(3))).size : undefined;
+const countDistinctValues = (values: number[]) => (values.length ? new Set(values).size : undefined);
+
+const finiteOrUndefined = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 
 export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   samples: (LocalAudioSample | LocalVideoSample)[] = [];
@@ -131,11 +131,32 @@ export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     this.cpuPressureMonitor = params.cpuPressureMonitor;
   }
 
-  // Counter delta across the window, or undefined when the browser never reported the
-  // counter. calculateDifferenceForSample coerces a missing value to 0, which would ship
-  // an absent metric as a real zero — indistinguishable from genuine silence.
-  private differenceIfReported = (key: keyof TempStats) =>
-    this.collectNumericValues(key).length ? this.calculateDifferenceForSample(key) : undefined;
+  // Delta for a cumulative counter, or undefined when the delta cannot be trusted.
+  // Guards the two values the subtraction actually reads — this window's last stat and the
+  // previous window's last stat — rather than the window as a whole. Guarding the whole
+  // window would let a counter that stops being reported partway through emit a fabricated
+  // 0 (indistinguishable from measured silence) or a negative.
+  private differenceIfReported = (key: keyof TempStats) => {
+    const latest = finiteOrUndefined(this.getLatestStat()?.[key]);
+    if (latest === undefined) {
+      return undefined;
+    }
+    if (this.prevLatestStat === undefined) {
+      // First window of a track: the counter is cumulative since capture start, not a window
+      // delta. Emitted as-is rather than dropped — RMS stays correct because energy and
+      // duration are inflated identically, and dropping it would leave short calls with no
+      // audio evidence at all.
+      return latest;
+    }
+    const previous = finiteOrUndefined(this.prevLatestStat[key]);
+    if (previous === undefined) {
+      return undefined;
+    }
+    // A cumulative counter moving backwards means the media-source was replaced — a device
+    // switch or an audio plugin toggle both swap the sender track. The window's true delta
+    // is unknowable, which is not the same as zero.
+    return latest < previous ? undefined : latest - previous;
+  };
 
   private getAudioSourceStats = (): Partial<LocalAudioSample> => {
     if (this.kind !== 'audio') {
@@ -144,13 +165,14 @@ export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const audioLevel = this.collectNumericValues('sourceAudioLevel');
     const erl = this.collectNumericValues('echoReturnLoss');
     const erle = this.collectNumericValues('echoReturnLossEnhancement');
-    // Energy is reported independently of ERL/ERLE, not gated behind them. ERL/ERLE only
-    // exist while a software canceller is running, so gating would drop the capture-level
-    // evidence for exactly the tracks published with echoCancellation disabled — the case
-    // where "was the mic live at all" is the question being asked.
+    // Energy is reported independently of ERL/ERLE, not gated behind them. ERL/ERLE exist
+    // only while a canceller is applied to the capture path, so gating would drop the
+    // capture-level evidence for exactly the tracks published with echoCancellation
+    // disabled — the case where "was the mic live at all" is the question being asked.
     return {
       audio_level_min: minOf(audioLevel),
       audio_level_max: maxOf(audioLevel),
+      audio_level_observed_count: audioLevel.length || undefined,
       total_audio_energy: this.differenceIfReported('sourceTotalAudioEnergy'),
       total_samples_duration_sec: this.differenceIfReported('sourceTotalSamplesDuration'),
       erl_db_min: minOf(erl),
@@ -158,6 +180,7 @@ export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       erle_db_min: minOf(erle),
       erle_db_max: maxOf(erle),
       erle_distinct_count: countDistinctValues(erle),
+      erle_observed_count: erle.length || undefined,
     };
   };
 
@@ -172,12 +195,13 @@ export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     );
   };
 
-  // Frame-counter stats, video only. sourceStatsAvailable alone is not a sufficient gate:
-  // audio tracks now resolve a media-source too, and the frame counters below coerce to 0
-  // rather than undefined, so an ungated call ships source_total_frames: 0 on every audio
-  // sample.
+  // Frame-counter stats. The counters below coerce a missing value to 0, so an audio track
+  // reaching them ships source_total_frames: 0 on every sample. Two guards, deliberately:
+  // buildAudioSourceStats no longer sets sourceStatsAvailable, and audio is excluded here
+  // too. Excluding audio rather than requiring video keeps video stats that arrive without a
+  // `kind` behaving exactly as they did before this gate existed.
   private getSourceStats = (latestStat: HMSTrackStats) => {
-    if (this.kind !== 'video' || !latestStat.sourceStatsAvailable) {
+    if (this.kind === 'audio' || !latestStat.sourceStatsAvailable) {
       return {};
     }
     const source_resolution = latestStat.sourceFrameHeight
@@ -246,7 +270,7 @@ export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const prevStat = this.tempStats[length - 2];
 
     return (
-      length === PUBLISH_STATS_SAMPLE_WINDOW ||
+      length === this.sampleWindowSize ||
       hasEnabledStateChanged(newStat, prevStat) ||
       (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
     );

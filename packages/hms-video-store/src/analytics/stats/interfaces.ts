@@ -6,7 +6,7 @@ interface BaseStatsPayload {
 }
 
 export interface PublishAnalyticPayload extends BaseStatsPayload {
-  video: Array<LocalAudioTrackAnalytics>; // Each element represents a video track that the peer is uploading
+  video: Array<LocalVideoTrackAnalytics>; // Each element represents a video track that the peer is uploading
   audio: Array<LocalAudioTrackAnalytics>; // Each element represents an audio track that the peer is uploading
 }
 
@@ -51,30 +51,51 @@ export interface LocalBaseSample {
   effects_metrics?: Record<string, Record<string, unknown> | undefined>; // Metrics from attached plugins (e.g., effects SDK)
 }
 
+/**
+ * Audio capture metrics for one sample window, from the audio `media-source` stat.
+ *
+ * Every field is optional in the "browser did not report it" sense, which is distinct from a
+ * reported zero — an absent counter must never be read as measured silence.
+ *
+ * Ranges rather than averages: ERLE legitimately drops to 0 during double-talk and silence,
+ * so a window mean makes an idle canceller and a working one look alike. No level average is
+ * reported either, because RMS is recoverable as
+ * `sqrt(total_audio_energy / total_samples_duration_sec)` — integrated across the window
+ * rather than sampled at poll time. That identity is from the spec
+ * (https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-totalaudioenergy) and needs
+ * `total_samples_duration_sec` to be present and non-zero.
+ */
 export interface LocalAudioSample extends LocalBaseSample {
-  /**
-   * Echo canceller health, from the audio `media-source` stat.
-   * A window average is not enough on its own: ERLE legitimately drops to 0 during
-   * double-talk and silence, so averaging makes an idle canceller and a working one
-   * look alike. `erle_distinct_count` is 1 when the value never moves across the
-   * window, which is what separates "no software AEC running" from "AEC running".
-   */
+  /** Echo return loss, dB. Absent when no canceller is applied to the capture path. */
   erl_db_min?: number;
   erl_db_max?: number;
+  /** Echo return loss enhancement, dB — how much echo the canceller removed. */
   erle_db_min?: number;
   erle_db_max?: number;
+  /**
+   * Distinct ERLE readings in the window. `1` means the canceller reported a pinned value —
+   * present but not adapting. It never means "no canceller"; that case carries no ERLE fields
+   * at all. Read with `erle_observed_count`, since a single observation also scores 1.
+   */
   erle_distinct_count?: number;
+  /** Polls that carried an ERLE reading — the denominator for the fields above. */
+  erle_observed_count?: number;
+  /**
+   * Cumulative-counter deltas. The first window of a track reports the total since capture
+   * start rather than a window delta; both fields are inflated identically, so RMS is
+   * unaffected but a per-window energy figure is not.
+   */
   total_audio_energy?: number;
   total_samples_duration_sec?: number;
   /**
-   * Capture level range over the window. No average is reported: RMS level is already
-   * recoverable as sqrt(total_audio_energy / total_samples_duration_sec), and that form is
-   * integrated rather than sampled at poll time. The range is what the energy integral
-   * flattens away — `audio_level_max` near 0 means nothing was captured at all, while an
-   * elevated `audio_level_min` means the floor never fell silent.
+   * Capture level range. `audio_level_max` near 0 means nothing was captured; an elevated
+   * `audio_level_min` means the noise floor never fell silent. `1.0` is full-scale clipping,
+   * which is non-linear and therefore defeats the canceller's linear echo model.
    */
   audio_level_min?: number;
   audio_level_max?: number;
+  /** Polls that carried an audio level — the denominator for the two fields above. */
+  audio_level_observed_count?: number;
 }
 
 export interface LocalVideoSample extends LocalBaseSample {
