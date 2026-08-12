@@ -6,6 +6,7 @@ import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSRoom } from './room';
 import { HMSPoll, HMSWhiteboard, SessionStoreUpdate } from './session-store';
 import { HMSSpeaker } from './speaker';
+import { TrackInterruptionListener } from './track-interruption';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
 import { MessageNotification } from '../notification-manager';
@@ -74,7 +75,11 @@ export interface InteractivityListener {
   onWhiteboardUpdate(whiteboard: HMSWhiteboard): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener, InteractivityListener {
+export interface HMSUpdateListener
+  extends DeviceChangeListener,
+    SessionStoreListener,
+    InteractivityListener,
+    TrackInterruptionListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;

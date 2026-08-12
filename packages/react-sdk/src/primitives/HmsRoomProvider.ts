@@ -116,20 +116,38 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
     /*
      * Chrome is deprecating the 'unload' event (gradually disabled by default through
      * 2026, https://developer.chrome.com/docs/web-platform/deprecating-unload), and it
-     * never fired reliably on mobile or when a page enters the back/forward cache. Listen
-     * on the broader set of page-lifecycle events so the peer still leaves the room on tab
-     * close, navigation, or bfcache/freeze. 'freeze' is dispatched on document, the others
-     * on window. The leave is best-effort regardless — the server is the source of truth for
-     * a departed peer via signalling disconnect; these handlers just make it prompt.
+     * never fired reliably on mobile. Leave on the events that mean the document is
+     * actually going away: 'pagehide' wherever 'unload' used to fire, plus 'beforeunload'
+     * for safari on desktop, which dispatches neither 'pagehide' nor 'visibilitychange'
+     * when a tab is closed.
+     *
+     * Never for a page that can come back. A hidden page has been backgrounded, and
+     * persisted === true is a page entering the back/forward cache — safari page-caches a
+     * document holding an RTCPeerConnection, so backgrounding the browser on iOS arrives
+     * here as both. On a real unload the page is still visible at this point: the unload
+     * steps fire pagehide first and flip the visibility state to hidden after. 'freeze' is
+     * not listened for at all, for the same reason — a frozen page resumes.
+     *
+     * A page that is hidden, cached or frozen and never comes back is the server's to
+     * notice: signalling stops and the peer is removed as offline.
      */
-    const leaveCallback = () => providerProps.actions.leave();
-    window.addEventListener('pagehide', leaveCallback);
+    const leaveCallback = () => {
+      if (document.visibilityState === 'hidden') {
+        return;
+      }
+      providerProps.actions.leave();
+    };
+    const pageHideCallback = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        return;
+      }
+      leaveCallback();
+    };
+    window.addEventListener('pagehide', pageHideCallback);
     window.addEventListener('beforeunload', leaveCallback);
-    document.addEventListener('freeze', leaveCallback);
     return () => {
-      window.removeEventListener('pagehide', leaveCallback);
+      window.removeEventListener('pagehide', pageHideCallback);
       window.removeEventListener('beforeunload', leaveCallback);
-      document.removeEventListener('freeze', leaveCallback);
     };
   }, [leaveOnUnload, providerProps]);
 

@@ -56,6 +56,7 @@ export type {
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   HMSTranscriptionInfo,
+  HMSTrackInterruption,
   HMSICEServer,
 } from './internal';
 

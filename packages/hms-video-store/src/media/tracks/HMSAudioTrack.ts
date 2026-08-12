@@ -1,7 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSLogger from '../../utils/logger';
-import { isChromiumBased } from '../../utils/support';
+import { isChromiumBased, parsedUserAgent } from '../../utils/support';
 import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export class HMSAudioTrack extends HMSTrack {
@@ -76,12 +76,15 @@ export class HMSAudioTrack extends HMSTrack {
     // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
     // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
     // Setting sinkId in safari(support started from 18.4) causes "robotic voice" on bluetooth device changes or setting sinkId
-    if (typeof (this.audioElement as any).setSinkId !== 'function' || !isChromiumBased) {
+    const hasSetSinkId = typeof (this.audioElement as any).setSinkId === 'function';
+    if (!hasSetSinkId || !isChromiumBased) {
+      this.logSetSinkIdSkipped(device, hasSetSinkId);
       return;
     }
     try {
       await (this.audioElement as any).setSinkId(device.deviceId);
       this.outputDevice = device;
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'setSinkId succeeded', device.label, `${this}`);
     } catch (error) {
       // setSinkId rejects (NotFoundError / NotAllowedError / AbortError). Don't silently
       // swallow — the caller needs to know the UI says "device X selected" but audio
@@ -89,6 +92,23 @@ export class HMSAudioTrack extends HMSTrack {
       HMSLogger.w('[HMSAudioTrack]', this.logIdentifier, 'setSinkId failed', `${this}`, error);
       throw error;
     }
+  }
+
+  private logSetSinkIdSkipped(device: MediaDeviceInfo, hasSetSinkId: boolean) {
+    const reason = hasSetSinkId ? 'non-chromium-browser' : 'setSinkId-unsupported';
+    const browser = parsedUserAgent.getBrowser();
+    HMSLogger.d(
+      '[HMSAudioTrack]',
+      this.logIdentifier,
+      'setSinkId skipped, audio stays on the OS default sink',
+      `{
+        reason: ${reason};
+        browser: ${browser?.name};
+        browserVersion: ${browser?.version};
+        requestedDevice: ${device.label};
+      }`,
+      `${this}`,
+    );
   }
 
   protected async subscribeToAudio(value: boolean) {

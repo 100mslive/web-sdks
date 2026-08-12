@@ -38,6 +38,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  HMSTrackInterruption,
   HMSVideoCodec,
   TokenRequest,
   TokenRequestOptions,
@@ -264,6 +265,7 @@ export class HMSSdk implements HMSInterface {
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.trackInterruption.subscribe(this.handleTrackInterruption);
     this.eventBus.localVideoUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.subscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
@@ -577,6 +579,20 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  private handleTrackInterruption = (interruption: HMSTrackInterruption) => {
+    HMSLogger.d(
+      this.TAG,
+      'Track interruption',
+      `{
+        started: ${interruption.started};
+        type: ${interruption.type};
+        reason: ${interruption.reason};
+        trackId: ${interruption.trackId};
+      }`,
+    );
+    this.listener?.onTrackInterruption?.(interruption);
+  };
+
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
     if (event.isUserSelection) {
       return;
@@ -711,6 +727,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localVideoUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.unpauseRemoteVideoTracks);
     this.eventBus.error.unsubscribe(this.handleError);
+    this.eventBus.trackInterruption.unsubscribe(this.handleTrackInterruption);
     this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();

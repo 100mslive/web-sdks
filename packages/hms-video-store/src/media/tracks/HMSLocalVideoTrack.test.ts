@@ -1,26 +1,250 @@
 import { HMSLocalVideoTrack } from './HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
+import { getVideoTrack } from '../../utils/track';
 import { HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams/HMSLocalStream';
+
+jest.mock('../../utils/track', () => ({
+  ...jest.requireActual('../../utils/track'),
+  getVideoTrack: jest.fn(),
+}));
+
+const getVideoTrackMock = getVideoTrack as jest.Mock;
 
 const streamId = 'stream-1';
 const trackId = 'track-1';
 
-const makeLocalVideoTrack = () => {
-  const nativeStream = { id: streamId, getTracks: () => [] } as unknown as MediaStream;
+/**
+ * An interrupted camera can come back reporting live and unmuted while producing frozen frames -
+ * which is what this fake reports, so recovery can only come from the interruption itself.
+ */
+const makeNativeTrack = (id: string) =>
+  ({
+    id,
+    kind: 'video',
+    label: 'Fake camera',
+    enabled: true,
+    muted: false,
+    readyState: 'live',
+    getSettings: jest.fn(() => ({ deviceId: 'cam-1' })),
+    getConstraints: jest.fn(() => ({})),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    stop: jest.fn(),
+  } as unknown as MediaStreamTrack);
+
+const makeLocalVideoTrack = (eventBus: EventBus = new EventBus()) => {
+  const nativeStream = {
+    id: streamId,
+    getTracks: () => [],
+    addTrack: jest.fn(),
+    removeTrack: jest.fn(),
+  } as unknown as MediaStream;
   const stream = new HMSLocalStream(nativeStream);
   stream.setConnection({} as unknown as HMSPublishConnection);
-  const nativeTrack = {
-    id: trackId,
-    kind: 'video',
-    enabled: true,
-    getSettings: jest.fn(() => ({})),
-    addEventListener: jest.fn(),
-  } as unknown as MediaStreamTrack;
   const settings = new HMSVideoTrackSettingsBuilder().build();
-  return new HMSLocalVideoTrack(stream, nativeTrack, 'regular', new EventBus(), settings);
+  return new HMSLocalVideoTrack(stream, makeNativeTrack(trackId), 'regular', eventBus, settings);
 };
+
+const setVisibility = (state: 'hidden' | 'visible') => {
+  Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
+};
+
+// jsdom has no canvas capture, and turning the camera off replaces the track with a blank one
+beforeAll(() => {
+  (HTMLCanvasElement.prototype as any).captureStream = () => ({
+    getVideoTracks: () => [makeNativeTrack('blank')],
+  });
+});
+
+describe('HMSLocalVideoTrack interruptions', () => {
+  beforeEach(() => {
+    setVisibility('visible');
+    getVideoTrackMock.mockReset();
+    getVideoTrackMock.mockImplementation(async () => makeNativeTrack('track-2'));
+  });
+
+  it('reacquires the camera on native unmute when the track is not publishing', async () => {
+    const track = makeLocalVideoTrack();
+    (track.nativeTrack as any).readyState = 'ended';
+
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmuteNatively();
+
+    expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
+    expect(track.nativeTrack.id).toBe('track-2');
+  });
+
+  // the OS restarts capture on its own here, a getUserMedia would only freeze the tile for longer
+  it('does not replace a live track on native unmute, only replays the sinks', async () => {
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localVideoEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmuteNatively();
+
+    expect(getVideoTrackMock).not.toHaveBeenCalled();
+    expect(enabledUpdates).toEqual([false, true]);
+  });
+
+  it('reacquires the camera on foreground after the background turned it off', async () => {
+    const track = makeLocalVideoTrack();
+
+    setVisibility('hidden');
+    (track.nativeTrack as any).enabled = false;
+    (track as any).enabledStateBeforeBackground = true;
+    (track as any).interrupted = true;
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
+  });
+
+  // backgrounding turns the camera off itself and turns it back on, the app hears nothing about it
+  it('does not prompt for the camera it turned off to background', async () => {
+    const eventBus = new EventBus();
+    const interruptions: unknown[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalVideoTrack(eventBus);
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([]);
+
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([]);
+    // and it is the same flow that reacquires the camera
+    expect(getVideoTrackMock).toHaveBeenCalled();
+  });
+
+  it('publishes a camera interruption to the app and clears the published mute', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean; type: string }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    const enabledUpdates: boolean[] = [];
+    eventBus.localVideoEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+    const unpaused = jest.fn();
+    eventBus.localVideoUnmutedNatively.subscribe(unpaused);
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track.nativeTrack as any).readyState = 'ended';
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmuteNatively();
+
+    expect(interruptions).toEqual([
+      { started: true, reason: 'track-muted-natively', type: 'video', trackId: track.trackId },
+      { started: false, reason: 'track-unmuted-natively', type: 'video', trackId: track.trackId },
+    ]);
+    // mute tells biz the camera is off, recovery has to take that back
+    expect(enabledUpdates).toEqual([false, true]);
+    expect(unpaused).toHaveBeenCalledTimes(1);
+  });
+
+  it('recovers once when the native unmute and the foreground event both fire', async () => {
+    const track = makeLocalVideoTrack();
+    (track.nativeTrack as any).readyState = 'ended';
+
+    (track as any).handleTrackMute();
+    await Promise.all([track.handleTrackUnmuteNatively(), (track as any).handleVisibilityChange()]);
+
+    expect(getVideoTrackMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not end the interruption when the camera fails to come back', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    // eventemitter2 rethrows the reserved 'error' event when nothing is listening
+    eventBus.error.subscribe(() => {});
+    getVideoTrackMock.mockRejectedValue(new Error('device in use'));
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track.nativeTrack as any).readyState = 'ended';
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmuteNatively();
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
+  /**
+   * Backgrounding swaps in a blank canvas track, and a failed reacquire installs one too, so both
+   * failure paths leave a track reporting live and unmuted. The prompt has to come from the
+   * interruption we recorded, not from the flags.
+   */
+  it('prompts on foreground when the camera did not come back', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean; reason: string }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    eventBus.error.subscribe(() => {});
+
+    const track = makeLocalVideoTrack(eventBus);
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+    // nothing while hidden - nobody is there to act on it
+    expect(interruptions).toEqual([]);
+
+    getVideoTrackMock.mockRejectedValue(new Error('device in use'));
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
+  // the camera is back, however it got back - the prompt cannot outlive it
+  it('ends the interruption when the user turns the camera back on themselves', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+
+    await track.setEnabled(false);
+    await track.setEnabled(true);
+
+    expect(interruptions.map(i => i.started)).toEqual([true, false]);
+  });
+
+  // getUserMedia resolving is not proof of capture - the camera can come back muted
+  it('does not end the interruption when the reacquired camera is still not capturing', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    getVideoTrackMock.mockImplementation(async () => {
+      const replacement = makeNativeTrack('track-2');
+      (replacement as any).muted = true;
+      return replacement;
+    });
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.setEnabled(false);
+    await track.setEnabled(true);
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
+  it('leaves an already off camera alone on foreground', async () => {
+    const eventBus = new EventBus();
+    const interruptions: unknown[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalVideoTrack(eventBus);
+    // enabled is derived from the native track
+    (track.nativeTrack as any).enabled = false;
+    await (track as any).handleVisibilityChange();
+
+    expect(getVideoTrackMock).not.toHaveBeenCalled();
+    expect(interruptions).toEqual([]);
+  });
+});
 
 describe('HMSLocalVideoTrack', () => {
   describe('removeOrReplaceProcessedTrack', () => {
