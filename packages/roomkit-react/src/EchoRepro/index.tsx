@@ -41,7 +41,17 @@ interface AudioSourceSample {
   rms?: number;
 }
 
-type Verdict = 'no-canceller' | 'idle' | 'working' | 'unknown';
+type Verdict = 'no-canceller' | 'idle' | 'weak' | 'working' | 'unknown';
+
+/**
+ * Classify on the SIZE of the ERLE excursion above idle, not on how many distinct values
+ * appeared. Distinctness alone is far too loose: across the 9 Andor provider sessions, 4 had
+ * 2-7 distinct ERLE values with a maximum of only 0.32-1.59 dB, and all of those are no-path.
+ * A canceller working against a genuine path reads much higher — the live-validated reference
+ * case reached 22.31 dB.
+ */
+const WEAK_ERLE_DB = 1.0;
+const REAL_ERLE_DB = 3.0;
 
 const verdictOf = (samples: AudioSourceSample[]): Verdict => {
   const withStat = samples.filter(s => s.echoReturnLossEnhancement !== undefined);
@@ -51,11 +61,15 @@ const verdictOf = (samples: AudioSourceSample[]): Verdict => {
   if (withStat.length === 0) {
     return 'no-canceller';
   }
-  const distinct = new Set(withStat.map(s => s.echoReturnLossEnhancement));
-  if (distinct.size === 1 && Math.abs((withStat[0].echoReturnLossEnhancement ?? 0) - AEC3_IDLE_ERLE) < 1e-9) {
-    return 'idle';
+  const max = Math.max(...withStat.map(s => s.echoReturnLossEnhancement as number));
+  const excursion = max - AEC3_IDLE_ERLE;
+  if (excursion >= REAL_ERLE_DB) {
+    return 'working';
   }
-  return distinct.size > 1 ? 'working' : 'idle';
+  if (excursion >= WEAK_ERLE_DB) {
+    return 'weak';
+  }
+  return 'idle';
 };
 
 const dbov = (rms?: number) => (rms && rms > 1e-12 ? 20 * Math.log10(rms) : undefined);
@@ -341,6 +355,7 @@ export const EchoRepro = () => {
 
   const verdictColour = {
     working: '#3fb950',
+    weak: '#d29922',
     idle: '#d29922',
     'no-canceller': '#f85149',
     unknown: '#8b949e',
@@ -348,10 +363,21 @@ export const EchoRepro = () => {
 
   const verdictText = {
     working: 'AEC is working against a real echo path',
+    weak: 'AEC saw only a marginal path — inconclusive, raise gain or move the mic closer',
     idle: 'AEC is running but found no echo path',
     'no-canceller': 'No canceller applied to the capture path',
     unknown: 'collecting…',
   }[verdict];
+
+  // ERLE says a path EXISTS; the acoustic delta says whether residual echo still escapes.
+  // Both are needed: a high ERLE with a negative delta is the canceller winning, which is a
+  // successful calibration rather than an audible-echo reproduction.
+  const residual =
+    verdict === 'working' && analysis.delta !== undefined
+      ? analysis.delta > 6
+        ? ' — and residual echo IS escaping (audible-echo repro)'
+        : ' — but AEC is removing it (no residual escaping)'
+      : '';
 
   return (
     <div
@@ -481,7 +507,7 @@ export const EchoRepro = () => {
       <div style={box}>
         <div style={{ color: verdictColour, fontSize: 16, marginBottom: 12 }}>
           {verdictText}
-          {verdict === 'working' && ' — this is a reproduced echo path'}
+          {residual}
         </div>
         <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
           <tbody>
