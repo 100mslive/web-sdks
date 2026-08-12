@@ -132,10 +132,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.sendInterruptionAnalytics({ started: false, reason: 'visibility-change' });
     if (this.permissionState && this.permissionState !== 'granted') {
-      HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
-      // the mic cannot come back without the permission, and the page is visible - prompt now
-      this.interrupted = true;
-      this.notifyInterruption({ started: true, reason: 'permission-not-granted' });
+      this.handlePermissionNotGranted();
       return;
     }
     try {
@@ -147,20 +144,37 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   /**
+   * The mic cannot come back while the permission is not granted, so an interruption that is still
+   * open is raised now, on a visible page. Only one that was actually recorded: reaching here does
+   * not mean anything was taken away, since a peer that joined muted holds an empty track that
+   * reports itself as needing reacquisition for the whole session and never granted the permission.
+   */
+  private handlePermissionNotGranted() {
+    HMSLogger.d(this.TAG, 'On visibile not replacing track as permission is not granted');
+    if (this.interrupted) {
+      this.notifyInterruption({ started: true, reason: 'permission-not-granted' });
+    }
+  }
+
+  /**
    * The mic did not come back, and the user is now here to see it. Either signal is enough: the
    * flags lie after an iOS interruption, where only `interrupted` - cleared once the track has
    * actually been replaced - says whether recovery worked, and a mic that died without ever firing
    * mute was never recorded as interrupted but does report it.
    */
   private notifyIfStillInterrupted(reason: string) {
-    if (this.interrupted || this.shouldReacquireTrack()) {
+    if (this.interrupted || (this.enabled && this.shouldReacquireTrack())) {
       this.notifyInterruption({ started: true, reason });
     }
   }
 
   private handleBackgrounded() {
-    // track state is fine do nothing
-    if (!this.shouldReacquireTrack()) {
+    /**
+     * Nothing was taken from a mic that is not publishing. A peer that joined muted holds an empty
+     * track, which reports itself as needing reacquisition for the whole session - recording that as
+     * an interruption would prompt them on the way back for a mic they never turned on.
+     */
+    if (!this.enabled || !this.shouldReacquireTrack()) {
       HMSLogger.d(this.TAG, 'visibility: hidden', `${this}`);
       return;
     }
@@ -217,9 +231,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * monitor reads zero. It is only resumed on join and on unblockAutoplay otherwise.
      */
     await HMSAudioContextHandler.resumeContext();
+    // reacquireStaleTrack owns the end, so that it is published once capture is verifiably back and
+    // from every path that restores it, not only from here
     await this.reacquireStaleTrack(reason);
     await this.setEnabled(this.enabled, true);
-    this.notifyInterruption({ started: false, reason });
     // whatsapp call doesn't seem to send video unmute natively, so use audio unmute to play video
     this.eventBus.localAudioUnmutedNatively.publish();
   };
@@ -507,6 +522,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     HMSLogger.d(this.TAG, 'reacquiring track', reason, `${this}`);
     await this.replaceTrackWith(this.settings);
+    if (this.shouldReacquireTrack()) {
+      // getUserMedia resolved with a track that is still not capturing - iOS hands one back muted
+      // during an OS interruption. The interruption is not over, so it is not ended.
+      HMSLogger.d(this.TAG, 'reacquired track is still not capturing', reason, `${this}`);
+      return;
+    }
     this.interrupted = false;
     /**
      * Capture is back, so the interruption is over however we got here. Publishing from this point

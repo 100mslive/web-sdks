@@ -96,16 +96,17 @@ export class HMSAudioTrack extends HMSTrack {
 
   private logSetSinkIdSkipped(device: MediaDeviceInfo, hasSetSinkId: boolean) {
     const reason = hasSetSinkId ? 'non-chromium-browser' : 'setSinkId-unsupported';
+    const browser = parsedUserAgent.getBrowser();
     HMSLogger.d(
       '[HMSAudioTrack]',
       this.logIdentifier,
       'setSinkId skipped, audio stays on the OS default sink',
-      JSON.stringify({
-        reason,
-        browser: parsedUserAgent.getBrowser()?.name,
-        browserVersion: parsedUserAgent.getBrowser()?.version,
-        requestedDevice: device.label,
-      }),
+      `{
+        reason: ${reason};
+        browser: ${browser?.name};
+        browserVersion: ${browser?.version};
+        requestedDevice: ${device.label};
+      }`,
       `${this}`,
     );
   }

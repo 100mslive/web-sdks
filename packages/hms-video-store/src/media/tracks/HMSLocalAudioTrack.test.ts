@@ -210,6 +210,47 @@ describe('HMSLocalAudioTrack interruptions', () => {
     expect(interruptions.map(i => i.started)).toEqual([true, false]);
   });
 
+  /**
+   * A peer that joined muted holds an empty track, which reports itself as needing reacquisition for
+   * the whole session, and its mic permission was never granted. Nothing was taken away from them.
+   */
+  it('does not prompt a peer that joined muted with the mic permission ungranted', async () => {
+    const eventBus = new EventBus();
+    const interruptions: unknown[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+
+    const track = makeLocalAudioTrack(eventBus);
+    // the empty track LocalTrackManager installs for a muted join
+    (track.nativeTrack as any).label = 'MediaStreamAudioDestinationNode';
+    (track.nativeTrack as any).enabled = false;
+    (track as any).permissionState = 'prompt';
+
+    setVisibility('hidden');
+    await (track as any).handleVisibilityChange();
+    setVisibility('visible');
+    await (track as any).handleVisibilityChange();
+
+    expect(interruptions).toEqual([]);
+  });
+
+  // getUserMedia resolving is not proof of capture - iOS hands back a muted track mid-interruption
+  it('does not end the interruption when the reacquired mic is still not capturing', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    getAudioTrackMock.mockImplementation(async () => {
+      const replacement = makeNativeTrack('track-2');
+      (replacement as any).muted = true;
+      return replacement;
+    });
+
+    const track = makeLocalAudioTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.handleTrackUnmute();
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
   it('prompts on foreground when the mic did not come back', async () => {
     const eventBus = new EventBus();
     const interruptions: { started: boolean; reason: string }[] = [];

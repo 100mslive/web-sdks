@@ -174,8 +174,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
          * is not the only way back: the user turning the camera on again lands here, and on desktop
          * there is no foreground event afterwards to clear the prompt.
          */
-        this.interrupted = false;
-        this.notifyInterruption({ started: false, reason });
+        // getUserMedia can resolve with a camera that is still not capturing, so the interruption is
+        // only over once the new track says it is publishing
+        if (!this.isTrackNotPublishing()) {
+          this.interrupted = false;
+          this.notifyInterruption({ started: false, reason });
+        }
       }
       this.videoHandler.updateSinks();
     }

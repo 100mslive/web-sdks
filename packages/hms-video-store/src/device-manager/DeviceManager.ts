@@ -84,7 +84,10 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.d(
         this.TAG,
         'updateOutputDevice - requested device not in the enumerated audioOutput list',
-        JSON.stringify({ deviceId, available: this.audioOutput.map(device => device.deviceId) }),
+        `{
+          deviceId: ${deviceId};
+          available: ${this.audioOutput.map(device => device.deviceId).join(', ')};
+        }`,
       );
       return undefined;
     }

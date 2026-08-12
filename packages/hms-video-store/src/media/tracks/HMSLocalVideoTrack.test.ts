@@ -212,6 +212,25 @@ describe('HMSLocalVideoTrack interruptions', () => {
     expect(interruptions.map(i => i.started)).toEqual([true, false]);
   });
 
+  // getUserMedia resolving is not proof of capture - the camera can come back muted
+  it('does not end the interruption when the reacquired camera is still not capturing', async () => {
+    const eventBus = new EventBus();
+    const interruptions: { started: boolean }[] = [];
+    eventBus.trackInterruption.subscribe(interruption => interruptions.push(interruption));
+    getVideoTrackMock.mockImplementation(async () => {
+      const replacement = makeNativeTrack('track-2');
+      (replacement as any).muted = true;
+      return replacement;
+    });
+
+    const track = makeLocalVideoTrack(eventBus);
+    (track as any).handleTrackMute();
+    await track.setEnabled(false);
+    await track.setEnabled(true);
+
+    expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+
   it('leaves an already off camera alone on foreground', async () => {
     const eventBus = new EventBus();
     const interruptions: unknown[] = [];

@@ -34,7 +34,11 @@ export class AudioOutputManager implements IAudioOutputManager {
     HMSLogger.d(
       '[AudioOutputManager]',
       'setDevice result',
-      JSON.stringify({ requested: deviceId, applied: newDevice?.label, appliedId: newDevice?.deviceId }),
+      `{
+        requested: ${deviceId};
+        applied: ${newDevice?.label};
+        appliedId: ${newDevice?.deviceId};
+      }`,
     );
     if (newDevice) {
       // If any remote audio tracks were auto-paused by an OS audio-session
