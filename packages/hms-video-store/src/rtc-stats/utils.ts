@@ -4,6 +4,9 @@ import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { RID } from '../interfaces';
 import {
+  HMSConnectionStats,
+  HMSConnectionType,
+  HMSIceCandidateStats,
   HMSLocalTrackStats,
   HMSPeerStats,
   HMSTrackStats,
@@ -373,15 +376,41 @@ export const sumOutboundRtpBytesSent = (report?: RTCStatsReport): number => {
   return total;
 };
 
+/**
+ * Resolves the pair's `localCandidateId`/`remoteCandidateId` against the report they came from.
+ * Candidate ids are only unique within a single report, so this has to happen while the report
+ * is still in hand — once it's discarded the ids on the stored pair point at nothing.
+ */
+const attachCandidates = (pair: RTCIceCandidatePairStats, report?: RTCStatsReport) =>
+  Object.assign(pair, {
+    localCandidate: report?.get(pair.localCandidateId) as HMSIceCandidateStats | undefined,
+    remoteCandidate: report?.get(pair.remoteCandidateId) as HMSIceCandidateStats | undefined,
+  });
+
+/**
+ * Whether the connection runs over a TURN relay (and over which transport) or directly.
+ */
+export const getConnectionType = (stats?: { localCandidate?: HMSIceCandidateStats }): HMSConnectionType | undefined => {
+  const candidate = stats?.localCandidate;
+  if (!candidate) {
+    return undefined;
+  }
+  if (candidate.relayProtocol) {
+    return `relay(${candidate.relayProtocol})`;
+  }
+  return candidate.candidateType;
+};
+
 export const getLocalPeerStatsFromReport = (
   type: PeerConnectionType,
   report?: RTCStatsReport,
   prevStats?: HMSPeerStats,
-): (RTCIceCandidatePairStats & { bitrate: number; outboundRtpBytesSent?: number }) | undefined => {
-  const activeCandidatePair = getActiveCandidatePairFromReport(report);
-  if (!activeCandidatePair) {
+): (HMSConnectionStats & { outboundRtpBytesSent?: number }) | undefined => {
+  const pair = getActiveCandidatePairFromReport(report);
+  if (!pair) {
     return undefined;
   }
+  const activeCandidatePair = attachCandidates(pair, report);
 
   if (type === 'publish') {
     // Compute publish bitrate from the sum of `bytesSent` across active outbound-rtp streams,
