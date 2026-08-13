@@ -1,5 +1,5 @@
-import { getLocalPeerStatsFromReport } from './utils';
-import { HMSPeerStats } from '../interfaces';
+import { getConnectionType, getLocalPeerStatsFromReport } from './utils';
+import { HMSIceCandidateStats, HMSPeerStats } from '../interfaces';
 
 type StatEntry = Record<string, any>;
 
@@ -24,6 +24,18 @@ const candidatePair = (bytesSent: number, timestamp: number, extra: Partial<Stat
   bytesReceived: 0,
   timestamp,
   availableOutgoingBitrate: 1_000_000,
+  ...extra,
+});
+
+const localCandidate = (extra: Partial<StatEntry> = {}): StatEntry => ({
+  id: 'LC1',
+  type: 'local-candidate',
+  ...extra,
+});
+
+const remoteCandidate = (extra: Partial<StatEntry> = {}): StatEntry => ({
+  id: 'RC1',
+  type: 'remote-candidate',
   ...extra,
 });
 
@@ -122,5 +134,53 @@ describe('getLocalPeerStatsFromReport — subscribe bitrate', () => {
 
     expect(nextStats).toBeDefined();
     expect(nextStats!.bitrate).toBe(1_000_000);
+  });
+});
+
+describe('getLocalPeerStatsFromReport — ICE candidates', () => {
+  test('resolves the active pair`s local and remote candidates from the same report', () => {
+    const report = makeReport([
+      transport('CP1'),
+      candidatePair(0, 1_000, { localCandidateId: 'LC1', remoteCandidateId: 'RC1' }),
+      localCandidate({ candidateType: 'srflx', protocol: 'udp', address: '223.181.114.100', port: 14154 }),
+      remoteCandidate({ candidateType: 'srflx', protocol: 'udp', address: '35.200.223.203', port: 29080 }),
+    ]);
+
+    const stats = getLocalPeerStatsFromReport('publish', report, undefined);
+
+    expect(stats!.localCandidate).toMatchObject({ candidateType: 'srflx', protocol: 'udp', port: 14154 });
+    expect(stats!.remoteCandidate).toMatchObject({ candidateType: 'srflx', address: '35.200.223.203' });
+  });
+
+  test('leaves candidates undefined when the report has no matching entries (Firefox)', () => {
+    const report = makeReport([transport('CP1'), candidatePair(0, 1_000)]);
+
+    const stats = getLocalPeerStatsFromReport('subscribe', report, undefined);
+
+    expect(stats!.localCandidate).toBeUndefined();
+    expect(stats!.remoteCandidate).toBeUndefined();
+  });
+});
+
+describe('getConnectionType', () => {
+  test.each([
+    ['host', undefined, 'host'],
+    ['srflx', undefined, 'srflx'],
+    ['prflx', undefined, 'prflx'],
+    ['relay', 'udp', 'relay(udp)'],
+    ['relay', 'tcp', 'relay(tcp)'],
+    ['relay', 'tls', 'relay(tls)'],
+    // A relayed path can surface as a peer-reflexive candidate when the address was learnt
+    // over the relay — `relayProtocol` is what gives it away, so it must win over candidateType.
+    ['prflx', 'udp', 'relay(udp)'],
+  ])('candidateType %s with relayProtocol %s => %s', (candidateType, relayProtocol, expected) => {
+    const localCandidate = { candidateType, relayProtocol } as HMSIceCandidateStats;
+
+    expect(getConnectionType({ localCandidate })).toBe(expected);
+  });
+
+  test('is undefined when the candidate is missing', () => {
+    expect(getConnectionType(undefined)).toBeUndefined();
+    expect(getConnectionType({})).toBeUndefined();
   });
 });

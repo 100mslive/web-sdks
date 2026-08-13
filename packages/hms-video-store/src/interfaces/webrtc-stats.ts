@@ -120,9 +120,50 @@ export interface HMSRemoteTrackStats extends BaseTrackStats, MissingInboundStats
 
 export interface HMSTrackStats extends HMSLocalTrackStats, HMSRemoteTrackStats {}
 
+/**
+ * `RTCIceCandidateStats` is absent from TS's DOM lib, and `relayProtocol`/`networkType`/`url`
+ * are reported by browsers but not typed anywhere.
+ * Ref: https://www.w3.org/TR/webrtc-stats/#icecandidate-dict*
+ */
+export interface HMSIceCandidateStats extends RTCStats {
+  transportId?: string;
+  address?: string;
+  port?: number;
+  protocol?: IceProtocol;
+  candidateType?: RTCIceCandidateType;
+  priority?: number;
+  url?: string;
+  /**
+   * Transport used to reach the TURN server. Only set on candidates obtained through a relay,
+   * which makes it — not `candidateType` — the proof that a path is relayed: a candidate can
+   * carry `relayProtocol` while its `candidateType` is `prflx`, when the peer-reflexive address
+   * was learnt over the relay.
+   */
+  relayProtocol?: IceProtocol | 'tls';
+  networkType?: string;
+}
+
+type IceProtocol = 'udp' | 'tcp';
+
+/**
+ * How the local peer is actually reaching the SFU: a direct path (`host`/`srflx`/`prflx`) or
+ * a TURN relay, with the transport used to reach the TURN server.
+ */
+export type HMSConnectionType = RTCIceCandidateType | `relay(${IceProtocol | 'tls'})`;
+
+/**
+ * The active ICE candidate pair of a peer connection, along with the two candidates it points
+ * at — resolved from `localCandidateId`/`remoteCandidateId` against the same stats report, since
+ * those ids are only meaningful within the report they came from.
+ */
+export type HMSConnectionStats = RTCIceCandidatePairStats & {
+  bitrate: number;
+  localCandidate?: HMSIceCandidateStats;
+  remoteCandidate?: HMSIceCandidateStats;
+};
+
 export interface HMSPeerStats {
-  publish?: RTCIceCandidatePairStats & {
-    bitrate: number;
+  publish?: HMSConnectionStats & {
     /**
      * Sum of `bytesSent` across active outbound-rtp streams at the time the stat was taken.
      * Used internally to derive `bitrate` on the next sample so the value only reflects
@@ -130,8 +171,7 @@ export interface HMSPeerStats {
      */
     outboundRtpBytesSent?: number;
   };
-  subscribe?: RTCIceCandidatePairStats & {
-    bitrate: number;
+  subscribe?: HMSConnectionStats & {
     packetsLost: number;
     packetsLostRate: number;
     jitter: number;
