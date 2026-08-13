@@ -1,5 +1,7 @@
-import { getLocalPeerStatsFromReport } from './utils';
+import { getLocalPeerStatsFromReport, getLocalTrackStats } from './utils';
+import { EventBus } from '../events/EventBus';
 import { HMSPeerStats } from '../interfaces';
+import { HMSLocalTrack, HMSTrackType } from '../media/tracks';
 
 type StatEntry = Record<string, any>;
 
@@ -122,5 +124,75 @@ describe('getLocalPeerStatsFromReport — subscribe bitrate', () => {
 
     expect(nextStats).toBeDefined();
     expect(nextStats!.bitrate).toBe(1_000_000);
+  });
+});
+
+const audioMediaSource = (extra: Partial<StatEntry> = {}): StatEntry => ({
+  id: 'SA1',
+  type: 'media-source',
+  kind: 'audio',
+  trackIdentifier: 'sender-track-1',
+  audioLevel: 0.05,
+  totalAudioEnergy: 12.5,
+  totalSamplesDuration: 60,
+  echoReturnLoss: -29.08,
+  echoReturnLossEnhancement: 0.1755,
+  ...extra,
+});
+
+const audioTrack = (report: RTCStatsReport, type = HMSTrackType.AUDIO) =>
+  ({
+    type,
+    trackId: 'track-1',
+    peerId: 'peer-1',
+    enabled: true,
+    transceiver: { sender: { track: { id: 'sender-track-1' }, getStats: async () => report } },
+  } as unknown as HMSLocalTrack);
+
+const eventBus = { analytics: { publish: jest.fn() } } as unknown as EventBus;
+
+describe('getLocalTrackStats — audio echo-cancellation stats', () => {
+  test('surfaces ERL/ERLE and cumulative energy from the audio media-source stat', async () => {
+    const report = makeReport([outboundRtp(1000, 5_000_000), audioMediaSource()]);
+
+    const stats = await getLocalTrackStats(eventBus, audioTrack(report));
+
+    expect(stats?.O1.echoReturnLoss).toBe(-29.08);
+    expect(stats?.O1.echoReturnLossEnhancement).toBe(0.1755);
+    expect(stats?.O1.sourceTotalAudioEnergy).toBe(12.5);
+    expect(stats?.O1.sourceTotalSamplesDuration).toBe(60);
+    expect(stats?.O1.sourceAudioLevel).toBe(0.05);
+    // sourceStatsAvailable gates the video frame counters; audio must not set it, otherwise
+    // getSourceStats ships source_total_frames: 0 on every audio sample.
+    expect(stats?.O1.sourceStatsAvailable).toBeUndefined();
+  });
+
+  test('reads a media-source that reports mediaType instead of kind', async () => {
+    const stat = audioMediaSource();
+    delete (stat as Record<string, unknown>).kind;
+    (stat as Record<string, unknown>).mediaType = 'audio';
+    const report = makeReport([outboundRtp(1000, 5_000_000), stat]);
+
+    const stats = await getLocalTrackStats(eventBus, audioTrack(report));
+
+    expect(stats?.O1.echoReturnLossEnhancement).toBe(0.1755);
+  });
+
+  test('ignores a media-source belonging to a different sender track', async () => {
+    const report = makeReport([outboundRtp(1000, 5_000_000), audioMediaSource({ trackIdentifier: 'someone-else' })]);
+
+    const stats = await getLocalTrackStats(eventBus, audioTrack(report));
+
+    expect(stats?.O1.echoReturnLossEnhancement).toBeUndefined();
+    expect(stats?.O1.sourceAudioLevel).toBeUndefined();
+  });
+
+  test('leaves echo fields unset when the browser reports no audio media-source', async () => {
+    const report = makeReport([outboundRtp(1000, 5_000_000)]);
+
+    const stats = await getLocalTrackStats(eventBus, audioTrack(report));
+
+    expect(stats?.O1.echoReturnLoss).toBeUndefined();
+    expect(stats?.O1.echoReturnLossEnhancement).toBeUndefined();
   });
 });

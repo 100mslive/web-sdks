@@ -1,4 +1,5 @@
 import {
+  LocalAudioSample,
   LocalAudioTrackAnalytics,
   LocalBaseSample,
   LocalVideoSample,
@@ -146,7 +147,12 @@ export abstract class RunningTrackAnalytics {
 
   abstract shouldCreateSample: () => boolean;
 
-  protected abstract collateSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
+  protected abstract collateSample: () =>
+    | LocalBaseSample
+    | LocalAudioSample
+    | LocalVideoSample
+    | RemoteAudioSample
+    | RemoteVideoSample;
 
   protected abstract toAnalytics: () =>
     | LocalAudioTrackAnalytics
@@ -160,6 +166,12 @@ export abstract class RunningTrackAnalytics {
 
   protected getFirstStat() {
     return this.tempStats[0];
+  }
+
+  protected collectNumericValues(key: keyof TempStats): number[] {
+    return this.tempStats
+      .map(stat => stat[key])
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
   }
 
   protected calculateSum(key: keyof TempStats) {

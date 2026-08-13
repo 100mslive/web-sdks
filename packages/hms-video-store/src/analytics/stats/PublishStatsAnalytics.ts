@@ -4,17 +4,17 @@ import {
   hasResolutionChanged,
   removeUndefinedFromObject,
   RunningTrackAnalytics,
+  TempStats,
 } from './BaseStatsAnalytics';
 import {
+  LocalAudioSample,
   LocalAudioTrackAnalytics,
-  LocalBaseSample,
   LocalVideoSample,
   LocalVideoTrackAnalytics,
   PublishAnalyticPayload,
 } from './interfaces';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import { CPUPressureMonitor } from '../../utils/cpu-pressure-monitor';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
@@ -43,7 +43,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
       video,
       joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
-      max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
+      max_window_sec: this.sampleWindowSize,
     };
   }
 
@@ -106,8 +106,17 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
   }
 }
 
-class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
-  samples: (LocalBaseSample | LocalVideoSample)[] = [];
+const minOf = (values: number[]) => (values.length ? Math.min(...values) : undefined);
+
+const maxOf = (values: number[]) => (values.length ? Math.max(...values) : undefined);
+
+const countDistinctValues = (values: number[]) => (values.length ? new Set(values).size : undefined);
+
+const finiteOrUndefined = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+
+export class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
+  samples: (LocalAudioSample | LocalVideoSample)[] = [];
   private cpuPressureMonitor?: CPUPressureMonitor;
 
   constructor(params: {
@@ -122,6 +131,59 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     this.cpuPressureMonitor = params.cpuPressureMonitor;
   }
 
+  // Delta for a cumulative counter, or undefined when the delta cannot be trusted.
+  // Guards the two values the subtraction actually reads — this window's last stat and the
+  // previous window's last stat — rather than the window as a whole. Guarding the whole
+  // window would let a counter that stops being reported partway through emit a fabricated
+  // 0 (indistinguishable from measured silence) or a negative.
+  private differenceIfReported = (key: keyof TempStats) => {
+    const latest = finiteOrUndefined(this.getLatestStat()?.[key]);
+    if (latest === undefined) {
+      return undefined;
+    }
+    if (this.prevLatestStat === undefined) {
+      // First window of a track: the counter is cumulative since capture start, not a window
+      // delta. Emitted as-is rather than dropped — RMS stays correct because energy and
+      // duration are inflated identically, and dropping it would leave short calls with no
+      // audio evidence at all.
+      return latest;
+    }
+    const previous = finiteOrUndefined(this.prevLatestStat[key]);
+    if (previous === undefined) {
+      return undefined;
+    }
+    // A cumulative counter moving backwards means the media-source was replaced — a device
+    // switch or an audio plugin toggle both swap the sender track. The window's true delta
+    // is unknowable, which is not the same as zero.
+    return latest < previous ? undefined : latest - previous;
+  };
+
+  private getAudioSourceStats = (): Partial<LocalAudioSample> => {
+    if (this.kind !== 'audio') {
+      return {};
+    }
+    const audioLevel = this.collectNumericValues('sourceAudioLevel');
+    const erl = this.collectNumericValues('echoReturnLoss');
+    const erle = this.collectNumericValues('echoReturnLossEnhancement');
+    // Energy is reported independently of ERL/ERLE, not gated behind them. ERL/ERLE exist
+    // only while a canceller is applied to the capture path, so gating would drop the
+    // capture-level evidence for exactly the tracks published with echoCancellation
+    // disabled — the case where "was the mic live at all" is the question being asked.
+    return {
+      audio_level_min: minOf(audioLevel),
+      audio_level_max: maxOf(audioLevel),
+      audio_level_observed_count: audioLevel.length || undefined,
+      total_audio_energy: this.differenceIfReported('sourceTotalAudioEnergy'),
+      total_samples_duration_sec: this.differenceIfReported('sourceTotalSamplesDuration'),
+      erl_db_min: minOf(erl),
+      erl_db_max: maxOf(erl),
+      erle_db_min: minOf(erle),
+      erle_db_max: maxOf(erle),
+      erle_distinct_count: countDistinctValues(erle),
+      erle_observed_count: erle.length || undefined,
+    };
+  };
+
   private getQualityLimitation = (latestStat: HMSTrackStats) => {
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
     return (
@@ -133,8 +195,13 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     );
   };
 
+  // Frame-counter stats. The counters below coerce a missing value to 0, so an audio track
+  // reaching them ships source_total_frames: 0 on every sample. Two guards, deliberately:
+  // buildAudioSourceStats no longer sets sourceStatsAvailable, and audio is excluded here
+  // too. Excluding audio rather than requiring video keeps video stats that arrive without a
+  // `kind` behaving exactly as they did before this gate existed.
   private getSourceStats = (latestStat: HMSTrackStats) => {
-    if (!latestStat.sourceStatsAvailable) {
+    if (this.kind === 'audio' || !latestStat.sourceStatsAvailable) {
       return {};
     }
     const source_resolution = latestStat.sourceFrameHeight
@@ -153,7 +220,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     };
   };
 
-  protected collateSample = (): LocalBaseSample | LocalVideoSample => {
+  protected collateSample = (): LocalAudioSample | LocalVideoSample => {
     const firstStat = this.getFirstStat();
     const latestStat = this.getLatestStat();
 
@@ -193,6 +260,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
       track_settings,
       effects_metrics: effects_metrics && Object.keys(effects_metrics).length > 0 ? effects_metrics : undefined,
       ...this.getSourceStats(latestStat),
+      ...this.getAudioSourceStats(),
     });
   };
 
@@ -202,7 +270,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     const prevStat = this.tempStats[length - 2];
 
     return (
-      length === PUBLISH_STATS_SAMPLE_WINDOW ||
+      length === this.sampleWindowSize ||
       hasEnabledStateChanged(newStat, prevStat) ||
       (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
     );
