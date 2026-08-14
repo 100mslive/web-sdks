@@ -4,6 +4,28 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="./favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Google Fonts, loaded WITHOUT blocking the parser.
+
+      A stylesheet the parser is waiting on blocks all script execution, not
+      just painting. Loaded the usual way, a slow or unreachable
+      fonts.googleapis.com stops every script on the page from running.
+
+      media="print" makes the sheet non-render-blocking; onload flips it to
+      "all" once it arrives. Fonts swap in late instead of holding up boot.
+
+      To verify: open DevTools > Network > block request domain
+      "fonts.googleapis.com", reload. The app should still render and work.
+      Swap the two lines below (drop media/onload) to see it break instead.
+    -->
+    <link
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;family=Lato:wght@400;700;900&amp;family=Montserrat:wght@400;500;600&amp;family=Open+Sans:wght@400;600&amp;family=Roboto:wght@400;500;700&amp;display=swap"
+    />
     <title>100ms Prebuilt Integration</title>
   </head>
   <body>
