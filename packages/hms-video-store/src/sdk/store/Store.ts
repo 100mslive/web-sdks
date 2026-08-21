@@ -224,6 +224,11 @@ class Store {
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
     this.addPluginsToRoles(params.plugins);
+    // Resolved unconditionally, not from the key-driven switch inside
+    // addPluginsToRoles: a policy that omits noiseCancellation means "not
+    // configured", which means off. Driving it from key presence let such
+    // templates keep the raw /init flag forever.
+    this.handleNoiseCancellationPlugin(params.plugins?.[Plugins.NOISE_CANCELLATION]);
     this.roleDetailsArrived = true;
     this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
@@ -464,10 +469,6 @@ class Store {
           this.addTranscriptionsPluginToRole(plugins[pluginName]);
           break;
         }
-        case Plugins.NOISE_CANCELLATION: {
-          this.handleNoiseCancellationPlugin(plugins[pluginName]);
-          break;
-        }
         default: {
           break;
         }
@@ -522,8 +523,9 @@ class Store {
     if (!this.room) {
       return;
     }
-    // it will be called again after internalConnect room initialization, even after network disconnection
-    this.room.isNoiseCancellationEnabled = !!plugin?.enabled && !!this.room.isNoiseCancellationEnabled;
+    // Idempotent: writes only its own field, never reads the derived value. Called
+    // again on every policy notification, including after a reconnect.
+    this.room.isNoiseCancellationEnabledFromPolicy = !!plugin?.enabled;
   };
 
   private setEnv() {

@@ -1111,7 +1111,7 @@ export default class HMSTransport {
         room.disableNoneLayerRequest = this.isFlagEnabled(InitFlags.FLAG_DISABLE_NONE_LAYER_REQUEST);
         room.isVBEnabled = this.isFlagEnabled(InitFlags.FLAG_VB_ENABLED);
         room.isHipaaEnabled = this.isFlagEnabled(InitFlags.FLAG_HIPAA_ENABLED);
-        room.isNoiseCancellationEnabled = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
+        room.isNoiseCancellationEnabledFromInit = this.isFlagEnabled(InitFlags.FLAG_NOISE_CANCELLATION);
       }
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
