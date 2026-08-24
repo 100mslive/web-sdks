@@ -152,7 +152,6 @@ export class AudioSinkManager {
       }
     };
     track.setAudioElement(audioEl);
-    await track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);
@@ -160,6 +159,16 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
+    /**
+     * setVolume applies the subscription state over the API data channel, a round trip to the SFU.
+     * Audio is subscribed by default, so this is an optimisation - attaching and playing the track
+     * must never wait on it or fail with it, or a lost response leaves the track silent forever.
+     */
+    try {
+      await track.setVolume(this.volume);
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'Could not apply audio subscription state', `${track}`, error);
+    }
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {

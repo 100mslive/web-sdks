@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter2';
+import EventEmitter, { WaitForOptions } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
@@ -20,6 +20,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
+  /**
+   * The SFU answers within a few ms, but a request sent right as the data channel opens has been
+   * seen to go unanswered. Without a bound here that caller waits for the rest of the session.
+   */
+  private readonly RESPONSE_TIMEOUT = 10000;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -176,10 +181,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (this.apiChannel?.readyState !== 'open') {
       await this.eventEmitter.waitFor('open');
     }
-    let response: PreferLayerResponse;
+    let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       this.apiChannel!.send(request);
-      response = await this.waitForResponse(requestId);
+      try {
+        response = await this.waitForResponse(requestId);
+      } catch {
+        HMSLogger.w(this.TAG, `No response for ${requestId}`, { request, try: i + 1 });
+        continue;
+      }
       const error = response.error;
       if (error) {
         // Don't retry or do anything, track is already removed
@@ -198,13 +208,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
         break;
       }
     }
-    return response!;
+    if (!response) {
+      throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
+    }
+    return response;
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
-    const res = await this.eventEmitter.waitFor('message', function (value) {
-      return value.includes(requestId);
-    });
+    const res = await this.eventEmitter.waitFor('message', {
+      filter: (value: string) => value.includes(requestId),
+      timeout: this.RESPONSE_TIMEOUT,
+    } as WaitForOptions);
     const response = JSON.parse(res[0] as string);
     HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
     return response;
