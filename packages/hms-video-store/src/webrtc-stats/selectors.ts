@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { HMSPreferredSimulcastLayer, RID, simulcastMapping } from '../internal';
+import { getConnectionType } from '../rtc-stats/utils';
 import { HMSPeerID, HMSStatsStore, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
@@ -51,6 +52,22 @@ const availablePublishBitrate = createSelector(
 const availableSubscribeBitrate = createSelector(
   localPeerStats,
   localPeerStats => localPeerStats?.subscribe?.availableIncomingBitrate,
+);
+
+/**
+ * How the publish connection reaches the SFU - `host`/`srflx`/`prflx` for a direct path,
+ * `relay(udp)`/`relay(tcp)`/`relay(tls)` when it goes through a TURN relay
+ */
+const publishConnectionType = createSelector(localPeerStats, localPeerStats =>
+  getConnectionType(localPeerStats?.publish),
+);
+
+/**
+ * How the subscribe connection reaches the SFU. Can differ from the publish connection,
+ * since the two peer connections run ICE independently
+ */
+const subscribeConnectionType = createSelector(localPeerStats, localPeerStats =>
+  getConnectionType(localPeerStats?.subscribe),
 );
 
 /**
@@ -128,6 +145,8 @@ export const selectHMSStats = {
   subscribeBitrate,
   availablePublishBitrate,
   availableSubscribeBitrate,
+  publishConnectionType,
+  subscribeConnectionType,
   totalBytesSent,
   totalBytesReceived,
   peerStatsByID,

@@ -263,8 +263,19 @@ const useTracksWithLabel = () => {
   return tracksWithLabels;
 };
 
+// `relay(tcp)` already names its transport, so only direct paths get the protocol appended.
+const formatConnection = (connectionType, connectionStats) => {
+  if (!connectionType) {
+    return '-';
+  }
+  const protocol = connectionStats?.localCandidate?.protocol;
+  return connectionType.startsWith('relay') || !protocol ? connectionType : `${connectionType} / ${protocol}`;
+};
+
 const LocalPeerStats = () => {
   const stats = useHMSStatsStore(selectHMSStats.localPeerStats);
+  const publishConnectionType = useHMSStatsStore(selectHMSStats.publishConnectionType);
+  const subscribeConnectionType = useHMSStatsStore(selectHMSStats.subscribeConnectionType);
 
   if (!stats) {
     return null;
@@ -272,6 +283,8 @@ const LocalPeerStats = () => {
 
   return (
     <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
+      <StatsRow label="Publish Connection" value={formatConnection(publishConnectionType, stats.publish)} />
+      <StatsRow label="Subscribe Connection" value={formatConnection(subscribeConnectionType, stats.subscribe)} />
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={`${((stats.subscribe?.jitter ?? 0) * 1000).toFixed(2)} ms`} />
       <StatsRow label="Publish Bitrate" value={formatBytes(stats.publish?.bitrate, 'b/s')} />
