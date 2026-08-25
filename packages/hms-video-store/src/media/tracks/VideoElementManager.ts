@@ -19,18 +19,32 @@ export class VideoElementManager {
   private videoElements = new Set<HTMLVideoElement>();
   private entries = new WeakMap<HTMLVideoElement, DOMRectReadOnly>();
   private id: string;
+  /** Which intersection entry an element is currently acting on - see handleIntersection. */
+  private intersectionSeq = new WeakMap<HTMLVideoElement, number>();
+  private seq = 0;
 
   constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
     this.init();
     this.id = uuid();
   }
 
+  /**
+   * addSink/removeSink reject when the layer request fails, and every call below discards the
+   * promise - updateSinks and removeVideoElement are sync, addVideoElement is discarded by
+   * HMSVideoTrack.attach, and the observers discard the handlers. Swallow here rather than inside
+   * the track, so attachVideo/detachVideo and setPreferredLayer keep reporting failures to the app.
+   * Logged at error because a warn is dropped once an app calls setLogLevel(ERROR).
+   */
+  private logIfRejected(result: void | Promise<void>, action: string) {
+    Promise.resolve(result).catch(error => HMSLogger.e(this.TAG, `${action} failed`, `${this.track}`, error));
+  }
+
   updateSinks(requestLayer = false) {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
-        this.track.addSink(videoElement, requestLayer);
+        this.logIfRejected(this.track.addSink(videoElement, requestLayer), 'addSink');
       } else {
-        this.track.removeSink(videoElement, requestLayer);
+        this.logIfRejected(this.track.removeSink(videoElement, requestLayer), 'removeSink');
       }
     }
   }
@@ -57,20 +71,20 @@ export class VideoElementManager {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
-        this.track.addSink(videoElement);
+        this.logIfRejected(this.track.addSink(videoElement), 'addSink');
       } else {
-        this.track.removeSink(videoElement);
+        this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
       }
     }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      await this.track.setPreferredLayer(this.track.getPreferredLayer());
+      this.logIfRejected(this.track.setPreferredLayer(this.track.getPreferredLayer()), 'setPreferredLayer');
     }
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.track.removeSink(videoElement);
+    this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
@@ -89,23 +103,42 @@ export class VideoElementManager {
     }
   }
 
+  /**
+   * The observer never awaits this, so scrolling a tile in and straight back out runs both entries
+   * at once. The add suspends on selectMaxLayer before it attaches a sink, which leaves the remove
+   * nothing to undo - it sees no sink and a layer already on none, so it sends nothing, and then
+   * the stale add resumes and asks for high, leaving the SFU streaming a tile no element renders.
+   * Stamp each entry and drop the add if a newer entry for that element arrived while it was
+   * suspended, so the last thing the user did is what decides the sink.
+   */
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
     // cleanup() nulls the observer fields; treat that as the destroyed signal.
     if (!this.intersectionObserver) {
       return;
     }
+    const target = entry.target as HTMLVideoElement;
+    const seq = ++this.seq;
+    this.intersectionSeq.set(target, seq);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
-      HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
-      this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
-      await this.selectMaxLayer();
-      await this.track.addSink(entry.target as HTMLVideoElement);
+      await this.addSinkForEntry(target, entry.boundingClientRect, seq);
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', `${this.track}`, this.id);
-      await this.track.removeSink(entry.target as HTMLVideoElement);
+      this.logIfRejected(this.track.removeSink(target), 'removeSink');
     }
   };
+
+  private async addSinkForEntry(target: HTMLVideoElement, rect: DOMRectReadOnly, seq: number) {
+    HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
+    this.entries.set(target, rect);
+    await this.selectMaxLayer();
+    if (this.intersectionSeq.get(target) !== seq) {
+      HMSLogger.d(this.TAG, 'add sink superseded', `${this.track}`, this.id);
+      return;
+    }
+    this.logIfRejected(this.track.addSink(target), 'addSink');
+  }
 
   private handleResize = async (entry: ResizeObserverEntry) => {
     if (!this.resizeObserver) {
@@ -172,7 +205,17 @@ export class VideoElementManager {
     }
     if (maxLayer) {
       HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
-      await this.track.setPreferredLayer(maxLayer);
+      /**
+       * Picking a layer is an optimisation over rendering the track, and the only callers are the
+       * resize and intersection handlers, which observers invoke without awaiting. Letting this
+       * reject would abort the sink attach and surface as an unhandled rejection.
+       */
+      try {
+        await this.track.setPreferredLayer(maxLayer);
+      } catch (error) {
+        // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
+        HMSLogger.e(this.TAG, `failed to select layer ${maxLayer}`, `${this.track}`, error);
+      }
     }
   }
 

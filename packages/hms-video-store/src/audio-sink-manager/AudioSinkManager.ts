@@ -166,7 +166,8 @@ export class AudioSinkManager {
      */
     track
       .setVolume(this.volume)
-      .catch(error => HMSLogger.w(this.TAG, 'Could not apply audio subscription state', `${track}`, error));
+      // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
+      .catch(error => HMSLogger.e(this.TAG, 'Could not apply audio subscription state', `${track}`, error));
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {

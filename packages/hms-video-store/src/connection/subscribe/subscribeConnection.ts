@@ -21,8 +21,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
   /**
-   * The SFU answers within a few ms, but a request sent right as the data channel opens has been
-   * seen to go unanswered. Without a bound here that caller waits for the rest of the session.
+   * Bounds both waits on the api data channel - for it to open, and for a reply. The first request
+   * of a session has been seen to go unanswered, and a channel that is closed or replaced never
+   * emits 'open' again; unbounded, either leaves that caller waiting for the rest of the session.
+   * Deliberately generous: a retry replays the original serialized request, so a premature one can
+   * apply stale desired state over a newer request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
 
@@ -178,16 +181,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   // eslint-disable-next-line complexity
   private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
-    if (this.apiChannel?.readyState !== 'open') {
-      await this.eventEmitter.waitFor('open');
-    }
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
-      this.apiChannel!.send(request);
+      // a previous attempt's error response must not stand in for this attempt's outcome
+      response = undefined;
       try {
+        await this.waitForChannelOpen();
+        // send can throw too - the channel may close between the open check and here
+        this.apiChannel!.send(request);
         response = await this.waitForResponse(requestId);
-      } catch {
-        HMSLogger.w(this.TAG, `No response for ${requestId}`, { request, try: i + 1 });
+      } catch (error) {
+        HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
         continue;
       }
       const error = response.error;
@@ -212,6 +216,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
       throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
     }
     return response;
+  };
+
+  /**
+   * Checked per attempt rather than once up front: 'open' is emitted from the channel's onopen, so
+   * a channel that is closed or replaced never emits again and an unbounded wait here would hang
+   * the caller for the rest of the session.
+   */
+  private waitForChannelOpen = async () => {
+    if (this.apiChannel?.readyState === 'open') {
+      return;
+    }
+    await this.eventEmitter.waitFor('open', { timeout: this.RESPONSE_TIMEOUT } as WaitForOptions);
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
