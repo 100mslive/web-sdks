@@ -187,7 +187,16 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
-    await this.requestLayer(newLayer, source);
+    /**
+     * Reached from addSink/removeSink, whose callers - updateSinks, removeVideoElement and
+     * VideoElementManager - do not await them, so a rejection here escapes unhandled.
+     * setPreferredLayer requests its layer directly and still rejects for API callers.
+     */
+    try {
+      await this.requestLayer(newLayer, source);
+    } catch (error) {
+      HMSLogger.w(`[Remote Track] ${this.logIdentifier} failed to request layer ${newLayer}, source=${source}`, error);
+    }
   }
 
   private pushInHistory(action: string) {

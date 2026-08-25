@@ -16,7 +16,13 @@ describe('VideoElementManager layer request failures', () => {
 
   beforeEach(() => {
     videoElement = document.createElement('video');
-    const connection = { sendOverApiDataChannelWithResponse: jest.fn() } as unknown as HMSSubscribeConnection;
+    window.MediaStream = jest.fn().mockImplementation(() => ({ addTrack: jest.fn() })) as unknown as typeof MediaStream;
+    jest.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    const connection = {
+      sendOverApiDataChannelWithResponse: jest
+        .fn()
+        .mockRejectedValue(new Error('No response from SFU for prefer-video-track-state')),
+    } as unknown as HMSSubscribeConnection;
     const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
     const nativeTrack = {
       id: 'track-1',
@@ -37,18 +43,64 @@ describe('VideoElementManager layer request failures', () => {
     jest.restoreAllMocks();
   });
 
-  const resizeEntry = {
-    target: videoElement,
-    contentRect: { width: 640, height: 360 },
-  } as unknown as ResizeObserverEntry;
+  // built per-test: videoElement is only assigned in beforeEach
+  const resizeEntry = () =>
+    ({ target: videoElement, contentRect: { width: 640, height: 360 } } as unknown as ResizeObserverEntry);
+
+  const intersectionEntry = () =>
+    ({
+      target: videoElement,
+      isIntersecting: true,
+      boundingClientRect: { width: 640, height: 360 },
+    } as unknown as IntersectionObserverEntry);
 
   it('does not reject from the resize handler when the layer request fails', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleResize = (manager as any).handleResize as (entry: ResizeObserverEntry) => Promise<void>;
 
-    await expect(
-      handleResize({ ...resizeEntry, target: videoElement } as ResizeObserverEntry),
-    ).resolves.toBeUndefined();
+    await expect(handleResize(resizeEntry())).resolves.toBeUndefined();
     expect(setPreferredLayer).toHaveBeenCalled();
+  });
+
+  it('does not reject from the intersection handler when the layer request fails', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleIntersection = (manager as any).handleIntersection as (
+      entry: IntersectionObserverEntry,
+    ) => Promise<void>;
+
+    await expect(handleIntersection(intersectionEntry())).resolves.toBeUndefined();
+  });
+
+  /**
+   * addSink is what assigns srcObject. Selecting a layer is an optimisation on top of that, so a
+   * failed layer request must not stop the element being attached - that leaves a blank tile.
+   */
+  it('still attaches the sink when the layer request fails', async () => {
+    const addSink = jest.spyOn(track, 'addSink');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleIntersection = (manager as any).handleIntersection as (
+      entry: IntersectionObserverEntry,
+    ) => Promise<void>;
+
+    await handleIntersection(intersectionEntry());
+
+    expect(addSink).toHaveBeenCalledWith(videoElement);
+  });
+
+  /**
+   * updateSinks is sync and discards the promises from addSink/removeSink, and it runs on every
+   * remote video mute/unmute via HMSRemoteVideoTrack.setEnabled, so a rejecting layer request
+   * there has no caller to catch it.
+   */
+  it('does not leak an unhandled rejection from updateSinks', async () => {
+    setPreferredLayer.mockRestore();
+    const unhandled = jest.fn();
+    process.on('unhandledRejection', unhandled);
+
+    manager.updateSinks(true);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    process.off('unhandledRejection', unhandled);
+
+    expect(unhandled).not.toHaveBeenCalled();
   });
 });

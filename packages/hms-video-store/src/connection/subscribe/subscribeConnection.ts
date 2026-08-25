@@ -21,11 +21,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
   /**
-   * The SFU answers in well under 10ms, but a request sent right as the data channel opens has
-   * been seen to go unanswered. Keep the bound tight - a remote peer unmuting re-subscribes over
-   * this channel, so every retry is time their audio stays missing. Retries are idempotent.
+   * A request sent in the window where the data channel is open locally but not yet on the SFU
+   * has been seen to go unanswered, which without a bound leaves the caller waiting for the whole
+   * session. Deliberately generous: a retry replays the original serialized request, so a
+   * premature one can apply stale desired state over a newer request.
    */
-  private readonly RESPONSE_TIMEOUT = 2000;
+  private readonly RESPONSE_TIMEOUT = 10000;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -184,6 +185,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
+      // a previous attempt's error response must not stand in for this attempt's outcome
+      response = undefined;
       this.apiChannel!.send(request);
       try {
         response = await this.waitForResponse(requestId);
