@@ -8,6 +8,13 @@ export class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;
+  /**
+   * Bumped per request so a failed one can tell whether it still owns the field. Both fields are
+   * written before the SFU confirms - they have to be, because they are what dedupes the next
+   * call - so an unconfirmed request has to put them back or every later call is deduped away.
+   */
+  private audioSeq = 0;
+  private videoSeq = 0;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
     super(nativeStream);
@@ -19,20 +26,35 @@ export class HMSRemoteStream extends HMSMediaStream {
       return;
     }
 
+    const previous = this.audio;
     this.audio = enabled;
+    const seq = ++this.audioSeq;
     HMSLogger.d(
       `[Remote stream] ${identifier || ''} 
     streamId=${this.id}
     trackId=${trackId}
     subscribing audio - ${this.audio}`,
     );
-    await this.connection.sendOverApiDataChannelWithResponse({
-      params: {
-        subscribed: this.audio,
-        track_id: trackId,
-      },
-      method: 'prefer-audio-track-state',
-    });
+    try {
+      await this.connection.sendOverApiDataChannelWithResponse(
+        {
+          params: {
+            subscribed: enabled,
+            track_id: trackId,
+          },
+          method: 'prefer-audio-track-state',
+        },
+        undefined,
+        () => seq !== this.audioSeq,
+      );
+    } catch (error) {
+      // the SFU never confirmed this, so leaving the field flipped would dedupe away every later
+      // attempt. A superseded request must not roll back - the newer one owns the field now.
+      if (seq === this.audioSeq) {
+        this.audio = previous;
+      }
+      throw error;
+    }
   }
 
   /**
@@ -55,21 +77,34 @@ export class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+  async setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
     HMSLogger.d(
       `[Remote stream] ${identifier} 
       streamId=${this.id}
       trackId=${trackId} 
       source: ${source} request ${layer} layer`,
     );
+    const previous = this.video;
     this.setVideoLayerLocally(layer, identifier, source);
-    return this.connection.sendOverApiDataChannelWithResponse({
-      params: {
-        max_spatial_layer: this.video,
-        track_id: trackId,
-      },
-      method: 'prefer-video-track-state',
-    });
+    const seq = ++this.videoSeq;
+    try {
+      return await this.connection.sendOverApiDataChannelWithResponse(
+        {
+          params: {
+            max_spatial_layer: layer,
+            track_id: trackId,
+          },
+          method: 'prefer-video-track-state',
+        },
+        undefined,
+        () => seq !== this.videoSeq,
+      );
+    } catch (error) {
+      if (seq === this.videoSeq) {
+        this.setVideoLayerLocally(previous, identifier, `${source}-failed`);
+      }
+      throw error;
+    }
   }
 
   /**

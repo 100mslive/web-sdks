@@ -145,9 +145,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   }
 
+  /**
+   * isSuperseded lets the caller cancel a request that a newer one has replaced. A retry replays
+   * the bytes serialised here, so without it a late retry re-applies desired state the caller has
+   * already moved on from - and the SFU ends up on the older value.
+   */
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
     requestId?: string,
+    isSuperseded?: () => boolean,
   ): Promise<PreferLayerResponse> {
     const id = uuid();
     if (message.method === 'prefer-video-track-state') {
@@ -162,7 +168,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       jsonrpc: '2.0',
       ...message,
     });
-    return this.sendMessage(request, id);
+    return this.sendMessage(request, id, isSuperseded);
   }
 
   close() {
@@ -180,11 +186,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
   };
 
   // eslint-disable-next-line complexity
-  private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
+  private sendMessage = async (
+    request: string,
+    requestId: string,
+    isSuperseded?: () => boolean,
+  ): Promise<PreferLayerResponse> => {
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
+      if (isSuperseded?.()) {
+        throw Error(`Superseded by a newer request before try ${i + 1} for ${requestId} - ${request}`);
+      }
       try {
         await this.waitForChannelOpen();
         // send can throw too - the channel may close between the open check and here
