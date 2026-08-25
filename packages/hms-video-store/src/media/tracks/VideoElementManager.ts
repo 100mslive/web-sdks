@@ -32,16 +32,16 @@ export class VideoElementManager {
    * the track, so attachVideo/detachVideo and setPreferredLayer keep reporting failures to the app.
    * Logged at error because a warn is dropped once an app calls setLogLevel(ERROR).
    */
-  private discard(result: void | Promise<void>, action: string) {
+  private logIfRejected(result: void | Promise<void>, action: string) {
     Promise.resolve(result).catch(error => HMSLogger.e(this.TAG, `${action} failed`, `${this.track}`, error));
   }
 
   updateSinks(requestLayer = false) {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
-        this.discard(this.track.addSink(videoElement, requestLayer), 'addSink');
+        this.logIfRejected(this.track.addSink(videoElement, requestLayer), 'addSink');
       } else {
-        this.discard(this.track.removeSink(videoElement, requestLayer), 'removeSink');
+        this.logIfRejected(this.track.removeSink(videoElement, requestLayer), 'removeSink');
       }
     }
   }
@@ -68,20 +68,20 @@ export class VideoElementManager {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
-        this.discard(this.track.addSink(videoElement), 'addSink');
+        this.logIfRejected(this.track.addSink(videoElement), 'addSink');
       } else {
-        this.discard(this.track.removeSink(videoElement), 'removeSink');
+        this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
       }
     }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      this.discard(this.track.setPreferredLayer(this.track.getPreferredLayer()), 'setPreferredLayer');
+      this.logIfRejected(this.track.setPreferredLayer(this.track.getPreferredLayer()), 'setPreferredLayer');
     }
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.discard(this.track.removeSink(videoElement), 'removeSink');
+    this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
@@ -111,10 +111,10 @@ export class VideoElementManager {
       HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
       this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
       await this.selectMaxLayer();
-      this.discard(this.track.addSink(entry.target as HTMLVideoElement), 'addSink');
+      this.logIfRejected(this.track.addSink(entry.target as HTMLVideoElement), 'addSink');
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', `${this.track}`, this.id);
-      this.discard(this.track.removeSink(entry.target as HTMLVideoElement), 'removeSink');
+      this.logIfRejected(this.track.removeSink(entry.target as HTMLVideoElement), 'removeSink');
     }
   };
 
