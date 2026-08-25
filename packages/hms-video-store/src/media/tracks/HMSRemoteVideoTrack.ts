@@ -108,7 +108,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   async addSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
     // an empty track is an on-demand placeholder - request the layer, which fetches the real track
     if (isEmptyTrack(this.nativeTrack)) {
-      await this.requestLayerSafely(this.preferredLayer, 'addSink');
+      await this.requestLayer(this.preferredLayer, 'addSink');
     } else {
       super.addSink(videoElement);
       if (shouldSendVideoLayer) {
@@ -187,23 +187,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
-    await this.requestLayerSafely(newLayer, source);
-  }
-
-  /**
-   * The promise around addSink/removeSink is discarded at the observer boundary - handleResize and
-   * handleIntersection are handed to Resize/IntersectionObserver - and by updateSinks,
-   * addVideoElement and removeVideoElement, so a rejection there escapes unhandled. Note attachVideo
-   * with autoManageVideo: false does await addSink, and no longer sees the failure; setPreferredLayer
-   * still rejects. Logged at error because a warn is dropped once an app calls setLogLevel(ERROR),
-   * which would be quieter than the unhandled rejection this replaces.
-   */
-  private async requestLayerSafely(layer: HMSSimulcastLayer, source: string) {
-    try {
-      await this.requestLayer(layer, source);
-    } catch (error) {
-      HMSLogger.e(`[Remote Track] ${this.logIdentifier} failed to request layer ${layer}, source=${source}`, error);
-    }
+    await this.requestLayer(newLayer, source);
   }
 
   private pushInHistory(action: string) {

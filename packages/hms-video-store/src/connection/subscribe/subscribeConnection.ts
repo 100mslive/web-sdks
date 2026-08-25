@@ -21,14 +21,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
   /**
-   * The first request of a session has been seen to go unanswered, which without a bound leaves
-   * that caller waiting for the rest of the session. Deliberately generous: a retry replays the
-   * original serialized request, so a premature one can apply stale desired state over a newer
-   * request.
+   * Bounds both waits on the api data channel - for it to open, and for a reply. The first request
+   * of a session has been seen to go unanswered, and a channel that is closed or replaced never
+   * emits 'open' again; unbounded, either leaves that caller waiting for the rest of the session.
+   * Deliberately generous: a retry replays the original serialized request, so a premature one can
+   * apply stale desired state over a newer request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
-  /** bound on waiting for the api data channel to open, applied per attempt */
-  private readonly OPEN_TIMEOUT = 10000;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -188,15 +187,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       response = undefined;
       try {
         await this.waitForChannelOpen();
-      } catch (error) {
-        HMSLogger.w(this.TAG, `API data channel not open for ${requestId}`, { request, try: i + 1, error });
-        continue;
-      }
-      this.apiChannel!.send(request);
-      try {
+        // send can throw too - the channel may close between the open check and here
+        this.apiChannel!.send(request);
         response = await this.waitForResponse(requestId);
       } catch (error) {
-        HMSLogger.w(this.TAG, `No response for ${requestId}`, { request, try: i + 1, error });
+        HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
         continue;
       }
       const error = response.error;
@@ -232,7 +227,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (this.apiChannel?.readyState === 'open') {
       return;
     }
-    await this.eventEmitter.waitFor('open', { timeout: this.OPEN_TIMEOUT } as WaitForOptions);
+    await this.eventEmitter.waitFor('open', { timeout: this.RESPONSE_TIMEOUT } as WaitForOptions);
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {

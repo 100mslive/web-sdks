@@ -1,6 +1,7 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
+import HMSLogger from '../../utils/logger';
 import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 /**
@@ -90,22 +91,31 @@ describe('VideoElementManager layer request failures', () => {
 
   /**
    * updateSinks is sync and discards the promises from addSink/removeSink, and it runs on every
-   * remote video mute/unmute via HMSRemoteVideoTrack.setEnabled, so a rejecting layer request
-   * there has no caller to catch it. Asserting on the promise updateSinks discards pins that
-   * directly - a process-level unhandledRejection spy never fires under jest.
+   * remote video mute/unmute via HMSRemoteVideoTrack.setEnabled, so a rejecting layer request there
+   * has no caller to catch it. The swallow lives at this discard point, not inside the track.
    */
-  it('does not reject from the promise updateSinks discards', async () => {
+  it('logs and swallows the promise updateSinks discards', async () => {
     setPreferredLayer.mockRestore();
+    const logError = jest.spyOn(HMSLogger, 'e').mockImplementation(() => undefined);
 
-    await expect(track.addSink(videoElement, true)).resolves.toBeUndefined();
+    manager.updateSinks(true);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(logError).toHaveBeenCalled();
   });
 
   /**
-   * On-demand tracks start as empty canvas tracks, and addSink takes a branch for them that asks
-   * for the layer directly instead of going through updateLayer. That request is what fetches the
-   * real track, so it is the one most exposed to an unanswered reply.
+   * addSink itself must keep rejecting: attachVideo with autoManageVideo: false awaits it, and on
+   * the empty-track branch nothing is attached, so swallowing there would report a failed attach
+   * as success.
    */
-  it('does not reject for an empty on-demand track', async () => {
+  it('still rejects from addSink so awaiting callers see the failure', async () => {
+    setPreferredLayer.mockRestore();
+
+    await expect(track.addSink(videoElement, true)).rejects.toThrow('No response from SFU');
+  });
+
+  it('still rejects from addSink for an empty on-demand track', async () => {
     setPreferredLayer.mockRestore();
     const emptyTrack = new HMSRemoteVideoTrack(
       track.stream as HMSRemoteStream,
@@ -119,6 +129,6 @@ describe('VideoElementManager layer request failures', () => {
       'regular',
     );
 
-    await expect(emptyTrack.addSink(videoElement, true)).resolves.toBeUndefined();
+    await expect(emptyTrack.addSink(videoElement, true)).rejects.toThrow('No response from SFU');
   });
 });
