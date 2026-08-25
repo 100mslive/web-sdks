@@ -21,10 +21,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
   /**
-   * The SFU answers within a few ms, but a request sent right as the data channel opens has been
-   * seen to go unanswered. Without a bound here that caller waits for the rest of the session.
+   * The SFU answers in well under 10ms, but a request sent right as the data channel opens has
+   * been seen to go unanswered. Keep the bound tight - a remote peer unmuting re-subscribes over
+   * this channel, so every retry is time their audio stays missing. Retries are idempotent.
    */
-  private readonly RESPONSE_TIMEOUT = 10000;
+  private readonly RESPONSE_TIMEOUT = 2000;
 
   readonly nativeConnection: RTCPeerConnection;
 

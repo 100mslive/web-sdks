@@ -65,7 +65,15 @@ export class VideoElementManager {
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      await this.track.setPreferredLayer(this.track.getPreferredLayer());
+      /**
+       * HMSVideoTrack.addSink does not await this method, so a failed layer request would
+       * otherwise escape as an unhandled rejection.
+       */
+      try {
+        await this.track.setPreferredLayer(this.track.getPreferredLayer());
+      } catch (error) {
+        HMSLogger.w(this.TAG, 'failed to set preferred layer', `${this.track}`, error);
+      }
     }
   }
 
@@ -94,6 +102,14 @@ export class VideoElementManager {
     if (!this.intersectionObserver) {
       return;
     }
+    try {
+      await this.applyIntersection(entry);
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'failed to handle intersection', `${this.track}`, error);
+    }
+  };
+
+  private async applyIntersection(entry: IntersectionObserverEntry) {
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
@@ -105,7 +121,7 @@ export class VideoElementManager {
       HMSLogger.d(this.TAG, 'remove sink intersection', `${this.track}`, this.id);
       await this.track.removeSink(entry.target as HTMLVideoElement);
     }
-  };
+  }
 
   private handleResize = async (entry: ResizeObserverEntry) => {
     if (!this.resizeObserver) {
@@ -115,7 +131,11 @@ export class VideoElementManager {
       return;
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
-    await this.selectMaxLayer();
+    try {
+      await this.selectMaxLayer();
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'failed to select max layer on resize', `${this.track}`, error);
+    }
   };
 
   /**
