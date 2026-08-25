@@ -85,21 +85,16 @@ describe('VideoElementManager layer request races', () => {
     } as unknown as IntersectionObserverEntry);
 
   /**
-   * Known gap, unchanged by the swallow and identical on main: scrolling a tile in and straight
-   * back out leaves the SFU on high. The add suspends on selectMaxLayer before it attaches a sink,
-   * so the remove that follows sees hasSinks() false and a layer still on none, decides there is
-   * nothing to say, and returns - then the add resumes and asks for high. The SFU keeps sending a
-   * stream no element renders.
-   *
-   * it.failing so this flips red the day the ordering is fixed, rather than asserting the bug.
+   * Scrolling a tile in and straight back out. The remove is what the user ended on, so the SFU
+   * must be left on none - otherwise it keeps sending a stream no element renders.
    */
-  it.failing('leaves the SFU on none when a tile is scrolled in and straight back out', async () => {
+  it('leaves the SFU on none when a tile is scrolled in and straight back out', async () => {
     handlersOf(manager).handleIntersection(entry(true));
     handlersOf(manager).handleIntersection(entry(false));
     await settle();
 
-    expect(sent[sent.length - 1]).toBe(HMSSimulcastLayer.NONE);
     expect(track.getLayer()).toBe(HMSSimulcastLayer.NONE);
+    expect(videoElement.srcObject).toBeNull();
   });
 
   /**
