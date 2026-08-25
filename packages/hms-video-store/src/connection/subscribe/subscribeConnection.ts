@@ -27,6 +27,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
    * request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
+  /** bound on waiting for the api data channel to open, applied per attempt */
+  private readonly OPEN_TIMEOUT = 10000;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -180,13 +182,16 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   // eslint-disable-next-line complexity
   private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
-    if (this.apiChannel?.readyState !== 'open') {
-      await this.eventEmitter.waitFor('open');
-    }
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
+      try {
+        await this.waitForChannelOpen();
+      } catch (error) {
+        HMSLogger.w(this.TAG, `API data channel not open for ${requestId}`, { request, try: i + 1, error });
+        continue;
+      }
       this.apiChannel!.send(request);
       try {
         response = await this.waitForResponse(requestId);
@@ -216,6 +221,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
       throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
     }
     return response;
+  };
+
+  /**
+   * Checked per attempt rather than once up front: 'open' is emitted from the channel's onopen, so
+   * a channel that is closed or replaced never emits again and an unbounded wait here would hang
+   * the caller for the rest of the session.
+   */
+  private waitForChannelOpen = async () => {
+    if (this.apiChannel?.readyState === 'open') {
+      return;
+    }
+    await this.eventEmitter.waitFor('open', { timeout: this.OPEN_TIMEOUT } as WaitForOptions);
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
