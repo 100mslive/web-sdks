@@ -21,10 +21,10 @@ export default class HMSSubscribeConnection extends HMSConnection {
   protected readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
   /**
-   * A request sent in the window where the data channel is open locally but not yet on the SFU
-   * has been seen to go unanswered, which without a bound leaves the caller waiting for the whole
-   * session. Deliberately generous: a retry replays the original serialized request, so a
-   * premature one can apply stale desired state over a newer request.
+   * The first request of a session has been seen to go unanswered, which without a bound leaves
+   * that caller waiting for the rest of the session. Deliberately generous: a retry replays the
+   * original serialized request, so a premature one can apply stale desired state over a newer
+   * request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
 

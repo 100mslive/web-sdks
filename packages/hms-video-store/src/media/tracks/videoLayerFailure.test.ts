@@ -5,7 +5,9 @@ import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 /**
  * The observer callbacks are private, but they are a real entry point - Resize/IntersectionObserver
- * invoke them exactly as these tests do, without awaiting the promise they return.
+ * call them and discard the promise they return, which is how a rejection escapes. The tests await
+ * it instead, so a rejection becomes a failing assertion. The resize path is debounced in
+ * production; calling the handler directly skips that.
  */
 interface ObserverHandlers {
   handleResize: (entry: ResizeObserverEntry) => Promise<void>;
