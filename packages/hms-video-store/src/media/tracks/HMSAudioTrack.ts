@@ -8,6 +8,11 @@ export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
+  /**
+   * Last volume asked for, kept off the audio element so it survives the element being torn down
+   * and rebuilt. Only 0 vs non-zero is acted on - it decides whether audio stays unsubscribed.
+   */
+  private requestedVolume = 100;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -25,11 +30,20 @@ export class HMSAudioTrack extends HMSTrack {
     if (value < 0 || value > 100) {
       throw Error('Please pass a valid number between 0-100');
     }
+    this.requestedVolume = value;
     // Don't subscribe to audio when volume is 0
     await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }
+  }
+
+  /**
+   * setVolume(0) silences the peer by unsubscribing, so anything that resubscribes has to check
+   * this first or it hands back audio the user asked not to hear.
+   */
+  protected isSilenced() {
+    return this.requestedVolume === 0;
   }
 
   setAudioElement(element: HTMLAudioElement | null) {

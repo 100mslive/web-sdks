@@ -6,6 +6,7 @@ export class HMSRemoteAudioTrack extends HMSAudioTrack {
       return;
     }
     await super.setEnabled(value);
-    await this.subscribeToAudio(value);
+    // the peer unmuting must not resubscribe audio the user silenced with setVolume(0)
+    await this.subscribeToAudio(value && !this.isSilenced());
   }
 }
