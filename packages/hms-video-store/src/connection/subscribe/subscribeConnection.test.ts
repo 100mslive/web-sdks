@@ -9,6 +9,10 @@ jest.mock('../../utils/timer-utils', () => ({
   workerSleep: () => Promise.resolve(),
 }));
 
+interface WithEventEmitter {
+  eventEmitter: { emit: (event: string, value: string) => void };
+}
+
 /**
  * The Aug 2026 silent-recording incident: the SFU never answered the first
  * `prefer-audio-track-state` request of a session, so the caller waited forever.
@@ -32,14 +36,16 @@ describe('HMSSubscribeConnection api data channel', () => {
     connection.nativeConnection.ondatachannel?.({ channel: nativeChannel } as RTCDataChannelEvent);
   });
 
-  const respondTo = (request: string) => {
-    const { id } = JSON.parse(request);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (connection as any).eventEmitter.emit(
+  /** the emitter is private; the data channel's onMessage feeds it exactly like this */
+  const emitReply = (request: string, body: Record<string, unknown>) => {
+    const { id } = JSON.parse(request) as { id: string };
+    (connection as unknown as WithEventEmitter).eventEmitter.emit(
       'message',
-      JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }),
+      JSON.stringify({ id, jsonrpc: '2.0', ...body }),
     );
   };
+
+  const respondTo = (request: string) => emitReply(request, { result: { track_id: 'track-1' } });
 
   it('resolves when the SFU answers', async () => {
     const promise = connection.sendOverApiDataChannelWithResponse({
@@ -83,12 +89,7 @@ describe('HMSSubscribeConnection api data channel', () => {
       .catch((error: Error) => error);
 
     await Promise.resolve();
-    const { id } = JSON.parse(sent[0]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (connection as any).eventEmitter.emit(
-      'message',
-      JSON.stringify({ id, jsonrpc: '2.0', error: { code: 429, message: 'too many requests' } }),
-    );
+    emitReply(sent[0], { error: { code: 429, message: 'too many requests' } });
 
     await jest.advanceTimersByTimeAsync(120_000);
     const result = await promise;

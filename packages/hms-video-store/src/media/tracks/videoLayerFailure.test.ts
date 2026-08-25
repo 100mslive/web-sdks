@@ -4,6 +4,17 @@ import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnecti
 import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 /**
+ * The observer callbacks are private, but they are a real entry point - Resize/IntersectionObserver
+ * invoke them exactly as these tests do, without awaiting the promise they return.
+ */
+interface ObserverHandlers {
+  handleResize: (entry: ResizeObserverEntry) => Promise<void>;
+  handleIntersection: (entry: IntersectionObserverEntry) => Promise<void>;
+}
+
+const handlersOf = (manager: VideoElementManager) => manager as unknown as ObserverHandlers;
+
+/**
  * A lost `prefer-video-track-state` reply makes requestLayer throw. The resize and
  * intersection handlers are handed to observers, which never await them, so a throw
  * there escapes as an unhandled rejection.
@@ -55,20 +66,12 @@ describe('VideoElementManager layer request failures', () => {
     } as unknown as IntersectionObserverEntry);
 
   it('does not reject from the resize handler when the layer request fails', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleResize = (manager as any).handleResize as (entry: ResizeObserverEntry) => Promise<void>;
-
-    await expect(handleResize(resizeEntry())).resolves.toBeUndefined();
+    await expect(handlersOf(manager).handleResize(resizeEntry())).resolves.toBeUndefined();
     expect(setPreferredLayer).toHaveBeenCalled();
   });
 
   it('does not reject from the intersection handler when the layer request fails', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleIntersection = (manager as any).handleIntersection as (
-      entry: IntersectionObserverEntry,
-    ) => Promise<void>;
-
-    await expect(handleIntersection(intersectionEntry())).resolves.toBeUndefined();
+    await expect(handlersOf(manager).handleIntersection(intersectionEntry())).resolves.toBeUndefined();
   });
 
   /**
@@ -77,12 +80,8 @@ describe('VideoElementManager layer request failures', () => {
    */
   it('still attaches the sink when the layer request fails', async () => {
     const addSink = jest.spyOn(track, 'addSink');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleIntersection = (manager as any).handleIntersection as (
-      entry: IntersectionObserverEntry,
-    ) => Promise<void>;
 
-    await handleIntersection(intersectionEntry());
+    await handlersOf(manager).handleIntersection(intersectionEntry());
 
     expect(addSink).toHaveBeenCalledWith(videoElement);
   });
