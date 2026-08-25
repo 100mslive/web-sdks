@@ -49,7 +49,11 @@ const makeNativeTrack = (id: string) =>
     stop: jest.fn(),
   } as unknown as MediaStreamTrack);
 
-const makeLocalAudioTrack = (eventBus: EventBus) => {
+const makeLocalAudioTrack = (
+  eventBus: EventBus,
+  source = 'regular',
+  nativeTrack: MediaStreamTrack = makeNativeTrack('track-1'),
+) => {
   const nativeStream = {
     id: 'stream-1',
     getTracks: () => [],
@@ -59,12 +63,25 @@ const makeLocalAudioTrack = (eventBus: EventBus) => {
   const stream = new HMSLocalStream(nativeStream);
   stream.setConnection({} as unknown as HMSPublishConnection);
   const settings = new HMSAudioTrackSettingsBuilder().build();
-  return new HMSLocalAudioTrack(stream, makeNativeTrack('track-1'), 'regular', eventBus, settings);
+  return new HMSLocalAudioTrack(stream, nativeTrack, source, eventBus, settings);
 };
 
 const setVisibility = (state: 'hidden' | 'visible') => {
   Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
 };
+
+const setMicPermission = (state?: PermissionState) => {
+  Object.defineProperty(navigator, 'permissions', {
+    value: state ? { query: jest.fn(async () => ({ state, onchange: null })) } : undefined,
+    configurable: true,
+  });
+};
+
+const listenedEvents = (nativeTrack: MediaStreamTrack) =>
+  (nativeTrack.addEventListener as jest.Mock).mock.calls.map(([name]) => name);
+
+// navigator.permissions resolves on a task, not a microtask
+const flushPermissionQuery = () => new Promise(resolve => setTimeout(resolve, 0));
 
 describe('HMSLocalAudioTrack interruptions', () => {
   beforeEach(() => {
@@ -323,5 +340,52 @@ describe('HMSLocalAudioTrack interruptions', () => {
     await track.handleTrackUnmute();
 
     expect(interruptions.map(i => i.started)).toEqual([true]);
+  });
+});
+
+/**
+ * The same wiring as the video track, and the same defect for the same reason - a screenshare is
+ * not a capture device this SDK owns, so a mute published for it never gets taken back. LIV-646.
+ */
+describe('HMSLocalAudioTrack screenshare', () => {
+  afterEach(() => setMicPermission(undefined));
+
+  it('does not listen for native mute and unmute on a screenshare audio track', () => {
+    const nativeTrack = makeNativeTrack('track-1');
+    makeLocalAudioTrack(new EventBus(), 'screen', nativeTrack);
+
+    expect(listenedEvents(nativeTrack)).not.toContain('mute');
+    expect(listenedEvents(nativeTrack)).not.toContain('unmute');
+  });
+
+  it('listens for native mute and unmute on a mic track', () => {
+    const nativeTrack = makeNativeTrack('track-1');
+    makeLocalAudioTrack(new EventBus(), 'regular', nativeTrack);
+
+    expect(listenedEvents(nativeTrack)).toEqual(expect.arrayContaining(['mute', 'unmute']));
+  });
+
+  it('does not mute screenshare audio when the microphone permission is denied', async () => {
+    setMicPermission('denied');
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localAudioEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    makeLocalAudioTrack(eventBus, 'screen');
+    await flushPermissionQuery();
+
+    expect(enabledUpdates).toEqual([]);
+  });
+
+  it('mutes the mic when the microphone permission is denied', async () => {
+    setMicPermission('denied');
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localAudioEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    makeLocalAudioTrack(eventBus, 'regular');
+    await flushPermissionQuery();
+
+    expect(enabledUpdates).toEqual([false]);
   });
 });
