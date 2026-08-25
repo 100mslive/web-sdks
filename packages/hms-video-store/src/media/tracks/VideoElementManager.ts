@@ -180,7 +180,8 @@ export class VideoElementManager {
       try {
         await this.track.setPreferredLayer(maxLayer);
       } catch (error) {
-        HMSLogger.w(this.TAG, `failed to select layer ${maxLayer}`, `${this.track}`, error);
+        // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
+        HMSLogger.e(this.TAG, `failed to select layer ${maxLayer}`, `${this.track}`, error);
       }
     }
   }

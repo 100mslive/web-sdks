@@ -89,17 +89,34 @@ describe('VideoElementManager layer request failures', () => {
   /**
    * updateSinks is sync and discards the promises from addSink/removeSink, and it runs on every
    * remote video mute/unmute via HMSRemoteVideoTrack.setEnabled, so a rejecting layer request
-   * there has no caller to catch it.
+   * there has no caller to catch it. Asserting on the promise updateSinks discards pins that
+   * directly - a process-level unhandledRejection spy never fires under jest.
    */
-  it('does not leak an unhandled rejection from updateSinks', async () => {
+  it('does not reject from the promise updateSinks discards', async () => {
     setPreferredLayer.mockRestore();
-    const unhandled = jest.fn();
-    process.on('unhandledRejection', unhandled);
 
-    manager.updateSinks(true);
-    await new Promise(resolve => setTimeout(resolve, 0));
-    process.off('unhandledRejection', unhandled);
+    await expect(track.addSink(videoElement, true)).resolves.toBeUndefined();
+  });
 
-    expect(unhandled).not.toHaveBeenCalled();
+  /**
+   * On-demand tracks start as empty canvas tracks, and addSink takes a branch for them that asks
+   * for the layer directly instead of going through updateLayer. That request is what fetches the
+   * real track, so it is the one most exposed to an unanswered reply.
+   */
+  it('does not reject for an empty on-demand track', async () => {
+    setPreferredLayer.mockRestore();
+    const emptyTrack = new HMSRemoteVideoTrack(
+      track.stream as HMSRemoteStream,
+      {
+        id: 'empty-1',
+        kind: 'video',
+        enabled: true,
+        label: '',
+        addEventListener: jest.fn(),
+      } as unknown as MediaStreamTrack,
+      'regular',
+    );
+
+    await expect(emptyTrack.addSink(videoElement, true)).resolves.toBeUndefined();
   });
 });

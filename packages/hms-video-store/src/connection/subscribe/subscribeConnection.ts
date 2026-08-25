@@ -190,8 +190,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
       this.apiChannel!.send(request);
       try {
         response = await this.waitForResponse(requestId);
-      } catch {
-        HMSLogger.w(this.TAG, `No response for ${requestId}`, { request, try: i + 1 });
+      } catch (error) {
+        HMSLogger.w(this.TAG, `No response for ${requestId}`, { request, try: i + 1, error });
         continue;
       }
       const error = response.error;
