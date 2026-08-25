@@ -164,11 +164,9 @@ export class AudioSinkManager {
      * Audio is subscribed by default, so this is an optimisation - attaching and playing the track
      * must never wait on it or fail with it, or a lost response leaves the track silent forever.
      */
-    try {
-      await track.setVolume(this.volume);
-    } catch (error) {
-      HMSLogger.w(this.TAG, 'Could not apply audio subscription state', `${track}`, error);
-    }
+    track
+      .setVolume(this.volume)
+      .catch(error => HMSLogger.w(this.TAG, 'Could not apply audio subscription state', `${track}`, error));
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
