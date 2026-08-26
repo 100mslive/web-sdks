@@ -63,8 +63,9 @@ export class AudioSinkManager {
   }
 
   async setVolume(value: number) {
-    // this.volume is recorded below and the fan-out no longer rethrows, so a value the element
-    // setter refuses would be kept and throw on every later track add. Not `< 0 || > 100`: NaN.
+    // this.volume is recorded below before the fan-out is awaited, so a value the element setter
+    // refuses would be kept whether or not the fan-out rejects, and then throw on every later
+    // track add. Not `< 0 || > 100`: NaN passes that.
     if (!(value >= 0 && value <= 100)) {
       throw Error('Please pass a valid number between 0-100');
     }
@@ -170,10 +171,11 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
-    // the element already has the volume, so what is left to do here is the subscription - an
-    // optimisation, since audio is subscribed by default, so attaching must never wait on it
+    // re-read rather than reusing the value from element creation: the awaits above (setOutputDevice,
+    // and play() via the autoplay check) are a window in which the user can change the volume, and
+    // applying the older one undoes it - permanently, since this also writes requestedVolume
     track
-      .setVolume(volume)
+      .setVolume(track.getRequestedVolume() ?? this.volume)
       // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
       .catch(error => HMSLogger.e(this.TAG, 'Could not apply audio subscription state', `${track}`, error));
   };

@@ -39,6 +39,8 @@ const buildTrack = (subscribe: StubOutcome) => {
 describe('AudioSinkManager', () => {
   let audioSinkManager: AudioSinkManager;
   let eventBus: EventBus;
+  // a real Store: the fan-out it performs is what several of these assert on
+  let store: Store;
   const peer = { peerId: 'peer-1' } as HMSRemotePeer;
 
   let realMediaStream: typeof MediaStream;
@@ -51,7 +53,7 @@ describe('AudioSinkManager', () => {
       tracks,
     })) as unknown as typeof MediaStream;
     eventBus = new EventBus();
-    const store = { updateAudioOutputVolume: jest.fn() } as unknown as Store;
+    store = new Store();
     const deviceManager = { outputDevice: undefined } as unknown as DeviceManager;
     audioSinkManager = new AudioSinkManager(store, deviceManager, eventBus);
     audioSinkManager.init();
@@ -141,6 +143,35 @@ describe('AudioSinkManager', () => {
       expect(audioSinkManager.getVolume()).toBe(100);
     });
 
+    /**
+     * AudioOutputManager must forward the sink's promise, not just its own guard: HMSSDKActions
+     * awaits this, and dropping it reports success while a track's resubscribe is failing.
+     */
+    it('surfaces a track`s failure through AudioOutputManager', async () => {
+      const audioOutput = new AudioOutputManager(
+        { outputDevice: undefined } as unknown as DeviceManager,
+        audioSinkManager,
+      );
+      const { track } = makeRemoteAudioTrack({ subscribe: 'rejects' });
+      track.setAudioElement(document.createElement('audio'));
+      store.addTrack(track);
+
+      await expect(audioOutput.setVolume(0)).rejects.toThrow();
+    });
+
+    /** the sink's own guard, reached directly - AudioOutputManager's intercepts it on the public path */
+    it('rejects NaN at the sink, before it reaches the element setter', async () => {
+      await expect(audioSinkManager.setVolume(NaN)).rejects.toThrow('Please pass a valid number between 0-100');
+    });
+
+    /** and on the per-track path, which HMSSDKActions.setTrackVolume reaches directly */
+    it('rejects NaN on a track', async () => {
+      const { track } = makeRemoteAudioTrack();
+      track.setAudioElement(document.createElement('audio'));
+
+      await expect(track.setVolume(NaN)).rejects.toThrow('Please pass a valid number between 0-100');
+    });
+
     it('still adds a working audio element after a rejected volume', async () => {
       await audioSinkManager.setVolume(150).catch(() => undefined);
       const track = makeRemoteAudioTrack().track;
@@ -158,6 +189,24 @@ describe('AudioSinkManager', () => {
      * sink volume there hands a peer the user muted individually back at full volume, and
      * resubscribes them at the SFU, while the UI still shows them muted.
      */
+    /**
+     * The volume is read where the element is created, but handleTrackAdd then awaits
+     * setOutputDevice and the autoplay check before applying the subscription half. Reusing the
+     * value read earlier undoes a volume change made during that window - and because it also
+     * writes requestedVolume, the stale value sticks for every later rebuild too.
+     */
+    it('does not undo a volume change made while the track was attaching', async () => {
+      const track = makeRemoteAudioTrack({ subscribe: 'hangs' }).track;
+      const added = eventBus.audioTrackAdded.publish({ track, peer });
+      // the user drags the slider while play() is still pending
+      audioSinkManager.setVolume(0).catch(() => undefined);
+      await added;
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(track.getAudioElement()?.volume).toBe(0);
+      expect(audioSinkManager.getVolume()).toBe(0);
+    });
+
     it('keeps a per-track mute across an element rebuild', async () => {
       const track = makeRemoteAudioTrack().track;
       await eventBus.audioTrackAdded.publish({ track, peer });
