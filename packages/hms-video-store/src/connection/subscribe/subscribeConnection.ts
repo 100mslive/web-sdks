@@ -317,11 +317,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (response) {
       return response;
     }
-    if (superseded()) {
+    /**
+     * close() is the same category as supersession: not a failure anyone can act on, and nothing
+     * survives it to be wrong about - clearPeerConnections() nulls the connection, and an SFU
+     * migration additionally drops every HMSRemoteStream via removeRemoteTracks(). Throwing here
+     * wrote one error per in-flight track on every normal leave, through the logIfRejected chain.
+     */
+    if (superseded() || this.closed) {
       return dropped();
-    }
-    if (this.closed) {
-      throw Error(`Subscribe connection closed before ${requestId} was answered - ${request}`);
     }
     throw Error(
       `No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`,

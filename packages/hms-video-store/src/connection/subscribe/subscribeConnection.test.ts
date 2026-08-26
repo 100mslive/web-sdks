@@ -23,25 +23,37 @@ describe('HMSSubscribeConnection api data channel', () => {
 
   beforeEach(() => {
     sent = [];
-    window.RTCPeerConnection = jest.fn().mockImplementation(() => ({
-      close: jest.fn(),
-      getSenders: () => [],
-    })) as unknown as typeof RTCPeerConnection;
+    window.RTCPeerConnection = jest
+      .fn()
+      .mockImplementation(() => ({ close: jest.fn() })) as unknown as typeof RTCPeerConnection;
     const signal = { trickle: jest.fn() } as unknown as JsonRpcSignal;
     const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
     connection = new HMSSubscribeConnection(signal, {}, () => false, observer);
 
+    let readyState = 'open';
     const nativeChannel = {
       label: API_DATA_CHANNEL,
-      readyState: 'open',
-      send: (message: string) => sent.push(message),
-      close: jest.fn(),
+      get readyState() {
+        return readyState;
+      },
+      send: (message: string) => {
+        if (readyState !== 'open') {
+          throw Error('InvalidStateError: channel is not open');
+        }
+        sent.push(message);
+      },
+      close: jest.fn(() => {
+        readyState = 'closed';
+      }),
     } as unknown as RTCDataChannel;
     connection.nativeConnection.ondatachannel?.({ channel: nativeChannel } as RTCDataChannelEvent);
   });
 
-  // a test that throws before its inline useRealTimers() would leak fake timers into the next one
   afterEach(() => {
+    // settles anything still parked, so a discarded promise cannot reject minutes later attributed
+    // to whatever suite is running by then
+    connection.close();
+    // a test that throws before its inline useRealTimers() would leak fake timers into the next one
     jest.useRealTimers();
   });
 
@@ -256,9 +268,10 @@ describe('HMSSubscribeConnection api data channel', () => {
     await jest.advanceTimersByTimeAsync(100);
 
     expect(settled).toBe(true);
-    // rejects rather than resolving: a caller that reads a torn-down connection as success keeps
-    // believing the SFU applied state it never received
-    await expect(promise).resolves.toBeInstanceOf(Error);
+    // dropped, not rejected: a leave is not a failure, and nothing survives close() to be wrong
+    // about - throwing here wrote one error per in-flight track on every normal leave
+    await expect(promise).resolves.not.toBeInstanceOf(Error);
+    await expect(promise).resolves.not.toHaveProperty('error');
   }, 10_000);
 
   /** the backoff before an attempt that will never happen only delays the throw */
@@ -296,11 +309,15 @@ describe('HMSSubscribeConnection api data channel', () => {
       params: { max_spatial_layer: 'high', track_id: 'track-1' },
     });
     await Promise.resolve();
-    // a newer request for the same track takes the claim while the first reply is in flight
-    connection.sendOverApiDataChannelWithResponse({
-      method: 'prefer-video-track-state',
-      params: { max_spatial_layer: 'low', track_id: 'track-1' },
-    });
+    // a newer request for the same track takes the claim while the first reply is in flight.
+    // Nothing answers it and this test runs on real timers, so its rejection needs a handler or it
+    // lands ~30s later attributed to whatever suite is running then.
+    connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-video-track-state',
+        params: { max_spatial_layer: 'low', track_id: 'track-1' },
+      })
+      .catch(() => undefined);
     await Promise.resolve();
     emitReply(sent[0], { result: { track_id: 'track-1' } });
 
@@ -331,9 +348,13 @@ describe('HMSSubscribeConnection api data channel', () => {
     connection.close();
     await jest.advanceTimersByTimeAsync(100);
 
-    await expect(stale).resolves.not.toBeInstanceOf(Error);
-    await expect(stale).resolves.not.toHaveProperty('error');
-    await expect(latest).resolves.toBeInstanceOf(Error);
+    // both drop: one because it was superseded, the other because close() is the same category.
+    // Asserting on `latest` too rather than merely awaiting it - otherwise it reads as though it
+    // is only there to keep a rejection handled.
+    for (const settled of [stale, latest]) {
+      await expect(settled).resolves.not.toBeInstanceOf(Error);
+      await expect(settled).resolves.not.toHaveProperty('error');
+    }
   }, 10_000);
 
   /**
@@ -427,7 +448,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     await jest.advanceTimersByTimeAsync(100);
 
     expect(settled).toBe(true);
-    await expect(promise).resolves.toBeInstanceOf(Error);
+    await expect(promise).resolves.not.toHaveProperty('error');
   }, 10_000);
 
   /**
@@ -479,7 +500,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     await jest.advanceTimersByTimeAsync(100);
 
     expect(settled).toBe(true);
-    await expect(promise).resolves.toBeInstanceOf(Error);
+    await expect(promise).resolves.not.toHaveProperty('error');
   }, 10_000);
 
   /** a channel that opens after the first attempt gave up should still get the request through */
