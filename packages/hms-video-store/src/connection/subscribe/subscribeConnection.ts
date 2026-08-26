@@ -241,8 +241,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
      * Resolve the way the disableAutoUnsubscribe skip does rather than reporting an error nobody
      * can act on - the newer request owns the outcome. Every exit path has to agree on this.
      */
-    const dropped = () => {
-      HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
+    const dropped = (reason: 'superseded' | 'connection closed') => {
+      HMSLogger.d(this.TAG, `Dropping ${requestId} - ${reason}`, request);
       return { id: requestId } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
@@ -252,14 +252,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
       if (superseded()) {
-        return dropped();
+        return dropped('superseded');
       }
       try {
         await this.waitForChannelOpen();
         // the claim can change hands while parked on the open wait, and a retry replays the bytes
         // serialised at request time - checking only before the wait still lets stale state out
         if (superseded()) {
-          return dropped();
+          return dropped('superseded');
         }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
@@ -286,7 +286,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         const shouldRetry = Math.floor(error.code / 100) === 5 || error.code === 429;
         if (!shouldRetry) {
           if (superseded()) {
-            return dropped();
+            return dropped('superseded');
           }
           throw Error(`code=${error.code}, message=${error.message} - ${requestId} not retried`);
         }
@@ -306,7 +306,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
      */
     if (response?.error) {
       if (superseded()) {
-        return dropped();
+        return dropped('superseded');
       }
       // the loop can run out of attempts still holding a retryable error, and no caller inspects
       // `error` on a resolved response, so returning it here reads as a request the SFU applied
@@ -324,7 +324,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
      * wrote one error per in-flight track on every normal leave, through the logIfRejected chain.
      */
     if (superseded() || this.closed) {
-      return dropped();
+      return dropped(superseded() ? 'superseded' : 'connection closed');
     }
     throw Error(
       `No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`,
