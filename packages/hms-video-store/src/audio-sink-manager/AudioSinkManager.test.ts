@@ -1,6 +1,8 @@
 import { AudioSinkManager } from './AudioSinkManager';
+import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
+import { HMSRemoteStream } from '../media/streams';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
@@ -19,6 +21,7 @@ const buildTrack = (subscribe: SubscribeOutcome) => {
     trackId: 'track-1',
     nativeTrack,
     getAudioElement: () => audioElement,
+    getRequestedVolume: () => undefined,
     setAudioElement: (element: HTMLAudioElement | null) => {
       audioElement = element;
     },
@@ -33,13 +36,33 @@ const buildTrack = (subscribe: SubscribeOutcome) => {
   } as unknown as HMSRemoteAudioTrack;
 };
 
+/** a real track, so setVolume's own ordering runs rather than the stub's resolved promise */
+const buildRealTrack = (answerSubscribe: boolean) => {
+  const connection = {
+    sendOverApiDataChannelWithResponse: answerSubscribe
+      ? jest.fn().mockResolvedValue({})
+      : jest.fn(() => new Promise(() => undefined)),
+  } as unknown as HMSSubscribeConnection;
+  const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
+  const nativeTrack = {
+    id: 'track-1',
+    kind: 'audio',
+    enabled: true,
+    addEventListener: jest.fn(),
+  } as unknown as MediaStreamTrack;
+  return new HMSRemoteAudioTrack(stream, nativeTrack, 'regular');
+};
+
 describe('AudioSinkManager', () => {
   let audioSinkManager: AudioSinkManager;
   let eventBus: EventBus;
   const peer = { peerId: 'peer-1' } as HMSRemotePeer;
 
+  let realMediaStream: typeof MediaStream;
+
   beforeEach(() => {
     document.body.innerHTML = '';
+    realMediaStream = window.MediaStream;
     window.MediaStream = jest.fn().mockImplementation((tracks: MediaStreamTrack[]) => ({
       id: 'stream-1',
       tracks,
@@ -54,6 +77,8 @@ describe('AudioSinkManager', () => {
 
   afterEach(() => {
     audioSinkManager.cleanup();
+    // a direct assignment, so restoreAllMocks cannot put the real one back
+    window.MediaStream = realMediaStream;
     jest.restoreAllMocks();
   });
 
@@ -88,5 +113,113 @@ describe('AudioSinkManager', () => {
 
     expect(unhandled).not.toHaveBeenCalled();
     expect(sinkChildren().length).toBe(1);
+  });
+
+  /**
+   * Volume is applied to the element where the element is created, so it is carried before play()
+   * whatever happens to the subscribe round trip - which the fake track above stubs out entirely.
+   * These use a real HMSRemoteAudioTrack so setVolume's own ordering is exercised.
+   */
+  describe('volume on the element it creates', () => {
+    /**
+     * Attaching must not wait on the round trip - that was the silent-recording fix - but the
+     * element it attaches has to already carry the app's volume, or the peer is audible at full
+     * volume for as long as the SFU takes to answer, and forever if it never does.
+     */
+    /**
+     * The window that matters is the one around play(), not the state once everything settles -
+     * a track turned down after play() has started it is audible for exactly as long as play()
+     * takes, on every track add and on every decode-error element rebuild.
+     */
+    it('is never audible at full volume, including at the moment play() is called', async () => {
+      const volumeAtPlay: number[] = [];
+      jest.spyOn(window.HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+        volumeAtPlay.push(this.volume);
+        return Promise.resolve();
+      });
+      await audioSinkManager.setVolume(0);
+      const track = buildRealTrack(false);
+
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // every observation is exactly 0, and there was at least one - not merely "never 1",
+      // which would pass for any wrong-but-not-full value
+      expect(volumeAtPlay.length).toBeGreaterThan(0);
+      expect([...new Set(volumeAtPlay)]).toEqual([0]);
+    });
+
+    /**
+     * The element carries the volume because it is set where the element is created, not because
+     * setVolume got far enough to apply it - so a subscribe call that rejects outright, or a retry
+     * budget that runs out, cannot leave a peer audible.
+     */
+    /**
+     * Recording the volume before the fan-out means nothing downstream gates it any more, and
+     * allSettled now swallows HMSAudioTrack.setVolume's range check. An out-of-range or NaN value
+     * would be kept and then thrown by the element setter on every later track add - IndexSizeError
+     * before the element is even wired up, so the peer gets no audio element at all.
+     */
+    it.each([150, -1, NaN])('rejects %p rather than recording it', async value => {
+      await expect(audioSinkManager.setVolume(value)).rejects.toThrow();
+
+      expect(audioSinkManager.getVolume()).toBe(100);
+    });
+
+    it('still adds a working audio element after a rejected volume', async () => {
+      await audioSinkManager.setVolume(150).catch(() => undefined);
+      const track = buildRealTrack(true);
+
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(track.getAudioElement()).toBeTruthy();
+      expect(track.getAudioElement()?.srcObject).toBeTruthy();
+    });
+
+    /**
+     * handleTrackAdd runs again on MEDIA_ERR_DECODE recovery (and on renegotiation), so the volume
+     * it puts on the rebuilt element must be the one that applies to *this* track. Using the global
+     * sink volume there hands a peer the user muted individually back at full volume, and
+     * resubscribes them at the SFU, while the UI still shows them muted.
+     */
+    it('keeps a per-track mute across an element rebuild', async () => {
+      const track = buildRealTrack(true);
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      await new Promise(resolve => setTimeout(resolve, 0));
+      // the user mutes this one peer from the tile menu
+      await track.setVolume(0);
+
+      // chrome raises a decode error; the sink manager rebuilds the element
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(track.getAudioElement()?.volume).toBe(0);
+    });
+
+    it('carries the volume even when the subscribe call rejects outright', async () => {
+      await audioSinkManager.setVolume(0);
+      const track = buildRealTrack(false);
+      jest.spyOn(track, 'setVolume').mockRejectedValue(new Error('No response from SFU'));
+
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(track.getAudioElement()?.volume).toBe(0);
+      expect(track.getAudioElement()?.srcObject).toBeTruthy();
+    });
+
+    it('does not play at full volume while the subscribe round trip is in flight', async () => {
+      await audioSinkManager.setVolume(0);
+      const track = buildRealTrack(false);
+
+      await eventBus.audioTrackAdded.publish({ track, peer });
+      // publish does not await its subscribers, so the add is only part-way through the autoplay
+      // check when it returns - without this the assertions below never see the volume being set
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(track.getAudioElement()?.srcObject).toBeTruthy();
+      expect(track.getAudioElement()?.volume).toBe(0);
+    });
   });
 });

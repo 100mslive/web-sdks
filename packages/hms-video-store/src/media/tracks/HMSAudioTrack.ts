@@ -10,9 +10,10 @@ export class HMSAudioTrack extends HMSTrack {
   private outputDevice?: MediaDeviceInfo;
   /**
    * Last volume asked for, kept off the audio element so it survives the element being torn down
-   * and rebuilt. Only 0 vs non-zero is acted on - it decides whether audio stays unsubscribed.
+   * and rebuilt. Undefined until something asks for one, which is how a track that was never given
+   * its own volume is told apart from one deliberately set to the same value as the sink's.
    */
-  private requestedVolume = 100;
+  private requestedVolume?: number;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -23,7 +24,17 @@ export class HMSAudioTrack extends HMSTrack {
 
   getVolume() {
     // floor is required because of floating-point precision. e.g 0.55*100 gives 55.00000000000001
-    return this.audioElement ? Math.floor(this.audioElement.volume * 100) : null;
+    if (this.audioElement) {
+      return Math.floor(this.audioElement.volume * 100);
+    }
+    // the element is rebuilt on decode-error recovery; reporting null there records volume 0 in the
+    // store for a peer that is not muted, which drops the app's slider to zero
+    return this.requestedVolume ?? null;
+  }
+
+  /** what was asked for on this track specifically, or undefined if it only ever took the sink's */
+  getRequestedVolume() {
+    return this.requestedVolume;
   }
 
   async setVolume(value: number) {
@@ -31,11 +42,14 @@ export class HMSAudioTrack extends HMSTrack {
       throw Error('Please pass a valid number between 0-100');
     }
     this.requestedVolume = value;
-    // Don't subscribe to audio when volume is 0
-    await this.subscribeToAudio(value === 0 ? false : this.enabled);
+    // Local and immediate. Ordering this after the await left the element at the old volume for
+    // however long the SFU took to answer, and forever when it never did - and the subscribe call
+    // can now throw, which skipped it entirely.
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }
+    // Don't subscribe to audio when volume is 0
+    await this.subscribeToAudio(value === 0 ? false : this.enabled);
   }
 
   /**
