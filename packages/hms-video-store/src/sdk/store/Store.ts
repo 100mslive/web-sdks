@@ -314,23 +314,17 @@ class Store {
   }
 
   /**
-   * Each track's setVolume is an independent request to the SFU. In series, one that goes
-   * unanswered burns its whole retry budget before the next track is even asked; letting its
-   * rejection out would additionally leave every track after it on the old volume.
-   *
-   * Logged rather than thrown, unlike updateAudioOutputDevice below: setVolume turns the audio
-   * element down synchronously and only the unsubscribe optimisation rides the data channel, so a
-   * rejection here means the volume *is* applied everywhere and the SFU is still sending audio
-   * nobody can hear. A sink change has no local half, which is why that one has to surface.
+   * Concurrent, and logged rather than thrown, unlike updateAudioOutputDevice below: setVolume
+   * turns the element down synchronously and only the unsubscribe optimisation rides the data
+   * channel, so a rejection means the volume is applied everywhere and the SFU is still sending
+   * audio nobody can hear. A sink change has no local half, which is why that one has to surface.
    */
   async updateAudioOutputVolume(value: number) {
-    const results = await Promise.allSettled(this.getAudioTracks().map(track => track.setVolume(value)));
-    results.forEach(result => {
-      if (result.status === 'rejected') {
-        // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
-        HMSLogger.e(this.TAG, 'could not apply audio subscription state for volume change', result.reason);
-      }
-    });
+    await Promise.all(
+      this.getAudioTracks().map(track =>
+        track.setVolume(value).catch(error => HMSLogger.e(this.TAG, 'could not apply audio subscription state', error)),
+      ),
+    );
   }
 
   async updateAudioOutputDevice(device: MediaDeviceInfo) {

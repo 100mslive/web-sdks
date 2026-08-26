@@ -1,4 +1,4 @@
-import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
+import { makeRemoteAudioTrack } from '../../test/helpers/makeRemoteAudioTrack';
 import { HMSRemoteStream } from '../streams';
 import { HMSRemoteAudioTrack } from '../tracks';
 
@@ -15,17 +15,7 @@ describe('HMSRemoteAudioTrack silenced with setVolume(0)', () => {
 
   beforeEach(() => {
     audioElement = document.createElement('audio');
-    const connection = {
-      sendOverApiDataChannelWithResponse: jest.fn().mockResolvedValue({}),
-    } as unknown as HMSSubscribeConnection;
-    stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
-    const nativeTrack = {
-      id: 'track-1',
-      kind: 'audio',
-      enabled: true,
-      addEventListener: jest.fn(),
-    } as unknown as MediaStreamTrack;
-    track = new HMSRemoteAudioTrack(stream, nativeTrack, 'regular');
+    ({ track, stream } = makeRemoteAudioTrack());
     track.setAudioElement(audioElement);
   });
 

@@ -1,6 +1,4 @@
-import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
-import { HMSRemoteStream } from '../streams';
-import { HMSRemoteAudioTrack } from '../tracks';
+import { makeRemoteAudioTrack } from '../../test/helpers/makeRemoteAudioTrack';
 
 /**
  * setVolume does two things: it turns the audio element down, and it applies the subscription state
@@ -8,25 +6,9 @@ import { HMSRemoteAudioTrack } from '../tracks';
  * on the remote half means a lost reply leaves the peer audible at the volume the user turned off.
  */
 describe('audio volume application', () => {
-  const buildTrack = (answerSubscribe: boolean) => {
-    const connection = {
-      sendOverApiDataChannelWithResponse: answerSubscribe
-        ? jest.fn().mockResolvedValue({})
-        : jest.fn(() => new Promise(() => undefined)),
-    } as unknown as HMSSubscribeConnection;
-    const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
-    const nativeTrack = {
-      id: 'track-1',
-      kind: 'audio',
-      enabled: true,
-      addEventListener: jest.fn(),
-    } as unknown as MediaStreamTrack;
-    return new HMSRemoteAudioTrack(stream, nativeTrack, 'regular');
-  };
-
   /** The reported shape: "mute this peer for me" while the SFU is not answering. */
   it('turns the audio element down without waiting for the SFU to answer', async () => {
-    const track = buildTrack(false);
+    const track = makeRemoteAudioTrack({ subscribe: 'hangs' }).track;
     const audioElement = document.createElement('audio');
     track.setAudioElement(audioElement);
 
@@ -42,7 +24,7 @@ describe('audio volume application', () => {
    * syncRoomState recorded volume 0 for a peer at 100, dropping the app's slider to zero.
    */
   it('reports the requested volume while the element is detached', async () => {
-    const track = buildTrack(true);
+    const track = makeRemoteAudioTrack().track;
     track.setAudioElement(document.createElement('audio'));
     await track.setVolume(40);
 
@@ -52,7 +34,7 @@ describe('audio volume application', () => {
   });
 
   it('still applies the volume when the subscribe round trip resolves normally', async () => {
-    const track = buildTrack(true);
+    const track = makeRemoteAudioTrack().track;
     const audioElement = document.createElement('audio');
     track.setAudioElement(audioElement);
 

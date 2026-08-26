@@ -1,11 +1,10 @@
 import { AudioSinkManager } from './AudioSinkManager';
-import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
-import { HMSRemoteStream } from '../media/streams';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
+import { makeRemoteAudioTrack } from '../test/helpers/makeRemoteAudioTrack';
 
 /**
  * Reproduces the Aug 2026 silent-recording incident: the SFU never answered the
@@ -34,23 +33,6 @@ const buildTrack = (subscribe: SubscribeOutcome) => {
     setOutputDevice: () => Promise.resolve(),
     getSinkId: () => undefined,
   } as unknown as HMSRemoteAudioTrack;
-};
-
-/** a real track, so setVolume's own ordering runs rather than the stub's resolved promise */
-const buildRealTrack = (answerSubscribe: boolean) => {
-  const connection = {
-    sendOverApiDataChannelWithResponse: answerSubscribe
-      ? jest.fn().mockResolvedValue({})
-      : jest.fn(() => new Promise(() => undefined)),
-  } as unknown as HMSSubscribeConnection;
-  const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
-  const nativeTrack = {
-    id: 'track-1',
-    kind: 'audio',
-    enabled: true,
-    addEventListener: jest.fn(),
-  } as unknown as MediaStreamTrack;
-  return new HMSRemoteAudioTrack(stream, nativeTrack, 'regular');
 };
 
 describe('AudioSinkManager', () => {
@@ -138,7 +120,7 @@ describe('AudioSinkManager', () => {
         return Promise.resolve();
       });
       await audioSinkManager.setVolume(0);
-      const track = buildRealTrack(false);
+      const track = makeRemoteAudioTrack({ subscribe: 'hangs' }).track;
 
       await eventBus.audioTrackAdded.publish({ track, peer });
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -168,7 +150,7 @@ describe('AudioSinkManager', () => {
 
     it('still adds a working audio element after a rejected volume', async () => {
       await audioSinkManager.setVolume(150).catch(() => undefined);
-      const track = buildRealTrack(true);
+      const track = makeRemoteAudioTrack().track;
 
       await eventBus.audioTrackAdded.publish({ track, peer });
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -184,7 +166,7 @@ describe('AudioSinkManager', () => {
      * resubscribes them at the SFU, while the UI still shows them muted.
      */
     it('keeps a per-track mute across an element rebuild', async () => {
-      const track = buildRealTrack(true);
+      const track = makeRemoteAudioTrack().track;
       await eventBus.audioTrackAdded.publish({ track, peer });
       await new Promise(resolve => setTimeout(resolve, 0));
       // the user mutes this one peer from the tile menu
@@ -199,7 +181,7 @@ describe('AudioSinkManager', () => {
 
     it('carries the volume even when the subscribe call rejects outright', async () => {
       await audioSinkManager.setVolume(0);
-      const track = buildRealTrack(false);
+      const track = makeRemoteAudioTrack({ subscribe: 'hangs' }).track;
       jest.spyOn(track, 'setVolume').mockRejectedValue(new Error('No response from SFU'));
 
       await eventBus.audioTrackAdded.publish({ track, peer });
@@ -207,19 +189,6 @@ describe('AudioSinkManager', () => {
 
       expect(track.getAudioElement()?.volume).toBe(0);
       expect(track.getAudioElement()?.srcObject).toBeTruthy();
-    });
-
-    it('does not play at full volume while the subscribe round trip is in flight', async () => {
-      await audioSinkManager.setVolume(0);
-      const track = buildRealTrack(false);
-
-      await eventBus.audioTrackAdded.publish({ track, peer });
-      // publish does not await its subscribers, so the add is only part-way through the autoplay
-      // check when it returns - without this the assertions below never see the volume being set
-      await new Promise(resolve => setTimeout(resolve, 0));
-
-      expect(track.getAudioElement()?.srcObject).toBeTruthy();
-      expect(track.getAudioElement()?.volume).toBe(0);
     });
   });
 });

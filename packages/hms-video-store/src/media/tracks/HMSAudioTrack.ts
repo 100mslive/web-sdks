@@ -27,8 +27,7 @@ export class HMSAudioTrack extends HMSTrack {
     if (this.audioElement) {
       return Math.floor(this.audioElement.volume * 100);
     }
-    // the element is rebuilt on decode-error recovery; reporting null there records volume 0 in the
-    // store for a peer that is not muted, which drops the app's slider to zero
+    // the element is null while it is rebuilt; null here records volume 0 in the store
     return this.requestedVolume ?? null;
   }
 
@@ -42,9 +41,7 @@ export class HMSAudioTrack extends HMSTrack {
       throw Error('Please pass a valid number between 0-100');
     }
     this.requestedVolume = value;
-    // Local and immediate. Ordering this after the await left the element at the old volume for
-    // however long the SFU took to answer, and forever when it never did - and the subscribe call
-    // can now throw, which skipped it entirely.
+    // local half first: the subscribe below can hang or throw
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }

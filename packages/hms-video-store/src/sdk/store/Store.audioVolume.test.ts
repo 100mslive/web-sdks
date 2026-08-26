@@ -1,10 +1,8 @@
 import { Store } from './index';
 import { AudioSinkManager } from '../../audio-sink-manager/AudioSinkManager';
-import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../../device-manager';
 import { EventBus } from '../../events/EventBus';
-import { HMSRemoteStream } from '../../media/streams';
-import { HMSRemoteAudioTrack } from '../../media/tracks';
+import { makeRemoteAudioTrack } from '../../test/helpers/makeRemoteAudioTrack';
 
 /**
  * A global volume change fans out one subscribe request per remote audio track. Running them in
@@ -16,19 +14,7 @@ describe('Store.updateAudioOutputVolume', () => {
   let store: Store;
 
   const addTrack = (id: string, answers: boolean) => {
-    const connection = {
-      sendOverApiDataChannelWithResponse: answers
-        ? jest.fn().mockResolvedValue({})
-        : jest.fn().mockRejectedValue(new Error('No response from SFU')),
-    } as unknown as HMSSubscribeConnection;
-    const stream = new HMSRemoteStream({ id: `stream-${id}` } as MediaStream, connection);
-    const nativeTrack = {
-      id,
-      kind: 'audio',
-      enabled: true,
-      addEventListener: jest.fn(),
-    } as unknown as MediaStreamTrack;
-    const track = new HMSRemoteAudioTrack(stream, nativeTrack, 'regular');
+    const { track } = makeRemoteAudioTrack({ id, subscribe: answers ? 'resolves' : 'rejects' });
     track.setAudioElement(document.createElement('audio'));
     store.addTrack(track);
     return track;

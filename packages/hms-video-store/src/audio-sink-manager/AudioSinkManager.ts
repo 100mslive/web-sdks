@@ -63,18 +63,12 @@ export class AudioSinkManager {
   }
 
   async setVolume(value: number) {
-    /**
-     * Validated here, not only per track: this.volume is recorded before the fan-out and the
-     * fan-out no longer rethrows, so a value the element setter refuses would be kept and then
-     * throw IndexSizeError on every later track add - before the element is wired up, leaving that
-     * peer with no audio element at all. `!(value >= 0 && value <= 100)` rather than the inverted
-     * range so NaN is rejected too.
-     */
+    // this.volume is recorded below and the fan-out no longer rethrows, so a value the element
+    // setter refuses would be kept and throw on every later track add. Not `< 0 || > 100`: NaN.
     if (!(value >= 0 && value <= 100)) {
       throw Error('Please pass a valid number between 0-100');
     }
-    // recorded before the fan-out: that is a round trip per track, and until it returns every
-    // track added meanwhile reads this - and a slow older call must not land after a newer one
+    // before the fan-out: tracks added while it is in flight read this
     this.volume = value;
     await this.store.updateAudioOutputVolume(value);
   }
@@ -143,15 +137,9 @@ export class AudioSinkManager {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
-    /**
-     * A fresh element starts at 1. Set the volume on the element itself, at the point it is
-     * created, rather than routing it through setVolume: that call also applies subscription state
-     * over the api data channel, and the element must carry the volume before play() whatever
-     * happens to the round trip.
-     *
-     * This runs again on decode-error recovery, so it has to prefer what was asked for on this
-     * track - otherwise the rebuild hands a peer the user muted individually back at full volume.
-     */
+    // a fresh element starts at 1, and it has to carry the volume before play() below. The track's
+    // own volume wins: this runs again on decode-error recovery, and the sink's would un-mute a
+    // peer the user muted individually.
     const volume = track.getRequestedVolume() ?? this.volume;
     audioEl.volume = volume / 100;
     audioEl.addEventListener('pause', this.handleAudioPaused);
@@ -182,13 +170,8 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
-    /**
-     * The element already carries the volume; this is the subscription half, a round trip to the
-     * SFU. Audio is subscribed by default, so it is an optimisation - attaching and playing must
-     * never wait on it or fail with it, or a lost response leaves the track silent forever.
-     * Re-applies the same value the element got, so a rebuild does not resubscribe a peer the user
-     * muted individually.
-     */
+    // the subscription half - an optimisation, since audio is subscribed by default, so attaching
+    // must never wait on it or fail with it
     track
       .setVolume(volume)
       // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
