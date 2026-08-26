@@ -99,8 +99,10 @@ export class VideoElementManager {
      * `preferredLayer` - which shouldSendVideoLayer sees as already current and skips, leaving the
      * SFU streaming for a tile that is gone.
      */
+    // finally, not then: a removeSink that rejects is exactly when the layer is left pinned, so
+    // skipping the recompute there abandons the case this exists for
     this.logIfRejected(
-      Promise.resolve(this.track.removeSink(videoElement)).then(() => this.selectMaxLayer()),
+      Promise.resolve(this.track.removeSink(videoElement)).finally(() => this.selectMaxLayer()),
       'removeSink',
     );
     HMSLogger.d(this.TAG, `Removing video element for ${this.track}`);

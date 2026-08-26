@@ -174,11 +174,41 @@ describe('VideoElementManager teardown while an add is in flight', () => {
     manager.removeVideoElement(videoElement);
     await settle();
 
-    expect(track.getPreferredLayer()).not.toBe(HMSSimulcastLayer.HIGH);
+    // the exact layer, not merely "not high": on a four-value enum `not.toBe` leaves two wrong
+    // answers passing, and what matters is what the SFU was actually told
+    expect(track.getPreferredLayer()).toBe(HMSSimulcastLayer.LOW);
+    expect(sent[sent.length - 1]).toBe(HMSSimulcastLayer.LOW);
     small.remove();
   });
 
   /** a resize entry for an element already torn down must not drive a layer request */
+  /** a removeSink that rejects is the case the recompute exists for, not one to skip it on */
+  it('still drops the preferred layer when removeSink rejects', async () => {
+    track.setSimulcastDefinitons([
+      { layer: HMSSimulcastLayer.LOW, resolution: { width: 160, height: 90 } },
+      { layer: HMSSimulcastLayer.MEDIUM, resolution: { width: 320, height: 180 } },
+      { layer: HMSSimulcastLayer.HIGH, resolution: { width: 640, height: 360 } },
+    ]);
+    const small = document.createElement('video');
+    document.body.appendChild(small);
+    manager.addVideoElement(small);
+    handlersOf(manager).handleIntersection({
+      target: small,
+      isIntersecting: true,
+      boundingClientRect: { width: 160, height: 90 },
+    } as unknown as IntersectionObserverEntry);
+    await settle();
+    handlersOf(manager).handleIntersection(entry());
+    await settle();
+    jest.spyOn(track, 'removeSink').mockRejectedValue(new Error('No response from SFU'));
+
+    manager.removeVideoElement(videoElement);
+    await settle();
+
+    expect(track.getPreferredLayer()).toBe(HMSSimulcastLayer.LOW);
+    small.remove();
+  });
+
   it('ignores a resize for an element that is no longer registered', async () => {
     handlersOf(manager).handleIntersection(entry());
     await settle();
