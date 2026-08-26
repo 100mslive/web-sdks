@@ -63,8 +63,15 @@ export class AudioSinkManager {
   }
 
   async setVolume(value: number) {
-    await this.store.updateAudioOutputVolume(value);
+    // this.volume is recorded below before the fan-out is awaited, so a value the element setter
+    // refuses would be kept whether or not the fan-out rejects, and then throw on every later
+    // track add. Not `< 0 || > 100`: NaN passes that.
+    if (!(value >= 0 && value <= 100)) {
+      throw Error('Please pass a valid number between 0-100');
+    }
+    // before the fan-out: tracks added while it is in flight read this
     this.volume = value;
+    await this.store.updateAudioOutputVolume(value);
   }
 
   /**
@@ -131,6 +138,11 @@ export class AudioSinkManager {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
+    // a fresh element starts at 1, and it has to carry the volume before play() below. The track's
+    // own volume wins: this runs again on decode-error recovery, and the sink's would un-mute a
+    // peer the user muted individually.
+    const volume = track.getRequestedVolume() ?? this.volume;
+    audioEl.volume = volume / 100;
     audioEl.addEventListener('pause', this.handleAudioPaused);
 
     audioEl.onerror = async () => {
@@ -159,13 +171,11 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
-    /**
-     * setVolume applies the subscription state over the API data channel, a round trip to the SFU.
-     * Audio is subscribed by default, so this is an optimisation - attaching and playing the track
-     * must never wait on it or fail with it, or a lost response leaves the track silent forever.
-     */
+    // re-read rather than reusing the value from element creation: the awaits above (setOutputDevice,
+    // and play() via the autoplay check) are a window in which the user can change the volume, and
+    // applying the older one undoes it - permanently, since this also writes requestedVolume
     track
-      .setVolume(this.volume)
+      .setVolume(track.getRequestedVolume() ?? this.volume)
       // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
       .catch(error => HMSLogger.e(this.TAG, 'Could not apply audio subscription state', `${track}`, error));
   };

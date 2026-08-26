@@ -313,10 +313,17 @@ class Store {
     this.speakers = speakers;
   }
 
+  /**
+   * Concurrent, so one unanswered request does not stop the rest being asked - in series the first
+   * rejection left every later track on the old volume.
+   *
+   * Still rejects. Turning a peer *up* resubscribes, and HMSRemoteStream records the new state
+   * before the send, so a lost reply leaves the stream believing it is subscribed while the SFU
+   * sends nothing - and the equality guard makes every retry a no-op. Swallowing that would tell
+   * the app the volume was applied while a peer is inaudible for the rest of the session.
+   */
   async updateAudioOutputVolume(value: number) {
-    for (const track of this.getAudioTracks()) {
-      await track.setVolume(value);
-    }
+    await Promise.all(this.getAudioTracks().map(track => track.setVolume(value)));
   }
 
   async updateAudioOutputDevice(device: MediaDeviceInfo) {
