@@ -84,11 +84,31 @@ export class VideoElementManager {
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
+    // dropped alongside the entry: without this, removing and immediately re-adding the same
+    // element leaves an in-flight add matching both the registry and its old stamp
+    this.intersectionSeq.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
+    /**
+     * removeSink must run before the recompute, and must not be put behind an await: it nulls
+     * srcObject synchronously, and a tile swapping tracks detaches and re-attaches the same node
+     * without awaiting the detach - a deferred one lands after the new stream is attached and
+     * nulls it.
+     *
+     * The recompute follows because the layer asked for is the max across live tiles, so the tile
+     * being removed may be the one holding it up, and removeSink's own updateLayer asks for the
+     * unchanged `preferredLayer` - which shouldSendVideoLayer sees as already current and skips,
+     * leaving the SFU streaming for a tile that is gone. The deletes above have to come first too,
+     * or the removed tile is still counted and the layer stays pinned.
+     */
+    // finally, not then: a removeSink that rejects is exactly when the layer is left pinned, so
+    // skipping the recompute there abandons the case this exists for
+    this.logIfRejected(
+      Promise.resolve(this.track.removeSink(videoElement)).finally(() => this.selectMaxLayer()),
+      'removeSink',
+    );
     HMSLogger.d(this.TAG, `Removing video element for ${this.track}`);
   }
 
@@ -133,11 +153,22 @@ export class VideoElementManager {
     HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
     this.entries.set(target, rect);
     await this.selectMaxLayer();
-    if (this.intersectionSeq.get(target) !== seq) {
+    if (!this.shouldStillAddSink(target, seq)) {
       HMSLogger.d(this.TAG, 'add sink superseded', `${this.track}`, this.id);
       return;
     }
     this.logIfRejected(this.track.addSink(target), 'addSink');
+  }
+
+  /**
+   * A newer intersection entry is not the only thing that can make a suspended add stale - the
+   * element can be detached, or the whole manager cleaned up, while it waits on its layer request.
+   * removeVideoElement drops the stamp, so the seq check already catches a detach; cleanup() only
+   * clears videoElements, which is what the registry check is for. Without them the add
+   * re-attaches srcObject to an element nobody renders and asks the SFU to keep streaming to it.
+   */
+  private shouldStillAddSink(target: HTMLVideoElement, seq: number) {
+    return this.videoElements.has(target) && this.intersectionSeq.get(target) === seq;
   }
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -183,6 +214,9 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   private async selectMaxLayer() {
+    // No elements left means no layer to pick, not "pick none" - removeSink's own updateLayer is
+    // what sends NONE once hasSinks() goes false, so leaving preferredLayer alone here is correct
+    // and the removal path depends on it.
     if (!(this.track instanceof HMSRemoteVideoTrack) || this.videoElements.size === 0) {
       return;
     }
@@ -206,9 +240,10 @@ export class VideoElementManager {
     if (maxLayer) {
       HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
       /**
-       * Picking a layer is an optimisation over rendering the track, and the only callers are the
-       * resize and intersection handlers, which observers invoke without awaiting. Letting this
-       * reject would abort the sink attach and surface as an unhandled rejection.
+       * Picking a layer is an optimisation over rendering the track, and no caller can act on it
+       * failing: the observers invoke handleResize/handleIntersection without awaiting them, and
+       * removeVideoElement chains this off removeSink and discards the result. Letting it reject
+       * would abort the sink attach and surface as an unhandled rejection.
        */
       try {
         await this.track.setPreferredLayer(maxLayer);

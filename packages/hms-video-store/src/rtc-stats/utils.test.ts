@@ -1,5 +1,7 @@
-import { getConnectionType, getLocalPeerStatsFromReport } from './utils';
+import { getConnectionType, getLocalPeerStatsFromReport, getTrackStats } from './utils';
+import { EventBus } from '../events/EventBus';
 import { HMSIceCandidateStats, HMSPeerStats } from '../interfaces';
+import { HMSRemoteTrack } from '../media/tracks';
 
 type StatEntry = Record<string, any>;
 
@@ -160,6 +162,30 @@ describe('getLocalPeerStatsFromReport — ICE candidates', () => {
     expect(stats!.localCandidate).toBeUndefined();
     expect(stats!.remoteCandidate).toBeUndefined();
   });
+
+  /**
+   * `getActiveCandidatePairFromReport` hands back the report's own candidate-pair entry, and
+   * everything downstream used to `Object.assign` onto it - which mutates the target, it does not
+   * clone. So the browser's entry picked up `localCandidate`, `remoteCandidate` and `bitrate`, and
+   * the two candidate objects rode into the reactive store to be deep-frozen by immer. Cloning once
+   * at the head of the chain is what keeps the whole chain off the report.
+   */
+  test('does not write anything back onto the report it read from', () => {
+    const report = makeReport([
+      transport('CP1'),
+      candidatePair(0, 1_000, { localCandidateId: 'LC1', remoteCandidateId: 'RC1' }),
+      localCandidate({ candidateType: 'srflx', protocol: 'udp', address: '223.181.114.100', port: 14154 }),
+      remoteCandidate({ candidateType: 'srflx', protocol: 'udp', address: '35.200.223.203', port: 29080 }),
+    ]);
+    const keysBefore = Object.keys(report.get('CP1')).sort();
+
+    const stats = getLocalPeerStatsFromReport('publish', report, undefined);
+
+    expect(Object.keys(report.get('CP1')).sort()).toEqual(keysBefore);
+    // and the caller still gets everything it asked for, on its own object
+    expect(stats).toMatchObject({ localCandidate: { id: 'LC1' }, remoteCandidate: { id: 'RC1' } });
+    expect(stats).toHaveProperty('bitrate');
+  });
 });
 
 describe('getConnectionType', () => {
@@ -182,5 +208,49 @@ describe('getConnectionType', () => {
   test('is undefined when the candidate is missing', () => {
     expect(getConnectionType(undefined)).toBeUndefined();
     expect(getConnectionType({})).toBeUndefined();
+  });
+});
+
+/**
+ * getRelevantStatsFromTrackReport reads inbound-rtp / remote-inbound-rtp straight off the report,
+ * so assigning onto what it returns writes into the browser's own entries - the same defect as the
+ * candidate pair, one level down and on every stats poll for every remote track.
+ */
+describe('getTrackStats — report ownership', () => {
+  const inboundRtp = (extra: Partial<StatEntry> = {}): StatEntry => ({
+    id: 'IN1',
+    type: 'inbound-rtp',
+    ssrc: 1,
+    bytesReceived: 1000,
+    packetsLost: 2,
+    timestamp: 1_000,
+    ...extra,
+  });
+  const remoteInboundRtp = (extra: Partial<StatEntry> = {}): StatEntry => ({
+    id: 'RIN1',
+    type: 'remote-inbound-rtp',
+    ssrc: 1,
+    packetsLost: 3,
+    timestamp: 1_000,
+    ...extra,
+  });
+
+  test('does not write derived fields onto the report entries it read from', async () => {
+    const report = makeReport([inboundRtp(), remoteInboundRtp()]);
+    const inboundKeysBefore = Object.keys(report.get('IN1')).sort();
+    const remoteKeysBefore = Object.keys(report.get('RIN1')).sort();
+    const track = {
+      trackId: 'track-1',
+      peerId: 'peer-1',
+      enabled: true,
+      transceiver: { receiver: { getStats: async () => report, track: { id: 'native-1' } } },
+    } as unknown as HMSRemoteTrack;
+
+    const stats = await getTrackStats({ analytics: { publish: jest.fn() } } as unknown as EventBus, track);
+
+    expect(Object.keys(report.get('IN1')).sort()).toEqual(inboundKeysBefore);
+    expect(Object.keys(report.get('RIN1')).sort()).toEqual(remoteKeysBefore);
+    expect(stats?.remote).not.toBe(report.get('RIN1'));
+    expect(stats).toHaveProperty('bitrate');
   });
 });
