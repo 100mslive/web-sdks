@@ -242,7 +242,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
      * can act on - the newer request owns the outcome. Every exit path has to agree on this.
      */
     const dropped = () => {
-      HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
+      HMSLogger.d(this.TAG, `Dropping ${requestId} - ${this.closed ? 'closed' : 'superseded'}`, request);
       return { id: requestId } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
