@@ -204,6 +204,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
    * until its own timeout otherwise, and the emitter is capped at 60.
    */
   private abortOnClose = async <T>(wait: CancelablePromise<T>): Promise<T> => {
+    // close() has already drained pendingAborts, so a wait parked after it would never be settled
+    if (this.closed) {
+      // cancel() rejects the wait, and nothing has subscribed to it yet - Promise.race below is
+      // what normally does that, and we are not reaching it
+      wait.catch(() => undefined);
+      wait.cancel?.();
+      throw Error('Subscribe connection closed');
+    }
     let abort!: (error: Error) => void;
     const aborted = new Promise<never>((_, reject) => {
       abort = reject;
@@ -240,14 +248,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return { id: requestId } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
+    /** the per-attempt detail is a warn, which an app on setLogLevel(ERROR) never sees */
+    let lastAttemptError: Error | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
       if (superseded()) {
         return dropped();
-      }
-      if (this.closed) {
-        break;
       }
       try {
         await this.waitForChannelOpen();
@@ -260,6 +267,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         this.apiChannel!.send(request);
         response = await this.waitForResponse(requestId);
       } catch (error) {
+        lastAttemptError = error as Error;
         HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
         if (this.closed) {
           break;
@@ -282,7 +290,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
           if (superseded()) {
             return dropped();
           }
-          throw Error(`code=${error.code}, message=${error.message}`);
+          throw Error(`code=${error.code}, message=${error.message} - ${requestId} not retried`);
         }
         if (i < this.MAX_RETRIES - 1) {
           const delay = (2 + Math.random() * 2) * 1000;
@@ -304,7 +312,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
       // the loop can run out of attempts still holding a retryable error, and no caller inspects
       // `error` on a resolved response, so returning it here reads as a request the SFU applied
-      throw Error(`code=${response.error.code}, message=${response.error.message}`);
+      throw Error(
+        `code=${response.error.code}, message=${response.error.message} - ${requestId} after ${this.MAX_RETRIES} tries`,
+      );
     }
     if (response) {
       return response;
@@ -315,7 +325,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (this.closed) {
       throw Error(`Subscribe connection closed before ${requestId} was answered - ${request}`);
     }
-    throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
+    throw Error(
+      `No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`,
+      // a malformed reply lands here too, via JSON.parse in waitForResponse - without the cause,
+      // "no response" is a flatly wrong diagnosis for a reply that did arrive
+      { cause: lastAttemptError },
+    );
   };
 
   /**

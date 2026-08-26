@@ -158,7 +158,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     await jest.advanceTimersByTimeAsync(10);
 
     expect(sent).toHaveLength(3);
-    await expect(promise).resolves.toBeInstanceOf(Error);
+    await expect(promise).resolves.toMatchObject({ message: expect.stringContaining('code=500') });
   }, 10_000);
 
   /**
@@ -332,6 +332,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     await jest.advanceTimersByTimeAsync(100);
 
     await expect(stale).resolves.not.toBeInstanceOf(Error);
+    await expect(stale).resolves.not.toHaveProperty('error');
     await expect(latest).resolves.toBeInstanceOf(Error);
   }, 10_000);
 
@@ -368,8 +369,117 @@ describe('HMSSubscribeConnection api data channel', () => {
     emitReply(sent[2], { error: { code: 500, message: 'internal' } });
     await jest.advanceTimersByTimeAsync(120_000);
 
+    // both halves are needed to discriminate: main resolved `{ id, error }` (not an Error, so the
+    // class check alone passes), and a regression that throws yields an Error (which has no
+    // `error` property, so the payload check alone passes)
     await expect(stale).resolves.not.toBeInstanceOf(Error);
+    await expect(stale).resolves.not.toHaveProperty('error');
     await latest;
+  }, 10_000);
+
+  /**
+   * 404 is "the track is already gone" - nothing for the caller to act on, so it resolves rather
+   * than joining the throwing paths. That is only true because the loop returns early; falling
+   * through would now hit the error throw below it.
+   */
+  it('resolves rather than throwing when the SFU says the track is gone', async () => {
+    const promise = connection.sendOverApiDataChannelWithResponse({
+      method: 'prefer-video-track-state',
+      params: { max_spatial_layer: 'high', track_id: 'track-1' },
+    });
+    await Promise.resolve();
+    emitReply(sent[0], { error: { code: 404, message: 'track not found' } });
+
+    await expect(promise).resolves.toMatchObject({ error: { code: 404 } });
+    // and it does not burn the retry budget on a track that no longer exists
+    expect(sent).toHaveLength(1);
+  });
+
+  /**
+   * The open wait is the one close() has to interrupt on a leave or SFU migration - a request
+   * parked there has no channel to answer it, so nothing else will ever settle it.
+   */
+  it('settles a request parked on the channel-open wait when the connection is closed', async () => {
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    const neverOpen = new HMSSubscribeConnection(
+      { trickle: jest.fn() } as unknown as JsonRpcSignal,
+      {},
+      () => false,
+      observer,
+    );
+    jest.useFakeTimers();
+    let settled = false;
+    const promise = neverOpen
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error)
+      .then(value => {
+        settled = true;
+        return value;
+      });
+
+    await jest.advanceTimersByTimeAsync(100);
+    expect(settled).toBe(false);
+
+    neverOpen.close();
+    await jest.advanceTimersByTimeAsync(100);
+
+    expect(settled).toBe(true);
+    await expect(promise).resolves.toBeInstanceOf(Error);
+  }, 10_000);
+
+  /**
+   * Racing the wait is not the same as ending it: without the cancel, eventemitter2 keeps each
+   * listener subscribed until its own timeout, on an emitter capped at 60.
+   */
+  it('leaves no listeners behind on the emitter after close', async () => {
+    jest.useFakeTimers();
+    const emitter = (connection as unknown as { eventEmitter: { listenerCount: (e: string) => number } }).eventEmitter;
+    const pending = [1, 2, 3].map(n =>
+      connection
+        .sendOverApiDataChannelWithResponse({
+          method: 'prefer-audio-track-state',
+          params: { subscribed: true, track_id: `track-${n}` },
+        })
+        .catch((error: Error) => error),
+    );
+    await jest.advanceTimersByTimeAsync(10);
+    expect(emitter.listenerCount('message')).toBeGreaterThan(0);
+
+    connection.close();
+    await jest.advanceTimersByTimeAsync(100);
+
+    expect(emitter.listenerCount('message')).toBe(0);
+    await Promise.all(pending);
+  }, 10_000);
+
+  /**
+   * close() drains the aborts, so a wait parked after it would have nothing left to settle it -
+   * the guard lives in abortOnClose rather than at the loop top so every entry is covered.
+   */
+  it('settles immediately for a request started after close', async () => {
+    jest.useFakeTimers();
+    connection.close();
+
+    let settled = false;
+    const promise = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error)
+      .then(value => {
+        settled = true;
+        return value;
+      });
+
+    // well inside RESPONSE_TIMEOUT - it must not wait one out
+    await jest.advanceTimersByTimeAsync(100);
+
+    expect(settled).toBe(true);
+    await expect(promise).resolves.toBeInstanceOf(Error);
   }, 10_000);
 
   /** a channel that opens after the first attempt gave up should still get the request through */
