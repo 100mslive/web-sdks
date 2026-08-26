@@ -315,15 +315,7 @@ class Store {
 
   async updateAudioOutputVolume(value: number) {
     for (const track of this.getAudioTracks()) {
-      try {
-        await track.setVolume(value);
-      } catch (error) {
-        // a remote track's setVolume applies the subscription over the API data channel and
-        // rejects when the SFU does not answer. Letting that out skips every track after this one
-        // and leaves AudioSinkManager without the value it stamps on tracks added later.
-        // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
-        HMSLogger.e(this.TAG, 'could not apply volume', `${track}`, error);
-      }
+      await track.setVolume(value);
     }
   }
 
