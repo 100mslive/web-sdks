@@ -452,6 +452,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private addTrackEventListeners(track: MediaStreamTrack) {
+    // see the same guard on HMSLocalVideoTrack - screen capture mutes without pairing an unmute
+    if (this.source === 'screen') {
+      return;
+    }
     track.addEventListener('mute', this.handleTrackMute);
     track.addEventListener('unmute', this.handleTrackUnmute);
   }
@@ -461,7 +465,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     track.removeEventListener('unmute', this.handleTrackUnmute);
   }
 
+  /** only the mic track is fed by the microphone permission, see the same guard on the video track */
   private trackPermissions = () => {
+    if (this.source !== 'regular') {
+      return;
+    }
     listenToPermissionChange('microphone', (state: PermissionState) => {
       this.permissionState = state;
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
