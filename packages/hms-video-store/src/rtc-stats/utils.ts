@@ -292,8 +292,8 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   const qualityLimitationDurations = normalizeQualityLimitationDurations(
     (streamStats as any).qualityLimitationDurations,
   );
-  return Object.assign(streamStats, {
-    remote: remoteStreamStats,
+  return Object.assign({}, streamStats, {
+    remote: remoteStreamStats && { ...remoteStreamStats },
     codec: codec,
     ...(qualityLimitationDurations ? { qualityLimitationDurations } : {}),
   });
@@ -382,7 +382,7 @@ export const sumOutboundRtpBytesSent = (report?: RTCStatsReport): number => {
  * is still in hand — once it's discarded the ids on the stored pair point at nothing.
  */
 const attachCandidates = (pair: RTCIceCandidatePairStats, report?: RTCStatsReport) =>
-  Object.assign(pair, {
+  Object.assign({}, pair, {
     localCandidate: report?.get(pair.localCandidateId) as HMSIceCandidateStats | undefined,
     remoteCandidate: report?.get(pair.remoteCandidateId) as HMSIceCandidateStats | undefined,
   });

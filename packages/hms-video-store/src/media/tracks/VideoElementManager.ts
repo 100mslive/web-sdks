@@ -84,11 +84,25 @@ export class VideoElementManager {
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.logIfRejected(this.track.removeSink(videoElement), 'removeSink');
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
+    this.intersectionSeq.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
+    /**
+     * removeSink first, and not behind an await: it nulls srcObject synchronously, and
+     * detachVideo/attachVideo run back to back when a tile swaps tracks - a deferred detach lands
+     * after the new stream is attached and nulls it.
+     *
+     * Then recompute. The layer asked for is the max across live tiles, so the tile being removed
+     * may be the one holding it up, and removeSink's own updateLayer asks for the unchanged
+     * `preferredLayer` - which shouldSendVideoLayer sees as already current and skips, leaving the
+     * SFU streaming for a tile that is gone.
+     */
+    this.logIfRejected(
+      Promise.resolve(this.track.removeSink(videoElement)).then(() => this.selectMaxLayer()),
+      'removeSink',
+    );
     HMSLogger.d(this.TAG, `Removing video element for ${this.track}`);
   }
 
@@ -133,11 +147,22 @@ export class VideoElementManager {
     HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
     this.entries.set(target, rect);
     await this.selectMaxLayer();
-    if (this.intersectionSeq.get(target) !== seq) {
+    if (!this.shouldStillAddSink(target, seq)) {
       HMSLogger.d(this.TAG, 'add sink superseded', `${this.track}`, this.id);
       return;
     }
     this.logIfRejected(this.track.addSink(target), 'addSink');
+  }
+
+  /**
+   * A newer intersection entry is not the only thing that can make a suspended add stale - the
+   * element can be detached (React unmounting the tile) or the whole manager cleaned up while it
+   * waits on its layer request. Neither touches the entry stamp, so both are checked here too;
+   * without it the add re-attaches srcObject to an element nobody renders and asks the SFU to keep
+   * streaming to it.
+   */
+  private shouldStillAddSink(target: HTMLVideoElement, seq: number) {
+    return this.videoElements.has(target) && this.intersectionSeq.get(target) === seq;
   }
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -183,6 +208,9 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   private async selectMaxLayer() {
+    // No elements left means no layer to pick, not "pick none" - removeSink's own updateLayer is
+    // what sends NONE once hasSinks() goes false, so leaving preferredLayer alone here is correct
+    // and the removal path depends on it.
     if (!(this.track instanceof HMSRemoteVideoTrack) || this.videoElements.size === 0) {
       return;
     }
