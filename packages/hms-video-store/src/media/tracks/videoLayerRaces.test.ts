@@ -182,11 +182,10 @@ describe('VideoElementManager layer request races', () => {
   });
 
   /**
-   * A failing request must not reject out of setEnabled - updateSinks discards the promise, so
-   * nothing downstream would catch it. The failed request also rolls the layer back, so the client
-   * and the SFU agree afterwards: the SFU never left high, and the unmute has nothing to add.
+   * A failing request must not swallow the one that follows it, and must not reject out of
+   * setEnabled - updateSinks discards the promise, so nothing downstream would catch it.
    */
-  it('does not reject when a request fails, and leaves the layer matching the SFU', async () => {
+  it('still sends the later request when the earlier one fails', async () => {
     await handlersOf(manager).handleIntersection(entry(true));
     await settle();
     sent.length = 0;
@@ -201,31 +200,7 @@ describe('VideoElementManager layer request races', () => {
     await settle();
 
     await expect(Promise.all([muted, unmuted])).resolves.toBeDefined();
-    expect(sent).toEqual([HMSSimulcastLayer.NONE]);
-    expect(track.getLayer()).toBe(HMSSimulcastLayer.HIGH);
+    expect(sent).toEqual([HMSSimulcastLayer.NONE, HMSSimulcastLayer.HIGH]);
     expect(videoElement.srcObject).not.toBeNull();
-  });
-
-  /**
-   * The rollback must not swallow a follow-up that genuinely differs - a resize into another
-   * bucket after a failed request still has something new to tell the SFU.
-   */
-  it('still sends a later request that asks for a different layer', async () => {
-    await handlersOf(manager).handleIntersection(entry(true));
-    await settle();
-    sent.length = 0;
-    send.mockImplementationOnce(({ params }) => {
-      sent.push(params.max_spatial_layer);
-      return Promise.reject(new Error('No response from SFU for prefer-video-track-state'));
-    });
-
-    await expect(track.setPreferredLayer(HMSSimulcastLayer.LOW)).rejects.toThrow();
-    await settle();
-    expect(track.getLayer()).toBe(HMSSimulcastLayer.HIGH);
-
-    await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
-    await settle();
-
-    expect(sent).toEqual([HMSSimulcastLayer.LOW, HMSSimulcastLayer.MEDIUM]);
   });
 });

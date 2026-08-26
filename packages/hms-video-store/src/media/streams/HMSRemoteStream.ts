@@ -19,7 +19,6 @@ export class HMSRemoteStream extends HMSMediaStream {
       return;
     }
 
-    const previous = this.audio;
     this.audio = enabled;
     HMSLogger.d(
       `[Remote stream] ${identifier || ''} 
@@ -27,22 +26,13 @@ export class HMSRemoteStream extends HMSMediaStream {
     trackId=${trackId}
     subscribing audio - ${this.audio}`,
     );
-    try {
-      await this.connection.sendOverApiDataChannelWithResponse({
-        params: {
-          subscribed: enabled,
-          track_id: trackId,
-        },
-        method: 'prefer-audio-track-state',
-      });
-    } catch (error) {
-      // the SFU never confirmed this, so leaving the field flipped would dedupe away every later
-      // attempt. Only undo our own write - a newer call already holding the field owns it now.
-      if (this.audio === enabled) {
-        this.audio = previous;
-      }
-      throw error;
-    }
+    await this.connection.sendOverApiDataChannelWithResponse({
+      params: {
+        subscribed: this.audio,
+        track_id: trackId,
+      },
+      method: 'prefer-audio-track-state',
+    });
   }
 
   /**
@@ -65,30 +55,21 @@ export class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  async setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
     HMSLogger.d(
       `[Remote stream] ${identifier} 
       streamId=${this.id}
       trackId=${trackId} 
       source: ${source} request ${layer} layer`,
     );
-    const previous = this.video;
     this.setVideoLayerLocally(layer, identifier, source);
-    try {
-      return await this.connection.sendOverApiDataChannelWithResponse({
-        params: {
-          max_spatial_layer: layer,
-          track_id: trackId,
-        },
-        method: 'prefer-video-track-state',
-      });
-    } catch (error) {
-      // only undo our own write - see setAudio
-      if (this.video === layer) {
-        this.setVideoLayerLocally(previous, identifier, `${source}-failed`);
-      }
-      throw error;
-    }
+    return this.connection.sendOverApiDataChannelWithResponse({
+      params: {
+        max_spatial_layer: this.video,
+        track_id: trackId,
+      },
+      method: 'prefer-video-track-state',
+    });
   }
 
   /**
