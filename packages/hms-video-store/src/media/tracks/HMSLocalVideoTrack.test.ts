@@ -34,7 +34,11 @@ const makeNativeTrack = (id: string) =>
     stop: jest.fn(),
   } as unknown as MediaStreamTrack);
 
-const makeLocalVideoTrack = (eventBus: EventBus = new EventBus()) => {
+const makeLocalVideoTrack = (
+  eventBus: EventBus = new EventBus(),
+  source = 'regular',
+  nativeTrack: MediaStreamTrack = makeNativeTrack(trackId),
+) => {
   const nativeStream = {
     id: streamId,
     getTracks: () => [],
@@ -44,12 +48,25 @@ const makeLocalVideoTrack = (eventBus: EventBus = new EventBus()) => {
   const stream = new HMSLocalStream(nativeStream);
   stream.setConnection({} as unknown as HMSPublishConnection);
   const settings = new HMSVideoTrackSettingsBuilder().build();
-  return new HMSLocalVideoTrack(stream, makeNativeTrack(trackId), 'regular', eventBus, settings);
+  return new HMSLocalVideoTrack(stream, nativeTrack, source, eventBus, settings);
 };
 
 const setVisibility = (state: 'hidden' | 'visible') => {
   Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
 };
+
+const setCameraPermission = (state?: PermissionState) => {
+  Object.defineProperty(navigator, 'permissions', {
+    value: state ? { query: jest.fn(async () => ({ state, onchange: null })) } : undefined,
+    configurable: true,
+  });
+};
+
+const listenedEvents = (nativeTrack: MediaStreamTrack) =>
+  (nativeTrack.addEventListener as jest.Mock).mock.calls.map(([name]) => name);
+
+// navigator.permissions resolves on a task, not a microtask
+const flushPermissionQuery = () => new Promise(resolve => setTimeout(resolve, 0));
 
 // jsdom has no canvas capture, and turning the camera off replaces the track with a blank one
 beforeAll(() => {
@@ -243,6 +260,54 @@ describe('HMSLocalVideoTrack interruptions', () => {
 
     expect(getVideoTrackMock).not.toHaveBeenCalled();
     expect(interruptions).toEqual([]);
+  });
+});
+
+/**
+ * Interruption handling belongs to the camera. A screenshare is not a capture device this SDK owns,
+ * and a mute published for it is never taken back - the capture keeps running, so the sharer sees
+ * their own share while every remote peer renders a blank tile until the share ends. LIV-646.
+ */
+describe('HMSLocalVideoTrack screenshare', () => {
+  afterEach(() => setCameraPermission(undefined));
+
+  it('does not listen for native mute and unmute on a screenshare track', () => {
+    const nativeTrack = makeNativeTrack(trackId);
+    makeLocalVideoTrack(new EventBus(), 'screen', nativeTrack);
+
+    expect(listenedEvents(nativeTrack)).not.toContain('mute');
+    expect(listenedEvents(nativeTrack)).not.toContain('unmute');
+  });
+
+  it('listens for native mute and unmute on a camera track', () => {
+    const nativeTrack = makeNativeTrack(trackId);
+    makeLocalVideoTrack(new EventBus(), 'regular', nativeTrack);
+
+    expect(listenedEvents(nativeTrack)).toEqual(expect.arrayContaining(['mute', 'unmute']));
+  });
+
+  it('does not mute a screenshare when the camera permission is denied', async () => {
+    setCameraPermission('denied');
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localVideoEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    makeLocalVideoTrack(eventBus, 'screen');
+    await flushPermissionQuery();
+
+    expect(enabledUpdates).toEqual([]);
+  });
+
+  it('mutes the camera when the camera permission is denied', async () => {
+    setCameraPermission('denied');
+    const eventBus = new EventBus();
+    const enabledUpdates: boolean[] = [];
+    eventBus.localVideoEnabled.subscribe(({ enabled }) => enabledUpdates.push(enabled));
+
+    makeLocalVideoTrack(eventBus, 'regular');
+    await flushPermissionQuery();
+
+    expect(enabledUpdates).toEqual([false]);
   });
 });
 

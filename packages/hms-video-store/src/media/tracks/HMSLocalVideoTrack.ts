@@ -589,6 +589,16 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private addTrackEventListeners(track: MediaStreamTrack) {
+    /**
+     * A native mute means the capture device was taken away, and publishing it so remote peers stop
+     * rendering is right for a camera, which comes back with an unmute. Chromium also raises mute on
+     * a screen-capture track whenever the shared surface stops producing frames, with no unmute to
+     * pair with it - the share would stay muted for everyone else while the sharer, whose capture
+     * never stopped, keeps seeing it.
+     */
+    if (this.source === 'screen') {
+      return;
+    }
     track.addEventListener('mute', this.handleTrackMute);
     track.addEventListener('unmute', this.handleTrackUnmuteNatively);
   }
@@ -598,7 +608,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     track.removeEventListener('unmute', this.handleTrackUnmuteNatively);
   }
 
+  /**
+   * Only the camera track is fed by the camera permission. The query resolves with the current
+   * state, so a screenshare started by someone who had blocked the camera used to publish
+   * mute=true for the share the moment its track was built, and nothing ever took that back.
+   */
   private trackPermissions = () => {
+    if (this.source !== 'regular') {
+      return;
+    }
     listenToPermissionChange('camera', (state: PermissionState) => {
       this.eventBus.analytics.publish(AnalyticsEventFactory.permissionChange(this.type, state));
       if (state === 'denied') {
