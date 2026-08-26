@@ -234,9 +234,10 @@ export class VideoElementManager {
     if (maxLayer) {
       HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
       /**
-       * Picking a layer is an optimisation over rendering the track, and the only callers are the
-       * resize and intersection handlers, which observers invoke without awaiting. Letting this
-       * reject would abort the sink attach and surface as an unhandled rejection.
+       * Picking a layer is an optimisation over rendering the track. The resize and intersection
+       * handlers call this without awaiting, and removeVideoElement awaits it only to order the
+       * recompute after removeSink - none of them can act on a failure. Letting it reject would
+       * abort the sink attach and surface as an unhandled rejection.
        */
       try {
         await this.track.setPreferredLayer(maxLayer);
