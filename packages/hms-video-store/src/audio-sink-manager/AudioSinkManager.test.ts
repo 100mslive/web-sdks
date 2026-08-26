@@ -1,5 +1,6 @@
 import { AudioSinkManager } from './AudioSinkManager';
 import { DeviceManager } from '../device-manager';
+import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { EventBus } from '../events/EventBus';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
@@ -138,13 +139,22 @@ describe('AudioSinkManager', () => {
      */
     /**
      * Recording the volume before the fan-out means nothing downstream gates it any more, and
-     * allSettled now swallows HMSAudioTrack.setVolume's range check. An out-of-range or NaN value
+     * the fan-out no longer rethrows and HMSAudioTrack.setVolume's range check. An out-of-range or NaN value
      * would be kept and then thrown by the element setter on every later track add - IndexSizeError
      * before the element is even wired up, so the peer gets no audio element at all.
      */
-    it.each([150, -1, NaN])('rejects %p rather than recording it', async value => {
-      await expect(audioSinkManager.setVolume(value)).rejects.toThrow();
+    /**
+     * Through AudioOutputManager, which is the only production caller and the one HMSSDKActions
+     * awaits. It must reject rather than throw synchronously or drop the promise - either way the
+     * rejection escapes as unhandled and the app is told the volume was applied.
+     */
+    it.each([150, -1, NaN])('rejects %p through the public path rather than recording it', async value => {
+      const audioOutput = new AudioOutputManager(
+        { outputDevice: undefined } as unknown as DeviceManager,
+        audioSinkManager,
+      );
 
+      await expect(audioOutput.setVolume(value)).rejects.toThrow('Please pass a valid number between 0-100');
       expect(audioSinkManager.getVolume()).toBe(100);
     });
 

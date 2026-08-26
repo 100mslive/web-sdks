@@ -37,7 +37,8 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   async setVolume(value: number) {
-    if (value < 0 || value > 100) {
+    // not `< 0 || > 100`: NaN passes that and reaches the element setter as a DOM error
+    if (!(value >= 0 && value <= 100)) {
       throw Error('Please pass a valid number between 0-100');
     }
     this.requestedVolume = value;
