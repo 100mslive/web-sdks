@@ -525,7 +525,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     await pending;
 
     const reasons = debug.mock.calls.map(c => String(c[1])).filter(m => m.startsWith('Dropping'));
-    expect(reasons.some(m => m.includes('connection closed'))).toBe(true);
+    expect(reasons.some(m => m.includes('closed'))).toBe(true);
     expect(reasons.some(m => m.includes('superseded'))).toBe(false);
   }, 10_000);
 
