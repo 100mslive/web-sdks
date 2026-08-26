@@ -287,8 +287,8 @@ describe('HMSSubscribeConnection api data channel', () => {
 
   /**
    * A reply the SFU actually sent is the outcome, whatever happened to the claim while it was in
-   * flight. Callers read the response - requestLayer hands it back to addSink's on-demand branch -
-   * so discarding a successful one reports a request the SFU applied as dropped.
+   * flight. Nothing in the SDK reads the resolved value today, so this is about not lying in the
+   * log and not leaving `PreferLayerResponse` a shape whose `result` silently disappears.
    */
   it('returns a response that arrived even if a newer request claimed the state meanwhile', async () => {
     const first = connection.sendOverApiDataChannelWithResponse({

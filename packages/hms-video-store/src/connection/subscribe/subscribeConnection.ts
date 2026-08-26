@@ -1,4 +1,4 @@
-import EventEmitter, { WaitForOptions } from 'eventemitter2';
+import EventEmitter, { CancelablePromise, WaitForOptions } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
@@ -14,9 +14,6 @@ import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } f
 import HMSConnection from '../HMSConnection';
 import HMSDataChannel from '../HMSDataChannel';
 import { HMSConnectionRole } from '../model';
-
-/** eventemitter2's waitFor hands back a promise that can be cancelled; its types do not say so */
-type CancelablePromise<T> = Promise<T> & { cancel?: () => void };
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
@@ -40,8 +37,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private closed = false;
   /**
    * Rejectors for the waits currently parked on the api data channel. close() fires them so a
-   * leave or an SFU migration does not leave every pending request retrying against a dead channel
-   * for its full budget - RESPONSE_TIMEOUT x MAX_RETRIES per track, long after nobody is listening.
+   * leave or an SFU migration settles every pending request at once, rather than each waiting out
+   * its RESPONSE_TIMEOUT first - the catch below breaks on `closed`, so it is one timeout per
+   * track, but that is still 10s of nothing per tile on every leave.
    */
   private pendingAborts = new Set<(error: Error) => void>();
 
@@ -209,7 +207,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       // cancel() rejects the wait, and nothing has subscribed to it yet - Promise.race below is
       // what normally does that, and we are not reaching it
       wait.catch(() => undefined);
-      wait.cancel?.();
+      wait.cancel('connection closed');
       throw Error('Subscribe connection closed');
     }
     let abort!: (error: Error) => void;
@@ -222,7 +220,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return await Promise.race([wait, aborted]);
     } finally {
       this.pendingAborts.delete(abort);
-      wait.cancel?.();
+      wait.cancel('request settled');
     }
   };
 
