@@ -292,6 +292,8 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   const qualityLimitationDurations = normalizeQualityLimitationDurations(
     (streamStats as any).qualityLimitationDurations,
   );
+  // as in attachCandidates: streamStats and remoteStreamStats are the report's own inbound-rtp and
+  // remote-inbound-rtp entries, and getTrackStats assigns packetsLostRate onto `remote` afterwards
   return Object.assign({}, streamStats, {
     remote: remoteStreamStats && { ...remoteStreamStats },
     codec: codec,
@@ -380,6 +382,13 @@ export const sumOutboundRtpBytesSent = (report?: RTCStatsReport): number => {
  * Resolves the pair's `localCandidateId`/`remoteCandidateId` against the report they came from.
  * Candidate ids are only unique within a single report, so this has to happen while the report
  * is still in hand — once it's discarded the ids on the stored pair point at nothing.
+ */
+/**
+ * The `{}` is the point: `pair` is the browser's own RTCStatsReport entry (getActiveCandidatePair-
+ * FromReport returns `report.get(...)`), and Object.assign writes into its target. Without a fresh
+ * target the report picks up localCandidate/remoteCandidate, and the bitrate assignments in
+ * getLocalPeerStatsFromReport below - which mutate deliberately - would land on it too. Those are
+ * safe only because this returns a copy.
  */
 const attachCandidates = (pair: RTCIceCandidatePairStats, report?: RTCStatsReport) =>
   Object.assign({}, pair, {

@@ -181,7 +181,6 @@ describe('VideoElementManager teardown while an add is in flight', () => {
     small.remove();
   });
 
-  /** a resize entry for an element already torn down must not drive a layer request */
   /** a removeSink that rejects is the case the recompute exists for, not one to skip it on */
   it('still drops the preferred layer when removeSink rejects', async () => {
     track.setSimulcastDefinitons([
@@ -209,6 +208,7 @@ describe('VideoElementManager teardown while an add is in flight', () => {
     small.remove();
   });
 
+  /** a resize entry for an element already torn down must not drive a layer request */
   it('ignores a resize for an element that is no longer registered', async () => {
     handlersOf(manager).handleIntersection(entry());
     await settle();
@@ -255,9 +255,9 @@ describe('VideoElementManager teardown while an add is in flight', () => {
     });
 
     /**
-     * detach must be synchronous. detachVideo/attachVideo run back to back when a tile swaps
-     * tracks (PIPManager, useVideo on track change): if the old track's removeSink is queued
-     * behind a layer request, it lands after the new stream is attached and nulls it.
+     * detach must be synchronous. A tile swapping tracks detaches and re-attaches the same node
+     * without awaiting the detach: if the old track's removeSink is queued behind a layer request,
+     * it lands after the new stream is attached and nulls it.
      */
     it('detaches the element synchronously, before any layer request', () => {
       manager.removeVideoElement(videoElement);
