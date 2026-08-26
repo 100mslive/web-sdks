@@ -1,4 +1,4 @@
-import EventEmitter, { WaitForOptions } from 'eventemitter2';
+import EventEmitter, { CancelablePromise, WaitForOptions } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
@@ -34,6 +34,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private pendingMessageQueue: string[] = [];
   /** `${method}:${track_id}` -> the id of the newest request for it; older ones stop retrying */
   private latestRequestPerState = new Map<string, string>();
+  private closed = false;
+  /**
+   * Rejectors for the waits currently parked on the api data channel. close() fires them so a
+   * leave or an SFU migration settles every pending request at once, rather than each waiting out
+   * its RESPONSE_TIMEOUT first - the catch below breaks on `closed`, so it is one timeout per
+   * track, but that is still 10s of nothing per tile on every leave.
+   */
+  private pendingAborts = new Set<(error: Error) => void>();
 
   private apiChannel?: HMSDataChannel;
   private eventEmitter = new EventEmitter({ maxListeners: 60 });
@@ -181,9 +189,40 @@ export default class HMSSubscribeConnection extends HMSConnection {
   }
 
   close() {
+    this.closed = true;
     super.close();
     this.apiChannel?.close();
+    this.pendingAborts.forEach(abort => abort(Error('Subscribe connection closed')));
+    this.pendingAborts.clear();
   }
+
+  /**
+   * Settles `wait` early if the connection is closed while it is parked on the api data channel.
+   * The wait is cancelled rather than just abandoned: eventemitter2 keeps the listener subscribed
+   * until its own timeout otherwise, and the emitter is capped at 60.
+   */
+  private abortOnClose = async <T>(wait: CancelablePromise<T>): Promise<T> => {
+    // close() has already drained pendingAborts, so a wait parked after it would never be settled
+    if (this.closed) {
+      // cancel() rejects the wait, and nothing has subscribed to it yet - Promise.race below is
+      // what normally does that, and we are not reaching it
+      wait.catch(() => undefined);
+      wait.cancel('connection closed');
+      throw Error('Subscribe connection closed');
+    }
+    let abort!: (error: Error) => void;
+    const aborted = new Promise<never>((_, reject) => {
+      abort = reject;
+    });
+    this.pendingAborts.add(abort);
+    try {
+      // race subscribes to both, so a later rejection from the loser is never unhandled
+      return await Promise.race([wait, aborted]);
+    } finally {
+      this.pendingAborts.delete(abort);
+      wait.cancel('request settled');
+    }
+  };
 
   private handlePendingApiMessages = () => {
     this.eventEmitter.emit('open', true);
@@ -207,6 +246,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return { id: requestId } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
+    /** the per-attempt detail is a warn, which an app on setLogLevel(ERROR) never sees */
+    let lastAttemptError: Error | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
@@ -215,41 +256,82 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
       try {
         await this.waitForChannelOpen();
+        // the claim can change hands while parked on the open wait, and a retry replays the bytes
+        // serialised at request time - checking only before the wait still lets stale state out
+        if (superseded()) {
+          return dropped();
+        }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
         response = await this.waitForResponse(requestId);
       } catch (error) {
+        lastAttemptError = error as Error;
         HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
+        if (this.closed) {
+          break;
+        }
         continue;
       }
       const error = response.error;
       if (error) {
-        // Don't retry or do anything, track is already removed
+        // Don't retry or do anything, track is already removed - and nothing for the caller to act
+        // on either, so this stays a resolve rather than joining the throwing paths below
         if (error.code === 404) {
           HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
-          break;
+          return response;
         }
         HMSLogger.d(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
-        const shouldRetry = error.code / 100 === 5 || error.code === 429;
+        // exact division is only ever true for 500 - a 502/503/504 from an SFU restarting has to
+        // retry the same way, not throw on the first attempt
+        const shouldRetry = Math.floor(error.code / 100) === 5 || error.code === 429;
         if (!shouldRetry) {
           if (superseded()) {
             return dropped();
           }
-          throw Error(`code=${error.code}, message=${error.message}`);
+          throw Error(`code=${error.code}, message=${error.message} - ${requestId} not retried`);
         }
-        const delay = (2 + Math.random() * 2) * 1000;
-        await workerSleep(delay);
+        if (i < this.MAX_RETRIES - 1) {
+          const delay = (2 + Math.random() * 2) * 1000;
+          await workerSleep(delay);
+        }
       } else {
         break;
       }
     }
-    if (!response) {
+    /**
+     * Every exit agrees on one rule: a request the newer one took over is not a failure, and a
+     * response the SFU actually sent is the outcome. So an error is reported only when this request
+     * still owns the state, and a success is returned whatever happened to the claim meanwhile -
+     * discarding it would report a request the SFU applied as dropped.
+     */
+    if (response?.error) {
       if (superseded()) {
         return dropped();
       }
-      throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
+      // the loop can run out of attempts still holding a retryable error, and no caller inspects
+      // `error` on a resolved response, so returning it here reads as a request the SFU applied
+      throw Error(
+        `code=${response.error.code}, message=${response.error.message} - ${requestId} after ${this.MAX_RETRIES} tries`,
+      );
     }
-    return response;
+    if (response) {
+      return response;
+    }
+    /**
+     * close() is the same category as supersession: not a failure anyone can act on, and nothing
+     * survives it to be wrong about - clearPeerConnections() nulls the connection, and an SFU
+     * migration additionally drops every HMSRemoteStream via removeRemoteTracks(). Throwing here
+     * wrote one error per in-flight track on every normal leave, through the logIfRejected chain.
+     */
+    if (superseded() || this.closed) {
+      return dropped();
+    }
+    throw Error(
+      `No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`,
+      // a malformed reply lands here too, via JSON.parse in waitForResponse - without the cause,
+      // "no response" is a flatly wrong diagnosis for a reply that did arrive
+      { cause: lastAttemptError },
+    );
   };
 
   /**
@@ -261,14 +343,20 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (this.apiChannel?.readyState === 'open') {
       return;
     }
-    await this.eventEmitter.waitFor('open', { timeout: this.RESPONSE_TIMEOUT } as WaitForOptions);
+    await this.abortOnClose(
+      this.eventEmitter.waitFor('open', {
+        timeout: this.RESPONSE_TIMEOUT,
+      } as WaitForOptions) as CancelablePromise<unknown>,
+    );
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
-    const res = await this.eventEmitter.waitFor('message', {
-      filter: (value: string) => value.includes(requestId),
-      timeout: this.RESPONSE_TIMEOUT,
-    } as WaitForOptions);
+    const res = (await this.abortOnClose(
+      this.eventEmitter.waitFor('message', {
+        filter: (value: string) => value.includes(requestId),
+        timeout: this.RESPONSE_TIMEOUT,
+      } as WaitForOptions) as CancelablePromise<unknown>,
+    )) as unknown[];
     const response = JSON.parse(res[0] as string);
     HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
     return response;
