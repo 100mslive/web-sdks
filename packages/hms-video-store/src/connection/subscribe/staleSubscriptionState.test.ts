@@ -140,10 +140,49 @@ describe('a request that a newer one has replaced', () => {
     expect(stream.isAudioSubscribed()).toBe(true);
   }, 20_000);
 
+  /**
+   * The SFU answering with a non-retryable code is the third way out of the retry loop, and it has
+   * to agree with the other two - a request that has already been replaced does not report failure
+   * on this path either.
+   */
+  it('does not report failure on a non-retryable error once it has been replaced', async () => {
+    const silenced = stream.setAudio(false, 'track-1').catch((error: Error) => error);
+    await flush();
+
+    const restored = stream.setAudio(true, 'track-1');
+    await flush();
+    respondTo(sent[1]);
+    await restored;
+
+    // the replaced request's own answer finally arrives, carrying a code it would never retry
+    const { id } = JSON.parse(sent[0]) as { id: string };
+    (connection as unknown as WithEventEmitter).eventEmitter.emit(
+      'message',
+      JSON.stringify({ id, jsonrpc: '2.0', error: { code: 400, message: 'bad request' } }),
+    );
+
+    expect(await silenced).not.toBeInstanceOf(Error);
+    expect(stream.isAudioSubscribed()).toBe(true);
+  }, 20_000);
+
   /** a request nothing has replaced still has to report failure the way it always did */
   it('still throws when a request that was never replaced runs out of attempts', async () => {
     const failed = stream.setAudio(false, 'track-1').catch((error: Error) => error);
     await exhaustRetries();
+
+    expect(await failed).toBeInstanceOf(Error);
+  }, 20_000);
+
+  /** and a non-retryable error on a request nothing replaced still rejects */
+  it('still throws on a non-retryable error when nothing replaced the request', async () => {
+    const failed = stream.setAudio(false, 'track-1').catch((error: Error) => error);
+    await flush();
+
+    const { id } = JSON.parse(sent[0]) as { id: string };
+    (connection as unknown as WithEventEmitter).eventEmitter.emit(
+      'message',
+      JSON.stringify({ id, jsonrpc: '2.0', error: { code: 400, message: 'bad request' } }),
+    );
 
     expect(await failed).toBeInstanceOf(Error);
   }, 20_000);

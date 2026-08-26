@@ -198,15 +198,20 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private sendMessage = async (request: string, requestId: string, stateKey: string): Promise<PreferLayerResponse> => {
     /** a newer request for the same track has taken over this piece of state */
     const superseded = () => this.latestRequestPerState.get(stateKey) !== requestId;
+    /**
+     * Resolve the way the disableAutoUnsubscribe skip does rather than reporting an error nobody
+     * can act on - the newer request owns the outcome. Every exit path has to agree on this.
+     */
+    const dropped = () => {
+      HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
+      return { id: requestId } as PreferLayerResponse;
+    };
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
-      // not a failure - the newer request owns the outcome, so resolve the way the
-      // disableAutoUnsubscribe skip above does rather than reporting an error nobody can act on
       if (superseded()) {
-        HMSLogger.d(this.TAG, `Superseded before try ${i + 1}, dropping ${requestId}`, request);
-        return { id: requestId } as PreferLayerResponse;
+        return dropped();
       }
       try {
         await this.waitForChannelOpen();
@@ -227,6 +232,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
         HMSLogger.d(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
         const shouldRetry = error.code / 100 === 5 || error.code === 429;
         if (!shouldRetry) {
+          if (superseded()) {
+            return dropped();
+          }
           throw Error(`code=${error.code}, message=${error.message}`);
         }
         const delay = (2 + Math.random() * 2) * 1000;
@@ -236,10 +244,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
     }
     if (!response) {
-      // a request that ran out of attempts only after being replaced still must not report failure
       if (superseded()) {
-        HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
-        return { id: requestId } as PreferLayerResponse;
+        return dropped();
       }
       throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
     }

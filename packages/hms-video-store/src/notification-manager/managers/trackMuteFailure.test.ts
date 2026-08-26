@@ -46,13 +46,16 @@ describe('TrackManager when the mute state cannot be applied', () => {
 
   afterEach(() => jest.restoreAllMocks());
 
-  it('logs the failure instead of leaking an unhandled rejection', async () => {
-    const rejections: unknown[] = [];
-    const onUnhandled = (e: PromiseRejectionEvent) => {
-      e.preventDefault();
-      rejections.push(e.reason);
-    };
-    window.addEventListener('unhandledrejection', onUnhandled);
+  /**
+   * handleTrackUpdate returns void, so there is no promise to await for this the way the observer
+   * handlers are tested. Watching for an unhandledrejection event would prove nothing either -
+   * jsdom never dispatches one, and jest owns the process-level handler. What actually keeps the
+   * rejection from leaking is that something attached a handler to it, so assert exactly that.
+   */
+  it('attaches a rejection handler and logs, rather than leaking', async () => {
+    const rejection = Promise.reject(new Error('No response from SFU for prefer-audio-track-state'));
+    const attachHandler = jest.spyOn(rejection, 'catch');
+    (track.setEnabled as jest.Mock).mockReturnValue(rejection);
 
     const notification = {
       tracks: { [trackId]: { track_id: trackId, mute: true, source: 'regular', type: 'audio' } },
@@ -61,10 +64,9 @@ describe('TrackManager when the mute state cannot be applied', () => {
     manager.handleTrackUpdate(notification);
 
     await new Promise(resolve => setTimeout(resolve, 0));
-    window.removeEventListener('unhandledrejection', onUnhandled);
 
     expect(track.setEnabled).toHaveBeenCalledWith(false);
+    expect(attachHandler).toHaveBeenCalled();
     expect(logError).toHaveBeenCalled();
-    expect(rejections).toHaveLength(0);
   });
 });
