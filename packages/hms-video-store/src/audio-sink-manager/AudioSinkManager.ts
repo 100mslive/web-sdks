@@ -170,8 +170,8 @@ export class AudioSinkManager {
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
     callListener && this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     await this.handleAutoplayError(track);
-    // the subscription half - an optimisation, since audio is subscribed by default, so attaching
-    // must never wait on it or fail with it
+    // the element already has the volume, so what is left to do here is the subscription - an
+    // optimisation, since audio is subscribed by default, so attaching must never wait on it
     track
       .setVolume(volume)
       // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)

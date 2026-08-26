@@ -29,7 +29,7 @@ describe('Store.updateAudioOutputVolume', () => {
     addTrackWith('unanswered', 'rejects');
     const last = addTrackWith('last', 'resolves');
 
-    await expect(store.updateAudioOutputVolume(0)).resolves.toBeUndefined();
+    await expect(store.updateAudioOutputVolume(0)).rejects.toThrow();
 
     expect(last.getVolume()).toBe(0);
   });
@@ -44,7 +44,8 @@ describe('Store.updateAudioOutputVolume', () => {
     addTrackWith('unanswered', 'rejects');
 
     try {
-      await expect(audioSinkManager.setVolume(0)).resolves.toBeUndefined();
+      // the volume is recorded before the fan-out, so it survives the rejection
+      await expect(audioSinkManager.setVolume(0)).rejects.toThrow();
       expect(audioSinkManager.getVolume()).toBe(0);
     } finally {
       audioSinkManager.cleanup();

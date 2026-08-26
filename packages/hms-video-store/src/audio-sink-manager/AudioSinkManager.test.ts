@@ -12,9 +12,9 @@ import { makeRemoteAudioTrack } from '../test/helpers/makeRemoteAudioTrack';
  * `prefer-audio-track-state` request for a peer that was already publishing when
  * the beam joined, so the audio element was never attached to the sink.
  */
-type SubscribeOutcome = 'resolves' | 'never-settles' | 'rejects';
+type StubOutcome = 'resolves' | 'never-settles' | 'rejects';
 
-const buildTrack = (subscribe: SubscribeOutcome) => {
+const buildTrack = (subscribe: StubOutcome) => {
   const nativeTrack = { id: 'native-1', kind: 'audio', enabled: true } as MediaStreamTrack;
   let audioElement: HTMLAudioElement | null = null;
   return {
@@ -105,11 +105,6 @@ describe('AudioSinkManager', () => {
    */
   describe('volume on the element it creates', () => {
     /**
-     * Attaching must not wait on the round trip - that was the silent-recording fix - but the
-     * element it attaches has to already carry the app's volume, or the peer is audible at full
-     * volume for as long as the SFU takes to answer, and forever if it never does.
-     */
-    /**
      * The window that matters is the one around play(), not the state once everything settles -
      * a track turned down after play() has started it is audible for exactly as long as play()
      * takes, on every track add and on every decode-error element rebuild.
@@ -133,19 +128,7 @@ describe('AudioSinkManager', () => {
     });
 
     /**
-     * The element carries the volume because it is set where the element is created, not because
-     * setVolume got far enough to apply it - so a subscribe call that rejects outright, or a retry
-     * budget that runs out, cannot leave a peer audible.
-     */
-    /**
-     * Recording the volume before the fan-out means nothing downstream gates it any more, and
-     * the fan-out no longer rethrows and HMSAudioTrack.setVolume's range check. An out-of-range or NaN value
-     * would be kept and then thrown by the element setter on every later track add - IndexSizeError
-     * before the element is even wired up, so the peer gets no audio element at all.
-     */
-    /**
-     * Through AudioOutputManager, which is the only production caller and the one HMSSDKActions
-     * awaits. It must reject rather than throw synchronously or drop the promise - either way the
+     * Through AudioOutputManager, the path HMSSDKActions awaits. It must reject rather than throw synchronously or drop the promise - either way the
      * rejection escapes as unhandled and the app is told the volume was applied.
      */
     it.each([150, -1, NaN])('rejects %p through the public path rather than recording it', async value => {

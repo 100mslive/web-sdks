@@ -10,8 +10,9 @@ export class HMSAudioTrack extends HMSTrack {
   private outputDevice?: MediaDeviceInfo;
   /**
    * Last volume asked for, kept off the audio element so it survives the element being torn down
-   * and rebuilt. Undefined until something asks for one, which is how a track that was never given
-   * its own volume is told apart from one deliberately set to the same value as the sink's.
+   * and rebuilt - which is what lets a rebuild restore it rather than reverting to the sink's.
+   * Undefined only before the track's first attach, since handleTrackAdd sets it. Read by
+   * isSilenced(), where 0 means the peer stays unsubscribed.
    */
   private requestedVolume?: number;
 

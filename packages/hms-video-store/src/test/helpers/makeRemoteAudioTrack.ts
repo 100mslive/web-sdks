@@ -22,7 +22,7 @@ const subscribeImpl = (outcome: SubscribeOutcome) => {
 
 /**
  * A real HMSRemoteAudioTrack over a fake subscribe connection, so setVolume's own ordering runs
- * rather than a stub's resolved promise. `send` is exposed for asserting what reached the SFU.
+ * rather than a stub's resolved promise.
  */
 export const makeRemoteAudioTrack = ({ subscribe = 'resolves', id = 'track-1' }: Options = {}) => {
   const send = subscribeImpl(subscribe);

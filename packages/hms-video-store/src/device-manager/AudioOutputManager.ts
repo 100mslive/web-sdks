@@ -18,9 +18,9 @@ export class AudioOutputManager implements IAudioOutputManager {
   }
 
   setVolume(value: number) {
-    // not `< 0 || > 100`: NaN passes that, and the element setter then throws on every later
-    // track add. Returned, not dropped - HMSSDKActions awaits this, and a dropped promise makes
-    // the sink's own rejection an unhandled one.
+    // returned, not dropped: HMSSDKActions awaits this, so dropping it makes every rejection
+    // below an unhandled one. The range check mirrors the sink's, which is the one that matters -
+    // this is here so the message is the same whichever layer you call.
     if (!(value >= 0 && value <= 100)) {
       return Promise.reject(Error('Please pass a valid number between 0-100'));
     }
