@@ -8,13 +8,6 @@ export class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;
-  /**
-   * Bumped per request so a failed one can tell whether it still owns the field. Both fields are
-   * written before the SFU confirms - they have to be, because they are what dedupes the next
-   * call - so an unconfirmed request has to put them back or every later call is deduped away.
-   */
-  private audioSeq = 0;
-  private videoSeq = 0;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
     super(nativeStream);
@@ -28,7 +21,6 @@ export class HMSRemoteStream extends HMSMediaStream {
 
     const previous = this.audio;
     this.audio = enabled;
-    const seq = ++this.audioSeq;
     HMSLogger.d(
       `[Remote stream] ${identifier || ''} 
     streamId=${this.id}
@@ -36,21 +28,17 @@ export class HMSRemoteStream extends HMSMediaStream {
     subscribing audio - ${this.audio}`,
     );
     try {
-      await this.connection.sendOverApiDataChannelWithResponse(
-        {
-          params: {
-            subscribed: enabled,
-            track_id: trackId,
-          },
-          method: 'prefer-audio-track-state',
+      await this.connection.sendOverApiDataChannelWithResponse({
+        params: {
+          subscribed: enabled,
+          track_id: trackId,
         },
-        undefined,
-        () => seq !== this.audioSeq,
-      );
+        method: 'prefer-audio-track-state',
+      });
     } catch (error) {
       // the SFU never confirmed this, so leaving the field flipped would dedupe away every later
-      // attempt. A superseded request must not roll back - the newer one owns the field now.
-      if (seq === this.audioSeq) {
+      // attempt. Only undo our own write - a newer call already holding the field owns it now.
+      if (this.audio === enabled) {
         this.audio = previous;
       }
       throw error;
@@ -86,21 +74,17 @@ export class HMSRemoteStream extends HMSMediaStream {
     );
     const previous = this.video;
     this.setVideoLayerLocally(layer, identifier, source);
-    const seq = ++this.videoSeq;
     try {
-      return await this.connection.sendOverApiDataChannelWithResponse(
-        {
-          params: {
-            max_spatial_layer: layer,
-            track_id: trackId,
-          },
-          method: 'prefer-video-track-state',
+      return await this.connection.sendOverApiDataChannelWithResponse({
+        params: {
+          max_spatial_layer: layer,
+          track_id: trackId,
         },
-        undefined,
-        () => seq !== this.videoSeq,
-      );
+        method: 'prefer-video-track-state',
+      });
     } catch (error) {
-      if (seq === this.videoSeq) {
+      // only undo our own write - see setAudio
+      if (this.video === layer) {
         this.setVideoLayerLocally(previous, identifier, `${source}-failed`);
       }
       throw error;

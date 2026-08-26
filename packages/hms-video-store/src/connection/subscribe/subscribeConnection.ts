@@ -32,6 +32,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
   readonly nativeConnection: RTCPeerConnection;
 
   private pendingMessageQueue: string[] = [];
+  /** `${method}:${track_id}` -> the id of the newest request for it; older ones stop retrying */
+  private latestRequestPerState = new Map<string, string>();
 
   private apiChannel?: HMSDataChannel;
   private eventEmitter = new EventEmitter({ maxListeners: 60 });
@@ -146,14 +148,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
   }
 
   /**
-   * isSuperseded lets the caller cancel a request that a newer one has replaced. A retry replays
-   * the bytes serialised here, so without it a late retry re-applies desired state the caller has
-   * already moved on from - and the SFU ends up on the older value.
+   * A retry replays the bytes serialised here, so a request still retrying after a newer one has
+   * been made for the same track would re-apply state the caller has moved on from. Each request
+   * claims its piece of subscription state, and stops once it no longer holds the claim.
    */
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
     requestId?: string,
-    isSuperseded?: () => boolean,
   ): Promise<PreferLayerResponse> {
     const id = uuid();
     if (message.method === 'prefer-video-track-state') {
@@ -168,7 +169,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
       jsonrpc: '2.0',
       ...message,
     });
-    return this.sendMessage(request, id, isSuperseded);
+    const stateKey = `${message.method}:${message.params.track_id}`;
+    this.latestRequestPerState.set(stateKey, id);
+    try {
+      return await this.sendMessage(request, id, stateKey);
+    } finally {
+      if (this.latestRequestPerState.get(stateKey) === id) {
+        this.latestRequestPerState.delete(stateKey);
+      }
+    }
   }
 
   close() {
@@ -186,17 +195,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
   };
 
   // eslint-disable-next-line complexity
-  private sendMessage = async (
-    request: string,
-    requestId: string,
-    isSuperseded?: () => boolean,
-  ): Promise<PreferLayerResponse> => {
+  private sendMessage = async (request: string, requestId: string, stateKey: string): Promise<PreferLayerResponse> => {
+    /** a newer request for the same track has taken over this piece of state */
+    const superseded = () => this.latestRequestPerState.get(stateKey) !== requestId;
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
-      if (isSuperseded?.()) {
-        throw Error(`Superseded by a newer request before try ${i + 1} for ${requestId} - ${request}`);
+      // not a failure - the newer request owns the outcome, so resolve the way the
+      // disableAutoUnsubscribe skip above does rather than reporting an error nobody can act on
+      if (superseded()) {
+        HMSLogger.d(this.TAG, `Superseded before try ${i + 1}, dropping ${requestId}`, request);
+        return { id: requestId } as PreferLayerResponse;
       }
       try {
         await this.waitForChannelOpen();
@@ -226,6 +236,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
     }
     if (!response) {
+      // a request that ran out of attempts only after being replaced still must not report failure
+      if (superseded()) {
+        HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
+        return { id: requestId } as PreferLayerResponse;
+      }
       throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
     }
     return response;

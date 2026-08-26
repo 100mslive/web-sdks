@@ -108,8 +108,12 @@ describe('subscription state when a request does not land', () => {
       expect(stream.getVideoLayer()).toBe(HMSSimulcastLayer.HIGH);
     }, 20_000);
 
-    /** the superseded request owns nothing, so it must not undo the newer one's field either */
-    it('leaves the newer value in place when the superseded request gives up', async () => {
+    /**
+     * Being replaced is not a failure - the newer request owns the outcome. Reporting an error
+     * would surface as a rejection an app cannot act on, and would log at error on the paths that
+     * only discard the promise. So it resolves, and it must not undo the newer value on the way.
+     */
+    it('resolves rather than failing, and leaves the newer value in place', async () => {
       const silenced = stream.setAudio(false, 'track-1').catch((error: Error) => error);
       await flush();
       await jest.advanceTimersByTimeAsync(2000);
@@ -119,7 +123,7 @@ describe('subscription state when a request does not land', () => {
       await restored;
       await exhaustRetries();
 
-      expect(await silenced).toBeInstanceOf(Error);
+      expect(await silenced).not.toBeInstanceOf(Error);
       expect(stream.isAudioSubscribed()).toBe(true);
     }, 20_000);
   });
