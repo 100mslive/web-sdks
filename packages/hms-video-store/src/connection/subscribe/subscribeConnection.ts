@@ -32,6 +32,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
   readonly nativeConnection: RTCPeerConnection;
 
   private pendingMessageQueue: string[] = [];
+  /** `${method}:${track_id}` -> the id of the newest request for it; older ones stop retrying */
+  private latestRequestPerState = new Map<string, string>();
 
   private apiChannel?: HMSDataChannel;
   private eventEmitter = new EventEmitter({ maxListeners: 60 });
@@ -145,6 +147,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   }
 
+  /**
+   * A retry replays the bytes serialised here, so a request still retrying after a newer one has
+   * been made for the same track would re-apply state the caller has moved on from. Each request
+   * claims its piece of subscription state, and stops once it no longer holds the claim.
+   */
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
     requestId?: string,
@@ -162,7 +169,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
       jsonrpc: '2.0',
       ...message,
     });
-    return this.sendMessage(request, id);
+    const stateKey = `${message.method}:${message.params.track_id}`;
+    this.latestRequestPerState.set(stateKey, id);
+    try {
+      return await this.sendMessage(request, id, stateKey);
+    } finally {
+      if (this.latestRequestPerState.get(stateKey) === id) {
+        this.latestRequestPerState.delete(stateKey);
+      }
+    }
   }
 
   close() {
@@ -180,11 +195,24 @@ export default class HMSSubscribeConnection extends HMSConnection {
   };
 
   // eslint-disable-next-line complexity
-  private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
+  private sendMessage = async (request: string, requestId: string, stateKey: string): Promise<PreferLayerResponse> => {
+    /** a newer request for the same track has taken over this piece of state */
+    const superseded = () => this.latestRequestPerState.get(stateKey) !== requestId;
+    /**
+     * Resolve the way the disableAutoUnsubscribe skip does rather than reporting an error nobody
+     * can act on - the newer request owns the outcome. Every exit path has to agree on this.
+     */
+    const dropped = () => {
+      HMSLogger.d(this.TAG, `Superseded, dropping ${requestId}`, request);
+      return { id: requestId } as PreferLayerResponse;
+    };
     let response: PreferLayerResponse | undefined;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
+      if (superseded()) {
+        return dropped();
+      }
       try {
         await this.waitForChannelOpen();
         // send can throw too - the channel may close between the open check and here
@@ -204,6 +232,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
         HMSLogger.d(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
         const shouldRetry = error.code / 100 === 5 || error.code === 429;
         if (!shouldRetry) {
+          if (superseded()) {
+            return dropped();
+          }
           throw Error(`code=${error.code}, message=${error.message}`);
         }
         const delay = (2 + Math.random() * 2) * 1000;
@@ -213,6 +244,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
     }
     if (!response) {
+      if (superseded()) {
+        return dropped();
+      }
       throw Error(`No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`);
     }
     return response;

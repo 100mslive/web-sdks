@@ -25,6 +25,17 @@ import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } fr
  */
 export class TrackManager {
   public TAG = '[TrackManager]';
+
+  /**
+   * A remote audio track's setEnabled applies the subscription over the API data channel, so it
+   * rejects when the SFU does not answer. Both call sites below are notification handlers that
+   * discard the promise, which turns that into an unhandled rejection. The local mute state has
+   * already been applied by then - only the subscription request failed - so log and carry on.
+   */
+  private logIfRejected(result: Promise<void>, track: HMSRemoteTrack) {
+    // error, not warn: a warn is dropped once an app calls setLogLevel(ERROR)
+    result.catch(error => HMSLogger.e(this.TAG, 'could not apply mute state', `${track}`, error));
+  }
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
   constructor(public store: Store, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
@@ -164,7 +175,7 @@ export class TrackManager {
         this.processTrackInfo(trackEntry, params.peer.peer_id, callListener);
         this.processPendingTracks();
       } else {
-        track.setEnabled(!trackEntry.mute);
+        this.logIfRejected(track.setEnabled(!trackEntry.mute), track as HMSRemoteTrack);
         const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
         if (eventType) {
           this.listener?.onTrackUpdate(eventType, track, hmsPeer);
@@ -194,7 +205,7 @@ export class TrackManager {
       track.peerId = hmsPeer.peerId;
       // set log identifier to initial name of the peer
       track.logIdentifier = hmsPeer.name;
-      track.setEnabled(!state.trackInfo.mute);
+      this.logIfRejected(track.setEnabled(!state.trackInfo.mute), track);
       this.addAudioTrack(hmsPeer, track);
       this.addVideoTrack(hmsPeer, track);
       /**
