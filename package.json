@@ -68,7 +68,7 @@
     "**/@tldraw/editor/nanoid": "^5.1.16",
     "**/@tldraw/store/nanoid": "^5.1.16",
     "**/@tldraw/tlschema/nanoid": "^5.1.16",
-    "qs": "^6.15.2",
+    "qs": "^6.16.0",
     "shell-quote": "^1.9.0",
     "js-cookie": "^3.0.7",
     "esbuild": "^0.28.1",
