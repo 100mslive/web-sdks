@@ -75,22 +75,9 @@ export class HMSAudioPluginsManager {
       throw err;
     }
 
-    switch (plugin.getName()) {
-      case 'HMSKrispPlugin': {
-        if (!this.room?.isNoiseCancellationEnabled) {
-          const errorMessage = 'Krisp Noise Cancellation is not enabled for this room';
-          if (this.pluginsMap.size === 0) {
-            throw Error(errorMessage);
-          } else {
-            HMSLogger.w(this.TAG, errorMessage);
-            return;
-          }
-        }
-        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
-        break;
-      }
-
-      default:
+    if (name === 'HMSKrispPlugin' && this.room?.isNoiseCancellationEnabled) {
+      // app enables only, a reprocess re-add is not a new start
+      this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
     }
     this.pluginAddInProgress = true;
 
@@ -106,6 +93,16 @@ export class HMSAudioPluginsManager {
     const name = plugin.getName?.();
     if (this.pluginsMap.get(name)) {
       HMSLogger.w(this.TAG, `plugin - ${name} already added.`);
+      return;
+    }
+    // checked here and not in addPlugin so a reprocess after the policy or init flag turned noise
+    // cancellation off drops Krisp instead of restarting it
+    if (name === 'HMSKrispPlugin' && !this.room?.isNoiseCancellationEnabled) {
+      const errorMessage = 'Krisp Noise Cancellation is not enabled for this room';
+      if (this.pluginsMap.size === 0) {
+        throw Error(errorMessage);
+      }
+      HMSLogger.w(this.TAG, errorMessage);
       return;
     }
 

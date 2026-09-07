@@ -23,12 +23,15 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
 const makeTrack = () => ({ nativeTrack: { id: 'mic' }, setProcessedTrack: jest.fn(async () => {}) } as any);
 
-/** a plugin whose first init or processAudioTrack stays pending until the test releases it, like Krisp's SDK and filter creation */
-const makePlugin = (pendingStep: 'init' | 'processAudioTrack' = 'processAudioTrack') => {
+/** a plugin whose first init or processAudioTrack can stay pending until the test releases it, like Krisp's SDK and filter creation */
+const makePlugin = ({
+  name = 'FakePlugin',
+  pendingStep,
+}: { name?: string; pendingStep?: 'init' | 'processAudioTrack' } = {}) => {
   let release!: (n?: unknown) => void;
   const pending = new Promise(resolve => (release = resolve));
   const plugin = {
-    getName: () => 'FakePlugin',
+    getName: () => name,
     getPluginType: () => HMSAudioPluginType.TRANSFORM,
     checkSupport: () => ({ isSupported: true }),
     isSupported: () => true,
@@ -37,7 +40,9 @@ const makePlugin = (pendingStep: 'init' | 'processAudioTrack' = 'processAudioTra
     stop: jest.fn(),
   } as unknown as HMSAudioPlugin & { init: jest.Mock; processAudioTrack: jest.Mock; stop: jest.Mock };
   // only the first call hangs, the re-add during a reprocess completes on its own
-  plugin[pendingStep].mockImplementationOnce(() => pending);
+  if (pendingStep) {
+    plugin[pendingStep].mockImplementationOnce(() => pending);
+  }
   return { plugin, release };
 };
 
@@ -45,7 +50,7 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
   it('does not tear the plugin down under an add that is still in progress', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
-    const { plugin, release } = makePlugin();
+    const { plugin, release } = makePlugin({ pendingStep: 'processAudioTrack' });
 
     // app adds the plugin; init is done, the filter node is still being created
     const add = manager.addPlugin(plugin);
@@ -78,7 +83,7 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
   it('waits for an in-flight add before tearing everything down on leave', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
-    const { plugin, release } = makePlugin('init');
+    const { plugin, release } = makePlugin({ pendingStep: 'init' });
 
     const add = manager.addPlugin(plugin);
     await flush();
@@ -92,6 +97,25 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     await cleanup;
     // the plugin must not outlive the leave: stopped, unregistered, nothing published
     expect(plugin.stop).toHaveBeenCalledTimes(1);
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it('drops Krisp on reprocess once the room no longer allows noise cancellation', async () => {
+    const track = makeTrack();
+    const room = { isNoiseCancellationEnabled: true } as any;
+    const manager = new HMSAudioPluginsManager(track, new EventBus(), room);
+    const { plugin } = makePlugin({ name: 'HMSKrispPlugin' });
+
+    await manager.addPlugin(plugin);
+    expect(manager.getPlugins()).toEqual(['HMSKrispPlugin']);
+
+    // the template policy turns noise cancellation off, then the mic is switched
+    room.isNoiseCancellationEnabled = false;
+    await expect(manager.reprocessPlugins()).rejects.toThrow('not enabled for this room');
+    // same outcome as an app add being refused: Krisp is stopped, not restarted, nothing published
+    expect(plugin.stop).toHaveBeenCalledTimes(1);
+    expect(plugin.init).toHaveBeenCalledTimes(1);
     expect(manager.getPlugins()).toEqual([]);
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
   });
