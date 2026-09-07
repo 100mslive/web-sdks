@@ -37,6 +37,14 @@ export class HMSAudioPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
   private room?: Room;
+  /**
+   * add, remove and reprocess all rebuild the node graph and stop/start the plugins, so they must not
+   * interleave: a reprocess (mic track replaced) landing while an add is still creating its filter
+   * node stops the plugin under that add, and the add then publishes a dead node. Everything that
+   * touches the graph runs through this queue. Only the entry points take it - cleanup() is called
+   * from inside them and from the track on leave, and stays lock-free.
+   */
+  private queue: Promise<unknown> = Promise.resolve();
 
   constructor(track: HMSLocalAudioTrack, private eventBus: EventBus, room?: Room) {
     this.hmsTrack = track;
@@ -87,10 +95,18 @@ export class HMSAudioPluginsManager {
     this.pluginAddInProgress = true;
 
     try {
-      await this.addPluginInternal(plugin);
+      await this.serialize(() => this.addPluginInternal(plugin));
     } finally {
       this.pluginAddInProgress = false;
     }
+  }
+
+  private serialize<T>(task: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(task, task);
+    this.queue = run.catch(() => {
+      // a failed task must not block the next one
+    });
+    return run;
   }
 
   // eslint-disable-next-line complexity
@@ -164,17 +180,19 @@ export class HMSAudioPluginsManager {
       default:
         break;
     }
-    await this.removePluginInternal(plugin);
-    if (this.pluginsMap.size === 0) {
-      // remove all previous nodes
-      await this.cleanup();
-      HMSLogger.i(this.TAG, `No plugins left, stopping plugins loop`);
-      await this.hmsTrack.setProcessedTrack(undefined);
-    } else {
-      // Reprocess the remaining plugins again because there is no way to connect
-      // the source of the removed plugin to destination of removed plugin
-      await this.reprocessPlugins();
-    }
+    await this.serialize(async () => {
+      await this.removePluginInternal(plugin);
+      if (this.pluginsMap.size === 0) {
+        // remove all previous nodes
+        await this.cleanup();
+        HMSLogger.i(this.TAG, `No plugins left, stopping plugins loop`);
+        await this.hmsTrack.setProcessedTrack(undefined);
+      } else {
+        // Reprocess the remaining plugins again because there is no way to connect
+        // the source of the removed plugin to destination of removed plugin
+        await this.reprocessInternal();
+      }
+    });
   }
 
   async cleanup() {
@@ -200,6 +218,10 @@ export class HMSAudioPluginsManager {
   }
 
   async reprocessPlugins() {
+    await this.serialize(() => this.reprocessInternal());
+  }
+
+  private async reprocessInternal() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
       return;
     }
@@ -207,7 +229,8 @@ export class HMSAudioPluginsManager {
     await this.cleanup();
     await this.initAudioNodes();
     for (const plugin of plugins) {
-      await this.addPlugin(plugin);
+      // not addPlugin: that is the app entry point, with the in-progress guard this queue replaces
+      await this.addPluginInternal(plugin);
     }
     await this.updateProcessedTrack();
   }
