@@ -48,6 +48,56 @@ const makePlugin = ({
 };
 
 describe('HMSAudioPluginsManager with an add in flight', () => {
+  it('ends usage when initial processing fails before the plugin is registered', async () => {
+    let now = 1000;
+    const clock = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    try {
+      const eventBus = new EventBus();
+      const usage = new PluginUsageTracker(eventBus);
+      const manager = new HMSAudioPluginsManager(makeTrack(), eventBus, { isNoiseCancellationEnabled: true } as any);
+      const { plugin } = makePlugin({ name: 'HMSKrispPlugin' });
+      plugin.processAudioTrack.mockImplementationOnce(async () => {
+        now = 2000;
+        throw new Error('filter creation failed');
+      });
+
+      await expect(manager.addPlugin(plugin)).rejects.toThrow('filter creation failed');
+      now = 62000;
+      expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(1000);
+      await manager.cleanup();
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it.each(['init', 'processAudioTrack'] as const)(
+    'ends usage immediately when cleanup interrupts %s',
+    async pendingStep => {
+      let now = 1000;
+      const clock = jest.spyOn(Date, 'now').mockImplementation(() => now);
+      try {
+        const eventBus = new EventBus();
+        const usage = new PluginUsageTracker(eventBus);
+        const manager = new HMSAudioPluginsManager(makeTrack(), eventBus, { isNoiseCancellationEnabled: true } as any);
+        const { plugin, release } = makePlugin({ name: 'HMSKrispPlugin', pendingStep });
+        const add = manager.addPlugin(plugin);
+        await flush();
+        now = 2000;
+        await manager.cleanup();
+
+        // Startup may never settle; accounting must already be closed at teardown.
+        now = 62000;
+        expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(1000);
+        release(node());
+        await add;
+        now = 122000;
+        expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(1000);
+      } finally {
+        clock.mockRestore();
+      }
+    },
+  );
+
   it('preserves Krisp usage across repeated device switches and cleanup', async () => {
     let now = 1000;
     const clock = jest.spyOn(Date, 'now').mockImplementation(() => now);

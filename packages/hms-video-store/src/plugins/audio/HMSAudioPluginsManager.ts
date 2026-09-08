@@ -136,6 +136,8 @@ export class HMSAudioPluginsManager {
       plugin.stop();
       this.unregister(name);
     }
+    // Startup opens usage before registration and may still be pending at teardown.
+    this.analytics.cleanup();
     this.disconnectNodes();
     await this.updateProcessedTrack(undefined);
   }
@@ -351,8 +353,8 @@ export class HMSAudioPluginsManager {
   private unregister(name: string) {
     if (this.pluginsMap.delete(name)) {
       HMSLogger.i(this.TAG, `removed plugin ${name}`);
-      this.analytics.removed(name);
     }
+    this.analytics.removed(name);
   }
 
   private disconnectNodes() {
