@@ -56,7 +56,9 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     const add = manager.addPlugin(plugin);
     await flush();
     expect(plugin.processAudioTrack).toHaveBeenCalledTimes(1);
-    expect(manager.getPlugins()).toEqual(['FakePlugin']);
+    // a plugin is only registered once it is wired up, so nothing is published or listed yet
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).not.toHaveBeenCalled();
 
     // the mic track gets replaced meanwhile, which reprocesses every plugin
     track.nativeTrack = { id: 'mic-2' };
@@ -80,24 +82,118 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
   });
 
-  it('waits for an in-flight add before tearing everything down on leave', async () => {
+  it('tears down on leave without waiting for an in-flight add, and the add unwinds itself', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
     const { plugin, release } = makePlugin({ pendingStep: 'init' });
 
-    const add = manager.addPlugin(plugin);
+    let added = false;
+    const add = manager.addPlugin(plugin).then(() => (added = true));
     await flush();
     expect(plugin.init).toHaveBeenCalledTimes(1);
 
-    // the peer leaves while the plugin is still initialising
-    const cleanup = manager.cleanup();
-    await flush();
+    // the peer leaves while the plugin is still initialising. track teardown awaits this before it
+    // stops the tracks and drops its listeners, so it must not be gated on plugin code
+    await manager.cleanup();
+    expect(added).toBe(false);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+
+    // the add resumes on a torn down manager and must not resurrect the plugin
     release();
     await add;
-    await cleanup;
-    // the plugin must not outlive the leave: stopped, unregistered, nothing published
+    expect(plugin.stop).toHaveBeenCalledTimes(1);
+    expect(plugin.processAudioTrack).not.toHaveBeenCalled();
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it('does not remove a plugin from under an add that is still in progress', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin, release } = makePlugin({ pendingStep: 'processAudioTrack' });
+
+    const add = manager.addPlugin(plugin);
+    await flush();
+    expect(plugin.processAudioTrack).toHaveBeenCalledTimes(1);
+
+    // app toggles the plugin off while the filter node is still being created
+    const remove = manager.removePlugin(plugin);
+    await flush();
+    // the mid point is the assertion: an end state check passes even when the remove runs early
+    expect(plugin.stop).not.toHaveBeenCalled();
+
+    release(node());
+    await add;
+    await remove;
     expect(plugin.stop).toHaveBeenCalledTimes(1);
     expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it('queues adds that land behind a reprocess instead of failing them as already in progress', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin: first } = makePlugin({ name: 'First' });
+    const { plugin: second } = makePlugin({ name: 'Second' });
+    const { plugin: third } = makePlugin({ name: 'Third' });
+
+    await manager.addPlugin(first);
+
+    // the mic is switched and the re-add hangs on the filter node
+    let release!: () => void;
+    first.processAudioTrack.mockImplementationOnce(() => new Promise(resolve => (release = () => resolve(node()))));
+    const reprocess = manager.reprocessPlugins();
+    await flush();
+
+    // the app enables two more plugins while that reprocess is still running. neither is in progress,
+    // they are queued, so neither may be refused with AddAlreadyInProgress
+    const adds = Promise.all([manager.addPlugin(second), manager.addPlugin(third)]);
+    await flush();
+
+    release();
+    await reprocess;
+    await adds;
+    expect(manager.getPlugins()).toEqual(['First', 'Second', 'Third']);
+  });
+
+  it.each([
+    ['HMSKrispPlugin', 'Other'],
+    ['Other', 'HMSKrispPlugin'],
+  ])('drops only Krisp on reprocess when the room turns it off, added as [%s, %s]', async (...order) => {
+    const track = makeTrack();
+    const room = { isNoiseCancellationEnabled: true } as any;
+    const manager = new HMSAudioPluginsManager(track, new EventBus(), room);
+    const plugins = order.map(name => makePlugin({ name }).plugin);
+
+    for (const plugin of plugins) {
+      await manager.addPlugin(plugin);
+    }
+    const other = plugins[order.indexOf('Other')];
+
+    room.isNoiseCancellationEnabled = false;
+    // rejects in either order: the reprocess must never report success while dropping Krisp
+    await expect(manager.reprocessPlugins()).rejects.toThrow('not enabled for this room');
+
+    // and the plugin that is still allowed keeps its graph rather than being collateral
+    // note: a rebuild restarts every plugin it keeps, so stop/init counts differ by insertion order
+    expect(manager.getPlugins()).toEqual(['Other']);
+    expect(other.processAudioTrack).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ stream: { tracks: [{ id: 'mic' }] } }),
+    );
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
+  });
+
+  it('goes back to the native track when a plugin cannot attach, instead of publishing a dead node', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin } = makePlugin();
+    plugin.processAudioTrack.mockRejectedValueOnce(new Error('filter node failed'));
+
+    // on main this resolved as a success and published an unfed destination node: the peer sent silence
+    await expect(manager.addPlugin(plugin)).rejects.toThrow('filter node failed');
+    expect(manager.getPlugins()).toEqual([]);
+    expect(plugin.stop).toHaveBeenCalledTimes(1);
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
   });
 
