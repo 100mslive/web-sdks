@@ -206,8 +206,10 @@ export class HMSAudioPluginsManager {
       await this.updateProcessedTrack(undefined);
     }
     // a plugin cannot be re-inited while it is still running
-    for (const plugin of this.pluginsMap.values()) {
+    for (const [name, plugin] of this.pluginsMap) {
       plugin.stop();
+      // Record this usage interval before restarting the plugin resets its timestamp.
+      this.analytics.removed(name);
     }
     this.disconnectNodes();
   }

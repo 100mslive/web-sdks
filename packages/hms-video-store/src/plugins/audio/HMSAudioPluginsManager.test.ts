@@ -1,5 +1,6 @@
 import { HMSAudioPlugin, HMSAudioPluginType } from './HMSAudioPlugin';
 import { HMSAudioPluginsManager } from './HMSAudioPluginsManager';
+import { PluginUsageTracker } from '../../common/PluginUsageTracker';
 import { EventBus } from '../../events/EventBus';
 
 const node = () => ({ connect: jest.fn(), disconnect: jest.fn(), context: 'ctx' });
@@ -47,6 +48,32 @@ const makePlugin = ({
 };
 
 describe('HMSAudioPluginsManager with an add in flight', () => {
+  it('preserves Krisp usage across repeated device switches and cleanup', async () => {
+    let now = 1000;
+    const clock = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    try {
+      const eventBus = new EventBus();
+      const usage = new PluginUsageTracker(eventBus);
+      const track = makeTrack();
+      const manager = new HMSAudioPluginsManager(track, eventBus, { isNoiseCancellationEnabled: true } as any);
+      await manager.addPlugin(makePlugin({ name: 'HMSKrispPlugin' }).plugin);
+
+      now += 10 * 60 * 1000;
+      track.nativeTrack = { id: 'mic-2' };
+      await manager.reprocessPlugins();
+      now += 60 * 1000;
+      track.nativeTrack = { id: 'mic-3' };
+      await manager.reprocessPlugins();
+      now += 2 * 60 * 1000;
+      await manager.cleanup();
+
+      now += 60 * 1000;
+      expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(13 * 60 * 1000);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
   it.each(['init', 'processAudioTrack'] as const)('releases restarted resources when %s fails', async failedStep => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
