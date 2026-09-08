@@ -173,13 +173,10 @@ export class HMSAudioPluginsManager {
    * ones it must not be stopped first, and it is only registered once it is running.
    */
   private async rebuildGraph(added?: HMSAudioPlugin) {
-    // a plugin cannot be re-inited while it is still running
-    const running = new Set<string>();
-    for (const [name, plugin] of this.pluginsMap) {
-      plugin.stop();
-      running.add(name);
+    const running = await this.stopGraph();
+    if (this.disposed) {
+      return;
     }
-    this.disconnectNodes();
 
     const plugins = Array.from(this.pluginsMap.values());
     if (added) {
@@ -201,6 +198,21 @@ export class HMSAudioPluginsManager {
     if (failure) {
       throw failure;
     }
+  }
+
+  private async stopGraph() {
+    if (this.outputTrack) {
+      // Keep native audio publishing while the replacement graph initializes.
+      await this.updateProcessedTrack(undefined);
+    }
+    // a plugin cannot be re-inited while it is still running
+    const running = new Set<string>();
+    for (const [name, plugin] of this.pluginsMap) {
+      plugin.stop();
+      running.add(name);
+    }
+    this.disconnectNodes();
+    return running;
   }
 
   /** publishes the rebuilt graph, or goes back to the native track if nothing is left in it */

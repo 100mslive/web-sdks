@@ -47,6 +47,57 @@ const makePlugin = ({
 };
 
 describe('HMSAudioPluginsManager with an add in flight', () => {
+  it.each(['init', 'processAudioTrack'] as const)(
+    'publishes native audio while a device switch waits for plugin %s',
+    async pendingStep => {
+      const track = makeTrack();
+      const manager = new HMSAudioPluginsManager(track, new EventBus());
+      const { plugin } = makePlugin();
+      await manager.addPlugin(plugin);
+      const oldOutput = track.setProcessedTrack.mock.calls[0][0];
+      track.setProcessedTrack.mockClear();
+
+      let release!: () => void;
+      plugin[pendingStep].mockImplementationOnce(() => new Promise(resolve => (release = () => resolve(node()))));
+      track.nativeTrack = { id: 'mic-2' };
+      const reprocess = manager.reprocessPlugins();
+      await flush();
+
+      expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+      expect(track.setProcessedTrack.mock.invocationCallOrder[0]).toBeLessThan(plugin.stop.mock.invocationCallOrder[0]);
+      expect(oldOutput.stop).toHaveBeenCalledTimes(1);
+
+      release();
+      await reprocess;
+      expect(plugin.processAudioTrack).toHaveBeenLastCalledWith(
+        expect.anything(),
+        expect.objectContaining({ stream: { tracks: [{ id: 'mic-2' }] } }),
+      );
+      expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
+    },
+  );
+
+  it('does not restart plugins if cleanup runs while switching back to native audio', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin } = makePlugin();
+    await manager.addPlugin(plugin);
+
+    let release!: () => void;
+    track.setProcessedTrack.mockImplementationOnce(() => new Promise<void>(resolve => (release = resolve)));
+    const reprocess = manager.reprocessPlugins();
+    await flush();
+    await manager.cleanup();
+    await manager.closeContext();
+
+    release();
+    await reprocess;
+    expect(plugin.init).toHaveBeenCalledTimes(1);
+    expect(plugin.stop).toHaveBeenCalledTimes(1);
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+  });
+
   it('does not tear the plugin down under an add that is still in progress', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
