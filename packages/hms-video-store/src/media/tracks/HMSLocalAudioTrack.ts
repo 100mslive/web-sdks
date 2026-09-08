@@ -259,6 +259,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.replaceSenderTrack();
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     isLevelMonitored && this.initAudioLevelMonitor();
+    // Recovery tracks need the same graph rebuild as successful device selections.
+    try {
+      await this.pluginsManager.reprocessPlugins();
+    } catch (e) {
+      this.eventBus.audioPluginFailed.publish(e as HMSException);
+    }
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
@@ -320,11 +326,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         );
       }
       throw e;
-    }
-    try {
-      await this.pluginsManager.reprocessPlugins();
-    } catch (e) {
-      this.eventBus.audioPluginFailed.publish(e as HMSException);
     }
   }
 

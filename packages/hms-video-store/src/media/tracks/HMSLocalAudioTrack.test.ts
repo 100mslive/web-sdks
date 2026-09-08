@@ -1,6 +1,8 @@
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack, HMSLocalStream } from '../../internal';
+import { HMSAudioPluginType } from '../../plugins';
+import Room from '../../sdk/models/HMSRoom';
 import { isMobileOrTablet } from '../../utils/support';
 import { getAudioTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings';
@@ -19,6 +21,7 @@ const getAudioTrackMock = getAudioTrack as jest.Mock;
 const isMobileOrTabletMock = isMobileOrTablet as jest.Mock;
 
 const audioContext = {
+  sampleRate: 48000,
   createMediaStreamSource: jest.fn(),
   createMediaStreamDestination: jest.fn(),
   resume: jest.fn(async () => {}),
@@ -53,6 +56,7 @@ const makeLocalAudioTrack = (
   eventBus: EventBus,
   source = 'regular',
   nativeTrack: MediaStreamTrack = makeNativeTrack('track-1'),
+  room?: Room,
 ) => {
   const nativeStream = {
     id: 'stream-1',
@@ -63,7 +67,7 @@ const makeLocalAudioTrack = (
   const stream = new HMSLocalStream(nativeStream);
   stream.setConnection({} as unknown as HMSPublishConnection);
   const settings = new HMSAudioTrackSettingsBuilder().build();
-  return new HMSLocalAudioTrack(stream, nativeTrack, source, eventBus, settings);
+  return new HMSLocalAudioTrack(stream, nativeTrack, source, eventBus, settings, room);
 };
 
 const setVisibility = (state: 'hidden' | 'visible') => {
@@ -388,4 +392,164 @@ describe('HMSLocalAudioTrack screenshare', () => {
 
     expect(enabledUpdates).toEqual([false]);
   });
+});
+
+// Model graph connections and ended capture, so publishing a live but unfed destination fails.
+describe('HMSLocalAudioTrack device switches with active noise cancellation', () => {
+  const makeCapturingTrack = (id: string) => {
+    const track = makeNativeTrack(id);
+    (track.stop as jest.Mock).mockImplementation(() => ((track as any).readyState = 'ended'));
+    return track;
+  };
+  const makeNode = (source?: MediaStreamTrack) => {
+    const node = {
+      context: audioContext,
+      source,
+      inputs: new Set<any>(),
+      outputs: new Set<any>(),
+      connect(target: any) {
+        node.outputs.add(target);
+        target.inputs.add(node);
+      },
+      disconnect() {
+        node.outputs.forEach(target => target.inputs.delete(node));
+        node.outputs.clear();
+      },
+    };
+    return node;
+  };
+  const hasLiveAudio = (node: ReturnType<typeof makeNode>): boolean =>
+    node.source ? node.source.readyState === 'live' : Array.from(node.inputs).some(hasLiveAudio);
+
+  const setup = () => {
+    const eventBus = new EventBus();
+    const room = { isNoiseCancellationEnabled: true } as Room;
+    const track = makeLocalAudioTrack(eventBus, 'regular', makeCapturingTrack('mic-1'), room);
+    const sender = {
+      track: undefined as any,
+      replaceTrack: jest.fn(async (replacement: MediaStreamTrack) => {
+        await Promise.resolve();
+        sender.track = replacement;
+      }),
+    };
+    track.transceiver = { direction: 'sendonly', sender } as unknown as RTCRtpTransceiver;
+    let activeNode: ReturnType<typeof makeNode> | undefined;
+    const plugin = {
+      getName: () => 'HMSKrispPlugin',
+      getPluginType: () => HMSAudioPluginType.TRANSFORM,
+      checkSupport: () => ({ isSupported: true }),
+      isSupported: () => true,
+      init: jest.fn(async () => {}),
+      processAudioTrack: jest.fn(async (_context: AudioContext, source: any) => {
+        activeNode = makeNode();
+        source.connect(activeNode);
+        return activeNode as unknown as AudioNode;
+      }),
+      stop: jest.fn(() => {
+        activeNode?.disconnect();
+        activeNode = undefined;
+      }),
+    };
+    return { track, sender, plugin, eventBus };
+  };
+
+  beforeEach(() => {
+    (global as any).MediaStream = jest.fn(tracks => ({ tracks }));
+    audioContext.createMediaStreamSource.mockImplementation(stream => makeNode(stream.tracks[0]));
+    audioContext.createMediaStreamDestination.mockImplementation(() => {
+      const destination = makeNode();
+      const output = Object.assign(makeCapturingTrack('processed'), { graph: destination });
+      return { ...destination, stream: { getAudioTracks: () => [output] } };
+    });
+    getAudioTrackMock.mockReset();
+    getAudioTrackMock.mockImplementation(async settings => makeCapturingTrack(settings.deviceId));
+  });
+
+  it('rebuilds from recovered capture while preserving the original device error', async () => {
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      expect(hasLiveAudio(sender.track.graph)).toBe(true);
+      const error = new Error('device unavailable');
+      getAudioTrackMock.mockRejectedValueOnce(error).mockResolvedValueOnce(makeCapturingTrack('fallback'));
+
+      await expect(track.setSettings({ deviceId: 'unavailable' })).rejects.toBe(error);
+      expect(track.nativeTrack.id).toBe('fallback');
+      expect(sender.track).toBe(track.getTrackBeingSent());
+      expect(hasLiveAudio(sender.track.graph)).toBe(true);
+      expect(plugin.init).toHaveBeenCalledTimes(2);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it('keeps recovered native audio live if rebuilding the plugin also fails', async () => {
+    const { track, sender, plugin, eventBus } = setup();
+    const failed = jest.fn();
+    eventBus.audioPluginFailed.subscribe(failed);
+    try {
+      await track.addPlugin(plugin);
+      const error = new Error('device unavailable');
+      const pluginError = new Error('filter creation failed');
+      getAudioTrackMock.mockRejectedValueOnce(error).mockResolvedValueOnce(makeCapturingTrack('fallback'));
+      plugin.processAudioTrack.mockRejectedValueOnce(pluginError);
+
+      await expect(track.setSettings({ deviceId: 'unavailable' })).rejects.toBe(error);
+      expect(sender.track).toBe(track.nativeTrack);
+      expect(sender.track.readyState).toBe('live');
+      expect(failed).toHaveBeenCalledWith(pluginError);
+      expect(track.getPlugins()).toEqual([]);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it.each(['init', 'processAudioTrack'] as const)(
+    'publishes the latest live microphone after three overlapping switches during %s',
+    async pendingStep => {
+      const { track, sender, plugin } = setup();
+      let release!: () => void;
+      const pending = new Promise<void>(resolve => (release = resolve));
+      const switches: Promise<void>[] = [];
+      try {
+        await track.addPlugin(plugin);
+        expect(hasLiveAudio(sender.track.graph)).toBe(true);
+        if (pendingStep === 'init') {
+          plugin.init.mockImplementationOnce(() => pending);
+        } else {
+          const process = plugin.processAudioTrack.getMockImplementation()!;
+          plugin.processAudioTrack.mockImplementationOnce(async (context, source) => {
+            await pending;
+            return process(context, source);
+          });
+        }
+
+        for (const deviceId of ['mic-2', 'mic-3', 'mic-4']) {
+          switches.push(track.setSettings({ deviceId }));
+          await new Promise(resolve => setTimeout(resolve, 0));
+          expect(sender.track).toBe(track.nativeTrack);
+          expect(sender.track.id).toBe(deviceId);
+          expect(sender.track.readyState).toBe('live');
+        }
+        // The queued switches must not stop a plugin whose rebuild is still pending.
+        expect(plugin.stop).toHaveBeenCalledTimes(1);
+        release();
+        await Promise.all(switches);
+
+        expect(track.nativeTrack.id).toBe('mic-4');
+        expect(sender.track).toBe(track.getTrackBeingSent());
+        expect(sender.track.readyState).toBe('live');
+        expect(hasLiveAudio(sender.track.graph)).toBe(true);
+        expect(plugin.processAudioTrack).toHaveBeenLastCalledWith(
+          audioContext,
+          expect.objectContaining({ source: track.nativeTrack }),
+        );
+        expect(plugin.init).toHaveBeenCalledTimes(4);
+      } finally {
+        release();
+        await Promise.allSettled(switches);
+        await track.cleanup();
+      }
+    },
+  );
 });
