@@ -47,6 +47,37 @@ const makePlugin = ({
 };
 
 describe('HMSAudioPluginsManager with an add in flight', () => {
+  it.each(['init', 'processAudioTrack'] as const)('releases restarted resources when %s fails', async failedStep => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin } = makePlugin();
+    let resourcesLive = false;
+    plugin.init.mockImplementation(async () => {
+      resourcesLive = true;
+    });
+    plugin.stop.mockImplementation(() => {
+      resourcesLive = false;
+    });
+    await manager.addPlugin(plugin);
+
+    plugin[failedStep].mockImplementationOnce(async () => {
+      resourcesLive = true;
+      throw new Error('restart failed');
+    });
+    await expect(manager.reprocessPlugins()).rejects.toThrow(/failed/);
+
+    expect(resourcesLive).toBe(false);
+    expect(plugin.stop).toHaveBeenCalledTimes(2);
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+
+    // The failed startup must also leave the queue and plugin usable for another attempt.
+    await manager.addPlugin(plugin);
+    expect(manager.getPlugins()).toEqual(['FakePlugin']);
+    await manager.cleanup();
+    expect(resourcesLive).toBe(false);
+  });
+
   it.each(['init', 'processAudioTrack'] as const)(
     'publishes native audio while a device switch waits for plugin %s',
     async pendingStep => {

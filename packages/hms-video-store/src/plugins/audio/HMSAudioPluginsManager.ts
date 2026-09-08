@@ -173,7 +173,7 @@ export class HMSAudioPluginsManager {
    * ones it must not be stopped first, and it is only registered once it is running.
    */
   private async rebuildGraph(added?: HMSAudioPlugin) {
-    const running = await this.stopGraph();
+    await this.stopGraph();
     if (this.disposed) {
       return;
     }
@@ -186,7 +186,7 @@ export class HMSAudioPluginsManager {
     let failure: Error | undefined;
     if (plugins.length > 0) {
       this.initAudioNodes();
-      failure = await this.startPlugins(plugins, running);
+      failure = await this.startPlugins(plugins);
       if (this.disposed) {
         // startPlugins unwound what it had started, a cleanup published the native track already
         return;
@@ -206,13 +206,10 @@ export class HMSAudioPluginsManager {
       await this.updateProcessedTrack(undefined);
     }
     // a plugin cannot be re-inited while it is still running
-    const running = new Set<string>();
-    for (const [name, plugin] of this.pluginsMap) {
+    for (const plugin of this.pluginsMap.values()) {
       plugin.stop();
-      running.add(name);
     }
     this.disconnectNodes();
-    return running;
   }
 
   /** publishes the rebuilt graph, or goes back to the native track if nothing is left in it */
@@ -230,9 +227,8 @@ export class HMSAudioPluginsManager {
   /**
    * Starts and chains every plugin in order, dropping the ones that fail. Returns the first failure
    * so the caller can report it after the graph is up.
-   * @param running names that were wired into the old graph, and so are already stopped
    */
-  private async startPlugins(plugins: HMSAudioPlugin[], running: Set<string>) {
+  private async startPlugins(plugins: HMSAudioPlugin[]) {
     let failure: Error | undefined;
     for (const plugin of plugins) {
       const name = plugin.getName?.();
@@ -240,10 +236,6 @@ export class HMSAudioPluginsManager {
         await this.startPlugin(plugin);
       } catch (err) {
         HMSLogger.e(this.TAG, `failed to start plugin ${name}, dropping it`, err);
-        if (!running.has(name)) {
-          // nothing stopped this one on the way in
-          plugin.stop();
-        }
         this.unregister(name);
         failure = failure || (err as Error);
         continue;
@@ -278,20 +270,24 @@ export class HMSAudioPluginsManager {
     // re-added on every rebuild so a failure is reported against a live analytics record
     this.analytics.added(name, this.audioContext!.sampleRate);
     this.validateAndThrow(name, plugin);
-    await this.analytics.initWithTime(name, async () => plugin.init());
-    if (this.disposed) {
-      // do not hand a node to a graph that is being torn down, startPlugins stops the plugin
-      return;
-    }
-    const currentNode = await plugin.processAudioTrack(
-      this.audioContext!, // it is always present at this point
-      this.prevAudioNode || this.sourceNode,
-    );
-    if (this.prevAudioNode) {
+    try {
+      await this.analytics.initWithTime(name, async () => plugin.init());
+      if (this.disposed) {
+        // do not hand a node to a graph that is being torn down, startPlugins stops the plugin
+        return;
+      }
+      const currentNode = await plugin.processAudioTrack(
+        this.audioContext!, // it is always present at this point
+        this.prevAudioNode || this.sourceNode,
+      );
       // the previous plugin was the end of the chain, extend it with this one
-      this.prevAudioNode.connect(currentNode);
+      this.prevAudioNode?.connect(currentNode);
+      this.prevAudioNode = currentNode;
+    } catch (err) {
+      // This startup may own resources even if an earlier instance was already stopped.
+      plugin.stop();
+      throw err;
     }
-    this.prevAudioNode = currentNode;
   }
 
   // private: it runs per plugin inside a rebuild, its failure only drops that plugin
