@@ -152,8 +152,7 @@ export class HMSAudioPluginsManager {
   private serialize<T>(task: () => Promise<T>): Promise<T> {
     const run = this.queue.then(task);
     this.queue = run.catch(err => {
-      // a failed task must not block the next one. every caller consumes run today, this only fires
-      // for one that does not
+      // Keep the queue usable after a failed task; callers still receive the rejection through run.
       HMSLogger.w(this.TAG, 'queued plugin task failed', err);
     });
     return run;
