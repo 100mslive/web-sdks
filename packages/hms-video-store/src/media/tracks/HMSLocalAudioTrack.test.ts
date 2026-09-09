@@ -564,6 +564,31 @@ describe('HMSLocalAudioTrack device switches with active noise cancellation', ()
     }
   });
 
+  // the graph teardown on this path is best effort: it runs on the way to the device error the app
+  // is waiting for, so a failed sender swap must neither replace that error nor be left half done
+  it('still surfaces the device error when releasing the plugin graph fails', async () => {
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      const denied = Object.assign(new Error('permission denied'), {
+        code: ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+      });
+      getAudioTrackMock.mockRejectedValueOnce(denied);
+      const empty = Object.assign(makeCapturingTrack('empty'), { label: 'MediaStreamAudioDestinationNode' });
+      audioContext.createMediaStreamDestination.mockImplementationOnce(() => ({
+        ...makeNode(),
+        stream: { getAudioTracks: () => [empty] },
+      }));
+      sender.replaceTrack.mockRejectedValueOnce(new Error('sender is gone'));
+
+      await expect(track.setSettings({ deviceId: 'denied' })).rejects.toBe(denied);
+      // and Krisp is not left processing the mic that has already been stopped
+      expect(plugin.stop).toHaveBeenCalled();
+    } finally {
+      await track.cleanup();
+    }
+  });
+
   it.each(['init', 'processAudioTrack'] as const)(
     'publishes the latest live microphone after three overlapping switches during %s',
     async pendingStep => {

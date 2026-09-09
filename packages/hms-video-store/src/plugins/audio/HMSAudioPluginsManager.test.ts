@@ -559,6 +559,44 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     expect(manager.getPlugins()).toEqual([]);
   });
 
+  /**
+   * A bypassed graph is invisible client side - TrackAudioLevelMonitor reads nativeTrack, so the
+   * local meter and localAudioSilence both show a healthy mic - which makes the SDK's own state the
+   * app's only signal that noise cancellation is not actually running.
+   */
+  it('drops the plugins when the built chain cannot be published', async () => {
+    const track = makeTrack();
+    const eventBus = new EventBus();
+    const failures = collectFailures(eventBus);
+    const manager = new HMSAudioPluginsManager(track, eventBus);
+    const { plugin } = makePlugin();
+    // a node belonging to another audio context cannot be connected to our destination
+    plugin.processAudioTrack.mockImplementationOnce(async () => ({ ...node(), context: 'other' }));
+
+    await expect(manager.addPlugin(plugin)).rejects.toMatchObject({ code: 7003, name: 'ProcessingFailed' });
+    expect(plugin.stop).toHaveBeenCalled();
+    expect(manager.getPlugins()).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+    // the add's own failure rejects it, it does not also go out as an event
+    expect(failures).toEqual([]);
+  });
+
+  // nothing publishes a krisp.stop for a plugin that never started, so a start here stays unmatched
+  it('does not publish krisp.start for an add that fails', async () => {
+    const eventBus = new EventBus();
+    const events: string[] = [];
+    eventBus.analytics.subscribe(event => events.push(event.name));
+    const manager = new HMSAudioPluginsManager(makeTrack(), eventBus, { isNoiseCancellationEnabled: true } as any);
+    const { plugin } = makePlugin({ name: 'HMSKrispPlugin' });
+    plugin.init.mockImplementationOnce(async () => {
+      throw new Error('model load failed');
+    });
+
+    await expect(manager.addPlugin(plugin)).rejects.toMatchObject({ code: 7002, name: 'InitFailed' });
+    expect(events).not.toContain('krisp.start');
+    await manager.cleanup();
+  });
+
   it('drops Krisp on reprocess once the room no longer allows noise cancellation', async () => {
     const track = makeTrack();
     const room = { isNoiseCancellationEnabled: true } as any;

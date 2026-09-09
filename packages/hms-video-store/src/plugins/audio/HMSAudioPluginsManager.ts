@@ -37,6 +37,15 @@ export class HMSAudioPluginsManager {
   private analytics: AudioPluginsAnalytics;
   // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
+  /**
+   * Best effort, not mutual exclusion. It is read at call time but set inside the task, so two adds
+   * in the same tick both see false and both get queued - the queue, not this flag, is what keeps
+   * them from interleaving. 7004 therefore only refuses an add that arrives once an earlier one is
+   * actually running, and whether a second add is refused or queued depends on the timing.
+   *
+   * Deliberate: covering the time a task spends queued behind a reprocess would refuse unrelated
+   * adds instead, which is the worse failure. See the queued-adds test.
+   */
   private pluginAddInProgress = false;
   private room?: Room;
   /**
@@ -46,6 +55,13 @@ export class HMSAudioPluginsManager {
    * three are the only entry points that take this queue, and rebuildGraph - the only thing that
    * builds the graph - only ever runs inside one of their tasks, so there is no queueing to
    * duplicate. cleanup is the one exception, it tears the graph down unqueued, see disposed.
+   *
+   * It does not serialize against the native track swap itself: HMSLocalAudioTrack.updateTrack
+   * assigns nativeTrack outside this queue, so a rebuild already in flight may have snapshotted the
+   * old, now stopped track in initAudioNodes and go on to publish silence. What bounds that is the
+   * reprocess for the new track being queued behind that rebuild: the silence lasts the in flight
+   * add's remaining init, at most AUDIO_PLUGIN_CALL_TIMEOUT, and the reprocess then rebuilds
+   * against the new track. Keep that reprocess queued rather than immediate.
    */
   private queue: Promise<unknown> = Promise.resolve();
   /**
@@ -86,8 +102,7 @@ export class HMSAudioPluginsManager {
     }
 
     await this.serialize(async () => {
-      // set inside the task: the flag is the app facing "an add is running" guard, it must not also
-      // cover the time this task spends queued behind a reprocess, or an unrelated add gets 7004
+      // set inside the task, not at call time - see the field
       this.pluginAddInProgress = true;
       try {
         this.throwIfDisposedForAdd(plugin);
@@ -95,14 +110,22 @@ export class HMSAudioPluginsManager {
           HMSLogger.w(this.TAG, `plugin - ${name} already added.`);
           return;
         }
-        if (name === 'HMSKrispPlugin' && this.room?.isNoiseCancellationEnabled) {
-          // one per app enable: neither a rebuild re-adding the plugin nor an add of a plugin that
-          // is already running is a new start, and krisp.stop is only published for a real removal
-          this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
-        }
         // @ts-ignore
         plugin.setEventBus?.(this.eventBus);
         await this.rebuildGraph(plugin);
+        if (name === 'HMSKrispPlugin' && this.room?.isNoiseCancellationEnabled) {
+          /**
+           * One per app enable, published only once the plugin is actually running: a rebuild
+           * re-adding it is not a new start, an add of a plugin that is already running returned
+           * above, and krisp.stop is only published for a real removal.
+           *
+           * After the rebuild rather than before it, because a failed add can never be matched by a
+           * stop: cleanup does not publish one, and removePlugin early returns for a plugin that
+           * startPlugins has already unregistered. Publishing first made every failed enable a
+           * permanent unmatched start.
+           */
+          this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
+        }
       } finally {
         this.pluginAddInProgress = false;
       }
@@ -230,7 +253,7 @@ export class HMSAudioPluginsManager {
       }
     }
 
-    await this.publishGraph();
+    await this.publishGraph(failures);
     this.reportFailures(failures, added);
     this.throwIfDisposedForAdd(added);
   }
@@ -247,7 +270,8 @@ export class HMSAudioPluginsManager {
     for (const [name, failure] of failures) {
       if (name === requested) {
         own = failure;
-      } else {
+      } else if (!this.disposed) {
+        // the track this would be reported against is already gone
         this.eventBus.audioPluginFailed.publish(failure);
       }
     }
@@ -265,34 +289,62 @@ export class HMSAudioPluginsManager {
   }
 
   private async stopGraph() {
-    if (this.outputTrack) {
-      // Keep native audio publishing while the replacement graph initializes.
-      await this.updateProcessedTrack(undefined);
+    try {
+      if (this.outputTrack) {
+        // Keep native audio publishing while the replacement graph initializes.
+        await this.updateProcessedTrack(undefined);
+      }
+    } finally {
+      // Even if that publish failed. A plugin cannot be re-inited while it is still running, and
+      // releaseGraph reaches this on the way to a device error - abandoning the teardown there
+      // would leave Krisp processing the mic that has just been stopped, which is what it is for.
+      for (const [name, plugin] of this.pluginsMap) {
+        this.stopPlugin(name, plugin, 'before rebuild');
+        // Record this usage interval before restarting the plugin resets its timestamp.
+        this.analytics.removed(name);
+      }
+      this.disconnectNodes();
     }
-    // a plugin cannot be re-inited while it is still running
-    for (const [name, plugin] of this.pluginsMap) {
-      this.stopPlugin(name, plugin, 'before rebuild');
-      // Record this usage interval before restarting the plugin resets its timestamp.
-      this.analytics.removed(name);
-    }
-    this.disconnectNodes();
   }
 
-  /** publishes the rebuilt graph, or goes back to the native track if there is nothing to publish */
-  private async publishGraph() {
+  /**
+   * publishes the rebuilt graph, or goes back to the native track if there is nothing to publish.
+   *
+   * @param failures the rebuild's failure map, added to if the built chain cannot be published.
+   * The plugins are dropped in that case, so the caller reports it like a failure to start.
+   */
+  private async publishGraph(failures: Map<string, HMSException>) {
+    // defensive: rebuildGraph, the only caller, already checked and nothing awaits in between. The
+    // check below is the load bearing one, a teardown can land inside the publish itself.
     if (this.disposed) {
       return;
     }
-    if (this.pluginsMap.size > 0 && this.connectToDestination()) {
-      await this.updateProcessedTrack(this.outputTrack);
-      if (this.disposed) {
-        // cleanup already published native; this publish may have landed after it
-        await this.updateProcessedTrack(undefined).catch(() => {});
+    if (this.pluginsMap.size > 0) {
+      if (this.connectToDestination()) {
+        await this.updateProcessedTrack(this.outputTrack);
+        if (this.disposed) {
+          // cleanup already published native; this publish may have landed after it
+          await this.updateProcessedTrack(undefined).catch(() => {});
+        }
+        return;
       }
-      return;
-    }
-    if (this.disposed) {
-      return;
+      /**
+       * The chain was built but cannot feed what we publish, so the native track is what goes out.
+       * Drop the plugins rather than leave them started and registered: no client side check can
+       * see the bypass - the level monitor reads the mic, not the graph - so getPlugins() reporting
+       * Krisp as on with no audioPluginFailed would be the app's only, wrong, signal.
+       */
+      const failure = ErrorFactory.MediaPluginErrors.ProcessingFailed(
+        HMSAction.AUDIO_PLUGINS,
+        'plugin output could not be connected to the published track',
+      );
+      for (const [name, plugin] of Array.from(this.pluginsMap)) {
+        this.stopPlugin(name, plugin, 'on failed publish');
+        // before unregister ends the usage interval, as on a failure to start
+        this.analytics.failure(name, failure);
+        this.unregister(name);
+        failures.set(name, failure);
+      }
     }
     HMSLogger.i(this.TAG, 'no plugin output to publish, going back to the native track');
     this.disconnectNodes();
@@ -387,7 +439,7 @@ export class HMSAudioPluginsManager {
    * subscribed to it, so it is consumed here rather than surfacing as an unhandled one - but a late
    * resolution is not undone.
    *
-   * ponytail: so a call that allocates after startPlugin has already stopped the plugin leaks that
+   * TODO: so a call that allocates after startPlugin has already stopped the plugin leaks that
    * for the page lifetime. One model instance, never connected to the graph and never reading the
    * mic, on a path that needs a 30s hang to reach at all. Stopping the plugin when the late call
    * lands is what this looks like it wants, but a subsequent add may have restarted that same

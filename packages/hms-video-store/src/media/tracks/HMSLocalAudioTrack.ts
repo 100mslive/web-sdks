@@ -265,9 +265,16 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const isSilentPlaceholder = isEmptyTrack(track);
     if (isSilentPlaceholder) {
       // drop the running graph (Krisp keeps processing a stopped mic otherwise) but do not
-      // rebuild against the oscillator — plugins stay registered for the next real capture
-      await this.pluginsManager.releaseGraph();
-      await this.setProcessedTrack(undefined);
+      // rebuild against the oscillator — plugins stay registered for the next real capture.
+      // Best effort: the only caller of this branch is about to throw the device error the app
+      // needs to see, and both calls below reach sender.replaceTrack, so a failed swap here must
+      // not take its place. updateProcessedTrack already logs the underlying failure at error.
+      try {
+        await this.pluginsManager.releaseGraph();
+        await this.setProcessedTrack(undefined);
+      } catch (e) {
+        HMSLogger.w(this.TAG, 'could not release the plugin graph for the silent placeholder', e);
+      }
     } else {
       await this.replaceSenderTrack();
     }
