@@ -437,6 +437,30 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
   });
 
+  it('drops a plugin whose support check throws without costing a running plugin its graph', async () => {
+    const track = makeTrack();
+    const eventBus = new EventBus();
+    const failures = collectFailures(eventBus);
+    const manager = new HMSAudioPluginsManager(track, eventBus);
+    const { plugin: running } = makePlugin({ name: 'Running' });
+    const { plugin: broken } = makePlugin({ name: 'Broken' });
+    (broken as any).checkSupport = () => {
+      throw new Error('support check blew up');
+    };
+
+    await manager.addPlugin(running);
+    await expect(manager.addPlugin(broken)).rejects.toMatchObject({
+      code: 7003,
+      description: 'support check blew up',
+    });
+
+    // this rebuild had already dismantled the running plugin's graph, so it has to publish the one
+    // it rebuilt: an untyped failure must not escape past that on its way to analytics
+    expect(manager.getPlugins()).toEqual(['Running']);
+    expect(failures).toEqual([]);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
+  });
+
   it('drops a plugin that hands back no audio node instead of publishing an unfed graph', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());

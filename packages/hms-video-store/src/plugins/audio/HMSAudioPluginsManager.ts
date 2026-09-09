@@ -277,12 +277,16 @@ export class HMSAudioPluginsManager {
       try {
         await this.startPlugin(plugin);
       } catch (err) {
-        HMSLogger.e(this.TAG, `failed to start plugin ${name}, dropping it`, err);
+        // normalized here, where every route out of startPlugin lands: analytics.failure reads
+        // toAnalyticsProperties off it, and an untyped error would throw out of this catch and cost
+        // the healthy plugins the graph this rebuild has already dismantled
+        const failure = this.toPluginError(err);
+        HMSLogger.e(this.TAG, `failed to start plugin ${name}, dropping it`, failure);
         // before unregister ends the usage interval: otherwise this is reported as a plugin the user
         // turned off right after enabling it, and "how often does Krisp drop" stays unanswerable
-        this.analytics.failure(name, err as HMSException);
+        this.analytics.failure(name, failure);
         this.unregister(name);
-        failures.set(name, err as HMSException);
+        failures.set(name, failure);
         continue;
       }
       if (this.disposed) {
@@ -334,13 +338,14 @@ export class HMSAudioPluginsManager {
     } catch (err) {
       // This startup may own resources even if an earlier instance was already stopped.
       plugin.stop();
-      throw this.toPluginError(err);
+      throw err;
     }
   }
 
   /**
-   * Everything that leaves a plugin startup carries a code, so the app gets an error it can switch
-   * on and analytics.failure can report it. init failures are already wrapped by initWithTime.
+   * Everything a dropped plugin reports carries a code, so the app gets an error it can switch on
+   * and analytics.failure can report it. init failures are already wrapped by initWithTime, but a
+   * plugin's own checkSupport or processAudioTrack can reject with anything.
    */
   private toPluginError(err: unknown) {
     if (err instanceof HMSException) {
