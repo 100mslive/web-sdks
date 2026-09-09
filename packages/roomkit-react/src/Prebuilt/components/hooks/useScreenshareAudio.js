@@ -13,7 +13,8 @@ export const useScreenshareAudio = () => {
 
   const handleMute = useCallback(() => {
     if (!peer.isLocal) {
-      hmsActions.setVolume(!track.volume ? 100 : 0, track.id);
+      // toggles across 0, so it always reaches the SFU and can reject
+      hmsActions.setVolume(!track.volume ? 100 : 0, track.id).catch(console.error);
     } else {
       hmsActions.setEnabledTrack(track.id, !track.enabled).catch(console.error);
     }

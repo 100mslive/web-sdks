@@ -2,6 +2,7 @@ import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import HMSSubscribeConnection from './subscribeConnection';
 import JsonRpcSignal from '../../signal/jsonrpc';
 import { API_DATA_CHANNEL } from '../../utils/constants';
+import HMSLogger from '../../utils/logger';
 
 // the retry backoff sleeps on a worker timer, which fake timers do not advance
 jest.mock('../../utils/timer-utils', () => ({
@@ -501,6 +502,31 @@ describe('HMSSubscribeConnection api data channel', () => {
 
     expect(settled).toBe(true);
     await expect(promise).resolves.not.toHaveProperty('error');
+  }, 10_000);
+
+  /**
+   * The SDK runs at VERBOSE by default and beam's chrome logs are how these are diagnosed, so the
+   * reason has to be right: two of dropped()'s call sites fire on close(), which is not
+   * supersession. Saying "superseded" on every leave sends the next reader somewhere wrong.
+   */
+  it('says why a request was dropped', async () => {
+    jest.useFakeTimers();
+    const debug = jest.spyOn(HMSLogger, 'd').mockImplementation(() => undefined);
+    const pending = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+    await jest.advanceTimersByTimeAsync(10);
+
+    connection.close();
+    await jest.advanceTimersByTimeAsync(100);
+    await pending;
+
+    const reasons = debug.mock.calls.map(c => String(c[1])).filter(m => m.startsWith('Dropping'));
+    expect(reasons.some(m => m.includes('closed'))).toBe(true);
+    expect(reasons.some(m => m.includes('superseded'))).toBe(false);
   }, 10_000);
 
   /** a channel that opens after the first attempt gave up should still get the request through */
