@@ -555,6 +555,8 @@ describe('HMSLocalAudioTrack device switches with active noise cancellation', ()
       // the device error the app is waiting for, and the graph still up reads the mic that is gone
       expect(track.nativeTrack).toBe(empty);
       expect(plugin.init).toHaveBeenCalledTimes(1);
+      expect(plugin.stop).toHaveBeenCalled();
+      expect(track.getPlugins()).toEqual(['HMSKrispPlugin']);
       expect(sender.track).toBe(empty);
       expect(track.getTrackBeingSent()).toBe(empty);
     } finally {

@@ -103,7 +103,7 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
         now = 62000;
         expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(1000);
         release(node());
-        await add;
+        await expect(add).rejects.toMatchObject({ description: 'cannot add plugin after cleanup' });
         now = 122000;
         expect(usage.getPluginUsage('HMSKrispPlugin')).toBe(1000);
       } finally {
@@ -261,6 +261,60 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
   });
 
+  it('does not publish plugin output after cleanup once the rebuilt graph is ready', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin } = makePlugin();
+    await manager.addPlugin(plugin);
+
+    let release!: () => void;
+    track.setProcessedTrack.mockImplementation(async (processed?: { id?: string }) => {
+      if (processed?.id === 'processed') {
+        await new Promise<void>(resolve => {
+          release = resolve;
+        });
+      }
+    });
+    const reprocess = manager.reprocessPlugins();
+    await flush();
+    await manager.cleanup();
+    release();
+    await reprocess;
+
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
+    expect(manager.getPlugins()).toEqual([]);
+  });
+
+  it('keeps rebuilding other plugins when one stop throws during reprocess', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin: first } = makePlugin({ name: 'First' });
+    const { plugin: second } = makePlugin({ name: 'Second' });
+    await manager.addPlugin(first);
+    await manager.addPlugin(second);
+    first.stop.mockImplementationOnce(() => {
+      throw new Error('stop failed');
+    });
+
+    await manager.reprocessPlugins();
+
+    expect(manager.getPlugins()).toEqual(['First', 'Second']);
+    expect(first.processAudioTrack).toHaveBeenCalledTimes(3);
+    expect(second.processAudioTrack).toHaveBeenCalledTimes(2);
+    expect(track.setProcessedTrack).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'processed' }));
+  });
+
+  it('rejects an add that only runs after cleanup', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    await manager.cleanup();
+
+    await expect(manager.addPlugin(makePlugin().plugin)).rejects.toMatchObject({
+      description: 'cannot add plugin after cleanup',
+    });
+    expect(manager.getPlugins()).toEqual([]);
+  });
+
   it('does not tear the plugin down under an add that is still in progress', async () => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
@@ -315,7 +369,7 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
 
     // the add resumes on a torn down manager and must not resurrect the plugin
     release();
-    await add;
+    await expect(add).rejects.toMatchObject({ description: 'cannot add plugin after cleanup' });
     expect(plugin.stop).toHaveBeenCalledTimes(1);
     expect(plugin.processAudioTrack).not.toHaveBeenCalled();
     expect(manager.getPlugins()).toEqual([]);
@@ -497,7 +551,8 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     const published = track.setProcessedTrack.mock.calls.length;
 
     release();
-    await Promise.all([add, ...queued]);
+    await expect(add).rejects.toMatchObject({ description: 'cannot add plugin after cleanup' });
+    await Promise.all(queued);
     // whatever was already queued must unwind, not publish onto the graph cleanup tore down
     expect(track.setProcessedTrack.mock.calls.length).toBe(published);
     expect(manager.getPlugins()).toEqual([]);

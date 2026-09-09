@@ -89,6 +89,7 @@ export class HMSAudioPluginsManager {
       // cover the time this task spends queued behind a reprocess, or an unrelated add gets 7004
       this.pluginAddInProgress = true;
       try {
+        this.throwIfDisposedForAdd(plugin);
         if (this.pluginsMap.has(name)) {
           HMSLogger.w(this.TAG, `plugin - ${name} already added.`);
           return;
@@ -122,7 +123,7 @@ export class HMSAudioPluginsManager {
       if (name === 'HMSKrispPlugin') {
         this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
       }
-      plugin.stop();
+      this.stopPlugin(name, plugin, 'on remove');
       this.unregister(name);
       // the graph is rebuilt from what is left: there is no way to splice one plugin's nodes out
       await this.rebuildGraph();
@@ -138,11 +139,7 @@ export class HMSAudioPluginsManager {
   async cleanup() {
     this.disposed = true;
     for (const [name, plugin] of Array.from(this.pluginsMap)) {
-      try {
-        plugin.stop();
-      } catch (err) {
-        HMSLogger.e(this.TAG, `error in stopping plugin ${name} at teardown`, err);
-      }
+      this.stopPlugin(name, plugin, 'at teardown');
       this.unregister(name);
     }
     // Startup opens usage before registration and may still be pending at teardown.
@@ -159,6 +156,21 @@ export class HMSAudioPluginsManager {
 
   async reprocessPlugins() {
     await this.serialize(() => this.rebuildGraph());
+  }
+
+  /**
+   * Stop every running plugin and drop the node graph, but leave pluginsMap intact so a later
+   * reprocess can re-attach them. Used when capture is replaced with the silent empty track:
+   * rebuilding against that oscillator would only delay the device error, but skipping teardown
+   * entirely left Krisp processing the mic that had just been stopped.
+   */
+  async releaseGraph() {
+    await this.serialize(async () => {
+      if (this.disposed) {
+        return;
+      }
+      await this.stopGraph();
+    });
   }
 
   private serialize<T>(task: () => Promise<T>): Promise<T> {
@@ -189,6 +201,7 @@ export class HMSAudioPluginsManager {
     }
     await this.stopGraph();
     if (this.disposed) {
+      this.throwIfDisposedForAdd(added);
       return;
     }
 
@@ -204,12 +217,14 @@ export class HMSAudioPluginsManager {
       if (this.disposed) {
         // startPlugins unwound what it had started, a cleanup published the native track already
         this.reportFailures(failures, added);
+        this.throwIfDisposedForAdd(added);
         return;
       }
     }
 
     await this.publishGraph();
     this.reportFailures(failures, added);
+    this.throwIfDisposedForAdd(added);
   }
 
   /**
@@ -248,7 +263,7 @@ export class HMSAudioPluginsManager {
     }
     // a plugin cannot be re-inited while it is still running
     for (const [name, plugin] of this.pluginsMap) {
-      plugin.stop();
+      this.stopPlugin(name, plugin, 'before rebuild');
       // Record this usage interval before restarting the plugin resets its timestamp.
       this.analytics.removed(name);
     }
@@ -257,8 +272,18 @@ export class HMSAudioPluginsManager {
 
   /** publishes the rebuilt graph, or goes back to the native track if there is nothing to publish */
   private async publishGraph() {
+    if (this.disposed) {
+      return;
+    }
     if (this.pluginsMap.size > 0 && this.connectToDestination()) {
       await this.updateProcessedTrack(this.outputTrack);
+      if (this.disposed) {
+        // cleanup already published native; this publish may have landed after it
+        await this.updateProcessedTrack(undefined).catch(() => {});
+      }
+      return;
+    }
+    if (this.disposed) {
       return;
     }
     HMSLogger.i(this.TAG, 'no plugin output to publish, going back to the native track');
@@ -295,7 +320,7 @@ export class HMSAudioPluginsManager {
          * this plugin finished starting after it ran, so it is running again and ours to stop.
          */
         HMSLogger.w(this.TAG, `torn down while starting ${name}, dropping the graph`);
-        plugin.stop();
+        this.stopPlugin(name, plugin, 'after teardown during start');
         this.unregister(name);
         this.disconnectNodes();
         return failures;
@@ -347,6 +372,21 @@ export class HMSAudioPluginsManager {
    * and analytics.failure can report it. init failures are already wrapped by initWithTime, but a
    * plugin's own checkSupport or processAudioTrack can reject with anything.
    */
+  private stopPlugin(name: string, plugin: HMSAudioPlugin, when: string) {
+    try {
+      plugin.stop();
+    } catch (err) {
+      HMSLogger.e(this.TAG, `error in stopping plugin ${name} ${when}`, err);
+    }
+  }
+
+  private throwIfDisposedForAdd(added?: HMSAudioPlugin) {
+    if (!this.disposed || !added) {
+      return;
+    }
+    throw ErrorFactory.MediaPluginErrors.ProcessingFailed(HMSAction.AUDIO_PLUGINS, 'cannot add plugin after cleanup');
+  }
+
   private toPluginError(err: unknown) {
     if (err instanceof HMSException) {
       return err;

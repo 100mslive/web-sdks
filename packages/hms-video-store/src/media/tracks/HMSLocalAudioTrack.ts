@@ -264,6 +264,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      */
     const isSilentPlaceholder = isEmptyTrack(track);
     if (isSilentPlaceholder) {
+      // drop the running graph (Krisp keeps processing a stopped mic otherwise) but do not
+      // rebuild against the oscillator — plugins stay registered for the next real capture
+      await this.pluginsManager.releaseGraph();
       await this.setProcessedTrack(undefined);
     } else {
       await this.replaceSenderTrack();
