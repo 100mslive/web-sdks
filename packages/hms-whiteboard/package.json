@@ -29,6 +29,7 @@
     "build": "node ../../scripts/build.js && yarn types:build",
     "types:build": "tsc -p tsconfig.json",
     "build:proto": "protoc --ts_opt long_type_string  --ts_out ./src/grpc -I=./proto proto/*proto",
+    "test": "jest --maxWorkers=1",
     "lint": "eslint -c .eslintrc src",
     "lint:fix": "eslint -c .eslintrc src --fix",
     "format": "prettier -w src/**"
