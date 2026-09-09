@@ -20,35 +20,58 @@ export class WhiteboardManager {
   }
 
   private async handleWhiteboardUpdate(notification: WhiteboardInfo) {
-    const localPeer = this.store.getLocalPeer();
     const prev = this.store.getWhiteboard(notification.id);
-    const isOwner = notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId;
-    const open = notification.state === 'open';
-    const whiteboard: HMSWhiteboard = {
-      id: notification.id,
-      title: notification.title,
-      attributes: notification.attributes,
-    };
-    whiteboard.open = isOwner ? prev?.open : open;
-    whiteboard.owner = whiteboard.open ? notification.owner : undefined;
+    const isOwner = this.isOwnedLocally(notification, prev);
+    const whiteboard = this.buildWhiteboard(notification, prev, isOwner);
 
     if (whiteboard.open) {
       if (isOwner) {
-        whiteboard.url = prev?.url;
-        whiteboard.token = prev?.token;
-        whiteboard.addr = prev?.addr;
-        whiteboard.permissions = prev?.permissions;
+        Object.assign(whiteboard, this.reuseLocalAccess(prev));
       } else {
-        const response = await this.transport.signal.getWhiteboard({ id: notification.id });
-        whiteboard.url = constructWhiteboardURL(response.token, response.addr, this.store.getEnv());
-        whiteboard.token = response.token;
-        whiteboard.addr = response.addr;
-        whiteboard.permissions = response.permissions;
-        whiteboard.open = response.permissions.length > 0;
+        Object.assign(whiteboard, await this.fetchAccess(notification.id));
       }
     }
 
     this.store.setWhiteboard(whiteboard);
     this.listener?.onWhiteboardUpdate(whiteboard);
+  }
+
+  /**
+   * `owner` is a customerUserId, which duplicate tabs of the same user share, so it can't identify
+   * this client alone - only prior local state proves we're the peer that opened the whiteboard.
+   */
+  private isOwnedLocally(notification: WhiteboardInfo, prev?: HMSWhiteboard) {
+    if (!prev) {
+      return false;
+    }
+    const localPeer = this.store.getLocalPeer();
+    return notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId;
+  }
+
+  private buildWhiteboard(notification: WhiteboardInfo, prev: HMSWhiteboard | undefined, isOwner: boolean) {
+    // The owner's local state wins, so a remote update can't reopen a board it just closed.
+    const open = isOwner ? prev?.open : notification.state === 'open';
+    return {
+      id: notification.id,
+      title: notification.title,
+      attributes: notification.attributes,
+      open,
+      owner: open ? notification.owner : undefined,
+    } as HMSWhiteboard;
+  }
+
+  private reuseLocalAccess(prev?: HMSWhiteboard) {
+    return { url: prev?.url, token: prev?.token, addr: prev?.addr, permissions: prev?.permissions };
+  }
+
+  private async fetchAccess(id: string) {
+    const response = await this.transport.signal.getWhiteboard({ id });
+    return {
+      url: constructWhiteboardURL(response.token, response.addr, this.store.getEnv()),
+      token: response.token,
+      addr: response.addr,
+      permissions: response.permissions,
+      open: response.permissions.length > 0,
+    };
   }
 }
