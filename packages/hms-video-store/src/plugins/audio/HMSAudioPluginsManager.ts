@@ -164,6 +164,13 @@ export class HMSAudioPluginsManager {
    * reprocess can re-attach them. Used when capture is replaced with the silent empty track:
    * rebuilding against that oscillator would only delay the device error, but skipping teardown
    * entirely left Krisp processing the mic that had just been stopped.
+   *
+   * Queued like the rest, so it is not immediate: behind an in-flight rebuild it waits - bounded by
+   * the plugin call timeout - and Krisp keeps running for that whole wait, which is the thing this
+   * is here to cut short. updateTrack awaits it too, so the device error the caller is about to
+   * throw is held up by the same amount. It stays queued anyway: tearing the graph down outside the
+   * queue would do it under a task that is mid-rebuild, which is the race the queue exists for, and
+   * the wait only costs cpu on a mic that has already stopped producing audio.
    */
   async releaseGraph() {
     await this.serialize(async () => {
@@ -376,8 +383,17 @@ export class HMSAudioPluginsManager {
    * track: no device switch, no unmute after an interruption, and no way to turn the plugin off.
    * Time it out instead and let the caller drop just that plugin.
    *
-   * The loser of the race keeps running and may still reject; race() has already subscribed to it,
-   * so that rejection is consumed here and does not surface as an unhandled one.
+   * The loser of the race keeps running. A late rejection is harmless - race() has already
+   * subscribed to it, so it is consumed here rather than surfacing as an unhandled one - but a late
+   * resolution is not undone.
+   *
+   * ponytail: so a call that allocates after startPlugin has already stopped the plugin leaks that
+   * for the page lifetime. One model instance, never connected to the graph and never reading the
+   * mic, on a path that needs a 30s hang to reach at all. Stopping the plugin when the late call
+   * lands is what this looks like it wants, but a subsequent add may have restarted that same
+   * instance by then and it would stop working noise cancellation instead. Upgrade path if the leak
+   * ever shows up: tag each start with an id and only stop the late arrival if its id is still
+   * current.
    */
   private async callPlugin<T>(name: string, what: string, call: () => Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout>;
