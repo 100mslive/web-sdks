@@ -21,7 +21,9 @@ export class WhiteboardManager {
 
   private async handleWhiteboardUpdate(notification: WhiteboardInfo) {
     const prev = this.store.getWhiteboard(notification.id);
-    const isOwner = this.isOwnedLocally(notification, prev);
+    // Only this client calling open() sets isLocalOwner - `owner` is a customerUserId and is
+    // shared by every tab of the same user, so it cannot tell us apart from a duplicate tab.
+    const isOwner = !!prev?.isLocalOwner;
     const whiteboard = this.buildWhiteboard(notification, prev, isOwner);
 
     if (whiteboard.open) {
@@ -36,20 +38,8 @@ export class WhiteboardManager {
     this.listener?.onWhiteboardUpdate(whiteboard);
   }
 
-  /**
-   * `owner` is a customerUserId, which duplicate tabs of the same user share, so it can't identify
-   * this client alone - only prior local state proves we're the peer that opened the whiteboard.
-   */
-  private isOwnedLocally(notification: WhiteboardInfo, prev?: HMSWhiteboard) {
-    if (!prev) {
-      return false;
-    }
-    const localPeer = this.store.getLocalPeer();
-    return notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId;
-  }
-
   private buildWhiteboard(notification: WhiteboardInfo, prev: HMSWhiteboard | undefined, isOwner: boolean) {
-    // The owner's local state wins, so a remote update can't reopen a board it just closed.
+    // The opener's local state wins, so a remote update can't reopen a board it just closed.
     const open = isOwner ? prev?.open : notification.state === 'open';
     return {
       id: notification.id,
@@ -57,6 +47,7 @@ export class WhiteboardManager {
       attributes: notification.attributes,
       open,
       owner: open ? notification.owner : undefined,
+      isLocalOwner: prev?.isLocalOwner,
     } as HMSWhiteboard;
   }
 
