@@ -58,11 +58,15 @@ beforeEach(() => {
   openHandles.length = 0;
   countResponse = () => Promise.resolve({ response: { count: '0' } });
   jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 });
 
 afterEach(() => {
   openHandles.forEach(close => close());
-  jest.runOnlyPendingTimers();
+  // A test that needs the real count delay swaps to real timers, so only drain fake ones.
+  if (jest.isMockFunction(setTimeout)) {
+    jest.runOnlyPendingTimers();
+  }
   jest.useRealTimers();
   jest.restoreAllMocks();
 });
@@ -146,11 +150,13 @@ describe('SessionStore.open', () => {
   });
 
   it('does not report a count failure that lands after close', async () => {
+    // Real timers: the count rejection has to settle through its own promise chain.
+    jest.useRealTimers();
     countResponse = () => Promise.reject(new Error('network error'));
     const { close, callbacks } = openSessionStore();
 
     close();
-    await jest.advanceTimersByTimeAsync(COUNT_RETRY_DELAY_MS);
+    await new Promise(resolve => setTimeout(resolve, COUNT_RETRY_DELAY_MS + 100));
 
     expect(callbacks.handleError).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
