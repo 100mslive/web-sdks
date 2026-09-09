@@ -124,6 +124,23 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     }
   });
 
+  it('publishes krisp.start on an app enable only, not on every device switch', async () => {
+    const eventBus = new EventBus();
+    const events: string[] = [];
+    eventBus.analytics.subscribe(event => events.push(event.name));
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, eventBus, { isNoiseCancellationEnabled: true } as any);
+
+    await manager.addPlugin(makePlugin({ name: 'HMSKrispPlugin' }).plugin);
+    for (const id of ['mic-2', 'mic-3']) {
+      track.nativeTrack = { id };
+      await manager.reprocessPlugins();
+    }
+
+    // main published one per rebuild too, so two mic switches reported three enables
+    expect(events.filter(name => name === 'krisp.start')).toHaveLength(1);
+  });
+
   it.each(['init', 'processAudioTrack'] as const)('releases restarted resources when %s fails', async failedStep => {
     const track = makeTrack();
     const manager = new HMSAudioPluginsManager(track, new EventBus());
@@ -174,6 +191,8 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
       expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
       expect(track.setProcessedTrack.mock.invocationCallOrder[0]).toBeLessThan(plugin.stop.mock.invocationCallOrder[0]);
       expect(oldOutput.stop).toHaveBeenCalledTimes(1);
+      // a rebuild must not unregister what it is restarting: clone() gates plugin migration on this
+      expect(manager.getPlugins()).toEqual(['FakePlugin']);
 
       release();
       await reprocess;
