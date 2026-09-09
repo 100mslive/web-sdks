@@ -564,6 +564,62 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
    * local meter and localAudioSilence both show a healthy mic - which makes the SDK's own state the
    * app's only signal that noise cancellation is not actually running.
    */
+  /**
+   * This rejection travels out of the queued task to whoever called add, remove or reprocess. Raw,
+   * a DOMException from replaceTrack reads there as an undefined code and description - nothing the
+   * app can switch on, and Prebuilt renders it as "Error: <message> - undefined".
+   */
+  it('normalises a failed sender swap into a plugin error', async () => {
+    const track = makeTrack();
+    const manager = new HMSAudioPluginsManager(track, new EventBus());
+    const { plugin } = makePlugin();
+
+    await manager.addPlugin(plugin);
+    track.setProcessedTrack.mockRejectedValueOnce(new Error('sender is gone'));
+
+    await expect(manager.reprocessPlugins()).rejects.toMatchObject({
+      code: 7003,
+      name: 'ProcessingFailed',
+      description: 'sender is gone',
+    });
+  });
+
+  // the app has to learn that init failed, not that stop did - and analytics counts the same cause
+  it('reports the init failure even when the plugin throws on stop', async () => {
+    const manager = new HMSAudioPluginsManager(makeTrack(), new EventBus());
+    const { plugin } = makePlugin();
+    plugin.init.mockImplementationOnce(async () => {
+      throw new Error('model load failed');
+    });
+    plugin.stop.mockImplementationOnce(() => {
+      throw new Error('stop blew up');
+    });
+
+    await expect(manager.addPlugin(plugin)).rejects.toMatchObject({ code: 7002, name: 'InitFailed' });
+  });
+
+  // dropping a plugin continues the loop, which used to skip the teardown check after the call
+  it('does not start the next plugin when a teardown lands during a failing start', async () => {
+    const manager = new HMSAudioPluginsManager(makeTrack(), new EventBus());
+    const { plugin: first } = makePlugin({ name: 'First' });
+    const { plugin: second } = makePlugin({ name: 'Second' });
+
+    await manager.addPlugin(first);
+    await manager.addPlugin(second);
+
+    // the mic is switched, the track is torn down inside First's re-init, and that init then fails
+    first.init.mockImplementationOnce(async () => {
+      await manager.cleanup();
+      throw new Error('init failed');
+    });
+    second.init.mockClear();
+    await manager.reprocessPlugins();
+
+    // otherwise Second gets a full init, up to the plugin call timeout, against a dead track
+    expect(second.init).not.toHaveBeenCalled();
+    expect(manager.getPlugins()).toEqual([]);
+  });
+
   it('drops the plugins when the built chain cannot be published', async () => {
     const track = makeTrack();
     const eventBus = new EventBus();

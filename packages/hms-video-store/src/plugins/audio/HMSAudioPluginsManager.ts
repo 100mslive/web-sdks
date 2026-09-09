@@ -358,6 +358,14 @@ export class HMSAudioPluginsManager {
   private async startPlugins(plugins: HMSAudioPlugin[]) {
     const failures = new Map<string, HMSException>();
     for (const plugin of plugins) {
+      if (this.disposed) {
+        // A teardown landed in an earlier plugin's start. Reached via the continue below, which
+        // skips the check after the call: without this, a dropped plugin costs the next one a full
+        // init - up to AUDIO_PLUGIN_CALL_TIMEOUT - against a track that is already gone.
+        HMSLogger.w(this.TAG, 'torn down between plugin starts, dropping the graph');
+        this.disconnectNodes();
+        return failures;
+      }
       const name = plugin.getName?.();
       try {
         await this.startPlugin(plugin);
@@ -423,8 +431,9 @@ export class HMSAudioPluginsManager {
       this.prevAudioNode?.connect(currentNode);
       this.prevAudioNode = currentNode;
     } catch (err) {
-      // This startup may own resources even if an earlier instance was already stopped.
-      plugin.stop();
+      // This startup may own resources even if an earlier instance was already stopped. Through
+      // stopPlugin, so a stop that throws cannot replace the failure we are about to report.
+      this.stopPlugin(name, plugin, 'after a failed start');
       throw err;
     }
   }
@@ -562,7 +571,10 @@ export class HMSAudioPluginsManager {
       await this.hmsTrack.setProcessedTrack(track);
     } catch (err) {
       HMSLogger.e(this.TAG, 'error in setting processed track', err);
-      throw err;
+      // the only raw throw on the queue path: this travels out through rebuildGraph to whoever
+      // called add, remove or reprocess, and a DOMException from replaceTrack reads as an undefined
+      // code and description there - the app cannot switch on it and Prebuilt renders "- undefined"
+      throw this.toPluginError(err);
     }
   }
 

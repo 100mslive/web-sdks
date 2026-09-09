@@ -584,6 +584,10 @@ describe('HMSLocalAudioTrack device switches with active noise cancellation', ()
       await expect(track.setSettings({ deviceId: 'denied' })).rejects.toBe(denied);
       // and Krisp is not left processing the mic that has already been stopped
       expect(plugin.stop).toHaveBeenCalled();
+      // the failed teardown swap must not take the sender reset with it: the retry succeeds, so the
+      // peer ends up on the placeholder rather than on the processed track disconnectNodes stopped
+      expect(sender.track).toBe(empty);
+      expect(track.getTrackBeingSent()).toBe(empty);
     } finally {
       await track.cleanup();
     }
