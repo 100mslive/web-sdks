@@ -88,13 +88,14 @@ export class SessionStore<T> {
     window.addEventListener('online', handleOnline);
 
     call.responses.onError(error => {
-      console.error('GRPCOpenStreamError: ', error);
-      // Our own teardown, not a connection failure. The signal is authoritative where the message
-      // is not: Chrome reports the abort reason before streaming starts and an AbortError after.
+      // Our own teardown, not a connection failure - closing the whiteboard ends the stream this
+      // way every time. The signal is authoritative where the message is not: Chrome reports the
+      // abort reason before streaming starts and an AbortError after.
       if (abortController.signal.aborted) {
         return;
       }
 
+      console.error('GRPCOpenStreamError: ', error);
       handleError(error);
 
       const nextState: BackoffState = {
@@ -118,6 +119,10 @@ export class SessionStore<T> {
         handleOpen(count ? initialValues : []);
       })
       .catch(error => {
+        // The whiteboard is already gone - reporting now would surface a connection error on it.
+        if (abortController.signal.aborted) {
+          return;
+        }
         console.error('GRPCCountError: ', error);
         const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
         handleError(error as unknown as Error, canRecover);

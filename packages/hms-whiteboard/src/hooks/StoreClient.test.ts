@@ -31,6 +31,9 @@ jest.mock('../grpc/sessionstore.client', () => ({
   })),
 }));
 
+// Matches the delay getKeysCountWithDelay waits before its first count call.
+const COUNT_RETRY_DELAY_MS = 200;
+
 const buildCallbacks = () => ({
   handleOpen: jest.fn(),
   handleChange: jest.fn(),
@@ -123,6 +126,34 @@ describe('SessionStore.open', () => {
 
     expect(streams).toHaveLength(2);
     expect(callbacks.handleError).not.toHaveBeenCalled();
+  });
+
+  it('does not log an error when the stream ends because we closed it', () => {
+    const { close } = openSessionStore();
+
+    close();
+    streams[0].emitError(new Error('BodyStreamBuffer was aborted'));
+
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('logs a genuine stream failure', () => {
+    openSessionStore();
+
+    streams[0].emitError(new Error('network error'));
+
+    expect(console.error).toHaveBeenCalledWith('GRPCOpenStreamError: ', expect.any(Error));
+  });
+
+  it('does not report a count failure that lands after close', async () => {
+    countResponse = () => Promise.reject(new Error('network error'));
+    const { close, callbacks } = openSessionStore();
+
+    close();
+    await jest.advanceTimersByTimeAsync(COUNT_RETRY_DELAY_MS);
+
+    expect(callbacks.handleError).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('reports a genuine stream failure and reconnects', () => {
