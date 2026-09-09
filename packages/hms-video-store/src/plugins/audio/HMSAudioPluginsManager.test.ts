@@ -3,6 +3,7 @@ import { HMSAudioPluginsManager } from './HMSAudioPluginsManager';
 import { PluginUsageTracker } from '../../common/PluginUsageTracker';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
+import { AUDIO_PLUGIN_CALL_TIMEOUT } from '../../utils/constants';
 
 const node = () => ({ connect: jest.fn(), disconnect: jest.fn(), context: 'ctx' });
 const audioContext = {
@@ -584,4 +585,32 @@ describe('HMSAudioPluginsManager with an add in flight', () => {
     expect(manager.getPlugins()).toEqual([]);
     expect(track.setProcessedTrack).toHaveBeenLastCalledWith(undefined);
   });
+
+  it.each(['init', 'processAudioTrack'] as const)(
+    'drops a plugin whose %s never settles instead of holding the queue',
+    async pendingStep => {
+      jest.useFakeTimers();
+      try {
+        const track = makeTrack();
+        const manager = new HMSAudioPluginsManager(track, new EventBus());
+        const { plugin } = makePlugin({ pendingStep });
+
+        // asserted before the clock moves, the add rejects while the timers are being advanced
+        const add = expect(manager.addPlugin(plugin)).rejects.toMatchObject({
+          description: expect.stringContaining('timed out'),
+        });
+        // everything behind the hung add: on main these never resolved for the life of the track,
+        // so a device switch, an unmute after an interruption and turning the plugin off all hung
+        const queued = manager.reprocessPlugins();
+        await jest.advanceTimersByTimeAsync(AUDIO_PLUGIN_CALL_TIMEOUT);
+
+        await add;
+        await expect(queued).resolves.toBeUndefined();
+        expect(manager.getPlugins()).toEqual([]);
+        await expect(manager.removePlugin(plugin)).resolves.toBeUndefined();
+      } finally {
+        jest.useRealTimers();
+      }
+    },
+  );
 });

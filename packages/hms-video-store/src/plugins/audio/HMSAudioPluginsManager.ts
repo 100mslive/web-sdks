@@ -8,6 +8,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSAudioContextHandler } from '../../internal';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import Room from '../../sdk/models/HMSRoom';
+import { AUDIO_PLUGIN_CALL_TIMEOUT } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 
 /**
@@ -343,14 +344,16 @@ export class HMSAudioPluginsManager {
     this.checkRoomPolicy(name);
     this.validateAndThrow(name, plugin);
     try {
-      await this.analytics.initWithTime(name, async () => plugin.init());
+      await this.analytics.initWithTime(name, () => this.callPlugin(name, 'init', async () => plugin.init()));
       if (this.disposed) {
         // do not hand a node to a graph that is being torn down, startPlugins stops the plugin
         return;
       }
-      const currentNode = await plugin.processAudioTrack(
-        this.audioContext!, // it is always present at this point
-        this.prevAudioNode || this.sourceNode,
+      const currentNode = await this.callPlugin(name, 'processAudioTrack', () =>
+        plugin.processAudioTrack(
+          this.audioContext!, // it is always present at this point
+          this.prevAudioNode || this.sourceNode,
+        ),
       );
       if (!currentNode) {
         // without a node the chain ends nowhere and the destination we publish is fed by nothing,
@@ -364,6 +367,30 @@ export class HMSAudioPluginsManager {
       // This startup may own resources even if an earlier instance was already stopped.
       plugin.stop();
       throw err;
+    }
+  }
+
+  /**
+   * Every call into a plugin's own code goes through here. These run inside the queue, so a plugin
+   * that never settles - a model fetch stalled on a bad network - would hold it for the life of the
+   * track: no device switch, no unmute after an interruption, and no way to turn the plugin off.
+   * Time it out instead and let the caller drop just that plugin.
+   *
+   * The loser of the race keeps running and may still reject; race() has already subscribed to it,
+   * so that rejection is consumed here and does not surface as an unhandled one.
+   */
+  private async callPlugin<T>(name: string, what: string, call: () => Promise<T>): Promise<T> {
+    let timer: ReturnType<typeof setTimeout>;
+    const timedOut = new Promise<never>((_, reject) => {
+      timer = setTimeout(
+        () => reject(Error(`plugin ${name} ${what} timed out after ${AUDIO_PLUGIN_CALL_TIMEOUT}ms`)),
+        AUDIO_PLUGIN_CALL_TIMEOUT,
+      );
+    });
+    try {
+      return await Promise.race([call(), timedOut]);
+    } finally {
+      clearTimeout(timer!);
     }
   }
 
