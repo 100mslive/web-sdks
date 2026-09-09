@@ -3,6 +3,7 @@ import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
+import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import { HMSAudioContextHandler } from '../../internal';
 import { HMSLocalAudioTrack } from '../../media/tracks';
@@ -41,14 +42,16 @@ export class HMSAudioPluginsManager {
    * add, remove and reprocess all rebuild the node graph and stop/start the plugins, so they must
    * not interleave: a reprocess (mic track replaced) landing while an add is still creating its
    * filter node stops the plugin under that add, and the add then publishes a dead node. Those
-   * three are the only entry points that take this queue, and rebuildGraph - the one thing that
-   * touches the graph - only ever runs inside a task, so there is no queueing to duplicate.
+   * three are the only entry points that take this queue, and rebuildGraph - the only thing that
+   * builds the graph - only ever runs inside one of their tasks, so there is no queueing to
+   * duplicate. cleanup is the one exception, it tears the graph down unqueued, see disposed.
    */
   private queue: Promise<unknown> = Promise.resolve();
   /**
-   * cleanup must not queue: track teardown awaits it before stopping tracks and removing listeners,
-   * and a plugin init that never settles would wedge it forever. It tears down immediately, and a
-   * rebuild still in flight unwinds against this flag instead of publishing onto the dead graph.
+   * cleanup must not queue: track teardown awaits it before it destroys the audio level monitor and
+   * removes its listeners, and a plugin init that never settles would wedge it forever. It tears
+   * down immediately, and a rebuild still in flight unwinds against this flag instead of publishing
+   * onto the dead graph.
    */
   private disposed = false;
 
@@ -75,15 +78,10 @@ export class HMSAudioPluginsManager {
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
-      this.analytics.added(name, this.audioContext!.sampleRate);
-      this.analytics.failure(name, err);
+      // no analytics: the record for this name belongs to the add that is actually running, and
+      // reporting a failure against it would end that plugin's usage and lose its stats
       HMSLogger.w("can't add another plugin when previous add is in progress");
       throw err;
-    }
-
-    if (name === 'HMSKrispPlugin' && this.room?.isNoiseCancellationEnabled) {
-      // app enables only, a rebuild re-adding the plugin is not a new start
-      this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
     }
 
     await this.serialize(async () => {
@@ -94,6 +92,11 @@ export class HMSAudioPluginsManager {
         if (this.pluginsMap.has(name)) {
           HMSLogger.w(this.TAG, `plugin - ${name} already added.`);
           return;
+        }
+        if (name === 'HMSKrispPlugin' && this.room?.isNoiseCancellationEnabled) {
+          // one per app enable: neither a rebuild re-adding the plugin nor an add of a plugin that
+          // is already running is a new start, and krisp.stop is only published for a real removal
+          this.eventBus.analytics.publish(AnalyticsEventFactory.krispStart());
         }
         // @ts-ignore
         plugin.setEventBus?.(this.eventBus);
@@ -110,14 +113,14 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
-    if (name === 'HMSKrispPlugin') {
-      this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
-    }
 
     await this.serialize(async () => {
       if (!this.pluginsMap.has(name)) {
         HMSLogger.w(this.TAG, `plugin - ${name} not found to remove.`);
         return;
+      }
+      if (name === 'HMSKrispPlugin') {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.krispStop());
       }
       plugin.stop();
       this.unregister(name);
@@ -127,19 +130,26 @@ export class HMSAudioPluginsManager {
   }
 
   /**
-   * Deliberately not queued, see the disposed field. Track teardown awaits this before it stops the
-   * tracks and drops its listeners, so it can only be bounded by our own work, never by a plugin's.
+   * Deliberately not queued, see the disposed field. Track teardown awaits this before it destroys
+   * the audio level monitor and drops its visibilitychange listener, so nothing here may await
+   * plugin code - and nothing here may throw either, or that listener survives on a torn down track
+   * and the next foreground event re-acquires the mic after the user has left the room.
    */
   async cleanup() {
     this.disposed = true;
     for (const [name, plugin] of Array.from(this.pluginsMap)) {
-      plugin.stop();
+      try {
+        plugin.stop();
+      } catch (err) {
+        HMSLogger.e(this.TAG, `error in stopping plugin ${name} at teardown`, err);
+      }
       this.unregister(name);
     }
     // Startup opens usage before registration and may still be pending at teardown.
     this.analytics.cleanup();
     this.disconnectNodes();
-    await this.updateProcessedTrack(undefined);
+    // updateProcessedTrack logs the failure, and there is nothing left to fall back to from here
+    await this.updateProcessedTrack(undefined).catch(() => {});
   }
 
   //Keeping it separate since we are initializing context only once
@@ -174,6 +184,9 @@ export class HMSAudioPluginsManager {
    * ones it must not be stopped first, and it is only registered once it is running.
    */
   private async rebuildGraph(added?: HMSAudioPlugin) {
+    if (this.hasNothingToBuild(added)) {
+      return;
+    }
     await this.stopGraph();
     if (this.disposed) {
       return;
@@ -184,21 +197,48 @@ export class HMSAudioPluginsManager {
       plugins.push(added);
     }
 
-    let failure: Error | undefined;
+    let failures = new Map<string, HMSException>();
     if (plugins.length > 0) {
       this.initAudioNodes();
-      failure = await this.startPlugins(plugins);
+      failures = await this.startPlugins(plugins);
       if (this.disposed) {
         // startPlugins unwound what it had started, a cleanup published the native track already
+        this.reportFailures(failures, added);
         return;
       }
     }
 
     await this.publishGraph();
+    this.reportFailures(failures, added);
+  }
 
-    if (failure) {
-      throw failure;
+  /**
+   * A rebuild restarts every plugin, so one call can produce failures for plugins the caller never
+   * mentioned. It gets the failure of the plugin it asked about, and the collateral ones reach the
+   * app as audioPluginFailed instead of as the wrong promise's rejection. A reprocess asked about
+   * none of them, so all of its failures go out as events and it resolves.
+   */
+  private reportFailures(failures: Map<string, HMSException>, added?: HMSAudioPlugin) {
+    const requested = added?.getName?.();
+    let own: HMSException | undefined;
+    for (const [name, failure] of failures) {
+      if (name === requested) {
+        own = failure;
+      } else {
+        this.eventBus.audioPluginFailed.publish(failure);
+      }
     }
+    if (own) {
+      throw own;
+    }
+  }
+
+  /**
+   * Nothing is wired up and nothing is being added. The majority of sessions never use an audio
+   * plugin, and a device change there must not churn the sender with a redundant replaceTrack.
+   */
+  private hasNothingToBuild(added?: HMSAudioPlugin) {
+    return !added && this.pluginsMap.size === 0 && !this.outputTrack;
   }
 
   private async stopGraph() {
@@ -215,32 +255,34 @@ export class HMSAudioPluginsManager {
     this.disconnectNodes();
   }
 
-  /** publishes the rebuilt graph, or goes back to the native track if nothing is left in it */
+  /** publishes the rebuilt graph, or goes back to the native track if there is nothing to publish */
   private async publishGraph() {
-    if (this.pluginsMap.size === 0) {
-      HMSLogger.i(this.TAG, 'no plugins left in the graph, going back to the native track');
-      this.disconnectNodes();
-      await this.updateProcessedTrack(undefined);
+    if (this.pluginsMap.size > 0 && this.connectToDestination()) {
+      await this.updateProcessedTrack(this.outputTrack);
       return;
     }
-    this.connectToDestination();
-    await this.updateProcessedTrack(this.outputTrack);
+    HMSLogger.i(this.TAG, 'no plugin output to publish, going back to the native track');
+    this.disconnectNodes();
+    await this.updateProcessedTrack(undefined);
   }
 
   /**
-   * Starts and chains every plugin in order, dropping the ones that fail. Returns the first failure
-   * so the caller can report it after the graph is up.
+   * Starts and chains every plugin in order, dropping the ones that fail. Returns their failures
+   * keyed by plugin name so the caller can report each one to whoever asked for that plugin.
    */
   private async startPlugins(plugins: HMSAudioPlugin[]) {
-    let failure: Error | undefined;
+    const failures = new Map<string, HMSException>();
     for (const plugin of plugins) {
       const name = plugin.getName?.();
       try {
         await this.startPlugin(plugin);
       } catch (err) {
         HMSLogger.e(this.TAG, `failed to start plugin ${name}, dropping it`, err);
+        // before unregister ends the usage interval: otherwise this is reported as a plugin the user
+        // turned off right after enabling it, and "how often does Krisp drop" stays unanswerable
+        this.analytics.failure(name, err as HMSException);
         this.unregister(name);
-        failure = failure || (err as Error);
+        failures.set(name, err as HMSException);
         continue;
       }
       if (this.disposed) {
@@ -252,11 +294,11 @@ export class HMSAudioPluginsManager {
         plugin.stop();
         this.unregister(name);
         this.disconnectNodes();
-        return failure;
+        return failures;
       }
       this.pluginsMap.set(name, plugin);
     }
-    return failure;
+    return failures;
   }
 
   /**
@@ -266,12 +308,10 @@ export class HMSAudioPluginsManager {
    */
   private async startPlugin(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
-    if (name === 'HMSKrispPlugin' && !this.room?.isNoiseCancellationEnabled) {
-      // ponytail: no MediaPluginErrors code covers a room policy, so this stays untyped for now
-      throw Error('Krisp Noise Cancellation is not enabled for this room');
-    }
-    // re-added on every rebuild so a failure is reported against a live analytics record
+    // re-added on every rebuild so both checks below are reported against a live analytics record,
+    // otherwise a plugin dropped on a device switch shows up as one the user turned off
     this.analytics.added(name, this.audioContext!.sampleRate);
+    this.checkRoomPolicy(name);
     this.validateAndThrow(name, plugin);
     try {
       await this.analytics.initWithTime(name, async () => plugin.init());
@@ -283,13 +323,42 @@ export class HMSAudioPluginsManager {
         this.audioContext!, // it is always present at this point
         this.prevAudioNode || this.sourceNode,
       );
+      if (!currentNode) {
+        // without a node the chain ends nowhere and the destination we publish is fed by nothing,
+        // which no client side check can see: the level monitor reads the mic. Drop the plugin.
+        throw Error(`plugin ${name} returned no audio node`);
+      }
       // the previous plugin was the end of the chain, extend it with this one
       this.prevAudioNode?.connect(currentNode);
       this.prevAudioNode = currentNode;
     } catch (err) {
       // This startup may own resources even if an earlier instance was already stopped.
       plugin.stop();
-      throw err;
+      throw this.toPluginError(err);
+    }
+  }
+
+  /**
+   * Everything that leaves a plugin startup carries a code, so the app gets an error it can switch
+   * on and analytics.failure can report it. init failures are already wrapped by initWithTime.
+   */
+  private toPluginError(err: unknown) {
+    if (err instanceof HMSException) {
+      return err;
+    }
+    HMSLogger.e(this.TAG, 'plugin failed with an untyped error', err);
+    return ErrorFactory.MediaPluginErrors.ProcessingFailed(
+      HMSAction.AUDIO_PLUGINS,
+      (err as Error)?.message || String(err),
+    );
+  }
+
+  private checkRoomPolicy(name: string) {
+    if (name === 'HMSKrispPlugin' && !this.room?.isNoiseCancellationEnabled) {
+      throw ErrorFactory.MediaPluginErrors.NotAllowedForRoom(
+        HMSAction.AUDIO_PLUGINS,
+        'Krisp Noise Cancellation is not enabled for this room',
+      );
     }
   }
 
@@ -330,13 +399,21 @@ export class HMSAudioPluginsManager {
     }
   }
 
+  /** @returns whether the end of the chain is really connected to the node we are about to publish */
   private connectToDestination() {
+    if (!this.prevAudioNode || !this.destinationNode || this.prevAudioNode.context !== this.destinationNode.context) {
+      HMSLogger.e(this.TAG, 'no usable output node for the plugin graph', {
+        hasChain: Boolean(this.prevAudioNode),
+        hasDestination: Boolean(this.destinationNode),
+      });
+      return false;
+    }
     try {
-      if (this.prevAudioNode && this.destinationNode && this.prevAudioNode.context === this.destinationNode.context) {
-        this.prevAudioNode.connect(this.destinationNode);
-      }
+      this.prevAudioNode.connect(this.destinationNode);
+      return true;
     } catch (err) {
       HMSLogger.e(this.TAG, 'error in connecting to destination node', err);
+      return false;
     }
   }
 

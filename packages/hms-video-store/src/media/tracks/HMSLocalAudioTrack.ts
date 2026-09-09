@@ -256,9 +256,23 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await localStream.replaceStreamTrack(this.nativeTrack, track);
     // change nativeTrack so plugin can start its work
     this.nativeTrack = track;
-    await this.replaceSenderTrack();
+    /**
+     * The empty track installed when capture is denied is a deliberately silent oscillator. Running
+     * the plugins against it only delays the device error the caller is about to get by a model
+     * load, and the graph that is published right now reads the mic that has just gone away, so
+     * publish the placeholder itself instead of a node fed by a stopped track.
+     */
+    const isSilentPlaceholder = isEmptyTrack(track);
+    if (isSilentPlaceholder) {
+      await this.setProcessedTrack(undefined);
+    } else {
+      await this.replaceSenderTrack();
+    }
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     isLevelMonitored && this.initAudioLevelMonitor();
+    if (isSilentPlaceholder) {
+      return;
+    }
     // Recovery tracks need the same graph rebuild as successful device selections.
     try {
       await this.pluginsManager.reprocessPlugins();
@@ -425,16 +439,24 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async cleanup() {
-    super.cleanup();
-    await this.pluginsManager.cleanup();
-    await this.pluginsManager.closeContext();
-    this.transceiver = undefined;
-    this.processedTrack?.stop();
-    this.tracksCreated.forEach(track => track.stop());
-    this.tracksCreated.clear();
-    this.isPublished = false;
-    this.destroyAudioLevelMonitor();
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    try {
+      super.cleanup();
+      await this.pluginsManager.cleanup();
+      await this.pluginsManager.closeContext();
+      this.transceiver = undefined;
+      this.processedTrack?.stop();
+      this.tracksCreated.forEach(track => track.stop());
+      this.tracksCreated.clear();
+      this.isPublished = false;
+    } finally {
+      /**
+       * Never skippable: a visibilitychange listener left on a torn down track walks
+       * handleForegrounded -> endInterruption -> restoreCapture and issues a getUserMedia after the
+       * user has left the room, and most callers of this do not await it to notice the failure.
+       */
+      this.destroyAudioLevelMonitor();
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**

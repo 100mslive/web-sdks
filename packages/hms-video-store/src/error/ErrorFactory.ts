@@ -550,6 +550,10 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    NotAllowedForRoom(action: HMSAction, description = '') {
+      return new HMSException(7006, 'NotAllowedForRoom', action, 'Plugin is not enabled for this room', description);
+    },
   },
 
   PlaylistErrors: {
