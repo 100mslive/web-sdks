@@ -228,6 +228,7 @@ export class HMSAudioPluginsManager {
    */
   private async rebuildGraph(added?: HMSAudioPlugin) {
     if (this.hasNothingToBuild(added)) {
+      HMSLogger.d(this.TAG, 'no plugins and nothing published, skipping the rebuild');
       return;
     }
     await this.stopGraph();
@@ -254,8 +255,25 @@ export class HMSAudioPluginsManager {
     }
 
     await this.publishGraph(failures);
+    this.logGraph(failures, added);
     this.reportFailures(failures, added);
     this.throwIfDisposedForAdd(added);
+  }
+
+  /**
+   * One line per add, remove and device change. Everything this PR changed about the graph shows up
+   * in the difference between `running` and what the app believes it enabled - a plugin the app
+   * thinks is on but that is missing here has been dropped by a rebuild.
+   *
+   * Its own method only to keep rebuildGraph under the complexity limit.
+   */
+  private logGraph(failures: Map<string, HMSException>, added?: HMSAudioPlugin) {
+    HMSLogger.i(this.TAG, 'rebuilt the plugin graph', {
+      requested: added?.getName?.(),
+      running: this.getPlugins(),
+      dropped: Array.from(failures.keys()),
+      publishing: this.outputTrack ? 'plugin output' : 'native track',
+    });
   }
 
   /**

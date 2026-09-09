@@ -264,6 +264,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      */
     const isSilentPlaceholder = isEmptyTrack(track);
     if (isSilentPlaceholder) {
+      // the branch is new and it is reached on a predicate over the track, so log what it matched
+      // on: a real mic classified here would stop the plugins with nothing else to show for it
+      HMSLogger.i(this.TAG, 'capture replaced with the silent placeholder, releasing the graph', {
+        trackId: track.id,
+        label: track.label,
+        plugins: this.pluginsManager.getPlugins(),
+      });
       // drop the running graph (Krisp keeps processing a stopped mic otherwise) but do not
       // rebuild against the oscillator — plugins stay registered for the next real capture.
       //
