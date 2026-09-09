@@ -443,20 +443,23 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async cleanup() {
     try {
+      // the only steps here that can throw, and nothing below them may be skipped when they do
       super.cleanup();
       await this.pluginsManager.cleanup();
       await this.pluginsManager.closeContext();
+    } finally {
+      /**
+       * Never skippable. tracksCreated holds every track gum has handed this one, including
+       * replacements the mic is still live on, so leaving them unstopped keeps the recording
+       * indicator up after the user has left the room. And a visibilitychange listener left on a
+       * torn down track walks handleForegrounded -> endInterruption -> restoreCapture and issues a
+       * getUserMedia from there - most callers of this do not await it to notice the failure.
+       */
       this.transceiver = undefined;
       this.processedTrack?.stop();
       this.tracksCreated.forEach(track => track.stop());
       this.tracksCreated.clear();
       this.isPublished = false;
-    } finally {
-      /**
-       * Never skippable: a visibilitychange listener left on a torn down track walks
-       * handleForegrounded -> endInterruption -> restoreCapture and issues a getUserMedia after the
-       * user has left the room, and most callers of this do not await it to notice the failure.
-       */
       this.destroyAudioLevelMonitor();
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }

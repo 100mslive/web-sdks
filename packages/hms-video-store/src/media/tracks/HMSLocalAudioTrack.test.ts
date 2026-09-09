@@ -612,4 +612,28 @@ describe('HMSLocalAudioTrack device switches with active noise cancellation', ()
       }
     },
   );
+
+  it('releases capture on leave even when tearing the plugin graph down throws', async () => {
+    const { track, plugin } = setup();
+    await track.addPlugin(plugin);
+    // tracksCreated only fills up once gum has handed over a replacement
+    await track.setSettings({ deviceId: 'mic-2' });
+    const created = Array.from((track as any).tracksCreated as Set<MediaStreamTrack>);
+    const processed = track.getTrackBeingSent();
+    expect(created).toContain(track.nativeTrack);
+
+    const teardown = new Error('teardown failed');
+    jest.spyOn((track as any).pluginsManager, 'cleanup').mockRejectedValue(teardown);
+    const removeListener = jest.spyOn(document, 'removeEventListener');
+
+    // the caller still learns it failed, it just cannot cost the user a released mic
+    await expect(track.cleanup()).rejects.toBe(teardown);
+
+    created.forEach(nativeTrack => expect(nativeTrack.readyState).toBe('ended'));
+    expect((track as any).tracksCreated.size).toBe(0);
+    expect(processed.stop).toHaveBeenCalled();
+    expect(track.audioLevelMonitor).toBeUndefined();
+    expect(removeListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    removeListener.mockRestore();
+  });
 });
