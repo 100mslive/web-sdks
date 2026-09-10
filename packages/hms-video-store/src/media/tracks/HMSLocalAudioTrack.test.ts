@@ -1,6 +1,9 @@
 import HMSPublishConnection from '../../connection/publish/publishConnection';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack, HMSLocalStream } from '../../internal';
+import { HMSAudioPluginType } from '../../plugins';
+import Room from '../../sdk/models/HMSRoom';
 import { isMobileOrTablet } from '../../utils/support';
 import { getAudioTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings';
@@ -19,8 +22,10 @@ const getAudioTrackMock = getAudioTrack as jest.Mock;
 const isMobileOrTabletMock = isMobileOrTablet as jest.Mock;
 
 const audioContext = {
+  sampleRate: 48000,
   createMediaStreamSource: jest.fn(),
   createMediaStreamDestination: jest.fn(),
+  createOscillator: jest.fn(() => ({ connect: jest.fn(), start: jest.fn() })),
   resume: jest.fn(async () => {}),
 };
 
@@ -53,6 +58,7 @@ const makeLocalAudioTrack = (
   eventBus: EventBus,
   source = 'regular',
   nativeTrack: MediaStreamTrack = makeNativeTrack('track-1'),
+  room?: Room,
 ) => {
   const nativeStream = {
     id: 'stream-1',
@@ -63,7 +69,7 @@ const makeLocalAudioTrack = (
   const stream = new HMSLocalStream(nativeStream);
   stream.setConnection({} as unknown as HMSPublishConnection);
   const settings = new HMSAudioTrackSettingsBuilder().build();
-  return new HMSLocalAudioTrack(stream, nativeTrack, source, eventBus, settings);
+  return new HMSLocalAudioTrack(stream, nativeTrack, source, eventBus, settings, room);
 };
 
 const setVisibility = (state: 'hidden' | 'visible') => {
@@ -387,5 +393,276 @@ describe('HMSLocalAudioTrack screenshare', () => {
     await flushPermissionQuery();
 
     expect(enabledUpdates).toEqual([false]);
+  });
+});
+
+// Model graph connections and ended capture, so publishing a live but unfed destination fails.
+describe('HMSLocalAudioTrack device switches with active noise cancellation', () => {
+  const makeCapturingTrack = (id: string) => {
+    const track = makeNativeTrack(id);
+    (track.stop as jest.Mock).mockImplementation(() => ((track as any).readyState = 'ended'));
+    return track;
+  };
+  const makeNode = (source?: MediaStreamTrack) => {
+    const node = {
+      context: audioContext,
+      source,
+      inputs: new Set<any>(),
+      outputs: new Set<any>(),
+      connect(target: any) {
+        node.outputs.add(target);
+        target.inputs.add(node);
+      },
+      disconnect() {
+        node.outputs.forEach(target => target.inputs.delete(node));
+        node.outputs.clear();
+      },
+    };
+    return node;
+  };
+  const hasLiveAudio = (node: ReturnType<typeof makeNode>): boolean =>
+    node.source ? node.source.readyState === 'live' : Array.from(node.inputs).some(hasLiveAudio);
+
+  const setup = () => {
+    const eventBus = new EventBus();
+    const room = { isNoiseCancellationEnabled: true } as Room;
+    const track = makeLocalAudioTrack(eventBus, 'regular', makeCapturingTrack('mic-1'), room);
+    const sender = {
+      track: undefined as any,
+      replaceTrack: jest.fn(async (replacement: MediaStreamTrack) => {
+        await Promise.resolve();
+        sender.track = replacement;
+      }),
+    };
+    track.transceiver = { direction: 'sendonly', sender } as unknown as RTCRtpTransceiver;
+    let activeNode: ReturnType<typeof makeNode> | undefined;
+    const plugin = {
+      getName: () => 'HMSKrispPlugin',
+      getPluginType: () => HMSAudioPluginType.TRANSFORM,
+      checkSupport: () => ({ isSupported: true }),
+      isSupported: () => true,
+      init: jest.fn(async () => {}),
+      processAudioTrack: jest.fn(async (_context: AudioContext, source: any) => {
+        activeNode = makeNode();
+        source.connect(activeNode);
+        return activeNode as unknown as AudioNode;
+      }),
+      stop: jest.fn(() => {
+        activeNode?.disconnect();
+        activeNode = undefined;
+      }),
+    };
+    return { track, sender, plugin, eventBus };
+  };
+
+  beforeEach(() => {
+    (global as any).MediaStream = jest.fn(tracks => ({ tracks }));
+    audioContext.createMediaStreamSource.mockImplementation(stream => makeNode(stream.tracks[0]));
+    audioContext.createMediaStreamDestination.mockImplementation(() => {
+      const destination = makeNode();
+      const output = Object.assign(makeCapturingTrack('processed'), { graph: destination });
+      return { ...destination, stream: { getAudioTracks: () => [output] } };
+    });
+    getAudioTrackMock.mockReset();
+    getAudioTrackMock.mockImplementation(async settings => makeCapturingTrack(settings.deviceId));
+  });
+
+  it('rebuilds from recovered capture while preserving the original device error', async () => {
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      expect(hasLiveAudio(sender.track.graph)).toBe(true);
+      const error = new Error('device unavailable');
+      getAudioTrackMock.mockRejectedValueOnce(error).mockResolvedValueOnce(makeCapturingTrack('fallback'));
+
+      await expect(track.setSettings({ deviceId: 'unavailable' })).rejects.toBe(error);
+      expect(track.nativeTrack.id).toBe('fallback');
+      expect(sender.track).toBe(track.getTrackBeingSent());
+      expect(hasLiveAudio(sender.track.graph)).toBe(true);
+      expect(plugin.init).toHaveBeenCalledTimes(2);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it('keeps recovered native audio live if rebuilding the plugin also fails', async () => {
+    const { track, sender, plugin, eventBus } = setup();
+    const failed = jest.fn();
+    eventBus.audioPluginFailed.subscribe(failed);
+    try {
+      await track.addPlugin(plugin);
+      const error = new Error('device unavailable');
+      const pluginError = new Error('filter creation failed');
+      getAudioTrackMock.mockRejectedValueOnce(error).mockResolvedValueOnce(makeCapturingTrack('fallback'));
+      plugin.processAudioTrack.mockRejectedValueOnce(pluginError);
+
+      await expect(track.setSettings({ deviceId: 'unavailable' })).rejects.toBe(error);
+      expect(sender.track).toBe(track.nativeTrack);
+      expect(sender.track.readyState).toBe('live');
+      // the app gets a coded error it can switch on, not a bare Error with an undefined description
+      expect(failed).toHaveBeenCalledWith(expect.objectContaining({ code: 7003, description: pluginError.message }));
+      expect(track.getPlugins()).toEqual([]);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it('rebuilds the graph on the mic reacquired after an interruption', async () => {
+    setVisibility('visible');
+    isMobileOrTabletMock.mockReturnValue(false);
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      const interruptedTrack = track.nativeTrack;
+
+      // the trigger this PR was reported against: an OS interruption, not a device change
+      (track as any).handleTrackMute();
+      await track.handleTrackUnmute();
+
+      // recovery re-acquires the same device, so this is a different track with the same id
+      expect(track.nativeTrack).not.toBe(interruptedTrack);
+      expect(interruptedTrack.readyState).toBe('ended');
+      expect(plugin.init).toHaveBeenCalledTimes(2);
+      expect(plugin.processAudioTrack).toHaveBeenLastCalledWith(
+        audioContext,
+        expect.objectContaining({ source: track.nativeTrack }),
+      );
+      expect(sender.track).toBe(track.getTrackBeingSent());
+      expect(hasLiveAudio(sender.track.graph)).toBe(true);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it('does not run the plugins against the silent track installed when capture is denied', async () => {
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      const denied = Object.assign(new Error('permission denied'), {
+        code: ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+      });
+      getAudioTrackMock.mockRejectedValueOnce(denied);
+      // LocalTrackManager.getEmptyAudioTrack builds its track off this same context
+      const empty = Object.assign(makeCapturingTrack('empty'), { label: 'MediaStreamAudioDestinationNode' });
+      audioContext.createMediaStreamDestination.mockImplementationOnce(() => ({
+        ...makeNode(),
+        stream: { getAudioTracks: () => [empty] },
+      }));
+
+      await expect(track.setSettings({ deviceId: 'denied' })).rejects.toBe(denied);
+
+      // the empty track is a deliberately silent oscillator: a Krisp init against it only delays
+      // the device error the app is waiting for, and the graph still up reads the mic that is gone
+      expect(track.nativeTrack).toBe(empty);
+      expect(plugin.init).toHaveBeenCalledTimes(1);
+      expect(plugin.stop).toHaveBeenCalled();
+      expect(track.getPlugins()).toEqual(['HMSKrispPlugin']);
+      expect(sender.track).toBe(empty);
+      expect(track.getTrackBeingSent()).toBe(empty);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  // the graph teardown on this path is best effort: it runs on the way to the device error the app
+  // is waiting for, so a failed sender swap must neither replace that error nor be left half done
+  it('still surfaces the device error when releasing the plugin graph fails', async () => {
+    const { track, sender, plugin } = setup();
+    try {
+      await track.addPlugin(plugin);
+      const denied = Object.assign(new Error('permission denied'), {
+        code: ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+      });
+      getAudioTrackMock.mockRejectedValueOnce(denied);
+      const empty = Object.assign(makeCapturingTrack('empty'), { label: 'MediaStreamAudioDestinationNode' });
+      audioContext.createMediaStreamDestination.mockImplementationOnce(() => ({
+        ...makeNode(),
+        stream: { getAudioTracks: () => [empty] },
+      }));
+      sender.replaceTrack.mockRejectedValueOnce(new Error('sender is gone'));
+
+      await expect(track.setSettings({ deviceId: 'denied' })).rejects.toBe(denied);
+      // and Krisp is not left processing the mic that has already been stopped
+      expect(plugin.stop).toHaveBeenCalled();
+      // the failed teardown swap must not take the sender reset with it: the retry succeeds, so the
+      // peer ends up on the placeholder rather than on the processed track disconnectNodes stopped
+      expect(sender.track).toBe(empty);
+      expect(track.getTrackBeingSent()).toBe(empty);
+    } finally {
+      await track.cleanup();
+    }
+  });
+
+  it.each(['init', 'processAudioTrack'] as const)(
+    'publishes the latest live microphone after three overlapping switches during %s',
+    async pendingStep => {
+      const { track, sender, plugin } = setup();
+      let release!: () => void;
+      const pending = new Promise<void>(resolve => (release = resolve));
+      const switches: Promise<void>[] = [];
+      try {
+        await track.addPlugin(plugin);
+        expect(hasLiveAudio(sender.track.graph)).toBe(true);
+        if (pendingStep === 'init') {
+          plugin.init.mockImplementationOnce(() => pending);
+        } else {
+          const process = plugin.processAudioTrack.getMockImplementation()!;
+          plugin.processAudioTrack.mockImplementationOnce(async (context, source) => {
+            await pending;
+            return process(context, source);
+          });
+        }
+
+        for (const deviceId of ['mic-2', 'mic-3', 'mic-4']) {
+          switches.push(track.setSettings({ deviceId }));
+          await new Promise(resolve => setTimeout(resolve, 0));
+          expect(sender.track).toBe(track.nativeTrack);
+          expect(sender.track.id).toBe(deviceId);
+          expect(sender.track.readyState).toBe('live');
+        }
+        // The queued switches must not stop a plugin whose rebuild is still pending.
+        expect(plugin.stop).toHaveBeenCalledTimes(1);
+        release();
+        await Promise.all(switches);
+
+        expect(track.nativeTrack.id).toBe('mic-4');
+        expect(sender.track).toBe(track.getTrackBeingSent());
+        expect(sender.track.readyState).toBe('live');
+        expect(hasLiveAudio(sender.track.graph)).toBe(true);
+        expect(plugin.processAudioTrack).toHaveBeenLastCalledWith(
+          audioContext,
+          expect.objectContaining({ source: track.nativeTrack }),
+        );
+        expect(plugin.init).toHaveBeenCalledTimes(4);
+      } finally {
+        release();
+        await Promise.allSettled(switches);
+        await track.cleanup();
+      }
+    },
+  );
+
+  it('releases capture on leave even when tearing the plugin graph down throws', async () => {
+    const { track, plugin } = setup();
+    await track.addPlugin(plugin);
+    // tracksCreated only fills up once gum has handed over a replacement
+    await track.setSettings({ deviceId: 'mic-2' });
+    const created = Array.from((track as any).tracksCreated as Set<MediaStreamTrack>);
+    const processed = track.getTrackBeingSent();
+    expect(created).toContain(track.nativeTrack);
+
+    const teardown = new Error('teardown failed');
+    jest.spyOn((track as any).pluginsManager, 'cleanup').mockRejectedValue(teardown);
+    const removeListener = jest.spyOn(document, 'removeEventListener');
+
+    // the caller still learns it failed, it just cannot cost the user a released mic
+    await expect(track.cleanup()).rejects.toBe(teardown);
+
+    created.forEach(nativeTrack => expect(nativeTrack.readyState).toBe('ended'));
+    expect((track as any).tracksCreated.size).toBe(0);
+    expect(processed.stop).toHaveBeenCalled();
+    expect(track.audioLevelMonitor).toBeUndefined();
+    expect(removeListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    removeListener.mockRestore();
   });
 });
