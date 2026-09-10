@@ -240,7 +240,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
-    if (currLayer === targetLayer) {
+    // only dedupe against a layer the SFU acknowledged - one it never applied has to be re-sent
+    if (currLayer === targetLayer && (this.stream as HMSRemoteStream).isVideoLayerConfirmed()) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Not sending update, already on layer ${targetLayer}, source=${source}`,

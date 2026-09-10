@@ -8,6 +8,14 @@ export class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;
+  /**
+   * `audio` and `video` hold the state we want; these say whether the SFU acknowledged it. Repeat
+   * requests dedupe against the desired value, so without this a request the SFU never applied -
+   * the first of a session is the one at risk - would silently swallow every later attempt to
+   * reach that same state, and the track never recovers.
+   */
+  private audioConfirmed = true;
+  private videoConfirmed = true;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
     super(nativeStream);
@@ -15,13 +23,14 @@ export class HMSRemoteStream extends HMSMediaStream {
   }
 
   async setAudio(enabled: boolean, trackId: string, identifier?: string) {
-    if (this.audio === enabled) {
+    if (this.audio === enabled && this.audioConfirmed) {
       return;
     }
 
     this.audio = enabled;
+    this.audioConfirmed = false;
     HMSLogger.d(
-      `[Remote stream] ${identifier || ''} 
+      `[Remote stream] ${identifier || ''}
     streamId=${this.id}
     trackId=${trackId}
     subscribing audio - ${this.audio}`,
@@ -33,6 +42,10 @@ export class HMSRemoteStream extends HMSMediaStream {
       },
       method: 'prefer-audio-track-state',
     });
+    // a newer request owns the field by now and will confirm its own value
+    if (this.audio === enabled) {
+      this.audioConfirmed = true;
+    }
   }
 
   /**
@@ -63,13 +76,22 @@ export class HMSRemoteStream extends HMSMediaStream {
       source: ${source} request ${layer} layer`,
     );
     this.setVideoLayerLocally(layer, identifier, source);
-    return this.connection.sendOverApiDataChannelWithResponse({
-      params: {
-        max_spatial_layer: this.video,
-        track_id: trackId,
-      },
-      method: 'prefer-video-track-state',
-    });
+    this.videoConfirmed = false;
+    return this.connection
+      .sendOverApiDataChannelWithResponse({
+        params: {
+          max_spatial_layer: this.video,
+          track_id: trackId,
+        },
+        method: 'prefer-video-track-state',
+      })
+      .then(response => {
+        // a newer request owns the field by now and will confirm its own layer
+        if (this.video === layer) {
+          this.videoConfirmed = true;
+        }
+        return response;
+      });
   }
 
   /**
@@ -82,6 +104,11 @@ export class HMSRemoteStream extends HMSMediaStream {
 
   getVideoLayer() {
     return this.video;
+  }
+
+  /** false when the SFU never acknowledged the current layer, so a repeat request must go out */
+  isVideoLayerConfirmed() {
+    return this.videoConfirmed;
   }
 
   isAudioSubscribed() {

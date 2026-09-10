@@ -11,9 +11,8 @@ jest.mock('../../utils/timer-utils', () => ({
   workerSleep: () => Promise.resolve(),
 }));
 
-interface WithEventEmitter {
-  eventEmitter: { emit: (event: string, value: string) => void };
-}
+/** the connection reads replies off the native channel, so replies in tests arrive the same way */
+type ChannelWithHandler = RTCDataChannel & { onmessage?: (event: { data: string }) => void };
 
 /**
  * A retry replays the bytes serialised when the request was made. Without a claim on the state it
@@ -25,6 +24,7 @@ describe('a request that a newer one has replaced', () => {
   let connection: HMSSubscribeConnection;
   let stream: HMSRemoteStream;
   let sent: string[];
+  let nativeChannel: ChannelWithHandler;
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -34,11 +34,11 @@ describe('a request that a newer one has replaced', () => {
     const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
     connection = new HMSSubscribeConnection(signal, {}, () => false, observer);
 
-    const nativeChannel = {
+    nativeChannel = {
       label: API_DATA_CHANNEL,
       readyState: 'open',
       send: (message: string) => sent.push(message),
-    } as unknown as RTCDataChannel;
+    } as unknown as ChannelWithHandler;
     connection.nativeConnection.ondatachannel?.({ channel: nativeChannel } as RTCDataChannelEvent);
 
     stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
@@ -50,10 +50,7 @@ describe('a request that a newer one has replaced', () => {
 
   const respondTo = (request: string) => {
     const { id } = JSON.parse(request) as { id: string };
-    (connection as unknown as WithEventEmitter).eventEmitter.emit(
-      'message',
-      JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }),
-    );
+    nativeChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
   };
 
   const paramsOf = (request: string) => (JSON.parse(request) as { params: Record<string, unknown> }).params;
@@ -74,8 +71,9 @@ describe('a request that a newer one has replaced', () => {
     const silenced = stream.setAudio(false, 'track-1').catch((error: Error) => error);
     await flush();
 
-    // the peer unmutes two seconds later. this is a real change, so it has to go out.
-    await jest.advanceTimersByTimeAsync(2000);
+    // the peer unmutes while the first request is still on its first attempt - this is a real
+    // change, so it has to go out. Later than one attempt is the same case with retries in front.
+    await jest.advanceTimersByTimeAsync(200);
     const restored = stream.setAudio(true, 'track-1');
     await flush();
     respondTo(sent[1]);
@@ -93,7 +91,7 @@ describe('a request that a newer one has replaced', () => {
     const low = stream.setVideoLayer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'resize').catch((e: Error) => e);
     await flush();
 
-    await jest.advanceTimersByTimeAsync(2000);
+    await jest.advanceTimersByTimeAsync(200);
     const high = stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize');
     await flush();
     respondTo(sent[1]);
@@ -129,7 +127,7 @@ describe('a request that a newer one has replaced', () => {
   it('resolves rather than failing, and leaves the newer value in place', async () => {
     const silenced = stream.setAudio(false, 'track-1').catch((error: Error) => error);
     await flush();
-    await jest.advanceTimersByTimeAsync(2000);
+    await jest.advanceTimersByTimeAsync(200);
     const restored = stream.setAudio(true, 'track-1');
     await flush();
     respondTo(sent[1]);

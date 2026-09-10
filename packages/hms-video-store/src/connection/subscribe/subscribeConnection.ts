@@ -28,6 +28,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
    * apply stale desired state over a newer request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
+  /**
+   * The SFU creates this channel, so by DCEP the client's `open` fires a half-RTT before the SFU's
+   * and a request sent in that window is dropped before it arrives. Replies measure single-digit
+   * ms, so a request with no answer by now was lost rather than slow - and every ms spent waiting
+   * is a black tile. Applies only until the SFU has answered once; see `channelProven`.
+   */
+  private readonly UNPROVEN_CHANNEL_TIMEOUT = 500;
+  /**
+   * Any reply proves the SFU's end of the channel is up, so the open race is behind us and a slow
+   * reply is the SFU being slow. Reset per channel: an SFU migration binds a new one.
+   */
+  private channelProven = false;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -62,10 +74,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
         return;
       }
 
+      this.channelProven = false;
       this.apiChannel = new HMSDataChannel(
         e.channel,
         {
           onMessage: (value: string) => {
+            this.channelProven = true;
             this.eventEmitter.emit('message', value);
             this.observer.onApiChannelMessage(value);
           },
@@ -354,7 +368,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     const res = (await this.abortOnClose(
       this.eventEmitter.waitFor('message', {
         filter: (value: string) => value.includes(requestId),
-        timeout: this.RESPONSE_TIMEOUT,
+        timeout: this.channelProven ? this.RESPONSE_TIMEOUT : this.UNPROVEN_CHANNEL_TIMEOUT,
       } as WaitForOptions) as CancelablePromise<unknown>,
     )) as unknown[];
     const response = JSON.parse(res[0] as string);

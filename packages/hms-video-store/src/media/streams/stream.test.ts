@@ -12,7 +12,7 @@ describe('HMSRemoteStream', () => {
   let stream: HMSRemoteStream;
   let sendOverApiDataChannelWithResponse: jest.Mock;
   beforeEach(() => {
-    sendOverApiDataChannelWithResponse = jest.fn();
+    sendOverApiDataChannelWithResponse = jest.fn().mockResolvedValue({});
     const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
   });
@@ -77,6 +77,59 @@ describe('HMSRemoteStream', () => {
     expectVideoSubscriptionMessage({
       track_id: videoTrackId,
       max_spatial_layer: HMSSimulcastLayer.MEDIUM,
+    });
+  });
+
+  /**
+   * Repeat requests dedupe against the desired value, which is set before the request goes out. A
+   * request the SFU never applied must not swallow the next attempt to reach that same state -
+   * the shape behind the Sep 2026 white recordings.
+   */
+  describe('when the request fails', () => {
+    const rejects = () => sendOverApiDataChannelWithResponse.mockRejectedValue(Error('No response from SFU'));
+
+    it('reports the video layer as unconfirmed', async () => {
+      rejects();
+      await expect(stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'src')).rejects.toThrow();
+      expect(stream.isVideoLayerConfirmed()).toBe(false);
+    });
+
+    it('sends the same audio state again instead of deduping against it', async () => {
+      rejects();
+      await expect(stream.setAudio(false, audioTrackId)).rejects.toThrow();
+
+      sendOverApiDataChannelWithResponse.mockResolvedValue({});
+      await stream.setAudio(false, audioTrackId);
+
+      expect(sendOverApiDataChannelWithResponse).toHaveBeenCalledTimes(2);
+      expect(stream.isAudioSubscribed()).toBe(false);
+    });
+
+    it('dedupes again once the SFU confirms', async () => {
+      rejects();
+      await expect(stream.setAudio(false, audioTrackId)).rejects.toThrow();
+
+      sendOverApiDataChannelWithResponse.mockResolvedValue({});
+      await stream.setAudio(false, audioTrackId);
+      await stream.setAudio(false, audioTrackId);
+
+      expect(sendOverApiDataChannelWithResponse).toHaveBeenCalledTimes(2);
+    });
+
+    /** a newer request owns the state, so an older one settling must not confirm its layer */
+    it('does not confirm a layer a newer request replaced', async () => {
+      let failFirst!: (error: Error) => void;
+      sendOverApiDataChannelWithResponse
+        .mockImplementationOnce(() => new Promise((_resolve, reject) => (failFirst = reject)))
+        .mockImplementationOnce(() => new Promise(() => undefined));
+
+      const first = stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'first').catch(error => error);
+      stream.setVideoLayer(HMSSimulcastLayer.MEDIUM, videoTrackId, 'test', 'second').catch(() => undefined);
+      failFirst(Error('No response from SFU'));
+      await first;
+
+      expect(stream.getVideoLayer()).toBe(HMSSimulcastLayer.MEDIUM);
+      expect(stream.isVideoLayerConfirmed()).toBe(false);
     });
   });
 });
