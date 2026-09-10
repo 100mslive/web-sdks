@@ -45,7 +45,7 @@ export class AudioPluginsAnalytics {
   }
 
   cleanup() {
-    for (const name of Object.keys(this.pluginAdded)) {
+    for (const name  in this.pluginAdded) {
       this.removed(name);
     }
   }
