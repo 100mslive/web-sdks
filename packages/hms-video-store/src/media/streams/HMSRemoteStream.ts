@@ -141,11 +141,6 @@ export class HMSRemoteStream extends HMSMediaStream {
     return this.video;
   }
 
-  /** false when the SFU never acknowledged the current layer, so a repeat request must go out */
-  isVideoLayerConfirmed() {
-    return this.videoConfirmed;
-  }
-
   isAudioSubscribed() {
     return this.audio;
   }
