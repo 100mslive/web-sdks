@@ -183,7 +183,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const disableAutoUnsubscribe = this.isFlagEnabled(InitFlags.FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE);
       if (disableAutoUnsubscribe && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
         HMSLogger.d(this.TAG, 'video auto unsubscribe is disabled, request is ignored');
-        return { id } as PreferLayerResponse;
+        return { id, dropped: true } as PreferLayerResponse;
       }
     }
     const request = JSON.stringify({
@@ -257,7 +257,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
      */
     const dropped = () => {
       HMSLogger.d(this.TAG, `Dropping ${requestId} - ${this.closed ? 'closed' : 'superseded'}`, request);
-      return { id: requestId } as PreferLayerResponse;
+      return { id: requestId, dropped: true } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
     /** the per-attempt detail is a warn, which an app on setLogLevel(ERROR) never sees */
@@ -277,7 +277,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
-        response = await this.waitForResponse(requestId);
+        response = await this.waitForResponse(requestId, i === 0);
       } catch (error) {
         lastAttemptError = error as Error;
         HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
@@ -364,11 +364,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
     );
   };
 
-  private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
+  /**
+   * Only the first attempt on an unproven channel gets the short bound. A request dropped in the
+   * open window is answered by resending at once, but a link slow enough to miss 500ms twice is
+   * slow rather than dropping, and hard-failing it would strand the high-RTT clients the 10s bound
+   * exists for.
+   */
+  private waitForResponse = async (requestId: string, firstAttempt: boolean): Promise<PreferLayerResponse> => {
+    const unproven = firstAttempt && !this.channelProven;
     const res = (await this.abortOnClose(
       this.eventEmitter.waitFor('message', {
         filter: (value: string) => value.includes(requestId),
-        timeout: this.channelProven ? this.RESPONSE_TIMEOUT : this.UNPROVEN_CHANNEL_TIMEOUT,
+        timeout: unproven ? this.UNPROVEN_CHANNEL_TIMEOUT : this.RESPONSE_TIMEOUT,
       } as WaitForOptions) as CancelablePromise<unknown>,
     )) as unknown[];
     const response = JSON.parse(res[0] as string);

@@ -124,6 +124,34 @@ describe('HMSSubscribeConnection api data channel', () => {
   }, 10_000);
 
   /**
+   * A link slow enough to miss 500ms twice is slow, not dropping. Putting every attempt on the
+   * short bound would hard-fail a high-RTT client at 1.5s, well inside SCTP's ~1s RTO.Min.
+   */
+  it('gives later attempts the full timeout even on an unproven channel', async () => {
+    jest.useFakeTimers();
+    const promise = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    await Promise.resolve();
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(10_000);
+    expect(sent).toHaveLength(3);
+
+    await jest.advanceTimersByTimeAsync(120_000);
+    await promise;
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
    * Only the unproven channel gets the short bound. Once the SFU has answered, a slow reply is the
    * SFU being slow rather than a dropped request, and resending on top of it is pure duplication.
    */

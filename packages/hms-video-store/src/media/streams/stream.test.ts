@@ -88,10 +88,10 @@ describe('HMSRemoteStream', () => {
   describe('when the request fails', () => {
     const rejects = () => sendOverApiDataChannelWithResponse.mockRejectedValue(Error('No response from SFU'));
 
-    it('reports the video layer as unconfirmed', async () => {
+    it('reports the video layer as unsettled', async () => {
       rejects();
       await expect(stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'src')).rejects.toThrow();
-      expect(stream.isVideoLayerConfirmed()).toBe(false);
+      expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(false);
     });
 
     it('sends the same audio state again instead of deduping against it', async () => {
@@ -129,7 +129,41 @@ describe('HMSRemoteStream', () => {
       await first;
 
       expect(stream.getVideoLayer()).toBe(HMSSimulcastLayer.MEDIUM);
-      expect(stream.isVideoLayerConfirmed()).toBe(false);
+      expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(false);
     });
+
+    /**
+     * A superseded request resolves locally without the SFU ever seeing it. Reading that as an
+     * acknowledgement re-creates the swallowed-retry bug for the very case most likely to hit it:
+     * two requests for the same value, neither answered.
+     */
+    it('does not treat a superseded resolution as an acknowledgement', async () => {
+      sendOverApiDataChannelWithResponse.mockResolvedValue({ id: 'req', dropped: true });
+
+      await stream.setAudio(false, audioTrackId);
+      expect(stream.isAudioSubscribed()).toBe(false);
+
+      sendOverApiDataChannelWithResponse.mockClear();
+      await stream.setAudio(false, audioTrackId);
+
+      expect(sendOverApiDataChannelWithResponse).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  /** repeated triggers while a request is in flight must not fan out duplicates of it */
+  it('dedupes a repeat request for a layer already on the wire', async () => {
+    sendOverApiDataChannelWithResponse.mockImplementation(() => new Promise(() => undefined));
+
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'resize').catch(() => undefined);
+
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(true);
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(false);
+  });
+
+  /** a layer the SFU reports is already applied - no request needed to reach it */
+  it('treats a server-sent layer as settled', () => {
+    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'test', 'setLayerFromServer');
+
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(true);
   });
 });

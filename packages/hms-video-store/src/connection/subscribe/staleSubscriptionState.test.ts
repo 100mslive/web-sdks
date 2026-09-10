@@ -53,6 +53,13 @@ describe('a request that a newer one has replaced', () => {
     nativeChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
   };
 
+  const respondWithError = (request: string) => {
+    const { id } = JSON.parse(request) as { id: string };
+    nativeChannel.onmessage?.({
+      data: JSON.stringify({ id, jsonrpc: '2.0', error: { code: 400, message: 'bad request' } }),
+    });
+  };
+
   const paramsOf = (request: string) => (JSON.parse(request) as { params: Record<string, unknown> }).params;
   const subscribedOf = (request: string) => paramsOf(request).subscribed as boolean;
   const layerOf = (request: string) => paramsOf(request).max_spatial_layer as HMSSimulcastLayer;
@@ -153,11 +160,7 @@ describe('a request that a newer one has replaced', () => {
     await restored;
 
     // the replaced request's own answer finally arrives, carrying a code it would never retry
-    const { id } = JSON.parse(sent[0]) as { id: string };
-    (connection as unknown as WithEventEmitter).eventEmitter.emit(
-      'message',
-      JSON.stringify({ id, jsonrpc: '2.0', error: { code: 400, message: 'bad request' } }),
-    );
+    respondWithError(sent[0]);
 
     expect(await silenced).not.toBeInstanceOf(Error);
     expect(stream.isAudioSubscribed()).toBe(true);
@@ -176,11 +179,7 @@ describe('a request that a newer one has replaced', () => {
     const failed = stream.setAudio(false, 'track-1').catch((error: Error) => error);
     await flush();
 
-    const { id } = JSON.parse(sent[0]) as { id: string };
-    (connection as unknown as WithEventEmitter).eventEmitter.emit(
-      'message',
-      JSON.stringify({ id, jsonrpc: '2.0', error: { code: 400, message: 'bad request' } }),
-    );
+    respondWithError(sent[0]);
 
     expect(await failed).toBeInstanceOf(Error);
   }, 20_000);

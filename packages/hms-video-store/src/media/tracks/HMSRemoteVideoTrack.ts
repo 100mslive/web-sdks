@@ -163,7 +163,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
-    (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
+    (this.stream as HMSRemoteStream).setVideoLayerFromServer(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
     return this._degraded;
   }
@@ -240,8 +240,9 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
-    // only dedupe against a layer the SFU acknowledged - one it never applied has to be re-sent
-    if (currLayer === targetLayer && (this.stream as HMSRemoteStream).isVideoLayerConfirmed()) {
+    // dedupe against the layer the SFU acknowledged or is being asked for - one it never applied
+    // has to be re-sent, or the track stays on a layer nobody is sending
+    if (currLayer === targetLayer && (this.stream as HMSRemoteStream).isVideoLayerSettled(targetLayer)) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Not sending update, already on layer ${targetLayer}, source=${source}`,
