@@ -37,8 +37,6 @@ describe('VideoElementManager layer request failures', () => {
       sendOverApiDataChannelWithResponse: jest
         .fn()
         .mockRejectedValue(new Error('No response from SFU for prefer-video-track-state')),
-      // these tests are about the rejection reaching the caller, not about convergence
-      isClosed: () => true,
     } as unknown as HMSSubscribeConnection;
     const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
     const nativeTrack = {
@@ -151,7 +149,6 @@ describe('HMSRemoteVideoTrack after a failed layer request', () => {
       { id: 'stream-1' } as MediaStream,
       {
         sendOverApiDataChannelWithResponse: send,
-        isClosed: () => true,
       } as unknown as HMSSubscribeConnection,
     );
     const track = new HMSRemoteVideoTrack(

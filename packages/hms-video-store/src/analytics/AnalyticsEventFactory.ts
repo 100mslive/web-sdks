@@ -119,9 +119,14 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  /** a subscribe request the SFU never applied, which the stream then failed to re-drive */
-  static subscribeStateStuck(properties: { method: string; trackId: string; desired: string; confirmed: string }) {
-    return new AnalyticsEvent({ name: 'subscribeStateStuck', level: AnalyticsEventLevel.ERROR, properties });
+  /** an attempt went unanswered and is being retried; `unproven` marks the channel-open race */
+  static subscribeRequestRetry(properties: { method: string; trackId: string; attempt: number; unproven: boolean }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
+  }
+
+  /** no attempt was answered, so the SFU is left on a state nobody asked for */
+  static subscribeRequestUnanswered(properties: { method: string; trackId: string; attempts: number }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestUnanswered', level: AnalyticsEventLevel.ERROR, properties });
   }
 
   static leave() {
