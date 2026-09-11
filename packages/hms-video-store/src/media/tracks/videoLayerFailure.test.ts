@@ -141,6 +141,9 @@ describe('VideoElementManager layer request failures', () => {
  * no-op, so the tile stays black for the rest of the session.
  */
 describe('HMSRemoteVideoTrack after a failed layer request', () => {
+  // the spies below are on globals, so leaving them in place would follow the next suite
+  afterEach(() => jest.restoreAllMocks());
+
   it('sends the same layer again instead of deduping against the failed one', async () => {
     window.MediaStream = jest.fn().mockImplementation(() => ({ addTrack: jest.fn() })) as unknown as typeof MediaStream;
     jest.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);

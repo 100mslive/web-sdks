@@ -180,7 +180,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
    */
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
-    requestId?: string,
   ): Promise<PreferLayerResponse> {
     const id = uuid();
     if (message.method === 'prefer-video-track-state') {
@@ -191,7 +190,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
     }
     const request = JSON.stringify({
-      id: requestId || id,
+      id,
       jsonrpc: '2.0',
       ...message,
     });
@@ -266,6 +265,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
     let response: PreferLayerResponse | undefined;
     /** the per-attempt detail is a warn, which an app on setLogLevel(ERROR) never sees */
     let lastAttemptError: Error | undefined;
+    /**
+     * Whether these bytes have ever reached the wire - not the loop index. An attempt that gives up
+     * on the channel-open wait, or whose send throws, never put anything in front of the SFU, so
+     * the attempt that does is still the first one and still the one the open race can swallow.
+     */
+    let sentOnce = false;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
@@ -281,7 +286,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
         }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
-        response = await this.waitForResponse(requestId, i === 0);
+        const firstSend = !sentOnce;
+        sentOnce = true;
+        response = await this.waitForResponse(requestId, firstSend);
       } catch (error) {
         lastAttemptError = error as Error;
         HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
@@ -393,13 +400,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
   };
 
   /**
-   * Only the first attempt on an unproven channel gets the short bound. A request dropped in the
-   * open window is answered by resending at once, but a link slow enough to miss 500ms twice is
-   * slow rather than dropping, and hard-failing it would strand the high-RTT clients the 10s bound
+   * Only the first send on an unproven channel gets the short bound. A request dropped in the open
+   * window is answered by resending at once, but a link slow enough to miss 500ms twice is slow
+   * rather than dropping, and hard-failing it would strand the high-RTT clients the 10s bound
    * exists for.
    */
-  private waitForResponse = async (requestId: string, firstAttempt: boolean): Promise<PreferLayerResponse> => {
-    const unproven = firstAttempt && !this.channelProven;
+  private waitForResponse = async (requestId: string, firstSend: boolean): Promise<PreferLayerResponse> => {
+    const unproven = firstSend && !this.channelProven;
     const res = (await this.abortOnClose(
       this.eventEmitter.waitFor('message', {
         filter: (value: string) => value.includes(requestId),

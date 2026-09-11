@@ -152,6 +152,54 @@ describe('HMSSubscribeConnection api data channel', () => {
   }, 10_000);
 
   /**
+   * The open race is about the first bytes on the wire, not the first turn of the retry loop. An
+   * attempt that gave up on the channel-open wait sent nothing, so the attempt that does send is
+   * still the one the SFU can drop - and it has to get the short bound, not the 10s one.
+   */
+  it('gives the short bound to the first send even when an earlier attempt never sent', async () => {
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    const late = new HMSSubscribeConnection(
+      { trickle: jest.fn() } as unknown as JsonRpcSignal,
+      {},
+      () => false,
+      observer,
+    );
+    const lateSent: string[] = [];
+    const lateChannel = {
+      label: API_DATA_CHANNEL,
+      readyState: 'open',
+      send: (message: string) => lateSent.push(message),
+      close: jest.fn(),
+    } as unknown as ChannelWithHandler;
+
+    jest.useFakeTimers();
+    const promise = late
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    // the first attempt burns its channel-open wait without ever reaching send
+    await jest.advanceTimersByTimeAsync(11_000);
+    expect(lateSent).toHaveLength(0);
+
+    late.nativeConnection.ondatachannel?.({ channel: lateChannel } as RTCDataChannelEvent);
+    lateChannel.onopen?.(new Event('open'));
+    await jest.advanceTimersByTimeAsync(100);
+    expect(lateSent).toHaveLength(1);
+
+    await jest.advanceTimersByTimeAsync(600);
+    expect(lateSent).toHaveLength(2);
+
+    const { id } = JSON.parse(lateSent[1]) as { id: string };
+    lateChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
+    await expect(promise).resolves.toBeDefined();
+    late.close();
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
    * Only the unproven channel gets the short bound. Once the SFU has answered, a slow reply is the
    * SFU being slow rather than a dropped request, and resending on top of it is pure duplication.
    */

@@ -94,6 +94,30 @@ describe('a request that a newer one has replaced', () => {
     expect(stream.isAudioSubscribed()).toBe(true);
   }, 20_000);
 
+  /**
+   * The first attempt is not the only window that matters - a request that has already replayed its
+   * bytes once is the one most likely to still be retrying when the caller moves on.
+   */
+  it('does not replay the stale unsubscribe once a retry is already in flight', async () => {
+    const silenced = stream.setAudio(false, 'track-1').catch((error: Error) => error);
+    await flush();
+
+    // the first attempt gives up on the unproven channel and replays the same bytes
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    const restored = stream.setAudio(true, 'track-1');
+    await flush();
+    respondTo(sent[2]);
+    await restored;
+
+    await exhaustRetries();
+    await silenced;
+
+    expect(sent.map(subscribedOf)).toEqual([false, false, true]);
+    expect(stream.isAudioSubscribed()).toBe(true);
+  }, 20_000);
+
   it('does not replay a stale layer when the tile resizes mid-flight', async () => {
     const low = stream.setVideoLayer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'resize').catch((e: Error) => e);
     await flush();
@@ -182,5 +206,36 @@ describe('a request that a newer one has replaced', () => {
     respondWithError(sent[0]);
 
     expect(await failed).toBeInstanceOf(Error);
+  }, 20_000);
+
+  /**
+   * Supersession normally answers this, but a replaced request can still receive a real success -
+   * sendMessage returns a response the SFU actually sent whatever happened to the claim. If that
+   * reply lands after the newer one, confirming it records a layer the SFU has already moved off.
+   */
+  it('does not let a late reply for a replaced request confirm its layer', async () => {
+    const high = stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch((e: Error) => e);
+    await flush();
+    const low = stream.setVideoLayer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'resize');
+    await flush();
+
+    // the newer request is answered first, then the replaced one's own reply arrives
+    respondTo(sent[1]);
+    await low;
+    respondTo(sent[0]);
+    await high;
+
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(true);
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(false);
+  }, 20_000);
+
+  /** the SFU telling us where it is outranks a request still on the wire */
+  it('lets a layer pushed by the SFU settle the dedupe while a request is in flight', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await flush();
+
+    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'id', 'degradation');
+
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(true);
   }, 20_000);
 });
