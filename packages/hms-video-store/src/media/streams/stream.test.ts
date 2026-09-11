@@ -105,6 +105,33 @@ describe('HMSRemoteStream', () => {
       expect(stream.isAudioSubscribed()).toBe(false);
     });
 
+    /**
+     * A failure is not proof the SFU stayed where it was - the reply is the only thing known to be
+     * lost. Deduping the correcting call against `confirmed` alone leaves the peer silent for the
+     * rest of the session, which is the bug this whole pair exists to prevent.
+     */
+    it('sends the opposite audio state again after a failure', async () => {
+      rejects();
+      await expect(stream.setAudio(false, audioTrackId)).rejects.toThrow();
+
+      sendOverApiDataChannelWithResponse.mockResolvedValue({});
+      await stream.setAudio(true, audioTrackId);
+
+      expect(sendOverApiDataChannelWithResponse).toHaveBeenCalledTimes(2);
+      expect(stream.isAudioSubscribed()).toBe(true);
+    });
+
+    /** an error reply is the SFU refusing, not applying - confirming it swallows the next attempt */
+    it('does not treat an error response as an acknowledgement', async () => {
+      sendOverApiDataChannelWithResponse.mockResolvedValue({ id: 'req', error: { code: 404, message: 'gone' } });
+      await stream.setAudio(false, audioTrackId);
+
+      sendOverApiDataChannelWithResponse.mockClear();
+      await stream.setAudio(false, audioTrackId);
+
+      expect(sendOverApiDataChannelWithResponse).toHaveBeenCalledTimes(1);
+    });
+
     it('dedupes again once the SFU confirms', async () => {
       rejects();
       await expect(stream.setAudio(false, audioTrackId)).rejects.toThrow();
@@ -158,6 +185,24 @@ describe('HMSRemoteStream', () => {
 
     expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(true);
     expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(false);
+  });
+
+  /** two requests can ask for the same layer; an older one settling must not free the newer's claim */
+  it('keeps the newer claim when an older request for the same layer settles', async () => {
+    let settleFirst!: (value: unknown) => void;
+    sendOverApiDataChannelWithResponse
+      .mockImplementationOnce(() => new Promise(resolve => (settleFirst = resolve)))
+      .mockImplementation(() => new Promise(() => undefined));
+
+    const first = stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'first');
+    stream.setVideoLayer(HMSSimulcastLayer.LOW, videoTrackId, 'test', 'second').catch(() => undefined);
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'third').catch(() => undefined);
+
+    settleFirst({ id: 'req', dropped: true });
+    await first;
+
+    // the third request is still on the wire asking for HIGH
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(true);
   });
 
   /** a layer the SFU reports is already applied - no request needed to reach it */
