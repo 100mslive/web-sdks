@@ -28,6 +28,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
    * apply stale desired state over a newer request.
    */
   private readonly RESPONSE_TIMEOUT = 10000;
+  /**
+   * The SFU creates this channel, so by DCEP the client's `open` fires a half-RTT before the SFU's
+   * and a request sent in that window is dropped before it arrives. Replies measure single-digit
+   * ms, so a request with no answer by now was lost rather than slow - and every ms spent waiting
+   * is a black tile. Applies only until the SFU has answered once; see `channelProven`.
+   */
+  private readonly UNPROVEN_CHANNEL_TIMEOUT = 500;
+  /**
+   * Any reply proves the SFU's end of the channel is up, so the open race is behind us and a slow
+   * reply is the SFU being slow. Reset per channel: an SFU migration binds a new one.
+   */
+  private channelProven = false;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -62,10 +74,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
         return;
       }
 
+      this.channelProven = false;
       this.apiChannel = new HMSDataChannel(
         e.channel,
         {
           onMessage: (value: string) => {
+            this.channelProven = true;
             this.eventEmitter.emit('message', value);
             this.observer.onApiChannelMessage(value);
           },
@@ -162,18 +176,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
    */
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
-    requestId?: string,
   ): Promise<PreferLayerResponse> {
     const id = uuid();
     if (message.method === 'prefer-video-track-state') {
       const disableAutoUnsubscribe = this.isFlagEnabled(InitFlags.FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE);
       if (disableAutoUnsubscribe && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
         HMSLogger.d(this.TAG, 'video auto unsubscribe is disabled, request is ignored');
-        return { id } as PreferLayerResponse;
+        return { id, dropped: true } as PreferLayerResponse;
       }
     }
     const request = JSON.stringify({
-      id: requestId || id,
+      id,
       jsonrpc: '2.0',
       ...message,
     });
@@ -243,11 +256,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
      */
     const dropped = () => {
       HMSLogger.d(this.TAG, `Dropping ${requestId} - ${this.closed ? 'closed' : 'superseded'}`, request);
-      return { id: requestId } as PreferLayerResponse;
+      return { id: requestId, dropped: true } as PreferLayerResponse;
     };
     let response: PreferLayerResponse | undefined;
     /** the per-attempt detail is a warn, which an app on setLogLevel(ERROR) never sees */
     let lastAttemptError: Error | undefined;
+    /**
+     * Whether these bytes have ever reached the wire - not the loop index. An attempt that gives up
+     * on the channel-open wait, or whose send throws, never put anything in front of the SFU, so
+     * the attempt that does is still the first one and still the one the open race can swallow.
+     */
+    let sentOnce = false;
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
@@ -263,7 +282,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
         }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
-        response = await this.waitForResponse(requestId);
+        const firstSend = !sentOnce;
+        sentOnce = true;
+        response = await this.waitForResponse(requestId, firstSend);
       } catch (error) {
         lastAttemptError = error as Error;
         HMSLogger.w(this.TAG, `Attempt failed for ${requestId}`, { request, try: i + 1, error });
@@ -350,11 +371,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
     );
   };
 
-  private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
+  /**
+   * Only the first send on an unproven channel gets the short bound. A request dropped in the open
+   * window is answered by resending at once, but a link slow enough to miss 500ms twice is slow
+   * rather than dropping, and hard-failing it would strand the high-RTT clients the 10s bound
+   * exists for.
+   */
+  private waitForResponse = async (requestId: string, firstSend: boolean): Promise<PreferLayerResponse> => {
+    const unproven = firstSend && !this.channelProven;
     const res = (await this.abortOnClose(
       this.eventEmitter.waitFor('message', {
         filter: (value: string) => value.includes(requestId),
-        timeout: this.RESPONSE_TIMEOUT,
+        timeout: unproven ? this.UNPROVEN_CHANNEL_TIMEOUT : this.RESPONSE_TIMEOUT,
       } as WaitForOptions) as CancelablePromise<unknown>,
     )) as unknown[];
     const response = JSON.parse(res[0] as string);

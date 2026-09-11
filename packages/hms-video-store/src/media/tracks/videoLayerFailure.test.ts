@@ -1,6 +1,7 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
+import { HMSSimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
@@ -130,5 +131,44 @@ describe('VideoElementManager layer request failures', () => {
     );
 
     await expect(emptyTrack.addSink(videoElement, true)).rejects.toThrow('No response from SFU');
+  });
+});
+
+/**
+ * shouldSendVideoLayer dedupes against the stream's local layer, and that layer is set
+ * optimistically before the request goes out. Leaving it on a value the SFU never applied makes
+ * the app's next attempt - a resize, a re-intersection, an explicit setPreferredLayer - a silent
+ * no-op, so the tile stays black for the rest of the session.
+ */
+describe('HMSRemoteVideoTrack after a failed layer request', () => {
+  // the spies below are on globals, so leaving them in place would follow the next suite
+  afterEach(() => jest.restoreAllMocks());
+
+  it('sends the same layer again instead of deduping against the failed one', async () => {
+    window.MediaStream = jest.fn().mockImplementation(() => ({ addTrack: jest.fn() })) as unknown as typeof MediaStream;
+    jest.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    const send = jest.fn().mockResolvedValue({});
+    const stream = new HMSRemoteStream(
+      { id: 'stream-1' } as MediaStream,
+      {
+        sendOverApiDataChannelWithResponse: send,
+      } as unknown as HMSSubscribeConnection,
+    );
+    const track = new HMSRemoteVideoTrack(
+      stream,
+      { id: 'track-1', kind: 'video', enabled: true, addEventListener: jest.fn() } as unknown as MediaStreamTrack,
+      'regular',
+    );
+    // setPreferredLayer is a no-op without a sink; this also settles the default HIGH request, so
+    // the state under test is the rejection below rather than anything left over from attaching
+    await track.addSink(document.createElement('video'));
+    send.mockClear();
+    send.mockRejectedValueOnce(Error('No response from SFU'));
+
+    await expect(track.setPreferredLayer(HMSSimulcastLayer.MEDIUM)).rejects.toThrow('No response from SFU');
+    await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
+
+    expect(send).toHaveBeenCalledTimes(2);
+    track.videoHandler.cleanup();
   });
 });
