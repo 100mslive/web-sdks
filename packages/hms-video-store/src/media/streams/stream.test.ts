@@ -13,7 +13,12 @@ describe('HMSRemoteStream', () => {
   let sendOverApiDataChannelWithResponse: jest.Mock;
   beforeEach(() => {
     sendOverApiDataChannelWithResponse = jest.fn().mockResolvedValue({});
-    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    // isClosed stops the re-drive a rejecting send would otherwise park; these tests are about the
+    // rejection reaching the caller, not about convergence
+    const connection = {
+      sendOverApiDataChannelWithResponse,
+      isClosed: () => true,
+    } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
   });
 

@@ -38,11 +38,13 @@ export class HMSRemoteStream extends HMSMediaStream {
     if (source !== RECONVERGE) {
       this.audioReconvergeUsed = 0;
     }
+    // set before the dedupe: leaving it behind lets a parked re-drive chase a value the app has
+    // already reversed, silencing a peer it explicitly unmuted
+    this.audio = enabled;
     if (this.isAudioSettled(enabled)) {
       return;
     }
 
-    this.audio = enabled;
     this.inFlightAudio = enabled;
     HMSLogger.d(
       `[Remote stream] ${identifier || ''}
@@ -68,8 +70,8 @@ export class HMSRemoteStream extends HMSMediaStream {
         },
         method: 'prefer-audio-track-state',
       });
-      // a dropped response never reached the SFU; the request that replaced this one owns the state
-      if (!response?.dropped) {
+      // dropped never reached the SFU, and an error (404) is a refusal - neither is state applied
+      if (!response?.dropped && !response?.error) {
         this.confirmedAudio = enabled;
       }
     } finally {
@@ -158,8 +160,8 @@ export class HMSRemoteStream extends HMSMediaStream {
         method: 'prefer-video-track-state',
       })
       .then(response => {
-        // a dropped response never reached the SFU; the request that replaced this one owns the layer
-        if (!response?.dropped) {
+        // dropped never reached the SFU, and an error (404) is a refusal - neither is state applied
+        if (!response?.dropped && !response?.error) {
           this.confirmedVideo = layer;
         }
         settle();

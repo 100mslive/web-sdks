@@ -58,6 +58,13 @@ describe('a request that ran out of attempts', () => {
     nativeChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
   };
 
+  const respondWithError = (request: string, code: number) => {
+    const { id } = JSON.parse(request) as { id: string };
+    nativeChannel.onmessage?.({
+      data: JSON.stringify({ id, jsonrpc: '2.0', error: { code, message: 'track not found' } }),
+    });
+  };
+
   const paramsOf = (request: string) => (JSON.parse(request) as { params: Record<string, unknown> }).params;
   const layerOf = (request: string) => paramsOf(request).max_spatial_layer as HMSSimulcastLayer;
   const subscribedOf = (request: string) => paramsOf(request).subscribed as boolean;
@@ -159,5 +166,34 @@ describe('a request that ran out of attempts', () => {
     await jest.advanceTimersByTimeAsync(10 * 60_000);
 
     expect(sent).toHaveLength(atClose);
+  }, 20_000);
+
+  /**
+   * The app reversing itself is the other way desired state moves. The SFU never applied the mute,
+   * so it is already where the app now wants it - and a re-drive chasing the mute would silence a
+   * peer the app has explicitly unmuted.
+   */
+  it('does not re-drive a value the app has since reversed', async () => {
+    stream.setAudio(false, 'track-1').catch(() => undefined);
+    await exhaustRetries();
+
+    await stream.setAudio(true, 'track-1');
+    const settled = sent.length;
+
+    await jest.advanceTimersByTimeAsync(10 * 60_000);
+
+    expect(sent.slice(settled).map(subscribedOf)).not.toContain(false);
+    expect(stream.isAudioSubscribed()).toBe(true);
+  }, 20_000);
+
+  /** a 404 is the SFU refusing the request, not applying it - confirming it would dedupe forever */
+  it('does not treat an error reply as the SFU applying the layer', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await flush();
+
+    respondWithError(sent[0], 404);
+    await flush();
+
+    expect(stream.isVideoLayerSettled(HMSSimulcastLayer.HIGH)).toBe(false);
   }, 20_000);
 });
