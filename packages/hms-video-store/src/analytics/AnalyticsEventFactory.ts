@@ -119,6 +119,16 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  /** an attempt went unanswered and is being retried; `unproven` marks the channel-open race */
+  static subscribeRequestRetry(properties: { method: string; trackId: string; attempt: number; unproven: boolean }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
+  }
+
+  /** no attempt was answered, so the SFU is left on a state nobody asked for */
+  static subscribeRequestUnanswered(properties: { method: string; trackId: string; attempts: number }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestUnanswered', level: AnalyticsEventLevel.ERROR, properties });
+  }
+
   static leave() {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }

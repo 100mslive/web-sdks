@@ -1,6 +1,9 @@
 import EventEmitter, { CancelablePromise, WaitForOptions } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
+import { EventBus } from '../../events/EventBus';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
@@ -152,6 +155,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     config: RTCConfiguration,
     private isFlagEnabled: (flag: InitFlags) => boolean,
     observer: ISubscribeConnectionObserver,
+    private eventBus?: EventBus,
   ) {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
@@ -291,6 +295,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
         if (this.closed) {
           break;
         }
+        // the only signal that this class of miss happened at all - nothing else records it
+        this.publishRequestEvent(AnalyticsEventFactory.subscribeRequestRetry, stateKey, {
+          attempt: i,
+          unproven: i === 0 && !this.channelProven,
+        });
         continue;
       }
       const error = response.error;
@@ -347,6 +356,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (superseded() || this.closed) {
       return dropped();
     }
+    this.publishRequestEvent(AnalyticsEventFactory.subscribeRequestUnanswered, stateKey, {
+      attempts: this.MAX_RETRIES,
+    });
     throw Error(
       `No response from SFU for ${requestId} after ${this.MAX_RETRIES} tries - ${request}`,
       // a malformed reply lands here too, via JSON.parse in waitForResponse - without the cause,
@@ -354,6 +366,22 @@ export default class HMSSubscribeConnection extends HMSConnection {
       { cause: lastAttemptError },
     );
   };
+
+  /** stateKey is `${method}:${track_id}`; the track id is the half that identifies the stuck track */
+  private publishRequestEvent<T>(
+    factory: (properties: T & { method: string; trackId: string }) => AnalyticsEvent,
+    stateKey: string,
+    properties: T,
+  ) {
+    const separator = stateKey.indexOf(':');
+    this.eventBus?.analytics.publish(
+      factory({
+        ...properties,
+        method: stateKey.slice(0, separator),
+        trackId: stateKey.slice(separator + 1),
+      }),
+    );
+  }
 
   /**
    * Checked per attempt rather than once up front: 'open' is emitted from the channel's onopen, so
