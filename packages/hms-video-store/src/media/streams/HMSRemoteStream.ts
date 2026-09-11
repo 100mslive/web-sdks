@@ -2,6 +2,12 @@ import { HMSMediaStream } from './HMSMediaStream';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
+import { workerSleep } from '../../utils/timer-utils';
+
+/** marks a request the stream raised itself, so it does not refill its own budget */
+const RECONVERGE = 'reconverge';
+/** delays before each re-drive, in ms; the length is the budget */
+const RECONVERGE_DELAYS = [1000, 3000, 9000];
 
 /** @internal */
 export class HMSRemoteStream extends HMSMediaStream {
@@ -19,13 +25,19 @@ export class HMSRemoteStream extends HMSMediaStream {
   private confirmedVideo = HMSSimulcastLayer.NONE;
   private inFlightAudio?: boolean;
   private inFlightVideo?: HMSSimulcastLayer;
+  /** re-drives spent since the last app-driven request; refilled by one, see RECONVERGE_DELAYS */
+  private videoReconvergeUsed = 0;
+  private audioReconvergeUsed = 0;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
     super(nativeStream);
     this.connection = connection;
   }
 
-  async setAudio(enabled: boolean, trackId: string, identifier?: string) {
+  async setAudio(enabled: boolean, trackId: string, identifier?: string, source?: string) {
+    if (source !== RECONVERGE) {
+      this.audioReconvergeUsed = 0;
+    }
     if (this.isAudioSettled(enabled)) {
       return;
     }
@@ -38,6 +50,16 @@ export class HMSRemoteStream extends HMSMediaStream {
     trackId=${trackId}
     subscribing audio - ${this.audio}`,
     );
+    try {
+      await this.sendAudio(enabled, trackId);
+    } catch (error) {
+      // outside sendAudio, so the re-drive sees the cleared in-flight state rather than its own
+      this.reconvergeAudio(trackId, identifier);
+      throw error;
+    }
+  }
+
+  private async sendAudio(enabled: boolean, trackId: string) {
     try {
       const response = await this.connection.sendOverApiDataChannelWithResponse({
         params: {
@@ -55,6 +77,28 @@ export class HMSRemoteStream extends HMSMediaStream {
         this.inFlightAudio = undefined;
       }
     }
+  }
+
+  /** the audio counterpart of reconvergeVideo; nothing re-sends audio short of a mute */
+  private reconvergeAudio(trackId: string, identifier?: string) {
+    const delay = RECONVERGE_DELAYS[this.audioReconvergeUsed];
+    if (delay === undefined) {
+      HMSLogger.e(`[Remote stream] ${identifier || ''} gave up subscribing audio ${this.audio} on ${trackId}`);
+      this.connection.reportStuckState({
+        method: 'prefer-audio-track-state',
+        trackId,
+        desired: String(this.audio),
+        confirmed: String(this.confirmedAudio),
+      });
+      return;
+    }
+    this.audioReconvergeUsed++;
+    workerSleep(delay).then(() => {
+      if (this.connection.isClosed() || this.inFlightAudio !== undefined || this.confirmedAudio === this.audio) {
+        return;
+      }
+      this.setAudio(this.audio, trackId, identifier, RECONVERGE).catch(() => undefined);
+    });
   }
 
   /** true when the SFU is known to be on `enabled`, or a request for it is already on the wire */
@@ -89,6 +133,9 @@ export class HMSRemoteStream extends HMSMediaStream {
    * @param identifier is stream identifier to be printed in logs
    */
   setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+    if (source !== RECONVERGE) {
+      this.videoReconvergeUsed = 0;
+    }
     HMSLogger.d(
       `[Remote stream] ${identifier} 
       streamId=${this.id}
@@ -120,8 +167,34 @@ export class HMSRemoteStream extends HMSMediaStream {
       })
       .catch(error => {
         settle();
+        this.reconvergeVideo(trackId, identifier);
         throw error;
       });
+  }
+
+  /**
+   * Running out of attempts leaves the SFU on a layer nobody asked for, and the only things that
+   * re-send are a resize or a sink change - neither of which a settled tile produces.
+   */
+  private reconvergeVideo(trackId: string, identifier: string) {
+    const delay = RECONVERGE_DELAYS[this.videoReconvergeUsed];
+    if (delay === undefined) {
+      HMSLogger.e(`[Remote stream] ${identifier} gave up reaching layer ${this.video} on ${trackId}`);
+      this.connection.reportStuckState({
+        method: 'prefer-video-track-state',
+        trackId,
+        desired: this.video,
+        confirmed: this.confirmedVideo,
+      });
+      return;
+    }
+    this.videoReconvergeUsed++;
+    workerSleep(delay).then(() => {
+      if (this.connection.isClosed() || this.inFlightVideo !== undefined || this.confirmedVideo === this.video) {
+        return;
+      }
+      this.setVideoLayer(this.video, trackId, identifier, RECONVERGE).catch(() => undefined);
+    });
   }
 
   /** true when the SFU is known to be on `layer`, or a request for it is already on the wire */

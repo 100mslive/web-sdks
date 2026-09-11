@@ -119,6 +119,11 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  /** a subscribe request the SFU never applied, which the stream then failed to re-drive */
+  static subscribeStateStuck(properties: { method: string; trackId: string; desired: string; confirmed: string }) {
+    return new AnalyticsEvent({ name: 'subscribeStateStuck', level: AnalyticsEventLevel.ERROR, properties });
+  }
+
   static leave() {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }

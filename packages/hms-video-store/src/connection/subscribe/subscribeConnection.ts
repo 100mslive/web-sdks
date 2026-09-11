@@ -1,6 +1,8 @@
 import EventEmitter, { CancelablePromise, WaitForOptions } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
+import { EventBus } from '../../events/EventBus';
 import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
@@ -152,12 +154,23 @@ export default class HMSSubscribeConnection extends HMSConnection {
     config: RTCConfiguration,
     private isFlagEnabled: (flag: InitFlags) => boolean,
     observer: ISubscribeConnectionObserver,
+    private eventBus?: EventBus,
   ) {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.initNativeConnectionCallbacks();
+  }
+
+  /** a leave or an SFU migration; anything still chasing a subscribe state should stop */
+  isClosed() {
+    return this.closed;
+  }
+
+  /** a stream gave up reaching a state; published from here because the event bus lives on this side */
+  reportStuckState(properties: { method: string; trackId: string; desired: string; confirmed: string }) {
+    this.eventBus?.analytics.publish(AnalyticsEventFactory.subscribeStateStuck(properties));
   }
 
   sendOverApiDataChannel(message: string) {
