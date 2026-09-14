@@ -119,8 +119,17 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  /** an attempt went unanswered and is being retried; `unproven` marks the channel-open race */
-  static subscribeRequestRetry(properties: { method: string; trackId: string; attempt: number; unproven: boolean }) {
+  /**
+   * An attempt went unanswered and is being retried. `sent` separates bytes the SFU ignored from
+   * an attempt that never reached the wire; `unproven` marks the channel-open race among the former.
+   */
+  static subscribeRequestRetry(properties: {
+    method: string;
+    trackId: string;
+    attempt: number;
+    unproven: boolean;
+    sent: boolean;
+  }) {
     return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
   }
 

@@ -274,6 +274,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
     for (let i = 0; i < this.MAX_RETRIES; i++) {
       // a previous attempt's error response must not stand in for this attempt's outcome
       response = undefined;
+      /**
+       * The open race is a property of the send, not of the loop index: an attempt that dies on
+       * the channel-open wait raced nothing, and the attempt that does send is still the first one
+       * and still carries the short bound. These two mirror what waitForResponse was given.
+       */
+      let sentThisAttempt = false;
+      let unprovenWait = false;
       if (superseded()) {
         return dropped();
       }
@@ -286,8 +293,10 @@ export default class HMSSubscribeConnection extends HMSConnection {
         }
         // send can throw too - the channel may close between the open check and here
         this.apiChannel!.send(request);
+        sentThisAttempt = true;
         const firstSend = !sentOnce;
         sentOnce = true;
+        unprovenWait = firstSend && !this.channelProven;
         response = await this.waitForResponse(requestId, firstSend);
       } catch (error) {
         lastAttemptError = error as Error;
@@ -298,7 +307,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
         // the only signal that this class of miss happened at all - nothing else records it
         this.publishRequestEvent(AnalyticsEventFactory.subscribeRequestRetry, stateKey, {
           attempt: i,
-          unproven: i === 0 && !this.channelProven,
+          unproven: unprovenWait,
+          sent: sentThisAttempt,
         });
         continue;
       }

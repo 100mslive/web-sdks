@@ -1,5 +1,6 @@
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import HMSSubscribeConnection from './subscribeConnection';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { EventBus } from '../../events/EventBus';
 import { HMSSimulcastLayer } from '../../interfaces';
 import { HMSRemoteStream } from '../../media/streams';
@@ -25,17 +26,22 @@ describe('a subscribe request the SFU does not answer', () => {
   let sent: string[];
   let nativeChannel: ChannelWithHandler;
   let eventBus: EventBus;
+  let published: AnalyticsEvent[];
   let events: string[];
 
   beforeEach(() => {
     jest.useFakeTimers();
     sent = [];
+    published = [];
     events = [];
     window.RTCPeerConnection = jest.fn().mockImplementation(() => ({})) as unknown as typeof RTCPeerConnection;
     const signal = { trickle: jest.fn() } as unknown as JsonRpcSignal;
     const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
     eventBus = new EventBus();
-    eventBus.analytics.subscribe(event => events.push(event.name));
+    eventBus.analytics.subscribe(event => {
+      published.push(event);
+      events.push(event.name);
+    });
     connection = new HMSSubscribeConnection(signal, {}, () => false, observer, eventBus);
 
     nativeChannel = {
@@ -98,5 +104,50 @@ describe('a subscribe request the SFU does not answer', () => {
     await request;
 
     expect(events).toEqual([]);
+  }, 20_000);
+
+  /**
+   * The open-race signal is a property of the send, not of the loop index. An attempt that dies on
+   * the channel-open wait never put bytes in front of the SFU, so the attempt that does is still
+   * the first send and still the one the race can swallow - it carries the 500ms bound, and has to
+   * carry the label that goes with it or the race this PR exists to count is filed as something else.
+   */
+  it('labels the first send unproven even when an earlier attempt never sent', async () => {
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    const late = new HMSSubscribeConnection(
+      { trickle: jest.fn() } as unknown as JsonRpcSignal,
+      {},
+      () => false,
+      observer,
+      eventBus,
+    );
+    const lateSent: string[] = [];
+    const lateChannel = {
+      label: API_DATA_CHANNEL,
+      readyState: 'open',
+      send: (message: string) => lateSent.push(message),
+    } as unknown as ChannelWithHandler;
+    const lateStream = new HMSRemoteStream({ id: 'stream-2' } as MediaStream, late);
+
+    lateStream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+
+    // attempt 0 gives up on the channel-open wait without ever sending
+    await jest.advanceTimersByTimeAsync(11_000);
+    expect(lateSent).toHaveLength(0);
+
+    late.nativeConnection.ondatachannel?.({ channel: lateChannel } as RTCDataChannelEvent);
+    lateChannel.onopen?.(new Event('open'));
+    // attempt 1 is the first send, on a channel nobody has proven - 500ms bound
+    await jest.advanceTimersByTimeAsync(600);
+
+    const retries = published.filter(event => event.name === 'subscribeRequestRetry');
+    const firstSend = retries.find(event => event.properties.sent === true);
+    expect(firstSend).toBeDefined();
+    expect(firstSend!.properties.unproven).toBe(true);
+
+    // and the attempt that never reached the wire is not filed as an open-race miss
+    const neverSent = retries.find(event => event.properties.sent === false);
+    expect(neverSent).toBeDefined();
+    expect(neverSent!.properties.unproven).toBe(false);
   }, 20_000);
 });
