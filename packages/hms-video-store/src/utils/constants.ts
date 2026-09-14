@@ -19,6 +19,13 @@ export const SUBSCRIBE_TIMEOUT = 60_000;
 
 export const ICE_DISCONNECTION_TIMEOUT = 5_000;
 
+/**
+ * Cap on a single call into an audio plugin's own code - init (a model fetch) or processAudioTrack.
+ * Those run inside the plugins manager's serialized queue, so one that never settles would hold
+ * that queue for the life of the track. Generous enough for a model load on a slow connection.
+ */
+export const AUDIO_PLUGIN_CALL_TIMEOUT = 30_000;
+
 export const RTC_STATS_MONITOR_INTERVAL = 1_000;
 
 export const MAINTAIN_TRACK_HISTORY = false;

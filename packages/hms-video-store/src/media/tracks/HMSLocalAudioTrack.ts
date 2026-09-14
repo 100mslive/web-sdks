@@ -256,9 +256,48 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await localStream.replaceStreamTrack(this.nativeTrack, track);
     // change nativeTrack so plugin can start its work
     this.nativeTrack = track;
-    await this.replaceSenderTrack();
+    /**
+     * The empty track installed when capture is denied is a deliberately silent oscillator. Running
+     * the plugins against it only delays the device error the caller is about to get by a model
+     * load, and the graph that is published right now reads the mic that has just gone away, so
+     * publish the placeholder itself instead of a node fed by a stopped track.
+     */
+    const isSilentPlaceholder = isEmptyTrack(track);
+    if (isSilentPlaceholder) {
+      // the branch is new and it is reached on a predicate over the track, so log what it matched
+      // on: a real mic classified here would stop the plugins with nothing else to show for it
+      HMSLogger.i(this.TAG, 'capture replaced with the silent placeholder, releasing the graph', {
+        trackId: track.id,
+        label: track.label,
+        plugins: this.pluginsManager.getPlugins(),
+      });
+      // drop the running graph (Krisp keeps processing a stopped mic otherwise) but do not
+      // rebuild against the oscillator — plugins stay registered for the next real capture.
+      //
+      // Both are best effort, and separately so. The caller of this branch is about to throw the
+      // device error the app needs to see, so neither failure may take its place - and the reset
+      // below has to run even when the teardown swap failed, or the peer is left on the processed
+      // track that disconnectNodes has just stopped while we report the placeholder as published.
+      await this.pluginsManager
+        .releaseGraph()
+        .catch(e => HMSLogger.w(this.TAG, 'could not release the plugin graph', e));
+      await this.setProcessedTrack(undefined).catch(e =>
+        HMSLogger.w(this.TAG, 'could not publish the silent placeholder', e),
+      );
+    } else {
+      await this.replaceSenderTrack();
+    }
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     isLevelMonitored && this.initAudioLevelMonitor();
+    if (isSilentPlaceholder) {
+      return;
+    }
+    // Recovery tracks need the same graph rebuild as successful device selections.
+    try {
+      await this.pluginsManager.reprocessPlugins();
+    } catch (e) {
+      this.eventBus.audioPluginFailed.publish(e as HMSException);
+    }
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
@@ -320,11 +359,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
         );
       }
       throw e;
-    }
-    try {
-      await this.pluginsManager.reprocessPlugins();
-    } catch (e) {
-      this.eventBus.audioPluginFailed.publish(e as HMSException);
     }
   }
 
@@ -424,16 +458,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async cleanup() {
-    super.cleanup();
-    await this.pluginsManager.cleanup();
-    await this.pluginsManager.closeContext();
-    this.transceiver = undefined;
-    this.processedTrack?.stop();
-    this.tracksCreated.forEach(track => track.stop());
-    this.tracksCreated.clear();
-    this.isPublished = false;
-    this.destroyAudioLevelMonitor();
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    try {
+      // the only steps here that can throw, and nothing below them may be skipped when they do
+      super.cleanup();
+      await this.pluginsManager.cleanup();
+      await this.pluginsManager.closeContext();
+    } finally {
+      /**
+       * Never skippable. tracksCreated holds every track gum has handed this one, including
+       * replacements the mic is still live on, so leaving them unstopped keeps the recording
+       * indicator up after the user has left the room. And a visibilitychange listener left on a
+       * torn down track walks handleForegrounded -> endInterruption -> restoreCapture and issues a
+       * getUserMedia from there - most callers of this do not await it to notice the failure.
+       */
+      this.transceiver = undefined;
+      this.processedTrack?.stop();
+      this.tracksCreated.forEach(track => track.stop());
+      this.tracksCreated.clear();
+      this.isPublished = false;
+      this.destroyAudioLevelMonitor();
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**

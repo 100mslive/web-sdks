@@ -44,6 +44,12 @@ export class AudioPluginsAnalytics {
     }
   }
 
+  cleanup() {
+    for (const name in this.pluginAdded) {
+      this.removed(name);
+    }
+  }
+
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
