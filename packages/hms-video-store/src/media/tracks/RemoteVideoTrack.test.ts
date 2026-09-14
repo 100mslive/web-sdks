@@ -17,7 +17,10 @@ describe('remoteVideoTrack', () => {
   beforeEach(() => {
     videoElement = document.createElement('video');
     sendOverApiDataChannelWithResponse = jest.fn().mockResolvedValue({});
-    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
     nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
     track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular', false);
@@ -169,7 +172,10 @@ describe('HMSRemoteVideoTrack with disableNoneLayerRequest', () => {
   beforeEach(() => {
     videoElement = document.createElement('video');
     sendOverApiDataChannelWithResponse = jest.fn().mockResolvedValue({});
-    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
     const nativeStream = new MediaStream();
     stream = new HMSRemoteStream(nativeStream, connection);
     nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;

@@ -18,6 +18,9 @@ import HMSConnection from '../HMSConnection';
 import HMSDataChannel from '../HMSDataChannel';
 import { HMSConnectionRole } from '../model';
 
+/** one spelling of the claim key, shared by the request path and cancelPendingRequest */
+const stateKeyFor = (method: string, trackId: string) => `${method}:${trackId}`;
+
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
@@ -164,6 +167,16 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.initNativeConnectionCallbacks();
   }
 
+  /**
+   * Drops the claim on one piece of subscription state, so anything still chasing it stops and
+   * resolves as dropped. The SFU telling us where it is overrules a request for somewhere else:
+   * without this the retries replay the overruled bytes and leave the SFU holding a preference
+   * the client has moved off, which the allocator restores to on the next bandwidth recovery.
+   */
+  cancelPendingRequest(method: string, trackId: string) {
+    this.latestRequestPerState.delete(stateKeyFor(method, trackId));
+  }
+
   sendOverApiDataChannel(message: string) {
     if (this.apiChannel && this.apiChannel.readyState === 'open') {
       this.apiChannel.send(message);
@@ -194,7 +207,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       jsonrpc: '2.0',
       ...message,
     });
-    const stateKey = `${message.method}:${message.params.track_id}`;
+    const stateKey = stateKeyFor(message.method, message.params.track_id);
     this.latestRequestPerState.set(stateKey, id);
     try {
       return await this.sendMessage(request, id, stateKey);
@@ -304,12 +317,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
         if (this.closed) {
           break;
         }
-        // the only signal that this class of miss happened at all - nothing else records it
-        this.publishRequestEvent(AnalyticsEventFactory.subscribeRequestRetry, stateKey, {
-          attempt: i,
-          unproven: unprovenWait,
-          sent: sentThisAttempt,
-        });
+        // the only signal that this class of miss happened at all - nothing else records it.
+        // A request the next loop turn drops was not retried, and counting it inflates the rate.
+        if (!superseded()) {
+          this.publishRequestEvent(AnalyticsEventFactory.subscribeRequestRetry, stateKey, {
+            attempt: i,
+            unproven: unprovenWait,
+            sent: sentThisAttempt,
+          });
+        }
         continue;
       }
       const error = response.error;

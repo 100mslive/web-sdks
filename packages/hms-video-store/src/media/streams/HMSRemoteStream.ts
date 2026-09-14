@@ -81,11 +81,13 @@ export class HMSRemoteStream extends HMSMediaStream {
   }
 
   /** the SFU telling us where it already is - authoritative, so no request is needed to reach it */
-  setVideoLayerFromServer(layer: HMSSimulcastLayer, identifier: string, source: string) {
+  setVideoLayerFromServer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
     this.confirmedVideo = layer;
     // drop any claim still on the wire: it describes a layer the SFU has just contradicted, and
     // isVideoLayerSettled prefers the claim, which would hide this value from the dedupe
     this.videoRequest = undefined;
+    // and on the connection too, or its retries keep replaying the overruled layer
+    this.connection.cancelPendingRequest('prefer-video-track-state', trackId);
     this.setVideoLayerLocally(layer, identifier, source);
   }
 

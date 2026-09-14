@@ -150,4 +150,22 @@ describe('a subscribe request the SFU does not answer', () => {
     expect(neverSent).toBeDefined();
     expect(neverSent!.properties.unproven).toBe(false);
   }, 20_000);
+
+  /**
+   * A request the next loop turn drops was not retried - it was replaced. Counting it inflates
+   * the retry rate with churn that has nothing to do with the SFU missing anything.
+   */
+  it('does not count a retry for a request a newer one has replaced', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await flush();
+    const low = stream.setVideoLayer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'resize');
+    await flush();
+    respondTo(sent[1]);
+    await low;
+
+    // the replaced request's own bound expires: it is dropped on the next turn, not retried
+    await jest.advanceTimersByTimeAsync(600);
+
+    expect(published.filter(event => event.name === 'subscribeRequestRetry')).toHaveLength(0);
+  }, 20_000);
 });
