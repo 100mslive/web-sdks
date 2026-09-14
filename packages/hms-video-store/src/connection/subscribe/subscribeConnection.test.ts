@@ -14,6 +14,9 @@ interface WithEventEmitter {
   eventEmitter: { emit: (event: string, value: string) => void };
 }
 
+/** the connection reads replies off the native channel, so replies in tests arrive the same way */
+type ChannelWithHandler = RTCDataChannel & { onmessage?: (event: { data: string }) => void };
+
 /**
  * The Aug 2026 silent-recording incident: the SFU never answered the first
  * `prefer-audio-track-state` request of a session, so the caller waited forever.
@@ -21,6 +24,7 @@ interface WithEventEmitter {
 describe('HMSSubscribeConnection api data channel', () => {
   let connection: HMSSubscribeConnection;
   let sent: string[];
+  let nativeChannel: ChannelWithHandler;
 
   beforeEach(() => {
     sent = [];
@@ -32,7 +36,7 @@ describe('HMSSubscribeConnection api data channel', () => {
     connection = new HMSSubscribeConnection(signal, {}, () => false, observer);
 
     let readyState = 'open';
-    const nativeChannel = {
+    nativeChannel = {
       label: API_DATA_CHANNEL,
       get readyState() {
         return readyState;
@@ -46,7 +50,7 @@ describe('HMSSubscribeConnection api data channel', () => {
       close: jest.fn(() => {
         readyState = 'closed';
       }),
-    } as unknown as RTCDataChannel;
+    } as unknown as ChannelWithHandler;
     connection.nativeConnection.ondatachannel?.({ channel: nativeChannel } as RTCDataChannelEvent);
   });
 
@@ -58,13 +62,10 @@ describe('HMSSubscribeConnection api data channel', () => {
     jest.useRealTimers();
   });
 
-  /** the emitter is private; the data channel's onMessage feeds it exactly like this */
+  /** goes through the native channel so a reply marks the channel proven, exactly as in production */
   const emitReply = (request: string, body: Record<string, unknown>) => {
     const { id } = JSON.parse(request) as { id: string };
-    (connection as unknown as WithEventEmitter).eventEmitter.emit(
-      'message',
-      JSON.stringify({ id, jsonrpc: '2.0', ...body }),
-    );
+    nativeChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', ...body }) });
   };
 
   const respondTo = (request: string) => emitReply(request, { result: { track_id: 'track-1' } });
@@ -93,6 +94,143 @@ describe('HMSSubscribeConnection api data channel', () => {
     const result = await promise;
 
     expect(result).toBeInstanceOf(Error);
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
+   * The SFU creates this channel, so by DCEP the client's `open` fires a half-RTT before the SFU's
+   * and a request sent in that window is dropped before it arrives. Replies measure single-digit
+   * ms, so the first attempt must not sit on the full timeout - that is a black tile for as long
+   * as it waits.
+   */
+  it('retries an unanswered first request in under a second', async () => {
+    jest.useFakeTimers();
+    const promise = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    await Promise.resolve();
+    expect(sent).toHaveLength(1);
+
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    respondTo(sent[1]);
+    await expect(promise).resolves.toBeDefined();
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
+   * A link slow enough to miss 500ms twice is slow, not dropping. Putting every attempt on the
+   * short bound would hard-fail a high-RTT client at 1.5s, well inside SCTP's ~1s RTO.Min.
+   */
+  it('gives later attempts the full timeout even on an unproven channel', async () => {
+    jest.useFakeTimers();
+    const promise = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    await Promise.resolve();
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(600);
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(10_000);
+    expect(sent).toHaveLength(3);
+
+    await jest.advanceTimersByTimeAsync(120_000);
+    await promise;
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
+   * The open race is about the first bytes on the wire, not the first turn of the retry loop. An
+   * attempt that gave up on the channel-open wait sent nothing, so the attempt that does send is
+   * still the one the SFU can drop - and it has to get the short bound, not the 10s one.
+   */
+  it('gives the short bound to the first send even when an earlier attempt never sent', async () => {
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    const late = new HMSSubscribeConnection(
+      { trickle: jest.fn() } as unknown as JsonRpcSignal,
+      {},
+      () => false,
+      observer,
+    );
+    const lateSent: string[] = [];
+    const lateChannel = {
+      label: API_DATA_CHANNEL,
+      readyState: 'open',
+      send: (message: string) => lateSent.push(message),
+      close: jest.fn(),
+    } as unknown as ChannelWithHandler;
+
+    jest.useFakeTimers();
+    const promise = late
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: true, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    // the first attempt burns its channel-open wait without ever reaching send
+    await jest.advanceTimersByTimeAsync(11_000);
+    expect(lateSent).toHaveLength(0);
+
+    late.nativeConnection.ondatachannel?.({ channel: lateChannel } as RTCDataChannelEvent);
+    lateChannel.onopen?.(new Event('open'));
+    await jest.advanceTimersByTimeAsync(100);
+    expect(lateSent).toHaveLength(1);
+
+    await jest.advanceTimersByTimeAsync(600);
+    expect(lateSent).toHaveLength(2);
+
+    const { id } = JSON.parse(lateSent[1]) as { id: string };
+    lateChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
+    await expect(promise).resolves.toBeDefined();
+    late.close();
+    jest.useRealTimers();
+  }, 10_000);
+
+  /**
+   * Only the unproven channel gets the short bound. Once the SFU has answered, a slow reply is the
+   * SFU being slow rather than a dropped request, and resending on top of it is pure duplication.
+   */
+  it('keeps the generous timeout once the SFU has answered on this channel', async () => {
+    const first = connection.sendOverApiDataChannelWithResponse({
+      method: 'prefer-audio-track-state',
+      params: { subscribed: true, track_id: 'track-1' },
+    });
+    await Promise.resolve();
+    respondTo(sent[0]);
+    await first;
+
+    jest.useFakeTimers();
+    const second = connection
+      .sendOverApiDataChannelWithResponse({
+        method: 'prefer-audio-track-state',
+        params: { subscribed: false, track_id: 'track-1' },
+      })
+      .catch((error: Error) => error);
+
+    await Promise.resolve();
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(1_000);
+    expect(sent).toHaveLength(2);
+
+    await jest.advanceTimersByTimeAsync(10_000);
+    expect(sent).toHaveLength(3);
+
+    await jest.advanceTimersByTimeAsync(120_000);
+    await second;
     jest.useRealTimers();
   }, 10_000);
 
