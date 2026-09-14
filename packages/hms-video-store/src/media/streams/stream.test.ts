@@ -13,7 +13,10 @@ describe('HMSRemoteStream', () => {
   let sendOverApiDataChannelWithResponse: jest.Mock;
   beforeEach(() => {
     sendOverApiDataChannelWithResponse = jest.fn().mockResolvedValue({});
-    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
   });
 
@@ -207,7 +210,7 @@ describe('HMSRemoteStream', () => {
 
   /** a layer the SFU reports is already applied - no request needed to reach it */
   it('treats a server-sent layer as settled', () => {
-    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'test', 'setLayerFromServer');
+    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, videoTrackId, 'test', 'setLayerFromServer');
 
     expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(true);
   });

@@ -55,7 +55,10 @@ describe('VideoElementManager layer request races', () => {
       sent.push(params.max_spatial_layer);
       return new Promise(resolve => setTimeout(() => resolve({}), 5));
     });
-    const connection = { sendOverApiDataChannelWithResponse: send } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse: send,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
 
     const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
     const nativeTrack = {

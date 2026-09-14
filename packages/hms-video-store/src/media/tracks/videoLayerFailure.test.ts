@@ -37,6 +37,7 @@ describe('VideoElementManager layer request failures', () => {
       sendOverApiDataChannelWithResponse: jest
         .fn()
         .mockRejectedValue(new Error('No response from SFU for prefer-video-track-state')),
+      cancelPendingRequest: jest.fn(),
     } as unknown as HMSSubscribeConnection;
     const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
     const nativeTrack = {
@@ -152,6 +153,7 @@ describe('HMSRemoteVideoTrack after a failed layer request', () => {
       { id: 'stream-1' } as MediaStream,
       {
         sendOverApiDataChannelWithResponse: send,
+        cancelPendingRequest: jest.fn(),
       } as unknown as HMSSubscribeConnection,
     );
     const track = new HMSRemoteVideoTrack(

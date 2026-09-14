@@ -875,6 +875,7 @@ export default class HMSTransport {
           this.initConfig.rtcConfiguration,
           this.isFlagEnabled.bind(this),
           subscribeConnectionObserver,
+          this.eventBus,
         );
       }
     }

@@ -234,8 +234,28 @@ describe('a request that a newer one has replaced', () => {
     stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
     await flush();
 
-    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'id', 'degradation');
+    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'degradation');
 
     expect(stream.isVideoLayerSettled(HMSSimulcastLayer.LOW)).toBe(true);
+  }, 20_000);
+
+  /**
+   * The SFU telling us where it is overrules a request for somewhere else. Clearing the local
+   * claim is not enough: the connection still holds this request's claim, so its retries replay
+   * the overruled bytes and leave the SFU holding a preference the client has moved off - which
+   * the allocator restores to on the next bandwidth recovery.
+   */
+  it('stops a request the SFU has already overruled', async () => {
+    const request = stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize');
+    await flush();
+    expect(sent).toHaveLength(1);
+
+    stream.setVideoLayerFromServer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'degradation');
+
+    await exhaustRetries();
+    const response = await request;
+
+    expect(sent.map(layerOf)).toEqual([HMSSimulcastLayer.HIGH]);
+    expect(response?.dropped).toBe(true);
   }, 20_000);
 });

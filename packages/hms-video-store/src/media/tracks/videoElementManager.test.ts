@@ -41,7 +41,10 @@ describe('videoElementManager', () => {
     localTrack = new HMSLocalVideoTrack(localStream, localNativeTrack, 'regular', new EventBus());
 
     sendOverApiDataChannelWithResponse = jest.fn();
-    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
     remoteNativeStream = { id: remoteStreamId } as MediaStream;
     remoteStream = new HMSRemoteStream(remoteNativeStream, connection);
     remoteNativeTrack = {

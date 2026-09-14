@@ -1,0 +1,171 @@
+import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
+import HMSSubscribeConnection from './subscribeConnection';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
+import { EventBus } from '../../events/EventBus';
+import { HMSSimulcastLayer } from '../../interfaces';
+import { HMSRemoteStream } from '../../media/streams';
+import JsonRpcSignal from '../../signal/jsonrpc';
+import { API_DATA_CHANNEL } from '../../utils/constants';
+
+// fake timers do not advance a worker timer; setTimeout keeps the retry backoff under test control
+jest.mock('../../utils/timer-utils', () => ({
+  ...jest.requireActual('../../utils/timer-utils'),
+  workerSleep: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+}));
+
+type ChannelWithHandler = RTCDataChannel & { onmessage?: (event: { data: string }) => void };
+
+/**
+ * A request the SFU never received has no signal anywhere: no SDK event, no SFU metric, and the
+ * browser console only reaches us inside a beam's uploaded Chrome log. Both confirmed cases were
+ * found by hand from one recording, so we cannot say how often this happens.
+ */
+describe('a subscribe request the SFU does not answer', () => {
+  let connection: HMSSubscribeConnection;
+  let stream: HMSRemoteStream;
+  let sent: string[];
+  let nativeChannel: ChannelWithHandler;
+  let eventBus: EventBus;
+  let published: AnalyticsEvent[];
+  let events: string[];
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    sent = [];
+    published = [];
+    events = [];
+    window.RTCPeerConnection = jest.fn().mockImplementation(() => ({})) as unknown as typeof RTCPeerConnection;
+    const signal = { trickle: jest.fn() } as unknown as JsonRpcSignal;
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    eventBus = new EventBus();
+    eventBus.analytics.subscribe(event => {
+      published.push(event);
+      events.push(event.name);
+    });
+    connection = new HMSSubscribeConnection(signal, {}, () => false, observer, eventBus);
+
+    nativeChannel = {
+      label: API_DATA_CHANNEL,
+      readyState: 'open',
+      send: (message: string) => sent.push(message),
+    } as unknown as ChannelWithHandler;
+    connection.nativeConnection.ondatachannel?.({ channel: nativeChannel } as RTCDataChannelEvent);
+
+    stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const respondTo = (request: string) => {
+    const { id } = JSON.parse(request) as { id: string };
+    nativeChannel.onmessage?.({ data: JSON.stringify({ id, jsonrpc: '2.0', result: { track_id: 'track-1' } }) });
+  };
+
+  /** let the pending microtask chain run without moving the clock */
+  const flush = async () => {
+    for (let i = 0; i < 6; i++) {
+      await Promise.resolve();
+    }
+  };
+
+  /** the 500ms bound on the first attempt of an unproven channel, plus slack */
+  const missFirstAttempt = () => jest.advanceTimersByTimeAsync(600);
+
+  /** run out all MAX_RETRIES attempts without ever answering */
+  const exhaustRetries = () => jest.advanceTimersByTimeAsync(21_000);
+
+  /**
+   * This is the case both RCAs showed - the first request of a session, dropped in the window
+   * before the SFU's end of the channel opens. It is rescued by the retry, so it is invisible
+   * today; counting it is how we learn whether the rescue is load-bearing.
+   */
+  it('reports an attempt that went unanswered', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await missFirstAttempt();
+
+    expect(events).toContain('subscribeRequestRetry');
+  }, 20_000);
+
+  /** the case the SDK cannot recover from, and the one we have never observed */
+  it('reports a request that no attempt answered', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await exhaustRetries();
+
+    expect(events).toContain('subscribeRequestUnanswered');
+  }, 20_000);
+
+  /** the rate is only meaningful if an answered request is silent */
+  it('reports nothing when the SFU answers', async () => {
+    const request = stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize');
+    await flush();
+    respondTo(sent[0]);
+    await request;
+
+    expect(events).toEqual([]);
+  }, 20_000);
+
+  /**
+   * The open-race signal is a property of the send, not of the loop index. An attempt that dies on
+   * the channel-open wait never put bytes in front of the SFU, so the attempt that does is still
+   * the first send and still the one the race can swallow - it carries the 500ms bound, and has to
+   * carry the label that goes with it or the race this PR exists to count is filed as something else.
+   */
+  it('labels the first send unproven even when an earlier attempt never sent', async () => {
+    const observer = { onApiChannelMessage: jest.fn() } as unknown as ISubscribeConnectionObserver;
+    const late = new HMSSubscribeConnection(
+      { trickle: jest.fn() } as unknown as JsonRpcSignal,
+      {},
+      () => false,
+      observer,
+      eventBus,
+    );
+    const lateSent: string[] = [];
+    const lateChannel = {
+      label: API_DATA_CHANNEL,
+      readyState: 'open',
+      send: (message: string) => lateSent.push(message),
+    } as unknown as ChannelWithHandler;
+    const lateStream = new HMSRemoteStream({ id: 'stream-2' } as MediaStream, late);
+
+    lateStream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+
+    // attempt 0 gives up on the channel-open wait without ever sending
+    await jest.advanceTimersByTimeAsync(11_000);
+    expect(lateSent).toHaveLength(0);
+
+    late.nativeConnection.ondatachannel?.({ channel: lateChannel } as RTCDataChannelEvent);
+    lateChannel.onopen?.(new Event('open'));
+    // attempt 1 is the first send, on a channel nobody has proven - 500ms bound
+    await jest.advanceTimersByTimeAsync(600);
+
+    const retries = published.filter(event => event.name === 'subscribeRequestRetry');
+    const firstSend = retries.find(event => event.properties.sent === true);
+    expect(firstSend).toBeDefined();
+    expect(firstSend!.properties.unproven).toBe(true);
+
+    // and the attempt that never reached the wire is not filed as an open-race miss
+    const neverSent = retries.find(event => event.properties.sent === false);
+    expect(neverSent).toBeDefined();
+    expect(neverSent!.properties.unproven).toBe(false);
+  }, 20_000);
+
+  /**
+   * A request the next loop turn drops was not retried - it was replaced. Counting it inflates
+   * the retry rate with churn that has nothing to do with the SFU missing anything.
+   */
+  it('does not count a retry for a request a newer one has replaced', async () => {
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'track-1', 'id', 'resize').catch(() => undefined);
+    await flush();
+    const low = stream.setVideoLayer(HMSSimulcastLayer.LOW, 'track-1', 'id', 'resize');
+    await flush();
+    respondTo(sent[1]);
+    await low;
+
+    // the replaced request's own bound expires: it is dropped on the next turn, not retried
+    await jest.advanceTimersByTimeAsync(600);
+
+    expect(published.filter(event => event.name === 'subscribeRequestRetry')).toHaveLength(0);
+  }, 20_000);
+});

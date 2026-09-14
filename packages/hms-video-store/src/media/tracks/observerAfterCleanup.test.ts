@@ -7,7 +7,10 @@ import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const makeRemoteVideoTrack = () => {
   const sendOverApiDataChannelWithResponse = jest.fn();
-  const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
+  const connection = {
+    sendOverApiDataChannelWithResponse,
+    cancelPendingRequest: jest.fn(),
+  } as unknown as HMSSubscribeConnection;
   const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
   const nativeTrack = {
     id: 'track-1',
@@ -79,7 +82,10 @@ describe('VideoElementManager teardown while an add is in flight', () => {
       sent.push(params.max_spatial_layer);
       return new Promise(resolve => setTimeout(() => resolve({}), 5));
     });
-    const connection = { sendOverApiDataChannelWithResponse: send } as unknown as HMSSubscribeConnection;
+    const connection = {
+      sendOverApiDataChannelWithResponse: send,
+      cancelPendingRequest: jest.fn(),
+    } as unknown as HMSSubscribeConnection;
     const stream = new HMSRemoteStream({ id: 'stream-1' } as MediaStream, connection);
     const nativeTrack = {
       id: 'track-1',
