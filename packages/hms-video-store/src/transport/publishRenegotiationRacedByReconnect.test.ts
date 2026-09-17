@@ -29,6 +29,9 @@ const makePublishConnection = () => {
   const appliedAnswers: string[] = [];
   return {
     appliedAnswers,
+    close() {
+      signalingState = 'closed';
+    },
     get signalingState() {
       return signalingState;
     },
@@ -106,24 +109,64 @@ describe('publish renegotiation raced by reconnect', () => {
    */
   it.todo('discards an answer superseded by a pending offer (needs offer identity, not state)');
 
-  it('discards the stale answer when a concurrent negotiation already returned to stable', async () => {
+  it('discards the stale answer and re-offers when the reconnect renegotiated during the offer retry', async () => {
     const publishConnection = makePublishConnection();
 
-    // The competing negotiation completes while our offer is in flight, so the
-    // connection is back at `stable` before our answer lands.
+    // Models JsonRpcSignal.call: first send dies on the websocket (1003), call()
+    // sleeps 2-4s and re-sends. The reconnect finishes its own negotiation inside
+    // that sleep, so the PC is back to `stable` before our answer lands.
+    const signalOffer = jest
+      .fn()
+      .mockImplementationOnce(async () => {
+        await publishConnection.setRemoteDescription({ type: 'answer', sdp: 'reconnect-answer' });
+        expect(publishConnection.signalingState).toBe('stable');
+        return { type: 'answer', sdp: 'stale-answer' };
+      })
+      .mockImplementationOnce(async () => ({ type: 'answer', sdp: 'fresh-answer' }));
+
+    const { rejectedWith, resolvedWith } = await runRenegotiation(signalOffer, publishConnection);
+
+    // Pre-fix this rejected with the terminal 4004 and the peer was dropped.
+    expect(rejectedWith).toBeUndefined();
+    expect(resolvedWith).toBe(true);
+    // The stale answer must never reach the peer connection, but our staged state
+    // must still get published — otherwise we trade a 4004 for a missing tile.
+    expect(signalOffer).toHaveBeenCalledTimes(2);
+    expect(publishConnection.appliedAnswers).toEqual(['reconnect-answer', 'fresh-answer']);
+    expect(publishConnection.signalingState).toBe('stable');
+  });
+
+  it('gives up after one re-offer rather than looping when the race repeats', async () => {
+    const publishConnection = makePublishConnection();
+
+    // Every offer loses the race — the re-offer must not recurse further.
     const signalOffer = jest.fn(async () => {
-      await publishConnection.setRemoteDescription({ type: 'answer', sdp: 'winner-answer' });
-      expect(publishConnection.signalingState).toBe('stable');
-      return { type: 'answer', sdp: 'stale-answer' };
+      await publishConnection.setRemoteDescription({ type: 'answer', sdp: 'winner' });
+      return { type: 'answer', sdp: 'loser' };
     });
 
     const { rejectedWith, resolvedWith } = await runRenegotiation(signalOffer, publishConnection);
 
-    // Previously this rejected with the terminal 4004 and the peer was dropped.
     expect(rejectedWith).toBeUndefined();
     expect(resolvedWith).toBe(true);
-    expect(publishConnection.appliedAnswers).toEqual(['winner-answer']);
-    expect(publishConnection.signalingState).toBe('stable');
+    expect(signalOffer).toHaveBeenCalledTimes(2); // original + exactly one re-offer
+    expect(publishConnection.appliedAnswers).toEqual(['winner', 'winner']);
+  });
+
+  it('does not re-offer from a closed connection', async () => {
+    const publishConnection = makePublishConnection();
+
+    const signalOffer = jest.fn(async () => {
+      publishConnection.close();
+      return { type: 'answer', sdp: 'answer-after-close' };
+    });
+
+    const { rejectedWith, resolvedWith } = await runRenegotiation(signalOffer, publishConnection);
+
+    expect(rejectedWith).toBeUndefined();
+    expect(resolvedWith).toBe(true);
+    expect(signalOffer).toHaveBeenCalledTimes(1); // no re-offer attempted
+    expect(publishConnection.appliedAnswers).toEqual([]);
   });
 
   it('still applies the answer on the happy path where nothing races the offer', async () => {

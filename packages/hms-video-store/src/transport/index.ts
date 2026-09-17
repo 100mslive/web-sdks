@@ -1023,24 +1023,43 @@ export default class HMSTransport {
   }
 
   /**
-   * Applies a publish answer only while the connection is still waiting for one. A
-   * concurrent renegotiation — `onRenegotiationNeeded` racing `retryPublishIceFailedTask`,
-   * or a reconnect completing during JsonRpcSignal.call's 1003 retry — leaves the
-   * connection back at `stable`, making this answer stale. Applying it throws the
-   * terminal 4004 and drops the peer from the room.
+   * Applies a publish answer only while the connection still holds the offer it was
+   * generated for. A concurrent renegotiation — `onRenegotiationNeeded` racing
+   * `retryPublishIceFailedTask`, or a reconnect completing during JsonRpcSignal.call's
+   * 1003 retry — leaves the connection back at `stable`, making this answer stale.
+   * Applying it throws the terminal 4004 and drops the peer.
    *
-   * State, deliberately not offer identity. After a successful setLocalDescription the
-   * spec guarantees `have-local-offer`, so this branch is taken on every healthy
-   * negotiation and behaviour there is unchanged. Matching on sdp instead would depend
-   * on Chrome storing our munged offer (createOffer applies fixMsid + enableOpusDtx)
-   * byte-identically, which is not guaranteed.
+   * Discarding alone would risk the missing tiles `retryPublishIceFailedTask` warns
+   * about, since the winning negotiation may predate whatever this offer staged. So
+   * re-offer once from current state instead. Bounded to a single retry: a second
+   * straight loss means another negotiation is already carrying the current state.
    */
-  private async applyPublishAnswer(answer: RTCSessionDescriptionInit) {
-    if (!this.publishConnection || this.publishConnection.signalingState !== 'have-local-offer') {
-      HMSLogger.w(TAG, `[role=PUBLISH] discarding stale answer, state=${this.publishConnection?.signalingState}`);
+  private async applyPublishAnswer(answer: RTCSessionDescriptionInit, allowReoffer = true) {
+    if (!this.publishConnection) {
       return;
     }
-    await this.publishConnection.setRemoteDescription(answer);
+    // State, deliberately not offer identity. After a successful setLocalDescription
+    // the spec guarantees `have-local-offer`, so this branch is taken on every healthy
+    // negotiation and behaviour there is unchanged. Matching on sdp instead would
+    // depend on Chrome storing our munged offer (createOffer applies fixMsid +
+    // enableOpusDtx) byte-identically, which is not guaranteed.
+    if (this.publishConnection.signalingState === 'have-local-offer') {
+      await this.publishConnection.setRemoteDescription(answer);
+      return;
+    }
+
+    const state = this.publishConnection.signalingState;
+    HMSLogger.w(TAG, `[role=PUBLISH] discarding stale answer, state=${state}`);
+    // Re-offer only when no negotiation is pending. `have-local-offer` means another
+    // pass owns the connection and will carry current state; `closed` would throw.
+    if (!allowReoffer || state !== 'stable') {
+      return;
+    }
+    HMSLogger.d(TAG, `[role=PUBLISH] re-offering after stale answer`);
+    const freshOffer = await this.publishConnection.createOffer(this.trackStates);
+    await this.publishConnection.setLocalDescription(freshOffer);
+    const freshAnswer = await this.signal.offer(freshOffer, this.trackStates);
+    await this.applyPublishAnswer(freshAnswer, false);
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
