@@ -46,6 +46,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.connectionState;
   }
 
+  public get signalingState(): RTCSignalingState {
+    return this.nativeConnection.signalingState;
+  }
+
   private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
   }

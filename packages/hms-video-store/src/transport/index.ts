@@ -1022,6 +1022,27 @@ export default class HMSTransport {
     }
   }
 
+  /**
+   * Applies a publish answer only while the connection is still waiting for one. A
+   * concurrent renegotiation — `onRenegotiationNeeded` racing `retryPublishIceFailedTask`,
+   * or a reconnect completing during JsonRpcSignal.call's 1003 retry — leaves the
+   * connection back at `stable`, making this answer stale. Applying it throws the
+   * terminal 4004 and drops the peer from the room.
+   *
+   * State, deliberately not offer identity. After a successful setLocalDescription the
+   * spec guarantees `have-local-offer`, so this branch is taken on every healthy
+   * negotiation and behaviour there is unchanged. Matching on sdp instead would depend
+   * on Chrome storing our munged offer (createOffer applies fixMsid + enableOpusDtx)
+   * byte-identically, which is not guaranteed.
+   */
+  private async applyPublishAnswer(answer: RTCSessionDescriptionInit) {
+    if (!this.publishConnection || this.publishConnection.signalingState !== 'have-local-offer') {
+      HMSLogger.w(TAG, `[role=PUBLISH] discarding stale answer, state=${this.publishConnection?.signalingState}`);
+      return;
+    }
+    await this.publishConnection.setRemoteDescription(answer);
+  }
+
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
@@ -1042,7 +1063,7 @@ export default class HMSTransport {
       const answer = await this.signal.offer(offer, this.trackStates);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
-      await this.publishConnection.setRemoteDescription(answer);
+      await this.applyPublishAnswer(answer);
       callback.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
