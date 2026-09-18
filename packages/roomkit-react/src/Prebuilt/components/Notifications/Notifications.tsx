@@ -17,6 +17,7 @@ import { PollNotificationModal } from './PollNotificationModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
 import { RoleChangeNotification } from './RoleChangeNotification';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
+import { TrackInterruptionModal } from './TrackInterruptionModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { TranscriptionNotifications } from './TranscriptionNotifications';
@@ -54,6 +55,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <ErrorNotifications />
       <AutoplayBlockedModal />
+      <TrackInterruptionModal />
       <PermissionErrorNotificationModal />
       <InitErrorModal />
       <ChatNotifications />

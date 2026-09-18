@@ -13,15 +13,20 @@ export class AudioContextManager {
   }
 
   /**
-   * Resume AudioContext if it is suspended
+   * Resume AudioContext if it is not running
    * Note: when the browser tab is muted by default, AudioContext will be in suspended state
    * It has to be resumed for the video/audio to be played.
+   * Safari also reports a non standard 'interrupted' state after an OS audio interruption - an
+   * incoming call or another app taking the audio session - which a check for 'suspended' misses.
    */
   async resumeContext() {
-    if (this.audioContext.state === 'suspended') {
-      await this.audioContext.resume();
-      HMSLogger.d(this.TAG, 'AudioContext is resumed');
+    const state = this.audioContext.state;
+    // resume rejects on a closed context, cleanup closes this one
+    if (state === 'running' || state === 'closed') {
+      return;
     }
+    await this.audioContext.resume();
+    HMSLogger.d(this.TAG, 'AudioContext is resumed', `from ${state}`);
   }
 
   getAudioTrack() {

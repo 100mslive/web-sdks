@@ -829,6 +829,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onTrackInterruption: this.onTrackInterruption.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
@@ -872,6 +873,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onTrackInterruption: this.onTrackInterruption.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
@@ -901,6 +903,21 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const action = request.roomEnded || !requestedBy ? 'roomEnded' : 'removedFromRoom';
     HMSLogger.i(`resetting state after peer removed ${action}`, request);
     this.resetState(action);
+  }
+
+  private onTrackInterruption(interruption: sdkTypes.HMSTrackInterruption) {
+    /**
+     * kept in the store and not only in the notification - a notification is the latest event only,
+     * and audio and video publish theirs from the same visibilitychange, so a subscriber that reads
+     * events can miss one of the two.
+     */
+    this.setState(store => {
+      const track = store.tracks[interruption.trackId];
+      if (track) {
+        track.interrupted = interruption.started;
+      }
+    }, 'trackInterruption');
+    this.hmsNotifications.sendTrackInterruption(interruption);
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
@@ -938,6 +955,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onReconnected: this.onReconnected.bind(this),
       onReconnecting: this.onReconnecting.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onTrackInterruption: this.onTrackInterruption.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),

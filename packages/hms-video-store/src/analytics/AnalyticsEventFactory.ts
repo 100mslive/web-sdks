@@ -119,6 +119,25 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  /**
+   * An attempt went unanswered and is being retried. `sent` separates bytes the SFU ignored from
+   * an attempt that never reached the wire; `unproven` marks the channel-open race among the former.
+   */
+  static subscribeRequestRetry(properties: {
+    method: string;
+    trackId: string;
+    attempt: number;
+    unproven: boolean;
+    sent: boolean;
+  }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
+  }
+
+  /** no attempt was answered, so the SFU is left on a state nobody asked for */
+  static subscribeRequestUnanswered(properties: { method: string; trackId: string; attempts: number }) {
+    return new AnalyticsEvent({ name: 'subscribeRequestUnanswered', level: AnalyticsEventLevel.ERROR, properties });
+  }
+
   static leave() {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }

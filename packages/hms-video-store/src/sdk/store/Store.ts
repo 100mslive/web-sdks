@@ -224,6 +224,11 @@ class Store {
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
     this.addPluginsToRoles(params.plugins);
+    // Resolved unconditionally, not from the key-driven switch inside
+    // addPluginsToRoles: a policy that omits noiseCancellation means "not
+    // configured", which means off. Driving it from key presence let such
+    // templates keep the raw /init flag forever.
+    this.handleNoiseCancellationPlugin(params.plugins?.[Plugins.NOISE_CANCELLATION]);
     this.roleDetailsArrived = true;
     this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
@@ -308,10 +313,17 @@ class Store {
     this.speakers = speakers;
   }
 
+  /**
+   * Concurrent, so one unanswered request does not stop the rest being asked - in series the first
+   * rejection left every later track on the old volume.
+   *
+   * Still rejects. Turning a peer *up* resubscribes, and HMSRemoteStream records the new state
+   * before the send, so a lost reply leaves the stream believing it is subscribed while the SFU
+   * sends nothing - and the equality guard makes every retry a no-op. Swallowing that would tell
+   * the app the volume was applied while a peer is inaudible for the rest of the session.
+   */
   async updateAudioOutputVolume(value: number) {
-    for (const track of this.getAudioTracks()) {
-      await track.setVolume(value);
-    }
+    await Promise.all(this.getAudioTracks().map(track => track.setVolume(value)));
   }
 
   async updateAudioOutputDevice(device: MediaDeviceInfo) {
@@ -464,10 +476,6 @@ class Store {
           this.addTranscriptionsPluginToRole(plugins[pluginName]);
           break;
         }
-        case Plugins.NOISE_CANCELLATION: {
-          this.handleNoiseCancellationPlugin(plugins[pluginName]);
-          break;
-        }
         default: {
           break;
         }
@@ -522,8 +530,9 @@ class Store {
     if (!this.room) {
       return;
     }
-    // it will be called again after internalConnect room initialization, even after network disconnection
-    this.room.isNoiseCancellationEnabled = !!plugin?.enabled && !!this.room.isNoiseCancellationEnabled;
+    // Idempotent: writes only its own field, never reads the derived value. Called
+    // again on every policy notification, including after a reconnect.
+    this.room.isNoiseCancellationEnabledFromPolicy = !!plugin?.enabled;
   };
 
   private setEnv() {

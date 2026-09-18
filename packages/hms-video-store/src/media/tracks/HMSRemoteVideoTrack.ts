@@ -106,7 +106,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async addSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
-    // if the native track is empty track, just request the preferred layer else attach it
+    // an empty track is an on-demand placeholder - request the layer, which fetches the real track
     if (isEmptyTrack(this.nativeTrack)) {
       await this.requestLayer(this.preferredLayer, 'addSink');
     } else {
@@ -163,7 +163,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
-    (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
+    (this.stream as HMSRemoteStream).setVideoLayerFromServer(
+      currentLayer,
+      this.trackId,
+      this.logIdentifier,
+      'setLayerFromServer',
+    );
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
     return this._degraded;
   }
@@ -240,7 +245,9 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
-    if (currLayer === targetLayer) {
+    // dedupe against the layer the SFU acknowledged or is being asked for - one it never applied
+    // has to be re-sent, or the track stays on a layer nobody is sending
+    if (currLayer === targetLayer && (this.stream as HMSRemoteStream).isVideoLayerSettled(targetLayer)) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Not sending update, already on layer ${targetLayer}, source=${source}`,

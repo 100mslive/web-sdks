@@ -45,7 +45,8 @@ import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
-    return 'You are the first to join';
+    // Hide on empty rooms: "You are the first to join" is read as already in-call.
+    return '';
   }
   const formattedNum = getFormattedCount(peerCount);
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;

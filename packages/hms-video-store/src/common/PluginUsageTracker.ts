@@ -33,7 +33,9 @@ export class PluginUsageTracker {
         this.pluginLastAddedAt.set(name, addedAt);
         break;
       }
+      // a plugin that failed also stops running, so mediaPlugin.failed ends its interval too
       case 'mediaPlugin.toggled.off':
+      case 'mediaPlugin.failed':
       case 'mediaPlugin.stats': {
         if (this.pluginLastAddedAt.has(name)) {
           const duration = event.properties.duration || (Date.now() - (this.pluginLastAddedAt.get(name) || 0)) / 1000;

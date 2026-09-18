@@ -38,7 +38,7 @@ export interface HMSRoom {
   isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
-  isNoiseCancellationEnabled?: boolean;
+  readonly isNoiseCancellationEnabled?: boolean;
   transcriptions?: HMSTranscriptionInfo[];
 }
 

@@ -7,7 +7,7 @@ export interface IAudioOutputManager {
   getDevice(): MediaDeviceInfo | undefined;
   setDevice(deviceId: string): Promise<MediaDeviceInfo | undefined>;
   getVolume(): number;
-  setVolume(value: number): void;
+  setVolume(value: number): Promise<void>;
 }
 
 export class AudioOutputManager implements IAudioOutputManager {
@@ -18,10 +18,13 @@ export class AudioOutputManager implements IAudioOutputManager {
   }
 
   setVolume(value: number) {
-    if (value < 0 || value > 100) {
-      throw Error('Please pass a valid number between 0-100');
+    // returned, not dropped: HMSSDKActions awaits this, so dropping it makes every rejection
+    // below an unhandled one. The range check mirrors the sink's, which is the one that matters -
+    // this is here so the message is the same whichever layer you call.
+    if (!(value >= 0 && value <= 100)) {
+      return Promise.reject(Error('Please pass a valid number between 0-100'));
     }
-    this.audioSinkManager.setVolume(value);
+    return this.audioSinkManager.setVolume(value);
   }
 
   getDevice() {
@@ -29,7 +32,17 @@ export class AudioOutputManager implements IAudioOutputManager {
   }
 
   async setDevice(deviceId?: string) {
+    HMSLogger.d('[AudioOutputManager]', 'setDevice requested', deviceId);
     const newDevice = await this.deviceManager.updateOutputDevice(deviceId, true);
+    HMSLogger.d(
+      '[AudioOutputManager]',
+      'setDevice result',
+      `{
+        requested: ${deviceId};
+        applied: ${newDevice?.label};
+        appliedId: ${newDevice?.deviceId};
+      }`,
+    );
     if (newDevice) {
       // If any remote audio tracks were auto-paused by an OS audio-session
       // interruption (headset pull / incoming call / Bluetooth swap), the user

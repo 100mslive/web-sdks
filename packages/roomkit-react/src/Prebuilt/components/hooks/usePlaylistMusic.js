@@ -26,7 +26,7 @@ export const usePlaylistMusic = () => {
 
   const setVolume = useCallback(
     value => {
-      hmsActions.setVolume(value, track?.id);
+      hmsActions.setVolume(value, track?.id).catch(console.error);
     },
     [hmsActions, track],
   );

@@ -26,7 +26,15 @@ export default defineConfig({
   },
   // esbuild 0.28 (pinned for GHSA-gv7w-rqvm-qjhr) refuses to downlevel some
   // destructuring in prebundled deps for the default browser target; this is a
-  // demo app, so target modern browsers and skip downleveling.
+  // demo app, so target modern browsers and skip downleveling. Both keys are
+  // needed: build.target covers `vite build`, while the dev-time dependency
+  // prebundler hardcodes its own esbuild target and only reads it back from
+  // optimizeDeps.esbuildOptions.
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
   build: {
     target: 'esnext',
   },

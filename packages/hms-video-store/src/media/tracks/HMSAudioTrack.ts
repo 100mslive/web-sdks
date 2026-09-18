@@ -1,13 +1,20 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSLogger from '../../utils/logger';
-import { isChromiumBased } from '../../utils/support';
+import { isChromiumBased, parsedUserAgent } from '../../utils/support';
 import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
+  /**
+   * Last volume asked for, kept off the audio element so it survives the element being torn down
+   * and rebuilt - which is what lets a rebuild restore it rather than reverting to the sink's.
+   * Undefined only before the track's first attach, since handleTrackAdd sets it. Read by
+   * isSilenced(), where 0 means the peer stays unsubscribed.
+   */
+  private requestedVolume?: number;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -18,18 +25,38 @@ export class HMSAudioTrack extends HMSTrack {
 
   getVolume() {
     // floor is required because of floating-point precision. e.g 0.55*100 gives 55.00000000000001
-    return this.audioElement ? Math.floor(this.audioElement.volume * 100) : null;
+    if (this.audioElement) {
+      return Math.floor(this.audioElement.volume * 100);
+    }
+    // the element is null while it is rebuilt; null here records volume 0 in the store
+    return this.requestedVolume ?? null;
+  }
+
+  /** what was asked for on this track specifically, or undefined if it only ever took the sink's */
+  getRequestedVolume() {
+    return this.requestedVolume;
   }
 
   async setVolume(value: number) {
-    if (value < 0 || value > 100) {
+    // not `< 0 || > 100`: NaN passes that and reaches the element setter as a DOM error
+    if (!(value >= 0 && value <= 100)) {
       throw Error('Please pass a valid number between 0-100');
     }
-    // Don't subscribe to audio when volume is 0
-    await this.subscribeToAudio(value === 0 ? false : this.enabled);
+    this.requestedVolume = value;
+    // local half first: the subscribe below can hang or throw
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }
+    // Don't subscribe to audio when volume is 0
+    await this.subscribeToAudio(value === 0 ? false : this.enabled);
+  }
+
+  /**
+   * setVolume(0) silences the peer by unsubscribing, so anything that resubscribes has to check
+   * this first or it hands back audio the user asked not to hear.
+   */
+  protected isSilenced() {
+    return this.requestedVolume === 0;
   }
 
   setAudioElement(element: HTMLAudioElement | null) {
@@ -76,12 +103,15 @@ export class HMSAudioTrack extends HMSTrack {
     // refer: https://bugzilla.mozilla.org/show_bug.cgi?id=1848283
     // refer: https://github.com/aws/amazon-chime-sdk-js/issues/2742
     // Setting sinkId in safari(support started from 18.4) causes "robotic voice" on bluetooth device changes or setting sinkId
-    if (typeof (this.audioElement as any).setSinkId !== 'function' || !isChromiumBased) {
+    const hasSetSinkId = typeof (this.audioElement as any).setSinkId === 'function';
+    if (!hasSetSinkId || !isChromiumBased) {
+      this.logSetSinkIdSkipped(device, hasSetSinkId);
       return;
     }
     try {
       await (this.audioElement as any).setSinkId(device.deviceId);
       this.outputDevice = device;
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'setSinkId succeeded', device.label, `${this}`);
     } catch (error) {
       // setSinkId rejects (NotFoundError / NotAllowedError / AbortError). Don't silently
       // swallow — the caller needs to know the UI says "device X selected" but audio
@@ -89,6 +119,23 @@ export class HMSAudioTrack extends HMSTrack {
       HMSLogger.w('[HMSAudioTrack]', this.logIdentifier, 'setSinkId failed', `${this}`, error);
       throw error;
     }
+  }
+
+  private logSetSinkIdSkipped(device: MediaDeviceInfo, hasSetSinkId: boolean) {
+    const reason = hasSetSinkId ? 'non-chromium-browser' : 'setSinkId-unsupported';
+    const browser = parsedUserAgent.getBrowser();
+    HMSLogger.d(
+      '[HMSAudioTrack]',
+      this.logIdentifier,
+      'setSinkId skipped, audio stays on the OS default sink',
+      `{
+        reason: ${reason};
+        browser: ${browser?.name};
+        browserVersion: ${browser?.version};
+        requestedDevice: ${device.label};
+      }`,
+      `${this}`,
+    );
   }
 
   protected async subscribeToAudio(value: boolean) {

@@ -15,6 +15,11 @@ export interface PreferLayerResponse {
     code: number;
     message: string;
   };
+  /**
+   * Resolved locally without the SFU ever answering - the request was superseded, or skipped. The
+   * caller must not read it as the SFU having applied the state.
+   */
+  dropped?: boolean;
 }
 
 export interface PreferAudioLayerParams {

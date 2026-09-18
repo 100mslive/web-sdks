@@ -83,12 +83,19 @@ export const useRemoteAVToggle = (
   }, [actions, handleError, videoTrack]);
 
   const setVolume = useCallback(
-    (volume: number) => {
+    async (volume: number) => {
       if (audioTrack) {
-        actions.setVolume(volume, audioTrack.id);
+        // muting or unmuting a peer for yourself rides the api data channel, so it can reject the
+        // same way toggleAudio can - and unlike the element volume, a failed resubscribe leaves
+        // that peer inaudible with no retry
+        try {
+          await actions.setVolume(volume, audioTrack.id);
+        } catch (err) {
+          handleError(err as Error, 'setVolume');
+        }
       }
     },
-    [actions, audioTrack],
+    [actions, audioTrack, handleError],
   );
 
   return {

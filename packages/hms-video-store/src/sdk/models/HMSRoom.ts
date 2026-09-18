@@ -27,8 +27,27 @@ export default class Room implements HMSRoom {
   isVBEnabled?: boolean;
   effectsKey?: string;
   isHipaaEnabled?: boolean;
-  isNoiseCancellationEnabled?: boolean;
+  /**
+   * Raw `noiseCancellation` feature flag from /init. Written only by HMSTransport
+   * on every connect, including reconnects. Never AND it here — see the derived
+   * getter below.
+   */
+  isNoiseCancellationEnabledFromInit = false;
+  /**
+   * The template policy's `noiseCancellation.enabled`. Written only by Store when
+   * policy arrives. Absent policy key means not configured, which means false.
+   */
+  isNoiseCancellationEnabledFromPolicy = false;
   translationConfig?: Record<HMSTranscriptionMode, { enabled: boolean; roleLanguages?: Record<string, string> }>;
+
+  /**
+   * Noise cancellation is available only when the account's feature flag and the
+   * template policy both allow it. Derived, never stored, so that a reconnect
+   * re-writing the init flag cannot clobber the template's decision.
+   */
+  get isNoiseCancellationEnabled(): boolean {
+    return this.isNoiseCancellationEnabledFromInit && this.isNoiseCancellationEnabledFromPolicy;
+  }
 
   constructor(id: string) {
     this.id = id;
