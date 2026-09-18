@@ -53,6 +53,10 @@ import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
 
+/** The answer was dropped because a newer offer is staged — the owner re-drives, nothing is lost. */
+const isSupersededAnswer = (error: unknown): boolean =>
+  error instanceof HMSException && error.code === ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED;
+
 // @DISCUSS: action and extra are not used at all.
 interface CallbackTriple {
   promise: PromiseCallbacks<boolean>;
@@ -455,6 +459,14 @@ export default class HMSTransport {
     } catch (error) {
       HMSLogger.w(TAG, `republish after migration failed for ${track.trackId}`, error);
       this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
+      // publishTrack skips its bookkeeping when the answer is discarded, but the transceiver is
+      // attached and trackStates still carries the track, so the ICE retry's offer publishes it.
+      // Leaving isPublished false would send a later removeTrack down cleanup() instead of
+      // unpublish, so the SFU would keep receiving it.
+      if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
+        this.store.addTrack(track);
+        track.isPublished = true;
+      }
     }
   }
 
@@ -640,23 +652,38 @@ export default class HMSTransport {
     stream.removeSender(track);
     try {
       await p;
-    } finally {
-      // the sender is already detached and the removal rides the next offer, so local
-      // teardown must not wait on the answer — a reject here would leave the camera live
-      await track.cleanup();
-      if (track.source === 'screen' && this.screenStream) {
-        // stop older screenshare tracks to remove the screenshare banner
-        this.screenStream.forEach(stream => {
-          stream.getTracks().forEach(_track => {
-            _track.stop();
-          });
-          this.screenStream.delete(stream);
-        });
+    } catch (error) {
+      // The sender is already detached and the removal rides the next offer, so a discarded
+      // answer must not abort the unpublish — callers do their own bookkeeping (splice,
+      // TRACK_REMOVED) after we return, and skipping it strands the track on localPeer.
+      if (!isSupersededAnswer(error)) {
+        throw error;
       }
-      // remove track from store on unpublish
-      this.store.removeTrack(track);
+      HMSLogger.w(TAG, `unpublishTrack: renegotiation superseded, tearing down anyway`, error);
+    } finally {
+      await this.teardownUnpublishedTrack(track);
     }
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+  }
+
+  /** Local teardown for an unpublished track; one failing step must not skip the others. */
+  private async teardownUnpublishedTrack(track: HMSLocalTrack) {
+    try {
+      await track.cleanup();
+    } catch (error) {
+      HMSLogger.w(TAG, `unpublishTrack: cleanup failed for ${track.trackId}`, error);
+    }
+    if (track.source === 'screen' && this.screenStream) {
+      // stop older screenshare tracks to remove the screenshare banner
+      this.screenStream.forEach(stream => {
+        stream.getTracks().forEach(_track => {
+          _track.stop();
+        });
+        this.screenStream.delete(stream);
+      });
+    }
+    // remove track from store on unpublish
+    this.store.removeTrack(track);
   }
 
   private async clearPeerConnections() {
@@ -1038,12 +1065,29 @@ export default class HMSTransport {
       connection.initAfterJoin();
       return !!answer;
     } catch (ex) {
-      // resolve for now as this might happen during migration
-      if (ex instanceof HMSException && ex.code === 421) {
-        return true;
-      }
+      return this.handleFirstPublishNegotiationError(ex);
+    }
+  }
+
+  /**
+   * Neither caller of negotiateOnFirstPublish catches: handleLocalRoleUpdate propagates into
+   * HMSSdk with no catch, and handleSFUMigration runs unawaited. A superseded answer means
+   * another negotiation owns current state, so wire renegotiation and report failure instead —
+   * without initAfterJoin every later publishTrack would await its promise forever.
+   */
+  private handleFirstPublishNegotiationError(ex: unknown): boolean {
+    if (!(ex instanceof HMSException)) {
       throw ex;
     }
+    // resolve for now as this might happen during migration
+    if (ex.code === 421) {
+      return true;
+    }
+    if (isSupersededAnswer(ex)) {
+      this.publishConnection?.initAfterJoin();
+      return false;
+    }
+    throw ex;
   }
 
   /**

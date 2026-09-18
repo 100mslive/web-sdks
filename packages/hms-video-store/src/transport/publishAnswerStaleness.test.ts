@@ -318,12 +318,10 @@ describe('publish answer staleness', () => {
       return answer('ans-1');
     });
 
-    await expect(t.negotiateOnFirstPublish()).rejects.toMatchObject({
-      code: ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
-      isTerminal: false,
-    });
+    // reported, never thrown — neither caller catches (see the wiring test below)
+    await expect(t.negotiateOnFirstPublish()).resolves.toBe(false);
     expect(native.applied).toEqual([]);
-    expect(discards[0]).toMatchObject({ reason: 'superseded_offer' });
+    expect(discards[0]).toMatchObject({ reason: 'superseded_offer', action: HMSAction.PUBLISH.toString() });
   });
 
   it('recovers the peer instead of ejecting it: RetryScheduler retries and never reaches Failed', async () => {
@@ -420,10 +418,94 @@ describe('publish answer staleness', () => {
       }
     });
 
-    await t.republishOnMigration({ trackId: 'audio' });
-    await t.republishOnMigration({ trackId: 'video' });
+    await t.republishOnMigration({ trackId: 'audio', publishedTrackId: undefined });
+    await t.republishOnMigration({ trackId: 'video', publishedTrackId: undefined });
 
     expect(published).toEqual(['audio', 'video']);
+  });
+
+  it('tears down and lets the caller finish its bookkeeping when unpublish loses the race', async () => {
+    const { t } = makeHarness();
+    const track: any = {
+      trackId: 'aux-1',
+      publishedTrackId: 'aux-1',
+      type: 'video',
+      source: 'screen',
+      stream: { removeSender: jest.fn() },
+      cleanup: jest.fn(async () => undefined),
+    };
+    t.trackStates = new Map([['aux-1', { track_id: 'aux-1', type: 'video', source: 'screen' }]]);
+    t.screenStream = new Set();
+    const removeTrack = jest.fn();
+    t.store.removeTrack = removeTrack;
+    // the renegotiation the unpublish is waiting on loses the epoch race
+    setTimeout(() => {
+      t.callbacks
+        .get(RENEGOTIATION_CALLBACK_ID)
+        .promise.reject(ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.UNPUBLISH, 'superseded_offer'));
+    }, 0);
+
+    // must NOT reject: HMSSdk.removeTrack aborts before splice()/TRACK_REMOVED on a throw
+    await expect(t.unpublishTrack(track)).resolves.toBeUndefined();
+    expect(track.cleanup).toHaveBeenCalled();
+    expect(removeTrack).toHaveBeenCalledWith(track);
+  });
+
+  it('finishes teardown even when track.cleanup rejects', async () => {
+    const { t } = makeHarness();
+    const track: any = {
+      trackId: 'aux-2',
+      publishedTrackId: 'aux-2',
+      type: 'video',
+      source: 'screen',
+      stream: { removeSender: jest.fn() },
+      cleanup: jest.fn(async () => {
+        throw new Error('processor teardown blew up');
+      }),
+    };
+    t.trackStates = new Map([['aux-2', { track_id: 'aux-2', type: 'video', source: 'screen' }]]);
+    const stopped = jest.fn();
+    t.screenStream = new Set([{ getTracks: () => [{ stop: stopped }] }]);
+    const removeTrack = jest.fn();
+    t.store.removeTrack = removeTrack;
+    setTimeout(() => t.callbacks.get(RENEGOTIATION_CALLBACK_ID).promise.resolve(true), 0);
+
+    await t.unpublishTrack(track);
+
+    // the screenshare banner stop and the store removal must not be skipped
+    expect(stopped).toHaveBeenCalled();
+    expect(removeTrack).toHaveBeenCalledWith(track);
+  });
+
+  it('wires renegotiation and returns false when negotiateOnFirstPublish is superseded', async () => {
+    const { t, connection, native } = makeHarness();
+    t.signal = makeSignal(async () => {
+      await connection.setLocalDescription(offer('offer-2'));
+      return answer('ans-1');
+    });
+
+    // neither caller catches, so it must not throw
+    await expect(t.negotiateOnFirstPublish()).resolves.toBe(false);
+    expect(native.applied).toEqual([]);
+    // without this every later publishTrack awaits RENEGOTIATION_CALLBACK_ID forever
+    expect(native.onnegotiationneeded).toEqual(expect.any(Function));
+  });
+
+  it('reconciles publish bookkeeping when a migration republish is superseded', async () => {
+    const { t } = makeHarness();
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
+    };
+
+    await t.republishOnMigration(track);
+
+    // else a later removeTrack takes the cleanup() branch and the SFU keeps receiving it
+    expect(addTrack).toHaveBeenCalledWith(track);
+    expect(track.isPublished).toBe(true);
   });
 
   it('backs off repeat publish-ICE retries so a lost race cannot spin OFFERs at RTT speed', () => {
