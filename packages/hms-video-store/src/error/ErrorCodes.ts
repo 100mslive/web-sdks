@@ -101,6 +101,9 @@ export const ErrorCodes = {
     ICE_DISCONNECTED: 4006,
 
     STATS_FAILED: 4007,
+
+    // [{action}]: Publish answer discarded, a newer offer is in flight.
+    PUBLISH_ANSWER_SUPERSEDED: 4008,
   },
 
   WebsocketMethodErrors: {

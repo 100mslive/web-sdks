@@ -149,7 +149,7 @@ export class RetryScheduler {
       this.onStateChange(TransportState.Reconnecting, error);
     }
 
-    const delay = this.getDelayForRetryCount(category);
+    const delay = this.getDelayForRetryCount(category, failedRetryCount);
 
     HMSLogger.d(
       this.TAG,
@@ -201,7 +201,7 @@ export class RetryScheduler {
     }
   }
 
-  private getDelayForRetryCount(category: TFC) {
+  private getDelayForRetryCount(category: TFC, failedRetryCount = 0) {
     const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
     let delaySeconds = 0;
     if (category === TFC.JoinWSMessageFailed) {
@@ -209,6 +209,10 @@ export class RetryScheduler {
       delaySeconds = 2 + jitter;
     } else if (category === TFC.SignalDisconnect) {
       delaySeconds = 1;
+    } else if (category === TFC.PublishIceConnectionFailed && failedRetryCount > 0) {
+      // first attempt stays immediate; repeats back off so a losing renegotiation
+      // cannot spin OFFERs at RTT speed for the whole 60s budget
+      delaySeconds = Math.min(2 ** (failedRetryCount - 1), 4) + jitter;
     }
     return delaySeconds * 1000;
   }
