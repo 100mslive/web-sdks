@@ -374,8 +374,11 @@ describe('publish answer staleness', () => {
     t.initConfig = { config: {} };
     t.store.getUserAgent = () => '';
 
+    // 4004, not the internal 4008: join is the only path that reaches the app's onError
+    // (onStateChange(Failed) -> leave event -> handlePreviewError), so it reports the error
+    // apps already handle. Terminal, else internalLeave's join-in-progress wait spins forever.
     await expect(t.negotiateJoinWebRTC({ name: 'n', data: '', autoSubscribeVideo: false })).rejects.toMatchObject({
-      code: ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
+      code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED,
       isTerminal: true,
     });
     expect(native.applied).toEqual([]);

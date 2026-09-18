@@ -1119,11 +1119,14 @@ export default class HMSTransport {
         epoch,
       }),
     );
-    const ex = ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);
-    // A non-terminal error escaping transport.join spins internalLeave's join-in-progress
-    // wait forever (sdk/index.ts), so on the join path this has to stay terminal.
-    ex.isTerminal = action === HMSAction.JOIN;
-    throw ex;
+    if (action === HMSAction.JOIN) {
+      // Join is the only path that reaches the app (onStateChange(Failed) -> leave event ->
+      // onError), and it genuinely failed — initAfterJoin never ran. Report the error apps
+      // already handle rather than leaking an internal code; it is terminal, which
+      // internalLeave's join-in-progress wait also requires.
+      throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, `${reason} epoch=${epoch}`);
+    }
+    throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);
   }
 
   /** Drops our own waiter only: a newer owner armed mid-flight must keep its entry. */
