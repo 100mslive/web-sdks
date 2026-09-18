@@ -37,9 +37,53 @@ jobs:
         with:
           fetch-depth: 1
 
+      # NOTE: web-sdks is a public repo, so it cannot consume the internal
+      # 100mslive/shared-actions/claude-code-review action that the private
+      # repos use. The prompt below is kept in sync with that action by hand,
+      # same as the other public SDK repos (100ms-react-native, 100ms-flutter,
+      # android-sdk).
       - name: Run Claude Code Review
-        uses: 100mslive/shared-actions/claude-code-review@main
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          repository: ${{ github.repository }}
-          pr_number: ${{ steps.pr.outputs.number }}
+          # Without this, claude-code-action rejects dependabot-initiated runs
+          # with "Workflow initiated by non-human actor: dependabot".
+          allowed_bots: 'dependabot[bot]'
+          prompt: |
+            Review PR #${{ steps.pr.outputs.number }} in ${{ github.repository }}.
+
+            Check for: bugs, security issues, race conditions, error handling, performance problems, code duplication, naming clarity, unnecessary complexity, violations of existing patterns, and sound design. Question whether new code is necessary—prefer removing or reusing over adding.
+
+            Read CLAUDE.md if present. Use `gh pr diff` to see changes. Skip style nitpicks—focus on correctness, security, and maintainability.
+
+            ## Dependabot dependency bumps
+
+            If the PR is authored by `dependabot[bot]` and touches only dependency manifests (`package.json` / `yarn.lock` / similar):
+
+            - **Do NOT blanket-approve.** Read the PR body — dependabot embeds each bumped dep's release notes / changelog between the old and new versions.
+            - For each bump, scan the release notes for:
+              - Breaking changes (removed APIs, renamed packages, changed signatures)
+              - Deprecations
+              - Behaviour changes (default values, error semantics, retry logic, logging changes)
+              - Security advisories (note in the review even if non-breaking — useful for audit)
+            - If a breaking change is present, grep the repo for usages of the affected symbol:
+              - If we use it → must-fix with file:line reference and a one-line suggested migration.
+              - If we don't → note in the review but approval is OK.
+            - Approve with a one-line summary of what was reviewed: `Reviewed release notes for: <dep1> (vA.B.C → vX.Y.Z), <dep2> (…). No affecting changes in our code path.` Otherwise post as `COMMENT` with must-fix items.
+
+            ## Metadata-only PRs
+
+            PRs that touch ONLY README / unrelated workflow files / comment-fix / similar non-code surface: post a one-line "No reviewable surface touched — metadata-only change." and approve. No need for deeper review.
+
+            First, check existing review comments using `gh api repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }}/comments`. If previous issues have been addressed, resolve those threads.
+
+            Post new comments as inline review using:
+            ```
+            gh api repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }}/reviews \
+              -f event="COMMENT" \
+              -f body="Summary of review" \
+              -f 'comments=[{"path":"src/file.ts","line":42,"body":"Your comment"}]'
+            ```
+            Use the line numbers from the new version of the file (not diff line numbers). Keep comments brief—state the issue and fix, no essays.
+
+          claude_args: '--model sonnet --allowedTools "Bash(gh api:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep"'
