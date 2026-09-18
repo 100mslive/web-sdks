@@ -53,6 +53,8 @@ import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
 
+type PublishAnswerDiscardReason = 'connection_replaced' | 'superseded_offer' | 'unexpected_state';
+
 /** The answer was dropped because a newer offer is staged — the owner re-drives, nothing is lost. */
 const isSupersededAnswer = (error: unknown): boolean =>
   error instanceof HMSException && error.code === ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED;
@@ -444,7 +446,8 @@ export default class HMSTransport {
       this.subscribeConnection?.setSfuNodeId(id);
     } else if (id && this.sfuNodeId !== id) {
       this.sfuNodeId = id;
-      this.handleSFUMigration();
+      // unawaited by design; a newer migration aborting this one must not surface as a rejection
+      this.handleSFUMigration().catch(error => HMSLogger.w(TAG, 'sfu migration aborted', error));
     }
   }
 
@@ -459,11 +462,11 @@ export default class HMSTransport {
     } catch (error) {
       HMSLogger.w(TAG, `republish after migration failed for ${track.trackId}`, error);
       this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
-      // publishTrack skips its bookkeeping when the answer is discarded, but the transceiver is
-      // attached and trackStates still carries the track, so the ICE retry's offer publishes it.
-      // Leaving isPublished false would send a later removeTrack down cleanup() instead of
-      // unpublish, so the SFU would keep receiving it.
-      if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
+      // Only a superseded answer leaves a publishable track behind: the transceiver is attached
+      // and trackStates carries it, so the ICE retry's offer publishes it, and leaving
+      // isPublished false would send a later removeTrack down cleanup() instead of unpublish.
+      // A real failure (offer never reached the SFU) must NOT be reported as published.
+      if (isSupersededAnswer(error) && track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
         this.store.addTrack(track);
         track.isPublished = true;
       }
@@ -1056,7 +1059,19 @@ export default class HMSTransport {
       const offer = await connection.createOffer(this.trackStates);
       const epoch = await connection.setLocalDescription(offer);
       const answer = await this.signal.offer(offer, this.trackStates);
-      this.assertPublishAnswerApplicable(connection, epoch, HMSAction.PUBLISH);
+      const discarded = this.publishAnswerDiscardReason(connection, epoch, HMSAction.PUBLISH);
+      if (discarded === 'connection_replaced') {
+        // A newer migration owns the peer now — it has already cleared trackStates and built
+        // its own connection. Continuing would republish onto it and duplicate its transceivers,
+        // so abort and let the caller unwind.
+        throw this.publishAnswerDiscardError(discarded, epoch, HMSAction.PUBLISH);
+      }
+      if (discarded) {
+        // Same connection, a racer's offer won; it carries current state. Report failure but
+        // wire renegotiation first — without initAfterJoin every later publishTrack hangs.
+        connection.initAfterJoin();
+        return false;
+      }
       await connection.setRemoteDescription(answer);
       for (const candidate of connection.candidates) {
         await connection.addIceCandidate(candidate);
@@ -1069,12 +1084,6 @@ export default class HMSTransport {
     }
   }
 
-  /**
-   * Neither caller of negotiateOnFirstPublish catches: handleLocalRoleUpdate propagates into
-   * HMSSdk with no catch, and handleSFUMigration runs unawaited. A superseded answer means
-   * another negotiation owns current state, so wire renegotiation and report failure instead —
-   * without initAfterJoin every later publishTrack would await its promise forever.
-   */
   private handleFirstPublishNegotiationError(ex: unknown): boolean {
     if (!(ex instanceof HMSException)) {
       throw ex;
@@ -1082,10 +1091,6 @@ export default class HMSTransport {
     // resolve for now as this might happen during migration
     if (ex.code === 421) {
       return true;
-    }
-    if (isSupersededAnswer(ex)) {
-      this.publishConnection?.initAfterJoin();
-      return false;
     }
     throw ex;
   }
@@ -1096,8 +1101,12 @@ export default class HMSTransport {
    * setLocalDescription, which is legal in `have-local-offer` and so invisible to
    * signalingState. Every discard is counted so the discard rate is measurable.
    */
-  private assertPublishAnswerApplicable(connection: HMSPublishConnection, epoch: number, action: HMSAction) {
-    let reason: 'connection_replaced' | 'superseded_offer' | 'unexpected_state' | undefined;
+  private publishAnswerDiscardReason(
+    connection: HMSPublishConnection,
+    epoch: number,
+    action: HMSAction,
+  ): PublishAnswerDiscardReason | undefined {
+    let reason: PublishAnswerDiscardReason | undefined;
     if (connection !== this.publishConnection) {
       reason = 'connection_replaced';
     } else if (!connection.isStagingLocalDescription(epoch)) {
@@ -1119,14 +1128,26 @@ export default class HMSTransport {
         epoch,
       }),
     );
+    return reason;
+  }
+
+  private publishAnswerDiscardError(reason: PublishAnswerDiscardReason, epoch: number, action: HMSAction) {
     if (action === HMSAction.JOIN) {
       // Join is the only path that reaches the app (onStateChange(Failed) -> leave event ->
       // onError), and it genuinely failed — initAfterJoin never ran. Report the error apps
       // already handle rather than leaking an internal code; it is terminal, which
       // internalLeave's join-in-progress wait also requires.
-      throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, `${reason} epoch=${epoch}`);
+      return ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, `${reason} epoch=${epoch}`);
     }
-    throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);
+    return ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);
+  }
+
+  /** Throws unless the answer still belongs to the offer this negotiation staged. */
+  private assertPublishAnswerApplicable(connection: HMSPublishConnection, epoch: number, action: HMSAction) {
+    const reason = this.publishAnswerDiscardReason(connection, epoch, action);
+    if (reason) {
+      throw this.publishAnswerDiscardError(reason, epoch, action);
+    }
   }
 
   /** Drops our own waiter only: a newer owner armed mid-flight must keep its entry. */

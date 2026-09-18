@@ -511,6 +511,39 @@ describe('publish answer staleness', () => {
     expect(track.isPublished).toBe(true);
   });
 
+  it('aborts rather than continuing when the connection was replaced under negotiateOnFirstPublish', async () => {
+    const { t, connection } = makeHarness();
+    t.signal = makeSignal(async () => {
+      // a second NodeInfo starts migration B: new connection, trackStates cleared
+      t.publishConnection = makeConnection().connection;
+      return answer('ans-1');
+    });
+
+    // must THROW, not return false: handleSFUMigration ignores the return value, so migration A
+    // would walk its republish loop against B's connection and duplicate B's transceivers
+    await expect(t.negotiateOnFirstPublish()).rejects.toMatchObject({
+      code: ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
+    });
+    expect(connection.nativeConnection.onnegotiationneeded).toBeNull();
+  });
+
+  it('does not report a genuinely failed migration republish as published', async () => {
+    const { t } = makeHarness();
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    // the offer never reached the SFU — nothing is staged, so claiming published is a lie
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died');
+    };
+
+    await t.republishOnMigration(track);
+
+    expect(addTrack).not.toHaveBeenCalled();
+    expect(track.isPublished).toBe(false);
+  });
+
   it('backs off repeat publish-ICE retries so a lost race cannot spin OFFERs at RTT speed', () => {
     const { t } = makeHarness();
     const delayFor = (n: number) =>
