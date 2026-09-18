@@ -133,6 +133,20 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
   }
 
+  /**
+   * A publish answer was dropped because the offer it answers is no longer staged.
+   * `action` names the owner that must re-drive; `reason` separates the three causes.
+   */
+  static publishAnswerDiscarded(properties: {
+    reason: 'connection_replaced' | 'superseded_offer' | 'unexpected_state';
+    action: string;
+    signaling_state: RTCSignalingState;
+    transport_state: string;
+    epoch: number;
+  }) {
+    return new AnalyticsEvent({ name: 'publishAnswerDiscarded', level: AnalyticsEventLevel.INFO, properties });
+  }
+
   /** no attempt was answered, so the SFU is left on a state nobody asked for */
   static subscribeRequestUnanswered(properties: { method: string; trackId: string; attempts: number }) {
     return new AnalyticsEvent({ name: 'subscribeRequestUnanswered', level: AnalyticsEventLevel.ERROR, properties });

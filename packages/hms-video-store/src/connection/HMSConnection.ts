@@ -33,6 +33,9 @@ export default abstract class HMSConnection {
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
+  /** Monotonic id of the local description this connection is staging. */
+  private localDescriptionEpoch = 0;
+
   protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
     this.role = role;
     this.signal = signal;
@@ -44,6 +47,10 @@ export default abstract class HMSConnection {
 
   public get connectionState(): RTCPeerConnectionState {
     return this.nativeConnection.connectionState;
+  }
+
+  public get signalingState(): RTCSignalingState {
+    return this.nativeConnection.signalingState;
   }
 
   private get action() {
@@ -78,13 +85,24 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+  /** True while `epoch` is still the newest local description staged on this connection. */
+  isStagingLocalDescription(epoch: number): boolean {
+    return this.localDescriptionEpoch === epoch;
+  }
+
+  /**
+   * Returns the epoch of the offer just staged. Bumped on entry, before the native call is
+   * chained onto the operations queue, so a racer is visible from the moment it starts.
+   */
+  async setLocalDescription(description: RTCSessionDescriptionInit): Promise<number> {
+    const epoch = ++this.localDescriptionEpoch;
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
     }
+    return epoch;
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
