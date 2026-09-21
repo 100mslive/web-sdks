@@ -20,6 +20,7 @@ import HMSPublishConnection from '../connection/publish/publishConnection';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { makeTransport, TransportState } from '../test/helpers/makeTransport';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
@@ -600,6 +601,48 @@ describe('publish answer staleness', () => {
     expect(track.isPublished).toBe(true);
   });
 
+  it('does not report a republish as published when the transceiver belongs to the old connection', async () => {
+    const { t, native } = makeHarness();
+    const transceiver = {} as RTCRtpTransceiver;
+    // the transceiver is attached to the connection the migration replaced, not the live one
+    native.transceivers = [transceiver];
+    const replacement = makeConnection();
+    t.publishConnection = replacement.connection;
+    replacement.native.transceivers = [];
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'connection_replaced');
+    };
+
+    await t.republishOnMigration(track);
+
+    expect(addTrack).not.toHaveBeenCalled();
+    expect(track.isPublished).toBe(false);
+  });
+
+  it('does not report a republish as published when trackStates no longer names the track', async () => {
+    const { t, native } = makeHarness();
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
+    // a concurrent unpublish dropped the trackState while the republish was in flight, so no
+    // later offer carries it — the transceiver alone does not make it published
+    t.trackStates = new Map();
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
+    };
+
+    await t.republishOnMigration(track);
+
+    expect(addTrack).not.toHaveBeenCalled();
+    expect(track.isPublished).toBe(false);
+  });
+
   it('does not report a republish as published when nothing is staged on the live connection', async () => {
     const { t, native } = makeHarness();
     // the 4008 raised when publishConnection is gone shares its code with a superseded answer,
@@ -637,6 +680,41 @@ describe('publish answer staleness', () => {
     expect(connection.nativeConnection.onnegotiationneeded).toBeNull();
   });
 
+  /**
+   * The regression this branch shipped and then took back: a throw here escapes into
+   * HMSSdk.handleLocalRoleUpdate, which awaits it before roleChangeManager and whiteboard, so
+   * the promoted peer never captures or publishes and no ROLE_UPDATED fires.
+   */
+  describe.each([
+    [
+      'a racer staged a newer offer',
+      (t: any, connection: HMSPublishConnection) => connection.setLocalDescription(offer('offer-2')),
+    ],
+    ['a migration replaced the connection', (t: any) => (t.publishConnection = makeConnection().connection)],
+  ])('role promotion when %s', (_case, race) => {
+    it('still finishes, so the caller reaches diffRolesAndPublishTracks', async () => {
+      const { t, connection } = makeHarness();
+      // the predicate short-circuits to true unless this flag is on, which would make the
+      // promotion a no-op and the assertion vacuous
+      t.isFlagEnabled = () => true;
+      t.createPeerConnections = jest.fn();
+      const negotiate = jest.spyOn(t, 'negotiateOnFirstPublish');
+      t.signal = makeSignal(async () => {
+        await race(t, connection);
+        return answer('ans-1');
+      });
+
+      await expect(
+        t.handleLocalRoleUpdate({
+          oldRole: { publishParams: {}, subscribeParams: {} },
+          newRole: { publishParams: { allowed: ['video'] }, subscribeParams: {} },
+        }),
+      ).resolves.toBeUndefined();
+
+      expect(negotiate).toHaveBeenCalled();
+    });
+  });
+
   it('aborts the migration itself when a newer one replaced the connection mid-negotiation', async () => {
     const { t, connection } = makeHarness();
     const localPeer = { isLocal: true, audioTrack: undefined, videoTrack: undefined, auxiliaryTracks: [] };
@@ -657,12 +735,12 @@ describe('publish answer staleness', () => {
   });
 
   /**
-   * Each republish is a full offer/answer round trip. Continuing past one that lost the
-   * connection attaches A's clones to B's connection, overwrites the single
-   * RENEGOTIATION_CALLBACK_ID slot B is awaiting, and clobbers B's auxiliaryTracks.
+   * The positive control for every `not.toHaveBeenCalled` below: without this, deleting
+   * onSFUMigration() outright would leave the whole migration suite green.
    */
-  it('stops the migration republish loop when a newer migration takes the connection', async () => {
-    const { t } = makeHarness();
+  it('completes a clean migration: every track republished, onSFUMigration fired once', async () => {
+    const { t, eventBus } = makeHarness();
+    const incomplete = collectEvents(eventBus, 'sfuMigrationIncomplete');
     const localPeer: any = {
       isLocal: true,
       audioTrack: makeMigratableTrack('audio', 'audio'),
@@ -672,15 +750,59 @@ describe('publish answer staleness', () => {
     stubMigrationStore(t, localPeer);
     const published: string[] = [];
     t.negotiateOnFirstPublish = jest.fn(async () => true);
-    t.republishOnMigration = jest.fn(async (track: { trackId: string }) => {
-      published.push(track.trackId);
-      t.publishConnection = makeConnection().connection;
-    });
+    t.republishOnMigration = jest.fn(async (track: { trackId: string }) => published.push(track.trackId));
 
     await t.handleSFUMigration();
 
-    expect(published).toEqual(['audio-clone']);
-    expect(t.listener.onSFUMigration).not.toHaveBeenCalled();
+    expect(published).toEqual(['audio-clone', 'video-clone', 'aux-clone']);
+    expect(localPeer.auxiliaryTracks.map((track: { trackId: string }) => track.trackId)).toEqual(['aux-clone']);
+    expect(t.listener.onSFUMigration).toHaveBeenCalledTimes(1);
+    expect(incomplete).toHaveLength(0);
+  });
+
+  /**
+   * Each republish is a full offer/answer round trip, so the check has to sit at every one of
+   * them. Continuing past a republish that lost the connection attaches A's clones to B's
+   * connection, overwrites the single RENEGOTIATION_CALLBACK_ID slot B awaits, and clobbers
+   * B's auxiliaryTracks. Table-driven so a deleted checkpoint cannot hide behind its siblings.
+   */
+  describe.each([
+    ['negotiate', 0, []],
+    ['audio', 1, ['audio-clone']],
+    ['video', 2, ['audio-clone', 'video-clone']],
+    ['aux', 3, ['audio-clone', 'video-clone', 'aux-clone']],
+  ])('aborts when a newer migration takes the connection during %s', (_stage, replaceAfter, expected) => {
+    it('stops there and announces nothing', async () => {
+      const { t } = makeHarness();
+      const localPeer: any = {
+        isLocal: true,
+        audioTrack: makeMigratableTrack('audio', 'audio'),
+        videoTrack: makeMigratableTrack('video', 'video'),
+        auxiliaryTracks: [makeMigratableTrack('aux', 'video'), makeMigratableTrack('aux-2', 'video')],
+      };
+      stubMigrationStore(t, localPeer);
+      const published: string[] = [];
+      const takeConnection = () => {
+        t.publishConnection = makeConnection().connection;
+      };
+      t.negotiateOnFirstPublish = jest.fn(async () => {
+        if (replaceAfter === 0) {
+          takeConnection();
+        }
+        return true;
+      });
+      t.republishOnMigration = jest.fn(async (track: { trackId: string }) => {
+        published.push(track.trackId);
+        if (published.length === replaceAfter) {
+          takeConnection();
+        }
+      });
+
+      await t.handleSFUMigration();
+
+      expect(published).toEqual(expected);
+      expect(t.listener.onSFUMigration).not.toHaveBeenCalled();
+    });
   });
 
   it('hands the already-cloned aux tracks back when the loop aborts', async () => {
@@ -772,9 +894,10 @@ describe('publish answer staleness', () => {
     expect(native.addedCandidates).toHaveLength(2);
   });
 
-  it('drains the buffer on the join path', async () => {
+  /** the positive control for the join discard test: nothing else drives join's success path */
+  it('applies the answer, drains the buffer and wires renegotiation on the join path', async () => {
     const { t, connection, native } = makeHarness();
-    connection.candidates.push({ candidate: 'join-c1' });
+    connection.candidates.push({ candidate: 'join-c1' }, { candidate: 'join-c2' });
     t.signal = {
       join: jest.fn(async () => answer('ans-1')),
       setSfuNodeId: jest.fn(),
@@ -785,17 +908,35 @@ describe('publish answer staleness', () => {
 
     await expect(t.negotiateJoinWebRTC({ name: 'n', data: '', autoSubscribeVideo: false })).resolves.toBe(true);
 
-    expect(native.addedCandidates).toEqual([{ candidate: 'join-c1' }]);
+    expect(native.applied).toEqual([{ answer: 'ans-1', against: 'offer-1' }]);
+    expect(native.addedCandidates).toEqual([{ candidate: 'join-c1' }, { candidate: 'join-c2' }]);
+    expect(native.onnegotiationneeded).toEqual(expect.any(Function));
   });
 
-  it('drains the buffer on the role-change first publish', async () => {
+  /** same, for the sibling every role promotion and every migration runs */
+  it('applies the answer, drains the buffer and wires renegotiation on the first publish', async () => {
     const { t, connection, native } = makeHarness();
     connection.candidates.push({ candidate: 'role-c1' });
     t.signal = makeSignal(async () => answer('ans-1'));
 
     await expect(t.negotiateOnFirstPublish()).resolves.toBe(true);
 
+    expect(native.applied).toEqual([{ answer: 'ans-1', against: 'offer-1' }]);
     expect(native.addedCandidates).toEqual([{ candidate: 'role-c1' }]);
+    expect(native.onnegotiationneeded).toEqual(expect.any(Function));
+  });
+
+  it('passes a 421 through as success on the first publish, and rethrows anything else', async () => {
+    const { t } = makeHarness();
+    const serverError = new HMSException(421, 'ServerErrors', HMSAction.PUBLISH, 'wrong sfu node', '');
+
+    // 421 means the offer reached the wrong node mid-migration; the migration re-drives
+    expect(t.handleFirstPublishNegotiationError(serverError)).toBe(true);
+    expect(() =>
+      t.handleFirstPublishNegotiationError(ErrorFactory.WebrtcErrors.CreateOfferFailed(HMSAction.PUBLISH, 'boom')),
+    ).toThrow();
+    // a non-HMSException is a programming error and must not be swallowed as success
+    expect(() => t.handleFirstPublishNegotiationError(new TypeError('undefined is not a function'))).toThrow(TypeError);
   });
 
   /**

@@ -135,10 +135,6 @@ export default class AnalyticsEventFactory {
   }
 
   /**
-   * A publish answer was dropped because the offer it answers is no longer staged.
-   * `action` names the owner that must re-drive; `reason` separates the three causes.
-   */
-  /**
    * A migration that did not finish. `reason` separates a deliberate abort — a newer migration
    * owns the peer — from a genuine failure, which nothing retries.
    */
@@ -158,6 +154,10 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  /**
+   * A publish answer was dropped because the offer it answers is no longer staged.
+   * `action` names the owner that must re-drive; `reason` separates the three causes.
+   */
   static publishAnswerDiscarded(properties: {
     reason: PublishAnswerDiscardReason;
     action: string;
