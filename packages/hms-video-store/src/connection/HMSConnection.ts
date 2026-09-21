@@ -33,7 +33,7 @@ export default abstract class HMSConnection {
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
-  /** Monotonic id of the local description this connection is staging. */
+  /** Monotonic id of the most recently requested local description (bumped on entry, not on apply). */
   private localDescriptionEpoch = 0;
 
   protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
@@ -65,7 +65,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  /** True when this connection owns the transceiver, i.e. its next offer carries it. */
+  /** True when the transceiver is still attached to this connection. */
   hasTransceiver(transceiver?: RTCRtpTransceiver): boolean {
     return !!transceiver && this.nativeConnection.getTransceivers().includes(transceiver);
   }
@@ -120,9 +120,8 @@ export default abstract class HMSConnection {
   }
 
   /**
-   * Applies the answer, then drains the candidates onTrickle buffered while there was no remote
-   * description. The publish connection never clears that list, so the drain is gated on this
-   * being the first answer — after it, onTrickle calls addIceCandidate directly.
+   * Applies the answer, then flushes the candidates onTrickle buffered before any remote
+   * description. Gated on this being the first answer; after it onTrickle adds directly.
    */
   async setRemoteDescriptionAndDrainCandidates(description: RTCSessionDescriptionInit): Promise<void> {
     const drain = !this.remoteDescription;
@@ -131,7 +130,13 @@ export default abstract class HMSConnection {
       return;
     }
     for (const candidate of this.candidates) {
-      await this.addIceCandidate(candidate);
+      // the description is already applied, so one unparseable candidate must not skip the rest
+      // nor report the negotiation as failed — the caller would undo a publish that did happen
+      try {
+        await this.addIceCandidate(candidate);
+      } catch (error) {
+        HMSLogger.w(TAG, `[role=${this.role}] buffered candidate rejected`, candidate, error);
+      }
     }
   }
 

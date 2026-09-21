@@ -3,11 +3,11 @@
  *
  * Applying a stale one throws SetRemoteDescriptionFailed (4004), which ErrorFactory builds
  * with isTerminal=true, so RetryScheduler routes it to handleTerminalError → Failed →
- * HMSSDKActions.leave(). The peer is ejected mid-call.
+ * HMSSdk.internalLeave(). The peer is ejected mid-call.
  *
  * The staleness key is connection identity + HMSConnection's localDescriptionEpoch, not
  * signalingState: setLocalDescription is legal in `have-local-offer` as well as `stable`
- * (W3C webrtc-pc 4.3.2), so a racer can replace our pending offer without the state moving,
+ * (W3C webrtc-pc, "set the RTCSessionDescription"), so a racer can replace our pending offer
  * and handleSFUMigration can replace the connection object while the field stays non-null.
  *
  * The fake native RTCPeerConnection below models the W3C operations chain (a serial queue)
@@ -41,12 +41,17 @@ class FakeNativePeerConnection {
   createOfferOptions: Array<RTCOfferOptions | undefined> = [];
   addedCandidates: RTCIceCandidateInit[] = [];
   transceivers: RTCRtpTransceiver[] = [];
+  /** candidate string the native call rejects, as a TURN-config-dependent OperationError would */
+  rejectCandidate: string | null = null;
 
   getTransceivers() {
     return this.transceivers;
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit) {
+    if (candidate.candidate === this.rejectCandidate) {
+      throw new Error('OperationError: could not parse candidate');
+    }
     this.addedCandidates.push(candidate);
   }
 
@@ -180,6 +185,16 @@ const makeHarness = (): Harness => {
   return { t, connection, native, observer: observer as any, eventBus, discards };
 };
 
+const collectEvents = (eventBus: EventBus, name: string) => {
+  const events: Array<Record<string, unknown>> = [];
+  eventBus.analytics.subscribe(event => {
+    if (event?.name === name) {
+      events.push(event.properties);
+    }
+  });
+  return events;
+};
+
 /** The smallest store/peer scaffolding handleSFUMigration walks before its republish loop. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stubMigrationStore = (t: any, localPeer: unknown) => {
@@ -273,7 +288,7 @@ describe('publish answer staleness', () => {
         reason: 'superseded_offer',
         action: HMSAction.RESTART_ICE.toString(),
         signaling_state: 'stable',
-        // needed to exclude the benign leave()-race discards from the rollout gate
+        // the field exists so leave()-race discards can be excluded from the rollout gate
         transport_state: 'Disconnected',
         epoch: 1,
       },
@@ -364,7 +379,8 @@ describe('publish answer staleness', () => {
       return answer('ans-1');
     });
 
-    // reported, never thrown — neither caller catches (see the wiring test below)
+    // reported, never thrown: the role-update caller has no catch, and the migration caller's
+    // catch would abandon the republish
     await expect(t.negotiateOnFirstPublish()).resolves.toBe(false);
     expect(native.applied).toEqual([]);
     expect(discards[0]).toMatchObject({ reason: 'superseded_offer', action: HMSAction.PUBLISH.toString() });
@@ -420,9 +436,9 @@ describe('publish answer staleness', () => {
     t.initConfig = { config: {} };
     t.store.getUserAgent = () => '';
 
-    // 4004, not the internal 4008: join is the only path that reaches the app's onError
-    // (onStateChange(Failed) -> leave event -> handlePreviewError), so it reports the error
-    // apps already handle. Terminal, else internalLeave's join-in-progress wait spins forever.
+    // 4004, not the internal 4008: HMSSdk.join's own catch rethrows this to the app's
+    // onError, so it reports the error apps already handle. Terminal, else internalLeave's
+    // join-in-progress wait spins forever.
     await expect(t.negotiateJoinWebRTC({ name: 'n', data: '', autoSubscribeVideo: false })).rejects.toMatchObject({
       code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED,
       isTerminal: true,
@@ -604,7 +620,7 @@ describe('publish answer staleness', () => {
   });
 
   /**
-   * handleLocalRoleUpdate:416 awaits negotiateOnFirstPublish bare, and HMSSdk awaits that before
+   * HMSTransport.handleLocalRoleUpdate awaits negotiateOnFirstPublish bare, and HMSSdk awaits that before
    * roleChangeManager.handleLocalPeerRoleUpdate. A throw there promotes a peer that never
    * captures or publishes, with no ROLE_UPDATED and nothing to recover it.
    */
@@ -617,7 +633,7 @@ describe('publish answer staleness', () => {
     });
 
     await expect(t.negotiateOnFirstPublish()).resolves.toBe(false);
-    // B's connection wires its own; this one is closed
+    // initAfterJoin skipped: in prod clearPeerConnections already closed this one
     expect(connection.nativeConnection.onnegotiationneeded).toBeNull();
   });
 
@@ -693,12 +709,8 @@ describe('publish answer staleness', () => {
 
   it('counts a genuinely failed migration instead of logging it away as aborted', async () => {
     const { t, eventBus } = makeHarness();
-    const failures: Array<Record<string, unknown>> = [];
-    eventBus.analytics.subscribe(event => {
-      if (event?.name === 'publish.failed') {
-        failures.push(event.properties);
-      }
-    });
+    const incomplete = collectEvents(eventBus, 'sfuMigrationIncomplete');
+    const publishFailed = collectEvents(eventBus, 'publish.failed');
     t.sfuNodeId = 'node-a';
     t.signal = { setSfuNodeId: jest.fn() };
     t.handleSFUMigration = async () => {
@@ -710,8 +722,29 @@ describe('publish answer staleness', () => {
     await Promise.resolve();
 
     // without this the peer sits half-migrated behind a single warn line, unmeasurable
-    expect(failures).toHaveLength(1);
-    expect(failures[0]).toMatchObject({ error_code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED });
+    expect(incomplete).toHaveLength(1);
+    expect(incomplete[0]).toMatchObject({
+      reason: 'failed',
+      sfu_node_id: 'node-b',
+      error_code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED,
+    });
+    // must not land in publish.failed — that counter already holds ordinary publish errors
+    expect(publishFailed).toHaveLength(0);
+  });
+
+  it('counts a superseded migration too — it abandons clones whose originals are gone', async () => {
+    const { t, eventBus } = makeHarness();
+    const incomplete = collectEvents(eventBus, 'sfuMigrationIncomplete');
+    t.sfuNodeId = 'node-b';
+    stubMigrationStore(t, { isLocal: true, audioTrack: undefined, videoTrack: undefined, auxiliaryTracks: [] });
+    t.negotiateOnFirstPublish = jest.fn(async () => {
+      t.publishConnection = makeConnection().connection;
+      return false;
+    });
+
+    await t.handleSFUMigration();
+
+    expect(incomplete).toEqual([{ reason: 'superseded', sfu_node_id: 'node-b' }]);
   });
 
   /**
@@ -737,6 +770,85 @@ describe('publish answer staleness', () => {
     await second.settled;
 
     expect(native.addedCandidates).toHaveLength(2);
+  });
+
+  it('drains the buffer on the join path', async () => {
+    const { t, connection, native } = makeHarness();
+    connection.candidates.push({ candidate: 'join-c1' });
+    t.signal = {
+      join: jest.fn(async () => answer('ans-1')),
+      setSfuNodeId: jest.fn(),
+      getPongResponseTimes: () => [],
+    };
+    t.initConfig = { config: {} };
+    t.store.getUserAgent = () => '';
+
+    await expect(t.negotiateJoinWebRTC({ name: 'n', data: '', autoSubscribeVideo: false })).resolves.toBe(true);
+
+    expect(native.addedCandidates).toEqual([{ candidate: 'join-c1' }]);
+  });
+
+  it('drains the buffer on the role-change first publish', async () => {
+    const { t, connection, native } = makeHarness();
+    connection.candidates.push({ candidate: 'role-c1' });
+    t.signal = makeSignal(async () => answer('ans-1'));
+
+    await expect(t.negotiateOnFirstPublish()).resolves.toBe(true);
+
+    expect(native.addedCandidates).toEqual([{ candidate: 'role-c1' }]);
+  });
+
+  /**
+   * An OperationError on one buffered candidate is routine with some TURN configs. The remote
+   * description is already applied by then, so throwing would make publishTrack report a
+   * failure for a track that is in fact published, and undo its own bookkeeping.
+   */
+  it('keeps draining, and keeps the negotiation successful, when one candidate is rejected', async () => {
+    const { t, connection, native } = makeHarness();
+    t.signal = makeSignal(async () => answer('ans-1'));
+    connection.candidates.push({ candidate: 'bad' }, { candidate: 'good' });
+    native.rejectCandidate = 'bad';
+
+    const { outcome, settled } = armWaiter(t, HMSAction.PUBLISH);
+    await t.performPublishRenegotiation();
+    await settled;
+
+    expect(native.addedCandidates).toEqual([{ candidate: 'good' }]);
+    expect(native.applied).toEqual([{ answer: 'ans-1', against: 'offer-1' }]);
+    expect(outcome.resolved).toBe(true);
+    expect(outcome.rejected).toBeUndefined();
+  });
+
+  /**
+   * Before the discard guard, a rejection at `await p` skipped teardown entirely. The guard put
+   * it in a `finally`, which also ran it on the rethrow — stopping the camera and dropping the
+   * track from the store while the caller aborted before TRACK_REMOVED / localPeer cleanup.
+   */
+  it('leaves the track intact when the unpublish fails for a reason other than a discard', async () => {
+    const { t } = makeHarness();
+    const track: any = {
+      trackId: 'v1',
+      publishedTrackId: 'v1',
+      type: 'video',
+      source: 'regular',
+      stream: { removeSender: jest.fn() },
+      cleanup: jest.fn(async () => undefined),
+    };
+    t.trackStates = new Map([['v1', { track_id: 'v1', type: 'video', source: 'regular' }]]);
+    const removeTrack = jest.fn();
+    t.store.removeTrack = removeTrack;
+    setTimeout(() => {
+      t.callbacks
+        .get(RENEGOTIATION_CALLBACK_ID)
+        .promise.reject(ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.UNPUBLISH, 'died'));
+    }, 0);
+
+    await expect(t.unpublishTrack(track)).rejects.toMatchObject({
+      code: ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
+    });
+    // the caller aborts before its own bookkeeping, so we must not have torn the track down
+    expect(track.cleanup).not.toHaveBeenCalled();
+    expect(removeTrack).not.toHaveBeenCalled();
   });
 
   it('backs off repeat publish-ICE retries so a lost race cannot spin OFFERs at RTT speed', () => {

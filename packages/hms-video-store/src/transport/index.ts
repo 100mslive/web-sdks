@@ -1,4 +1,5 @@
 import { JoinParameters } from './models/JoinParameters';
+import { PublishAnswerDiscardReason } from './models/PublishAnswerDiscardReason';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import ITransportObserver from './ITransportObserver';
@@ -52,8 +53,6 @@ import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
-
-type PublishAnswerDiscardReason = 'connection_replaced' | 'superseded_offer' | 'unexpected_state';
 
 /** The answer was dropped because a newer offer is staged — the owner re-drives, nothing is lost. */
 const isSupersededAnswer = (error: unknown): boolean =>
@@ -453,10 +452,10 @@ export default class HMSTransport {
   }
 
   /**
-   * A migration that fails part way leaves the peer with the old connections closed,
-   * trackStates cleared and no tracks republished, and nothing retries it — so it has to be
-   * counted rather than logged away. Deliberately not onStateChange(Failed): that is
-   * internalLeave, and how often this fires is exactly what is not measured today.
+   * A part-way migration leaves the old connections closed, trackStates cleared and the
+   * republish incomplete, and nothing retries it. Counted on its own event, not `publish.failed`
+   * — that one already holds ordinary publish errors. Not onStateChange(Failed): that is
+   * internalLeave, and a transient signal loss here would eject a recoverable peer.
    */
   private reportSFUMigrationFailure(error: unknown) {
     const ex =
@@ -464,7 +463,9 @@ export default class HMSTransport {
         ? error
         : ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (error as Error)?.message);
     HMSLogger.e(TAG, 'sfu migration failed', ex);
-    this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: ex }));
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.sfuMigrationIncomplete({ reason: 'failed', sfuNodeId: this.sfuNodeId, error: ex }),
+    );
   }
 
   /**
@@ -522,7 +523,11 @@ export default class HMSTransport {
     if (this.publishConnection === connection) {
       return false;
     }
+    // this abandons clones whose originals are already cleaned up, so it is a discard and counted
     HMSLogger.w(TAG, 'sfu migration superseded by a newer one, aborting republish');
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.sfuMigrationIncomplete({ reason: 'superseded', sfuNodeId: this.sfuNodeId }),
+    );
     return true;
   }
 
@@ -723,16 +728,17 @@ export default class HMSTransport {
     try {
       await p;
     } catch (error) {
-      // The sender is already detached and the removal rides the next offer, so a discarded
-      // answer must not abort the unpublish — callers do their own bookkeeping (splice,
-      // TRACK_REMOVED) after we return, and skipping it strands the track on localPeer.
+      // A genuine failure must leave the track intact: the caller aborts before its own
+      // bookkeeping, so tearing down here strands a stopped track on localPeer that the store
+      // no longer has and the app was never told to remove.
       if (!isSupersededAnswer(error)) {
         throw error;
       }
+      // A discarded answer is different — the sender is already detached and the removal rides
+      // the next offer, so the caller's splice/TRACK_REMOVED must still run.
       HMSLogger.w(TAG, `unpublishTrack: renegotiation superseded, tearing down anyway`, error);
-    } finally {
-      await this.teardownUnpublishedTrack(track);
     }
+    await this.teardownUnpublishedTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
@@ -1128,7 +1134,7 @@ export default class HMSTransport {
         // Report failure, never throw: handleLocalRoleUpdate awaits this bare, and a throw
         // would skip diffRolesAndPublishTracks and leave a promoted peer that never captures
         // or publishes. handleSFUMigration checks connection identity itself instead.
-        if (discarded !== 'connection_replaced') {
+        if (discarded !== PublishAnswerDiscardReason.ConnectionReplaced) {
           // Same connection, a racer's offer won and it carries current state — but wire
           // renegotiation first, without initAfterJoin every later publishTrack hangs.
           // A replaced connection is already closed; its new owner wires its own.
@@ -1169,12 +1175,12 @@ export default class HMSTransport {
   ): PublishAnswerDiscardReason | undefined {
     let reason: PublishAnswerDiscardReason | undefined;
     if (connection !== this.publishConnection) {
-      reason = 'connection_replaced';
+      reason = PublishAnswerDiscardReason.ConnectionReplaced;
     } else if (!connection.isStagingLocalDescription(epoch)) {
-      reason = 'superseded_offer';
+      reason = PublishAnswerDiscardReason.SupersededOffer;
     } else if (connection.signalingState !== 'have-local-offer') {
-      // belt and braces: unreachable above, kept so a future mutation outside HMSConnection is counted
-      reason = 'unexpected_state';
+      // unreachable while HMSConnection owns every state transition; kept so a future one is counted
+      reason = PublishAnswerDiscardReason.UnexpectedState;
     }
     if (!reason) {
       return;
@@ -1194,10 +1200,10 @@ export default class HMSTransport {
 
   private publishAnswerDiscardError(reason: PublishAnswerDiscardReason, epoch: number, action: HMSAction) {
     if (action === HMSAction.JOIN) {
-      // Join is the only path that reaches the app (onStateChange(Failed) -> leave event ->
-      // onError), and it genuinely failed — initAfterJoin never ran. Report the error apps
-      // already handle rather than leaking an internal code; it is terminal, which
-      // internalLeave's join-in-progress wait also requires.
+      // Join is the only path where the discard is immediately fatal: HMSSdk.join's own catch
+      // rethrows to the app's onError, and initAfterJoin never ran, so it genuinely failed.
+      // Report the error apps already handle rather than leaking an internal code. Terminal,
+      // which internalLeave's join-in-progress wait also requires.
       return ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, `${reason} epoch=${epoch}`);
     }
     return ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);

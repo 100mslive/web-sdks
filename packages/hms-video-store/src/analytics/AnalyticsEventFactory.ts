@@ -7,6 +7,7 @@ import { HMSException } from '../error/HMSException';
 import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
+import { PublishAnswerDiscardReason } from '../transport/models/PublishAnswerDiscardReason';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -137,8 +138,28 @@ export default class AnalyticsEventFactory {
    * A publish answer was dropped because the offer it answers is no longer staged.
    * `action` names the owner that must re-drive; `reason` separates the three causes.
    */
+  /**
+   * A migration that did not finish. `reason` separates a deliberate abort — a newer migration
+   * owns the peer — from a genuine failure, which nothing retries.
+   */
+  static sfuMigrationIncomplete({
+    reason,
+    sfuNodeId,
+    error,
+  }: {
+    reason: 'superseded' | 'failed';
+    sfuNodeId?: string;
+    error?: HMSException;
+  }) {
+    return new AnalyticsEvent({
+      name: 'sfuMigrationIncomplete',
+      level: error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties: this.getPropertiesWithError({ reason, sfu_node_id: sfuNodeId }, error),
+    });
+  }
+
   static publishAnswerDiscarded(properties: {
-    reason: 'connection_replaced' | 'superseded_offer' | 'unexpected_state';
+    reason: PublishAnswerDiscardReason;
     action: string;
     signaling_state: RTCSignalingState;
     transport_state: string;
