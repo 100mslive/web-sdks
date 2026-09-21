@@ -20,6 +20,7 @@ import HMSPublishConnection from '../connection/publish/publishConnection';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
+import { EventBus } from '../events/EventBus';
 import { makeTransport, TransportState } from '../test/helpers/makeTransport';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
 
@@ -35,8 +36,19 @@ class FakeNativePeerConnection {
 
   /** sdp of the local offer currently staged — what an incoming answer is applied against */
   pendingLocalSdp: string | null = null;
+  remoteDescription: RTCSessionDescriptionInit | null = null;
   applied: Array<{ answer: string; against: string | null }> = [];
   createOfferOptions: Array<RTCOfferOptions | undefined> = [];
+  addedCandidates: RTCIceCandidateInit[] = [];
+  transceivers: RTCRtpTransceiver[] = [];
+
+  getTransceivers() {
+    return this.transceivers;
+  }
+
+  async addIceCandidate(candidate: RTCIceCandidateInit) {
+    this.addedCandidates.push(candidate);
+  }
 
   private chain: Promise<unknown> = Promise.resolve();
   private offerCount = 0;
@@ -87,6 +99,7 @@ class FakeNativePeerConnection {
       }
       this.applied.push({ answer: description.sdp!, against: this.pendingLocalSdp });
       this.pendingLocalSdp = null;
+      this.remoteDescription = description;
       this.signalingState = 'stable';
     });
   }
@@ -115,6 +128,12 @@ let lastNative: FakeNativePeerConnection;
   return lastNative;
 };
 
+// jsdom has no MediaStream; HMSMediaStream's constructor only reads `id`
+let streamCount = 0;
+(global as unknown as { MediaStream: unknown }).MediaStream = function MediaStreamStub(this: { id: string }) {
+  this.id = `native-stream-${++streamCount}`;
+};
+
 const makeConnection = () => {
   const signal = { trickle: jest.fn() };
   const observer = {
@@ -138,6 +157,7 @@ interface Harness {
   native: FakeNativePeerConnection;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   observer: any;
+  eventBus: EventBus;
   discards: Array<Record<string, unknown>>;
 }
 
@@ -157,7 +177,33 @@ const makeHarness = (): Harness => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return { t, connection, native, observer: observer as any, discards };
+  return { t, connection, native, observer: observer as any, eventBus, discards };
+};
+
+/** The smallest store/peer scaffolding handleSFUMigration walks before its republish loop. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const stubMigrationStore = (t: any, localPeer: unknown) => {
+  t.clearPeerConnections = jest.fn();
+  // leave publishConnection as the harness one so the captured identity is observable
+  t.createPeerConnections = jest.fn();
+  t.store.getPeerMap = () => ({});
+  t.store.removeRemoteTracks = jest.fn();
+  t.store.removeTrack = jest.fn();
+  t.store.getLocalPeer = () => localPeer;
+  t.listener = { onSFUMigration: jest.fn() };
+};
+
+/** A local track the migration can clone and clean up. */
+const makeMigratableTrack = (trackId: string, type: 'audio' | 'video') => {
+  const track = {
+    trackId,
+    type,
+    source: 'regular',
+    stream: { id: `stream-${trackId}` },
+    cleanup: jest.fn(),
+    clone: jest.fn(() => ({ trackId: `${trackId}-clone`, type, source: 'regular' })),
+  };
+  return track;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -494,9 +540,11 @@ describe('publish answer staleness', () => {
     expect(native.onnegotiationneeded).toEqual(expect.any(Function));
   });
 
-  it('reconciles publish bookkeeping when a migration republish is superseded', async () => {
-    const { t } = makeHarness();
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false };
+  it('reconciles publish bookkeeping when a migration republish leaves the track staged', async () => {
+    const { t, native } = makeHarness();
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
     t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
     const addTrack = jest.fn();
     t.store.addTrack = addTrack;
@@ -511,7 +559,56 @@ describe('publish answer staleness', () => {
     expect(track.isPublished).toBe(true);
   });
 
-  it('aborts rather than continuing when the connection was replaced under negotiateOnFirstPublish', async () => {
+  /**
+   * The gate reads the connection, not the error code: 4008 covers both "a racer's offer won"
+   * (staged) and "publish connection is gone" (nothing staged), and a lost socket can leave the
+   * track fully staged for the reconnect's re-offer.
+   */
+  it('reports a socket-loss republish as published when the transceiver is still staged', async () => {
+    const { t, native } = makeHarness();
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    // the SFU may have applied the offer before the socket died, and the signal reconnect
+    // re-offers trackStates either way — isPublished false would send removeTrack down cleanup()
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died');
+    };
+
+    await t.republishOnMigration(track);
+
+    expect(addTrack).toHaveBeenCalledWith(track);
+    expect(track.isPublished).toBe(true);
+  });
+
+  it('does not report a republish as published when nothing is staged on the live connection', async () => {
+    const { t, native } = makeHarness();
+    // the 4008 raised when publishConnection is gone shares its code with a superseded answer,
+    // but the transceiver is on nobody's connection — claiming published is a lie
+    native.transceivers = [];
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver: {} };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'publish connection is gone');
+    };
+
+    await t.republishOnMigration(track);
+
+    expect(addTrack).not.toHaveBeenCalled();
+    expect(track.isPublished).toBe(false);
+  });
+
+  /**
+   * handleLocalRoleUpdate:416 awaits negotiateOnFirstPublish bare, and HMSSdk awaits that before
+   * roleChangeManager.handleLocalPeerRoleUpdate. A throw there promotes a peer that never
+   * captures or publishes, with no ROLE_UPDATED and nothing to recover it.
+   */
+  it('returns false instead of throwing when the connection was replaced under it', async () => {
     const { t, connection } = makeHarness();
     t.signal = makeSignal(async () => {
       // a second NodeInfo starts migration B: new connection, trackStates cleared
@@ -519,29 +616,127 @@ describe('publish answer staleness', () => {
       return answer('ans-1');
     });
 
-    // must THROW, not return false: handleSFUMigration ignores the return value, so migration A
-    // would walk its republish loop against B's connection and duplicate B's transceivers
-    await expect(t.negotiateOnFirstPublish()).rejects.toMatchObject({
-      code: ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
-    });
+    await expect(t.negotiateOnFirstPublish()).resolves.toBe(false);
+    // B's connection wires its own; this one is closed
     expect(connection.nativeConnection.onnegotiationneeded).toBeNull();
   });
 
-  it('does not report a genuinely failed migration republish as published', async () => {
+  it('aborts the migration itself when a newer one replaced the connection mid-negotiation', async () => {
+    const { t, connection } = makeHarness();
+    const localPeer = { isLocal: true, audioTrack: undefined, videoTrack: undefined, auxiliaryTracks: [] };
+    stubMigrationStore(t, localPeer);
+    const republish = jest.fn();
+    t.republishOnMigration = republish;
+    t.negotiateOnFirstPublish = jest.fn(async () => {
+      expect(t.publishConnection).toBe(connection);
+      t.publishConnection = makeConnection().connection;
+      return false;
+    });
+
+    await t.handleSFUMigration();
+
+    // migration B owns the peer now — A must not republish onto it or announce a migration
+    expect(republish).not.toHaveBeenCalled();
+    expect(t.listener.onSFUMigration).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Each republish is a full offer/answer round trip. Continuing past one that lost the
+   * connection attaches A's clones to B's connection, overwrites the single
+   * RENEGOTIATION_CALLBACK_ID slot B is awaiting, and clobbers B's auxiliaryTracks.
+   */
+  it('stops the migration republish loop when a newer migration takes the connection', async () => {
     const { t } = makeHarness();
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    // the offer never reached the SFU — nothing is staged, so claiming published is a lie
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died');
+    const localPeer: any = {
+      isLocal: true,
+      audioTrack: makeMigratableTrack('audio', 'audio'),
+      videoTrack: makeMigratableTrack('video', 'video'),
+      auxiliaryTracks: [makeMigratableTrack('aux', 'video')],
+    };
+    stubMigrationStore(t, localPeer);
+    const published: string[] = [];
+    t.negotiateOnFirstPublish = jest.fn(async () => true);
+    t.republishOnMigration = jest.fn(async (track: { trackId: string }) => {
+      published.push(track.trackId);
+      t.publishConnection = makeConnection().connection;
+    });
+
+    await t.handleSFUMigration();
+
+    expect(published).toEqual(['audio-clone']);
+    expect(t.listener.onSFUMigration).not.toHaveBeenCalled();
+  });
+
+  it('hands the already-cloned aux tracks back when the loop aborts', async () => {
+    const { t } = makeHarness();
+    const remaining = makeMigratableTrack('aux-2', 'video');
+    const localPeer: any = {
+      isLocal: true,
+      audioTrack: undefined,
+      videoTrack: undefined,
+      auxiliaryTracks: [makeMigratableTrack('aux-1', 'video'), remaining],
+    };
+    stubMigrationStore(t, localPeer);
+    t.negotiateOnFirstPublish = jest.fn(async () => true);
+    t.republishOnMigration = jest.fn(async () => {
+      t.publishConnection = makeConnection().connection;
+    });
+
+    await t.handleSFUMigration();
+
+    // the originals are already cleaned up, so dropping the clones loses the screenshare for good
+    expect(localPeer.auxiliaryTracks.map((track: { trackId: string }) => track.trackId)).toEqual([
+      'aux-1-clone',
+      'aux-2',
+    ]);
+  });
+
+  it('counts a genuinely failed migration instead of logging it away as aborted', async () => {
+    const { t, eventBus } = makeHarness();
+    const failures: Array<Record<string, unknown>> = [];
+    eventBus.analytics.subscribe(event => {
+      if (event?.name === 'publish.failed') {
+        failures.push(event.properties);
+      }
+    });
+    t.sfuNodeId = 'node-a';
+    t.signal = { setSfuNodeId: jest.fn() };
+    t.handleSFUMigration = async () => {
+      throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(HMSAction.PUBLISH, 'sfu rejected the offer');
     };
 
-    await t.republishOnMigration(track);
+    t.setSFUNodeId('node-b');
+    await Promise.resolve();
+    await Promise.resolve();
 
-    expect(addTrack).not.toHaveBeenCalled();
-    expect(track.isPublished).toBe(false);
+    // without this the peer sits half-migrated behind a single warn line, unmeasurable
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toMatchObject({ error_code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED });
+  });
+
+  /**
+   * onTrickle buffers into connection.candidates while remoteDescription is null, and the
+   * publish connection never clears that list. negotiateOnFirstPublish's discard path returns
+   * before its own drain, so the renegotiation that wins the race owns the flush — without it
+   * every candidate trickled before the first answer is stranded and publish ICE can stall.
+   */
+  it('drains the pre-first-answer candidate buffer, exactly once', async () => {
+    const { t, connection, native } = makeHarness();
+    t.signal = makeSignal(async () => answer('ans-1'));
+    connection.candidates.push({ candidate: 'c1' }, { candidate: 'c2' });
+
+    const first = armWaiter(t, HMSAction.PUBLISH);
+    await t.performPublishRenegotiation();
+    await first.settled;
+
+    expect(native.addedCandidates).toEqual([{ candidate: 'c1' }, { candidate: 'c2' }]);
+
+    // a later renegotiation must not re-add them: onTrickle now goes straight to addIceCandidate
+    const second = armWaiter(t, HMSAction.PUBLISH);
+    await t.performPublishRenegotiation();
+    await second.settled;
+
+    expect(native.addedCandidates).toHaveLength(2);
   });
 
   it('backs off repeat publish-ICE retries so a lost race cannot spin OFFERs at RTT speed', () => {

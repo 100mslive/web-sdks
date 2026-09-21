@@ -446,9 +446,39 @@ export default class HMSTransport {
       this.subscribeConnection?.setSfuNodeId(id);
     } else if (id && this.sfuNodeId !== id) {
       this.sfuNodeId = id;
-      // unawaited by design; a newer migration aborting this one must not surface as a rejection
-      this.handleSFUMigration().catch(error => HMSLogger.w(TAG, 'sfu migration aborted', error));
+      // unawaited by design. A newer migration supersedes this one by returning, not by
+      // rejecting, so anything landing in the catch is a genuine failure.
+      this.handleSFUMigration().catch(error => this.reportSFUMigrationFailure(error));
     }
+  }
+
+  /**
+   * A migration that fails part way leaves the peer with the old connections closed,
+   * trackStates cleared and no tracks republished, and nothing retries it — so it has to be
+   * counted rather than logged away. Deliberately not onStateChange(Failed): that is
+   * internalLeave, and how often this fires is exactly what is not measured today.
+   */
+  private reportSFUMigrationFailure(error: unknown) {
+    const ex =
+      error instanceof HMSException
+        ? error
+        : ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (error as Error)?.message);
+    HMSLogger.e(TAG, 'sfu migration failed', ex);
+    this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: ex }));
+  }
+
+  /**
+   * True when the live publish connection will carry this track in its next offer — the
+   * transceiver is attached to that connection and trackStates still names it. Keyed on state,
+   * not on the error code: 4008 also covers 'publish connection is gone', where nothing is
+   * staged, and a WebSocketConnectionLost from signal.offer can leave the track fully staged.
+   */
+  private isTrackStagedForPublish(track: HMSLocalTrack): boolean {
+    return (
+      !!track.publishedTrackId &&
+      this.trackStates.has(track.publishedTrackId) &&
+      !!this.publishConnection?.hasTransceiver(track.transceiver)
+    );
   }
 
   /**
@@ -462,20 +492,42 @@ export default class HMSTransport {
     } catch (error) {
       HMSLogger.w(TAG, `republish after migration failed for ${track.trackId}`, error);
       this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
-      // Only a superseded answer leaves a publishable track behind: the transceiver is attached
-      // and trackStates carries it, so the ICE retry's offer publishes it, and leaving
+      // A staged track is published by the next offer (ICE retry, signal reconnect), and leaving
       // isPublished false would send a later removeTrack down cleanup() instead of unpublish.
-      // A real failure (offer never reached the SFU) must NOT be reported as published.
-      if (isSupersededAnswer(error) && track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
+      // A track that never reached the connection must NOT be reported as published.
+      if (this.isTrackStagedForPublish(track)) {
         this.store.addTrack(track);
         track.isPublished = true;
       }
     }
   }
 
-  // eslint-disable-next-line complexity
   async handleSFUMigration() {
     HMSLogger.time('sfu migration');
+    try {
+      await this.performSFUMigration();
+    } finally {
+      HMSLogger.timeEnd('sfu migration');
+    }
+  }
+
+  /**
+   * A newer NodeInfo starts its own migration, which replaces publishConnection and rebuilds
+   * trackStates. Every republish below is a full offer/answer round trip, so ownership has to be
+   * re-checked between them: continuing would attach this migration's clones to the newer
+   * connection, overwrite the single RENEGOTIATION_CALLBACK_ID slot the newer one is awaiting
+   * (hanging it for the rest of the session), and clobber the auxiliaryTracks list it rebuilt.
+   */
+  private isMigrationSuperseded(connection: HMSPublishConnection | null) {
+    if (this.publishConnection === connection) {
+      return false;
+    }
+    HMSLogger.w(TAG, 'sfu migration superseded by a newer one, aborting republish');
+    return true;
+  }
+
+  // eslint-disable-next-line complexity
+  private async performSFUMigration() {
     this.clearPeerConnections();
     const peers = this.store.getPeerMap();
     this.store.removeRemoteTracks();
@@ -494,8 +546,12 @@ export default class HMSTransport {
       return;
     }
     this.createPeerConnections();
+    const connection = this.publishConnection;
     this.trackStates.clear();
     await this.negotiateOnFirstPublish();
+    if (this.isMigrationSuperseded(connection)) {
+      return;
+    }
     const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
       const stream = localPeer.audioTrack.stream as HMSLocalStream;
@@ -507,6 +563,9 @@ export default class HMSTransport {
       localPeer.audioTrack.cleanup();
       localPeer.audioTrack = newTrack;
       await this.republishOnMigration(newTrack);
+      if (this.isMigrationSuperseded(connection)) {
+        return;
+      }
     }
 
     if (localPeer.videoTrack) {
@@ -519,9 +578,12 @@ export default class HMSTransport {
       localPeer.videoTrack.cleanup();
       localPeer.videoTrack = newTrack;
       await this.republishOnMigration(newTrack);
+      if (this.isMigrationSuperseded(connection)) {
+        return;
+      }
     }
 
-    const auxTracks = [];
+    const auxTracks: HMSLocalTrack[] = [];
     while (localPeer.auxiliaryTracks.length > 0) {
       const track = localPeer.auxiliaryTracks.shift();
       if (track) {
@@ -549,12 +611,17 @@ export default class HMSTransport {
         track.cleanup();
         auxTracks.push(newTrack);
         await this.republishOnMigration(newTrack);
+        if (this.isMigrationSuperseded(connection)) {
+          // hand the clones back: the newer migration re-clones from auxiliaryTracks, and the
+          // originals are already cleaned up, so dropping them loses the screenshare for good
+          localPeer.auxiliaryTracks = auxTracks.concat(localPeer.auxiliaryTracks);
+          return;
+        }
       }
     }
     localPeer.auxiliaryTracks = auxTracks;
     streamMap.clear();
     this.listener?.onSFUMigration?.();
-    HMSLogger.timeEnd('sfu migration');
   }
 
   /**
@@ -1019,10 +1086,7 @@ export default class HMSTransport {
     // setSFUNodeId can run handleSFUMigration synchronously and replace publishConnection
     this.setSFUNodeId(answer?.sfu_node_id);
     this.assertPublishAnswerApplicable(connection, epoch, HMSAction.JOIN);
-    await connection.setRemoteDescription(answer);
-    for (const candidate of connection.candidates) {
-      await connection.addIceCandidate(candidate);
-    }
+    await connection.setRemoteDescriptionAndDrainCandidates(answer);
 
     connection.initAfterJoin();
     return !!answer;
@@ -1060,22 +1124,19 @@ export default class HMSTransport {
       const epoch = await connection.setLocalDescription(offer);
       const answer = await this.signal.offer(offer, this.trackStates);
       const discarded = this.publishAnswerDiscardReason(connection, epoch, HMSAction.PUBLISH);
-      if (discarded === 'connection_replaced') {
-        // A newer migration owns the peer now — it has already cleared trackStates and built
-        // its own connection. Continuing would republish onto it and duplicate its transceivers,
-        // so abort and let the caller unwind.
-        throw this.publishAnswerDiscardError(discarded, epoch, HMSAction.PUBLISH);
-      }
       if (discarded) {
-        // Same connection, a racer's offer won; it carries current state. Report failure but
-        // wire renegotiation first — without initAfterJoin every later publishTrack hangs.
-        connection.initAfterJoin();
+        // Report failure, never throw: handleLocalRoleUpdate awaits this bare, and a throw
+        // would skip diffRolesAndPublishTracks and leave a promoted peer that never captures
+        // or publishes. handleSFUMigration checks connection identity itself instead.
+        if (discarded !== 'connection_replaced') {
+          // Same connection, a racer's offer won and it carries current state — but wire
+          // renegotiation first, without initAfterJoin every later publishTrack hangs.
+          // A replaced connection is already closed; its new owner wires its own.
+          connection.initAfterJoin();
+        }
         return false;
       }
-      await connection.setRemoteDescription(answer);
-      for (const candidate of connection.candidates) {
-        await connection.addIceCandidate(candidate);
-      }
+      await connection.setRemoteDescriptionAndDrainCandidates(answer);
 
       connection.initAfterJoin();
       return !!answer;
@@ -1183,7 +1244,9 @@ export default class HMSTransport {
       const answer = await this.signal.offer(offer, this.trackStates);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       this.assertPublishAnswerApplicable(connection, epoch, callback.action);
-      await connection.setRemoteDescription(answer);
+      // negotiateOnFirstPublish's discard path returns before its own drain, so this can be the
+      // negotiation that first sets a remote description — it then owns the buffered candidates.
+      await connection.setRemoteDescriptionAndDrainCandidates(answer);
       callback.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {

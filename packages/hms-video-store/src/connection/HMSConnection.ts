@@ -65,6 +65,11 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
+  /** True when this connection owns the transceiver, i.e. its next offer carries it. */
+  hasTransceiver(transceiver?: RTCRtpTransceiver): boolean {
+    return !!transceiver && this.nativeConnection.getTransceivers().includes(transceiver);
+  }
+
   async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
@@ -111,6 +116,22 @@ export default abstract class HMSConnection {
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
+    }
+  }
+
+  /**
+   * Applies the answer, then drains the candidates onTrickle buffered while there was no remote
+   * description. The publish connection never clears that list, so the drain is gated on this
+   * being the first answer — after it, onTrickle calls addIceCandidate directly.
+   */
+  async setRemoteDescriptionAndDrainCandidates(description: RTCSessionDescriptionInit): Promise<void> {
+    const drain = !this.remoteDescription;
+    await this.setRemoteDescription(description);
+    if (!drain) {
+      return;
+    }
+    for (const candidate of this.candidates) {
+      await this.addIceCandidate(candidate);
     }
   }
 
