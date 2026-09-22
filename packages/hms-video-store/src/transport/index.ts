@@ -476,8 +476,10 @@ export default class HMSTransport {
   /**
    * True when the live publish connection will carry this track in its next offer — the
    * transceiver is attached to that connection and trackStates still names it. Keyed on state,
-   * not on the error code: 4008 also covers 'publish connection is gone', where nothing is
-   * staged, and a WebSocketConnectionLost from signal.offer can leave the track fully staged.
+   * not on the error code: 4008 also covers `connection_gone`, where nothing is staged, and a
+   * WebSocketConnectionLost from signal.offer can leave the track fully staged. publishTrack's
+   * catch is the only caller, so every publish path — app addTrack, role change, migration —
+   * gets the same answer.
    */
   private isTrackStagedForPublish(track: HMSLocalTrack): boolean {
     return (
@@ -496,15 +498,9 @@ export default class HMSTransport {
     try {
       await this.publishTrack(track);
     } catch (error) {
+      // publishTrack reconciles a staged track itself, so anything reaching here genuinely failed.
       HMSLogger.w(TAG, `republish after migration failed for ${track.trackId}`, error);
       this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
-      // A staged track is published by the next offer (ICE retry, signal reconnect), and leaving
-      // isPublished false would send a later removeTrack down cleanup() instead of unpublish.
-      // A track that never reached the connection must NOT be reported as published.
-      if (this.isTrackStagedForPublish(track)) {
-        this.store.addTrack(track);
-        track.isPublished = true;
-      }
     }
   }
 
@@ -686,7 +682,17 @@ export default class HMSTransport {
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    await p;
+    try {
+      await p;
+    } catch (error) {
+      // A displaced waiter or a lost socket can leave the track fully staged, and the next offer
+      // (ICE retry, signal reconnect) publishes it. Reporting it unpublished sends a later
+      // removeTrack down cleanup() instead of unpublish, and the SFU is never told.
+      if (!this.isTrackStagedForPublish(track)) {
+        throw error;
+      }
+      HMSLogger.w(TAG, `publishTrack: waiter lost its race, ${track.trackId} is staged for the next offer`, error);
+    }
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
     // add track to store after publish
     this.store.addTrack(track);
@@ -1201,17 +1207,27 @@ export default class HMSTransport {
     if (!reason) {
       return;
     }
-    HMSLogger.w(TAG, `[role=PUBLISH] discarding answer reason=${reason} state=${connection.signalingState}`);
+    this.reportPublishAnswerDiscard(reason, action, connection.signalingState, epoch);
+    return reason;
+  }
+
+  /** The one emit point for `publishAnswerDiscarded`, so no 4008 lands without a matching row. */
+  private reportPublishAnswerDiscard(
+    reason: PublishAnswerDiscardReason,
+    action: HMSAction,
+    signalingState?: RTCSignalingState,
+    epoch?: number,
+  ) {
+    HMSLogger.w(TAG, `[role=PUBLISH] discarding answer reason=${reason} state=${signalingState}`);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.publishAnswerDiscarded({
         reason,
         action: action.toString(),
-        signaling_state: connection.signalingState,
+        signaling_state: signalingState,
         transport_state: TransportState[this.state],
         epoch,
       }),
     );
-    return reason;
   }
 
   private publishAnswerDiscardError(reason: PublishAnswerDiscardReason, epoch: number, action: HMSAction) {
@@ -1252,8 +1268,12 @@ export default class HMSTransport {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { promise: { resolve, reject }, action, extra: {} });
       if (displaced) {
         HMSLogger.w(TAG, `renegotiation waiter for ${displaced.action} displaced by ${action}`);
+        this.reportPublishAnswerDiscard(PublishAnswerDiscardReason.WaiterDisplaced, displaced.action);
         displaced.promise.reject(
-          ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(displaced.action, 'renegotiation callback displaced'),
+          ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(
+            displaced.action,
+            `${PublishAnswerDiscardReason.WaiterDisplaced} by ${action}`,
+          ),
         );
       }
     });
@@ -1270,9 +1290,10 @@ export default class HMSTransport {
     const connection = this.publishConnection;
     if (!connection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot renegotiate');
+      this.reportPublishAnswerDiscard(PublishAnswerDiscardReason.ConnectionGone, callback.action);
       // settle, else publishTrack/unpublishTrack await their promise for the rest of the session
       callback.promise.reject(
-        ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(callback.action, 'publish connection is gone'),
+        ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(callback.action, PublishAnswerDiscardReason.ConnectionGone),
       );
       this.releaseRenegotiationCallback(callback);
       return;
@@ -1490,8 +1511,12 @@ export default class HMSTransport {
      */
     if (this.publishConnection) {
       const p = this.armRenegotiationCallback(HMSAction.RESTART_ICE);
-      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
-      await p;
+      // attach before the round trip: anything arming inside it rejects `p` with no handler yet,
+      // which the browser reports as an uncaught 4008 on every displacement
+      await Promise.all([
+        p,
+        this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' }),
+      ]);
     }
 
     return true;

@@ -235,6 +235,45 @@ const makeMigratableTrack = (trackId: string, type: 'audio' | 'video') => {
   return track;
 };
 
+/**
+ * The scaffolding publishTrack walks before it awaits the renegotiation waiter. `transceiver`
+ * stands in for what stream.addTransceiver attaches; leave it off the native connection's list
+ * to model "nothing staged".
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const makePublishableTrack = (t: any, trackId: string, transceiver?: RTCRtpTransceiver) => {
+  t.store.getSimulcastLayers = () => undefined;
+  t.store.addTrack = jest.fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const track: any = {
+    trackId,
+    publishedTrackId: trackId,
+    track_id: trackId,
+    stream_id: `stream-${trackId}`,
+    type: 'video',
+    source: 'regular',
+    mute: false,
+    isPublished: false,
+    transceiver,
+    settings: { maxBitrate: 500, maxFramerate: 30 },
+    getTrackIDBeingSent: () => trackId,
+    stream: {
+      id: `stream-${trackId}`,
+      setConnection: jest.fn(),
+      addTransceiver: jest.fn(),
+      setMaxBitrateAndFramerate: jest.fn(async () => undefined),
+    },
+  };
+  return track;
+};
+
+/** Drives publishTrack with a waiter that loses its race, without going through a real offer. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const publishWithWaiterRejecting = (t: any, track: unknown, error: Error) => {
+  t.armRenegotiationCallback = () => Promise.reject(error);
+  return t.publishTrack(track);
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const armWaiter = (t: any, action: HMSAction) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -570,23 +609,63 @@ describe('publish answer staleness', () => {
     expect(native.onnegotiationneeded).toEqual(expect.any(Function));
   });
 
-  it('reconciles publish bookkeeping when a migration republish leaves the track staged', async () => {
+  it('reconciles publish bookkeeping when the waiter loses its race but the track is staged', async () => {
     const { t, native } = makeHarness();
     const transceiver = {} as RTCRtpTransceiver;
     native.transceivers = [transceiver];
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
-    };
+    const track = makePublishableTrack(t, 'v1', transceiver);
 
-    await t.republishOnMigration(track);
+    await expect(
+      publishWithWaiterRejecting(
+        t,
+        track,
+        ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer'),
+      ),
+    ).resolves.toBeUndefined();
 
     // else a later removeTrack takes the cleanup() branch and the SFU keeps receiving it
-    expect(addTrack).toHaveBeenCalledWith(track);
+    expect(t.store.addTrack).toHaveBeenCalledWith(track);
     expect(track.isPublished).toBe(true);
+  });
+
+  /**
+   * The reconcile has to live in publishTrack, not republishOnMigration: transport.publish
+   * swallows into analytics and HMSSdk.addTrack pushes to auxiliaryTracks either way, so an
+   * app-driven addTrack reaches the same half-published state the migration path was fixed for.
+   */
+  it('reports an app-driven addTrack as published when a retry displaces its waiter', async () => {
+    const { t, native } = makeHarness();
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track = makePublishableTrack(t, 'screen-1', transceiver);
+    // the real arm, displaced the way retryPublishIceFailedTask displaces it
+    const publishing = t.publishTrack(track);
+    t.armRenegotiationCallback(HMSAction.RESTART_ICE);
+
+    await expect(publishing).resolves.toBeUndefined();
+
+    expect(t.store.addTrack).toHaveBeenCalledWith(track);
+    expect(track.isPublished).toBe(true);
+  });
+
+  it('reports the first of two concurrent addTracks as published when the second displaces it', async () => {
+    const { t, native } = makeHarness();
+    const first = {} as RTCRtpTransceiver;
+    const second = {} as RTCRtpTransceiver;
+    native.transceivers = [first, second];
+    const trackA = makePublishableTrack(t, 'a1', first);
+    const trackB = makePublishableTrack(t, 'b1', second);
+
+    const publishingA = t.publishTrack(trackA);
+    const publishingB = t.publishTrack(trackB);
+    // B's arm displaced A's waiter; settle B so both can be awaited
+    t.callbacks.get(RENEGOTIATION_CALLBACK_ID).promise.resolve(true);
+
+    await expect(publishingA).resolves.toBeUndefined();
+    await expect(publishingB).resolves.toBeUndefined();
+
+    expect(trackA.isPublished).toBe(true);
+    expect(trackB.isPublished).toBe(true);
   });
 
   /**
@@ -594,23 +673,22 @@ describe('publish answer staleness', () => {
    * (staged) and "publish connection is gone" (nothing staged), and a lost socket can leave the
    * track fully staged for the reconnect's re-offer.
    */
-  it('reports a socket-loss republish as published when the transceiver is still staged', async () => {
+  it('reports a socket-loss publish as published when the transceiver is still staged', async () => {
     const { t, native } = makeHarness();
     const transceiver = {} as RTCRtpTransceiver;
     native.transceivers = [transceiver];
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
+    const track = makePublishableTrack(t, 'v1', transceiver);
     // the SFU may have applied the offer before the socket died, and the signal reconnect
     // re-offers trackStates either way — isPublished false would send removeTrack down cleanup()
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died');
-    };
+    await expect(
+      publishWithWaiterRejecting(
+        t,
+        track,
+        ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died'),
+      ),
+    ).resolves.toBeUndefined();
 
-    await t.republishOnMigration(track);
-
-    expect(addTrack).toHaveBeenCalledWith(track);
+    expect(t.store.addTrack).toHaveBeenCalledWith(track);
     expect(track.isPublished).toBe(true);
   });
 
@@ -622,22 +700,19 @@ describe('publish answer staleness', () => {
   it('keeps the migration going when getTransceivers throws under load', async () => {
     const { t, native } = makeHarness();
     native.throwOnGetTransceivers = true;
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver: {} };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
-    };
+    const track = makePublishableTrack(t, 'v1', {} as RTCRtpTransceiver);
+    const error = ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
 
+    // the throw must not escape the migration's per-track catch
+    await expect(publishWithWaiterRejecting(t, track, error)).rejects.toBe(error);
     await expect(t.republishOnMigration(track)).resolves.toBeUndefined();
 
     // degraded locally: unknown staging state means we must not claim published
-    expect(addTrack).not.toHaveBeenCalled();
+    expect(t.store.addTrack).not.toHaveBeenCalled();
     expect(track.isPublished).toBe(false);
   });
 
-  it('does not report a republish as published when the transceiver belongs to the old connection', async () => {
+  it('does not report a publish as published when the transceiver belongs to the old connection', async () => {
     const { t, native } = makeHarness();
     const transceiver = {} as RTCRtpTransceiver;
     // the transceiver is attached to the connection the migration replaced, not the live one
@@ -645,56 +720,45 @@ describe('publish answer staleness', () => {
     const replacement = makeConnection();
     t.publishConnection = replacement.connection;
     replacement.native.transceivers = [];
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'connection_replaced');
-    };
+    const track = makePublishableTrack(t, 'v1', transceiver);
+    const error = ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'connection_replaced');
 
-    await t.republishOnMigration(track);
+    await expect(publishWithWaiterRejecting(t, track, error)).rejects.toBe(error);
 
-    expect(addTrack).not.toHaveBeenCalled();
+    expect(t.store.addTrack).not.toHaveBeenCalled();
     expect(track.isPublished).toBe(false);
   });
 
-  it('does not report a republish as published when trackStates no longer names the track', async () => {
+  it('does not report a publish as published when trackStates no longer names the track', async () => {
     const { t, native } = makeHarness();
     const transceiver = {} as RTCRtpTransceiver;
     native.transceivers = [transceiver];
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver };
-    // a concurrent unpublish dropped the trackState while the republish was in flight, so no
+    const track = makePublishableTrack(t, 'v1', transceiver);
+    const error = ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
+    // a concurrent unpublish dropped the trackState while the publish was in flight, so no
     // later offer carries it — the transceiver alone does not make it published
-    t.trackStates = new Map();
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
+    t.armRenegotiationCallback = () => {
+      t.trackStates = new Map();
+      return Promise.reject(error);
     };
 
-    await t.republishOnMigration(track);
+    await expect(t.publishTrack(track)).rejects.toBe(error);
 
-    expect(addTrack).not.toHaveBeenCalled();
+    expect(t.store.addTrack).not.toHaveBeenCalled();
     expect(track.isPublished).toBe(false);
   });
 
-  it('does not report a republish as published when nothing is staged on the live connection', async () => {
+  it('does not report a publish as published when nothing is staged on the live connection', async () => {
     const { t, native } = makeHarness();
     // the 4008 raised when publishConnection is gone shares its code with a superseded answer,
     // but the transceiver is on nobody's connection — claiming published is a lie
     native.transceivers = [];
-    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver: {} };
-    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
-    const addTrack = jest.fn();
-    t.store.addTrack = addTrack;
-    t.publishTrack = async () => {
-      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'publish connection is gone');
-    };
+    const track = makePublishableTrack(t, 'v1', {} as RTCRtpTransceiver);
+    const error = ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'publish connection is gone');
 
-    await t.republishOnMigration(track);
+    await expect(publishWithWaiterRejecting(t, track, error)).rejects.toBe(error);
 
-    expect(addTrack).not.toHaveBeenCalled();
+    expect(t.store.addTrack).not.toHaveBeenCalled();
     expect(track.isPublished).toBe(false);
   });
 
@@ -1025,6 +1089,71 @@ describe('publish answer staleness', () => {
     expect(t.callbacks.get(RENEGOTIATION_CALLBACK_ID).action).toBe(HMSAction.RESTART_ICE);
     t.callbacks.get(RENEGOTIATION_CALLBACK_ID).promise.resolve(true);
     await expect(second).resolves.toBe(true);
+  });
+
+  /**
+   * Both waiter-level 4008s have to be counted too. They land in `publish.failed` either way, and
+   * the verification gate reconciles that against `publishAnswerDiscarded` — a 4008 with no
+   * matching discard row reads as an unexplained publish failure. Neither has an offer in flight,
+   * so `epoch` and `signaling_state` are absent rather than faked.
+   */
+  it('counts a displaced waiter as a discard', async () => {
+    const { t, discards } = makeHarness();
+    const first = t.armRenegotiationCallback(HMSAction.PUBLISH);
+    const settled = first.catch(() => undefined);
+
+    t.armRenegotiationCallback(HMSAction.RESTART_ICE);
+    await settled;
+
+    expect(discards).toEqual([
+      expect.objectContaining({ reason: 'waiter_displaced', action: HMSAction.PUBLISH.toString() }),
+    ]);
+  });
+
+  /**
+   * retryPublishIceFailedTask arms `p` and then awaits a full offer/answer round trip before
+   * `await p` attaches a handler. Anything arming inside that window rejects `p` unhandled, so
+   * the browser logs `Uncaught (in promise) HMSException 4008` on every displacement. The retry
+   * still re-drives, so this is noise — but it is noise on the path we ask support to read.
+   */
+  it('does not leave the restart-ICE waiter unhandled when a publish displaces it mid-flight', async () => {
+    const { t } = makeHarness();
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+    try {
+      t.signal = makeSignal(async () => {
+        // a publishTrack arms while the OFFER rpc is in flight, displacing the restart-ICE waiter
+        t.armRenegotiationCallback(HMSAction.PUBLISH);
+        // the real rpc crosses macrotask boundaries; that is when node flags an unhandled rejection
+        await new Promise(resolve => setTimeout(resolve, 0));
+        return answer('ans-1');
+      });
+
+      await expect(t.retryPublishIceFailedTask()).rejects.toMatchObject({
+        code: ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
+      });
+      // let node's unhandled-rejection detection run
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(unhandled).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+      t.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
+    }
+  });
+
+  it('counts a gone publish connection as a discard', async () => {
+    const { t, discards } = makeHarness();
+    const { settled } = armWaiter(t, HMSAction.PUBLISH);
+    t.publishConnection = null;
+
+    await t.performPublishRenegotiation();
+    await settled;
+
+    expect(discards).toEqual([
+      expect.objectContaining({ reason: 'connection_gone', action: HMSAction.PUBLISH.toString() }),
+    ]);
   });
 
   /**

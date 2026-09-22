@@ -9,4 +9,8 @@ export enum PublishAnswerDiscardReason {
   SupersededOffer = 'superseded_offer',
   /** neither of the above and still not in have-local-offer; counted, never expected */
   UnexpectedState = 'unexpected_state',
+  /** a newer owner took the single renegotiation slot before this one was settled */
+  WaiterDisplaced = 'waiter_displaced',
+  /** the publish connection was torn down before the renegotiation could run */
+  ConnectionGone = 'connection_gone',
 }

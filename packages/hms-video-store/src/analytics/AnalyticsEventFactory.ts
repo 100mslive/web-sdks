@@ -164,12 +164,13 @@ export default class AnalyticsEventFactory {
    * A publish answer was dropped because the offer it answers is no longer staged.
    * `action` names the owner that must re-drive; `reason` separates the three causes.
    */
+  /** the two waiter-level discards have no offer in flight, so they carry no epoch/signaling_state */
   static publishAnswerDiscarded(properties: {
     reason: PublishAnswerDiscardReason;
     action: string;
-    signaling_state: RTCSignalingState;
+    signaling_state?: RTCSignalingState;
     transport_state: string;
-    epoch: number;
+    epoch?: number;
   }) {
     return new AnalyticsEvent({ name: 'publishAnswerDiscarded', level: AnalyticsEventLevel.INFO, properties });
   }

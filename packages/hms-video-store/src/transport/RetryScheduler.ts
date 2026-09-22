@@ -201,7 +201,7 @@ export class RetryScheduler {
     }
   }
 
-  private getDelayForRetryCount(category: TFC, failedRetryCount = 0) {
+  private getDelayForRetryCount(category: TFC, failedRetryCount: number) {
     const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
     let delaySeconds = 0;
     if (category === TFC.JoinWSMessageFailed) {

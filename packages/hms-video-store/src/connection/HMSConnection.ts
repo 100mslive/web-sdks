@@ -73,8 +73,8 @@ export default abstract class HMSConnection {
     try {
       return this.nativeConnection.getTransceivers().includes(transceiver);
     } catch (error) {
-      // getSenders/getReceivers are known to throw under load; the only caller is a catch
-      // block, so escaping here would unwind the migration it exists to keep going
+      // getSenders/getReceivers are known to throw under load; the only caller decides, inside a
+      // catch, whether a failed publish left the track staged — escaping turns that into a throw
       HMSLogger.w(TAG, `[role=${this.role}] getTransceivers threw`, error);
       return false;
     }
