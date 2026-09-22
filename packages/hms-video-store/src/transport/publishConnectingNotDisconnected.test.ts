@@ -26,6 +26,8 @@ import { ICE_DISCONNECTION_TIMEOUT } from '../utils/constants';
 type FakeTransport = {
   publishDisconnectTimer: number;
   publishEverConnected?: boolean;
+  publishConnectedWaiters: Set<(connected: boolean) => void>;
+  settlePublishConnectedWaiters: (connected: boolean) => void;
   publishConnection: {
     connectionState: RTCPeerConnectionState;
     selectedCandidatePair?: { local?: { candidate: string }; remote?: { candidate: string } };
@@ -39,6 +41,7 @@ type FakeTransport = {
 const proto = HMSTransport.prototype as unknown as {
   handlePublishConnectionStateChange: (this: FakeTransport, s: RTCPeerConnectionState) => Promise<void>;
   publishCandidateDescription: (this: FakeTransport) => string;
+  settlePublishConnectedWaiters: (this: FakeTransport, connected: boolean) => void;
 };
 
 /** A transport whose publish connection is in `state`, with no candidate pair unless given one. */
@@ -47,6 +50,8 @@ const makeFake = (state: RTCPeerConnectionState, hasCandidatePair = false): Fake
     publishDisconnectTimer: 0,
     // a fresh transport has not been up yet; the real field default is asserted separately
     publishEverConnected: false,
+    publishConnectedWaiters: new Set<(connected: boolean) => void>(),
+    settlePublishConnectedWaiters: (connected: boolean) => proto.settlePublishConnectedWaiters.call(fake, connected),
     publishConnection: {
       connectionState: state,
       selectedCandidatePair: hasCandidatePair

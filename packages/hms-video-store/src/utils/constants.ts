@@ -18,6 +18,11 @@ export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CA
 export const SUBSCRIBE_TIMEOUT = 60_000;
 
 export const ICE_DISCONNECTION_TIMEOUT = 5_000;
+/**
+ * Backstop on waiting for a restarted publish transport to reconnect. `connected` and `failed`
+ * are the real exits; this only bounds a transport stuck in `connecting`, within the 60s budget.
+ */
+export const PUBLISH_ICE_RECONNECT_TIMEOUT = 15_000;
 
 /**
  * Cap on a single call into an audio plugin's own code - init (a model fetch) or processAudioTrack.

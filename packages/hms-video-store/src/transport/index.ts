@@ -39,6 +39,7 @@ import {
   LEAVE_REASON,
   PROTOCOL_SPEC,
   PROTOCOL_VERSION,
+  PUBLISH_ICE_RECONNECT_TIMEOUT,
   PUBLISH_STATS_PUSH_INTERVAL,
   PUBLISH_STATS_SAMPLE_WINDOW,
   RENEGOTIATION_CALLBACK_ID,
@@ -85,6 +86,8 @@ export default class HMSTransport {
   private publishDisconnectTimer = 0;
   /** `connecting` only means a loss once the connection has been up; on the way up it is normal. */
   private publishEverConnected = false;
+  /** resolvers waiting for the publish transport to come back up after an ICE restart */
+  private publishConnectedWaiters = new Set<(connected: boolean) => void>();
   private listener?: HMSUpdateListener;
   private onScreenshareStop = () => {};
   private screenStream = new Set<MediaStream>();
@@ -649,6 +652,7 @@ export default class HMSTransport {
     this.publishDisconnectTimer = 0;
     // the replacement connection starts from scratch, so it has to earn `connected` again
     this.publishEverConnected = false;
+    this.settlePublishConnectedWaiters(false);
     this.lastPublishDtlsState = 'new';
     this.publishConnection?.close();
     this.subscribeConnection?.close();
@@ -1045,6 +1049,33 @@ export default class HMSTransport {
     return `local candidate - ${pair?.local?.candidate}; remote candidate - ${pair?.remote?.candidate}`;
   }
 
+  private settlePublishConnectedWaiters(connected: boolean) {
+    const waiters = Array.from(this.publishConnectedWaiters);
+    this.publishConnectedWaiters.clear();
+    waiters.forEach(settle => settle(connected));
+  }
+
+  /**
+   * An ICE restart only re-offers; the transport carries nothing until ICE actually connects.
+   * Resolves false on `failed` or at the backstop, so the caller retries rather than reporting a
+   * reconnect that has not happened.
+   */
+  private waitForPublishConnected(): Promise<boolean> {
+    if (this.publishConnection?.connectionState === 'connected') {
+      return Promise.resolve(true);
+    }
+    return new Promise<boolean>(resolve => {
+      let timer = 0;
+      const settle = (connected: boolean) => {
+        clearTimeout(timer);
+        this.publishConnectedWaiters.delete(settle);
+        resolve(connected);
+      };
+      timer = window.setTimeout(() => settle(false), PUBLISH_ICE_RECONNECT_TIMEOUT);
+      this.publishConnectedWaiters.add(settle);
+    });
+  }
+
   private async handlePublishConnectionStateChange(newState: RTCPeerConnectionState) {
     if (newState === 'new') {
       return;
@@ -1052,12 +1083,14 @@ export default class HMSTransport {
 
     if (newState === 'connected') {
       this.publishEverConnected = true;
+      this.settlePublishConnectedWaiters(true);
       // the DTLS handler already does this; without it every blip stacks another timer
       clearTimeout(this.publishDisconnectTimer);
       this.publishDisconnectTimer = 0;
       this.connectivityListener?.onICESuccess(true);
       this.publishConnection?.handleSelectedIceCandidatePairs();
     } else if (newState === 'failed') {
+      this.settlePublishConnectedWaiters(false);
       await this.handleIceConnectionFailure(
         HMSConnectionRole.Publish,
         ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, this.publishCandidateDescription()),
@@ -1254,6 +1287,7 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
+      const iceRestart = this.publishConnection.connectionState !== 'connected';
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -1261,8 +1295,13 @@ export default class HMSTransport {
           extra: {},
         });
       });
-      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
+      await this.performPublishRenegotiation({ iceRestart });
       await p;
+      // The offer/answer only restarts gathering. Returning true here lets RetryScheduler drop the
+      // in-progress marker and flip to Joined, which fires onReconnected while nothing can publish
+      // yet — and, with the marker gone, the next disconnect opens a second cycle. Resolves at once
+      // when the transport is already up, including the case where it dropped during the re-offer.
+      return this.waitForPublishConnected();
     }
 
     return true;
