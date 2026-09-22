@@ -2,7 +2,13 @@ import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { Value_Type } from '../grpc/sessionstore';
 import { StoreClient } from '../grpc/sessionstore.client';
 import { BackoffState, calculateBackoff } from '../utils';
-import { INITIAL_BACKOFF_MS, RETRY_ERROR_MESSAGES, WHITEBOARD_CLOSE_MESSAGE } from '../constants';
+import {
+  INITIAL_BACKOFF_MS,
+  RETRY_ERROR_MESSAGES,
+  WHITEBOARD_CLOSE_MESSAGE,
+  WHITEBOARD_RECONNECT_MESSAGE,
+  WHITEBOARD_REOPEN_MESSAGE,
+} from '../constants';
 interface OpenCallbacks<T> {
   handleOpen: (values: T[]) => void;
   handleChange: (key: string, value?: T) => void;
@@ -10,6 +16,10 @@ interface OpenCallbacks<T> {
 }
 export class SessionStore<T> {
   private storeClient: StoreClient;
+  /** Teardown state for the stream generation that is currently live. */
+  private abortController?: AbortController;
+  private reconnectTimer?: ReturnType<typeof setTimeout>;
+  private onlineHandler?: () => void;
 
   constructor(endpoint: string, token: string) {
     const transport = new GrpcWebFetchTransport({
@@ -20,11 +30,19 @@ export class SessionStore<T> {
     this.storeClient = new StoreClient(transport);
   }
 
-  async open(
+  /**
+   * Starts streaming session store changes and returns the handle that closes it.
+   * The handle is returned synchronously so a caller can never unmount without it.
+   */
+  open(
     { handleOpen, handleChange, handleError }: OpenCallbacks<T>,
     backoffState: BackoffState = { attempt: 0, currentDelay: INITIAL_BACKOFF_MS },
   ) {
+    // open() is the only place a stream is created, so replacing any still-live generation here
+    // means no stream can be orphaned by a caller that opens twice.
+    this.teardown();
     const abortController = new AbortController();
+    this.abortController = abortController;
     const call = this.storeClient.open(
       {
         changeId: '',
@@ -62,51 +80,72 @@ export class SessionStore<T> {
 
     // Reconnect immediately when the browser comes back online
     const handleOnline = () => {
-      window.removeEventListener('online', handleOnline);
-      abortController.abort('reconnecting due to online event');
+      this.teardown(WHITEBOARD_RECONNECT_MESSAGE);
       this.open({ handleOpen, handleChange, handleError }); // reset backoff
     };
 
+    this.onlineHandler = handleOnline;
     window.addEventListener('online', handleOnline);
 
     call.responses.onError(error => {
-      console.error('GRPCOpenStreamError: ', error);
-      // Don't retry if this was an abort - either intentional close or already reconnecting
-      if (error.message.includes('abort')) {
+      // Our own teardown, not a connection failure - closing the whiteboard ends the stream this
+      // way every time. The signal is authoritative where the message is not: Chrome reports the
+      // abort reason before streaming starts and an AbortError after.
+      if (abortController.signal.aborted) {
         return;
       }
 
+      console.error('GRPCOpenStreamError: ', error);
       handleError(error);
 
-      const nextDelay = calculateBackoff(backoffState);
       const nextState: BackoffState = {
         attempt: backoffState.attempt + 1,
-        currentDelay: nextDelay,
-      };
-
-      const openCallback = () => {
-        window.removeEventListener('online', handleOnline);
-        abortController.abort(`closing to open new conn`);
-        this.open({ handleOpen, handleChange, handleError }, nextState);
+        currentDelay: calculateBackoff(backoffState),
       };
 
       // Apply exponential backoff before reconnecting
-      setTimeout(openCallback, backoffState.currentDelay);
+      this.reconnectTimer = setTimeout(() => {
+        this.open({ handleOpen, handleChange, handleError }, nextState);
+      }, backoffState.currentDelay);
     });
 
-    try {
-      count = await this.getKeysCountWithDelay();
-      handleOpen(count ? initialValues : []);
-    } catch (error) {
-      console.error('GRPCCountError: ', error);
-      const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
-      handleError(error as unknown as Error, canRecover);
+    this.getKeysCountWithDelay()
+      .then(keysCount => {
+        // A close or reconnect landed while the count was in flight - its records are stale now.
+        if (abortController.signal.aborted) {
+          return;
+        }
+        count = keysCount;
+        handleOpen(count ? initialValues : []);
+      })
+      .catch(error => {
+        // The whiteboard is already gone - reporting now would surface a connection error on it.
+        if (abortController.signal.aborted) {
+          return;
+        }
+        console.error('GRPCCountError: ', error);
+        const canRecover = RETRY_ERROR_MESSAGES.includes((error as unknown as Error).message.toLowerCase());
+        handleError(error as unknown as Error, canRecover);
+      });
+
+    return () => this.teardown(WHITEBOARD_CLOSE_MESSAGE);
+  }
+
+  /**
+   * Closes the live stream generation and cancels any reconnect it had scheduled.
+   * `reason` is diagnostic only - Chrome drops it once the response body is streaming.
+   */
+  private teardown(reason: string = WHITEBOARD_REOPEN_MESSAGE) {
+    clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = undefined;
+
+    if (this.onlineHandler) {
+      window.removeEventListener('online', this.onlineHandler);
+      this.onlineHandler = undefined;
     }
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      abortController.abort(WHITEBOARD_CLOSE_MESSAGE);
-    };
+    this.abortController?.abort(reason);
+    this.abortController = undefined;
   }
 
   set(key: string, value?: T) {
