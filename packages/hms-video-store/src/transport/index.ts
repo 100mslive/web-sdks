@@ -464,7 +464,12 @@ export default class HMSTransport {
         : ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (error as Error)?.message);
     HMSLogger.e(TAG, 'sfu migration failed', ex);
     this.eventBus.analytics.publish(
-      AnalyticsEventFactory.sfuMigrationIncomplete({ reason: 'failed', sfuNodeId: this.sfuNodeId, error: ex }),
+      AnalyticsEventFactory.sfuMigrationIncomplete({
+        reason: 'failed',
+        sfuNodeId: this.sfuNodeId,
+        transportState: TransportState[this.state],
+        error: ex,
+      }),
     );
   }
 
@@ -523,10 +528,15 @@ export default class HMSTransport {
     if (this.publishConnection === connection) {
       return false;
     }
-    // this abandons clones whose originals are already cleaned up, so it is a discard and counted
+    // this abandons clones whose originals are already cleaned up, so it is a discard and counted.
+    // leave() also nulls publishConnection, so transport_state separates that benign race.
     HMSLogger.w(TAG, 'sfu migration superseded by a newer one, aborting republish');
     this.eventBus.analytics.publish(
-      AnalyticsEventFactory.sfuMigrationIncomplete({ reason: 'superseded', sfuNodeId: this.sfuNodeId }),
+      AnalyticsEventFactory.sfuMigrationIncomplete({
+        reason: 'superseded',
+        sfuNodeId: this.sfuNodeId,
+        transportState: TransportState[this.state],
+      }),
     );
     return true;
   }
@@ -617,9 +627,13 @@ export default class HMSTransport {
         auxTracks.push(newTrack);
         await this.republishOnMigration(newTrack);
         if (this.isMigrationSuperseded(connection)) {
-          // hand the clones back: the newer migration re-clones from auxiliaryTracks, and the
-          // originals are already cleaned up, so dropping them loses the screenshare for good
-          localPeer.auxiliaryTracks = auxTracks.concat(localPeer.auxiliaryTracks);
+          // These clones sit on a connection nobody will offer again, and the newer migration
+          // may already be past its own aux loop — handing them back would leave a tile the app
+          // cannot dismiss. Tear them down so capture stops and the app gets TRACK_REMOVED.
+          for (const orphan of auxTracks) {
+            await this.teardownUnpublishedTrack(orphan);
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, orphan, localPeer);
+          }
           return;
         }
       }
@@ -666,13 +680,7 @@ export default class HMSTransport {
       `${track}`,
     );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.PUBLISH,
-        extra: {},
-      });
-    });
+    const p = this.armRenegotiationCallback(HMSAction.PUBLISH);
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
@@ -700,29 +708,33 @@ export default class HMSTransport {
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
+  /**
+   * Drops the track from the offer payload and returns what it dropped, so a failed unpublish
+   * can put it back — the caller leaves the track on localPeer and in the store, and without
+   * its trackState no later offer would ever carry it again.
+   */
+  private takeTrackState(track: HMSLocalTrack): TrackState | undefined {
+    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
+      const trackState = this.trackStates.get(track.publishedTrackId);
+      this.trackStates.delete(track.publishedTrackId);
+      return trackState;
+    }
+    // TODO: hotfix to unpublish replaced video track id, solve it properly
+    // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
+    // the original initial track id for a proper fix
+    const originalTrackState = Array.from(this.trackStates.values()).find(
+      trackState => track.type === trackState.type && track.source === trackState.source,
+    );
+    if (originalTrackState) {
+      this.trackStates.delete(originalTrackState.track_id);
+    }
+    return originalTrackState;
+  }
+
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
-    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
-      this.trackStates.delete(track.publishedTrackId);
-    } else {
-      // TODO: hotfix to unpublish replaced video track id, solve it properly
-      // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
-      // the original initial track id for a proper fix
-      const currentTrackStates = Array.from(this.trackStates.values());
-      const originalTrackState = currentTrackStates.find(
-        trackState => track.type === trackState.type && track.source === trackState.source,
-      );
-      if (originalTrackState) {
-        this.trackStates.delete(originalTrackState.track_id);
-      }
-    }
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.UNPUBLISH,
-        extra: {},
-      });
-    });
+    const removedTrackState = this.takeTrackState(track);
+    const p = this.armRenegotiationCallback(HMSAction.UNPUBLISH);
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
     try {
@@ -730,8 +742,12 @@ export default class HMSTransport {
     } catch (error) {
       // A genuine failure must leave the track intact: the caller aborts before its own
       // bookkeeping, so tearing down here strands a stopped track on localPeer that the store
-      // no longer has and the app was never told to remove.
+      // no longer has and the app was never told to remove. Put the trackState back too, or the
+      // track stays published everywhere except in the payload every later offer is built from.
       if (!isSupersededAnswer(error)) {
+        if (removedTrackState) {
+          this.trackStates.set(removedTrackState.track_id, removedTrackState);
+        }
         throw error;
       }
       // A discarded answer is different — the sender is already detached and the removal rides
@@ -1224,6 +1240,25 @@ export default class HMSTransport {
     }
   }
 
+  /**
+   * Arms the single renegotiation waiter. The slot holds one owner, so whoever takes it has to
+   * settle the one it displaces: releaseRenegotiationCallback deliberately keeps the newer
+   * entry, so a displaced owner is otherwise never settled and its caller awaits for the rest
+   * of the session with the track captured but unpublished.
+   */
+  private armRenegotiationCallback(action: HMSAction): Promise<boolean> {
+    const displaced = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
+    return new Promise<boolean>((resolve, reject) => {
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { promise: { resolve, reject }, action, extra: {} });
+      if (displaced) {
+        HMSLogger.w(TAG, `renegotiation waiter for ${displaced.action} displaced by ${action}`);
+        displaced.promise.reject(
+          ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(displaced.action, 'renegotiation callback displaced'),
+        );
+      }
+    });
+  }
+
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
@@ -1451,13 +1486,7 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
-      const p = new Promise<boolean>((resolve, reject) => {
-        this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-          promise: { resolve, reject },
-          action: HMSAction.RESTART_ICE,
-          extra: {},
-        });
-      });
+      const p = this.armRenegotiationCallback(HMSAction.RESTART_ICE);
       await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
       await p;
     }

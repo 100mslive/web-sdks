@@ -22,6 +22,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
+import { HMSTrackUpdate } from '../interfaces';
 import { makeTransport, TransportState } from '../test/helpers/makeTransport';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
 
@@ -45,7 +46,13 @@ class FakeNativePeerConnection {
   /** candidate string the native call rejects, as a TURN-config-dependent OperationError would */
   rejectCandidate: string | null = null;
 
+  /** getSenders/getReceivers are documented in HMSConnection as throwing under load */
+  throwOnGetTransceivers = false;
+
   getTransceivers() {
+    if (this.throwOnGetTransceivers) {
+      throw new Error('InvalidStateError: getTransceivers failed');
+    }
     return this.transceivers;
   }
 
@@ -206,7 +213,8 @@ const stubMigrationStore = (t: any, localPeer: unknown) => {
   t.store.removeRemoteTracks = jest.fn();
   t.store.removeTrack = jest.fn();
   t.store.getLocalPeer = () => localPeer;
-  t.listener = { onSFUMigration: jest.fn() };
+  t.screenStream = new Set();
+  t.listener = { onSFUMigration: jest.fn(), onTrackUpdate: jest.fn() };
 };
 
 /** A local track the migration can clone and clean up. */
@@ -217,7 +225,12 @@ const makeMigratableTrack = (trackId: string, type: 'audio' | 'video') => {
     source: 'regular',
     stream: { id: `stream-${trackId}` },
     cleanup: jest.fn(),
-    clone: jest.fn(() => ({ trackId: `${trackId}-clone`, type, source: 'regular' })),
+    clone: jest.fn(() => ({
+      trackId: `${trackId}-clone`,
+      type,
+      source: 'regular',
+      cleanup: jest.fn(async () => undefined),
+    })),
   };
   return track;
 };
@@ -601,6 +614,29 @@ describe('publish answer staleness', () => {
     expect(track.isPublished).toBe(true);
   });
 
+  /**
+   * The gate runs inside republishOnMigration's catch — the handler whose whole job is to stop
+   * one failed republish aborting the rest. An escaping getTransceivers unwinds the migration
+   * and gets it counted as a genuine failure.
+   */
+  it('keeps the migration going when getTransceivers throws under load', async () => {
+    const { t, native } = makeHarness();
+    native.throwOnGetTransceivers = true;
+    const track: any = { trackId: 'v1', publishedTrackId: 'v1', isPublished: false, transceiver: {} };
+    t.trackStates = new Map([['v1', { track_id: 'v1' }]]);
+    const addTrack = jest.fn();
+    t.store.addTrack = addTrack;
+    t.publishTrack = async () => {
+      throw ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'superseded_offer');
+    };
+
+    await expect(t.republishOnMigration(track)).resolves.toBeUndefined();
+
+    // degraded locally: unknown staging state means we must not claim published
+    expect(addTrack).not.toHaveBeenCalled();
+    expect(track.isPublished).toBe(false);
+  });
+
   it('does not report a republish as published when the transceiver belongs to the old connection', async () => {
     const { t, native } = makeHarness();
     const transceiver = {} as RTCRtpTransceiver;
@@ -805,28 +841,39 @@ describe('publish answer staleness', () => {
     });
   });
 
-  it('hands the already-cloned aux tracks back when the loop aborts', async () => {
+  /**
+   * Handing the clones back is only sound while the newer migration still has its aux loop
+   * ahead of it. If it is already past — it drained auxiliaryTracks and announced success — the
+   * handed-back clone sits on a closed connection nobody will offer again: a tile the app
+   * cannot dismiss, with capture still running. Tearing down is correct in both orders.
+   */
+  it('tears the already-cloned aux tracks down when the loop aborts', async () => {
     const { t } = makeHarness();
-    const remaining = makeMigratableTrack('aux-2', 'video');
     const localPeer: any = {
       isLocal: true,
       audioTrack: undefined,
       videoTrack: undefined,
-      auxiliaryTracks: [makeMigratableTrack('aux-1', 'video'), remaining],
+      auxiliaryTracks: [makeMigratableTrack('aux-1', 'video'), makeMigratableTrack('aux-2', 'video')],
     };
     stubMigrationStore(t, localPeer);
+    const removeTrack = jest.fn();
+    t.store.removeTrack = removeTrack;
+    const clones: any[] = [];
     t.negotiateOnFirstPublish = jest.fn(async () => true);
-    t.republishOnMigration = jest.fn(async () => {
+    t.republishOnMigration = jest.fn(async (track: any) => {
+      clones.push(track);
       t.publishConnection = makeConnection().connection;
     });
 
     await t.handleSFUMigration();
 
-    // the originals are already cleaned up, so dropping the clones loses the screenshare for good
-    expect(localPeer.auxiliaryTracks.map((track: { trackId: string }) => track.trackId)).toEqual([
-      'aux-1-clone',
-      'aux-2',
-    ]);
+    expect(clones.map(c => c.trackId)).toEqual(['aux-1-clone']);
+    // capture stopped, dropped from the store, and the app told — no undismissable tile
+    expect(clones[0].cleanup).toHaveBeenCalled();
+    expect(removeTrack).toHaveBeenCalledWith(clones[0]);
+    expect(t.listener.onTrackUpdate).toHaveBeenCalledWith(HMSTrackUpdate.TRACK_REMOVED, clones[0], localPeer);
+    // and nothing dead is left on the peer
+    expect(localPeer.auxiliaryTracks).not.toContain(clones[0]);
   });
 
   it('counts a genuinely failed migration instead of logging it away as aborted', async () => {
@@ -848,6 +895,8 @@ describe('publish answer staleness', () => {
     expect(incomplete[0]).toMatchObject({
       reason: 'failed',
       sfu_node_id: 'node-b',
+      // without this a leave() race is indistinguishable from a real incomplete migration
+      transport_state: 'Disconnected',
       error_code: ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED,
     });
     // must not land in publish.failed — that counter already holds ordinary publish errors
@@ -866,7 +915,7 @@ describe('publish answer staleness', () => {
 
     await t.handleSFUMigration();
 
-    expect(incomplete).toEqual([{ reason: 'superseded', sfu_node_id: 'node-b' }]);
+    expect(incomplete).toEqual([{ reason: 'superseded', sfu_node_id: 'node-b', transport_state: 'Disconnected' }]);
   });
 
   /**
@@ -924,6 +973,58 @@ describe('publish answer staleness', () => {
     expect(native.applied).toEqual([{ answer: 'ans-1', against: 'offer-1' }]);
     expect(native.addedCandidates).toEqual([{ candidate: 'role-c1' }]);
     expect(native.onnegotiationneeded).toEqual(expect.any(Function));
+  });
+
+  /**
+   * Driven through negotiateOnFirstPublish, not the helper: deleting the
+   * `catch { return this.handleFirstPublishNegotiationError(ex) }` wiring otherwise leaves the
+   * suite green, while in production it aborts every role promotion and migration that hits
+   * a 421 — the wrong-node reply this passthrough exists for.
+   */
+  it('resolves the first publish when signal.offer rejects with a 421', async () => {
+    const { t } = makeHarness();
+    t.signal = makeSignal(async () => {
+      throw new HMSException(421, 'ServerErrors', HMSAction.PUBLISH, 'wrong sfu node', '');
+    });
+
+    await expect(t.negotiateOnFirstPublish()).resolves.toBe(true);
+  });
+
+  it('rethrows a non-421 signal.offer failure out of the first publish', async () => {
+    const { t } = makeHarness();
+    t.signal = makeSignal(async () => {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died');
+    });
+
+    await expect(t.negotiateOnFirstPublish()).rejects.toMatchObject({
+      code: ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
+    });
+  });
+
+  /**
+   * RENEGOTIATION_CALLBACK_ID holds one owner. releaseRenegotiationCallback is identity-gated
+   * so it keeps the newer entry — which means whoever displaces an owner has to settle it, or
+   * publishTrack/unpublishTrack awaits for the rest of the session with the track captured and
+   * unpublished. This is the root of the role-change hang and the migration-vs-migration hang.
+   */
+  it('rejects the displaced renegotiation waiter instead of stranding it', async () => {
+    const { t } = makeHarness();
+    const first = t.armRenegotiationCallback(HMSAction.PUBLISH);
+    const outcome: { rejected?: any } = {};
+    const settled = first.catch((error: any) => {
+      outcome.rejected = error;
+    });
+
+    const second = t.armRenegotiationCallback(HMSAction.RESTART_ICE);
+    await settled;
+
+    expect(outcome.rejected.code).toBe(ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED);
+    // non-terminal, so the owning retry re-drives rather than the peer being ejected
+    expect(outcome.rejected.isTerminal).toBe(false);
+    // and the newer owner keeps the slot
+    expect(t.callbacks.get(RENEGOTIATION_CALLBACK_ID).action).toBe(HMSAction.RESTART_ICE);
+    t.callbacks.get(RENEGOTIATION_CALLBACK_ID).promise.resolve(true);
+    await expect(second).resolves.toBe(true);
   });
 
   it('passes a 421 through as success on the first publish, and rethrows anything else', async () => {
@@ -990,6 +1091,9 @@ describe('publish answer staleness', () => {
     // the caller aborts before its own bookkeeping, so we must not have torn the track down
     expect(track.cleanup).not.toHaveBeenCalled();
     expect(removeTrack).not.toHaveBeenCalled();
+    // and the trackState must be back: the caller leaves the track published on localPeer and
+    // in the store, so every later offer has to keep carrying it
+    expect(t.trackStates.get('v1')).toMatchObject({ track_id: 'v1' });
   });
 
   it('backs off repeat publish-ICE retries so a lost race cannot spin OFFERs at RTT speed', () => {

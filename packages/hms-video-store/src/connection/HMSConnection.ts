@@ -67,7 +67,17 @@ export default abstract class HMSConnection {
 
   /** True when the transceiver is still attached to this connection. */
   hasTransceiver(transceiver?: RTCRtpTransceiver): boolean {
-    return !!transceiver && this.nativeConnection.getTransceivers().includes(transceiver);
+    if (!transceiver) {
+      return false;
+    }
+    try {
+      return this.nativeConnection.getTransceivers().includes(transceiver);
+    } catch (error) {
+      // getSenders/getReceivers are known to throw under load; the only caller is a catch
+      // block, so escaping here would unwind the migration it exists to keep going
+      HMSLogger.w(TAG, `[role=${this.role}] getTransceivers threw`, error);
+      return false;
+    }
   }
 
   async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {

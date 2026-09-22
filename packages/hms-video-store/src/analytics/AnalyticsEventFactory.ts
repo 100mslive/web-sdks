@@ -141,16 +141,22 @@ export default class AnalyticsEventFactory {
   static sfuMigrationIncomplete({
     reason,
     sfuNodeId,
+    transportState,
     error,
   }: {
     reason: 'superseded' | 'failed';
     sfuNodeId?: string;
+    // needed to keep a leave() race out of the numbers the Failed-vs-count decision rests on
+    transportState: string;
     error?: HMSException;
   }) {
     return new AnalyticsEvent({
       name: 'sfuMigrationIncomplete',
       level: error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
-      properties: this.getPropertiesWithError({ reason, sfu_node_id: sfuNodeId }, error),
+      properties: this.getPropertiesWithError(
+        { reason, sfu_node_id: sfuNodeId, transport_state: transportState },
+        error,
+      ),
     });
   }
 
