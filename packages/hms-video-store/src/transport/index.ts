@@ -83,6 +83,8 @@ export default class HMSTransport {
   private sfuNodeId?: string;
   joinRetryCount = 0;
   private publishDisconnectTimer = 0;
+  /** `connecting` only means a loss once the connection has been up; on the way up it is normal. */
+  private publishEverConnected = false;
   private listener?: HMSUpdateListener;
   private onScreenshareStop = () => {};
   private screenStream = new Set<MediaStream>();
@@ -645,6 +647,8 @@ export default class HMSTransport {
     this.publishDtlsStateTimer = 0;
     clearTimeout(this.publishDisconnectTimer);
     this.publishDisconnectTimer = 0;
+    // the replacement connection starts from scratch, so it has to earn `connected` again
+    this.publishEverConnected = false;
     this.lastPublishDtlsState = 'new';
     this.publishConnection?.close();
     this.subscribeConnection?.close();
@@ -751,34 +755,7 @@ export default class HMSTransport {
 
         onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
           logConnectionState(HMSConnectionRole.Publish, newState, false);
-          if (newState === 'new') {
-            return;
-          }
-
-          if (newState === 'connected') {
-            this.connectivityListener?.onICESuccess(true);
-            this.publishConnection?.handleSelectedIceCandidatePairs();
-          } else if (newState === 'failed') {
-            await this.handleIceConnectionFailure(
-              HMSConnectionRole.Publish,
-              ErrorFactory.WebrtcErrors.ICEFailure(
-                HMSAction.PUBLISH,
-                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-              ),
-            );
-          } else {
-            this.publishDisconnectTimer = window.setTimeout(() => {
-              if (this.publishConnection?.connectionState !== 'connected') {
-                this.handleIceConnectionFailure(
-                  HMSConnectionRole.Publish,
-                  ErrorFactory.WebrtcErrors.ICEDisconnected(
-                    HMSAction.PUBLISH,
-                    `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
-                  ),
-                );
-              }
-            }, ICE_DISCONNECTION_TIMEOUT);
-          }
+          await this.handlePublishConnectionStateChange(newState);
         },
 
         onIceCandidate: candidate => {
@@ -1060,6 +1037,44 @@ export default class HMSTransport {
         callback.promise.reject(ex);
       }
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
+    }
+  }
+
+  private publishCandidateDescription() {
+    const pair = this.publishConnection?.selectedCandidatePair;
+    return `local candidate - ${pair?.local?.candidate}; remote candidate - ${pair?.remote?.candidate}`;
+  }
+
+  private async handlePublishConnectionStateChange(newState: RTCPeerConnectionState) {
+    if (newState === 'new') {
+      return;
+    }
+
+    if (newState === 'connected') {
+      this.publishEverConnected = true;
+      // the DTLS handler already does this; without it every blip stacks another timer
+      clearTimeout(this.publishDisconnectTimer);
+      this.publishDisconnectTimer = 0;
+      this.connectivityListener?.onICESuccess(true);
+      this.publishConnection?.handleSelectedIceCandidatePairs();
+    } else if (newState === 'failed') {
+      await this.handleIceConnectionFailure(
+        HMSConnectionRole.Publish,
+        ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, this.publishCandidateDescription()),
+      );
+    } else if (this.publishEverConnected) {
+      // Only a connection that was up can be disconnected. A fresh one passes through `connecting`,
+      // and arming here reported Reconnecting for a peer that had never connected; an ICE restart
+      // 5s in also discards the gathering still in flight. A never-connecting transport is left to
+      // the browser's own `failed` transition, which respects the ICE agent's real timeouts.
+      this.publishDisconnectTimer = window.setTimeout(() => {
+        if (this.publishConnection?.connectionState !== 'connected') {
+          this.handleIceConnectionFailure(
+            HMSConnectionRole.Publish,
+            ErrorFactory.WebrtcErrors.ICEDisconnected(HMSAction.PUBLISH, this.publishCandidateDescription()),
+          );
+        }
+      }, ICE_DISCONNECTION_TIMEOUT);
     }
   }
 
