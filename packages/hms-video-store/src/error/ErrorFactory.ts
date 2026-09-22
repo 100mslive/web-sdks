@@ -321,6 +321,17 @@ export const ErrorFactory = {
       );
     },
 
+    /** The offer this answer replies to is no longer staged. Non-terminal: the owner retries. */
+    PublishAnswerSuperseded(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED,
+        'PublishAnswerSuperseded',
+        action,
+        `[${action.toString()}]: Publish answer discarded, a newer offer is in flight. `,
+        description,
+      );
+    },
+
     ICEFailure(action: HMSAction, description = '', isTerminal = false) {
       return new HMSException(
         ErrorCodes.WebrtcErrors.ICE_FAILURE,

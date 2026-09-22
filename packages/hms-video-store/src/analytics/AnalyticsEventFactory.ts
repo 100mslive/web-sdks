@@ -7,6 +7,7 @@ import { HMSException } from '../error/HMSException';
 import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
+import { PublishAnswerDiscardReason } from '../transport/models/PublishAnswerDiscardReason';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -131,6 +132,48 @@ export default class AnalyticsEventFactory {
     sent: boolean;
   }) {
     return new AnalyticsEvent({ name: 'subscribeRequestRetry', level: AnalyticsEventLevel.INFO, properties });
+  }
+
+  /**
+   * A migration that did not finish. `reason` separates a deliberate abort — a newer migration
+   * owns the peer — from a genuine failure, which nothing retries.
+   */
+  static sfuMigrationIncomplete({
+    reason,
+    sfuNodeId,
+    transportState,
+    error,
+  }: {
+    reason: 'superseded' | 'failed';
+    sfuNodeId?: string;
+    // needed to keep a leave() race out of the numbers the Failed-vs-count decision rests on
+    transportState: string;
+    error?: HMSException;
+  }) {
+    return new AnalyticsEvent({
+      name: 'sfuMigrationIncomplete',
+      level: error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties: this.getPropertiesWithError(
+        { reason, sfu_node_id: sfuNodeId, transport_state: transportState },
+        error,
+      ),
+    });
+  }
+
+  /**
+   * A publish answer was dropped because the offer it answers is no longer staged, or the waiter
+   * for it was settled without one. `action` names the owner that must re-drive; `reason`
+   * separates the five causes. The two waiter-level ones have no offer in flight, so they carry
+   * no `epoch`/`signaling_state`.
+   */
+  static publishAnswerDiscarded(properties: {
+    reason: PublishAnswerDiscardReason;
+    action: string;
+    signaling_state?: RTCSignalingState;
+    transport_state: string;
+    epoch?: number;
+  }) {
+    return new AnalyticsEvent({ name: 'publishAnswerDiscarded', level: AnalyticsEventLevel.INFO, properties });
   }
 
   /** no attempt was answered, so the SFU is left on a state nobody asked for */

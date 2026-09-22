@@ -1,4 +1,5 @@
 import { JoinParameters } from './models/JoinParameters';
+import { PublishAnswerDiscardReason } from './models/PublishAnswerDiscardReason';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import ITransportObserver from './ITransportObserver';
@@ -52,6 +53,10 @@ import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
+
+/** The answer was dropped because a newer offer is staged — the owner re-drives, nothing is lost. */
+const isSupersededAnswer = (error: unknown): boolean =>
+  error instanceof HMSException && error.code === ErrorCodes.WebrtcErrors.PUBLISH_ANSWER_SUPERSEDED;
 
 // @DISCUSS: action and extra are not used at all.
 interface CallbackTriple {
@@ -440,13 +445,100 @@ export default class HMSTransport {
       this.subscribeConnection?.setSfuNodeId(id);
     } else if (id && this.sfuNodeId !== id) {
       this.sfuNodeId = id;
-      this.handleSFUMigration();
+      // unawaited by design. A newer migration supersedes this one by returning, not by
+      // rejecting, so anything landing in the catch is a genuine failure.
+      this.handleSFUMigration().catch(error => this.reportSFUMigrationFailure(error));
     }
   }
 
-  // eslint-disable-next-line complexity
+  /**
+   * A part-way migration leaves the old connections closed, trackStates cleared and the
+   * republish incomplete, and nothing retries it. Counted on its own event, not `publish.failed`
+   * — that one already holds ordinary publish errors. Not onStateChange(Failed): that is
+   * internalLeave, and a transient signal loss here would eject a recoverable peer.
+   */
+  private reportSFUMigrationFailure(error: unknown) {
+    const ex =
+      error instanceof HMSException
+        ? error
+        : ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (error as Error)?.message);
+    HMSLogger.e(TAG, 'sfu migration failed', ex);
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.sfuMigrationIncomplete({
+        reason: 'failed',
+        sfuNodeId: this.sfuNodeId,
+        transportState: TransportState[this.state],
+        error: ex,
+      }),
+    );
+  }
+
+  /**
+   * True when the live publish connection will carry this track in its next offer — the
+   * transceiver is attached to that connection and trackStates still names it. Keyed on state,
+   * not on the error code: 4008 also covers `connection_gone`, where nothing is staged, and a
+   * WebSocketConnectionLost from signal.offer can leave the track fully staged. publishTrack's
+   * catch is the only caller, so every publish path — app addTrack, role change, migration —
+   * gets the same answer.
+   */
+  private isTrackStagedForPublish(track: HMSLocalTrack): boolean {
+    return (
+      !!track.publishedTrackId &&
+      this.trackStates.has(track.publishedTrackId) &&
+      !!this.publishConnection?.hasTransceiver(track.transceiver)
+    );
+  }
+
+  /**
+   * Republishes one cloned track during migration. The old track is already stopped by the
+   * time we get here, so one failure must not abort the tracks still to be republished —
+   * the publish ICE retry re-offers all of trackStates anyway.
+   */
+  private async republishOnMigration(track: HMSLocalTrack) {
+    try {
+      await this.publishTrack(track);
+    } catch (error) {
+      // publishTrack reconciles a staged track itself, so anything reaching here genuinely failed.
+      HMSLogger.w(TAG, `republish after migration failed for ${track.trackId}`, error);
+      this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
+    }
+  }
+
   async handleSFUMigration() {
     HMSLogger.time('sfu migration');
+    try {
+      await this.performSFUMigration();
+    } finally {
+      HMSLogger.timeEnd('sfu migration');
+    }
+  }
+
+  /**
+   * A newer NodeInfo starts its own migration, which replaces publishConnection and rebuilds
+   * trackStates. Every republish below is a full offer/answer round trip, so ownership has to be
+   * re-checked between them: continuing would attach this migration's clones to the newer
+   * connection, overwrite the single RENEGOTIATION_CALLBACK_ID slot the newer one is awaiting
+   * (hanging it for the rest of the session), and clobber the auxiliaryTracks list it rebuilt.
+   */
+  private isMigrationSuperseded(connection: HMSPublishConnection | null) {
+    if (this.publishConnection === connection) {
+      return false;
+    }
+    // this abandons clones whose originals are already cleaned up, so it is a discard and counted.
+    // leave() also nulls publishConnection, so transport_state separates that benign race.
+    HMSLogger.w(TAG, 'sfu migration superseded by a newer one, aborting republish');
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.sfuMigrationIncomplete({
+        reason: 'superseded',
+        sfuNodeId: this.sfuNodeId,
+        transportState: TransportState[this.state],
+      }),
+    );
+    return true;
+  }
+
+  // eslint-disable-next-line complexity
+  private async performSFUMigration() {
     this.clearPeerConnections();
     const peers = this.store.getPeerMap();
     this.store.removeRemoteTracks();
@@ -465,8 +557,12 @@ export default class HMSTransport {
       return;
     }
     this.createPeerConnections();
+    const connection = this.publishConnection;
     this.trackStates.clear();
     await this.negotiateOnFirstPublish();
+    if (this.isMigrationSuperseded(connection)) {
+      return;
+    }
     const streamMap = new Map<string, HMSLocalStream>();
     if (localPeer.audioTrack) {
       const stream = localPeer.audioTrack.stream as HMSLocalStream;
@@ -476,8 +572,11 @@ export default class HMSTransport {
       const newTrack = localPeer.audioTrack.clone(streamMap.get(stream.id)!);
       this.store.removeTrack(localPeer.audioTrack);
       localPeer.audioTrack.cleanup();
-      await this.publishTrack(newTrack);
       localPeer.audioTrack = newTrack;
+      await this.republishOnMigration(newTrack);
+      if (this.isMigrationSuperseded(connection)) {
+        return;
+      }
     }
 
     if (localPeer.videoTrack) {
@@ -488,11 +587,14 @@ export default class HMSTransport {
       this.store.removeTrack(localPeer.videoTrack);
       const newTrack = localPeer.videoTrack.clone(streamMap.get(stream.id)!);
       localPeer.videoTrack.cleanup();
-      await this.publishTrack(newTrack);
       localPeer.videoTrack = newTrack;
+      await this.republishOnMigration(newTrack);
+      if (this.isMigrationSuperseded(connection)) {
+        return;
+      }
     }
 
-    const auxTracks = [];
+    const auxTracks: HMSLocalTrack[] = [];
     while (localPeer.auxiliaryTracks.length > 0) {
       const track = localPeer.auxiliaryTracks.shift();
       if (track) {
@@ -518,14 +620,23 @@ export default class HMSTransport {
           newTrack.nativeTrack.addEventListener('ended', this.onScreenshareStop);
         }
         track.cleanup();
-        await this.publishTrack(newTrack);
         auxTracks.push(newTrack);
+        await this.republishOnMigration(newTrack);
+        if (this.isMigrationSuperseded(connection)) {
+          // These clones sit on a connection nobody will offer again, and the newer migration
+          // may already be past its own aux loop — handing them back would leave a tile the app
+          // cannot dismiss. Tear them down so capture stops and the app gets TRACK_REMOVED.
+          for (const orphan of auxTracks) {
+            await this.teardownUnpublishedTrack(orphan);
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, orphan, localPeer);
+          }
+          return;
+        }
       }
     }
     localPeer.auxiliaryTracks = auxTracks;
     streamMap.clear();
     this.listener?.onSFUMigration?.();
-    HMSLogger.timeEnd('sfu migration');
   }
 
   /**
@@ -565,19 +676,28 @@ export default class HMSTransport {
       `${track}`,
     );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.PUBLISH,
-        extra: {},
-      });
-    });
+    const p = this.armRenegotiationCallback(HMSAction.PUBLISH);
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
-    await p;
+    try {
+      await p;
+    } catch (error) {
+      // A displaced waiter or a lost socket can leave the track fully staged, and the next offer
+      // (ICE retry, signal reconnect) publishes it. Reporting it unpublished sends a later
+      // removeTrack down cleanup() instead of unpublish, and the SFU is never told.
+      if (!this.isTrackStagedForPublish(track)) {
+        throw error;
+      }
+      // The caller's catch used to report this; a displaced waiter already has its discard row,
+      // but anything else would otherwise vanish out of the 4004/4005 baseline.
+      if (!isSupersededAnswer(error)) {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
+      }
+      HMSLogger.w(TAG, `publishTrack: waiter lost its race, ${track.trackId} is staged for the next offer`, error);
+    }
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
     // add track to store after publish
     this.store.addTrack(track);
@@ -599,33 +719,63 @@ export default class HMSTransport {
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
+  /**
+   * Drops the track from the offer payload and returns what it dropped, so a failed unpublish
+   * can put it back — the caller leaves the track on localPeer and in the store, and without
+   * its trackState no later offer would ever carry it again.
+   */
+  private takeTrackState(track: HMSLocalTrack): TrackState | undefined {
+    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
+      const trackState = this.trackStates.get(track.publishedTrackId);
+      this.trackStates.delete(track.publishedTrackId);
+      return trackState;
+    }
+    // TODO: hotfix to unpublish replaced video track id, solve it properly
+    // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
+    // the original initial track id for a proper fix
+    const originalTrackState = Array.from(this.trackStates.values()).find(
+      trackState => track.type === trackState.type && track.source === trackState.source,
+    );
+    if (originalTrackState) {
+      this.trackStates.delete(originalTrackState.track_id);
+    }
+    return originalTrackState;
+  }
+
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
-    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
-      this.trackStates.delete(track.publishedTrackId);
-    } else {
-      // TODO: hotfix to unpublish replaced video track id, solve it properly
-      // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
-      // the original initial track id for a proper fix
-      const currentTrackStates = Array.from(this.trackStates.values());
-      const originalTrackState = currentTrackStates.find(
-        trackState => track.type === trackState.type && track.source === trackState.source,
-      );
-      if (originalTrackState) {
-        this.trackStates.delete(originalTrackState.track_id);
-      }
-    }
-    const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-        promise: { resolve, reject },
-        action: HMSAction.UNPUBLISH,
-        extra: {},
-      });
-    });
+    const removedTrackState = this.takeTrackState(track);
+    const p = this.armRenegotiationCallback(HMSAction.UNPUBLISH);
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
-    await p;
-    await track.cleanup();
+    try {
+      await p;
+    } catch (error) {
+      // A genuine failure must leave the track intact: the caller aborts before its own
+      // bookkeeping, so tearing down here strands a stopped track on localPeer that the store
+      // no longer has and the app was never told to remove. Put the trackState back too, or the
+      // track stays published everywhere except in the payload every later offer is built from.
+      if (!isSupersededAnswer(error)) {
+        if (removedTrackState) {
+          this.trackStates.set(removedTrackState.track_id, removedTrackState);
+        }
+        throw error;
+      }
+      // A discarded answer is different — the sender is already detached and the removal rides
+      // the next offer, so the caller's splice/TRACK_REMOVED must still run.
+      HMSLogger.w(TAG, `unpublishTrack: renegotiation superseded, tearing down anyway`, error);
+    }
+    await this.teardownUnpublishedTrack(track);
+    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
+  }
+
+  /** Local teardown for an unpublished track; one failing step must not skip the others. */
+  private async teardownUnpublishedTrack(track: HMSLocalTrack) {
+    try {
+      await track.cleanup();
+    } catch (error) {
+      HMSLogger.w(TAG, `unpublishTrack: cleanup failed for ${track.trackId}`, error);
+    }
     if (track.source === 'screen' && this.screenStream) {
       // stop older screenshare tracks to remove the screenshare banner
       this.screenStream.forEach(stream => {
@@ -637,7 +787,6 @@ export default class HMSTransport {
     }
     // remove track from store on unpublish
     this.store.removeTrack(track);
-    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
   private async clearPeerConnections() {
@@ -952,8 +1101,9 @@ export default class HMSTransport {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
       return false;
     }
-    const offer = await this.publishConnection.createOffer();
-    await this.publishConnection.setLocalDescription(offer);
+    const connection = this.publishConnection;
+    const offer = await connection.createOffer();
+    const epoch = await connection.setLocalDescription(offer);
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
     const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
@@ -966,13 +1116,12 @@ export default class HMSTransport {
       onDemandTracks,
       offer,
     );
+    // setSFUNodeId can run handleSFUMigration synchronously and replace publishConnection
     this.setSFUNodeId(answer?.sfu_node_id);
-    await this.publishConnection.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection.candidates) {
-      await this.publishConnection.addIceCandidate(candidate);
-    }
+    this.assertPublishAnswerApplicable(connection, epoch, HMSAction.JOIN);
+    await connection.setRemoteDescriptionAndDrainCandidates(answer);
 
-    this.publishConnection.initAfterJoin();
+    connection.initAfterJoin();
     return !!answer;
   }
 
@@ -1002,24 +1151,137 @@ export default class HMSTransport {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
       return false;
     }
+    const connection = this.publishConnection;
     try {
-      const offer = await this.publishConnection.createOffer(this.trackStates);
-      await this.publishConnection.setLocalDescription(offer);
+      const offer = await connection.createOffer(this.trackStates);
+      const epoch = await connection.setLocalDescription(offer);
       const answer = await this.signal.offer(offer, this.trackStates);
-      await this.publishConnection.setRemoteDescription(answer);
-      for (const candidate of this.publishConnection.candidates) {
-        await this.publishConnection.addIceCandidate(candidate);
+      const discarded = this.publishAnswerDiscardReason(connection, epoch, HMSAction.PUBLISH);
+      if (discarded) {
+        // Report failure, never throw: handleLocalRoleUpdate awaits this bare, and a throw
+        // would skip diffRolesAndPublishTracks and leave a promoted peer that never captures
+        // or publishes. handleSFUMigration checks connection identity itself instead.
+        if (discarded !== PublishAnswerDiscardReason.ConnectionReplaced) {
+          // Same connection, a racer's offer won and it carries current state — but wire
+          // renegotiation first, without initAfterJoin every later publishTrack hangs.
+          // A replaced connection is already closed; its new owner wires its own.
+          connection.initAfterJoin();
+        }
+        return false;
       }
+      await connection.setRemoteDescriptionAndDrainCandidates(answer);
 
-      this.publishConnection.initAfterJoin();
+      connection.initAfterJoin();
       return !!answer;
     } catch (ex) {
-      // resolve for now as this might happen during migration
-      if (ex instanceof HMSException && ex.code === 421) {
-        return true;
-      }
+      return this.handleFirstPublishNegotiationError(ex);
+    }
+  }
+
+  private handleFirstPublishNegotiationError(ex: unknown): boolean {
+    if (!(ex instanceof HMSException)) {
       throw ex;
     }
+    // resolve for now as this might happen during migration
+    if (ex.code === 421) {
+      return true;
+    }
+    throw ex;
+  }
+
+  /**
+   * An answer may only be applied to the offer it answers. Identity covers the connection
+   * being replaced under us (handleSFUMigration); the epoch covers a racer's
+   * setLocalDescription, which is legal in `have-local-offer` and so invisible to
+   * signalingState. Every discard is counted so the discard rate is measurable.
+   */
+  private publishAnswerDiscardReason(
+    connection: HMSPublishConnection,
+    epoch: number,
+    action: HMSAction,
+  ): PublishAnswerDiscardReason | undefined {
+    let reason: PublishAnswerDiscardReason | undefined;
+    if (connection !== this.publishConnection) {
+      reason = PublishAnswerDiscardReason.ConnectionReplaced;
+    } else if (!connection.isStagingLocalDescription(epoch)) {
+      reason = PublishAnswerDiscardReason.SupersededOffer;
+    } else if (connection.signalingState !== 'have-local-offer') {
+      // unreachable while HMSConnection owns every state transition; kept so a future one is counted
+      reason = PublishAnswerDiscardReason.UnexpectedState;
+    }
+    if (!reason) {
+      return;
+    }
+    this.reportPublishAnswerDiscard(reason, action, connection.signalingState, epoch);
+    return reason;
+  }
+
+  /** The one emit point for `publishAnswerDiscarded`, so no 4008 lands without a matching row. */
+  private reportPublishAnswerDiscard(
+    reason: PublishAnswerDiscardReason,
+    action: HMSAction,
+    signalingState?: RTCSignalingState,
+    epoch?: number,
+  ) {
+    HMSLogger.w(TAG, `[role=PUBLISH] discarding answer reason=${reason} state=${signalingState}`);
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.publishAnswerDiscarded({
+        reason,
+        action: action.toString(),
+        signaling_state: signalingState,
+        transport_state: TransportState[this.state],
+        epoch,
+      }),
+    );
+  }
+
+  private publishAnswerDiscardError(reason: PublishAnswerDiscardReason, epoch: number, action: HMSAction) {
+    if (action === HMSAction.JOIN) {
+      // Join is the only path where the discard is immediately fatal: HMSSdk.join's own catch
+      // rethrows to the app's onError, and initAfterJoin never ran, so it genuinely failed.
+      // Report the error apps already handle rather than leaking an internal code. Terminal,
+      // which internalLeave's join-in-progress wait also requires.
+      return ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, `${reason} epoch=${epoch}`);
+    }
+    return ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(action, `${reason} epoch=${epoch}`);
+  }
+
+  /** Throws unless the answer still belongs to the offer this negotiation staged. */
+  private assertPublishAnswerApplicable(connection: HMSPublishConnection, epoch: number, action: HMSAction) {
+    const reason = this.publishAnswerDiscardReason(connection, epoch, action);
+    if (reason) {
+      throw this.publishAnswerDiscardError(reason, epoch, action);
+    }
+  }
+
+  /** Drops our own waiter only: a newer owner armed mid-flight must keep its entry. */
+  private releaseRenegotiationCallback(callback: CallbackTriple) {
+    if (this.callbacks.get(RENEGOTIATION_CALLBACK_ID) === callback) {
+      this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
+    }
+  }
+
+  /**
+   * Arms the single renegotiation waiter. The slot holds one owner, so whoever takes it has to
+   * settle the one it displaces: releaseRenegotiationCallback deliberately keeps the newer
+   * entry, so a displaced owner is otherwise never settled and its caller awaits for the rest
+   * of the session with the track captured but unpublished.
+   */
+  private armRenegotiationCallback(action: HMSAction): Promise<boolean> {
+    const displaced = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
+    return new Promise<boolean>((resolve, reject) => {
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { promise: { resolve, reject }, action, extra: {} });
+      if (displaced) {
+        HMSLogger.w(TAG, `renegotiation waiter for ${displaced.action} displaced by ${action}`);
+        this.reportPublishAnswerDiscard(PublishAnswerDiscardReason.WaiterDisplaced, displaced.action);
+        displaced.promise.reject(
+          ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(
+            displaced.action,
+            `${PublishAnswerDiscardReason.WaiterDisplaced} by ${action}`,
+          ),
+        );
+      }
+    });
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
@@ -1030,19 +1292,31 @@ export default class HMSTransport {
       return;
     }
 
-    if (!this.publishConnection) {
+    const connection = this.publishConnection;
+    if (!connection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot renegotiate');
+      this.reportPublishAnswerDiscard(PublishAnswerDiscardReason.ConnectionGone, callback.action);
+      // settle, else publishTrack/unpublishTrack await their promise for the rest of the session
+      callback.promise.reject(
+        ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(callback.action, PublishAnswerDiscardReason.ConnectionGone),
+      );
+      this.releaseRenegotiationCallback(callback);
       return;
     }
 
     try {
-      const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
-      await this.publishConnection.setLocalDescription(offer);
+      const offer = await connection.createOffer(this.trackStates, constraints);
+      const epoch = await connection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
-      this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
-      await this.publishConnection.setRemoteDescription(answer);
+      this.assertPublishAnswerApplicable(connection, epoch, callback.action);
+      // Commit point — release before the drain: holding the slot across it lets a concurrent arm
+      // displace and reject a negotiation that then succeeds. `finally` covers the earlier exits.
+      this.releaseRenegotiationCallback(callback);
+      // negotiateOnFirstPublish's discard path returns before its own drain, so this can be the
+      // negotiation that first sets a remote description — it then owns the buffered candidates.
+      await connection.setRemoteDescriptionAndDrainCandidates(answer);
       callback.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
@@ -1060,6 +1334,8 @@ export default class HMSTransport {
         callback.promise.reject(ex);
       }
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
+    } finally {
+      this.releaseRenegotiationCallback(callback);
     }
   }
 
@@ -1239,15 +1515,13 @@ export default class HMSTransport {
      * Do iceRestart only if not connected
      */
     if (this.publishConnection) {
-      const p = new Promise<boolean>((resolve, reject) => {
-        this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
-          promise: { resolve, reject },
-          action: HMSAction.RESTART_ICE,
-          extra: {},
-        });
-      });
-      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
-      await p;
+      const p = this.armRenegotiationCallback(HMSAction.RESTART_ICE);
+      // attach before the round trip: anything arming inside it rejects `p` with no handler yet,
+      // which the browser reports as an uncaught 4008 on every displacement
+      await Promise.all([
+        p,
+        this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' }),
+      ]);
     }
 
     return true;
@@ -1301,13 +1575,16 @@ export default class HMSTransport {
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect
-    const ok = this.store.getRoom()?.joinedAt
-      ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
-      : this.signal.isConnected;
-    // Send track update to sync local track state changes during reconnection
-    this.signal.trackUpdate(this.trackStates);
+    try {
+      const ok = this.store.getRoom()?.joinedAt
+        ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
+        : this.signal.isConnected;
 
-    return ok;
+      return ok;
+    } finally {
+      // mutes made while disconnected must reach biz even if the renegotiation threw
+      this.signal.trackUpdate(this.trackStates);
+    }
   };
 
   private setTransportStateForConnect() {

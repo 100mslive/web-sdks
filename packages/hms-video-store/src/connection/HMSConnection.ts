@@ -33,6 +33,9 @@ export default abstract class HMSConnection {
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
+  /** Monotonic id of the most recently requested local description (bumped on entry, not on apply). */
+  private localDescriptionEpoch = 0;
+
   protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
     this.role = role;
     this.signal = signal;
@@ -46,6 +49,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.connectionState;
   }
 
+  public get signalingState(): RTCSignalingState {
+    return this.nativeConnection.signalingState;
+  }
+
   private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
   }
@@ -56,6 +63,21 @@ export default abstract class HMSConnection {
 
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
     return this.nativeConnection.addTransceiver(track, init);
+  }
+
+  /** True when the transceiver is still attached to this connection. */
+  hasTransceiver(transceiver?: RTCRtpTransceiver): boolean {
+    if (!transceiver) {
+      return false;
+    }
+    try {
+      return this.nativeConnection.getTransceivers().includes(transceiver);
+    } catch (error) {
+      // getSenders/getReceivers are known to throw under load; the only caller decides, inside a
+      // catch, whether a failed publish left the track staged — escaping turns that into a throw
+      HMSLogger.w(TAG, `[role=${this.role}] getTransceivers threw`, error);
+      return false;
+    }
   }
 
   async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
@@ -78,13 +100,24 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+  /** True while `epoch` is still the newest local description staged on this connection. */
+  isStagingLocalDescription(epoch: number): boolean {
+    return this.localDescriptionEpoch === epoch;
+  }
+
+  /**
+   * Returns the epoch of the offer just staged. Bumped on entry, before the native call is
+   * chained onto the operations queue, so a racer is visible from the moment it starts.
+   */
+  async setLocalDescription(description: RTCSessionDescriptionInit): Promise<number> {
+    const epoch = ++this.localDescriptionEpoch;
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
     }
+    return epoch;
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
@@ -93,6 +126,27 @@ export default abstract class HMSConnection {
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
+    }
+  }
+
+  /**
+   * Applies the answer, then flushes the candidates onTrickle buffered before any remote
+   * description. Gated on this being the first answer; after it onTrickle adds directly.
+   */
+  async setRemoteDescriptionAndDrainCandidates(description: RTCSessionDescriptionInit): Promise<void> {
+    const drain = !this.remoteDescription;
+    await this.setRemoteDescription(description);
+    if (!drain) {
+      return;
+    }
+    for (const candidate of this.candidates) {
+      // the description is already applied, so one unparseable candidate must not skip the rest
+      // nor report the negotiation as failed — the caller would undo a publish that did happen
+      try {
+        await this.addIceCandidate(candidate);
+      } catch (error) {
+        HMSLogger.w(TAG, `[role=${this.role}] buffered candidate rejected`, candidate, error);
+      }
     }
   }
 
