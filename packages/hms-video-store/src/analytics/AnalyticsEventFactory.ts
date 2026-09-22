@@ -161,10 +161,11 @@ export default class AnalyticsEventFactory {
   }
 
   /**
-   * A publish answer was dropped because the offer it answers is no longer staged.
-   * `action` names the owner that must re-drive; `reason` separates the three causes.
+   * A publish answer was dropped because the offer it answers is no longer staged, or the waiter
+   * for it was settled without one. `action` names the owner that must re-drive; `reason`
+   * separates the five causes. The two waiter-level ones have no offer in flight, so they carry
+   * no `epoch`/`signaling_state`.
    */
-  /** the two waiter-level discards have no offer in flight, so they carry no epoch/signaling_state */
   static publishAnswerDiscarded(properties: {
     reason: PublishAnswerDiscardReason;
     action: string;

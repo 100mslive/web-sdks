@@ -693,9 +693,53 @@ describe('publish answer staleness', () => {
   });
 
   /**
-   * The gate runs inside republishOnMigration's catch — the handler whose whole job is to stop
-   * one failed republish aborting the rest. An escaping getTransceivers unwinds the migration
-   * and gets it counted as a genuine failure.
+   * The swallow branch is the only thing standing between a genuine failure and silence: the
+   * caller's catch (transport.publish) used to turn it into a publish.failed row. Losing that
+   * hides real m-line 4004s inside the very count this PR's verification section reads. A
+   * displaced waiter already has its publishAnswerDiscarded row, so only non-4008 needs one.
+   */
+  it('still reports a genuine failure that left the track staged', async () => {
+    const { t, native, eventBus } = makeHarness();
+    const failures = collectEvents(eventBus, 'publish.failed');
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track = makePublishableTrack(t, 'v1', transceiver);
+
+    await expect(
+      publishWithWaiterRejecting(
+        t,
+        track,
+        ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.PUBLISH, 'socket died'),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(track.isPublished).toBe(true);
+    expect(failures).toHaveLength(1);
+  });
+
+  it('does not double-count a displaced waiter, which already has its discard row', async () => {
+    const { t, native, eventBus } = makeHarness();
+    const failures = collectEvents(eventBus, 'publish.failed');
+    const transceiver = {} as RTCRtpTransceiver;
+    native.transceivers = [transceiver];
+    const track = makePublishableTrack(t, 'v1', transceiver);
+
+    await expect(
+      publishWithWaiterRejecting(
+        t,
+        track,
+        ErrorFactory.WebrtcErrors.PublishAnswerSuperseded(HMSAction.PUBLISH, 'waiter_displaced by RESTART_ICE'),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(track.isPublished).toBe(true);
+    expect(failures).toHaveLength(0);
+  });
+
+  /**
+   * The gate runs inside publishTrack's catch, which republishOnMigration delegates to — and that
+   * handler's whole job is to stop one failed republish aborting the rest. An escaping
+   * getTransceivers unwinds the migration and gets it counted as a genuine failure.
    */
   it('keeps the migration going when getTransceivers throws under load', async () => {
     const { t, native } = makeHarness();

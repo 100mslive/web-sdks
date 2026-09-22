@@ -691,6 +691,11 @@ export default class HMSTransport {
       if (!this.isTrackStagedForPublish(track)) {
         throw error;
       }
+      // The caller's catch used to report this; a displaced waiter already has its discard row,
+      // but anything else would otherwise vanish out of the 4004/4005 baseline.
+      if (!isSupersededAnswer(error)) {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.publish({ error: error as Error }));
+      }
       HMSLogger.w(TAG, `publishTrack: waiter lost its race, ${track.trackId} is staged for the next offer`, error);
     }
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
