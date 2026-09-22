@@ -1285,6 +1285,9 @@ export default class HMSTransport {
       const answer = await this.signal.offer(offer, this.trackStates);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       this.assertPublishAnswerApplicable(connection, epoch, callback.action);
+      // Commit point — release before the drain: holding the slot across it lets a concurrent arm
+      // displace and reject a negotiation that then succeeds. `finally` covers the earlier exits.
+      this.releaseRenegotiationCallback(callback);
       // negotiateOnFirstPublish's discard path returns before its own drain, so this can be the
       // negotiation that first sets a remote description — it then owns the buffered candidates.
       await connection.setRemoteDescriptionAndDrainCandidates(answer);

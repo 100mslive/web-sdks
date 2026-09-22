@@ -1027,6 +1027,62 @@ describe('publish answer staleness', () => {
     await expect(second).resolves.toBe(true);
   });
 
+  /**
+   * The other direction of the same slot: displacement must not reject an owner whose answer is
+   * already committed. assertPublishAnswerApplicable is the commit point — past it the answer is
+   * going to be applied, and the drain that follows is bookkeeping. Holding the slot across that
+   * drain lets a concurrent publishTrack/restartICE reject a negotiation that then succeeds, so
+   * publishTrack throws before store.addTrack and the track is live on the wire but absent from
+   * the store: remote peers see it, the local app does not.
+   */
+  it('keeps a committed negotiation successful when a concurrent caller arms during the drain', async () => {
+    const { t, native } = makeHarness();
+    let reachedDrain!: () => void;
+    const atDrain = new Promise<void>(resolve => {
+      reachedDrain = resolve;
+    });
+    t.signal = makeSignal(async () => {
+      // gate every operation queued from here on, so the drain parks and the window stays open
+      native.holdOperations();
+      reachedDrain();
+      return answer('ans-1');
+    });
+
+    const first = t.armRenegotiationCallback(HMSAction.PUBLISH);
+    const outcome: { resolved?: boolean; rejected?: any } = {};
+    const settled = first.then(
+      (value: boolean) => {
+        outcome.resolved = value;
+      },
+      (error: any) => {
+        outcome.rejected = error;
+      },
+    );
+
+    const negotiation = t.performPublishRenegotiation();
+    await atDrain;
+    // let the chain get past the commit point and block inside setRemoteDescription
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // the interleaving this test exists for: committed, but the answer has not landed yet
+    expect(native.applied).toHaveLength(0);
+    // a concurrent restartICE arms while our answer is committed but not yet drained
+    const second = t.armRenegotiationCallback(HMSAction.RESTART_ICE);
+
+    native.releaseOperations();
+    await negotiation;
+    await settled;
+
+    expect(outcome.rejected).toBeUndefined();
+    expect(outcome.resolved).toBe(true);
+    expect(native.applied).toEqual([{ answer: 'ans-1', against: 'offer-1' }]);
+    // the newer owner still holds the slot, waiting on its own negotiation
+    expect(t.callbacks.get(RENEGOTIATION_CALLBACK_ID).action).toBe(HMSAction.RESTART_ICE);
+    t.callbacks.get(RENEGOTIATION_CALLBACK_ID).promise.resolve(true);
+    await expect(second).resolves.toBe(true);
+  });
+
   it('passes a 421 through as success on the first publish, and rethrows anything else', async () => {
     const { t } = makeHarness();
     const serverError = new HMSException(421, 'ServerErrors', HMSAction.PUBLISH, 'wrong sfu node', '');
