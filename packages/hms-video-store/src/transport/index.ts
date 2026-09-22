@@ -1096,10 +1096,12 @@ export default class HMSTransport {
         ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, this.publishCandidateDescription()),
       );
     } else if (this.publishEverConnected) {
-      // Only a connection that was up can be disconnected. A fresh one passes through `connecting`,
-      // and arming here reported Reconnecting for a peer that had never connected; an ICE restart
-      // 5s in also discards the gathering still in flight. A never-connecting transport is left to
-      // the browser's own `failed` transition, which respects the ICE agent's real timeouts.
+      /**
+       * Only a connection that was up can be disconnected. A fresh one passes through `connecting`,
+       * and arming here reported Reconnecting for a peer that had never connected; an ICE restart
+       * 5s in also discards the gathering still in flight. A never-connecting transport is left to
+       * the browser's own `failed` transition, which respects the ICE agent's real timeouts.
+       */
       this.publishDisconnectTimer = window.setTimeout(() => {
         if (this.publishConnection?.connectionState !== 'connected') {
           this.handleIceConnectionFailure(
@@ -1297,10 +1299,12 @@ export default class HMSTransport {
       });
       await this.performPublishRenegotiation({ iceRestart });
       await p;
-      // The offer/answer only restarts gathering. Returning true here lets RetryScheduler drop the
-      // in-progress marker and flip to Joined, which fires onReconnected while nothing can publish
-      // yet — and, with the marker gone, the next disconnect opens a second cycle. Resolves at once
-      // when the transport is already up, including the case where it dropped during the re-offer.
+      /**
+       * The offer/answer only restarts gathering. Returning true here lets RetryScheduler drop the
+       * in-progress marker and flip to Joined, which fires onReconnected while nothing can publish
+       * yet — and, with the marker gone, the next disconnect opens a second cycle. Resolves at once
+       * when the transport is already up, including the case where it dropped during the re-offer.
+       */
       return this.waitForPublishConnected();
     }
 
