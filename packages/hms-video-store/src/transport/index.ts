@@ -312,6 +312,13 @@ export default class HMSTransport {
     this.observer.onStateChange(this.state);
   }
 
+  /** Next signal reconnect (init + websocket) uses this token. */
+  updateAuthToken(token: string) {
+    if (this.joinParameters) {
+      this.joinParameters.authToken = token;
+    }
+  }
+
   // eslint-disable-next-line complexity
   async connect(
     token: string,

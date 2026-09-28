@@ -615,6 +615,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   /**
+   * Replace the auth token used for reconnects, so sessions can outlive the original token's expiry.
+   * Call it before the current token expires. The new token must be for the same room and user.
+   * @param token - new auth token
+   */
+  updateAuthToken(token: string): void;
+
+  /**
    * enable sending audio speaker data to beam
    * @returns Promise<void> - resolves when the speaker data is enabled
    */
