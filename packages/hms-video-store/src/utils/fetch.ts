@@ -16,10 +16,20 @@ export const fetchWithRetry = async (
     try {
       // fetch will throw error if there's a browser-level issue
       const response = await fetch(url, options);
-      const data = await response.clone().json();
+      // error responses from a gateway or proxy are often not JSON, fall back to the http status for those
+      const data = await response
+        .clone()
+        .json()
+        .catch(() => undefined);
+      const code = data?.code ?? response.status;
       // throw error for additional codes to retry based on server's response
-      if (retryCodes && retryCodes.length && !response.ok && retryCodes.includes(data.code)) {
-        throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
+      if (retryCodes && retryCodes.length && !response.ok && retryCodes.includes(code)) {
+        throw ErrorFactory.APIErrors.ServerErrors(
+          code,
+          HMSAction.GET_TOKEN,
+          data?.message ?? response.statusText,
+          false,
+        );
       }
 
       return response;
