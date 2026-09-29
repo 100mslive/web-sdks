@@ -20,6 +20,9 @@ permissions:
 jobs:
   publish_packages:
     runs-on: ubuntu-latest
+    # Gates publishing on a required reviewer and scopes the OIDC subject to
+    # this environment, so npm trusted publishing can require environment:NPM Publish.
+    environment: NPM Publish
     steps:
       - uses: actions/checkout@v7
       # Pinned to v6: v7 runs `yarn cache dir` after writing the registry-url .npmrc,
