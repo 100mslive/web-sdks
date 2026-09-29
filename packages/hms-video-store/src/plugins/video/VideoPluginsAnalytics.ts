@@ -111,7 +111,7 @@ export class VideoPluginsAnalytics {
       this.failure(name, err);
       throw err;
     }
-    if (time) {
+    if (time !== undefined) {
       this.processingAvgs[name]?.add(time);
     }
   }
