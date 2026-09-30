@@ -222,6 +222,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     return this.sdk.getAuthTokenByRoomCode(tokenRequest, tokenRequestOptions);
   }
 
+  updateAuthToken(token: string) {
+    this.sdk.updateAuthToken(token);
+  }
+
   async preview(config: sdkTypes.HMSPreviewConfig) {
     const roomState = this.store.getState(selectRoomState);
     if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {

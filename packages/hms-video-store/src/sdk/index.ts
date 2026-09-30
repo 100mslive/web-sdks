@@ -810,6 +810,24 @@ export class HMSSdk implements HMSInterface {
     return token;
   }
 
+  updateAuthToken(token: string) {
+    const config = this.store.getConfig();
+    if (!config) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('updateAuthToken: call preview or join first');
+    }
+    const current = decodeJWT(config.authToken);
+    const next = decodeJWT(token);
+    if (next.roomId !== current.roomId || next.userId !== current.userId) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('updateAuthToken: token must be for the same room and user', {
+        roomId: next.roomId,
+        userId: next.userId,
+      });
+    }
+    config.authToken = token;
+    this.transport?.updateAuthToken(token);
+    HMSLogger.d(this.TAG, 'auth token updated');
+  }
+
   getLocalPeer() {
     return this.store.getLocalPeer();
   }

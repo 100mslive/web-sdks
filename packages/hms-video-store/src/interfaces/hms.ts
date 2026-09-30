@@ -30,6 +30,7 @@ export interface HMSInterface {
   cancelMidCallPreview(): Promise<void>;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
+  updateAuthToken(token: string): void;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
