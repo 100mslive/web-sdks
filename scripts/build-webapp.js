@@ -17,7 +17,11 @@ async function main() {
   const source = pkg.name === '@100mslive/roomkit-web' ? './src/index.js' : './src/index.ts';
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'copy', '.png': 'copy' };
-  const define = { 'process.env': JSON.stringify(process.env) };
+  // Only public vars reach the bundle; the full build env holds CI tokens.
+  const clientEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.startsWith('REACT_APP_') || key === 'NODE_ENV'),
+  );
+  const define = { 'process.env': JSON.stringify(clientEnv) };
   const target = 'es6';
   const plugins = [
     PostCssPlugin.default({
