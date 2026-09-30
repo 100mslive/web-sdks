@@ -7,7 +7,11 @@ async function main() {
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'copy', '.png': 'copy' };
   require('dotenv').config();
-  const define = { 'process.env': JSON.stringify(process.env) };
+  // Only public vars reach the bundle; the full build env holds CI tokens.
+  const clientEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.startsWith('REACT_APP_') || key === 'NODE_ENV'),
+  );
+  const define = { 'process.env': JSON.stringify(clientEnv) };
   const commonOptions = {
     entryPoints: [source],
     assetNames: '[name]',
