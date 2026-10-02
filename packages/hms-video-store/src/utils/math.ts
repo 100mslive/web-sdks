@@ -8,6 +8,9 @@ export class RunningAverage {
   }
 
   getAvg(): number {
+    if (this.count === 0) {
+      return 0;
+    }
     return Math.floor(this.total / this.count);
   }
 
