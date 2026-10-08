@@ -47,6 +47,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
       owner: response.owner,
       permissions: response.permissions || [],
       open: true,
+      isLocalOwner: true,
     };
 
     this.store.setWhiteboard(whiteboard);
@@ -62,7 +63,12 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     if (!prevWhiteboard) {
       throw new Error(`Whiteboard ID: ${id} not found`);
     }
-    const whiteboard: HMSWhiteboard = { id: prevWhiteboard.id, title: prevWhiteboard.title, open: false };
+    const whiteboard: HMSWhiteboard = {
+      id: prevWhiteboard.id,
+      title: prevWhiteboard.title,
+      open: false,
+      isLocalOwner: prevWhiteboard.isLocalOwner,
+    };
 
     this.store.setWhiteboard(whiteboard);
     this.listener?.onWhiteboardUpdate(whiteboard);
@@ -79,9 +85,9 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
       if (whiteboard.url) {
         const response = await this.transport.signal.getWhiteboard({ id: whiteboard.id });
         const localPeer = this.store.getLocalPeer();
-        const isOwner = localPeer?.customerUserId === response.owner;
+        const isOwner = !!whiteboard.isLocalOwner;
         const open = isOwner
-          ? localPeer.role?.permissions.whiteboard?.includes('admin')
+          ? localPeer?.role?.permissions.whiteboard?.includes('admin')
           : response.permissions.length > 0;
         const newWhiteboard: HMSWhiteboard = {
           ...whiteboard,
