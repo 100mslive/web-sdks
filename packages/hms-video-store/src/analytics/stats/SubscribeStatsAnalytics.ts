@@ -16,7 +16,7 @@ import {
 import { HMSTrackStats } from '../../interfaces';
 import { HMSRemoteVideoTrack } from '../../internal';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { MAX_SAFE_INTEGER, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { MAX_SAFE_INTEGER } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
@@ -37,7 +37,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
       video,
       joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
-      max_window_sec: SUBSCRIBE_STATS_SAMPLE_WINDOW,
+      max_window_sec: this.sampleWindowSize,
     };
   }
 
@@ -188,7 +188,7 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     const prevStat = this.tempStats[length - 2];
 
     return (
-      length === SUBSCRIBE_STATS_SAMPLE_WINDOW ||
+      length === this.sampleWindowSize ||
       hasEnabledStateChanged(newStat, prevStat) ||
       (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
     );
