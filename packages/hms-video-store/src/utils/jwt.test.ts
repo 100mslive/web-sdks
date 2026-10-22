@@ -37,4 +37,30 @@ describe('decodeJWT', () => {
       expect((e as HMSException).message).toContain('Token is not in proper JWT format');
     }
   });
+
+  const tokenWithPayload = (payload: string) => `header.${payload}.signature`;
+  const toBase64Url = (value: string) =>
+    Buffer.from(value).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  it('should decode a base64url encoded payload', () => {
+    const payload = { room_id: 'room?>?>', user_id: 'user', role: 'host' };
+    const encoded = toBase64Url(JSON.stringify(payload));
+    expect(encoded).toMatch(/[-_]/);
+    expect(decodeJWT(tokenWithPayload(encoded))).toEqual({ roomId: 'room?>?>', userId: 'user', role: 'host' });
+  });
+
+  it('should decode a payload with non-ascii characters', () => {
+    const encoded = toBase64Url(JSON.stringify({ room_id: 'room', user_id: 'user', role: 'héllo' }));
+    expect(decodeJWT(tokenWithPayload(encoded)).role).toEqual('héllo');
+  });
+
+  it('should throw HMSException when the payload is not base64', () => {
+    expect.assertions(3);
+    try {
+      decodeJWT(tokenWithPayload('not*base64!'));
+    } catch (e) {
+      expectToBeTerminalException(e);
+      expect((e as HMSException).message).toContain('Token is not in proper JWT format');
+    }
+  });
 });
