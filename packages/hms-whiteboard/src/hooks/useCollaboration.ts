@@ -153,13 +153,13 @@ export function useCollaboration({
     const unsubs: (() => void)[] = [];
 
     // Open session and sync the session store changes to the store
-    sessionStore
-      .open({
+    unsubs.push(
+      sessionStore.open({
         handleOpen,
         handleChange,
         handleError,
-      })
-      .then(unsub => unsubs.push(unsub));
+      }),
+    );
 
     // Sync store changes to the yjs doc
     unsubs.push(

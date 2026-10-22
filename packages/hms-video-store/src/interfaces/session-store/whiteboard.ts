@@ -32,4 +32,10 @@ export interface HMSWhiteboard {
    * @internal
    */
   token?: string;
+  /**
+   * whether this client is the one that opened the whiteboard. `owner` is a customerUserId, which
+   * every tab of the same user shares, so it cannot tell this client apart from its duplicates.
+   * @internal
+   */
+  isLocalOwner?: boolean;
 }

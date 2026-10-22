@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   selectAppData,
   selectIsConnectedToRoom,
-  selectLocalPeer,
   selectPermissions,
   selectWhiteboard,
 } from '@100mslive/hms-video-store';
@@ -10,11 +9,12 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
 export const useWhiteboard = (isMobile = false) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
   const whiteboard = useHMSStore(selectWhiteboard);
   const isHeadless = useHMSStore(selectAppData('disableNotifications'));
   const open = !!whiteboard?.open;
-  const isOwner = whiteboard?.owner === localPeerUserId;
+  // Set only by this client opening the whiteboard. Comparing `owner` to the local customerUserId
+  // would also match a duplicate tab, which must not be offered the close control.
+  const isOwner = !!whiteboard?.isLocalOwner;
   const actions = useHMSActions();
   const [isEnabled, setIsEnabled] = useState(false);
   const permissions = useHMSStore(selectPermissions)?.whiteboard;
