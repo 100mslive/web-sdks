@@ -1,51 +1,29 @@
-import { type IResult, UAParser } from 'ua-parser-js';
+import type { IResult } from 'ua-parser-js';
+import { applyClientHints, getClientHints, parseUserAgent } from './client-hints';
 import HMSLogger from './logger';
 
-// Initialize the parser
-const uaParser = new UAParser();
+const uaResult = parseUserAgent();
 
-// Store the enhanced result with clientHints when available
+// Replaced by the client hints result once it resolves.
 let enhancedResult: IResult | null = null;
 let clientHintsPromise: Promise<IResult> | null = null;
 
 export const isBrowser = typeof window !== 'undefined';
 
-// Initialize clientHints in browser environment
 if (isBrowser) {
-  try {
-    // Get the initial result
-    const initialResult = uaParser.getResult();
-
-    // Attempt to get clientHints asynchronously
-    // This will return a Promise in browser environments with clientHints support
-    const result = initialResult.withClientHints();
-
-    // Check if it's a Promise (browser environment)
-    if (result && typeof (result as Promise<IResult>).then === 'function') {
-      clientHintsPromise = result as Promise<IResult>;
-      clientHintsPromise
-        .then(enhancedData => {
-          enhancedResult = enhancedData;
-        })
-        .catch(() => {
-          // Silently fail - fallback to standard UA parsing
-          enhancedResult = initialResult;
-        });
-    } else {
-      HMSLogger.d('UAParser', 'Client Hints not supported, using standard UA parsing');
-      // Synchronous result (non-browser or no clientHints support)
-      enhancedResult = result as IResult;
-    }
-  } catch {
-    // Fallback to standard parsing if clientHints fails
-    enhancedResult = uaParser.getResult();
-  }
+  clientHintsPromise = Promise.resolve()
+    .then(getClientHints)
+    .then(hints => {
+      if (!hints) {
+        HMSLogger.d('UAParser', 'Client Hints not supported, using standard UA parsing');
+      }
+      return hints ? applyClientHints(uaResult, hints) : uaResult;
+    })
+    .catch(() => uaResult)
+    .then(result => (enhancedResult = result));
 }
 
-// Helper to get the best available parser result
-const getParserResult = (): IResult => {
-  return enhancedResult || uaParser.getResult();
-};
+const getParserResult = (): IResult => enhancedResult || uaResult;
 
 export const parsedUserAgent = {
   getBrowser: () => getParserResult().browser,
