@@ -7,6 +7,7 @@
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { AnalyticsEventLevel } from '../../analytics/AnalyticsEventLevel';
 import HMSLogger from '../../utils/logger';
+import { parsedUserAgent } from '../../utils/support';
 
 const TAG = '[CameraFramesProbe]';
 const SAMPLE_AT_MS = [1000, 2000, 3000, 5000, 8000, 12000, 20000];
@@ -33,7 +34,6 @@ type Sample = Record<string, unknown> & { t_ms: number; frames?: number; frames_
 // Every camera track the SDK opened on this page, to see whether two were live at once.
 const openedCameras: { track: MediaStreamTrack; openedAt: number }[] = [];
 let eventsSent = 0;
-let clientHints: Promise<unknown> | undefined;
 
 const safe = <T>(read: () => T): T | undefined => {
   try {
@@ -51,16 +51,15 @@ const safeAsync = async <T>(read: () => Promise<T>): Promise<T | string | undefi
   }
 };
 
-const readClientHints = () => {
-  clientHints =
-    clientHints ||
-    safeAsync(() => {
-      const uaData = (window.navigator as Navigator & { userAgentData?: any }).userAgentData;
-      return typeof uaData?.getHighEntropyValues === 'function'
-        ? uaData.getHighEntropyValues(['model', 'platformVersion', 'fullVersionList', 'formFactors'])
-        : Promise.resolve(undefined);
-    });
-  return clientHints;
+// The SDK's parsed user agent once client hints resolve: real Android model and full browser version.
+const userAgent = async () => {
+  const { browser, os, device, cpu } = await parsedUserAgent.withClientHints();
+  return {
+    browser: `${browser.name} ${browser.version}`,
+    os: `${os.name} ${os.version}`,
+    device: { vendor: device.vendor, model: device.model, type: device.type },
+    cpu: cpu.architecture,
+  };
 };
 
 const pageState = () => ({
@@ -278,8 +277,8 @@ export class CameraFramesProbe {
 
   private async run(track: MediaStreamTrack, reason: string, otherLiveCameras: unknown[]) {
     const startedAt = Date.now();
-    const [hints, devices, permission] = await Promise.all([
-      readClientHints(),
+    const [ua, devices, permission] = await Promise.all([
+      safeAsync(userAgent),
       safeAsync(async () =>
         (await navigator.mediaDevices.enumerateDevices())
           .filter(device => device.kind === 'videoinput')
@@ -290,7 +289,7 @@ export class CameraFramesProbe {
     this.send('acquire', {
       reason,
       other_live_cameras: otherLiveCameras,
-      client_hints: hints,
+      user_agent: ua,
       video_inputs: devices,
       camera_permission: permission,
       ...(await this.snapshot(track)),
