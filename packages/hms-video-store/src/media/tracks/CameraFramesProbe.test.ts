@@ -150,6 +150,56 @@ describe('CameraFramesProbe', () => {
     expect(phases()).toEqual(['acquire', 'summary', 'acquire', 'summary']);
   });
 
+  it('drops the reopened camera when the user turns video off while it opens', async () => {
+    const stuck = fakeTrack(() => 0);
+    const { host } = makeHost(stuck);
+    let busy = false;
+    host.isBusy = () => busy;
+    const reopened = fakeTrack(() => 90);
+    setUserMedia(
+      jest.fn(async () => {
+        busy = true; // setEnabled(false) landed while getUserMedia was pending
+        return { getVideoTracks: () => [reopened] };
+      }),
+    );
+    new CameraFramesProbe(host).watch(stuck, 'create');
+    await run(15000);
+    expect(host.installed).toHaveLength(0);
+    expect(reopened.readyState).toBe('ended');
+    expect(host.restored).toBe(0);
+  });
+
+  it('drops the reopened camera and does not restore when the track is cleaned up mid attempt', async () => {
+    const stuck = fakeTrack(() => 0);
+    const { host } = makeHost(stuck);
+    const probe = new CameraFramesProbe(host);
+    const reopened = fakeTrack(() => 0);
+    setUserMedia(
+      jest.fn(async () => {
+        probe.stop(); // leave -> cleanup
+        return { getVideoTracks: () => [reopened] };
+      }),
+    );
+    probe.watch(stuck, 'create');
+    await run(15000);
+    expect(host.installed).toHaveLength(0);
+    expect(reopened.readyState).toBe('ended');
+    expect(host.restored).toBe(0);
+  });
+
+  it('still samples when a browser call for the acquire extras never settles', async () => {
+    let frames = 0;
+    const track = fakeTrack(() => (frames += 30));
+    const { host, phases } = makeHost(track);
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { enumerateDevices: () => new Promise(() => undefined) },
+    });
+    new CameraFramesProbe(host).watch(track, 'create');
+    await run(25000);
+    expect(phases()).toEqual(['acquire', 'summary']);
+  });
+
   it('never throws into the caller', async () => {
     const track = fakeTrack(() => 0);
     const { host } = makeHost(track);
