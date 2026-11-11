@@ -52,8 +52,8 @@ const CPU_ARCHITECTURES: Record<string, string> = {
 
 /** Resolves the high entropy hints, or null where the browser does not expose them (Safari, Firefox). */
 export const getClientHints = (): Promise<UAClientHints | null> => {
-  const uaData = (globalThis.navigator as { userAgentData?: NavigatorUAData } | undefined)?.userAgentData;
-  if (!uaData?.getHighEntropyValues) {
+  const uaData = (window.navigator as Navigator & { userAgentData?: NavigatorUAData }).userAgentData;
+  if (typeof uaData?.getHighEntropyValues !== 'function') {
     return Promise.resolve(null);
   }
   return uaData.getHighEntropyValues(HIGH_ENTROPY_HINTS);
