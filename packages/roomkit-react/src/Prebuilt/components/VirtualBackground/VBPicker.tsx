@@ -1,22 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import {
-  HMSMediaStreamPlugin,
-  selectAppData,
-  selectEffectsKey,
-  selectIsEffectsEnabled,
-  selectLocalPeerRole,
-} from '@100mslive/hms-video-store';
 // Open issue with eslint-plugin-import https://github.com/import-js/eslint-plugin-import/issues/1810
 // eslint-disable-next-line
 import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background/hmsvbplugin';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
+  HMSMediaStreamPlugin,
   HMSRoomState,
+  selectAppData,
+  selectEffectsKey,
+  selectIsEffectsEnabled,
   selectIsLargeRoom,
   selectIsLocalVideoEnabled,
   selectIsLocalVideoPluginPresent,
   selectLocalPeer,
+  selectLocalPeerRole,
   selectRoomState,
   selectVideoTrackByID,
   useHMSActions,
