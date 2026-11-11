@@ -14,6 +14,8 @@ const SAMPLE_AT_MS = [1000, 2000, 3000, 5000, 8000, 12000, 20000];
 const DETECT_AT_MS = 5000;
 const ATTEMPT_WINDOW_MS = 3000;
 const MAX_EVENTS_PER_PAGE = 40;
+// the acquire extras are optional; a browser call that never settles must not hold up the timeline
+const EXTRAS_TIMEOUT_MS = 1500;
 
 export interface CameraProbeHost {
   publish(event: AnalyticsEvent): void;
@@ -194,6 +196,9 @@ const attemptArms = (stuck: MediaStreamTrack, requested: MediaTrackConstraints) 
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+const withTimeout = <T>(read: Promise<T>) =>
+  Promise.race([read, sleep(EXTRAS_TIMEOUT_MS).then(() => 'timeout' as const)]);
+
 export class CameraFramesProbe {
   private watched?: MediaStreamTrack;
   private timers: { timer: ReturnType<typeof setTimeout>; resolve: () => void }[] = [];
@@ -278,13 +283,17 @@ export class CameraFramesProbe {
   private async run(track: MediaStreamTrack, reason: string, otherLiveCameras: unknown[]) {
     const startedAt = Date.now();
     const [ua, devices, permission] = await Promise.all([
-      safeAsync(userAgent),
-      safeAsync(async () =>
-        (await navigator.mediaDevices.enumerateDevices())
-          .filter(device => device.kind === 'videoinput')
-          .map(device => ({ id: device.deviceId, label: device.label })),
+      withTimeout(safeAsync(userAgent)),
+      withTimeout(
+        safeAsync(async () =>
+          (await navigator.mediaDevices.enumerateDevices())
+            .filter(device => device.kind === 'videoinput')
+            .map(device => ({ id: device.deviceId, label: device.label })),
+        ),
       ),
-      safeAsync(async () => (await navigator.permissions.query({ name: 'camera' as PermissionName })).state),
+      withTimeout(
+        safeAsync(async () => (await navigator.permissions.query({ name: 'camera' as PermissionName })).state),
+      ),
     ]);
     this.send('acquire', {
       reason,
@@ -328,22 +337,29 @@ export class CameraFramesProbe {
   private async attempt(stuck: MediaStreamTrack) {
     this.attempted = true;
     const { results, recovered } = await this.runArms(
+      stuck,
       attemptArms(stuck, safe(() => this.host.getRequestedConstraints()) || {}),
     );
-    if (!recovered && this.host.getNativeTrack().readyState !== 'live') {
+    // never reopen a camera the user turned off or a track that was cleaned up meanwhile
+    if (!recovered && this.mayTouchCamera(stuck) && this.host.getNativeTrack().readyState !== 'live') {
       await safeAsync(() => this.host.restoreCamera());
     }
     this.send('attempts', { recovered, results, page: pageState() });
   }
 
-  private async runArms(arms: ReturnType<typeof attemptArms>) {
+  /** Still watching the stuck camera, video still on, the SDK not recovering it, and the page in front. */
+  private mayTouchCamera(stuck: MediaStreamTrack) {
+    return this.watched === stuck && !this.host.isBusy() && document.visibilityState === 'visible';
+  }
+
+  private async runArms(stuck: MediaStreamTrack, arms: ReturnType<typeof attemptArms>) {
     const results: Record<string, unknown>[] = [];
     for (const { arm, constraints } of arms) {
-      if (this.host.isBusy() || document.visibilityState !== 'visible') {
-        results.push({ arm, skipped: 'sdk busy or page hidden' });
+      if (!this.mayTouchCamera(stuck)) {
+        results.push({ arm, skipped: 'video turned off, track replaced or page hidden' });
         break;
       }
-      const result = await this.tryArm(arm, constraints);
+      const result = await this.tryArm(stuck, arm, constraints);
       results.push(result);
       if (result.recovered) {
         return { results, recovered: true };
@@ -352,8 +368,9 @@ export class CameraFramesProbe {
     return { results, recovered: false };
   }
 
-  private async tryArm(arm: string, constraints: MediaTrackConstraints) {
+  private async tryArm(stuck: MediaStreamTrack, arm: string, constraints: MediaTrackConstraints) {
     const startedAt = Date.now();
+    const released = this.host.getNativeTrack();
     this.host.releaseCamera();
     let track: MediaStreamTrack;
     try {
@@ -362,6 +379,11 @@ export class CameraFramesProbe {
       return { arm, constraints, error: `${(error as Error)?.name}: ${(error as Error)?.message}` };
     }
     const gumMs = Date.now() - startedAt;
+    // the user may have turned video off, or the SDK swapped or cleaned up the track, while this opened
+    if (!this.mayTouchCamera(stuck) || this.host.getNativeTrack() !== released) {
+      track.stop();
+      return { arm, constraints, get_user_media_ms: gumMs, aborted: 'camera state changed during the attempt' };
+    }
     const installed = await safeAsync(() => this.host.installCameraTrack(track));
     openedCameras.push({ track, openedAt: Date.now() });
     await sleep(ATTEMPT_WINDOW_MS);
