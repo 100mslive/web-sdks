@@ -12,7 +12,8 @@ interface Case {
   };
 }
 
-// Expected values are what the SDK reported for these browsers before this parser change.
+// Expected values match what the SDK reported for these browsers before this parser change, except that
+// phone builds keep the "Mobile " prefix after the hints resolve.
 const cases: Case[] = [
   {
     name: 'macChrome',
@@ -188,7 +189,7 @@ const cases: Case[] = [
     },
     expected: {
       browser: {
-        name: 'Chrome',
+        name: 'Mobile Chrome',
         version: '130.0.6723.102',
       },
       os: {
@@ -223,7 +224,7 @@ const cases: Case[] = [
     },
     expected: {
       browser: {
-        name: 'Chrome',
+        name: 'Mobile Chrome',
         version: '130.0.6723.102',
       },
       os: {
@@ -258,7 +259,7 @@ const cases: Case[] = [
     },
     expected: {
       browser: {
-        name: 'Chrome',
+        name: 'Mobile Chrome',
         version: '130.0.6723.102',
       },
       os: {
@@ -628,6 +629,33 @@ describe('client hints user agent parsing', () => {
     const parsed = parseUserAgent(desktopMode.ua);
     const result = applyClientHints(parsed, { platform: 'Android', platformVersion: '14.0.0' });
     expect(result.os).toEqual(parsed.os);
+  });
+
+  it('keeps an embedder name when the hints list only Chromium', () => {
+    const parsed = parseUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) electron-app/1.0.0 Chrome/130.0.6723.92 Electron/33.0.2 Safari/537.36',
+    );
+    const result = applyClientHints(parsed, { fullVersionList: [{ brand: 'Chromium', version: '130.0.6723.92' }] });
+    expect(result.browser).toEqual(parsed.browser);
+    expect(result.browser.name).toBe('Electron');
+  });
+
+  it('reports a tablet from its form factor when the model is not reported', () => {
+    const parsed = parseUserAgent(cases[0].ua);
+    const result = applyClientHints(parsed, { mobile: false, model: '', formFactors: ['Tablet'] });
+    expect(result.device.type).toBe('tablet');
+  });
+
+  it('ignores hint values that name Object.prototype members', () => {
+    const parsed = parseUserAgent(cases[0].ua);
+    const result = applyClientHints(parsed, {
+      fullVersionList: [{ brand: 'constructor', version: '1.0' }],
+      formFactors: ['toString'],
+      architecture: '__proto__',
+    });
+    expect(result.browser).toEqual(parsed.browser);
+    expect(result.device.type).toBeUndefined();
+    expect(result.cpu.architecture).toBeUndefined();
   });
 
   it('does not mutate the parsed result', () => {

@@ -50,6 +50,10 @@ const CPU_ARCHITECTURES: Record<string, string> = {
   'arm/32': 'arm',
 };
 
+// Own keys only: a name such as "constructor" must not resolve to an Object.prototype member.
+const lookup = <T>(map: Record<string, T>, key = ''): T | undefined =>
+  Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+
 /** Resolves the high entropy hints, or null where the browser does not expose them (Safari, Firefox). */
 export const getClientHints = (): Promise<UAClientHints | null> => {
   const uaData = (window.navigator as Navigator & { userAgentData?: NavigatorUAData }).userAgentData;
@@ -67,8 +71,8 @@ export const parseUserAgent = (ua?: string): IResult => {
   const result = new UAParser(ua).getResult();
   const osName = result.os.name || '';
   const browserName = result.browser.name || '';
-  result.os.name = OS_NAMES[osName] || result.os.name;
-  if (MOBILE_BUILDS[browserName]?.test(result.ua)) {
+  result.os.name = lookup(OS_NAMES, osName) || result.os.name;
+  if (lookup(MOBILE_BUILDS, browserName)?.test(result.ua)) {
     result.browser.name = `Mobile ${browserName}`;
   }
   return result;
@@ -80,8 +84,14 @@ export const parseUserAgent = (ua?: string): IResult => {
  * come from the hints.
  */
 export const applyClientHints = (parsed: IResult, hints: UAClientHints): IResult => {
-  const brand = pickBrand(hints.fullVersionList);
-  const browser = brand ? { ...brand, major: brand.version.split('.')[0] } : parsed.browser;
+  const brand = pickBrand(hints.fullVersionList, parsed.browser.name);
+  const browser = brand
+    ? {
+        name: keepMobilePrefix(parsed.browser.name, brand.name),
+        version: brand.version,
+        major: brand.version.split('.')[0],
+      }
+    : parsed.browser;
   return {
     ...parsed,
     browser,
@@ -92,16 +102,24 @@ export const applyClientHints = (parsed: IResult, hints: UAClientHints): IResult
 };
 
 /** Picks the browser brand, skipping GREASE entries and Chromium when a branded browser is also listed. */
-const pickBrand = (brands: UAClientHints['fullVersionList'] = []) => {
+const pickBrand = (brands: UAClientHints['fullVersionList'] = [], parsedName = '') => {
   const real = brands.filter(({ brand }) => !GREASE_BRAND.test(brand));
-  const known = real.find(({ brand }) => BRAND_NAMES[brand]);
+  const known = real.find(({ brand }) => lookup(BRAND_NAMES, brand));
   if (known) {
     return { name: BRAND_NAMES[known.brand], version: known.version };
   }
-  // Only plain Chromium may name itself; an unknown brand keeps what the user agent string parsed to.
+  // Chromium names itself only over a Chrome-looking user agent; Electron and other embedders keep their name.
   const onlyChromium = real.length === 1 && real[0].brand === 'Chromium';
-  return onlyChromium ? { name: 'Chromium', version: real[0].version } : undefined;
+  return onlyChromium && CHROMIUM_LOOKALIKES.has(parsedName)
+    ? { name: 'Chromium', version: real[0].version }
+    : undefined;
 };
+
+const CHROMIUM_LOOKALIKES = new Set(['Chrome', 'Mobile Chrome', 'Chromium']);
+
+// The phone build stays "Mobile Chrome" after hints resolve, so the name does not change mid-session.
+const keepMobilePrefix = (parsedName = '', brandName: string) =>
+  parsedName === `Mobile ${brandName}` ? parsedName : brandName;
 
 const clientHintsOSVersion = (osName = '', { platform = osName, platformVersion }: UAClientHints) => {
   // Android in desktop mode sends a Linux user agent, so hints for a different platform are ignored.
@@ -119,18 +137,27 @@ const windowsVersion = (platformVersion: string) => {
 
 const clientHintsDevice = (device: IResult['device'], hints: UAClientHints): IResult['device'] => {
   if (!hints.model) {
-    return { ...device, type: device.type || mobileType(hints) };
+    return { ...device, type: device.type || deviceType(hints) };
   }
   const resolved = parseDeviceModel(hints);
   return {
     model: hints.model,
     // Telemetry groups unrecognised models under "Generic".
     vendor: resolved.vendor || 'Generic',
-    type: mobileType(hints) || resolved.type || device.type,
+    type: deviceType(hints) || resolved.type || device.type,
   };
 };
 
-const mobileType = ({ mobile }: UAClientHints) => (mobile ? 'mobile' : undefined);
+const FORM_FACTOR_TYPES: Record<string, string> = { Mobile: 'mobile', Tablet: 'tablet', XR: 'xr' };
+
+/** The device type the browser reports: `mobile` first, then the first recognised form factor. */
+const deviceType = ({ mobile, formFactors = [] }: UAClientHints) => {
+  if (mobile) {
+    return 'mobile';
+  }
+  const formFactor = formFactors.find(factor => lookup(FORM_FACTOR_TYPES, factor));
+  return formFactor ? lookup(FORM_FACTOR_TYPES, formFactor) : undefined;
+};
 
 /** Resolves the vendor and form factor of a model name through the user agent parser's device table. */
 const parseDeviceModel = ({ model, platformVersion = '10', mobile }: UAClientHints) => {
@@ -140,4 +167,4 @@ const parseDeviceModel = ({ model, platformVersion = '10', mobile }: UAClientHin
 };
 
 const cpuArchitecture = ({ architecture, bitness }: UAClientHints) =>
-  CPU_ARCHITECTURES[`${architecture}/${bitness === '64' ? '64' : '32'}`];
+  lookup(CPU_ARCHITECTURES, `${architecture}/${bitness === '64' ? '64' : '32'}`);

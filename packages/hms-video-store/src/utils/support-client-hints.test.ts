@@ -2,6 +2,11 @@ const setUserAgentData = (userAgentData?: { getHighEntropyValues: () => Promise<
   Object.defineProperty(navigator, 'userAgentData', { value: userAgentData, configurable: true });
 };
 
+const withoutHintsMethod = <T extends { withClientHints: unknown }>({
+  withClientHints: _withClientHints,
+  ...rest
+}: T) => rest;
+
 const loadSupport = async () => {
   let support: typeof import('./support') | undefined;
   jest.isolateModules(() => {
@@ -31,13 +36,23 @@ describe('parsedUserAgent client hints', () => {
     setUserAgentData({ getHighEntropyValues: () => Promise.reject(new Error('NotAllowedError')) });
     const { parsedUserAgent } = await loadSupport();
     const before = parsedUserAgent.getResult();
-    await expect(parsedUserAgent.withClientHints()).resolves.toBe(before);
-    expect(parsedUserAgent.getResult()).toBe(before);
+    await expect(parsedUserAgent.withClientHints()).resolves.toEqual(withoutHintsMethod(before));
+    expect(parsedUserAgent.getResult()).toEqual(before);
   });
 
   it('uses the user agent string where the browser has no client hints', async () => {
     const { parsedUserAgent } = await loadSupport();
     const before = parsedUserAgent.getResult();
-    await expect(parsedUserAgent.withClientHints()).resolves.toBe(before);
+    await expect(parsedUserAgent.withClientHints()).resolves.toEqual(withoutHintsMethod(before));
+  });
+
+  it('keeps withClientHints on getResult for callers of the ua-parser-js 2.x shape', async () => {
+    setUserAgentData({
+      getHighEntropyValues: () =>
+        Promise.resolve({ fullVersionList: [{ brand: 'Google Chrome', version: '130.0.6723.92' }] }),
+    });
+    const { parsedUserAgent } = await loadSupport();
+    const result = await parsedUserAgent.getResult().withClientHints();
+    expect(result.browser.version).toBe('130.0.6723.92');
   });
 });

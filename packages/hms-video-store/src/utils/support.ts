@@ -19,11 +19,19 @@ if (isBrowser) {
       }
       return hints ? applyClientHints(uaResult, hints) : uaResult;
     })
-    .catch(() => uaResult)
+    .catch(error => {
+      HMSLogger.w('UAParser', 'Client Hints failed, using standard UA parsing', error);
+      return uaResult;
+    })
     .then(result => (enhancedResult = result));
 }
 
 const getParserResult = (): IResult => enhancedResult || uaResult;
+
+const withClientHints = () => clientHintsPromise || Promise.resolve(getParserResult());
+
+/** The parsed user agent; `withClientHints` keeps the shape callers used with ua-parser-js 2.x. */
+export type HMSUserAgentResult = IResult & { withClientHints: () => Promise<IResult> };
 
 export const parsedUserAgent = {
   getBrowser: () => getParserResult().browser,
@@ -32,8 +40,8 @@ export const parsedUserAgent = {
   getCPU: () => getParserResult().cpu,
   getEngine: () => getParserResult().engine,
   getUA: () => getParserResult().ua,
-  getResult: getParserResult,
-  withClientHints: () => clientHintsPromise || Promise.resolve(getParserResult()),
+  getResult: (): HMSUserAgentResult => ({ ...getParserResult(), withClientHints }),
+  withClientHints,
 };
 
 export const isNode =

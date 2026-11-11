@@ -34,21 +34,24 @@ const EXCEPTIONS = {
 
 const readJSON = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 
-const publishedPackages = () =>
-  fs
-    .readdirSync(path.join(ROOT, 'packages'))
-    .map(dir => path.join(ROOT, 'packages', dir))
-    .filter(dir => fs.existsSync(path.join(dir, 'package.json')))
-    .filter(dir => !readJSON(path.join(dir, 'package.json')).private);
+const workspacePackages = fs
+  .readdirSync(path.join(ROOT, 'packages'))
+  .map(dir => path.join(ROOT, 'packages', dir))
+  .filter(dir => fs.existsSync(path.join(dir, 'package.json')));
 
-/** Node's lookup: the nearest node_modules/<name> walking up from the requiring package. */
+const publishedPackages = () => workspacePackages.filter(dir => !readJSON(path.join(dir, 'package.json')).private);
+
+// Real paths, since node_modules links each workspace package to its folder.
+const workspaceDirs = new Set(workspacePackages.map(dir => fs.realpathSync(dir)));
+
+/** Node's lookup: the nearest node_modules/<name> walking up from the requiring package, stopping at the repo root. */
 const resolvePackageDir = (name, fromDir) => {
   for (let dir = fromDir; ; dir = path.dirname(dir)) {
     const candidate = path.join(dir, 'node_modules', name, 'package.json');
     if (fs.existsSync(candidate)) {
       return path.dirname(fs.realpathSync(candidate));
     }
-    if (dir === path.dirname(dir)) {
+    if (dir === ROOT || dir === path.dirname(dir)) {
       return null;
     }
   }
@@ -80,9 +83,8 @@ const runtimeDependencies = pkg => ({
   ...pkg.peerDependencies,
 });
 
-// Workspace packages are ours and published under the repository license.
-const isViolation = (dir, pkg, id) =>
-  !dir.startsWith(path.join(ROOT, 'packages')) && !isAllowed(licenseOf(pkg)) && !EXCEPTIONS[id];
+// Workspace packages are ours and published under the repository license; their own node_modules are not.
+const isViolation = (dir, pkg, id) => !workspaceDirs.has(dir) && !isAllowed(licenseOf(pkg)) && !EXCEPTIONS[id];
 
 const isOptionalPeer = (pkg, name) => Boolean(pkg.peerDependenciesMeta?.[name]?.optional);
 
