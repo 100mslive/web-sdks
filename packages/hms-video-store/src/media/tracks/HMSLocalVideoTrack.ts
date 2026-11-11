@@ -1,4 +1,5 @@
 import isEqual from 'lodash.isequal';
+import { CameraFramesProbe, CameraProbeHost } from './CameraFramesProbe';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
@@ -55,6 +56,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /** the visibilitychange handler is only attached on mobile, see the constructor */
   private recoversOnForeground = false;
   private permissionState?: PermissionState;
+  /** temporary diagnostics for a camera that delivers no frames */
+  private framesProbe?: CameraFramesProbe;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -106,6 +109,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.recoversOnForeground = isBrowser && source === 'regular' && isMobileOrTablet();
     if (this.recoversOnForeground) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+    this.startFramesProbe(track);
+  }
+
+  private startFramesProbe(track: MediaStreamTrack) {
+    if (this.source !== 'regular') {
+      return;
+    }
+    this.framesProbe = new CameraFramesProbe(this.probeHost);
+    if (!isEmptyTrack(track)) {
+      this.framesProbe.watch(track, 'create');
     }
   }
 
@@ -304,6 +318,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @internal
    */
   async cleanup() {
+    this.framesProbe?.stop();
     this.eventBus.localAudioUnmutedNatively.unsubscribe(this.handleTrackUnmute);
     this.removeTrackEventListeners(this.nativeTrack);
     // Stopping the plugin before cleaning the track is more predictable when dealing with 3rd party plugins
@@ -427,6 +442,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const newTrack = await getVideoTrack(settings);
       this.addTrackEventListeners(newTrack);
+      this.framesProbe?.watch(newTrack, 'reacquire');
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
@@ -458,6 +474,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // Generate a new track from previous settings so there won't be blank tile because previous track is stopped
       const track = await getVideoTrack(this.settings);
       this.addTrackEventListeners(track);
+      this.framesProbe?.watch(track, 'reacquire-fallback');
       // Send analytics event with constraints and resulting track settings
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.mediaConstraints({
@@ -623,6 +640,37 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
       }
     });
+  };
+
+  private probeHost: CameraProbeHost = {
+    publish: event => this.eventBus.analytics.publish(event),
+    getNativeTrack: () => this.nativeTrack,
+    getSender: () => this.transceiver?.sender,
+    getSinks: () => this.videoHandler.getVideoElements(),
+    getRequestedConstraints: () => this.settings.toConstraints(),
+    getState: () => ({
+      enabled: this.enabled,
+      is_published: this.isPublished,
+      interrupted: this.interrupted,
+      recovering: Boolean(this.recovery),
+      plugins: this.pluginsManager.getPlugins().length,
+      stream_plugins: this.mediaStreamPluginsManager.getPlugins().length,
+      processed_track: Boolean(this.processedTrack),
+      transceiver_direction: this.transceiver?.direction,
+    }),
+    isBusy: () => !this.enabled || this.interrupted || Boolean(this.recovery),
+    releaseCamera: () => {
+      this.removeTrackEventListeners(this.nativeTrack);
+      this.nativeTrack.stop();
+    },
+    installCameraTrack: async track => {
+      this.addTrackEventListeners(track);
+      await this.replaceSender(track, this.enabled);
+      this.nativeTrack = track;
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
+    },
+    restoreCamera: () => this.setEnabled(true, true, 'camera-probe-restore'),
   };
 
   private sendInterruptionAnalytics({ started, reason }: { started: boolean; reason: string }) {
