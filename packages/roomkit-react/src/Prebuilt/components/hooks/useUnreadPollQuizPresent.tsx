@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { selectLocalPeerID } from '@100mslive/hms-video-store';
-import { HMSNotificationTypes, useHMSNotifications, useHMSStore } from '@100mslive/react-sdk';
+import { HMSNotificationTypes, selectLocalPeerID, useHMSNotifications, useHMSStore } from '@100mslive/react-sdk';
 
 export const useUnreadPollQuizPresent = () => {
   const localPeerID = useHMSStore(selectLocalPeerID);

@@ -1,4 +1,4 @@
-import { HMSVideoTrack } from '@100mslive/hms-video-store';
+import { HMSVideoTrack } from '@100mslive/react-sdk';
 
 let counter = 100;
 

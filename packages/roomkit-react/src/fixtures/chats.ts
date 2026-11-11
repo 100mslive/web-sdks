@@ -1,4 +1,4 @@
-import { HMSMessage, HMSMessageType } from '@100mslive/hms-video-store';
+import { HMSMessage, HMSMessageType } from '@100mslive/react-sdk';
 
 let counter = 1;
 export const makeFakeMessage = (msg: string, sender: string): HMSMessage => {
