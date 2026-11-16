@@ -13,7 +13,7 @@ export const operatingSystemIconInfo = {
     val: 'Tizen',
     icon: `${CMS_MEDIA_SERVER}cms/Tizen_b99350214e/Tizen_b99350214e.svg`,
   },
-  'mac os': {
+  macos: {
     key: 'macos',
     val: 'Mac OS',
     icon: `${CMS_MEDIA_SERVER}cms/mac_OS_804456afd8/mac_OS_804456afd8.png`,

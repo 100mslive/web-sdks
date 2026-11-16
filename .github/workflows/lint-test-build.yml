@@ -20,6 +20,9 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
+      - name: Check dependency licenses
+        run: node scripts/check-licenses.js
+
       - name: Test
         run: yarn test
 

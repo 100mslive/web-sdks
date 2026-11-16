@@ -39,7 +39,7 @@ import {
   WhiteBoardPluginPermissions,
 } from '../../notification-manager';
 import HMSLogger from '../../utils/logger';
-import { ENV } from '../../utils/support';
+import { ENV, parsedUserAgent } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
@@ -64,8 +64,17 @@ class Store {
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
+  private frameworkInfo?: HMSFrameworkInfo;
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
+
+  constructor() {
+    // Client hints resolve after construction and carry the real OS version, model and browser version.
+    parsedUserAgent
+      .withClientHints()
+      .then(() => (this.userAgent = createUserAgent(this.env, this.frameworkInfo)))
+      .catch(error => HMSLogger.w('Store', 'user agent refresh with client hints failed', error));
+  }
 
   getConfig() {
     return this.config;
@@ -214,6 +223,7 @@ class Store {
   }
 
   createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
+    this.frameworkInfo = frameworkInfo;
     this.userAgent = createUserAgent(this.env, frameworkInfo);
   }
 
