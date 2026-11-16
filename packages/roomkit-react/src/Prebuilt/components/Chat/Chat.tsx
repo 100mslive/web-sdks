@@ -1,9 +1,15 @@
 import React, { MutableRefObject, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
-import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
 import { match } from 'ts-pattern';
-import { selectHMSMessagesCount, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  selectHMSMessagesCount,
+  selectSessionStore,
+  selectUnreadHMSMessagesCount,
+  useHMSActions,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';

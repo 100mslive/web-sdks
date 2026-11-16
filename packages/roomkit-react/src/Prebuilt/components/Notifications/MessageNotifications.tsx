@@ -1,6 +1,11 @@
 import { useEffect } from 'react';
-import { HMSNotificationTypes, selectIsLocalScreenShared } from '@100mslive/hms-video-store';
-import { useAwayNotifications, useHMSNotifications, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSNotificationTypes,
+  selectIsLocalScreenShared,
+  useAwayNotifications,
+  useHMSNotifications,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { usePIPWindow } from '../PIP/usePIPWindow';
 

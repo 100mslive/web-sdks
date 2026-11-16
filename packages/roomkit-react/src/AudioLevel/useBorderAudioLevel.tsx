@@ -1,6 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { HMSTrackID } from '@100mslive/hms-video-store';
-import { useAudioLevelStyles } from '@100mslive/react-sdk';
+import { HMSTrackID, useAudioLevelStyles } from '@100mslive/react-sdk';
 import { useTheme } from '../Theme';
 
 /**

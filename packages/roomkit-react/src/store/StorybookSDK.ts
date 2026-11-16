@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { HMSFrameworkInfo } from '@100mslive/hms-video-store';
 import {
   HMSActions,
   HMSAudioTrackSettings,
   HMSConfig,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPeer,
   HMSPreferredSimulcastLayer,
