@@ -7,6 +7,16 @@ export interface AuthToken {
   role: string;
 }
 
+/**
+ * JWT segments are base64url encoded and their text is UTF-8, while atob only understands
+ * standard base64 and returns a binary string.
+ */
+function decodeBase64Url(segment: string): string {
+  const binary = atob(segment.replace(/-/g, '+').replace(/_/g, '/'));
+  const percentEncoded = Array.from(binary, character => `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`);
+  return decodeURIComponent(percentEncoded.join(''));
+}
+
 export default function decodeJWT(token?: string): AuthToken {
   if (!token || token.length === 0) {
     throw ErrorFactory.APIErrors.InvalidTokenFormat(
@@ -23,9 +33,8 @@ export default function decodeJWT(token?: string): AuthToken {
     );
   }
 
-  const payloadStr = atob(parts[1]);
   try {
-    const payload = JSON.parse(payloadStr);
+    const payload = JSON.parse(decodeBase64Url(parts[1]));
     return {
       roomId: payload.room_id,
       userId: payload.user_id,
